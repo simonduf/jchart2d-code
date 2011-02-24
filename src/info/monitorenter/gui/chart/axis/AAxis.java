@@ -1,21 +1,21 @@
 /*
  *  AAxis.java (bold as love), base class for an axis  of the Chart2D.
- *  Copyright (C) Achim Westermann, created on 21.03.2005, 16:41:06
+ *  Copyright (C) 2007 -2011 Achim Westermann, created on 20:33:13.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
  *  License as published by the Free Software Foundation; either
  *  version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU Lesser General Public
  *  License along with this library; if not, write to the Free Software
  *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
+ *  
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
  *
@@ -34,9 +34,10 @@ import info.monitorenter.gui.chart.LabeledValue;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterAutoUnits;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyUnbounded;
-import info.monitorenter.util.MathUtil;
+import info.monitorenter.util.ExceptionUtil;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.StringUtil;
+import info.monitorenter.util.math.MathUtil;
 
 import java.awt.Dimension;
 import java.awt.FontMetrics;
@@ -66,7 +67,7 @@ import java.util.TreeSet;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.55 $
+ * @version $Revision: 1.61 $
  */
 public abstract class AAxis implements IAxis, PropertyChangeListener {
 
@@ -332,7 +333,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * <p>
    * 
    * @author Achim Westermann
-   * @version $Revision: 1.55 $
+   * @version $Revision: 1.61 $
    * @since 3.0.0
    */
   private abstract static class APropertyChangeReactorSynced implements
@@ -351,13 +352,13 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      *      info.monitorenter.gui.chart.axis.AAxis)
      */
     public final void propertyChange(final PropertyChangeEvent changeEvent, final AAxis receiver) {
-      Chart2D chart = receiver.getAccessor().getChart();
+      final Chart2D chart = receiver.getAccessor().getChart();
       synchronized (chart) {
         if (Chart2D.DEBUG_THREADING) {
           System.out.println("AAxis.propertyChange (" + Thread.currentThread().getName()
               + "), 1 lock");
         }
-        boolean repaint = this.propertyChangeSynced(changeEvent, receiver);
+        final boolean repaint = this.propertyChangeSynced(changeEvent, receiver);
         if (repaint) {
           chart.setRequestedRepaint(true);
         }
@@ -394,11 +395,11 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * Internal encapsulation of the code to react upon a property change.
    * <p>
    * Used on the value side of a map to have a fast dispatch to the code to
-   * react.
+   * react as axis listens to a lot of different properties.
    * <p>
    * 
    * @author Achim Westermann
-   * @version $Revision: 1.55 $
+   * @version $Revision: 1.61 $
    * @since 3.0.0
    */
   private static interface IPropertyChangeReactor {
@@ -429,7 +430,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * <p>
    * 
    * @author Achim Westermann
-   * @version $Revision: 1.55 $
+   * @version $Revision: 1.61 $
    * @since 3.0.0
    */
   private static final class PropertyChangeRepainter implements AAxis.IPropertyChangeReactor {
@@ -447,10 +448,10 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      *      info.monitorenter.gui.chart.axis.AAxis)
      */
     public void propertyChange(final PropertyChangeEvent changeEvent, final AAxis receiver) {
-      AChart2DDataAccessor accessor = receiver.getAccessor();
+      final AChart2DDataAccessor accessor = receiver.getAccessor();
       // only if this axis is already connected to a chart:
       if (accessor != null) {
-        Chart2D parent = accessor.getChart();
+        final Chart2D parent = accessor.getChart();
         if (parent != null) {
           parent.setRequestedRepaint(true);
         }
@@ -495,7 +496,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      */
     @Override
     public int getHeight(final Graphics g2d) {
-      FontMetrics fontdim = g2d.getFontMetrics();
+      final FontMetrics fontdim = g2d.getFontMetrics();
       // the height of the font:
       int height = fontdim.getHeight();
       // and the height of a major tick mark:
@@ -511,14 +512,14 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     @Override
     protected final double getMaximumPixelForLabel(final Graphics g2d) {
 
-      FontMetrics fontdim = g2d.getFontMetrics();
-      int fontwidth = fontdim.charWidth('0');
+      final FontMetrics fontdim = g2d.getFontMetrics();
+      final int fontwidth = fontdim.charWidth('0');
       /*
        * multiply with longest possible number. longest possible number is the
        * non-fraction part of the highest number plus the maximum amount of
        * fraction digits plus one for the fraction separator dot.
        */
-      int len = AAxis.this.getFormatter().getMaxAmountChars();
+      final int len = AAxis.this.getFormatter().getMaxAmountChars();
       return fontwidth * (len + 2);
     }
 
@@ -537,8 +538,8 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     protected final double getMinimumValueDistanceForLabels(final Graphics g2d) {
 
       double result;
-      Dimension d = this.m_chart.getSize();
-      int pxrange = (int) d.getWidth() - 60;
+      final Dimension d = this.m_chart.getSize();
+      final int pxrange = (int) d.getWidth() - 60;
       if (pxrange <= 0) {
         result = 1;
       } else {
@@ -546,7 +547,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
         if (valuerange == 0) {
           valuerange = 10;
         }
-        double pxToValue = valuerange / pxrange;
+        final double pxToValue = valuerange / pxrange;
         result = pxToValue * this.getMaximumPixelForLabel(g2d);
       }
       return result;
@@ -582,13 +583,13 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     @Override
     protected final double getValueDistanceForPixel(final int pixel) {
       double result;
-      Dimension d = this.m_chart.getSize();
-      int pxrangex = (int) d.getWidth() - 60;
+      final Dimension d = this.m_chart.getSize();
+      final int pxrangex = (int) d.getWidth() - 60;
       if (pxrangex <= 0) {
         result = -1d;
       } else {
-        double valuerangex = AAxis.this.getMax() - AAxis.this.getMin();
-        double pxToValue = valuerangex / pxrangex;
+        final double valuerangex = AAxis.this.getMax() - AAxis.this.getMin();
+        final double pxToValue = valuerangex / pxrangex;
         result = pxToValue * pixel;
       }
       return result;
@@ -599,10 +600,10 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      */
     @Override
     public int getWidth(final Graphics g2d) {
-      FontMetrics fontdim = g2d.getFontMetrics();
+      final FontMetrics fontdim = g2d.getFontMetrics();
       // only the space required for the right side label:
-      int fontwidth = fontdim.charWidth('0');
-      int rightSideOverhang = (AAxis.this.getFormatter().getMaxAmountChars()) * fontwidth;
+      final int fontwidth = fontdim.charWidth('0');
+      final int rightSideOverhang = (AAxis.this.getFormatter().getMaxAmountChars()) * fontwidth;
 
       return rightSideOverhang;
     }
@@ -620,7 +621,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
         ITracePoint2D point;
         while (itPoints.hasNext()) {
           point = itPoints.next();
-          double absolute = point.getX();
+          final double absolute = point.getX();
           double result = (absolute - range.getMin()) / scaler;
           if (!MathUtil.isDouble(result)) {
             result = 0;
@@ -657,12 +658,12 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     public double translatePxToValue(final int pixel) {
       double result = 0;
       // relate to the offset:
-      double px = pixel - this.m_chart.getXChartStart();
+      final double px = pixel - this.m_chart.getXChartStart();
 
-      int rangeX = this.m_chart.getXChartEnd() - this.m_chart.getXChartStart();
+      final int rangeX = this.m_chart.getXChartEnd() - this.m_chart.getXChartStart();
       if (rangeX != 0) {
-        double scaledX = px / rangeX;
-        Range valueRangeX = AAxis.this.getRange();
+        final double scaledX = px / rangeX;
+        final Range valueRangeX = AAxis.this.getRange();
         result = scaledX * valueRangeX.getExtent() + valueRangeX.getMin();
       }
       return result;
@@ -678,18 +679,29 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
       double valueNormalized;
       // cannot use AAxis.this.getMax() / getMin() because log axis will
       // transform those values!
-      Range valueRange = AAxis.this.getRange();
+      final Range valueRange = AAxis.this.getRange();
       valueNormalized = (value - valueRange.getMin()) / valueRange.getExtent();
       // now expand into the pixel space:
-      int rangeX = this.getPixelRange();
+      final int rangeX = this.getPixelRange();
       if (rangeX == 0) {
         // return null
       } else {
-        double tmpResult = (valueNormalized * rangeX + this.m_chart.getXChartStart());
+        final double tmpResult = (valueNormalized * rangeX + this.m_chart.getXChartStart());
         result = (int) Math.round(tmpResult);
       }
       return result;
     }
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#getDimensionString()
+   */
+  public String getDimensionString() {
+    String result = null;
+    if (this.m_accessor != null) {
+      result = this.m_accessor.toString();
+    }
+    return result;
   }
 
   /**
@@ -729,7 +741,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      */
     @Override
     public final int getHeight(final Graphics g2d) {
-      FontMetrics fontdim = g2d.getFontMetrics();
+      final FontMetrics fontdim = g2d.getFontMetrics();
       // only the space required for the right side label:
       int fontHeight = fontdim.getHeight();
       // -4 is for showing colons of x - labels that are below the baseline
@@ -746,8 +758,8 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     @Override
     protected final double getMaximumPixelForLabel(final Graphics g2d) {
 
-      FontMetrics fontdim = g2d.getFontMetrics();
-      int fontheight = fontdim.getHeight();
+      final FontMetrics fontdim = g2d.getFontMetrics();
+      final int fontheight = fontdim.getHeight();
       return fontheight + 10;
     }
 
@@ -766,8 +778,8 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     protected final double getMinimumValueDistanceForLabels(final Graphics g2d) {
 
       double result;
-      Dimension d = this.m_chart.getSize();
-      int pxrange = (int) d.getHeight() - 40;
+      final Dimension d = this.m_chart.getSize();
+      final int pxrange = (int) d.getHeight() - 40;
       if (pxrange <= 0) {
         result = 1;
       } else {
@@ -775,7 +787,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
         if (valuerange == 0) {
           valuerange = 10;
         }
-        double pxToValue = valuerange / pxrange;
+        final double pxToValue = valuerange / pxrange;
         result = pxToValue * this.getMaximumPixelForLabel(g2d);
       }
       return result;
@@ -811,13 +823,13 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     @Override
     protected final double getValueDistanceForPixel(final int pixel) {
       double result;
-      Dimension d = this.m_chart.getSize();
-      int pxrangey = (int) d.getHeight() - 40;
+      final Dimension d = this.m_chart.getSize();
+      final int pxrangey = (int) d.getHeight() - 40;
       if (pxrangey <= 0) {
         result = -1d;
       } else {
-        double valuerangey = AAxis.this.getMaxValue() - AAxis.this.getMinValue();
-        double pxToValue = valuerangey / pxrangey;
+        final double valuerangey = AAxis.this.getMaxValue() - AAxis.this.getMinValue();
+        final double pxToValue = valuerangey / pxrangey;
         result = pxToValue * pixel;
       }
       return result;
@@ -828,9 +840,9 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      */
     @Override
     public final int getWidth(final Graphics g2d) {
-      FontMetrics fontdim = g2d.getFontMetrics();
+      final FontMetrics fontdim = g2d.getFontMetrics();
       // the width of the font:
-      int fontWidth = fontdim.charWidth('0');
+      final int fontWidth = fontdim.charWidth('0');
       // times the maximum amount of chars:
       int height = fontWidth * AAxis.this.getFormatter().getMaxAmountChars();
       // and the height of a major tick mark:
@@ -848,12 +860,12 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     @Override
     protected void scaleTrace(final ITrace2D trace, final Range range) {
       if (trace.isVisible()) {
-        double scaler = range.getExtent();
-        Iterator<ITracePoint2D> itPoints = trace.iterator();
+        final double scaler = range.getExtent();
+        final Iterator<ITracePoint2D> itPoints = trace.iterator();
         ITracePoint2D point;
         while (itPoints.hasNext()) {
           point = itPoints.next();
-          double absolute = point.getY();
+          final double absolute = point.getY();
           double result = (absolute - range.getMin()) / scaler;
           if (!MathUtil.isDouble(result)) {
             result = 0;
@@ -891,12 +903,12 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     public double translatePxToValue(final int pixel) {
       double result = 0;
       // invert, as awt px are higher the lower the chart value is:
-      double px = this.m_chart.getYChartStart() - pixel;
+      final double px = this.m_chart.getYChartStart() - pixel;
 
-      int rangeY = this.m_chart.getYChartStart() - this.m_chart.getYChartEnd();
+      final int rangeY = this.m_chart.getYChartStart() - this.m_chart.getYChartEnd();
       if (rangeY != 0) {
-        double scaledY = px / rangeY;
-        Range valueRangeY = AAxis.this.getRange();
+        final double scaledY = px / rangeY;
+        final Range valueRangeY = AAxis.this.getRange();
         result = scaledY * valueRangeY.getExtent() + valueRangeY.getMin();
       }
       return result;
@@ -912,10 +924,10 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
       double valueNormalized;
       // cannot use AAxis.this.getMax() / getMin() because log axis will
       // transform those values!
-      Range valueRange = AAxis.this.getRange();
+      final Range valueRange = AAxis.this.getRange();
       valueNormalized = (value - valueRange.getMin()) / valueRange.getExtent();
       // now expand into the pixel space:
-      int rangeY = this.getPixelRange();
+      final int rangeY = this.getPixelRange();
       if (rangeY == 0) {
         // return null
       } else {
@@ -926,30 +938,237 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
 
   }
 
+  /** Debugging flag for sysouts. */
+  private static final boolean DEBUG = false;
+
+  /**
+   * Internal fast access to the right property change code encapsulation via
+   * the property name.
+   * <p>
+   * This is done for better performance - an old endless
+   * <code>..else if(propertyName.equals(..))..</code> has been replaced by
+   * this.
+   * <p>
+   */
+  private static SortedMap<String, AAxis.IPropertyChangeReactor> propertyReactors;
+
   /** Generated <code>serialVersionUID</code>. **/
   private static final long serialVersionUID = -3615740476406530580L;
 
-  /**
-   * Flag to detect if a re-scaling has to be done.
-   * <p>
-   * It is set to false in <code>{@link #scale()}</code> which is triggered from
-   * the painting Thread. Whenever a bound change is detected in
-   * <code>{@link #propertyChange(PropertyChangeEvent)}</code> this is set to
-   * true.
-   * <p>
-   * Please remind: In previous versions there was only a test if the bounds had
-   * changed since the last scaling. This was not always correct: If in between
-   * two paint cycles the bounds were changed and new points added but at the
-   * point in time when the 2nd paint cycle starts the bounds would be equal no
-   * full rescaling would be performed even if the added points would have been
-   * scaled in relation to the changed bounds at their adding time: Bounds
-   * checks are not sufficient!
-   * <p>
-   */
-  protected boolean m_needsFullRescale = false;
+  static {
+    AAxis.propertyReactors = new TreeMap<String, AAxis.IPropertyChangeReactor>();
+    // Don't waste the heap for stateless code:
+    final IPropertyChangeReactor repaintReactor = new PropertyChangeRepainter();
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_STROKE, repaintReactor);
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_STROKE, repaintReactor);
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_PAINTERS, repaintReactor);
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_COLOR, repaintReactor);
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_NAME, repaintReactor);
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_ERRORBARPOLICY, repaintReactor);
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_ERRORBARPOLICY_CONFIGURATION, repaintReactor);
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_ZINDEX, repaintReactor);
+    AAxis.propertyReactors.put(IAxis.PROPERTY_LABELFORMATTER, repaintReactor);
+    AAxis.propertyReactors.put(IAxisLabelFormatter.PROPERTY_FORMATCHANGE, repaintReactor);
+    AAxis.propertyReactors.put(IAxis.AxisTitle.PROPERTY_TITLEFONT, repaintReactor);
+    AAxis.propertyReactors.put(IAxis.AxisTitle.PROPERTY_TITLE, repaintReactor);
+    AAxis.propertyReactors.put(IAxis.AxisTitle.PROPERTY_TITLEPAINTER, repaintReactor);
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_MAX_X, new APropertyChangeReactorSynced() {
 
-  /** Debugging flag for sysouts. */
-  private static final boolean DEBUG = false;
+      /**
+       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
+       *      info.monitorenter.gui.chart.axis.AAxis)
+       */
+      @Override
+      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
+          final AAxis receiver) {
+        boolean result = false;
+        if (Chart2D.DEBUG_SCALING) {
+          System.out.println("pc-Xmax");
+        }
+        final AChart2DDataAccessor accessor = receiver.getAccessor();
+        // only care if axis works in x dimension:
+        if (accessor.getDimension() == Chart2D.X) {
+          final double value = ((Double) changeEvent.getNewValue()).doubleValue();
+          if (value > receiver.m_max) {
+            final ITrace2D trace = (ITrace2D) changeEvent.getSource();
+            if (trace.isVisible()) {
+              receiver.m_max = value;
+              receiver.m_needsFullRescale = true;
+              result = true;
+            }
+          } else if (value < receiver.m_max) {
+            receiver.m_max = receiver.findMax();
+            receiver.m_needsFullRescale = true;
+            result = true;
+          }
+        }
+        return result;
+      }
+
+    });
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_MIN_X, new APropertyChangeReactorSynced() {
+
+      /**
+       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
+       *      info.monitorenter.gui.chart.axis.AAxis)
+       */
+      @Override
+      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
+          final AAxis receiver) {
+        boolean result = false;
+        if (Chart2D.DEBUG_SCALING) {
+          System.out.println("pc-Xmin");
+        }
+        if (receiver.getAccessor().getDimension() == Chart2D.X) {
+          final double value = ((Double) changeEvent.getNewValue()).doubleValue();
+          if (value < receiver.m_min) {
+            final ITrace2D trace = (ITrace2D) changeEvent.getSource();
+            if (trace.isVisible()) {
+              receiver.m_min = value;
+              receiver.m_needsFullRescale = true;
+              result = true;
+            }
+          } else if (value > receiver.m_min) {
+            receiver.m_min = receiver.findMin();
+            receiver.m_needsFullRescale = true;
+            result = true;
+          }
+        }
+        return result;
+      }
+
+    });
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_MAX_Y, new APropertyChangeReactorSynced() {
+
+      /**
+       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
+       *      info.monitorenter.gui.chart.axis.AAxis)
+       */
+      @Override
+      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
+          final AAxis receiver) {
+        boolean result = false;
+        if (Chart2D.DEBUG_SCALING) {
+          System.out.println("pc-Ymax");
+        }
+        // only care if axis works in y dimension:
+        if (receiver.getAccessor().getDimension() == Chart2D.Y) {
+          final double value = ((Double) changeEvent.getNewValue()).doubleValue();
+          if (value > receiver.m_max) {
+            final ITrace2D trace = (ITrace2D) changeEvent.getSource();
+            if (trace.isVisible()) {
+              receiver.m_max = value;
+              receiver.m_needsFullRescale = true;
+              result = true;
+            }
+          } else if (value < receiver.m_max) {
+            receiver.m_max = receiver.findMax();
+            receiver.m_needsFullRescale = true;
+            result = true;
+          }
+        }
+        return result;
+      }
+    });
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_MIN_Y, new APropertyChangeReactorSynced() {
+
+      /**
+       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
+       *      info.monitorenter.gui.chart.axis.AAxis)
+       */
+      @Override
+      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
+          final AAxis receiver) {
+        boolean result = false;
+        if (Chart2D.DEBUG_SCALING) {
+          System.out.println("pc-Ymin");
+        }
+        if (receiver.getAccessor().getDimension() == Chart2D.Y) {
+
+          final double value = ((Double) changeEvent.getNewValue()).doubleValue();
+          if (value < receiver.m_min) {
+            final ITrace2D trace = (ITrace2D) changeEvent.getSource();
+            if (trace.isVisible()) {
+              receiver.m_min = value;
+              receiver.m_needsFullRescale = true;
+              result = true;
+            }
+          } else if (value > receiver.m_min) {
+            receiver.m_min = receiver.findMin();
+            receiver.m_needsFullRescale = true;
+            result = true;
+          }
+        }
+        return result;
+      }
+    });
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_TRACEPOINT, new APropertyChangeReactorSynced() {
+
+      /**
+       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
+       *      info.monitorenter.gui.chart.axis.AAxis)
+       */
+      @Override
+      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
+          final AAxis receiver) {
+        boolean result = false;
+        // now points added or removed -> rescale!
+        if (Chart2D.DEBUG_SCALING) {
+          System.out.println("pc-tp");
+        }
+        final ITracePoint2D oldPt = (ITracePoint2D) changeEvent.getOldValue();
+        final ITracePoint2D newPt = (ITracePoint2D) changeEvent.getNewValue();
+        // added or removed?
+        // we only care about added points (rescaling is our task)
+        if (oldPt == null) {
+          receiver.scalePoint(newPt);
+          result = true;
+        }
+        return result;
+      }
+    });
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_VISIBLE, new APropertyChangeReactorSynced() {
+
+      /**
+       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
+       *      info.monitorenter.gui.chart.axis.AAxis)
+       */
+      @Override
+      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
+          final AAxis receiver) {
+        boolean result = false;
+        // invisible traces don't count for max and min, so
+        // expensive search has to be started here:
+        // TODO: Do performance: Get the trace of the event and check only
+        // it's bounds here!!!
+        receiver.m_max = receiver.findMax();
+        receiver.m_min = receiver.findMin();
+        // if the trace that became visible does not exceed bounds
+        // it will not cause a "dirty Scaling" -> updateScaling and
+        // repainting (in Painter Thread).
+        final ITrace2D trace = (ITrace2D) changeEvent.getSource();
+        receiver.scaleTrace(trace);
+        result = true;
+        return result;
+      }
+    });
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_POINT_CHANGED, new APropertyChangeReactorSynced() {
+
+      /**
+       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
+       *      info.monitorenter.gui.chart.axis.AAxis)
+       */
+      @Override
+      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
+          final AAxis receiver) {
+        boolean result = false;
+        final ITracePoint2D changed = (ITracePoint2D) changeEvent.getNewValue();
+        receiver.scalePoint(changed);
+        result = true;
+        return result;
+      }
+    });
+  }
 
   /**
    * The accessor to the Chart2D.
@@ -997,6 +1216,25 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    */
   protected double m_minorTickSpacing = 1;
 
+  /**
+   * Flag to detect if a re-scaling has to be done.
+   * <p>
+   * It is set to false in <code>{@link #scale()}</code> which is triggered from
+   * the painting Thread. Whenever a bound change is detected in
+   * <code>{@link #propertyChange(PropertyChangeEvent)}</code> this is set to
+   * true.
+   * <p>
+   * Please remind: In previous versions there was only a test if the bounds had
+   * changed since the last scaling. This was not always correct: If in between
+   * two paint cycles the bounds were changed and new points added but at the
+   * point in time when the 2nd paint cycle starts the bounds would be equal no
+   * full rescaling would be performed even if the added points would have been
+   * scaled in relation to the changed bounds at their adding time: Bounds
+   * checks are not sufficient!
+   * <p>
+   */
+  protected boolean m_needsFullRescale = false;
+
   /** Boolean switch for painting x grid lines. * */
   private boolean m_paintGrid = false;
 
@@ -1021,7 +1259,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   protected double m_power;
 
   /** Support for acting as a property change event producer for listeners. */
-  private PropertyChangeSupport m_propertyChangeSupport;
+  private final PropertyChangeSupport m_propertyChangeSupport;
 
   /**
    * A plugable range policy.
@@ -1034,10 +1272,10 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * This is used for detection of dirty scaling.
    * <p>
    */
-  private Range m_rangePreviousScaling = new Range(0, 0);
+  private final Range m_rangePreviousScaling = new Range(0, 0);
 
   /** Reused range for <code>{@link #getRange()}</code>. */
-  private Range m_reusedRange = new Range(0, 0);
+  private final Range m_reusedRange = new Range(0, 0);
 
   /**
    * Controls whether scale values are started from major ticks.
@@ -1052,238 +1290,12 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * <code>ITrace2d</code> instances to paint with z-index ordering based on
    * <code>{@link ITrace2D#getZIndex()}</code>.
    */
-  private TreeSet<ITrace2D> m_traces = new TreeSet<ITrace2D>();
+  private final TreeSet<ITrace2D> m_traces = new TreeSet<ITrace2D>();
 
   /**
    * True if this axis is to be painted on a chart; false to hide.
    */
   private boolean m_visible = true;
-
-  /**
-   * Internal fast access to the right property change code encapsulation via
-   * the property name.
-   * <p>
-   * This is done for better performance - an old endless
-   * <code>..else if(propertyName.equals(..))..</code> has been replaced by
-   * this.
-   * <p>
-   */
-  private static SortedMap<String, AAxis.IPropertyChangeReactor> propertyReactors;
-
-  static {
-    AAxis.propertyReactors = new TreeMap<String, AAxis.IPropertyChangeReactor>();
-    // Don't waste the heap for stateless code:
-    IPropertyChangeReactor repaintReactor = new PropertyChangeRepainter();
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_STROKE, repaintReactor);
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_STROKE, repaintReactor);
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_PAINTERS, repaintReactor);
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_COLOR, repaintReactor);
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_NAME, repaintReactor);
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_ERRORBARPOLICY, repaintReactor);
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_ERRORBARPOLICY_CONFIGURATION, repaintReactor);
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_ZINDEX, repaintReactor);
-    AAxis.propertyReactors.put(IAxis.PROPERTY_LABELFORMATTER, repaintReactor);
-    AAxis.propertyReactors.put(IAxisLabelFormatter.PROPERTY_FORMATCHANGE, repaintReactor);
-    AAxis.propertyReactors.put(IAxis.AxisTitle.PROPERTY_TITLEFONT, repaintReactor);
-    AAxis.propertyReactors.put(IAxis.AxisTitle.PROPERTY_TITLE, repaintReactor);
-    AAxis.propertyReactors.put(IAxis.AxisTitle.PROPERTY_TITLEPAINTER, repaintReactor);
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_MAX_X, new APropertyChangeReactorSynced() {
-
-      /**
-       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
-       *      info.monitorenter.gui.chart.axis.AAxis)
-       */
-      @Override
-      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
-          final AAxis receiver) {
-        boolean result = false;
-        if (Chart2D.DEBUG_SCALING) {
-          System.out.println("pc-Xmax");
-        }
-        AChart2DDataAccessor accessor = receiver.getAccessor();
-        // only care if axis works in x dimension:
-        if (accessor.getDimension() == Chart2D.X) {
-          double value = ((Double) changeEvent.getNewValue()).doubleValue();
-          if (value > receiver.m_max) {
-            ITrace2D trace = (ITrace2D) changeEvent.getSource();
-            if (trace.isVisible()) {
-              receiver.m_max = value;
-              receiver.m_needsFullRescale = true;
-              result = true;
-            }
-          } else if (value < receiver.m_max) {
-            receiver.m_max = receiver.findMax();
-            receiver.m_needsFullRescale = true;
-            result = true;
-          }
-        }
-        return result;
-      }
-
-    });
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_MIN_X, new APropertyChangeReactorSynced() {
-
-      /**
-       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
-       *      info.monitorenter.gui.chart.axis.AAxis)
-       */
-      @Override
-      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
-          final AAxis receiver) {
-        boolean result = false;
-        if (Chart2D.DEBUG_SCALING) {
-          System.out.println("pc-Xmin");
-        }
-        if (receiver.getAccessor().getDimension() == Chart2D.X) {
-          double value = ((Double) changeEvent.getNewValue()).doubleValue();
-          if (value < receiver.m_min) {
-            ITrace2D trace = (ITrace2D) changeEvent.getSource();
-            if (trace.isVisible()) {
-              receiver.m_min = value;
-              receiver.m_needsFullRescale = true;
-              result = true;
-            }
-          } else if (value > receiver.m_min) {
-            receiver.m_min = receiver.findMin();
-            receiver.m_needsFullRescale = true;
-            result = true;
-          }
-        }
-        return result;
-      }
-
-    });
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_MAX_Y, new APropertyChangeReactorSynced() {
-
-      /**
-       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
-       *      info.monitorenter.gui.chart.axis.AAxis)
-       */
-      @Override
-      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
-          final AAxis receiver) {
-        boolean result = false;
-        if (Chart2D.DEBUG_SCALING) {
-          System.out.println("pc-Ymax");
-        }
-        // only care if axis works in y dimension:
-        if (receiver.getAccessor().getDimension() == Chart2D.Y) {
-          double value = ((Double) changeEvent.getNewValue()).doubleValue();
-          if (value > receiver.m_max) {
-            ITrace2D trace = (ITrace2D) changeEvent.getSource();
-            if (trace.isVisible()) {
-              receiver.m_max = value;
-              receiver.m_needsFullRescale = true;
-              result = true;
-            }
-          } else if (value < receiver.m_max) {
-            receiver.m_max = receiver.findMax();
-            receiver.m_needsFullRescale = true;
-            result = true;
-          }
-        }
-        return result;
-      }
-    });
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_MIN_Y, new APropertyChangeReactorSynced() {
-
-      /**
-       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
-       *      info.monitorenter.gui.chart.axis.AAxis)
-       */
-      @Override
-      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
-          final AAxis receiver) {
-        boolean result = false;
-        if (Chart2D.DEBUG_SCALING) {
-          System.out.println("pc-Ymin");
-        }
-        if (receiver.getAccessor().getDimension() == Chart2D.Y) {
-
-          double value = ((Double) changeEvent.getNewValue()).doubleValue();
-          if (value < receiver.m_min) {
-            ITrace2D trace = (ITrace2D) changeEvent.getSource();
-            if (trace.isVisible()) {
-              receiver.m_min = value;
-              receiver.m_needsFullRescale = true;
-              result = true;
-            }
-          } else if (value > receiver.m_min) {
-            receiver.m_min = receiver.findMin();
-            receiver.m_needsFullRescale = true;
-            result = true;
-          }
-        }
-        return result;
-      }
-    });
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_TRACEPOINT, new APropertyChangeReactorSynced() {
-
-      /**
-       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
-       *      info.monitorenter.gui.chart.axis.AAxis)
-       */
-      @Override
-      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
-          final AAxis receiver) {
-        boolean result = false;
-        // now points added or removed -> rescale!
-        if (Chart2D.DEBUG_SCALING) {
-          System.out.println("pc-tp");
-        }
-        ITracePoint2D oldPt = (ITracePoint2D) changeEvent.getOldValue();
-        ITracePoint2D newPt = (ITracePoint2D) changeEvent.getNewValue();
-        // added or removed?
-        // we only care about added points (rescaling is our task)
-        if (oldPt == null) {
-          receiver.scalePoint(newPt);
-          result = true;
-        }
-        return result;
-      }
-    });
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_VISIBLE, new APropertyChangeReactorSynced() {
-
-      /**
-       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
-       *      info.monitorenter.gui.chart.axis.AAxis)
-       */
-      @Override
-      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
-          final AAxis receiver) {
-        boolean result = false;
-        // invisible traces don't count for max and min, so
-        // expensive search has to be started here:
-        // TODO: Do performance: Get the trace of the event and check only
-        // it's bounds here!!!
-        receiver.m_max = receiver.findMax();
-        receiver.m_min = receiver.findMin();
-        // if the trace that became visible does not exceed bounds
-        // it will not cause a "dirty Scaling" -> updateScaling and
-        // repainting (in Painter Thread).
-        ITrace2D trace = (ITrace2D) changeEvent.getSource();
-        receiver.scaleTrace(trace);
-        result = true;
-        return result;
-      }
-    });
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_POINT_CHANGED, new APropertyChangeReactorSynced() {
-
-      /**
-       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
-       *      info.monitorenter.gui.chart.axis.AAxis)
-       */
-      @Override
-      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
-          final AAxis receiver) {
-        boolean result = false;
-        ITracePoint2D changed = (ITracePoint2D) changeEvent.getNewValue();
-        receiver.scalePoint(changed);
-        result = true;
-        return result;
-      }
-    });
-  }
 
   /**
    * Default constructor that uses a {@link LabelFormatterAutoUnits} for
@@ -1303,9 +1315,9 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    */
   public AAxis(final IAxisLabelFormatter formatter) {
     this.m_propertyChangeSupport = new PropertyChangeSupport(this);
-    this.setFormatter(formatter);
     this.setAxisTitle(new AxisTitle(null));
     this.m_rangePolicy = new RangePolicyUnbounded(Range.RANGE_UNBOUNDED);
+    this.setFormatter(formatter);
   }
 
   /**
@@ -1324,15 +1336,22 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
 
     boolean result = false;
     if (Chart2D.DEBUG_THREADING) {
-      System.out.println("aaxis.addTrace (" + Thread.currentThread().getName() + "), 0 locks");
+      System.out.println(Thread.currentThread().getName() + "Aaxis" + this.getDimensionString()
+          + ".addTrace(), 0 locks");
     }
     synchronized (this.getAccessor().getChart()) {
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println("AAxis.addTrace(" + Thread.currentThread().getName() + "), 1 lock");
+        System.out.println(Thread.currentThread().getName() + ", AAxis" + this.getDimensionString()
+            + ".addTrace(), 1 lock");
       }
       synchronized (trace) {
         if (Chart2D.DEBUG_THREADING) {
-          System.out.println("AAxis.addTrace(" + Thread.currentThread().getName() + "), 2 locks");
+          System.out.println(Thread.currentThread().getName() + ", AAxis"
+              + this.getDimensionString() + ".addTrace(), 2 locks");
+        }
+        if (this.m_traces.contains(trace)) {
+          throw new IllegalArgumentException("Trace " + trace.getName()
+              + " is already contaied in this axis " + this.getAxisTitle() + ". Review your code. ");
         }
         // do it here:
         result = this.m_traces.add(trace);
@@ -1341,11 +1360,11 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
 
           // for static traces (all points added) we won't get events.
           // so update here:
-          double max = this.getAccessor().getMaxValue(trace);
+          final double max = this.getAccessor().getMaxValue(trace);
           if (max > this.m_max) {
             this.m_max = max;
           }
-          double min = this.getAccessor().getMinValue(trace);
+          final double min = this.getAccessor().getMinValue(trace);
           if (min < this.m_min) {
             this.m_min = min;
           }
@@ -1354,8 +1373,19 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
             this.m_min = min;
             this.m_max = max;
           }
+          if (Chart2D.DEBUG_THREADING) {
+            System.out.println(Thread.currentThread().getName() + ", AAxis"
+                + this.getDimensionString() + ".addTrace(), before installing chart to trace "
+                + trace.getName());
+            ExceptionUtil.dumpThreadStack(System.out);
 
+          }
           trace.setRenderer(this.m_accessor.getChart());
+          if (Chart2D.DEBUG_THREADING) {
+            System.out.println(Thread.currentThread().getName() + ", AAxis"
+                + this.getDimensionString() + ".addTrace(), after installing chart to trace "
+                + trace.getName());
+          }
           // unconditionally scale the trace as we don't know which
           // bounds it was related to before.
           this.scaleTrace(trace);
@@ -1363,13 +1393,13 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
 
       }
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println("AAxis.addTrace(" + Thread.currentThread().getName()
-            + "), left 1 lock: 1 remaining");
+        System.out.println(Thread.currentThread().getName() + ", AAxis" + this.getDimensionString()
+            + ".addTrace(), left 1 lock: 1 remaining");
       }
     }
     if (Chart2D.DEBUG_THREADING) {
-      System.out.println("AAxis.addTrace(" + Thread.currentThread().getName()
-          + "), left 1 lock:  0 remaining");
+      System.out.println(Thread.currentThread().getName() + ", AAxis" + this.getDimensionString()
+          + ".addTrace(), left 1 lock:  0 remaining");
     }
     // A deadlock occurs if a listener triggers paint.
     // This was the case with ChartPanel.
@@ -1399,6 +1429,127 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   protected abstract AChart2DDataAccessor createAccessor(Chart2D chart, int dimension, int position);
 
   /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final AAxis other = (AAxis) obj;
+    if (this.m_accessor == null) {
+      if (other.m_accessor != null) {
+        return false;
+      }
+    } else if (!this.m_accessor.equals(other.m_accessor)) {
+      return false;
+    }
+    if (this.m_axisPosition != other.m_axisPosition) {
+      return false;
+    }
+    if (this.m_axisTitle == null) {
+      if (other.m_axisTitle != null) {
+        return false;
+      }
+    } else if (!this.m_axisTitle.equals(other.m_axisTitle)) {
+      return false;
+    }
+    if (this.m_formatter == null) {
+      if (other.m_formatter != null) {
+        return false;
+      }
+    } else if (!this.m_formatter.equals(other.m_formatter)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_majorTickSpacing) != Double
+        .doubleToLongBits(other.m_majorTickSpacing)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_max) != Double.doubleToLongBits(other.m_max)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_min) != Double.doubleToLongBits(other.m_min)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_minorTickSpacing) != Double
+        .doubleToLongBits(other.m_minorTickSpacing)) {
+      return false;
+    }
+    if (this.m_needsFullRescale != other.m_needsFullRescale) {
+      return false;
+    }
+    if (this.m_paintGrid != other.m_paintGrid) {
+      return false;
+    }
+    if (this.m_paintScale != other.m_paintScale) {
+      return false;
+    }
+    if (this.m_pixelXLeft != other.m_pixelXLeft) {
+      return false;
+    }
+    if (this.m_pixelXRight != other.m_pixelXRight) {
+      return false;
+    }
+    if (this.m_pixelYBottom != other.m_pixelYBottom) {
+      return false;
+    }
+    if (this.m_pixelYTop != other.m_pixelYTop) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_power) != Double.doubleToLongBits(other.m_power)) {
+      return false;
+    }
+    if (this.m_propertyChangeSupport == null) {
+      if (other.m_propertyChangeSupport != null) {
+        return false;
+      }
+    } else if (!this.m_propertyChangeSupport.equals(other.m_propertyChangeSupport)) {
+      return false;
+    }
+    if (this.m_rangePolicy == null) {
+      if (other.m_rangePolicy != null) {
+        return false;
+      }
+    } else if (!this.m_rangePolicy.equals(other.m_rangePolicy)) {
+      return false;
+    }
+    if (this.m_rangePreviousScaling == null) {
+      if (other.m_rangePreviousScaling != null) {
+        return false;
+      }
+    } else if (!this.m_rangePreviousScaling.equals(other.m_rangePreviousScaling)) {
+      return false;
+    }
+    if (this.m_reusedRange == null) {
+      if (other.m_reusedRange != null) {
+        return false;
+      }
+    } else if (!this.m_reusedRange.equals(other.m_reusedRange)) {
+      return false;
+    }
+    if (this.m_startMajorTick != other.m_startMajorTick) {
+      return false;
+    }
+    if (this.m_traces == null) {
+      if (other.m_traces != null) {
+        return false;
+      }
+    } else if (!this.m_traces.equals(other.m_traces)) {
+      return false;
+    }
+    if (this.m_visible != other.m_visible) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Searches for the maximum value of all contained ITraces in the dimension
    * this axis stands for.
    * <p>
@@ -1417,7 +1568,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   protected final double findMax() {
     double max = -Double.MAX_VALUE;
     double tmp;
-    Iterator<ITrace2D> it = this.getTraces().iterator();
+    final Iterator<ITrace2D> it = this.getTraces().iterator();
     ITrace2D trace;
     while (it.hasNext()) {
       trace = it.next();
@@ -1454,7 +1605,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   protected final double findMin() {
     double min = Double.MAX_VALUE;
     double tmp;
-    Iterator<ITrace2D> it = this.getTraces().iterator();
+    final Iterator<ITrace2D> it = this.getTraces().iterator();
     ITrace2D trace;
     while (it.hasNext()) {
       trace = it.next();
@@ -1535,16 +1686,16 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * @return the labels for this axis.
    */
   protected List<LabeledValue> getLabels(final double resolution) {
-    List<LabeledValue> collect = new LinkedList<LabeledValue>();
+    final List<LabeledValue> collect = new LinkedList<LabeledValue>();
     if (resolution > 0) {
 
-      Range domain = this.getRange();
-      double min = domain.getMin();
-      double max = domain.getMax();
+      final Range domain = this.getRange();
+      final double min = domain.getMin();
+      final double max = domain.getMax();
       String oldLabelName = "";
       LabeledValue label;
-      double range = max - min;
-      double tickResolution = this.roundToTicks(resolution, false, false).getValue();
+      final double range = max - min;
+      final double tickResolution = this.roundToTicks(resolution, false, false).getValue();
       double value = Math.ceil(min / tickResolution) * tickResolution;
       // This was value before the patch that prevents the labels from jumping:
       // It's benefit was that the first label was not this
@@ -1554,7 +1705,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
       int loopStop = 0;
       boolean firstMajorFound = false;
       // first tick, manual init
-      while (value <= max && loopStop < 100) {
+      while ((value <= max) && (loopStop < 100)) {
         if (loopStop == 99) {
           if (AAxis.DEBUG) {
             System.out.println(this.m_accessor.toString() + " axis: loop to high");
@@ -1574,7 +1725,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
         loopStop++;
         if (firstMajorFound || !this.m_startMajorTick || label.isMajorTick()) {
           firstMajorFound = true;
-          if (value <= max && value >= min) {
+          if ((value <= max) && (value >= min)) {
             collect.add(label);
           } else if (value > max) {
             if (AAxis.DEBUG) {
@@ -1588,7 +1739,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
         }
         value += resolution;
       }
-      int stop = collect.size();
+      final int stop = collect.size();
 
       for (int i = 0; i < stop; i++) {
         label = collect.get(i);
@@ -1692,7 +1843,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * @see #setRangePolicy(IRangePolicy)
    */
   public final Range getRange() {
-    double min = this.getMin();
+    final double min = this.getMin();
     double max = this.getMax();
     if (min == max) {
       max += 10;
@@ -1717,9 +1868,9 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * @see info.monitorenter.gui.chart.IAxis#getScaleValues(java.awt.Graphics)
    */
   public List<LabeledValue> getScaleValues(final Graphics g2d) {
-    double labelspacepx = this.m_accessor.getMinimumValueDistanceForLabels(g2d);
-    double formattingspace = this.m_formatter.getMinimumValueShiftForChange();
-    double max = Math.max(labelspacepx, formattingspace);
+    final double labelspacepx = this.m_accessor.getMinimumValueDistanceForLabels(g2d);
+    final double formattingspace = this.m_formatter.getMinimumValueShiftForChange();
+    final double max = Math.max(labelspacepx, formattingspace);
     return this.getLabels(max);
   }
 
@@ -1784,16 +1935,58 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((this.m_accessor == null) ? 0 : this.m_accessor.hashCode());
+    result = prime * result + this.m_axisPosition;
+    result = prime * result + ((this.m_axisTitle == null) ? 0 : this.m_axisTitle.hashCode());
+    result = prime * result + ((this.m_formatter == null) ? 0 : this.m_formatter.hashCode());
+    long temp;
+    temp = Double.doubleToLongBits(this.m_majorTickSpacing);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(this.m_max);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(this.m_min);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(this.m_minorTickSpacing);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    result = prime * result + (this.m_needsFullRescale ? 1231 : 1237);
+    result = prime * result + (this.m_paintGrid ? 1231 : 1237);
+    result = prime * result + (this.m_paintScale ? 1231 : 1237);
+    result = prime * result + this.m_pixelXLeft;
+    result = prime * result + this.m_pixelXRight;
+    result = prime * result + this.m_pixelYBottom;
+    result = prime * result + this.m_pixelYTop;
+    temp = Double.doubleToLongBits(this.m_power);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    result = prime * result
+        + ((this.m_propertyChangeSupport == null) ? 0 : this.m_propertyChangeSupport.hashCode());
+    result = prime * result + ((this.m_rangePolicy == null) ? 0 : this.m_rangePolicy.hashCode());
+    result = prime * result
+        + ((this.m_rangePreviousScaling == null) ? 0 : this.m_rangePreviousScaling.hashCode());
+    result = prime * result + ((this.m_reusedRange == null) ? 0 : this.m_reusedRange.hashCode());
+    result = prime * result + (this.m_startMajorTick ? 1231 : 1237);
+    result = prime * result + ((this.m_traces == null) ? 0 : this.m_traces.hashCode());
+    result = prime * result + (this.m_visible ? 1231 : 1237);
+    return result;
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.IAxis#hasTrace(info.monitorenter.gui.chart.ITrace2D)
    */
   public final boolean hasTrace(final ITrace2D trace) {
+    // TODO: Null enters here for tooltips with arithmetic mean trace!!!
     boolean result = false;
     result = this.m_traces.contains(trace);
     return result;
   }
 
   /**
-   * Perfomres expensive calculations for various values that are used by many
+   * Performs expensive calculations for various values that are used by many
    * calls throughout a paint iterations.
    * <p>
    * These values are constant throughout a paint iteration by the contract that
@@ -1812,7 +2005,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     // 10,20,30,....
     final double range = this.getMax() - this.getMin();
     double computeRange = range;
-    if (range == 0 || !MathUtil.isDouble(range)) {
+    if ((range == 0) || !MathUtil.isDouble(range)) {
       computeRange = 1;
     }
     double tmpPower = 0;
@@ -1982,17 +2175,17 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    *          the graphics context to use.
    */
   private void paintAxisXBottom(final Graphics g2d) {
-    Chart2D chart = this.getAccessor().getChart();
+    final Chart2D chart = this.getAccessor().getChart();
     int tmp = 0;
-    FontMetrics fontdim = g2d.getFontMetrics();
-    int fontheight = fontdim.getHeight();
+    final FontMetrics fontdim = g2d.getFontMetrics();
+    final int fontheight = fontdim.getHeight();
 
-    int xAxisStart = chart.getXChartStart();
-    int xAxisEnd = chart.getXChartEnd();
-    int yAxisEnd = chart.getYChartEnd();
-    int rangexPx = xAxisEnd - xAxisStart;
+    final int xAxisStart = chart.getXChartStart();
+    final int xAxisEnd = chart.getXChartEnd();
+    final int yAxisEnd = chart.getYChartEnd();
+    final int rangexPx = xAxisEnd - xAxisStart;
 
-    int yAxisLine = this.getPixelYTop();
+    final int yAxisLine = this.getPixelYTop();
 
     g2d.drawLine(xAxisStart, yAxisLine, xAxisEnd, yAxisLine);
     // drawing the x title :
@@ -2000,11 +2193,11 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     // drawing tick - scale, corresponding values, grid and conditional unit
     // label:
     if (this.isPaintScale()) {
-      IAxisTickPainter tickPainter = chart.getAxisTickPainter();
+      final IAxisTickPainter tickPainter = chart.getAxisTickPainter();
       tmp = 0;
-      List<LabeledValue> labels = this.getScaleValues(g2d);
+      final List<LabeledValue> labels = this.getScaleValues(g2d);
 
-      for (LabeledValue label : labels) {
+      for (final LabeledValue label : labels) {
         tmp = xAxisStart + (int) (label.getValue() * rangexPx);
         // true -> is bottom axis:
         tickPainter.paintXTick(tmp, yAxisLine, label.isMajorTick(), true, g2d);
@@ -2035,16 +2228,16 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    *          the graphics context to use.
    */
   private void paintAxisXTop(final Graphics g2d) {
-    Chart2D chart = this.getAccessor().getChart();
+    final Chart2D chart = this.getAccessor().getChart();
     int tmp = 0;
-    FontMetrics fontdim = g2d.getFontMetrics();
+    final FontMetrics fontdim = g2d.getFontMetrics();
 
-    int xAxisStart = chart.getXChartStart();
-    int xAxisEnd = chart.getXChartEnd();
-    int yAxisStart = chart.getYChartStart();
-    int rangexPx = xAxisEnd - xAxisStart;
+    final int xAxisStart = chart.getXChartStart();
+    final int xAxisEnd = chart.getXChartEnd();
+    final int yAxisStart = chart.getYChartStart();
+    final int rangexPx = xAxisEnd - xAxisStart;
     // 1.2) x axis top:
-    int yAxisLine = this.getPixelYBottom();
+    final int yAxisLine = this.getPixelYBottom();
     g2d.drawLine(xAxisStart, yAxisLine, xAxisEnd, yAxisLine);
     // drawing the x title :
     this.paintTitle(g2d);
@@ -2053,10 +2246,10 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     if (this.isPaintScale()) {
       // first for x- angle.
       tmp = 0;
-      IAxisTickPainter tickPainter = chart.getAxisTickPainter();
-      int majorTickLength = tickPainter.getMajorTickLength();
-      List<LabeledValue> labels = this.getScaleValues(g2d);
-      for (LabeledValue label : labels) {
+      final IAxisTickPainter tickPainter = chart.getAxisTickPainter();
+      final int majorTickLength = tickPainter.getMajorTickLength();
+      final List<LabeledValue> labels = this.getScaleValues(g2d);
+      for (final LabeledValue label : labels) {
         tmp = xAxisStart + (int) (label.getValue() * rangexPx);
         // 2nd boolean false -> is not bottom axis (top):
         tickPainter.paintXTick(tmp, yAxisLine, label.isMajorTick(), false, g2d);
@@ -2087,26 +2280,26 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    *          the graphics context to use.
    */
   private void paintAxisYLeft(final Graphics g2d) {
-    Chart2D chart = this.getAccessor().getChart();
+    final Chart2D chart = this.getAccessor().getChart();
     int tmp = 0;
-    FontMetrics fontdim = g2d.getFontMetrics();
+    final FontMetrics fontdim = g2d.getFontMetrics();
 
-    int xAxisStart = chart.getXChartStart();
-    int xAxisEnd = chart.getXChartEnd();
-    int yAxisStart = chart.getYChartStart();
-    int yAxisEnd = chart.getYChartEnd();
-    int rangeyPx = yAxisStart - yAxisEnd;
-    int xAxisLine = this.getPixelXRight();
+    final int xAxisStart = chart.getXChartStart();
+    final int xAxisEnd = chart.getXChartEnd();
+    final int yAxisStart = chart.getYChartStart();
+    final int yAxisEnd = chart.getYChartEnd();
+    final int rangeyPx = yAxisStart - yAxisEnd;
+    final int xAxisLine = this.getPixelXRight();
     g2d.drawLine(xAxisLine, yAxisStart, xAxisLine, yAxisEnd);
     // drawing the y title :
     this.paintTitle(g2d);
     // drawing tick - scale, corresponding values, grid and conditional unit
     // label:
     if (this.isPaintScale()) {
-      IAxisTickPainter tickPainter = chart.getAxisTickPainter();
-      int majorTickLength = tickPainter.getMajorTickLength();
-      List<LabeledValue> labels = this.getScaleValues(g2d);
-      for (LabeledValue label : labels) {
+      final IAxisTickPainter tickPainter = chart.getAxisTickPainter();
+      final int majorTickLength = tickPainter.getMajorTickLength();
+      final List<LabeledValue> labels = this.getScaleValues(g2d);
+      for (final LabeledValue label : labels) {
         tmp = yAxisStart - (int) (label.getValue() * rangeyPx);
 
         // true -> is left y axis:
@@ -2124,7 +2317,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
         }
       }
       // unit-labeling
-      String unitName = this.getFormatter().getUnit().getUnitName();
+      final String unitName = this.getFormatter().getUnit().getUnitName();
       g2d.drawString(unitName, 4, yAxisEnd);
     }
 
@@ -2139,16 +2332,16 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    *          the graphics context to use.
    */
   private void paintAxisYRight(final Graphics g2d) {
-    Chart2D chart = this.getAccessor().getChart();
+    final Chart2D chart = this.getAccessor().getChart();
     int tmp = 0;
-    FontMetrics fontdim = g2d.getFontMetrics();
+    final FontMetrics fontdim = g2d.getFontMetrics();
 
-    int xAxisStart = chart.getXChartStart();
-    int xAxisEnd = chart.getXChartEnd();
-    int yAxisStart = chart.getYChartStart();
-    int yAxisEnd = chart.getYChartEnd();
-    int rangeyPx = yAxisStart - yAxisEnd;
-    int xAxisLine = this.getPixelXLeft();
+    final int xAxisStart = chart.getXChartStart();
+    final int xAxisEnd = chart.getXChartEnd();
+    final int yAxisStart = chart.getYChartStart();
+    final int yAxisEnd = chart.getYChartEnd();
+    final int rangeyPx = yAxisStart - yAxisEnd;
+    final int xAxisLine = this.getPixelXLeft();
     g2d.drawLine(xAxisLine, yAxisStart, xAxisLine, yAxisEnd);
     // drawing the y title :
     this.paintTitle(g2d);
@@ -2156,10 +2349,10 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     // label:
     if (this.isPaintScale()) {
       // then for y- angle.
-      IAxisTickPainter tickPainter = chart.getAxisTickPainter();
-      List<LabeledValue> labels = this.getScaleValues(g2d);
-      int tickWidth = tickPainter.getMajorTickLength() + 4;
-      for (LabeledValue label : labels) {
+      final IAxisTickPainter tickPainter = chart.getAxisTickPainter();
+      final List<LabeledValue> labels = this.getScaleValues(g2d);
+      final int tickWidth = tickPainter.getMajorTickLength() + 4;
+      for (final LabeledValue label : labels) {
         tmp = yAxisStart - (int) (label.getValue() * rangeyPx);
         // false -> is right y axis:
         tickPainter.paintYTick(xAxisLine, tmp, label.isMajorTick(), false, g2d);
@@ -2174,7 +2367,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
         }
       }
       // unit-labeling
-      String unitName = this.getFormatter().getUnit().getUnitName();
+      final String unitName = this.getFormatter().getUnit().getUnitName();
       g2d.drawString(unitName, (int) chart.getSize().getWidth()
           - fontdim.charsWidth(unitName.toCharArray(), 0, unitName.length()) - 4, yAxisEnd);
 
@@ -2189,14 +2382,14 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     int result = 0;
     // TODO: Add support for different axis locations: top, bottom, left,right!
     // drawing the title :
-    IAxis.AxisTitle axisTitle = this.getAxisTitle();
-    String title = axisTitle.getTitle();
+    final IAxis.AxisTitle axisTitle = this.getAxisTitle();
+    final String title = axisTitle.getTitle();
     if (!StringUtil.isEmpty(title)) {
       IAxisTitlePainter titlePainter;
       titlePainter = axisTitle.getTitlePainter();
       titlePainter.paintTitle(this, g2d);
 
-      int dimension = this.getDimension();
+      final int dimension = this.getDimension();
       switch (dimension) {
         case Chart2D.X:
           result = titlePainter.getHeight(this, g2d);
@@ -2228,8 +2421,8 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
       System.out
           .println("AAxis.propertyChange (" + Thread.currentThread().getName() + "), 0 locks");
     }
-    String property = evt.getPropertyName();
-    IPropertyChangeReactor reactor = AAxis.propertyReactors.get(property);
+    final String property = evt.getPropertyName();
+    final IPropertyChangeReactor reactor = AAxis.propertyReactors.get(property);
     if (reactor != null) {
       reactor.propertyChange(evt, this);
     }
@@ -2239,13 +2432,13 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * @see info.monitorenter.gui.chart.IAxis#removeAllTraces()
    */
   public final Set<ITrace2D> removeAllTraces() {
-    Set<ITrace2D> result = new TreeSet<ITrace2D>();
+    final Set<ITrace2D> result = new TreeSet<ITrace2D>();
     result.addAll(this.m_traces);
     /*
      * cannot work on this.m_traces as remove will cause concurrent modification
      * exception!
      */
-    for (ITrace2D trace : result) {
+    for (final ITrace2D trace : result) {
       this.removeTrace(trace);
     }
     return result;
@@ -2255,7 +2448,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * @see info.monitorenter.gui.chart.IAxis#removeAxisTitle()
    */
   public AxisTitle removeAxisTitle() {
-    AxisTitle result = this.m_axisTitle;
+    final AxisTitle result = this.m_axisTitle;
     this.unListenToAxisTitle(this.m_axisTitle);
     this.m_axisTitle = null;
     return result;
@@ -2274,7 +2467,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * @see info.monitorenter.gui.chart.IAxis#removeTrace(info.monitorenter.gui.chart.ITrace2D)
    */
   public boolean removeTrace(final ITrace2D trace) {
-    boolean result = this.m_traces.remove(trace);
+    final boolean result = this.m_traces.remove(trace);
     if (result) {
       this.unlisten2Trace(trace);
       this.m_max = this.findMax();
@@ -2305,10 +2498,10 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    */
   protected LabeledValue roundToTicks(final double value, final boolean floor,
       final boolean findMajorTick) {
-    LabeledValue ret = new LabeledValue();
+    final LabeledValue ret = new LabeledValue();
 
-    double minorTick = this.m_minorTickSpacing * this.m_power;
-    double majorTick = this.m_majorTickSpacing * this.m_power;
+    final double minorTick = this.m_minorTickSpacing * this.m_power;
+    final double majorTick = this.m_majorTickSpacing * this.m_power;
 
     double majorRound;
 
@@ -2317,7 +2510,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     } else {
       majorRound = Math.ceil(value / majorTick);
     }
-    boolean majorZeroHit = majorRound == 0 && value != 0;
+    final boolean majorZeroHit = (majorRound == 0) && (value != 0);
     majorRound *= majorTick;
     double minorRound;
     if (floor) {
@@ -2325,7 +2518,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     } else {
       minorRound = Math.ceil(value / minorTick);
     }
-    boolean minorZeroHit = minorRound == 0 && value != 0;
+    final boolean minorZeroHit = (minorRound == 0) && (value != 0);
     minorRound *= minorTick;
     if (majorZeroHit || minorZeroHit) {
       if (AAxis.DEBUG) {
@@ -2333,15 +2526,15 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
       }
     }
 
-    double minorDistance = Math.abs(value - minorRound);
-    double majorDistance = Math.abs(value - majorRound);
+    final double minorDistance = Math.abs(value - minorRound);
+    final double majorDistance = Math.abs(value - majorRound);
 
     double majorMinorRelation = minorDistance / majorDistance;
     if (Double.isNaN(majorMinorRelation)) {
       majorMinorRelation = 1.0;
     }
 
-    if (majorDistance <= minorDistance || findMajorTick) {
+    if ((majorDistance <= minorDistance) || findMajorTick) {
       ret.setValue(majorRound);
       ret.setMajorTick(true);
     } else {
@@ -2361,7 +2554,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * @see info.monitorenter.gui.chart.IAxis#scale()
    */
   public void scale() {
-    Iterator<ITrace2D> it = this.m_traces.iterator();
+    final Iterator<ITrace2D> it = this.m_traces.iterator();
     ITrace2D trace;
     while (it.hasNext()) {
       trace = it.next();
@@ -2381,7 +2574,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    *          bounds.
    */
   protected final void scalePoint(final ITracePoint2D point) {
-    int axis = this.getAccessor().getDimension();
+    final int axis = this.getAccessor().getDimension();
     if (axis == Chart2D.X) {
       point.setScaledX(this.getScaledValue(point.getX()));
 
@@ -2403,7 +2596,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * @see info.monitorenter.gui.chart.IAxis#scaleTrace(info.monitorenter.gui.chart.ITrace2D)
    */
   public void scaleTrace(final ITrace2D trace) {
-    Range range = this.getRange();
+    final Range range = this.getRange();
     this.m_accessor.scaleTrace(trace, range);
   }
 
@@ -2477,9 +2670,10 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
 
     if (this.getAccessor() != null) {
       // remove listener for this:
-      this.removePropertyChangeListener(PROPERTY_LABELFORMATTER, this.getAccessor().getChart());
+      this.removePropertyChangeListener(IAxis.PROPERTY_LABELFORMATTER, this.getAccessor()
+          .getChart());
       // add listener for this:
-      this.addPropertyChangeListener(PROPERTY_LABELFORMATTER, this.getAccessor().getChart());
+      this.addPropertyChangeListener(IAxis.PROPERTY_LABELFORMATTER, this.getAccessor().getChart());
       // listener to subsequent format changes:
       if (this.m_formatter != null) {
         // remove listener on old formatter:
@@ -2488,12 +2682,13 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
       }
       formatter.addPropertyChangeListener(IAxisLabelFormatter.PROPERTY_FORMATCHANGE, this);
     }
-    IAxisLabelFormatter old = this.m_formatter;
+    final IAxisLabelFormatter old = this.m_formatter;
 
     this.m_formatter = formatter;
 
     this.m_formatter.setAxis(this);
-    this.m_propertyChangeSupport.firePropertyChange(PROPERTY_LABELFORMATTER, old, this.m_formatter);
+    this.m_propertyChangeSupport.firePropertyChange(IAxis.PROPERTY_LABELFORMATTER, old,
+        this.m_formatter);
   }
 
   /**
@@ -2569,7 +2764,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    *          true if the grid should be painted or false if not.
    */
   public final void setPaintGrid(final boolean grid) {
-    boolean oldValue = this.m_paintGrid;
+    final boolean oldValue = this.m_paintGrid;
     this.m_paintGrid = grid;
     if (oldValue != grid) {
       if (grid) {
@@ -2659,7 +2854,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    */
   public void setRangePolicy(final IRangePolicy rangePolicy) {
 
-    IRangePolicy old = this.getRangePolicy();
+    final IRangePolicy old = this.getRangePolicy();
 
     double max = 0;
     double min = 0;
@@ -2681,12 +2876,13 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
         this.m_accessor.m_chart);
 
     // check for scaling changes:
-    if (((max != 0) && (min != 0)) && (max != AAxis.this.getMax() || min != AAxis.this.getMin())) {
+    if (((max != 0) && (min != 0))
+        && ((max != AAxis.this.getMax()) || (min != AAxis.this.getMin()))) {
       this.m_accessor.m_chart.propertyChange(new PropertyChangeEvent(rangePolicy,
           IRangePolicy.PROPERTY_RANGE, new Range(min, max), this.m_rangePolicy.getRange()));
     }
 
-    this.m_propertyChangeSupport.firePropertyChange(PROPERTY_RANGEPOLICY, old, rangePolicy);
+    this.m_propertyChangeSupport.firePropertyChange(IAxis.PROPERTY_RANGEPOLICY, old, rangePolicy);
   }
 
   /**
@@ -2707,7 +2903,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    */
   @Deprecated
   public final String setTitle(final String title) {
-    String result = this.getAxisTitle().setTitle(title);
+    final String result = this.getAxisTitle().setTitle(title);
     return result;
   }
 
@@ -2723,7 +2919,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    */
   @Deprecated
   public final IAxisTitlePainter setTitlePainter(final IAxisTitlePainter painter) {
-    IAxisTitlePainter result = this.getAxisTitle().setTitlePainter(painter);
+    final IAxisTitlePainter result = this.getAxisTitle().setTitlePainter(painter);
     return result;
   }
 
@@ -2749,12 +2945,12 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * 
    * @param mouseEvent
    *          a mouse event that has been fired on this component.
-   *          
+   * 
    * @return the translation of the mouse event coordinates of the given mouse
    *         event to the value within the chart for the dimension covered by
    *         this axis (x or y) or null if no calculations could be performed as
    *         the chart was not painted before.
-   *         
+   * 
    * @throws IllegalArgumentException
    *           if the given mouse event is out of the current graphics context
    *           (not a mouse event of the chart component).

@@ -2,6 +2,8 @@
  * AbstractRangePolicy.java of project jchart2d,  A default superclass for chart viewport 
  * implementations that adds support for setting and getting ranges.
  * 
+ * Copyright (c) 2007 - 2011  Achim Westermann, Achim.Westermann@gmx.de
+ *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
  *  License as published by the Free Software Foundation; either
@@ -40,7 +42,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.8 $
  */
 public abstract class ARangePolicy implements IRangePolicy {
 
@@ -63,7 +65,8 @@ public abstract class ARangePolicy implements IRangePolicy {
   private Range m_range;
 
   /**
-   * Creates a range policy with an unconfigured range ({@link Range#RANGE_UNBOUNDED}).
+   * Creates a range policy with an unconfigured range (
+   * {@link Range#RANGE_UNBOUNDED}).
    * <p>
    * 
    */
@@ -100,12 +103,44 @@ public abstract class ARangePolicy implements IRangePolicy {
   }
 
   /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final ARangePolicy other = (ARangePolicy) obj;
+    if (this.m_propertyChangeSupport == null) {
+      if (other.m_propertyChangeSupport != null) {
+        return false;
+      }
+    } else if (!this.m_propertyChangeSupport.equals(other.m_propertyChangeSupport)) {
+      return false;
+    }
+    if (this.m_range == null) {
+      if (other.m_range != null) {
+        return false;
+      }
+    } else if (!this.m_range.equals(other.m_range)) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Fires a property change event to the registered listeners.
    * <p>
    * 
    * @param property
-   *          one of the <code>PROPERTY_XXX</code> constants defined in
-   *          <code>{@link info.monitorenter.gui.chart.ITrace2D}</code>.
+   *          one of the <code>PROPERTY_XXX</code> constants defined in <code>
+   *          {@link info.monitorenter.gui.chart.ITrace2D}</code>.
    * 
    * @param oldvalue
    *          the old value of the property.
@@ -142,6 +177,19 @@ public abstract class ARangePolicy implements IRangePolicy {
   }
 
   /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result
+        + ((this.m_propertyChangeSupport == null) ? 0 : this.m_propertyChangeSupport.hashCode());
+    result = prime * result + ((this.m_range == null) ? 0 : this.m_range.hashCode());
+    return result;
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.IRangePolicy#removePropertyChangeListener(java.beans.PropertyChangeListener,
    *      java.lang.String)
    */
@@ -170,11 +218,11 @@ public abstract class ARangePolicy implements IRangePolicy {
    *          {@link IRangePolicy#getMax(double, double)}.
    */
   public void setRange(final Range range) {
-    double oldMin = this.m_range.getMin();
-    double oldMax = this.m_range.getMax();
-    Range oldRange = this.m_range;
-    boolean minchanged = range.getMin() != oldMin;
-    boolean maxchanged = range.getMax() != oldMax;
+    final double oldMin = this.m_range.getMin();
+    final double oldMax = this.m_range.getMax();
+    final Range oldRange = this.m_range;
+    final boolean minchanged = range.getMin() != oldMin;
+    final boolean maxchanged = range.getMax() != oldMax;
     this.m_range = range;
     if (minchanged && maxchanged) {
       this.firePropertyChange(IRangePolicy.PROPERTY_RANGE, oldRange, this.m_range);

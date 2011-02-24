@@ -1,6 +1,6 @@
 /*
  *  Trace2DActionRemove, action to remove a trace from a chart.
- *  Copyright (C) 2004 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2004 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -45,7 +45,7 @@ import javax.swing.UIManager;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public final class Trace2DActionRemove
     extends ATrace2DAction {

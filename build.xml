@@ -7,7 +7,7 @@
 	<!-- General Properties -->
 
 	<property name="project.name" value="jchart2d" />
-	<property name="project.version" value="3.2.0" />
+	<property name="project.version" value="3.2.1" />
 	<property name="libdir" value="${basedir}/ext" />
 	<property name="outjar" value="${basedir}/${project.name}-${project.version}.jar" />
 	<property name="distfolder" value="${basedir}/${project.name}-${project.version}/" />
@@ -22,7 +22,7 @@
        The resource is a properties file within the proguard.jar
        and informs about the task implementation.
   -->
-	<taskdef resource="proguard/ant/task.properties" classpath="${libdir}/build/proguard-4.2.jar" />
+	<taskdef resource="proguard/ant/task.properties" classpath="${libdir}/build/proguard-4.5.1.jar" />
 
 	<!-- General paths & filesets. -->
 
@@ -96,22 +96,6 @@
 		</copy>
 	</target>
 
-	<!--
-    <target name="integrate.jars">
-        <copy file="${basedir}/lgpl.txt" toDir="${builddir}" />
-        <unjar dest="${builddir}">
-            <fileset refid="externalJars" />
-        </unjar>
-        -->
-	<!-- remove potentially contained sourcefiles -->
-	<!--    
-	<delete includeEmptyDirs="false">
-            <fileset dir="${builddir}">
-                <include name="**/*.java" />
-            </fileset>
-        </delete>
-    </target>
--->
 	<target name="makejarFat" depends="delete.classfiles,build">
 		<jar destfile="${project.name}-${project.version}.jar" basedir="${builddir}" update="false" manifest="manifest.mf">
 			<include name="**/*.class" />
@@ -154,6 +138,9 @@
 		<proguard obfuscate="false" shrink="true" overloadaggressively="false" warn="true" verbose="true" ignorewarnings="true" printmapping="true" allowaccessmodification="false" optimize="false">
 			<libraryjar>
 				<pathelement path="${java.home}/lib/rt.jar" />
+				<fileset dir="${libdir}">
+					<include name="*.jar" />
+				</fileset>
 			</libraryjar>
 			<!--
                caution: The name attribut value has to be the same expression
@@ -162,6 +149,10 @@
 			<injar name="${outjar}" />
 			<outjar name="${basedir}/${project.name}-${project.version}-shrinked.jar" />
 			<!-- Filter -->
+			<!-- keep all interfaces -->
+			<keep name="*" type="interface" />
+			<!-- keep all demos -->
+
 			<keep access="public" name="info.monitorenter.gui.chart.demos.*">
 				<method access="public static" name="main" />
 				<constructor />
@@ -252,10 +243,22 @@
 			<!-- keep all error bar stuff -->
 			<keep access="public" name="info.monitorenter.gui.chart.errorbars.**" allowoptimization="false">
 				<constructor />
-				<method access="public" name="**"/>
+				<method access="public" name="**" />
 			</keep>
 		</proguard>
-		<signjar jar="${basedir}/${project.name}-applet.jar" alias="jchart2.sourceforge.net" storepass="password" keypass="tracerunner" />
+		<!--
+		<genkey alias="jchart2.sourceforge.net" storepass="password" keystore="${basedir}/.keystore" >
+		  <dname>
+		    <param name="CN" value="Achim Westermann"/>
+		    <param name="OU" value="JChart2D"/>
+		    <param name="O"  value="monitorenter.info"/>
+		    <param name="C"  value="DE"/>
+		  </dname>
+			
+		</genkey>
+		-->
+		<!-- Not working on my box for now -->
+		<signjar jar="${basedir}/${project.name}-applet.jar" alias="jchart2.sourceforge.net" keystore="${basedir}/.keystore" verbose="true" storepass="password" keypass="tracerunner" />
 	</target>
 
 	<!-- Dependency only for ensuring validity -->

@@ -1,7 +1,7 @@
 /*
  *  Trace2DActionRemoveErrorBarPolicy, action to remove an IErrorBarPolicy 
  *  from an ITrace2D.
- *  Copyright (C) 2007 - 2010 Achim Westermann
+ *  Copyright (C) 2007 - 2011 Achim Westermann
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -36,7 +36,7 @@ import info.monitorenter.gui.chart.ITrace2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public final class Trace2DActionRemoveErrorBarPolicy extends ATrace2DActionErrorBarPolicy {
 

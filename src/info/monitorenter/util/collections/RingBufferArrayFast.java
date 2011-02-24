@@ -1,6 +1,6 @@
 /*
  * RingBufferArrayFast, an array- based fast implementation of a RingBuffer.
- * Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2004 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@ package info.monitorenter.util.collections;
 
 import info.monitorenter.util.StringUtil;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -32,27 +33,27 @@ import java.util.NoSuchElementException;
  * 
  * This implementation differs from the <code>RingBufferArray</code> in one
  * point: <br>
- * If <code>setBufferSize(int asize)</code> decreases the size of the buffer
- * and it will get smaller than the actual amount of elements stored, they will
- * get lost. This avoids the need for an internal List to store elements
+ * If <code>setBufferSize(int asize)</code> decreases the size of the buffer and
+ * it will get smaller than the actual amount of elements stored, they will get
+ * lost. This avoids the need for an internal List to store elements
  * overhanging. Some tests may be left out that may speed up this
  * <code>IRingBuffer</code>. Adding 5000000 elements was about 25 % faster
  * compared to the <code>RingBufferArray</code> on an Athlon 1200, 256 MB RAM.
  * <p>
  * 
  * For allowing high performance single-threaded use this implementation and the
- * implementations of the retrieveable <code>Iterator</code>- instances are
- * not synchronized at all.
+ * implementations of the retrievable <code>Iterator</code>- instances are not
+ * synchronized at all.
  * <p>
  * 
  * @param <T>
- *            the type of instances to store.
+ *          the type of instances to store.
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  */
 public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
+
   /**
-   * 
    * Base for ring buffer iterators that has access to the ring buffer by being
    * an non-static inner class.
    * <p>
@@ -60,7 +61,7 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.11 $
+   * @version $Revision: 1.13 $
    */
   protected abstract class ARingBufferIterator implements Iterator<T> {
     /**
@@ -82,6 +83,55 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
     }
 
     /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(final Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (this.getClass() != obj.getClass()) {
+        return false;
+      }
+      final ARingBufferIterator other = (ARingBufferIterator) obj;
+      if (!this.getOuterType().equals(other.getOuterType())) {
+        return false;
+      }
+      if (this.m_count != other.m_count) {
+        return false;
+      }
+      if (this.m_pos != other.m_pos) {
+        return false;
+      }
+      return true;
+    }
+
+    /**
+     * Returns the outer instance.<p>
+     * 
+     * @return the outer instance.
+     */
+    private RingBufferArrayFast<T> getOuterType() {
+      return RingBufferArrayFast.this;
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + this.getOuterType().hashCode();
+      result = prime * result + this.m_count;
+      result = prime * result + this.m_pos;
+      return result;
+    }
+
+    /**
      * @see java.util.Iterator#hasNext()
      */
     public boolean hasNext() {
@@ -99,7 +149,7 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
       if (!this.hasNext()) {
         throw new NoSuchElementException();
       }
-      Object result = RingBufferArrayFast.this.m_buffer[this.m_pos];
+      final Object result = RingBufferArrayFast.this.m_buffer[this.m_pos];
       this.m_count++;
       this.incPos();
       if (result == null) {
@@ -114,7 +164,7 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
      * <p>
      * 
      * @throws UnsupportedOperationException
-     *             always as this is not supported.
+     *           always as this is not supported.
      * 
      * @see java.util.Iterator#remove()
      */
@@ -143,7 +193,7 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
    * <p>
    * 
    * <pre>
-   *    
+   * 
    *             headpointer
    *              |
    *        +---+---+---+---+
@@ -159,8 +209,8 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
    *        remember:
    *            -the headpointer points to the space where the next element will be inserted.
    *            -the tailpointer points to the space to read the next element from.
-   *    
-   *    
+   * 
+   * 
    * </pre>
    * 
    * <p>
@@ -191,7 +241,7 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
    * Constructs a RingBuffer with the given size.
    * 
    * @param aSize
-   *            the size of the buffer.
+   *          the size of the buffer.
    */
   public RingBufferArrayFast(final int aSize) {
     this.m_buffer = new Object[aSize];
@@ -204,7 +254,7 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
    * <P>
    * 
    * @param anObject
-   *            the instance to add.
+   *          the instance to add.
    * 
    * @return the oldest Object, if RingBuffer was filled with 'maxsize' elements
    *         before, or null.
@@ -247,6 +297,40 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
   }
 
   /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @SuppressWarnings("unchecked")
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final RingBufferArrayFast<T> other = (RingBufferArrayFast<T>) obj;
+    if (!Arrays.equals(this.m_buffer, other.m_buffer)) {
+      return false;
+    }
+    if (this.m_empty != other.m_empty) {
+      return false;
+    }
+    if (this.m_headpointer != other.m_headpointer) {
+      return false;
+    }
+    if (this.m_size != other.m_size) {
+      return false;
+    }
+    if (this.m_tailpointer != other.m_tailpointer) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * @see info.monitorenter.util.collections.IRingBuffer#getBufferSize()
    */
   public int getBufferSize() {
@@ -280,6 +364,21 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
       tmp--;
     }
     return (T) this.m_buffer[tmp];
+  }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + Arrays.hashCode(this.m_buffer);
+    result = prime * result + (this.m_empty ? 1231 : 1237);
+    result = prime * result + this.m_headpointer;
+    result = prime * result + this.m_size;
+    result = prime * result + this.m_tailpointer;
+    return result;
   }
 
   /**
@@ -327,7 +426,7 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
    * @see info.monitorenter.util.collections.IRingBuffer#isFull()
    */
   public boolean isFull() {
-    boolean ret = (this.m_headpointer == this.m_tailpointer) && !this.m_empty;
+    final boolean ret = (this.m_headpointer == this.m_tailpointer) && !this.m_empty;
     if (RingBufferArrayFast.DEBUG) {
       System.out.println("isFull: " + ret + " head: " + this.m_headpointer + " tail: "
           + this.m_tailpointer);
@@ -434,7 +533,7 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
    */
   @SuppressWarnings("unchecked")
   public T[] removeAll() {
-    Object[] ret = new Object[this.size()];
+    final Object[] ret = new Object[this.size()];
     if (RingBufferArrayFast.DEBUG) {
       System.out.println("removeAll()");
     }
@@ -456,11 +555,11 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
    * <code>List pendingremove</code>.
    * 
    * @param newSize
-   *            the new size of the buffer.
+   *          the new size of the buffer.
    */
   public void setBufferSize(final int newSize) {
-    Object[] newbuffer = new Object[newSize];
-    boolean emptyStore = this.m_empty;
+    final Object[] newbuffer = new Object[newSize];
+    final boolean emptyStore = this.m_empty;
     int i = 0;
     int j = 0;
     if (RingBufferArrayFast.DEBUG) {
@@ -468,13 +567,13 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
           + this.m_tailpointer + " head: " + this.m_headpointer);
     }
     // skip the oldest ones that are discarded
-    int oldSize = this.size();
-    int stop = oldSize - newSize;
-    for (; i < stop && !this.isEmpty(); i++) {
+    final int oldSize = this.size();
+    final int stop = oldSize - newSize;
+    for (; (i < stop) && !this.isEmpty(); i++) {
       this.remove();
     }
     // add the ones that are the youngest (if some remaining)
-    for (j = 0; j < newSize && !this.isEmpty(); j++) {
+    for (j = 0; (j < newSize) && !this.isEmpty(); j++) {
       newbuffer[j] = this.remove();
     }
     this.m_tailpointer = 0;
@@ -522,7 +621,7 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
       }
       result = "[]";
     } else {
-      Object[] actualcontent = new Object[this.size()];
+      final Object[] actualcontent = new Object[this.size()];
       int tmp = this.m_tailpointer;
       int i = 0;
       for (; i < actualcontent.length; i++) {
@@ -532,7 +631,7 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
         } else {
           tmp++;
         }
-        if (tmp == this.m_headpointer && this.m_empty) {
+        if ((tmp == this.m_headpointer) && this.m_empty) {
           break;
         }
       }

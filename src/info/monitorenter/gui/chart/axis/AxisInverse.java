@@ -2,7 +2,7 @@
  *  AAxisInverse.java of project jchart2d, 
  *  an IAxis implementations that inverts the values and shows 
  *  decreasing values (10, 9,... 1).  
- *  Copyright (c) 2007 - 2010 Achim Westermann, created on 20:33:13.
+ *  Copyright (c) 2007 - 2011 Achim Westermann, created on 20:33:13.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -29,8 +29,8 @@ import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.LabeledValue;
-import info.monitorenter.util.MathUtil;
 import info.monitorenter.util.Range;
+import info.monitorenter.util.math.MathUtil;
 
 import java.util.Iterator;
 import java.util.List;
@@ -49,11 +49,10 @@ import java.util.List;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  *         (adaption for core)
  * 
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.20 $
  */
 
-public class AxisInverse
-    extends AAxis {
+public class AxisInverse extends AAxis {
 
   /**
    * 
@@ -64,8 +63,7 @@ public class AxisInverse
    * 
    * @see Chart2D#getAxisX()
    */
-  public class XDataInverseAccessor
-      extends AAxis.XDataAccessor {
+  public class XDataInverseAccessor extends AAxis.XDataAccessor {
 
     /** Generated <code>serialVersionUID</code>. */
     private static final long serialVersionUID = -7789192812199631543L;
@@ -75,7 +73,7 @@ public class AxisInverse
      * <p>
      * 
      * @param chart
-     *            the chart to access.
+     *          the chart to access.
      */
     public XDataInverseAccessor(final Chart2D chart) {
 
@@ -135,8 +133,7 @@ public class AxisInverse
    * 
    * @see Chart2D#getAxisY()
    */
-  protected class YDataInverseAccessor
-      extends AAxis.YDataAccessor {
+  protected class YDataInverseAccessor extends AAxis.YDataAccessor {
 
     /** Generated <code>serialVersionUID</code>. */
     private static final long serialVersionUID = -1759763478911933057L;
@@ -146,7 +143,7 @@ public class AxisInverse
      * <p>
      * 
      * @param chart
-     *            the chart to access.
+     *          the chart to access.
      */
     public YDataInverseAccessor(final Chart2D chart) {
 
@@ -195,25 +192,28 @@ public class AxisInverse
       return result;
     }
 
-//    /**
-//     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateValueToPx(double)
-//     */
-//    public int translateValueToPx(final double value) {
-//      int result = 0;
-//      // first normalize to [00.0..1.0]
-//      double valueNormalized;
-//      // the same as AAxis.this.getRange().getExtend()
-//      double valueRange = AxisInverse.this.getMax() - AxisInverse.this.getMin();
-//      valueNormalized = 1 - ((value - AxisInverse.this.getMin()) / valueRange);
-//      // no expand into the pixel space:
-//      int rangeY = this.m_chart.getYChartStart() - this.m_chart.getYChartEnd();
-//      if (rangeY == 0) {
-//        // return null
-//      } else {
-//        result = (int) Math.round(this.m_chart.getYChartStart() - valueNormalized * rangeY);
-//      }
-//      return result;
-//    }
+    // /**
+    // * @see
+    // info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateValueToPx(double)
+    // */
+    // public int translateValueToPx(final double value) {
+    // int result = 0;
+    // // first normalize to [00.0..1.0]
+    // double valueNormalized;
+    // // the same as AAxis.this.getRange().getExtend()
+    // double valueRange = AxisInverse.this.getMax() -
+    // AxisInverse.this.getMin();
+    // valueNormalized = 1 - ((value - AxisInverse.this.getMin()) / valueRange);
+    // // no expand into the pixel space:
+    // int rangeY = this.m_chart.getYChartStart() - this.m_chart.getYChartEnd();
+    // if (rangeY == 0) {
+    // // return null
+    // } else {
+    // result = (int) Math.round(this.m_chart.getYChartStart() - valueNormalized
+    // * rangeY);
+    // }
+    // return result;
+    // }
   }
 
   /** Generated <code>serialVersionUID</code>. */
@@ -232,7 +232,7 @@ public class AxisInverse
    * <p>
    * 
    * @param formatter
-   *            needed for formatting labels of this axis.
+   *          needed for formatting labels of this axis.
    * 
    */
   public AxisInverse(final IAxisLabelFormatter formatter) {
@@ -270,13 +270,13 @@ public class AxisInverse
   /**
    * Returns the labels for this axis.
    * <p>
-   * The labels will have at least the given argument <code>resolution</code>
-   * as distance in the value domain of the chart.
+   * The labels will have at least the given argument <code>resolution</code> as
+   * distance in the value domain of the chart.
    * <p>
    * 
    * @param resolution
-   *            the distance in the value domain of the chart that has to be at
-   *            least between to labels.
+   *          the distance in the value domain of the chart that has to be at
+   *          least between to labels.
    * 
    * @return the labels for this axis.
    */

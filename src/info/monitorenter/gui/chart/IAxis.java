@@ -1,7 +1,7 @@
 /*
  *  IAxis.java of project jchart2d, interface for an axis of the 
  *  Chart2D.
- *  Copyright (C) 2004 - 2010 Achim Westermann.
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -41,7 +41,7 @@ import java.util.Set;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.37 $
+ * @version $Revision: 1.39 $
  */
 public interface IAxis extends Serializable {
 
@@ -50,7 +50,7 @@ public interface IAxis extends Serializable {
    * <p>
    * 
    * @author Achim Westermann
-   * @version $Revision: 1.37 $
+   * @version $Revision: 1.39 $
    * @since 3.0.0
    */
   public final class AxisTitle implements Cloneable, Serializable {
@@ -456,6 +456,11 @@ public interface IAxis extends Serializable {
    * Adds a trace that belongs to this axis.
    * <p>
    * 
+   * Adding a trace that is already contained may be problematic, so an
+   * exception should be raised in that case to warn you that your code is doing
+   * unnecessary to malicious operations.
+   * <p>
+   * 
    * @param trace
    *          the trace to add.
    * @return true if the trace was added, false else.
@@ -489,14 +494,17 @@ public interface IAxis extends Serializable {
    * @return the axis title used.
    */
   public IAxis.AxisTitle getAxisTitle();
-  
+
   /**
-   * Removes the title of this axis.<p>
+   * Removes the title of this axis.
+   * <p>
    * 
-   * Prefer this method instead of <code>{@link #getAxisTitle()}</code> if you want to drop the axis title as this 
-   * method also "unlistens" this axis from it's title.<p>
-   *   
-   * @return the removed title. 
+   * Prefer this method instead of <code>{@link #getAxisTitle()}</code> if you
+   * want to drop the axis title as this method also "unlistens" this axis from
+   * it's title.
+   * <p>
+   * 
+   * @return the removed title.
    */
   public IAxis.AxisTitle removeAxisTitle();
 
@@ -508,6 +516,14 @@ public interface IAxis extends Serializable {
    *         assigned to a chart.
    */
   public int getDimension();
+
+  /**
+   * Returns the String constant for the dimension this axis stands for in the chart.
+   * <p>
+   * 
+   * @return "X", "Y" or <code>null</code> if not assigned to a <code>{@link Chart2D}</code>. 
+   **/ 
+  public String getDimensionString();
 
   /**
    * Returns the formatter for labels.

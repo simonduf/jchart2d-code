@@ -1,6 +1,6 @@
 /*
  *  IErrorBarValue.java of project jchart2d, interface for an error bar. 
- *  Copyright (c) 2004 - 2010 Achim Westermann.
+ *  Copyright (c) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,7 @@ import java.io.Serializable;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public interface IErrorBarPixel extends Serializable {
 

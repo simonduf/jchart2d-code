@@ -3,7 +3,7 @@
  *  a demonstration of the minimal code to set up a chart with 
  *  dynamic data and a 2nd trace that shows the arithmetic mean 
  *  of the last n datapoints added. 
- *  Copyright (C) 2007 - 2010 Achim Westermann, created on 26.07.2007, 22:27:55
+ *  Copyright (C) 2007 - 2011 Achim Westermann, created on 26.07.2007, 22:27:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

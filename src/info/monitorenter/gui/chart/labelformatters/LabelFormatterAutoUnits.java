@@ -2,7 +2,7 @@
  * LabelFormatterAutoUnits.java, a label formatter that adds 
  * an automatic choice of the unit SI prefix to a decorated 
  * label formatter. 
- * Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2004 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -45,7 +45,7 @@ import java.util.Map;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.19 $
+ * @version $Revision: 1.22 $
  * 
  */
 public class LabelFormatterAutoUnits extends ALabelFormatter {
@@ -69,7 +69,7 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
     // Iterator itUnits = .iterator();
     double factor = 0;
     int power;
-    for (AUnit unit : UnitFactory.getInstance().getUnits(UnitSystemSI.getInstance())) {
+    for (final AUnit unit : UnitFactory.getInstance().getUnits(UnitSystemSI.getInstance())) {
       power = 0;
       factor = unit.getFactor();
       if (factor > 1) {
@@ -101,7 +101,7 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
    * ticks.
    * <p>
    */
-  private AUnit m_unit = UNIT_UNCHANGED;
+  private AUnit m_unit = ALabelFormatter.UNIT_UNCHANGED;
 
   /**
    * Default constructor that uses a <code>{@link LabelFormatterSimple}</code>
@@ -159,18 +159,10 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
   }
 
   /**
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(final Object obj) {
-    return this.m_delegate.equals(obj);
-  }
-
-  /**
    * @see info.monitorenter.gui.chart.IAxisLabelFormatter#format(double)
    */
   public String format(final double value) {
-    double tmp = value / this.m_unit.getFactor();
+    final double tmp = value / this.m_unit.getFactor();
     return this.m_delegate.format(tmp);
   }
 
@@ -199,7 +191,7 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
   public int getMaxAmountChars() {
     // find the fractions by using range information:
     int fractionDigits = 0;
-    Range range = this.getAxis().getRange();
+    final Range range = this.getAxis().getRange();
     double dRange = range.getExtent() / this.m_unit.getFactor();
     if (dRange < 1) {
       if (dRange == 0) {
@@ -229,7 +221,7 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
     int integerDigits = 0;
     double max = range.getMax() / (this.m_unit.getFactor());
     double min = Math.abs(range.getMin()) / (this.m_unit.getFactor());
-    if (max == 0 && min == 0) {
+    if ((max == 0) && (min == 0)) {
       integerDigits = 1;
     } else if (max < min) {
       while (min > 1) {
@@ -246,7 +238,7 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
     // errors:
     if (this.m_delegate instanceof LabelFormatterNumber) {
 
-      NumberFormat nf = ((LabelFormatterNumber) this.m_delegate).getNumberFormat();
+      final NumberFormat nf = ((LabelFormatterNumber) this.m_delegate).getNumberFormat();
       if (integerDigits > nf.getMaximumIntegerDigits()) {
         nf.setMaximumIntegerDigits(integerDigits);
       }
@@ -282,13 +274,6 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
     return this.m_unit;
   }
 
-  /**
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    return this.m_delegate.hashCode();
-  }
 
   /**
    * @see info.monitorenter.gui.chart.IAxisLabelFormatter#initPaintIteration()
@@ -296,7 +281,7 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
   @Override
   public void initPaintIteration() {
     this.m_delegate.initPaintIteration();
-    Range domain = this.m_delegate.getAxis().getRange();
+    final Range domain = this.m_delegate.getAxis().getRange();
     this.chooseUnit(domain.getMin(), domain.getMax());
   }
 
@@ -326,6 +311,8 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
   public void setAxis(final IAxis axis) {
 
     this.m_delegate.setAxis(axis);
+    final Range range = axis.getRange();
+    this.chooseUnit(range.getMin(), range.getMax());
   }
 
   /**

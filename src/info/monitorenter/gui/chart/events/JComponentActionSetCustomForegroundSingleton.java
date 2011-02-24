@@ -1,7 +1,7 @@
 /*
  *  JComponentActionSetCustomForegroundSingleton, 
  *  singleton action to set a custom foreground color of a JComponent.
- *  Copyright (C) 2007 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -47,7 +47,7 @@ import javax.swing.JComponent;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public final class JComponentActionSetCustomForegroundSingleton extends AJComponentAction {
 

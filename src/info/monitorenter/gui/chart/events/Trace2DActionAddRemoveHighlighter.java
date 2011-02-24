@@ -1,6 +1,6 @@
 /*
  *  Trace2DActionAddRemoveHighlighter, action to set a Highlighter on an ITrace2D.
- *  Copyright (C) 2007 - 2010 Achim Westermann.
+ *  Copyright (C) 2007 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
  */
 package info.monitorenter.gui.chart.events;
 
-import info.monitorenter.gui.chart.IPointHighlighter;
+import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem;
 
@@ -33,7 +33,7 @@ import javax.swing.AbstractButton;
 
 /**
  * <code>Action</code> that adds or removes constructor-given
- * {@link info.monitorenter.gui.chart.IPointHighlighter} to the corresponding trace.
+ * {@link info.monitorenter.gui.chart.IPointPainter} to the corresponding trace.
  * <p>
  * This action only works in combination with {@link AbstractButton}
  * instances that send themselves as the event object to the
@@ -44,7 +44,7 @@ import javax.swing.AbstractButton;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.6 $
  */
 public final class Trace2DActionAddRemoveHighlighter extends ATrace2DAction {
 
@@ -56,7 +56,7 @@ public final class Trace2DActionAddRemoveHighlighter extends ATrace2DAction {
   /**
    * The stroke to set.
    */
-  private IPointHighlighter< ? > m_pointHighlighter;
+  private IPointPainter< ? > m_pointHighlighter;
 
   /**
    * Create an <code>Action</code> that accesses the trace and identifies itself
@@ -76,10 +76,10 @@ public final class Trace2DActionAddRemoveHighlighter extends ATrace2DAction {
    *          the highlighter to add / remove from the trace.
    */
   public Trace2DActionAddRemoveHighlighter(final ITrace2D trace, final String description,
-      final IPointHighlighter< ? > hightlighter) {
+      final IPointPainter< ? > hightlighter) {
     super(trace, description);
     this.m_pointHighlighter = hightlighter;
-    trace.addPropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS, this);
+    trace.addPropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, this);
   }
 
   /**
@@ -110,9 +110,9 @@ public final class Trace2DActionAddRemoveHighlighter extends ATrace2DAction {
    */
   public void propertyChange(final PropertyChangeEvent evt) {
     String property = evt.getPropertyName();
-    if (property.equals(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS)) {
-      IPointHighlighter< ? > oldValue = (IPointHighlighter< ? >) evt.getOldValue();
-      IPointHighlighter< ? > newValue = (IPointHighlighter< ? >) evt.getNewValue();
+    if (property.equals(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED)) {
+      IPointPainter< ? > oldValue = (IPointPainter< ? >) evt.getOldValue();
+      IPointPainter< ? > newValue = (IPointPainter< ? >) evt.getNewValue();
       // added or removed?
       if (oldValue == null) {
         // added

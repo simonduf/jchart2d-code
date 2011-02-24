@@ -1,6 +1,6 @@
 /*
  * RunningChart, a test for the Chart2D.
- * Copyright (c) 2007 - 2010  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2007 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -51,7 +51,7 @@ import javax.swing.JFrame;
  * <p>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'> Achim Westermann </a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  */
 public class AntialiasingChart extends JFrame {
   /**
@@ -60,7 +60,7 @@ public class AntialiasingChart extends JFrame {
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * @version $Revision: 1.3 $
+   * @version $Revision: 1.5 $
    */
   static class RandomBumper extends Thread {
     /** Streches or compresses the grade of jumping of the internal number. */
@@ -163,7 +163,7 @@ public class AntialiasingChart extends JFrame {
     wnd.setSize(700, 210);
     wnd.setResizable(true);
     wnd.setVisible(true);
-    new ObjRecorder2Trace2DAdapter(data, new RandomBumper(0.5, 1000), "m_number", 100);
+    new ObjRecorder2Trace2DAdapter(data, new RandomBumper(0.5, 1000), "m_number", 1000);
   }
 
   /** The chart to use. */

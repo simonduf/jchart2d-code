@@ -1,6 +1,6 @@
 /*
  *  IToolTipType.java of project jchart2d, interface for tool tips of the chart. 
- *  Copyright (C) 2004 - 2010, Achim Westermann.
+ *  Copyright (C) 2004 - 2011, Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -20,8 +20,8 @@
  *
  *
  * File   : $Source: /cvsroot/jchart2d/jchart2d/src/info/monitorenter/gui/chart/IToolTipType.java,v $
- * Date   : $Date: 2010/06/01 21:34:27 $
- * Version: $Revision: 1.4 $
+ * Date   : $Date: 2011/01/14 08:36:10 $
+ * Version: $Revision: 1.5 $
  */
 
 package info.monitorenter.gui.chart;

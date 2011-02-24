@@ -1,6 +1,6 @@
 /*
  *  Messages.java of project jchart2d, Localization bundle. 
- *  Copyright (C) 2004 - 2010, Achim Westermann
+ *  Copyright (C) 2004 - 2011, Achim Westermann
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -20,8 +20,8 @@
  *
  *
  * File   : $Source: /cvsroot/jchart2d/jchart2d/src/info/monitorenter/gui/util/Messages.java,v $
- * Date   : $Date: 2010/06/01 21:34:31 $
- * Version: $Revision: 1.4 $
+ * Date   : $Date: 2011/01/14 08:36:11 $
+ * Version: $Revision: 1.6 $
  */
 
 package info.monitorenter.gui.util;
@@ -37,7 +37,9 @@ import java.util.ResourceBundle;
  * 
  */
 public class Messages {
-  private static final String BUNDLE_NAME = "info.monitorenter.gui.util.messages"; //$NON-NLS-1$
+  
+  /** Constant for the bundle name. */
+  private static final String BUNDLE_NAME = "info.monitorenter.gui.util.messages"; 
 
   /** Bundle constant. */
   private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);

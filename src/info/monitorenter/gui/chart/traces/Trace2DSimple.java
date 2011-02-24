@@ -1,6 +1,6 @@
 /*
  *  Trace2DSimple, a list- based simple implementation of a ITrace2D.
- *  Copyright (c) 2004 - 2010 Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2011 Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -34,7 +34,7 @@ import java.util.List;
  * <code>{@link info.monitorenter.gui.chart.TracePoint2D}</code> instances in
  * a <code>{@link java.util.List}</code>.
  * <p>
- * This class has the following behaviour: <br>
+ * This class has the following behavior: <br>
  * <ul>
  * <li>All tracepoints that are added are stored unchanged in a LinkedList.
  * </li>
@@ -47,7 +47,7 @@ import java.util.List;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.16 $
  */
 public class Trace2DSimple
     extends ATrace2D implements ITrace2D {

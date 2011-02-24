@@ -1,6 +1,6 @@
 /*
  * ITrace2D, the interface for all traces used by the Chart2D.
- * Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2004 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -140,18 +140,27 @@ import java.util.Set;
  * </tr>
  * <tr>
  * <td>
- * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_POINT_HIGHLIGHTERS}</code>
+ * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_POINT_HIGHLIGHTERS_CHANGED}</code>
  * </td>
  * <td><code>{@link ITrace2D}</code> that changed</td>
  * <td><code>null</code>, indicating that a point highlighter was added.</td>
- * <td><code>{@link info.monitorenter.gui.chart.IPointHighlighter}</code>, the
+ * <td><code>{@link info.monitorenter.gui.chart.IPointPainter}</code>, the
  * new highlighter.</td>
+ * </tr>
+ * <tr>
+ * <td>
+ * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_POINT_HIGHLIGHTERS_CHANGED}</code>
+ * </td>
+ * <td><code>{@link ITrace2D}</code> that changed</td>
+ * <td><code>{@link info.monitorenter.gui.chart.IPointPainter}</code>, the
+ * old highlighter.</td>
+ * <td><code>null</code>, indicating that a point highlighter was removed.</td>
  * </tr>
  * <tr>
  * <td>
  * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_PAINTERS}</code></td>
  * <td><code>{@link ITrace2D}</code> that changed</td>
- * <td><code>{@link info.monitorenter.gui.chart.IPointHighlighter}</code>, the
+ * <td><code>{@link info.monitorenter.gui.chart.IPointPainter}</code>, the
  * old highlighter.</td>
  * <td><code>null</code>, indicating that a highlighter was removed.</td>
  * </tr>
@@ -240,7 +249,7 @@ import java.util.Set;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.36 $
+ * @version $Revision: 1.41 $
  */
 public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, Serializable {
 
@@ -253,30 +262,30 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
-   * @version $Revision: 1.36 $
+   * @version $Revision: 1.41 $
    */
-  public final class ManhattanDistancePoint {
+  public final class DistancePoint {
+    /** Constant for unfound distance. */
+    public static final DistancePoint EMPTY = new DistancePoint();
+
+    /** The measured distance. */
+    private double m_distance;
+
     /** The point with the distance. */
     private ITracePoint2D m_point;
-
-    /** Constant for unfound manhattan distance. */
-    public static final ManhattanDistancePoint EMPTY = new ManhattanDistancePoint();
-
-    /** The measured Manhattan distance. */
-    private double m_manhattanDistance;
 
     /**
      * Defcon.
      */
-    public ManhattanDistancePoint() {
+    public DistancePoint() {
       // nop.
     }
 
     /**
-     * @return the manhattandistance.
+     * @return the distance.
      */
-    public final double getManhattanDistance() {
-      return this.m_manhattanDistance;
+    public final double getDistance() {
+      return this.m_distance;
     }
 
     /**
@@ -290,8 +299,8 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
      * @param manhattandistance
      *          the manhattandistance to set
      */
-    public final void setManhattanDistance(final double manhattandistance) {
-      this.m_manhattanDistance = manhattandistance;
+    public final void setDistance(final double manhattandistance) {
+      this.m_distance = manhattandistance;
     }
 
     /**
@@ -339,6 +348,18 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public static final String PROPERTY_ERRORBARPOLICY_CONFIGURATION = "ITrace2D.PROPERTY_ERRORBARPOLICY_CONFIGURATION";
 
   /**
+   * The property key defining the <code>label</code> property. Use in
+   * combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   * <p>
+   * 
+   * This is no real property as the <code>{@link #getLabel()}</code> access two
+   * other fields.
+   * <p>
+   */
+  public static final String PROPERTY_LABEL = "ITrace2D.PROPERTY_LABEL";
+
+  /**
    * The property key defining the <code>maxX</code> property. Use in
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
@@ -382,14 +403,6 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public static final String PROPERTY_PAINTERS = "ITrace2D.PROPERTY_PAINTERS";
 
   /**
-   * The property key defining a change in the set of <code>
-   * {@link IPointHighlighter}</code>
-   * instances. Use in combination with
-   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
-   */
-  public static final String PROPERTY_POINT_HIGHLIGHTERS = "ITrace2D.PROPERTY_POINT_HIGHLIGHTERS";
-
-  /**
    * The property key defining the <code>physicalUnits</code> property. Use in
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
@@ -412,6 +425,14 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public static final String PROPERTY_POINT_CHANGED = "ITrace2D.PROPERTY_POINT_CHANGED";
 
   /**
+   * The property key defining a change in the set of <code>
+   * {@link IPointPainter}</code>
+   * instances. Use in combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   */
+  public static final String PROPERTY_POINT_HIGHLIGHTERS_CHANGED = "ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED";
+
+  /**
    * The property key defining the <code>stroke</code> property. Use in
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
@@ -432,18 +453,6 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
   public static final String PROPERTY_VISIBLE = "ITrace2D.PROPERTY_VISIBLE";
-
-  /**
-   * The property key defining the <code>label</code> property. Use in
-   * combination with
-   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
-   * <p>
-   * 
-   * This is no real property as the <code>{@link #getLabel()}</code> access two
-   * other fields.
-   * <p>
-   */
-  public static final String PROPERTY_LABEL = "ITrace2D.PROPERTY_LABEL";
 
   /**
    * The property key defining the <code>zIndex</code> property.
@@ -498,7 +507,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * @return true if the painter was added (same instance was not contained
    *         before).
    */
-  public boolean addErrorBarPolicy(IErrorBarPolicy<?> errorBarPolicy);
+  public boolean addErrorBarPolicy(IErrorBarPolicy< ? > errorBarPolicy);
 
   /**
    * Adds a trace point to the internal data.
@@ -543,9 +552,10 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public boolean addPoint(ITracePoint2D p);
 
   /**
-   * Adds the given point highlighter to the internal set of point highlighters.
+   * Adds the given point painter to the internal set of point highlighters.
    * <p>
-   * It will be the last point highlighter to paint if highlighting is done.
+   * It will be the last point painter to paint highlighting if highlighting is
+   * active.
    * <p>
    * 
    * @param highlighter
@@ -554,7 +564,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * @return true if the highlighter was added (class of instance not contained
    *         before).
    */
-  public boolean addPointHighlighter(IPointHighlighter<?> highlighter);
+  public boolean addPointHighlighter(IPointPainter< ? > highlighter);
 
   /**
    * Registers a property change listener that will be informed about changes of
@@ -580,7 +590,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * @return true if the painter was added (class of instance not contained
    *         before).
    */
-  public boolean addTracePainter(ITracePainter<?> painter);
+  public boolean addTracePainter(ITracePainter< ? > painter);
 
   /**
    * Returns true if the given painter is contained in this compound painter.
@@ -590,7 +600,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    *          the painter to check whether it is contained.
    * @return true if the given painter is contained in this compound painter.
    */
-  public boolean containsTracePainter(final ITracePainter<?> painter);
+  public boolean containsTracePainter(final ITracePainter< ? > painter);
 
   /**
    * Method to trigger by <code>{@link TracePoint2D#setLocation(double, double)}
@@ -649,7 +659,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * @return the <code>Set&lt;{@link IErrorBarPolicy}&gt;</code> that will be
    *         used to render error bars for this trace.
    */
-  public Set<IErrorBarPolicy<?>> getErrorBarPolicies();
+  public Set<IErrorBarPolicy< ? >> getErrorBarPolicies();
 
   /**
    * Returns true if this trace has error bars configured.
@@ -763,6 +773,32 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
 
   /**
    * Returns the nearest point to the given normalized value coordinates of this
+   * trace in Euclid distance.
+   * <p>
+   * Please note that the arguments must be normalized value coordinates like
+   * provided by a <code>{@link TracePoint2D#getScaledX()}</code> or the
+   * division of a pixel coordinate by the total pixel range of the chart.
+   * <p>
+   * Using the Manhattan distance is much faster than Euclid distance as it only
+   * includes basic addition an absolute value for computation per point (vs.
+   * square root, addition and quadrature for Euclid distance). However the
+   * euclid distance spans a circle for the nearest points which is visually
+   * more normal for end users than the Manhattan distance which forms a rhombus
+   * and reaches far distances in only one dimension.
+   * <p>
+   * 
+   * @param x
+   *          the x value as a normalized value between 0 and 1.0.
+   * @param y
+   *          the x value as a normalized value between 0 and 1.0.
+   * 
+   * @return the nearest point to the given normalized value coordinates of this
+   *         trace in Euclid distance.
+   */
+  public DistancePoint getNearestPointEuclid(double x, double y);
+
+  /**
+   * Returns the nearest point to the given normalized value coordinates of this
    * trace in Manhattan distance.
    * <p>
    * Please note that the arguments must be normalized value coordinates like
@@ -782,7 +818,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * @return the nearest point to the given normalized value coordinates of this
    *         trace in Manhattan distance.
    */
-  public ManhattanDistancePoint getNearestPointManhattan(double x, double y);
+  public DistancePoint getNearestPointManhattan(double x, double y);
 
   /**
    * Returns the concatenation <code>[x: "{@link #getPhysicalUnitsX()}", y: "
@@ -814,16 +850,16 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public String getPhysicalUnitsY();
 
   /**
-   * Returns the <code>Set&lt;{@link IPointHighlighter}&gt;</code> that may be used to
-   * highlight points.
+   * Returns the <code>Set&lt;{@link IPointPainter}&gt;</code> that may be used to highlight
+   * points of this trace.
    * <p>
-   * This is used by the point highlighting feature for tool tips :
-   * <code>{@link Chart2D.ToolTipType#VALUE_SNAP_TO_TRACEPOINTS}</code>
+   * This is used by the point highlighting feature:
+   * <code>{@link Chart2D#enablePointHighlighting(boolean)}</code>
    * 
-   * @return the <code>Set&lt;{@link IPointHighlighter}&gt;</code> that may be
-   *         used to highlight points.
+   * @return the <code>Set&lt;{@link IPointPainter}&gt;</code> that may be used
+   *         to highlight points.
    */
-  public Set<IPointHighlighter<?>> getPointHighlighters();
+  public Set<IPointPainter< ? >> getPointHighlighters();
 
   /**
    * Returns all property change listeners for the given property.
@@ -872,7 +908,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * @return the <code>Set&lt;{@link ITracePainter}&gt;</code> that will be used
    *         to paint this trace.
    */
-  public Set<ITracePainter<?>> getTracePainters();
+  public Set<ITracePainter< ? >> getTracePainters();
 
   /**
    * The z-index defines the order in which this instance will be painted.
@@ -884,6 +920,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    *         be painted.
    */
   public Integer getZIndex();
+
   /**
    * Returns false if internal <code>{@link TracePoint2D}</code> instances are
    * contained or true if not.
@@ -923,18 +960,19 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public Iterator<ITracePoint2D> iterator();
 
   /**
-   * Clears all internal point highlighters used.<p>
-   * 
-   * Returns the <code>Set&lt;{@link IPointHighlighter}&gt;</code> that was used to
-   * highlight points.
+   * Clears all internal point highlighters used.
    * <p>
-   * This is used by the point highlighting feature for tool tips :
-   * <code>{@link Chart2D.ToolTipType#VALUE_SNAP_TO_TRACEPOINTS}</code>
    * 
-   * @return the <code>Set&lt;{@link IPointHighlighter}&gt;</code> that was be
-   *         used to highlight points.
+   * Returns the <code>Set&lt;{@link IPointPainter}&gt;</code> that was used to highlight
+   * points.
+   * <p>
+   * This is used by the point highlighting feature:
+   * <code>{@link Chart2D#enablePointHighlighting(boolean)}</code>
+   * 
+   * @return the <code>Set&lt;{@link IPointPainter}&gt;</code> that was be used
+   *         to highlight points.
    */
-  public Set<IPointHighlighter<?>> removeAllPointHighlighters();
+  public Set<IPointPainter< ? >> removeAllPointHighlighters();
 
   /**
    * Removes all internal <code>TracePoint2D</code>.{@link #isEmpty()} will
@@ -965,7 +1003,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    *          the error bar policy to remove.
    * @return true if the painter was removed (same instance contained before).
    */
-  public boolean removeErrorBarPolicy(IErrorBarPolicy<?> errorBarPolicy);
+  public boolean removeErrorBarPolicy(IErrorBarPolicy< ? > errorBarPolicy);
 
   /**
    * Removes the given point from this trace.
@@ -987,10 +1025,10 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * @return true if a point highlighter of the class of the given argument was
    *         removed.
    */
-  public boolean removePointHighlighter(final IPointHighlighter<?> highlighter);
+  public boolean removePointHighlighter(final IPointPainter< ? > highlighter);
 
   /**
-   * Deregisters a property change listener that has been registerd for
+   * Unregisters a property change listener that has been registered for
    * listening on all properties.
    * <p>
    * 
@@ -1005,7 +1043,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * <p>
    * 
    * @param property
-   *          one of the constants with teh <code>PROPERTY_</code> prefix
+   *          one of the constants with the <code>PROPERTY_</code> prefix
    *          defined in this class or subclasses.
    * @param listener
    *          the listener for this property change.
@@ -1022,7 +1060,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * @return true if a trace painter of the class of the given argument was
    *         removed.
    */
-  public boolean removeTracePainter(final ITracePainter<?> painter);
+  public boolean removeTracePainter(final ITracePainter< ? > painter);
 
   /**
    * Set a <code>java.awt.Color</code> for this trace.
@@ -1042,7 +1080,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * @return the <code>Set&lt;{@link IErrorBarPolicy}&gt;</code> that was used
    *         before.
    */
-  public Set<IErrorBarPolicy<?>> setErrorBarPolicy(IErrorBarPolicy<?> errorBarPolicy);
+  public Set<IErrorBarPolicy< ? >> setErrorBarPolicy(IErrorBarPolicy< ? > errorBarPolicy);
 
   /**
    * Assingns a specific name to the <code>ITrace2D</code> which will be
@@ -1055,7 +1093,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public void setName(String name);
 
   /**
-   * Assings a specific String representing the physical unit to the <code>
+   * Assigns a specific String representing the physical unit to the <code>
    *  ITrace2D</code>
    * (e.g. Volt, Ohm, lux, ...) which will be displayed by the <code>
    * {@link Chart2D}</code>
@@ -1075,14 +1113,14 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * @param highlighter
    *          the new sole highlighter to use.
    * 
-   * @return the <code>Set&lt;{@link IPointHighlighter}&gt;</code> that was used
+   * @return the <code>Set&lt;{@link IPointPainter}&gt;</code> that was used
    *         before or null if nothing changed.
    */
-  public Set<IPointHighlighter<?>> setPointHighlighter(IPointHighlighter<?> highlighter);
+  public Set<IPointPainter< ? >> setPointHighlighter(IPointPainter< ? > highlighter);
 
   /**
    * This is a callback from {@link Chart2D#addTrace(ITrace2D)} and must not be
-   * invoked from elswhere (needed for synchronization).
+   * invoked from elsewhere (needed for synchronization).
    * <p>
    * Not the best design to put this to an interface, but Char2D should handle
    * this interface only.
@@ -1113,7 +1151,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * @return the <code>Set&lt;{@link ITracePainter}&gt;</code> that was used
    *         before.
    */
-  public Set<ITracePainter<?>> setTracePainter(ITracePainter<?> painter);
+  public Set<ITracePainter< ? >> setTracePainter(ITracePainter< ? > painter);
 
   /**
    * Set the visibility. If argument is false, this instance will not be

@@ -1,6 +1,6 @@
 /*
  * MultiTracing, a demo testing the thread- safetiness of the Chart2D.
- * Copyright (c) 2007 - 2010  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2007 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -43,21 +43,20 @@ import javax.swing.JFrame;
  * single point to the chart and go to a sleep. After having painted the whole
  * trace, each Thread sleeps for a random time, removes it's trace, sleeps for
  * another random time and starts again. <br>
- * To be true: the data for the <code>TracePoint</code> instances is computed
- * a single time at startup.
+ * To be true: the data for the <code>TracePoint</code> instances is computed a
+ * single time at startup.
  * </p>
  * <p>
  * This test may blow your CPU. I am currently working on an AMD Athlon 1200,
  * 512 MB RAM so I did not get these problems.
  * </p>
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.13 $
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  */
 
-public final class MultiTracing
-    extends JFrame {
+public final class MultiTracing extends JFrame {
   /**
    * Thread that adds a trace to a chart, paints the points with configurable
    * sleep breaks and then removes it. It then goes to sleep and starts this
@@ -67,10 +66,9 @@ public final class MultiTracing
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.11 $
+   * @version $Revision: 1.13 $
    */
-  static final class AddPaintRemoveThread
-      extends Thread {
+  static final class AddPaintRemoveThread extends Thread {
 
     /** The y values to paint. */
     private double[] m_data;
@@ -115,42 +113,47 @@ public final class MultiTracing
      */
     @Override
     public void run() {
+      try {
 
-      while (true) {
-        if (Chart2D.DEBUG_THREADING) {
-          System.out.println(this.getName() + "(" + Thread.currentThread().getName() + ") adding trace.");
-        }
-        this.m_innnerChart.addTrace(this.m_trace);
-        for (int i = 0; i < this.m_data.length; i++) {
+        while (true) {
+
           if (Chart2D.DEBUG_THREADING) {
             System.out.println(this.getName() + "(" + Thread.currentThread().getName()
-                + ") adding point to " + this.m_trace.getName());
+                + ") adding trace.");
           }
-          this.m_trace.addPoint(i, this.m_data[i]);
+          this.m_innnerChart.addTrace(this.m_trace);
+          for (int i = 0; i < this.m_data.length; i++) {
+            if (Chart2D.DEBUG_THREADING) {
+              System.out.println("Thread "+ this.getName() + " adding point to " + this.m_trace.getName());
+            }
+            this.m_trace.addPoint(i, this.m_data[i]);
+            try {
+              Thread.sleep(this.m_sleep);
+            } catch (InterruptedException e) {
+              e.printStackTrace(System.err);
+            }
+
+          }
           try {
-            Thread.sleep(this.m_sleep);
+            Thread.sleep((long) (Math.random() * this.m_sleep));
           } catch (InterruptedException e) {
             e.printStackTrace(System.err);
           }
+          if (Chart2D.DEBUG_THREADING) {
+            System.out.println(this.getName() + "(" + Thread.currentThread().getName()
+                + ") removing trace.");
+          }
+          this.m_innnerChart.removeTrace(this.m_trace);
+          this.m_trace.removeAllPoints();
 
+          try {
+            Thread.sleep((long) (Math.random() * this.m_sleep));
+          } catch (InterruptedException e) {
+            e.printStackTrace(System.err);
+          }
         }
-        try {
-          Thread.sleep((long) (Math.random() * this.m_sleep));
-        } catch (InterruptedException e) {
-          e.printStackTrace(System.err);
-        }
-        if (Chart2D.DEBUG_THREADING) {
-          System.out
-              .println(this.getName() + "(" + Thread.currentThread().getName() + ") removing trace.");
-        }
-        this.m_innnerChart.removeTrace(this.m_trace);
-        this.m_trace.removeAllPoints();
-
-        try {
-          Thread.sleep((long) (Math.random() * this.m_sleep));
-        } catch (InterruptedException e) {
-          e.printStackTrace(System.err);
-        }
+      } catch (Throwable f) {
+        f.printStackTrace(System.err);
       }
     }
   }
@@ -162,8 +165,6 @@ public final class MultiTracing
 
   /** Sleep break time between adding two points. */
   private static final int SLEEP = 100;
-
-
 
   /**
    * Main entry.
@@ -216,8 +217,8 @@ public final class MultiTracing
     }
 
     final MultiTracing wnd = new MultiTracing();
-//    wnd.setForceXRange(new Range(0, data[0].length + 10));
-//    wnd.setForceYRange(MultiTracing.getRange(data));
+    // wnd.setForceXRange(new Range(0, data[0].length + 10));
+    // wnd.setForceYRange(MultiTracing.getRange(data));
     wnd.setLocation(100, 300);
     wnd.setSize(800, 300);
     wnd.setResizable(true);

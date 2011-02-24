@@ -41,7 +41,7 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class TestLabelFormatterAutoUnits extends ATestChartOperations {
 
@@ -57,7 +57,8 @@ public class TestLabelFormatterAutoUnits extends ATestChartOperations {
     suite.setName(TestLabelFormatterAutoUnits.class.getName());
 
     suite.addTest(new TestLabelFormatterAutoUnits("testLabelFormatterAutoUnits"));
-    
+    suite.addTest(new TestLabelFormatterAutoUnits("testLabelFormatterAutoUnitsFemto"));
+    suite.addTest(new TestLabelFormatterAutoUnits("testLabelFormatterAutoUnitsNano"));
 
     return suite;
   }
@@ -126,6 +127,72 @@ public class TestLabelFormatterAutoUnits extends ATestChartOperations {
 
   }
   
+  /**
+   * Checks if the given label formatter uses the femto unit for small numbers 
+   * (e.g. 0.0000000000000005).
+   * <p>
+   */
+  public void testLabelFormatterAutoUnitsFemto() {
+    ATestChartOperations.AChartOperation operation = new AChartOperation(
+        "y-axis should have femto prefix") {
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
+      public Object action(final Chart2D chart) {
+        return null;
+      }
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#fillTrace(info.monitorenter.gui.chart.ITrace2D)
+       */
+      @Override
+      public void fillTrace(final ITrace2D trace) {
+        trace.addPoint(47,  0.0000000000000005);
+        trace.addPoint(48,  0.0000000000000010);
+        trace.addPoint(48,  0.0000000000000006);
+        trace.addPoint(49,  0.0000000000000009);
+        trace.addPoint(49,  0.0000000000000008);
+        trace.addPoint(50,  0.0000000000000007);
+        trace.addPoint(48,  0.0000000000000012);
+      }
+    };
+    this.setTestOperation(operation);
+  } 
+
+  /**
+   * Checks if the given label formatter uses the nano unit for small numbers 
+   * (e.g. 0.0000000000005).
+   * <p>
+   */
+  public void testLabelFormatterAutoUnitsNano() {
+    ATestChartOperations.AChartOperation operation = new AChartOperation(
+        "y-axis should have femto prefix") {
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
+      public Object action(final Chart2D chart) {
+        return null;
+      }
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#fillTrace(info.monitorenter.gui.chart.ITrace2D)
+       */
+      @Override
+      public void fillTrace(final ITrace2D trace) {
+        trace.addPoint(47,  0.0000000000005);
+        trace.addPoint(48,  0.0000000000010);
+        trace.addPoint(48,  0.0000000000006);
+        trace.addPoint(49,  0.0000000000009);
+        trace.addPoint(49,  0.0000000000008);
+        trace.addPoint(50,  0.0000000000007);
+        trace.addPoint(50,  0.0000000000027);
+      }
+    };
+    this.setTestOperation(operation);
+  } 
+
   /**
    * Sets a new number format to a <code>{@link LabelFormatterNumber}</code> of
    * the y axis.

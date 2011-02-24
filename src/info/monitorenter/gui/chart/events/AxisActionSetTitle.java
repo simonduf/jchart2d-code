@@ -1,7 +1,7 @@
 /*
  *  AxisActionSetTitle.java of project jchart2d, an action  implementation 
  *  to set the title String of an IAxis.
- *  Copyright (c) 2007 - 2010 Achim Westermann, created on 20:30:06.
+ *  Copyright (c) 2007 - 2011 Achim Westermann, created on 20:30:06.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -39,7 +39,7 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class AxisActionSetTitle extends AAxisAction {
 

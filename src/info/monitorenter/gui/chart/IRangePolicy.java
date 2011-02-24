@@ -1,6 +1,6 @@
 /*
  *  IRangePolicy.java of project jchart2d. Interface for viewport policies. 
- *  Copyright (C) 2004 - 2010 Achim Westermann.
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -42,7 +42,7 @@ import java.io.Serializable;
  * <th><code>property</code></th>
  * <th><code>oldValue</code></th>
  * <th><code>newValue</code></th>
- * <th>occurance</th>
+ * <th>occurrence</th>
  * </tr>
  * <tr>
  * <td><code>{@link #PROPERTY_RANGE}</code></td>
@@ -72,7 +72,7 @@ import java.io.Serializable;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.9 $
  * 
  * @see info.monitorenter.gui.chart.axis.AAxis
  */

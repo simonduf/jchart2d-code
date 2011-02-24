@@ -1,6 +1,6 @@
 /*
  *  IUnitSystem.java, interface for unit systems.
- *  Copyright (C) 2004 - 2010 Achim Westermann.
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -34,7 +34,7 @@ package info.monitorenter.util.units;
  *
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public interface IUnitSystem {
   /**

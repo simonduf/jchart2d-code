@@ -1,6 +1,6 @@
 /*
  *  Chart2DActionEnableHighlighting.java of project jchart2d
- *  Copyright (c) 2010 Achim Westermann.
+ *  Copyright (c) 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,6 @@
 package info.monitorenter.gui.chart.events;
 
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.controls.LayoutFactory;
 import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem;
 
@@ -55,7 +54,7 @@ import javax.swing.JRadioButtonMenuItem;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  */
 public class Chart2DActionEnableHighlighting extends AChart2DAction {
 
@@ -100,7 +99,7 @@ public class Chart2DActionEnableHighlighting extends AChart2DAction {
    */
   public void propertyChange(final PropertyChangeEvent evt) {
     String property = evt.getPropertyName();
-    if (property.equals(IAxis.PROPERTY_PAINTGRID)) {
+    if (property.equals(Chart2D.PROPERTY_POINT_HIGHLIGHTING_ENABLED)) {
       this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, evt.getOldValue(),
           evt.getNewValue());
     }

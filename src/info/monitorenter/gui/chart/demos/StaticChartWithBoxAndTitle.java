@@ -2,7 +2,7 @@
  * StaticChartWithBoxAndTitle.java of project jchart2d, a demonstration 
  * of the minimal code to set up a chart with static data surrounded 
  * by a titeled box. 
- * Copyright (C) 2007 - 2010 Achim Westermann
+ * Copyright (C) 2007 - 2011 Achim Westermann
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -48,7 +48,7 @@ import javax.swing.border.TitledBorder;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public final class StaticChartWithBoxAndTitle extends JPanel {
   /**

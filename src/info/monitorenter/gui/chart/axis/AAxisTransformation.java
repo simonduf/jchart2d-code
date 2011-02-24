@@ -2,7 +2,7 @@
  *  AAxisTransformation.java of project jchart2d, 
  *  base class for Axis implementations that transform the scale 
  *  for changed display.  
- *  Copyright (C) 2007 -2010 Achim Westermann, created on 20:33:13.
+ *  Copyright (C) 2007 -2011 Achim Westermann, created on 20:33:13.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -28,8 +28,8 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
-import info.monitorenter.util.MathUtil;
 import info.monitorenter.util.Range;
+import info.monitorenter.util.math.MathUtil;
 
 import java.awt.event.MouseEvent;
 import java.util.Iterator;
@@ -40,7 +40,7 @@ import java.util.Iterator;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.30 $
+ * @version $Revision: 1.32 $
  */
 public abstract class AAxisTransformation extends AAxis {
 
@@ -240,9 +240,6 @@ public abstract class AAxisTransformation extends AAxis {
 
   }
 
-  /** Generated <code>serialVersionUID</code>. **/
-  private static final long serialVersionUID = -4665444421196939779L;
-
   /**
    * Internal flag that defines that only every n milliseconds a transformation
    * error (untransformable value was used in chart: this axis implementation of
@@ -250,6 +247,9 @@ public abstract class AAxisTransformation extends AAxis {
    * output.
    */
   private static final int OUTPUT_ERROR_THRESHHOLD = 30000;
+
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = -4665444421196939779L;
 
   /**
    * Internal timestamp of the last transformation error reporting.

@@ -1,7 +1,7 @@
 /*
  * ITracePainter.java,  provides new instances of ITracePoint2D whenever
  * jchart needs to create them.
- * Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2004 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@ package info.monitorenter.gui.chart;
  * <p> 
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public interface ITracePointProvider {
 

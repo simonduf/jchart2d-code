@@ -8,12 +8,8 @@
    <div id="main">
     <!-- Header -->
     <!--#include virtual="./header.shtml" -->
-
-    
     <!--#include virtual="./navigation.shtml" -->
     <!-- Navigation -->
-    
-    
     <div id="content">
      <h2>Credits</h2>
      <p>
@@ -47,12 +43,11 @@
       </tr>
       <tr>
        <td id="box" style="background-color: #eef5fd;">
-        <a href="http://jlibeps.sourceforge.net/">jlibeps - A java EPS library</a>
+        <a href="http://xmlgraphics.apache.org/commons/">Apache XML Graphics Commons</a>
        </td>
        <td>
-        <a href="http://jlibeps.sourceforge.net/" target="_blank">http://jlibeps.sourceforge.net</a><br/>
-        jlibeps is a free java library which allows the creation of EPS pictures from a graphics2D; 
-        jlibeps is released on the GNU GPL. jlibeps is compatible with java 1.4 and newer versions.
+        <a href="http://xmlgraphics.apache.org/commons/" target="_blank">http://xmlgraphics.apache.org/commons/</a><br/>
+        This is used to create of EPS output. Great library that works on Graphics2D implementation.
        </td>
       </tr>
       

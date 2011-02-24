@@ -2,7 +2,7 @@
  *  MultitraceStaticChart.java of project jchart2d, a demonstration 
  *  of the minimal code to set up a chart with static data and several 
  *  traces. 
- *  Copyright (C) 2007 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,6 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.pointhighlighters.PointHighlighterConfigurable;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.views.ChartPanel;
@@ -46,7 +45,7 @@ import javax.swing.JPanel;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.9 $
  */
 public final class MultitraceStaticChart
     extends JPanel {
@@ -96,16 +95,16 @@ public final class MultitraceStaticChart
     // ITrace2D trace = new Trace2DLtd(200);
     ITrace2D trace = new Trace2DSimple();
     trace.setColor(Color.RED);
+    // Add the trace to the chart before adding any points / point highlighters:
+    chart.addTrace(trace);
 
     // Feature: turn on tool tips that mark the nearest tracepoint: 
     chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
     // Feature: turn on highlightings that mark the nearest tracepoint: 
     chart.enablePointHighlighting(true);
     // also specify which highlighter to use for the trace!
-    trace.setPointHighlighter(new PointHighlighterConfigurable(new PointPainterDisc(8),true));
+    trace.setPointHighlighter(new PointPainterDisc(8));
 
-    // Add the trace to the chart:
-    chart.addTrace(trace);
     // Add all points, as it is static:
     double time = System.currentTimeMillis();
     for (int i = 0; i < 100; i++) {
@@ -115,9 +114,9 @@ public final class MultitraceStaticChart
     // Create 2nd ITrace:
     trace = new Trace2DSimple();
     trace.setColor(Color.BLUE);
-    trace.setPointHighlighter(new PointHighlighterConfigurable(new PointPainterDisc(8),true));
-    // Add the trace to the chart:
+    // Add the trace to the chart before adding any points / point highlighters:
     chart.addTrace(trace);
+    trace.setPointHighlighter(new PointPainterDisc(8));
     // Add all points, as it is static:
     for (int i = 0; i < 100; i++) {
       trace.addPoint(time + i, 200 - i * Math.random());

@@ -1,6 +1,6 @@
 /*
  *  ErrorBarPixel.java of project jchart2d, a plain data container implementation. 
- *  Copyright (c) 2007 - 2010 Achim Westermann, created on 02.10.2006 08:21:35.
+ *  Copyright (c) 2007 - 2011 Achim Westermann, created on 02.10.2006 08:21:35.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import info.monitorenter.gui.chart.ITrace2D;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.11 $
  */
 public class ErrorBarPixel implements IErrorBarPixel {
 
@@ -39,16 +39,16 @@ public class ErrorBarPixel implements IErrorBarPixel {
   private static final long serialVersionUID = -8982331911629960274L;
 
   /** The negative x error in pixel. */
-  private int m_negativeXErrorPixel = ERROR_PIXEL_NONE;
+  private int m_negativeXErrorPixel = IErrorBarPixel.ERROR_PIXEL_NONE;
 
   /** The negative y error in pixel. */
-  private int m_negativeYErrorPixel = ERROR_PIXEL_NONE;
+  private int m_negativeYErrorPixel = IErrorBarPixel.ERROR_PIXEL_NONE;
 
   /** The positive x error in pixel. */
-  private int m_positiveXErrorPixel = ERROR_PIXEL_NONE;
+  private int m_positiveXErrorPixel = IErrorBarPixel.ERROR_PIXEL_NONE;
 
   /** The positive y error in pixel. */
-  private int m_positiveYErrorPixel = ERROR_PIXEL_NONE;
+  private int m_positiveYErrorPixel = IErrorBarPixel.ERROR_PIXEL_NONE;
 
   /**
    * The trace the corresponding
@@ -65,7 +65,7 @@ public class ErrorBarPixel implements IErrorBarPixel {
    * <p>
    * 
    * @param trace
-   *            required for transformation.
+   *          required for transformation.
    */
   public ErrorBarPixel(final ITrace2D trace) {
     this.m_trace = trace;
@@ -79,10 +79,40 @@ public class ErrorBarPixel implements IErrorBarPixel {
    * <p>
    */
   public void clear() {
-    this.m_negativeXErrorPixel = ERROR_PIXEL_NONE;
-    this.m_negativeYErrorPixel = ERROR_PIXEL_NONE;
-    this.m_positiveXErrorPixel = ERROR_PIXEL_NONE;
-    this.m_positiveYErrorPixel = ERROR_PIXEL_NONE;
+    this.m_negativeXErrorPixel = IErrorBarPixel.ERROR_PIXEL_NONE;
+    this.m_negativeYErrorPixel = IErrorBarPixel.ERROR_PIXEL_NONE;
+    this.m_positiveXErrorPixel = IErrorBarPixel.ERROR_PIXEL_NONE;
+    this.m_positiveYErrorPixel = IErrorBarPixel.ERROR_PIXEL_NONE;
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final ErrorBarPixel other = (ErrorBarPixel) obj;
+    if (this.m_negativeXErrorPixel != other.m_negativeXErrorPixel) {
+      return false;
+    }
+    if (this.m_negativeYErrorPixel != other.m_negativeYErrorPixel) {
+      return false;
+    }
+    if (this.m_positiveXErrorPixel != other.m_positiveXErrorPixel) {
+      return false;
+    }
+    if (this.m_positiveYErrorPixel != other.m_positiveYErrorPixel) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -121,11 +151,25 @@ public class ErrorBarPixel implements IErrorBarPixel {
   }
 
   /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + this.m_negativeXErrorPixel;
+    result = prime * result + this.m_negativeYErrorPixel;
+    result = prime * result + this.m_positiveXErrorPixel;
+    result = prime * result + this.m_positiveYErrorPixel;
+    return result;
+  }
+
+  /**
    * Intended for {@link AErrorBarPolicyConfigurable} only.
    * <p>
    * 
    * @param negativeXError
-   *            The negativeXError in pixel to set.
+   *          The negativeXError in pixel to set.
    */
   protected final void setNegativeXErrorPixel(final int negativeXError) {
     this.m_negativeXErrorPixel = negativeXError;
@@ -136,7 +180,7 @@ public class ErrorBarPixel implements IErrorBarPixel {
    * <p>
    * 
    * @param negativeYError
-   *            The negativeYError in pixel to set.
+   *          The negativeYError in pixel to set.
    */
   protected final void setNegativeYErrorPixel(final int negativeYError) {
     this.m_negativeYErrorPixel = negativeYError;
@@ -147,7 +191,7 @@ public class ErrorBarPixel implements IErrorBarPixel {
    * <p>
    * 
    * @param positiveXError
-   *            The positiveXError in pixel to set.
+   *          The positiveXError in pixel to set.
    */
   protected final void setPositiveXErrorPixel(final int positiveXError) {
     this.m_positiveXErrorPixel = positiveXError;
@@ -158,7 +202,7 @@ public class ErrorBarPixel implements IErrorBarPixel {
    * <p>
    * 
    * @param positiveYError
-   *            The positiveYError in pixel to set.
+   *          The positiveYError in pixel to set.
    */
   protected final void setPositiveYErrorPixel(final int positiveYError) {
     this.m_positiveYErrorPixel = positiveYError;
@@ -169,7 +213,7 @@ public class ErrorBarPixel implements IErrorBarPixel {
    * <p>
    * 
    * @param trace
-   *            The trace to set.
+   *          The trace to set.
    */
   protected final void setTrace(final ITrace2D trace) {
     this.m_trace = trace;

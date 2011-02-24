@@ -1,6 +1,6 @@
 /*
  *  ChartActionSetToolTipType.java of project jchart2d
- *  Copyright (c) 2007 - 2010 Achim Westermann, created on 00:13:29.
+ *  Copyright (c) 2007 - 2011 Achim Westermann, created on 00:13:29.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -38,7 +38,7 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ChartActionSetToolTipType extends AChart2DAction {
 

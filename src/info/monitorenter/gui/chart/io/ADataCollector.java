@@ -1,5 +1,5 @@
 /*
- * AbstractDataCollector.java jchart2d Copyright (C) 2004 - 2010 Achim Westermann, created
+ * AbstractDataCollector.java jchart2d Copyright (C) 2004 - 2011 Achim Westermann, created
  * on 10.12.2004, 14:48:09 
  * 
  *  This library is free software; you can redistribute it and/or
@@ -26,7 +26,7 @@ import info.monitorenter.gui.chart.ITracePoint2D;
 
 
 /**
- * A simple Runnable that contiuously collects data every latency time period
+ * A simple Runnable that continuously collects data every latency time period
  * and adds it to the internal ITrace2D instance.
  * <p>
  * Extend from this class and override the method {@link #collectData()}.
@@ -35,7 +35,7 @@ import info.monitorenter.gui.chart.ITracePoint2D;
  * 
  * <pre>
  *       Chart2D chart = new Chart2D();
- *       ITrace2D trace = &lt;initializatioin&gt;
+ *       ITrace2D trace = &lt;initialization&gt;
  *       chart.addTrace(trace);
  *       // Put the chart in your UI...
  *       // ...
@@ -49,11 +49,12 @@ import info.monitorenter.gui.chart.ITracePoint2D;
  * throw an exception as it would allow several Threads to run a collector. Use
  * the {@link #start()} instead.
  * <p>
- * rabbel rabbel.
+ * <b>Always connect the trace to a chart first before starting the collector for that trace!</b>
+ * (deadlock prevention will raise an exception else).
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.11 $
  */
 public abstract class ADataCollector implements Runnable {
 

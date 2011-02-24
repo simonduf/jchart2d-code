@@ -2,7 +2,7 @@
  *  Trace2DArithmeticMean.java of project jchart2d, a trace 
  *  that accumulates the latest n points added to a single point with the arithmetic 
  *  mean value. 
- *  Copyright 2004 - 2010 (C) Achim Westermann.
+ *  Copyright 2004 - 2011 (C) Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * A trace that accumulates the lates n points added to a single point with the
+ * A trace that accumulates the latest n points added to a single point with the
  * arithmetic mean value.
  * <p>
  * 
@@ -54,7 +54,7 @@ import java.util.List;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.15 $
  * 
  * @since 7.0.0
  * 
@@ -65,10 +65,10 @@ public class Trace2DArithmeticMean extends ATrace2D {
   private static final long serialVersionUID = -4365986306182830082L;
 
   /** The buffer for the points about to be merged. */
-  private IRingBuffer<ITracePoint2D> m_pointBuffer;
+  private final IRingBuffer<ITracePoint2D> m_pointBuffer;
 
   /** The internal list of points to render. */
-  private List<ITracePoint2D> m_points = new LinkedList<ITracePoint2D>();
+  private final List<ITracePoint2D> m_points = new LinkedList<ITracePoint2D>();
 
   /**
    * The amount of n recent points to buffer. private int m_pointBufferSize; /**
@@ -91,10 +91,42 @@ public class Trace2DArithmeticMean extends ATrace2D {
   @Override
   protected boolean addPointInternal(final ITracePoint2D p) {
     this.m_pointBuffer.add(p);
-    ITracePoint2D cumulate = this.getArithmeticMean();
-    boolean result = this.m_points.add(cumulate);
+    final ITracePoint2D cumulate = this.getArithmeticMean();
+    final boolean result = this.m_points.add(cumulate);
     this.firePointAdded(cumulate);
     return result;
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final Trace2DArithmeticMean other = (Trace2DArithmeticMean) obj;
+    if (this.m_pointBuffer == null) {
+      if (other.m_pointBuffer != null) {
+        return false;
+      }
+    } else if (!this.m_pointBuffer.equals(other.m_pointBuffer)) {
+      return false;
+    }
+    if (this.m_points == null) {
+      if (other.m_points != null) {
+        return false;
+      }
+    } else if (!this.m_points.equals(other.m_points)) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -109,7 +141,7 @@ public class Trace2DArithmeticMean extends ATrace2D {
     double x = 0;
     double y = 0;
     ITracePoint2D result;
-    for (ITracePoint2D point : this.m_pointBuffer) {
+    for (final ITracePoint2D point : this.m_pointBuffer) {
       result = point;
       x += result.getX();
       y += result.getY();
@@ -141,6 +173,18 @@ public class Trace2DArithmeticMean extends ATrace2D {
   }
 
   /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((this.m_pointBuffer == null) ? 0 : this.m_pointBuffer.hashCode());
+    result = prime * result + ((this.m_points == null) ? 0 : this.m_points.hashCode());
+    return result;
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#isEmpty()
    */
   public boolean isEmpty() {
@@ -169,7 +213,7 @@ public class Trace2DArithmeticMean extends ATrace2D {
    */
   @Override
   protected ITracePoint2D removePointInternal(final ITracePoint2D point) {
-    ITracePoint2D result = this.m_points.remove(0);
+    final ITracePoint2D result = this.m_points.remove(0);
     return result;
   }
 

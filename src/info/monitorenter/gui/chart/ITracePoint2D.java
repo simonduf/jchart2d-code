@@ -1,6 +1,6 @@
 /*
  * ITracePoint2d.java, interface for trace points.
- * Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2004 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@ import java.util.Set;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.13 $
  */
 public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serializable, Cloneable {
 
@@ -60,22 +60,59 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
   public static final int STATE_REMOVED = 2;
 
   /**
-   * Adds a point highlighter that additionally (to the trace painter of the
-   * chart) paint this point.
+   * Adds a point painter that additionally (to the pointer painters of the
+   * trace (<code>{@link ITrace2D#getTracePainters()} </code>)) paint this
+   * point.
    * <p>
    * No clone will be taken. Outside modifications of the argument later on will
    * also affect this instances state!
    * <p>
+   * <b>Caution!</b> This is a low level mechanism that is also used by the
+   * highlighting mechanism. It is being utilized by the
+   * <code>{@link Chart2D#enablePointHighlighting(boolean)}</code> which will
+   * use some mouse motion listener to remove outdated highlighters and add
+   * highlighters to the new point in focus by taking the highlighter configured
+   * in the trace. <br/>
+   * So to use point highlighting for traces you should not re-program it at
+   * this level but just use
+   * <code>{@link ITrace2D#addPointHighlighter(IPointPainter)}</code> and
+   * </code>{@link Chart2D#enablePointHighlighting(boolean)}</code>.
+   * <p>
    * 
-   * @param pointHighlighter
-   *          a point highlighter that additionally (to the trace painter of the
-   *          chart) paint this point.
+   * @param pointPainter
+   *          a point painter that will additionally (to the trace painter of
+   *          the chart) paint this point.
    * 
-   * @return true if this point highlighter was accepted (not contained before
-   *         by the means of <code>
-   *         {@link IPointPainter#compareTo(Object) } </code>.
+   * @return true if this point painter was accepted (not contained before by
+   *         the means of <code> {@link IPointPainter#compareTo(Object) } </code>
+   *         .
    */
-  public boolean addAdditionalPointHighlighter(IPointHighlighter<?> pointHighlighter);
+  public boolean addAdditionalPointPainter(IPointPainter< ? > pointPainter);
+
+  /**
+   * Removes a point painter that additionally (to the pointer painters of the
+   * trace (<code>{@link ITrace2D#getTracePainters()} </code>)) paint this
+   * point.
+   * <p>
+   * 
+   * @param pointPainter
+   *          a point painter that currently is used to additionally (to the
+   *          trace painter of the chart) paint this point.
+   * 
+   * @return true if this point painter was removed (contained before by the
+   *         means of <code> {@link IPointPainter#compareTo(Object) } </code>.
+   */
+  public boolean removeAdditionalPointPainter(IPointPainter< ? > pointPainter);
+
+  /**
+   * Removes all point painters that additionally (to the pointer painters of
+   * the trace (<code>{@link ITrace2D#getTracePainters()} </code>)) paint this
+   * point.
+   * <p>
+   * 
+   * @return all instances that were used before this call.
+   */
+  public Set<IPointPainter< ? >> removeAllAdditionalPointPainters();
 
   /**
    * Returns a cloned instance (deep copy).
@@ -86,17 +123,37 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
   public Object clone();
 
   /**
-   * Returns the point highlighters that additionally (to the trace painter of
-   * the chart) paint this point.
+   * Returns the point painter that additionally (to the trace painter of the
+   * chart) paint this point.
    * <p>
    * The original list is returned so painters may be added or removed (even all
    * painters may be cleared).
    * <p>
    * 
-   * @return the point highlighters that additionally (to the trace painter of
-   *         the chart) paint this point.
+   * @return the point painters that additionally (to the trace painter of the
+   *         chart) paint this point.
    */
-  public Set<IPointHighlighter<?>> getAdditionalPointHighlighters();
+  public Set<IPointPainter< ? >> getAdditionalPointPainters();
+
+  /**
+   * Returns the Euclid distance of this point's normalized values (
+   * <code>{@link #getScaledX()}, {@link #getScaledY()}</code>) to the given
+   * normalized coordinates.
+   * <p>
+   * 
+   * @param xNormalized
+   *          the normalized x coordinate between 0 and 1.0 to measure the
+   *          Euclid distance to.
+   * 
+   * @param yNormalized
+   *          the normalized y coordinate between 0 and 1.0 to measure the
+   *          Euclid distance to.
+   * 
+   * @return the Euclid distance of this point's normalized values (<code>
+   *         {@link #getScaledX()}, {@link #getScaledY()}</code>) to the given
+   *         normalized coordinates.
+   */
+  public abstract double getEuclidDistance(final double xNormalized, final double yNormalized);
 
   /**
    * Returns the listener trace connected to this trace point.

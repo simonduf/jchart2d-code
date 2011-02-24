@@ -56,7 +56,7 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.31 $
+ * @version $Revision: 1.34 $
  */
 public class TestChartOperationsVisual extends ATestChartOperations {
 
@@ -91,7 +91,7 @@ public class TestChartOperationsVisual extends ATestChartOperations {
     suite.addTest(new TestChartOperationsVisual("testSetTraceTitleOnEmptyTitleTrace"));
     suite.addTest(new TestChartOperationsVisual("testAddRemoveTrace"));
     suite.addTest(new TestChartOperationsVisual("testSetZIndex"));
-
+    suite.addTest(new TestChartOperationsVisual("testRemoveTraceForBug2891801"));
     return suite;
   }
 
@@ -309,7 +309,7 @@ public class TestChartOperationsVisual extends ATestChartOperations {
   }
 
   /**
-   * Invokes <code>{@link IErrorBarPainter#setStartPointPainter(IPointPainter)}
+   * Invokes <code>{@link IErrorBarPainter#setStartPointPainter(IPointPainterConfigurableUI)}
    * </code> with a <code>{@link PointPainterDisc}</code>.
    * <p>
    */
@@ -731,6 +731,93 @@ public class TestChartOperationsVisual extends ATestChartOperations {
       public ITrace2D[] createTraces() {
         ITrace2D trace = new Trace2DSimple();
         return new ITrace2D[] {trace };
+      }
+    };
+    this.setTestOperation(operation);
+  }
+  
+  /**
+   * Test the following procedure from bug report: 
+   * https://sourceforge.net/tracker/?func=detail&aid=2891801&group_id=50440&atid=459734.<p>
+   * <ol>
+   * <li>Add a chart.</li>
+   * <li>Add a first trace on a first Y axis.</li>
+   * <li>Add a second trace on a second Y axis.</li>
+   * <li>Add a third trace on a third Y axis.</li>
+   * <li>Add a fourth trace on the first Y axis.</li>
+   * <li>try to remove it.</li>
+   * </ol>
+   * <p>
+   */
+  public void testRemoveTraceForBug2891801() {
+    ATestChartOperations.AChartOperation operation = new AChartOperation("testRemoveTraceForBug2891801"){
+
+      /** The trace to check remove on. **/
+      private ITrace2D m_trace4; 
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#preCondition(info.monitorenter.gui.chart.Chart2D)
+       */
+      @Override
+      public void preCondition(Chart2D chart) throws Exception {
+        super.preCondition(chart);
+        AAxis axisY1 = new AxisLinear();
+        axisY1.getAxisTitle().setTitle("asisY1");
+        AAxis axisY2 = new AxisLinear();
+        axisY2.getAxisTitle().setTitle("asisY2");
+        AAxis axisY3 = new AxisLinear();
+        axisY3.getAxisTitle().setTitle("asisY3");
+        chart.addAxisYLeft(axisY1);
+        chart.addAxisYLeft(axisY2);
+        chart.addAxisYLeft(axisY3);
+
+        // trace1
+        IAxis xAxis = chart.getAxisX();
+        ITrace2D trace1 = new Trace2DLtd();
+        trace1.setColor(Color.BLUE);
+        chart.addTrace(trace1,xAxis, axisY1);
+        this.fillTrace(trace1);
+
+        // trace2
+        ITrace2D trace2 = new Trace2DLtd();
+        trace2.setColor(Color.RED);
+        chart.addTrace(trace2,xAxis, axisY2);
+        this.fillTrace(trace2);
+        
+        // trace3
+        ITrace2D trace3 = new Trace2DLtd();
+        trace3.setColor(Color.BLACK);
+        chart.addTrace(trace3,xAxis, axisY3);
+        this.fillTrace(trace3);
+  
+        // trace4 to axis1
+        ITrace2D trace4 = new Trace2DLtd();
+        trace4.setColor(Color.MAGENTA);
+        trace4.setStroke(new BasicStroke(3f));
+        chart.addTrace(trace4,xAxis, axisY1);
+        this.fillTrace(trace4);
+        this.m_trace4 = trace4;
+      }
+
+      /**
+       * Overridden to have an empty array returned and be in control to which axes the traces 
+       * are added in <code>{@link info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#preCondition(Chart2D)} </code>.
+       * <p>
+       * 
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#createTraces()
+       */
+      @Override
+      public ITrace2D[] createTraces() {
+        ITrace2D[]result = new ITrace2D[]{
+        };
+        return result;
+      }
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
+      public Object action(Chart2D chart) throws Exception {
+        chart.removeTrace(this.m_trace4);
+        return null;
       }
     };
     this.setTestOperation(operation);

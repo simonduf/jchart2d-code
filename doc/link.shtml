@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <!--#include virtual="./head.shtml" -->
 <script language="javascript">
-  var update="06/03/2007";
+  var update="01/07/2010";
  </script>
 <body id="link">
 <div id="wrapper">
@@ -99,6 +99,20 @@
 <h2>Software using JChart2D</h2>
 
 <table border="0">
+	<tr>
+		<td id="box"><a href="http://bluetiger.bauchlandung.org/other/annea/" rel="_blank">Training of an MLP(Thomas Unterthiner)</a></td>
+		<td>Thomas Unterthiner used JChart2d in an applet for comparing different training algorithms for a Multi Layer Perceptron (neural network).</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td id="box"><a href="http://www.mixedmode.com/cgi-bin/main.cgi?view=jtr0view" rel="_blank">jtr0view</a></td>
+		<td>A Java based binary transient and dc sweep waveform viewer for displaying binary format Hspice output files (.tr0 and .sw0).</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
 	<tr>
 		<td id="box"><a href="http://www.cospandesign.com/?p=124" rel="_blank">JEvalCharter by Cospan Design</a></td>
 		<td>Function evaluator combined with chart output.</td>

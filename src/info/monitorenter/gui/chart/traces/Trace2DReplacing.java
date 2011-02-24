@@ -1,6 +1,6 @@
 /*
  *  Trace2DReplacing, a list- based implementation of a ITrace2D.
- *  Copyright (c) 2004 - 2010 Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2011 Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,7 @@ import info.monitorenter.gui.chart.ITracePoint2D;
 
 
 /**
- * Has the behaviour of <code>Trace2DBijective</code> and additional
+ * Has the behavior of <code>Trace2DBijective</code> and additional
  * features.<p>
  * 
  * <ul>
@@ -44,7 +44,7 @@ import info.monitorenter.gui.chart.ITracePoint2D;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.12 $
  */
 public class Trace2DReplacing extends Trace2DSimple {
 

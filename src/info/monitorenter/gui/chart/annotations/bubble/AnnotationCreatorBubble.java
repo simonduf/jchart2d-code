@@ -1,7 +1,7 @@
 /*
  *  AnnotationCreatorBubble.java of project jchart2d, factory implementation 
  *  for annotation view creation in tool tip bubble style 
- *  Copyright (C) 2002 - 2010, Achim Westermann, created on 13.02.2009
+ *  Copyright (C) 2002 - 2011, Achim Westermann, created on 13.02.2009
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -21,8 +21,8 @@
  *
  *
  * File   : $Source: /cvsroot/jchart2d/jchart2d/src/info/monitorenter/gui/chart/annotations/bubble/AnnotationCreatorBubble.java,v $
- * Date   : $Date: 2010/06/01 21:34:31 $
- * Version: $Revision: 1.3 $
+ * Date   : $Date: 2011/01/14 08:36:11 $
+ * Version: $Revision: 1.4 $
  */
 
 package info.monitorenter.gui.chart.annotations.bubble;

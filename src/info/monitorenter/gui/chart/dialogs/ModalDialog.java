@@ -1,7 +1,7 @@
 /*
  *  ModalDialog.java, class for dialogs with ok and cancel buttons and 
  *  support for modality within jchart2d.
- *  Copyright (c) 2007 - 2010 Achim Westermann, created on 09:31:15.
+ *  Copyright (c) 2007 - 2011 Achim Westermann, created on 09:31:15.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -41,6 +41,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
@@ -56,11 +57,14 @@ import javax.swing.JPanel;
  * query this component for input: it knows about the component that was used to
  * query inputs.
  * <p>
+ * <b>However for easy String prompts you should prefer:</b>
+ * <code>{@link JOptionPane#showInputDialog(Object)}</code>.
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  * 
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.14 $
  */
 public class ModalDialog extends JDialog {
 

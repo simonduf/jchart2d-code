@@ -2,6 +2,8 @@
  *  TraceTester, an incredible old but remarkable weird visual test for 
  *  the automatic scaling routines of jchart2d.
  * 
+ * Copyright (c) 2007 - 2011  Achim Westermann, Achim.Westermann@gmx.de
+ *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
  *  License as published by the Free Software Foundation; either
@@ -51,7 +53,7 @@ import javax.swing.JFrame;
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public final class TraceTester {
 
@@ -65,7 +67,7 @@ public final class TraceTester {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.7 $
+   * @version $Revision: 1.8 $
    */
   static class HalfRandomPoints extends TraceTester.RandomPoints {
 
@@ -121,7 +123,7 @@ public final class TraceTester {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.7 $
+   * @version $Revision: 1.8 $
    */
   private static class RandomPoints {
     /** Used for randomization. */

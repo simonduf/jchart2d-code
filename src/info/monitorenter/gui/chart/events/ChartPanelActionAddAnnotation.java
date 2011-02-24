@@ -1,6 +1,6 @@
 /*
  *  Action that adds an annotation to a ChartPanel.
- *  Copyright (C) 2007 - 2010 Achim Westermann
+ *  Copyright (C) 2007 - 2011 Achim Westermann
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -45,7 +45,7 @@ import javax.swing.JPopupMenu;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.9 $
  * 
  */
 public class ChartPanelActionAddAnnotation extends AChartPanelAction {
@@ -77,12 +77,13 @@ public class ChartPanelActionAddAnnotation extends AChartPanelAction {
     Component source = (Component) e.getSource();
     JPopupMenu menu = UIUtil.findTopLevelPopupMenu(source);
     PopupListener plistener = PopupListener.lookup(menu);
-    // TODO: use this as soon as jdk 1.6 is used: 
-   //Point location = plistener.getLastPopupMouseEvent().getLocationOnScreen();
-   Point location = plistener.getLastPopupMouseEvent().getPoint();
+    // TODO: use this as soon as jdk 1.6 is used:
+    // Point location =
+    // plistener.getLastPopupMouseEvent().getLocationOnScreen();
+    Point location = plistener.getLastPopupMouseEvent().getPoint();
     Chart2D chart = this.m_chartpanel.getChart();
-    ITracePoint2D point = chart.getNearestPointManhattan((int) location.getX(), (int) location
-        .getY());
+    ITracePoint2D point = chart.getPointFinder().getNearestPoint((int) location.getX(),
+        (int) location.getY(), chart);
 
     IAnnotationCreator factory = this.m_chartpanel.getAnnotationCreator();
 

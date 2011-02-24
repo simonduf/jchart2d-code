@@ -1,7 +1,7 @@
 /*
  *  MinimalStaticChartWithNanValues.java of project jchart2d, a demonstration 
  *  of the minimal code to set up a chart with static data with NaN values. 
- *  Copyright (C) 2007 - 2010 Achim Westermann.
+ *  Copyright (C) 2007 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -44,7 +44,7 @@ import javax.swing.JPanel;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final class MinimalStaticChartWithNanValues extends JPanel {
   /**

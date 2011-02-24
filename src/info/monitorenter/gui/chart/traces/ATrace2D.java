@@ -1,6 +1,6 @@
 /*
  *  ATrace2D.java , base class for ITrace2D implementations of jchart2d.
- *  Copyright (C) 2004 - 2010 Achim Westermann.
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,15 +24,15 @@ package info.monitorenter.gui.chart.traces;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IErrorBarPolicy;
-import info.monitorenter.gui.chart.IPointHighlighter;
+import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.ITracePointProvider;
 import info.monitorenter.gui.chart.traces.painters.TracePainterPolyline;
-import info.monitorenter.util.MathUtil;
 import info.monitorenter.util.SerializationUtility;
 import info.monitorenter.util.StringUtil;
+import info.monitorenter.util.math.MathUtil;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -65,17 +65,17 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.66 $
+ * @version $Revision: 1.75 $
  */
 public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
-
-  /** Generated <code>serialVersionUID</code>. * */
-  private static final long serialVersionUID = -3955095612824507919L;
 
   /**
    * Instance counter for read-access in subclasses.
    */
   private static int instanceCount = 0;
+
+  /** Generated <code>serialVersionUID</code>. * */
+  private static final long serialVersionUID = -3955095612824507919L;
 
   /**
    * Returns the instanceCount for all <code>ATrace2D</code> subclasses.
@@ -91,7 +91,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * <code>Char2D</code> instances that are interested in changes of internal
    * <code>ITracePoint2D</code> instances.
    */
-  private List<ChangeListener> m_changeListeners = new LinkedList<ChangeListener>();
+  private final List<ChangeListener> m_changeListeners = new LinkedList<ChangeListener>();
 
   /** The color property. */
   private Color m_color = Color.black;
@@ -167,6 +167,9 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    */
   protected String m_physicalUnitsY = "";
 
+  /** The internal set of point highlighters to use. */
+  private Set<IPointPainter< ? >> m_pointHighlighters;
+
   /**
    * The instance that add support for firing <code>PropertyChangeEvents</code>
    * and maintaining <code>PropertyChangeListeners</code>.
@@ -178,7 +181,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * The <code>Chart2D</code> this trace is added to. Needed for
    * synchronization.
    */
-  protected Object m_renderer = new Object();
+  protected Object m_renderer = Boolean.FALSE;
 
   /**
    * The stroke property.
@@ -187,9 +190,6 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
 
   /** The internal set of trace painters to use. */
   private Set<ITracePainter< ? >> m_tracePainters;
-
-  /** The internal set of point highlighters to use. */
-  private Set<IPointHighlighter< ? >> m_pointHighlighters;
 
   /**
    * The visible property.
@@ -210,7 +210,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
     ATrace2D.instanceCount++;
     this.m_tracePainters = new LinkedHashSet<ITracePainter< ? >>();
     this.m_tracePainters.add(new TracePainterPolyline());
-    this.m_pointHighlighters = new LinkedHashSet<IPointHighlighter< ? >>();
+    this.m_pointHighlighters = new LinkedHashSet<IPointPainter< ? >>();
     this.m_stroke = new BasicStroke(1f);
   }
 
@@ -222,6 +222,26 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
   }
 
   /**
+   * Ensures that no deadlock due to a missing internal chart reference may
+   * occur.
+   * 
+   * @throws IllegalStateException
+   *           if this trace is not assigned to a chart.
+   * 
+   */
+  protected final void ensureInitialized() {
+    if (this.m_renderer == Boolean.FALSE) {
+      throw new IllegalStateException("Connect this trace (" + this.getName()
+          + ") to a chart first before this operation (undebuggable deadlocks might occur else)");
+    } else {
+      if (Chart2D.DEBUG_THREADING) {
+        System.out.println(this.getClass() + "(" + Thread.currentThread().getName()
+            + ") this.m_renderer: " + this.m_renderer);
+      }
+    }
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#addErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
    */
   public final boolean addErrorBarPolicy(final IErrorBarPolicy< ? > errorBarPolicy) {
@@ -229,6 +249,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("addErrorBarPolicy, 0 locks");
     }
+    this.ensureInitialized();
     synchronized (this.m_renderer) {
       if (Chart2D.DEBUG_THREADING) {
         System.out.println("addErrorBarPolicy, 1 lock");
@@ -242,7 +263,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
           errorBarPolicy.setTrace(this);
           errorBarPolicy.addPropertyChangeListener(IErrorBarPolicy.PROPERTY_CONFIGURATION, this);
           this.expandErrorBarBounds();
-          this.firePropertyChange(PROPERTY_ERRORBARPOLICY, null, errorBarPolicy);
+          this.firePropertyChange(ITrace2D.PROPERTY_ERRORBARPOLICY, null, errorBarPolicy);
         }
       }
     }
@@ -256,9 +277,9 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
 
     boolean result = false;
     ITracePoint2D p = null;
-    Chart2D chart = this.getRenderer();
+    final Chart2D chart = this.getRenderer();
     if (chart != null) {
-      ITracePointProvider pointProvider = chart.getTracePointProvider();
+      final ITracePointProvider pointProvider = chart.getTracePointProvider();
       if (pointProvider != null) {
         p = pointProvider.createTracePoint(x, y);
       }
@@ -267,9 +288,9 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
       result = this.addPoint(p);
     } else {
       // TODO: write a logging here?
-      Exception ex = new Exception(
+      final RuntimeException ex = new IllegalStateException(
           "Unable to addPoint because trace is not assigned to chart yet. Call chart.addTrace(trace) before!!!");
-      ex.printStackTrace(System.err);
+      throw ex;
     }
     return result;
   }
@@ -292,21 +313,23 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    */
   public final boolean addPoint(final ITracePoint2D p) {
     if (Chart2D.DEBUG_THREADING) {
-      System.out.println("addPoint, 0 locks");
+      System.out.println(Thread.currentThread().getName() + ", ATrace2D.addPoint, 0 locks");
     }
+    boolean accepted = false;
+    this.ensureInitialized();
     synchronized (this.m_renderer) {
       if (Chart2D.DEBUG_THREADING) {
         if (!(this.m_renderer instanceof Chart2D)) {
           throw new RuntimeException(
               "Call chart.setTrace(trace) first before adding points or you might run into deadlocks!");
         }
-        System.out.println("addPoint, 1 lock");
+        System.out.println(Thread.currentThread().getName() + ", ATrace2D.addPoint, 1 lock");
       }
       synchronized (this) {
         if (Chart2D.DEBUG_THREADING) {
-          System.out.println("addPoint, 2 locks");
+          System.out.println(Thread.currentThread().getName() + ", ATrace2D.addPoint, 2 locks");
         }
-        boolean accepted = this.addPointInternal(p);
+        accepted = this.addPointInternal(p);
         if (accepted) {
           // fires property changes for max/min x/y:
           this.expandErrorBarBounds();
@@ -315,7 +338,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
           p.setListener(this);
           // inform computing traces:
           if (this.m_computingTraces.size() > 0) {
-            Iterator<ITrace2D> it = this.m_computingTraces.iterator();
+            final Iterator<ITrace2D> it = this.m_computingTraces.iterator();
             ITrace2D trace;
             while (it.hasNext()) {
               trace = it.next();
@@ -335,27 +358,38 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
           this.m_minY = p.getY();
           this.m_maxX = p.getX();
           this.m_maxY = p.getY();
-          Double zero = new Double(0);
+          final Double zero = new Double(0);
           this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, zero, new Double(this.m_minX));
           this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, zero, new Double(this.m_minY));
 
           this.m_firsttime = false;
         }
-        return accepted;
+
       }
+      if (Chart2D.DEBUG_THREADING) {
+        System.out.println(Thread.currentThread().getName()
+            + ", ATrace2D.addPoint, freed 1 lock,  1 lock remaining.");
+      }
+
     }
+    if (Chart2D.DEBUG_THREADING) {
+      System.out.println(Thread.currentThread().getName()
+          + ", ATrace2D.addPoint, freed 1 lock,  0 locks remaining.");
+    }
+    return accepted;
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#addPointHighlighter(info.monitorenter.gui.chart.IPointHighlighter)
+   * @see info.monitorenter.gui.chart.ITrace2D#addPointHighlighter(info.monitorenter.gui.chart.IPointPainter)
    */
-  public boolean addPointHighlighter(final IPointHighlighter< ? > highlighter) {
+  public boolean addPointHighlighter(final IPointPainter< ? > highlighter) {
     boolean result = false;
+    this.ensureInitialized();
     synchronized (this.m_renderer) {
       synchronized (this) {
         result = this.m_pointHighlighters.add(highlighter);
         if (result) {
-          this.firePropertyChange(PROPERTY_POINT_HIGHLIGHTERS, null, highlighter);
+          this.firePropertyChange(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, null, highlighter);
         }
       }
     }
@@ -402,11 +436,12 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    */
   public boolean addTracePainter(final ITracePainter< ? > painter) {
     boolean result = false;
+    this.ensureInitialized();
     synchronized (this.m_renderer) {
       synchronized (this) {
         result = this.m_tracePainters.add(painter);
         if (result) {
-          this.firePropertyChange(PROPERTY_PAINTERS, null, painter);
+          this.firePropertyChange(ITrace2D.PROPERTY_PAINTERS, null, painter);
         }
       }
     }
@@ -425,8 +460,8 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
     // for equal z-indices be more fine grained or else within a set traces
     // would get lost!
     if (result == 0) {
-      int me = this.hashCode();
-      int it = o.hashCode();
+      final int me = this.hashCode();
+      final int it = o.hashCode();
       result = me - it;
     }
     return result;
@@ -440,56 +475,193 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
   }
 
   /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final ATrace2D other = (ATrace2D) obj;
+    if (this.m_changeListeners == null) {
+      if (other.m_changeListeners != null) {
+        return false;
+      }
+    } else if (!this.m_changeListeners.equals(other.m_changeListeners)) {
+      return false;
+    }
+    if (this.m_color == null) {
+      if (other.m_color != null) {
+        return false;
+      }
+    } else if (!this.m_color.equals(other.m_color)) {
+      return false;
+    }
+    if (this.m_computingTraces == null) {
+      if (other.m_computingTraces != null) {
+        return false;
+      }
+    } else if (!this.m_computingTraces.equals(other.m_computingTraces)) {
+      return false;
+    }
+    if (this.m_errorBarPolicies == null) {
+      if (other.m_errorBarPolicies != null) {
+        return false;
+      }
+    } else if (!this.m_errorBarPolicies.equals(other.m_errorBarPolicies)) {
+      return false;
+    }
+    if (this.m_firsttime != other.m_firsttime) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_maxX) != Double.doubleToLongBits(other.m_maxX)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_maxXErrorBar) != Double
+        .doubleToLongBits(other.m_maxXErrorBar)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_maxY) != Double.doubleToLongBits(other.m_maxY)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_maxYErrorBar) != Double
+        .doubleToLongBits(other.m_maxYErrorBar)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_minX) != Double.doubleToLongBits(other.m_minX)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_minXErrorBar) != Double
+        .doubleToLongBits(other.m_minXErrorBar)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_minY) != Double.doubleToLongBits(other.m_minY)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_minYErrorBar) != Double
+        .doubleToLongBits(other.m_minYErrorBar)) {
+      return false;
+    }
+    if (this.m_name == null) {
+      if (other.m_name != null) {
+        return false;
+      }
+    } else if (!this.m_name.equals(other.m_name)) {
+      return false;
+    }
+    if (this.m_physicalUnitsX == null) {
+      if (other.m_physicalUnitsX != null) {
+        return false;
+      }
+    } else if (!this.m_physicalUnitsX.equals(other.m_physicalUnitsX)) {
+      return false;
+    }
+    if (this.m_physicalUnitsY == null) {
+      if (other.m_physicalUnitsY != null) {
+        return false;
+      }
+    } else if (!this.m_physicalUnitsY.equals(other.m_physicalUnitsY)) {
+      return false;
+    }
+    if (this.m_pointHighlighters == null) {
+      if (other.m_pointHighlighters != null) {
+        return false;
+      }
+    } else if (!this.m_pointHighlighters.equals(other.m_pointHighlighters)) {
+      return false;
+    }
+    if (this.m_propertyChangeSupport == null) {
+      if (other.m_propertyChangeSupport != null) {
+        return false;
+      }
+    } else if (!this.m_propertyChangeSupport.equals(other.m_propertyChangeSupport)) {
+      return false;
+    }
+    if (this.m_stroke == null) {
+      if (other.m_stroke != null) {
+        return false;
+      }
+    } else if (!this.m_stroke.equals(other.m_stroke)) {
+      return false;
+    }
+    if (this.m_tracePainters == null) {
+      if (other.m_tracePainters != null) {
+        return false;
+      }
+    } else if (!this.m_tracePainters.equals(other.m_tracePainters)) {
+      return false;
+    }
+    if (this.m_visible != other.m_visible) {
+      return false;
+    }
+    if (this.m_zIndex == null) {
+      if (other.m_zIndex != null) {
+        return false;
+      }
+    } else if (!this.m_zIndex.equals(other.m_zIndex)) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Internally expands all bounds according to potential error bars.
    */
   private void expandErrorBarBounds() {
-    boolean requiresErrorBarCalculation = !this.isEmpty();
+    final boolean requiresErrorBarCalculation = !this.isEmpty();
     if (requiresErrorBarCalculation) {
       boolean change;
+      this.ensureInitialized();
       synchronized (this.m_renderer) {
         synchronized (this) {
           if (this.showsPositiveXErrorBars()) {
             change = this.expandMaxXErrorBarBounds();
             if (change) {
-              this.firePropertyChange(PROPERTY_MAX_X, this, new Double(this.getMaxX()));
+              this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, this, new Double(this.getMaxX()));
             }
           } else {
             if (this.m_maxXErrorBar != -Double.MAX_VALUE) {
               this.m_maxXErrorBar = -Double.MAX_VALUE;
-              this.firePropertyChange(PROPERTY_MAX_X, this, new Double(this.getMaxX()));
+              this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, this, new Double(this.getMaxX()));
             }
           }
           if (this.showsPositiveYErrorBars()) {
             change = this.expandMaxYErrorBarBounds();
             if (change) {
-              this.firePropertyChange(PROPERTY_MAX_Y, this, new Double(this.getMaxY()));
+              this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, this, new Double(this.getMaxY()));
             }
           } else {
             if (this.m_maxYErrorBar != -Double.MAX_VALUE) {
               this.m_maxYErrorBar = -Double.MAX_VALUE;
-              this.firePropertyChange(PROPERTY_MAX_Y, this, new Double(this.getMaxY()));
+              this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, this, new Double(this.getMaxY()));
             }
           }
           if (this.showsNegativeXErrorBars()) {
             change = this.expandMinXErrorBarBounds();
             if (change) {
-              this.firePropertyChange(PROPERTY_MIN_X, this, new Double(this.getMinX()));
+              this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, this, new Double(this.getMinX()));
             }
           } else {
             if (this.m_minXErrorBar != Double.MAX_VALUE) {
               this.m_minXErrorBar = Double.MAX_VALUE;
-              this.firePropertyChange(PROPERTY_MIN_X, this, new Double(this.getMinX()));
+              this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, this, new Double(this.getMinX()));
             }
           }
           if (this.showsNegativeYErrorBars()) {
             change = this.expandMinYErrorBarBounds();
             if (change) {
-              this.firePropertyChange(PROPERTY_MIN_Y, this, new Double(this.getMinY()));
+              this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, this, new Double(this.getMinY()));
             }
           } else {
             if (this.m_minYErrorBar != Double.MAX_VALUE) {
               this.m_minYErrorBar = Double.MAX_VALUE;
-              this.firePropertyChange(PROPERTY_MIN_Y, this, new Double(this.getMinY()));
+              this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, this, new Double(this.getMinY()));
             }
           }
         }
@@ -507,12 +679,12 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * @return true if a change to <code>{@link #getMaxX()}</code> was done.
    */
   private boolean expandMaxXErrorBarBounds() {
-    Chart2D chart = this.getRenderer();
+    final Chart2D chart = this.getRenderer();
     boolean change = false;
     double errorBarMaxXCollect = -Double.MAX_VALUE;
     if (chart != null) {
       double errorBarMaxX = -Double.MAX_VALUE;
-      for (IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
+      for (final IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
         if (errorBarPolicy.isShowPositiveXErrors()) {
           // was it turned on?
           errorBarMaxX = errorBarPolicy.getXError(this.m_maxX);
@@ -522,7 +694,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
         }
       }
     }
-    double absoluteMax = errorBarMaxXCollect + this.m_maxX;
+    final double absoluteMax = errorBarMaxXCollect + this.m_maxX;
     if (!MathUtil.assertEqual(this.m_maxXErrorBar, absoluteMax, 0.00000001)) {
       this.m_maxXErrorBar = absoluteMax;
       change = true;
@@ -540,12 +712,12 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * @return true if a change to <code>{@link #getMaxY()}</code> was done.
    */
   private boolean expandMaxYErrorBarBounds() {
-    Chart2D chart = this.getRenderer();
+    final Chart2D chart = this.getRenderer();
     boolean change = false;
     double errorBarMaxYCollect = -Double.MAX_VALUE;
     if (chart != null) {
       double errorBarMaxY = -Double.MAX_VALUE;
-      for (IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
+      for (final IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
         if (errorBarPolicy.isShowPositiveYErrors()) {
           errorBarMaxY = errorBarPolicy.getYError(this.m_maxY);
           if (errorBarMaxY > errorBarMaxYCollect) {
@@ -554,7 +726,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
         }
       }
     }
-    double absoluteMax = errorBarMaxYCollect + this.m_maxY;
+    final double absoluteMax = errorBarMaxYCollect + this.m_maxY;
     if (!MathUtil.assertEqual(this.m_maxYErrorBar, absoluteMax, 0.00000001)) {
       this.m_maxYErrorBar = absoluteMax;
       change = true;
@@ -573,12 +745,12 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * @return true if a change to <code>{@link #getMinX()}</code> was done.
    */
   private boolean expandMinXErrorBarBounds() {
-    Chart2D chart = this.getRenderer();
+    final Chart2D chart = this.getRenderer();
     boolean change = false;
     double errorBarMinXCollect = -Double.MAX_VALUE;
     if (chart != null) {
       double errorBarMinX = -Double.MAX_VALUE;
-      for (IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
+      for (final IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
         if (errorBarPolicy.isShowNegativeXErrors()) {
           errorBarMinX = errorBarPolicy.getXError(this.m_minX);
           if (errorBarMinX > errorBarMinXCollect) {
@@ -587,7 +759,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
         }
       }
     }
-    double absoluteMin = this.m_minX - errorBarMinXCollect;
+    final double absoluteMin = this.m_minX - errorBarMinXCollect;
     if (!MathUtil.assertEqual(this.m_minXErrorBar, absoluteMin, 0.00000001)) {
       this.m_minXErrorBar = absoluteMin;
       change = true;
@@ -605,12 +777,12 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * @return true if a change to <code>{@link #getMinY()}</code> was done.
    */
   private boolean expandMinYErrorBarBounds() {
-    Chart2D chart = this.getRenderer();
+    final Chart2D chart = this.getRenderer();
     boolean change = false;
     double errorBarMinYCollect = -Double.MAX_VALUE;
     if (chart != null) {
       double errorBarMinY = -Double.MAX_VALUE;
-      for (IErrorBarPolicy< ? > errorBarPolicy : this.getErrorBarPolicies()) {
+      for (final IErrorBarPolicy< ? > errorBarPolicy : this.getErrorBarPolicies()) {
         if (errorBarPolicy.isShowNegativeYErrors()) {
           // calculate the error
           errorBarMinY = errorBarPolicy.getYError(this.m_minY);
@@ -620,7 +792,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
         }
       }
     }
-    double absoluteMin = this.m_minY - errorBarMinYCollect;
+    final double absoluteMin = this.m_minY - errorBarMinYCollect;
     if (!MathUtil.assertEqual(this.m_minYErrorBar, absoluteMin, 0.00000001)) {
       this.m_minYErrorBar = absoluteMin;
       change = true;
@@ -659,7 +831,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    */
   protected void firePointAdded(final ITracePoint2D added) {
     this.firePointChanged(added, ITracePoint2D.STATE_ADDED);
-    this.firePropertyChange(PROPERTY_TRACEPOINT, null, added);
+    this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT, null, added);
   }
 
   /**
@@ -694,6 +866,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
   public void firePointChanged(final ITracePoint2D changed, final int state) {
     double tmpx = changed.getX();
     double tmpy = changed.getY();
+    this.ensureInitialized();
     synchronized (this.m_renderer) {
       synchronized (this) {
         // for a changed point all cases (new extremum as for added case, other
@@ -705,20 +878,20 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
           if (tmpx > this.m_maxX) {
             this.m_maxX = tmpx;
             this.expandMaxXErrorBarBounds();
-            this.firePropertyChange(PROPERTY_MAX_X, null, new Double(this.m_maxX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, null, new Double(this.m_maxX));
           } else if (tmpx < this.m_minX) {
             this.m_minX = tmpx;
             this.expandMinXErrorBarBounds();
-            this.firePropertyChange(PROPERTY_MIN_X, null, new Double(this.m_minX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, null, new Double(this.m_minX));
           }
           if (tmpy > this.m_maxY) {
             this.m_maxY = tmpy;
             this.expandMaxYErrorBarBounds();
-            this.firePropertyChange(PROPERTY_MAX_Y, null, new Double(this.m_maxY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, null, new Double(this.m_maxY));
           } else if (tmpy < this.m_minY) {
             this.m_minY = tmpy;
             this.expandMinYErrorBarBounds();
-            this.firePropertyChange(PROPERTY_MIN_Y, null, new Double(this.m_minY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, null, new Double(this.m_minY));
           }
         }
         if (ITracePoint2D.STATE_REMOVED == state) {
@@ -726,20 +899,24 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
           if (tmpx >= this.m_maxX) {
             tmpx = this.m_maxX;
             this.maxXSearch();
-            this.firePropertyChange(PROPERTY_MAX_X, new Double(tmpx), new Double(this.m_maxX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(tmpx), new Double(
+                this.m_maxX));
           } else if (tmpx <= this.m_minX) {
             tmpx = this.m_minX;
             this.minXSearch();
-            this.firePropertyChange(PROPERTY_MIN_X, new Double(tmpx), new Double(this.m_minX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(tmpx), new Double(
+                this.m_minX));
           }
           if (tmpy >= this.m_maxY) {
             tmpy = this.m_maxY;
             this.maxYSearch();
-            this.firePropertyChange(PROPERTY_MAX_Y, new Double(tmpy), new Double(this.m_maxY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(tmpy), new Double(
+                this.m_maxY));
           } else if (tmpy <= this.m_minY) {
             tmpy = this.m_minY;
             this.minYSearch();
-            this.firePropertyChange(PROPERTY_MIN_Y, new Double(tmpy), new Double(this.m_minY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(tmpy), new Double(
+                this.m_minY));
           }
           if (this.getSize() == 0) {
             this.m_firsttime = true;
@@ -749,44 +926,52 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
           if (tmpx < this.m_maxX) {
             final double oldMaxX = this.m_maxX;
             this.maxXSearch();
-            this.firePropertyChange(PROPERTY_MAX_X, new Double(oldMaxX), new Double(this.m_maxX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldMaxX), new Double(
+                this.m_maxX));
           } else if (tmpx > this.m_maxX) {
             final double oldMaxX = this.m_maxX;
             this.m_maxX = tmpx;
             this.expandMaxXErrorBarBounds();
-            this.firePropertyChange(PROPERTY_MAX_X, new Double(oldMaxX), new Double(this.m_maxX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldMaxX), new Double(
+                this.m_maxX));
           }
           if (tmpx > this.m_minX) {
             final double oldMinX = this.m_minX;
             this.minXSearch();
-            this.firePropertyChange(PROPERTY_MIN_X, new Double(oldMinX), new Double(this.m_minX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldMinX), new Double(
+                this.m_minX));
           } else if (tmpx < this.m_minX) {
             final double oldMinX = this.m_minX;
             this.m_minX = tmpx;
             this.expandMinXErrorBarBounds();
-            this.firePropertyChange(PROPERTY_MIN_X, new Double(oldMinX), new Double(this.m_minX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldMinX), new Double(
+                this.m_minX));
           }
           if (tmpy < this.m_maxY) {
             final double oldMaxY = this.m_maxY;
             this.maxYSearch();
-            this.firePropertyChange(PROPERTY_MAX_Y, new Double(oldMaxY), new Double(this.m_maxY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldMaxY), new Double(
+                this.m_maxY));
           } else if (tmpy > this.m_maxY) {
             final double oldMaxY = this.m_maxY;
             this.m_maxY = tmpy;
             this.expandMaxYErrorBarBounds();
-            this.firePropertyChange(PROPERTY_MAX_Y, new Double(oldMaxY), new Double(this.m_maxY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldMaxY), new Double(
+                this.m_maxY));
           }
           if (tmpy > this.m_minY) {
             final double oldMinY = this.m_minY;
             this.minYSearch();
-            this.firePropertyChange(PROPERTY_MIN_Y, new Double(oldMinY), new Double(this.m_minY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldMinY), new Double(
+                this.m_minY));
           } else if (tmpy < this.m_minY) {
             final double oldMinY = this.m_minY;
             this.m_minY = tmpy;
             this.expandMinYErrorBarBounds();
-            this.firePropertyChange(PROPERTY_MIN_Y, new Double(oldMinY), new Double(this.m_minY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldMinY), new Double(
+                this.m_minY));
           }
-          this.firePropertyChange(PROPERTY_POINT_CHANGED, null, changed);
+          this.firePropertyChange(ITrace2D.PROPERTY_POINT_CHANGED, null, changed);
         }
       }
     }
@@ -810,7 +995,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    */
   protected void firePointRemoved(final ITracePoint2D removed) {
     this.firePointChanged(removed, ITracePoint2D.STATE_REMOVED);
-    this.firePropertyChange(PROPERTY_TRACEPOINT, removed, null);
+    this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT, removed, null);
   }
 
   /**
@@ -827,9 +1012,10 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    */
   protected final void firePropertyChange(final String property, final Object oldvalue,
       final Object newvalue) {
-    if (property.equals(PROPERTY_MAX_X) || property.equals(PROPERTY_MAX_Y)
-        || property.equals(PROPERTY_MIN_X) || property.equals(PROPERTY_MIN_Y)
-        || property.equals(PROPERTY_TRACEPOINT) || property.equals(PROPERTY_POINT_CHANGED)) {
+    if (property.equals(ITrace2D.PROPERTY_MAX_X) || property.equals(ITrace2D.PROPERTY_MAX_Y)
+        || property.equals(ITrace2D.PROPERTY_MIN_X) || property.equals(ITrace2D.PROPERTY_MIN_Y)
+        || property.equals(ITrace2D.PROPERTY_TRACEPOINT)
+        || property.equals(ITrace2D.PROPERTY_POINT_CHANGED)) {
       if (!Thread.holdsLock(this.m_renderer)) {
         throw new RuntimeException("Acquire a lock on the corresponding chart first!");
       }
@@ -879,7 +1065,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
   public final boolean getHasErrorBars() {
     boolean result = false;
     if (this.m_errorBarPolicies.size() > 0) {
-      for (IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
+      for (final IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
         if (errorBarPolicy.getErrorBarPainters().size() > 0) {
           result |= errorBarPolicy.isShowNegativeXErrors();
           if (result) {
@@ -920,7 +1106,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    */
   public final String getLabel() {
     String name = this.getName();
-    String physunit = this.getPhysicalUnits();
+    final String physunit = this.getPhysicalUnits();
     if (!(StringUtil.isEmpty(name)) && (!StringUtil.isEmpty(physunit))) {
       name = new StringBuffer(name).append(" ").append(physunit).toString();
     } else if (!StringUtil.isEmpty(physunit)) {
@@ -955,6 +1141,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    */
 
   public final double getMaxY() {
+    this.ensureInitialized();
     synchronized (this.m_renderer) {
       synchronized (this) {
         double result = this.m_maxY;
@@ -991,6 +1178,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * @return the original minimum y- value ignoring the offsetY.
    */
   public final double getMinY() {
+    this.ensureInitialized();
     synchronized (this.m_renderer) {
       synchronized (this) {
         double result = this.m_minY;
@@ -1019,16 +1207,46 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * <p>
    * Subclasses that have more insight about their internal data storage could
    * override this with a faster implementation (e.g. if the points are kept in
+   * a sorted order a skip - strategy) could find the minimum faster.
+   * <p>
+   * 
+   * @see info.monitorenter.gui.chart.ITrace2D#getNearestPointEuclid(double,
+   *      double)
+   */
+  public DistancePoint getNearestPointEuclid(final double x, final double y) {
+    final DistancePoint result = new DistancePoint();
+
+    final Iterator<ITracePoint2D> it = this.iterator();
+    ITracePoint2D point;
+    double distance;
+    double shortestDistance = Double.MAX_VALUE;
+    while (it.hasNext()) {
+      point = it.next();
+      distance = point.getEuclidDistance(x, y);
+      if (distance < shortestDistance) {
+        shortestDistance = distance;
+        result.setPoint(point);
+        result.setDistance(shortestDistance);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Naive implementation that iterates over every point.
+   * <p>
+   * Subclasses that have more insight about their internal data storage could
+   * override this with a faster implementation (e.g. if the points are kept in
    * a sorted order a skip - strategy could find the minimum faster.
    * <p>
    * 
    * @see info.monitorenter.gui.chart.ITrace2D#getNearestPointManhattan(double,
    *      double)
    */
-  public ManhattanDistancePoint getNearestPointManhattan(final double x, final double y) {
-    ManhattanDistancePoint result = new ManhattanDistancePoint();
+  public DistancePoint getNearestPointManhattan(final double x, final double y) {
+    final DistancePoint result = new DistancePoint();
 
-    Iterator<ITracePoint2D> it = this.iterator();
+    final Iterator<ITracePoint2D> it = this.iterator();
     ITracePoint2D point;
     double manhattanDistance;
     double shortestManhattanDistance = Double.MAX_VALUE;
@@ -1038,7 +1256,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
       if (manhattanDistance < shortestManhattanDistance) {
         shortestManhattanDistance = manhattanDistance;
         result.setPoint(point);
-        result.setManhattanDistance(shortestManhattanDistance);
+        result.setDistance(shortestManhattanDistance);
       }
 
     }
@@ -1077,7 +1295,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#getPointHighlighters()
    */
-  public final Set<IPointHighlighter< ? >> getPointHighlighters() {
+  public final Set<IPointPainter< ? >> getPointHighlighters() {
 
     return this.m_pointHighlighters;
   }
@@ -1138,22 +1356,80 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
     // as those are invoked several times for each iteration
     // (and paint contains several iterations).
     if (Chart2D.DEBUG_THREADING) {
-      System.out.println("trace.getZindex, 0 locks");
+      System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName()
+          + ".getZindex, 0 locks");
     }
-
     synchronized (this.m_renderer) {
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println("trace.getZindex, 1 locks");
+        System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName()
+            + ".getZindex, 1 locks");
       }
 
       synchronized (this) {
         if (Chart2D.DEBUG_THREADING) {
-          System.out.println("trace.getZindex, 2 locks");
+          System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName()
+              + ".getZindex, 2 locks");
         }
-
-        return this.m_zIndex;
+      }
+      if (Chart2D.DEBUG_THREADING) {
+        System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName()
+            + ".getZindex, freed 1 lock: 1 lock remaining");
       }
     }
+    if (Chart2D.DEBUG_THREADING) {
+      System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName()
+          + ".getZindex, freed 1 lock: 0 locks remaining");
+    }
+    return this.m_zIndex;
+  }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result
+        + ((this.m_changeListeners == null) ? 0 : this.m_changeListeners.hashCode());
+    result = prime * result + ((this.m_color == null) ? 0 : this.m_color.hashCode());
+    result = prime * result
+        + ((this.m_computingTraces == null) ? 0 : this.m_computingTraces.hashCode());
+    result = prime * result
+        + ((this.m_errorBarPolicies == null) ? 0 : this.m_errorBarPolicies.hashCode());
+    result = prime * result + (this.m_firsttime ? 1231 : 1237);
+    long temp;
+    temp = Double.doubleToLongBits(this.m_maxX);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(this.m_maxXErrorBar);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(this.m_maxY);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(this.m_maxYErrorBar);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(this.m_minX);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(this.m_minXErrorBar);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(this.m_minY);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(this.m_minYErrorBar);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    result = prime * result + ((this.m_name == null) ? 0 : this.m_name.hashCode());
+    result = prime * result
+        + ((this.m_physicalUnitsX == null) ? 0 : this.m_physicalUnitsX.hashCode());
+    result = prime * result
+        + ((this.m_physicalUnitsY == null) ? 0 : this.m_physicalUnitsY.hashCode());
+    result = prime * result
+        + ((this.m_pointHighlighters == null) ? 0 : this.m_pointHighlighters.hashCode());
+    result = prime * result
+        + ((this.m_propertyChangeSupport == null) ? 0 : this.m_propertyChangeSupport.hashCode());
+    result = prime * result + ((this.m_stroke == null) ? 0 : this.m_stroke.hashCode());
+    result = prime * result
+        + ((this.m_tracePainters == null) ? 0 : this.m_tracePainters.hashCode());
+    result = prime * result + (this.m_visible ? 1231 : 1237);
+    result = prime * result + ((this.m_zIndex == null) ? 0 : this.m_zIndex.hashCode());
+    return result;
   }
 
   /**
@@ -1184,7 +1460,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
       double ret = -Double.MAX_VALUE;
       ITracePoint2D tmpoint = null;
       double tmp;
-      Iterator<ITracePoint2D> it = this.iterator();
+      final Iterator<ITracePoint2D> it = this.iterator();
       while (it.hasNext()) {
         tmpoint = it.next();
         tmp = tmpoint.getX();
@@ -1220,7 +1496,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
       double ret = -Double.MAX_VALUE;
       ITracePoint2D tmpoint = null;
       double tmp;
-      Iterator<ITracePoint2D> it = this.iterator();
+      final Iterator<ITracePoint2D> it = this.iterator();
       while (it.hasNext()) {
         tmpoint = it.next();
         tmp = tmpoint.getY();
@@ -1256,7 +1532,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
       double ret = Double.MAX_VALUE;
       ITracePoint2D tmpoint = null;
       double tmp;
-      Iterator<ITracePoint2D> it = this.iterator();
+      final Iterator<ITracePoint2D> it = this.iterator();
       while (it.hasNext()) {
         tmpoint = it.next();
         tmp = tmpoint.getX();
@@ -1292,7 +1568,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
       double ret = Double.MAX_VALUE;
       ITracePoint2D tmpoint = null;
       double tmp;
-      Iterator<ITracePoint2D> it = this.iterator();
+      final Iterator<ITracePoint2D> it = this.iterator();
       while (it.hasNext()) {
         tmpoint = it.next();
         tmp = tmpoint.getY();
@@ -1314,7 +1590,8 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
   public void propertyChange(final PropertyChangeEvent evt) {
     if (IErrorBarPolicy.PROPERTY_CONFIGURATION.equals(evt.getPropertyName())) {
       this.expandErrorBarBounds();
-      this.firePropertyChange(PROPERTY_ERRORBARPOLICY_CONFIGURATION, null, evt.getSource());
+      this
+          .firePropertyChange(ITrace2D.PROPERTY_ERRORBARPOLICY_CONFIGURATION, null, evt.getSource());
     }
 
   }
@@ -1338,9 +1615,9 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#removeAllPointHighlighters()
    */
-  public Set<IPointHighlighter< ? >> removeAllPointHighlighters() {
-    Set<IPointHighlighter< ? >> result = new LinkedHashSet<IPointHighlighter< ? >>();
-    for (IPointHighlighter< ? > highlighter : this.getPointHighlighters()) {
+  public Set<IPointPainter< ? >> removeAllPointHighlighters() {
+    final Set<IPointPainter< ? >> result = new LinkedHashSet<IPointPainter< ? >>();
+    for (final IPointPainter< ? > highlighter : this.getPointHighlighters()) {
       this.removePointHighlighter(highlighter);
       result.add(highlighter);
     }
@@ -1355,6 +1632,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * @see info.monitorenter.gui.chart.ITrace2D#removeAllPoints()
    */
   public final void removeAllPoints() {
+    this.ensureInitialized();
     synchronized (this.m_renderer) {
       synchronized (this) {
 
@@ -1379,7 +1657,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
             this.m_minY));
 
         // inform computing traces:
-        for (ITrace2D trace : this.m_computingTraces) {
+        for (final ITrace2D trace : this.m_computingTraces) {
           trace.removeAllPoints();
         }
       }
@@ -1399,7 +1677,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * @see info.monitorenter.gui.chart.ITrace2D#removeComputingTrace(info.monitorenter.gui.chart.ITrace2D)
    */
   public boolean removeComputingTrace(final ITrace2D trace) {
-    boolean result = this.m_computingTraces.remove(trace);
+    final boolean result = this.m_computingTraces.remove(trace);
     return result;
   }
 
@@ -1411,6 +1689,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("addErrorBarPolicy, 0 locks");
     }
+    this.ensureInitialized();
     synchronized (this.m_renderer) {
       if (Chart2D.DEBUG_THREADING) {
         System.out.println("addErrorBarPolicy, 1 lock");
@@ -1425,7 +1704,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
           errorBarPolicy.setTrace(null);
           errorBarPolicy.removePropertyChangeListener(IErrorBarPolicy.PROPERTY_CONFIGURATION, this);
           this.expandErrorBarBounds();
-          this.firePropertyChange(PROPERTY_ERRORBARPOLICY, errorBarPolicy, null);
+          this.firePropertyChange(ITrace2D.PROPERTY_ERRORBARPOLICY, errorBarPolicy, null);
         }
       }
     }
@@ -1451,6 +1730,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * @see #firePointChanged(ITracePoint2D, int)
    */
   public boolean removePoint(final ITracePoint2D point) {
+    this.ensureInitialized();
     synchronized (this.m_renderer) {
       if (Chart2D.DEBUG_THREADING) {
         System.out.println("removePoint, 0 locks");
@@ -1459,7 +1739,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
         if (Chart2D.DEBUG_THREADING) {
           System.out.println("removePoint, 1 lock");
         }
-        ITracePoint2D removed = this.removePointInternal(point);
+        final ITracePoint2D removed = this.removePointInternal(point);
         if (removed != null) {
 
           double tmpx = removed.getX();
@@ -1468,26 +1748,30 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
           if (tmpx >= this.m_maxX) {
             tmpx = this.m_maxX;
             this.maxXSearch();
-            this.firePropertyChange(PROPERTY_MAX_X, new Double(tmpx), new Double(this.m_maxX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(tmpx), new Double(
+                this.m_maxX));
           } else if (tmpx <= this.m_minX) {
             tmpx = this.m_minX;
             this.minXSearch();
-            this.firePropertyChange(PROPERTY_MIN_X, new Double(tmpx), new Double(this.m_minX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(tmpx), new Double(
+                this.m_minX));
           }
           if (tmpy >= this.m_maxY) {
             tmpy = this.m_maxY;
             this.maxYSearch();
-            this.firePropertyChange(PROPERTY_MAX_Y, new Double(tmpy), new Double(this.m_maxY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(tmpy), new Double(
+                this.m_maxY));
           } else if (tmpy <= this.m_minY) {
             tmpy = this.m_minY;
             this.minYSearch();
-            this.firePropertyChange(PROPERTY_MIN_Y, new Double(tmpy), new Double(this.m_minY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(tmpy), new Double(
+                this.m_minY));
           }
 
           this.firePointRemoved(removed);
           removed.setListener(null);
           // inform computing traces:
-          for (ITrace2D trace : this.m_computingTraces) {
+          for (final ITrace2D trace : this.m_computingTraces) {
             trace.removePoint(removed);
           }
         }
@@ -1497,15 +1781,21 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#removePointHighlighter(info.monitorenter.gui.chart.IPointHighlighter)
+   * @see info.monitorenter.gui.chart.ITrace2D#removePointHighlighter(info.monitorenter.gui.chart.IPointPainter)
    */
-  public boolean removePointHighlighter(final IPointHighlighter< ? > higlighter) {
-    boolean result = false;
-    result = this.m_pointHighlighters.remove(higlighter);
-    if (result) {
-      this.firePropertyChange(PROPERTY_POINT_HIGHLIGHTERS, higlighter, null);
+  public boolean removePointHighlighter(final IPointPainter< ? > higlighter) {
+
+    this.ensureInitialized();
+    synchronized (this.m_renderer) {
+      synchronized (this) {
+        boolean result = false;
+        result = this.m_pointHighlighters.remove(higlighter);
+        if (result) {
+          this.firePropertyChange(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, higlighter, null);
+        }
+        return result;
+      }
     }
-    return result;
   }
 
   /**
@@ -1565,7 +1855,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
     if (this.m_tracePainters.size() > 1) {
       result = this.m_tracePainters.remove(painter);
       if (result) {
-        this.firePropertyChange(PROPERTY_PAINTERS, painter, null);
+        this.firePropertyChange(ITrace2D.PROPERTY_PAINTERS, painter, null);
       }
 
     } else {
@@ -1584,10 +1874,10 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    *          the <code>Color</code> this trace will be painted with.
    */
   public final void setColor(final Color color) {
-    Color oldValue = this.m_color;
+    final Color oldValue = this.m_color;
     this.m_color = color;
     if (!this.m_color.equals(oldValue)) {
-      this.firePropertyChange(PROPERTY_COLOR, oldValue, this.m_color);
+      this.firePropertyChange(ITrace2D.PROPERTY_COLOR, oldValue, this.m_color);
     }
   }
 
@@ -1595,10 +1885,11 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * @see info.monitorenter.gui.chart.ITrace2D#setErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
    */
   public final Set<IErrorBarPolicy< ? >> setErrorBarPolicy(final IErrorBarPolicy< ? > errorBarPolicy) {
-    Set<IErrorBarPolicy< ? >> result = this.m_errorBarPolicies;
+    final Set<IErrorBarPolicy< ? >> result = this.m_errorBarPolicies;
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("setErrorBarPolicy, 0 locks");
     }
+    this.ensureInitialized();
     synchronized (this.m_renderer) {
       if (Chart2D.DEBUG_THREADING) {
         System.out.println("setErrorBarPolicy, 1 lock");
@@ -1608,18 +1899,18 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
           System.out.println("setErrorBarPolicy, 2 locks");
         }
         this.m_errorBarPolicies = new TreeSet<IErrorBarPolicy< ? >>();
-        boolean added = this.m_errorBarPolicies.add(errorBarPolicy);
+        final boolean added = this.m_errorBarPolicies.add(errorBarPolicy);
         if (added) {
           errorBarPolicy.setTrace(this);
           this.expandErrorBarBounds();
           errorBarPolicy.addPropertyChangeListener(IErrorBarPolicy.PROPERTY_CONFIGURATION, this);
-          this.firePropertyChange(PROPERTY_ERRORBARPOLICY, null, errorBarPolicy);
+          this.firePropertyChange(ITrace2D.PROPERTY_ERRORBARPOLICY, null, errorBarPolicy);
         }
         // now remove this from the previous instances:
-        for (IErrorBarPolicy< ? > oldPolicy : result) {
+        for (final IErrorBarPolicy< ? > oldPolicy : result) {
           oldPolicy.setTrace(null);
           errorBarPolicy.removePropertyChangeListener(IErrorBarPolicy.PROPERTY_CONFIGURATION, this);
-          this.firePropertyChange(PROPERTY_ERRORBARPOLICY, oldPolicy, null);
+          this.firePropertyChange(ITrace2D.PROPERTY_ERRORBARPOLICY, oldPolicy, null);
         }
       }
     }
@@ -1638,12 +1929,12 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * @see info.monitorenter.gui.chart.ITrace2D#setName(java.lang.String)
    */
   public final void setName(final String name) {
-    String oldValue = this.m_name;
-    String oldLabel = this.getLabel();
+    final String oldValue = this.m_name;
+    final String oldLabel = this.getLabel();
     this.m_name = name;
-    String newLabel = this.getLabel();
-    this.firePropertyChange(PROPERTY_LABEL, oldLabel, newLabel);
-    this.firePropertyChange(PROPERTY_NAME, oldValue, this.m_name);
+    final String newLabel = this.getLabel();
+    this.firePropertyChange(ITrace2D.PROPERTY_LABEL, oldLabel, newLabel);
+    this.firePropertyChange(ITrace2D.PROPERTY_NAME, oldValue, this.m_name);
 
   }
 
@@ -1651,39 +1942,42 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * @see ITrace2D#setPhysicalUnits(String, String)
    */
   public final void setPhysicalUnits(final String xunit, final String yunit) {
-    String oldValue = this.getPhysicalUnits();
-    String oldLabel = this.getLabel();
+    final String oldValue = this.getPhysicalUnits();
+    final String oldLabel = this.getLabel();
     this.m_physicalUnitsX = xunit;
     this.m_physicalUnitsY = yunit;
-    String newValue = this.getPhysicalUnits();
-    String newLabel = this.getLabel();
-    this.firePropertyChange(PROPERTY_LABEL, oldLabel, newLabel);
-    this.firePropertyChange(PROPERTY_PHYSICALUNITS, oldValue, newValue);
+    final String newValue = this.getPhysicalUnits();
+    final String newLabel = this.getLabel();
+    this.firePropertyChange(ITrace2D.PROPERTY_LABEL, oldLabel, newLabel);
+    this.firePropertyChange(ITrace2D.PROPERTY_PHYSICALUNITS, oldValue, newValue);
   }
 
   /**
    * 
-   * @see info.monitorenter.gui.chart.ITrace2D#setPointHighlighter(info.monitorenter.gui.chart.IPointHighlighter)
+   * @see info.monitorenter.gui.chart.ITrace2D#setPointHighlighter(info.monitorenter.gui.chart.IPointPainter)
    */
-  public final Set<IPointHighlighter< ? >> setPointHighlighter(
-      final IPointHighlighter< ? > highlighter) {
-    Set<IPointHighlighter< ? >> result = this.m_pointHighlighters;
-    this.m_pointHighlighters = new LinkedHashSet<IPointHighlighter< ? >>();
+  public final Set<IPointPainter< ? >> setPointHighlighter(final IPointPainter< ? > highlighter) {
+    this.ensureInitialized();
+    synchronized (this.m_renderer) {
+      synchronized (this) {
+        Set<IPointPainter< ? >> result = this.m_pointHighlighters;
+        this.m_pointHighlighters = new LinkedHashSet<IPointPainter< ? >>();
 
-    boolean added = this.m_pointHighlighters.add(highlighter);
-    if (added) {
-      for (IPointHighlighter< ? > rem : result) {
-        this.firePropertyChange(PROPERTY_POINT_HIGHLIGHTERS, rem, null);
+        final boolean added = this.m_pointHighlighters.add(highlighter);
+        if (added) {
+          for (final IPointPainter< ? > rem : result) {
+            this.firePropertyChange(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, rem, null);
+          }
+          this.firePropertyChange(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, null, highlighter);
+
+        } else {
+          // roll back: will never happen, but here for formal reason
+          this.m_pointHighlighters = result;
+          result = null;
+        }
+        return result;
       }
-      this.firePropertyChange(PROPERTY_POINT_HIGHLIGHTERS, null, highlighter);
-
-    } else {
-      // roll back: will never happen, but here for formal reason
-      this.m_pointHighlighters = result;
-      result = null;
-
     }
-    return result;
   }
 
   /**
@@ -1697,7 +1991,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    *          the chart that paints this instance.
    */
   public final void setRenderer(final Chart2D renderer) {
-    boolean requiresErrorBarCalculation = this.m_renderer != renderer;
+    final boolean requiresErrorBarCalculation = this.m_renderer != renderer;
     this.m_renderer = renderer;
     if (requiresErrorBarCalculation) {
       this.expandErrorBarBounds();
@@ -1711,10 +2005,10 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
     if (stroke == null) {
       throw new IllegalArgumentException("Argument must not be null.");
     }
-    Stroke oldValue = this.m_stroke;
+    final Stroke oldValue = this.m_stroke;
     this.m_stroke = stroke;
     if (!this.m_stroke.equals(oldValue)) {
-      this.firePropertyChange(PROPERTY_STROKE, oldValue, this.m_stroke);
+      this.firePropertyChange(ITrace2D.PROPERTY_STROKE, oldValue, this.m_stroke);
     }
   }
 
@@ -1724,13 +2018,13 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
   public final Set<ITracePainter< ? >> setTracePainter(final ITracePainter< ? > painter) {
     Set<ITracePainter< ? >> result = this.m_tracePainters;
     this.m_tracePainters = new TreeSet<ITracePainter< ? >>();
-    boolean added = this.m_tracePainters.add(painter);
+    final boolean added = this.m_tracePainters.add(painter);
     if (added) {
-      for (ITracePainter< ? > rem : result) {
-        this.firePropertyChange(PROPERTY_PAINTERS, rem, null);
+      for (final ITracePainter< ? > rem : result) {
+        this.firePropertyChange(ITrace2D.PROPERTY_PAINTERS, rem, null);
 
       }
-      this.firePropertyChange(PROPERTY_PAINTERS, null, painter);
+      this.firePropertyChange(ITrace2D.PROPERTY_PAINTERS, null, painter);
 
     } else {
       // roll back: will never happen, but here for formal reason
@@ -1754,10 +2048,10 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * @see info.monitorenter.gui.chart.ITrace2D#setVisible(boolean)
    */
   public final void setVisible(final boolean visible) {
-    boolean oldValue = this.m_visible;
+    final boolean oldValue = this.m_visible;
     this.m_visible = visible;
     if (oldValue != this.m_visible) {
-      this.firePropertyChange(PROPERTY_VISIBLE, Boolean.valueOf(oldValue), Boolean
+      this.firePropertyChange(ITrace2D.PROPERTY_VISIBLE, Boolean.valueOf(oldValue), Boolean
           .valueOf(this.m_visible));
     }
   }
@@ -1771,19 +2065,19 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
     }
 
     if (!zIndex.equals(this.m_zIndex)) {
-
+      this.ensureInitialized();
       synchronized (this.m_renderer) {
         if (Chart2D.DEBUG_THREADING) {
           System.out.println("trace.setZIndex, 1 lock");
         }
 
-        Integer oldValue = this.m_zIndex;
+        final Integer oldValue = this.m_zIndex;
         synchronized (this) {
           if (Chart2D.DEBUG_THREADING) {
             System.out.println("trace.setZIndex, 2 locks");
           }
           this.m_zIndex = Integer.valueOf(zIndex.intValue());
-          this.firePropertyChange(PROPERTY_ZINDEX, oldValue, this.m_zIndex);
+          this.firePropertyChange(ITrace2D.PROPERTY_ZINDEX, oldValue, this.m_zIndex);
         }
       }
     }
@@ -1794,7 +2088,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    */
   public boolean showsErrorBars() {
     boolean result = false;
-    for (IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
+    for (final IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
       if (errorBarPolicy.getErrorBarPainters().size() > 0) {
         if (errorBarPolicy.isShowNegativeXErrors() || errorBarPolicy.isShowNegativeYErrors()
             || errorBarPolicy.isShowPositiveXErrors() || errorBarPolicy.isShowPositiveYErrors()) {
@@ -1811,7 +2105,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    */
   public boolean showsNegativeXErrorBars() {
     boolean result = false;
-    for (IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
+    for (final IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
       if (errorBarPolicy.getErrorBarPainters().size() > 0) {
         if (errorBarPolicy.isShowNegativeXErrors()) {
           result = true;
@@ -1827,7 +2121,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    */
   public boolean showsNegativeYErrorBars() {
     boolean result = false;
-    for (IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
+    for (final IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
       if (errorBarPolicy.getErrorBarPainters().size() > 0) {
         if (errorBarPolicy.isShowNegativeYErrors()) {
           result = true;
@@ -1843,7 +2137,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    */
   public boolean showsPositiveXErrorBars() {
     boolean result = false;
-    for (IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
+    for (final IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
       if (errorBarPolicy.getErrorBarPainters().size() > 0) {
         if (errorBarPolicy.isShowPositiveXErrors()) {
           result = true;
@@ -1859,7 +2153,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    */
   public boolean showsPositiveYErrorBars() {
     boolean result = false;
-    for (IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
+    for (final IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
       if (errorBarPolicy.getErrorBarPainters().size() > 0) {
         if (errorBarPolicy.isShowPositiveYErrors()) {
           result = true;

@@ -1,6 +1,6 @@
 /*
  *  Trace2DActionSetName, action to set the name of an ITrace2D.
- *  Copyright (C) 2004 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2004 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -38,7 +38,7 @@ import javax.swing.JOptionPane;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.7 $
  */
 public final class Trace2DActionSetName extends ATrace2DAction {
 
@@ -87,7 +87,9 @@ public final class Trace2DActionSetName extends ATrace2DAction {
     String chosen = JOptionPane.showInputDialog(this.m_trigger,
         "Please input the new Name for trace " + this.m_trace.getName(), "Set trace name",
         JOptionPane.PLAIN_MESSAGE);
-    this.m_trace.setName(chosen);
+    if(chosen != null) {
+      this.m_trace.setName(chosen);
+    }
   }
 
   /**

@@ -1,7 +1,7 @@
 /*
  *  Chart2DActionPrintSingleton, 
  *  singleton action that prints the chart with a dialog.
- *  Copyright (C) 2007 - 2010 Achim Westermann
+ *  Copyright (C) 2007 - 2011 Achim Westermann
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ import java.util.Map;
  * 
  * @see info.monitorenter.gui.chart.events.Chart2DActionSetCustomGridColor
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public final class Chart2DActionPrintSingleton
     extends AChart2DAction {

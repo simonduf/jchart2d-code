@@ -1,6 +1,6 @@
 /*
  * ViewChartValue.java of project jchart2d, a view that displays the data value
- * of the point the mouse pointer currently is over the Chart2D component.
+ *  Copyright (C) 2008 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -42,7 +42,7 @@ import javax.swing.JTextField;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.10 $
  */
 public class ChartCoordinateView extends JPanel {
 
@@ -65,7 +65,7 @@ public class ChartCoordinateView extends JPanel {
    * Needed to remove it from the chart when this component dies.
    * <p>
    */
-  private transient MouseMotionListener m_mouseListener;
+  private transient final MouseMotionListener m_mouseListener;
 
   /**
    * Creates an component that will contain two text fields that display the
@@ -88,7 +88,7 @@ public class ChartCoordinateView extends JPanel {
        */
       @Override
       public void mouseMoved(final MouseEvent me) {
-        ITracePoint2D value = ChartCoordinateView.this.m_chart2D.translateMousePosition(me);
+        final ITracePoint2D value = ChartCoordinateView.this.m_chart2D.translateMousePosition(me);
         if (value != null) {
           ChartCoordinateView.this.m_xView.setText(ChartCoordinateView.this.m_chart2D.getAxisX()
               .getFormatter().format(value.getX()));
@@ -106,7 +106,7 @@ public class ChartCoordinateView extends JPanel {
     this.setLayout(new GridBagLayout());
 
     // First "row"
-    GridBagConstraints gbc = new GridBagConstraints();
+    final GridBagConstraints gbc = new GridBagConstraints();
     gbc.insets.left = 4;
     gbc.insets.right = 4;
     gbc.insets.top = 4;
@@ -144,6 +144,45 @@ public class ChartCoordinateView extends JPanel {
   }
 
   /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final ChartCoordinateView other = (ChartCoordinateView) obj;
+    if (this.m_chart2D == null) {
+      if (other.m_chart2D != null) {
+        return false;
+      }
+    } else if (!this.m_chart2D.equals(other.m_chart2D)) {
+      return false;
+    }
+    if (this.m_xView == null) {
+      if (other.m_xView != null) {
+        return false;
+      }
+    } else if (!this.m_xView.equals(other.m_xView)) {
+      return false;
+    }
+    if (this.m_yView == null) {
+      if (other.m_yView != null) {
+        return false;
+      }
+    } else if (!this.m_yView.equals(other.m_yView)) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Removes the mouse motion listener from the chart.
    * <p>
    * 
@@ -155,5 +194,18 @@ public class ChartCoordinateView extends JPanel {
   protected void finalize() throws Throwable {
     super.finalize();
     this.m_chart2D.removeMouseMotionListener(this.m_mouseListener);
+  }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((this.m_chart2D == null) ? 0 : this.m_chart2D.hashCode());
+    result = prime * result + ((this.m_xView == null) ? 0 : this.m_xView.hashCode());
+    result = prime * result + ((this.m_yView == null) ? 0 : this.m_yView.hashCode());
+    return result;
   }
 }

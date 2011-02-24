@@ -2,7 +2,7 @@
  *  Chart2DActionSaveEpsSingleton, 
  *  singleton action that saves the chart to an encapsulated postscript
  *  file.
- *  Copyright (C) 2007 - 2010 Achim Westermann
+ *  Copyright (C) 2007 - 2011 Achim Westermann
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -52,7 +52,7 @@ import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
  * 
  * @see info.monitorenter.gui.chart.events.Chart2DActionSetCustomGridColor
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public final class Chart2DActionSaveEpsSingletonApacheFop {
 

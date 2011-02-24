@@ -1,6 +1,6 @@
 /*
  *  TestErrorBarsVisual.java of project jchart2d, <enterpurposehere>. 
- *  Copyright (C) 2002 - 2010, Achim Westermann, created on Jan 3, 2010
+ *  Copyright (C) 2002 - 2011, Achim Westermann, created on Jan 3, 2011
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -20,8 +20,8 @@
  *
  *
  * File   : $Source: /cvsroot/jchart2d/jchart2d/test/info/monitorenter/gui/chart/errorbars/TestErrorBarsVisual.java,v $
- * Date   : $Date: 2010/04/10 15:42:57 $
- * Version: $Revision: 1.3 $
+ * Date   : $Date: 2011/01/14 08:36:11 $
+ * Version: $Revision: 1.4 $
  */
 
 package info.monitorenter.gui.chart.errorbars;

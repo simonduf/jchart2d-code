@@ -1,6 +1,6 @@
 /*
  *  LinePainter.java,  point painter that paints lines. 
- *  Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,6 @@
 package info.monitorenter.gui.chart.pointpainters;
 
 import info.monitorenter.gui.chart.ITracePoint2D;
-import info.monitorenter.util.MathUtil;
 
 import java.awt.Graphics;
 
@@ -32,10 +31,10 @@ import java.awt.Graphics;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.18 $
  * 
  */
-public class PointPainterLine extends APointPainter {
+public class PointPainterLine extends APointPainter<PointPainterLine> {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 4325801979289678143L;

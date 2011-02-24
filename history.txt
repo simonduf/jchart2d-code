@@ -1,12 +1,12 @@
 /*
  * File   : $Source: /cvsroot/jchart2d/jchart2d/history.txt,v $
- * Date   : $Date: 2010/06/02 19:10:34 $
- * Version: $Revision: 1.196 $
+ * Date   : $Date: 2011/02/13 06:42:53 $
+ * Version: $Revision: 1.216 $
  *
  * This file is part of jchart2d -
  * the Open Source real time charting library.
  *
- * Copyright (c) 2002 - 2010 Achim Westermann
+ * Copyright (c) 2002 - 2011 Achim Westermann
  */
 
 Quick intro
@@ -15,10 +15,14 @@ Use this library for integration of charts into your Java application.
 To just view a chart open a shell (under windows cmd, penguins
 will know), cd to the directory you downloaded this file to 
 and type 
-"java - jar jchart2d-3.2.0.jar". 
+"java - jar jchart2d-3.2.1.jar". 
 You may also want to look at other demos. The may be launched by typing 
-"java -cp jchart2d-3.2.0.jar <fullyqualifiedclassname>". 
-E.g.: "java -cp jchart2d-3.2.0.jar info.monitorenter.gui.chart.demos.RunningChart" 
+"java -cp <jarfilelist> <fullyqualifiedclassname>". 
+E.g.: "java -cp jchart2d-3.2.1.jar  info.monitorenter.gui.chart.demos.MinimalDynamicChart".
+For full support (eps output, range chooser) also incorporate the 3rd party libraries to the 
+classplath: 
+linux: "java -cp jchart2d-3.2.1.jar:xmlgraphics-commons-1.3.1.jar:bislider.jar info.monitorenter.gui.chart.demos.AdvancedDynamicChart" 
+Windows: "java -cp jchart2d-3.2.1.jar;xmlgraphics-commons-1.3.1.jar;bislider.jar info.monitorenter.gui.chart.demos.AdvancedDynamicChart" 
 
 
 History of changes for the jchart2d project.
@@ -33,6 +37,53 @@ Legend:
 o API change that requires refactoring. 
   Note that refactoring of protected code intended for library 
   internal details will not be listed.
+
+jchart2d-3.2.1 - <month>, <day>, <year>
+
+! Added context menu entry for enabling/disabling antialiasing. 
+! Added various context menu entries for setting label formatters to axes.
+! Stroke, color and transparency now may be specified for point highlighters or point painters. 
+  The latter will override the settings of the trace to paint.  
+! Custom IPointFinders to find the nearest point of a chart corresponding to a mouse event 
+  may be used.   
+! Automatic enabling/disabling of expensive trace highlighting when trace highlighters are 
+  added / removed. 
+! Added simplified highlighting menu to trace menu (right click on trace name) too.
+! Changed color management of error bar painters to use the new configurable point painter's color.
+! Updated to Proguard Version 4.5.1.
+! Synchronized direct changes to the trace point instances to avoid those not being reflected in UI (due to consumed repaint requests while paint cylce still running). 
+  This should improve point highlighting (disallow forgetting to show changed highlighted point). 
+! Switched from bislider to JIDE oss for the range slider. 
+* Fixed unreported bug when setting a new LabelFormatterAutoUnits not calculating the proper unit. 
+* Fixed unreported bug when using currency/percent formatting in label formatter: labels would overwrite each other.
+* Fixed issue with wrong equals / hashcode implementations (menu items for highlighters/painters would not update state if API call should cause that). 
+* Fixed issue with duplicate property change listeners on for menu items. 
+* Fixed issue with ClassCastException when changing the end point painter of an error bar painter (duplicate property constant). 
+* Fixed bug #1930893 again: ZoomableChart now interpolates the connections of two 
+  invisible points if their connection crosses the zooming window. 
+* Fixed bug #3064089: Zoom does not work for multi axes plots (Contribution by Anadi Mishra).
+* Fixed bug: Chart2D.setAxis<Dimension><Location>(AAxis, int) was not contained in the jar file (proguard shrinker issue).
+* Fixed issue with remaining highlighted point when removing point highlighter from trace. 
+* Fixed NPE when calling TracePoint2D.setLocation(double, double) before point has been added to trace. 
+* Fixed issue with NPE when highlighting an interpolated point. 
+* Fixed issue with point highlighting leaving several highlighted points if there is more than 1 trace and your mouse gets 
+  nearer to another trace than the previous trace being highlighted. 
+* Fixed issue with changed point highlighters on a trace being reported to the Chart instead of it's point highlighting worker 
+  (thus resulting in no proper update of the changed highlighter on the highlighted points). 
+* Fixed bug #3127284: Using the ChartPanel wrapper, right click in the label of a trace to change its name. Press "cancel". The name disappears from the GUI.
+* Fixed unreleased issue: point highlighting tracking in the chart is not enabled/disabled automatically if the first/last point highlighter was added / removed. 
+* Fixed unreported issue: Trying to add points from a separate thread before a trace is added to a chart runs into silent deadlock preventing the chart from 
+  becoming visible / reactive. 
+* Fixed possible deadlock when launching many threads at startup while ChartPanel is used (Container.getTreelock() issue in addTrace of Chart2D). 
+* Fixed possible deadlock when adding many traces at startup and paint of Chart2D is already invoked before finish of adding all traces. 
+* Fixed bug #3164863: LabelFormatter does not chooses femto range for very small values ( < 10^-16).
+o Renamed info.monitorenter.MathUtil to info.monitorenter.util.math.MathUtil.
+o Renamed info.monitorenter.math.IntegerReusable to info.monitorenter.math.IntegerMutable. 
+o Simplified API: dropped interface IPointHighlighter. Use IPointPainter wherever you used IPointHighlighter before. 
+o Simplified API: dropped class APointHighlighter. Extend APointPainter wherever you used APointPainter before. 
+o Simplified API: dropped class PointHighlighterConfigurable. Use the raw PointPainter argument from it's constructor instead. 
+  Example: "new PointPainterConfigurable(new PointPainterDisc(20), true)" -> "new PointPainterDisc(20)" 
+o To prevent deadlocks at startup now every trace has to be first added to a chart before: adding points, setting point highlighters, setting error bar policies to the trace. 
 
 jchart2d-3.2.0 - June, 2nd, 2010
 

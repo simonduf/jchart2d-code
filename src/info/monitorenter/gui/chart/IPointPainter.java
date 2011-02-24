@@ -1,7 +1,7 @@
 /*
  *  IPaintPointer.java of project jchart2d, generic interface for 
  *  instances that have to render a point in pixel coordinates.
- *  Copyright (c) 2004 - 2010 Achim Westermann.
+ *  Copyright (c) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,6 @@
  */
 package info.monitorenter.gui.chart;
 
-
 import java.awt.Graphics;
 import java.io.Serializable;
 
@@ -33,20 +32,23 @@ import java.io.Serializable;
  * 
  * This low level interface is used wherever points have to be painted:
  * <ul>
- * <li> painting traces ({@link info.monitorenter.gui.chart.ITracePainter})
- * </li>
- * <li> painting endpoints, startpoints and the segments of errorbars ({@link info.monitorenter.gui.chart.errorbars.ErrorBarPainter}).
- * </li>
+ * <li>painting traces ({@link info.monitorenter.gui.chart.ITracePainter})</li>
+ * <li>painting endpoints, startpoints and the segments of errorbars (
+ * {@link info.monitorenter.gui.chart.errorbars.ErrorBarPainter}).</li>
+ * <li>painting additional point highlighters (
+ * {@link ITracePoint2D#addAdditionalPointPainter(IPointPainter)}).</li>
  * </ul>
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @param <T> demonstration of unknown comparable and inheritance idiom or bad generics design for this case. 
+ * @param <T>
+ *          demonstration of unknown comparable and inheritance idiom or bad
+ *          generics design for this case.
  * 
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.19 $
  */
-public interface IPointPainter<T extends IPointPainter<T>> extends Serializable, Comparable<T>  {
+public interface IPointPainter<T extends IPointPainter<T>> extends Serializable, Comparable<T> {
   /**
    * Invoked to inform implementations that a paint iteration ends for the
    * corresponding {@link info.monitorenter.gui.chart.ITrace2D}.
@@ -65,33 +67,25 @@ public interface IPointPainter<T extends IPointPainter<T>> extends Serializable,
    * is available for the graphic representation of the current point.
    * <p>
    * 
-   * Note that by contract the <code>{@link TracePoint2D}</code> argument is
-   * only guaranteed to be non-null in case the instance is used as a painter
-   * for <code>{@link ITracePainter}</code> subtypes. If you plan to use your
-   * implementation also for a subcomponent of an
-   * <code>{@link IErrorBarPainter}</code> (e.g.
-   * <code>{@link IErrorBarPainter#setConnectionPainter(IPointPainter)}</code>)
-   * then you have to implement "null - safe" for that argument.
-   * <p>
    * 
    * @param absoluteX
-   *            the ready to use x value for the point to paint.
+   *          the ready to use x value for the point to paint.
    * 
    * @param absoluteY
-   *            the ready to use y value for the point to paint.
+   *          the ready to use y value for the point to paint.
    * 
    * @param nextX
-   *            the ready to use next x value for the point to paint.
+   *          the ready to use next x value for the point to paint.
    * 
    * @param nextY
-   *            the ready to use next y value for the point to paint.
+   *          the ready to use next y value for the point to paint.
    * 
    * @param g
-   *            the graphic context to paint on.
+   *          the graphic context to paint on.
    * 
    * @param original
-   *            just for information, for painting this should be irrelevant and
-   *            it should not be changed too!
+   *          just for information, for painting this should be irrelevant and
+   *          it should not be changed too!
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
       final int nextY, final Graphics g, final ITracePoint2D original);
@@ -105,5 +99,4 @@ public interface IPointPainter<T extends IPointPainter<T>> extends Serializable,
    *          provided in case pending paint operations have to be performed.
    */
   public void startPaintIteration(Graphics g2d);
-
 }

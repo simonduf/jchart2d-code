@@ -1,6 +1,6 @@
 /*
  *  StringUtil, utility class for string operations.
- *  Copyright (C) 2004 - 2010 Achim Westermann.
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -34,9 +34,10 @@ import java.util.List;
  * 
  * @author Achim.Westermann@gmx.de
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.10 $
  */
 public final class StringUtil {
+  
   /** Singleton instance. */
   private static StringUtil instance = null;
 
@@ -92,7 +93,7 @@ public final class StringUtil {
    *          treatment.
    * 
    */
-  public static final void arraysToString(final List<Object> objects) {
+  public static final void listOfArraysToString(final List<Object> objects) {
     if (objects == null) {
       return;
     }
@@ -106,21 +107,9 @@ public final class StringUtil {
    * If the given Object is no Array, it's toString - method is invoked.
    * Primitive type - Arrays and Object - Arrays are introspected using
    * java.lang.reflect.Array. Convention for creation fo String -
-   * representation: <br>
+   * representation: <p>
    * 
-   * <code>
-   * // Primitive arrays: 
-   * &quot;[&quot;+isArr[0]+&quot;,&quot;+isArr[1]+.. ..+isArr[isArr.length-1]+&quot;]&quot;
-   *     
-   *     
-   * //Object arrays :  
-   * &quot;[&quot;+isArr[0].toString()+&quot;,&quot;+.. ..+isArr[isArr.length-1].toString+&quot;]&quot;
-   * // Two or three - dimensional Arrays are not supported
-   * //(should be reflected in a special output method, e.g.as a field)
-   * 
-   * // other Objects:    
-   * toString()
-   * </code>
+   * @see StringUtil#arrayToString(Object, String)
    * 
    * @param isArr
    *          The Array to represent as String.
@@ -130,6 +119,40 @@ public final class StringUtil {
    * 
    */
   public static final String arrayToString(final Object isArr) {
+    String result = StringUtil.arrayToString(isArr, ",");
+    return result;
+  }
+  
+  /**
+   * If the given Object is no Array, it's toString - method is invoked.
+   * Primitive type - Arrays and Object - Arrays are introspected using
+   * java.lang.reflect.Array. Convention for creation for String -
+   * representation: <br>
+   * 
+   * <code>
+   * // Primitive arrays: 
+   * &quot;[&quot;+isArr[0]+&quot;&lt;separator&gt;&quot;+isArr[1]+.. ..+isArr[isArr.length-1]+&quot;]&quot;
+   *     
+   *     
+   * //Object arrays :  
+   * &quot;[&quot;+isArr[0].toString()+&quot;&lt;separator&gt;&quot;+.. ..+isArr[isArr.length-1].toString+&quot;]&quot;
+   * // Two or three - dimensional Arrays are not supported
+   * //(should be reflected in a special output method, e.g.as a field)
+   * 
+   * // other Objects:    
+   * toString()
+   * </code>
+   * 
+   * @param separator put in-between each array element in the resulting string. 
+   * 
+   * @param isArr
+   *          The Array to represent as String.
+   * 
+   * @return a String-representation of the Object.
+   * 
+   * 
+   */
+  public static final String arrayToString(final Object isArr, final String separator) {
     String result;
     if (isArr == null) {
       result = "null";
@@ -147,7 +170,7 @@ public final class StringUtil {
             tmp.append(element.toString());
           }
           if (i < length - 1) {
-            tmp.append(",");
+            tmp.append(separator);
           }
         }
         tmp.append("]");

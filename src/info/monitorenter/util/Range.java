@@ -1,6 +1,6 @@
 /*
  *  Range.java, a simple data structure to express min and max.
- *  Copyright (C) 2004 - 2010 Achim Westermann.
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,8 @@
  *
  */
 package info.monitorenter.util;
+
+import info.monitorenter.util.math.MathUtil;
 
 import java.io.Serializable;
 
@@ -101,14 +103,23 @@ public class Range implements Serializable {
    */
   @Override
   public boolean equals(final Object obj) {
-    boolean result = true;
-    if (obj instanceof Range) {
-      Range other = (Range) obj;
-      result = (this.m_max == other.m_max) && (this.m_min == other.m_min);
-    } else {
-      result = false;
+    if (this == obj) {
+      return true;
     }
-    return result;
+    if (obj == null) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final Range other = (Range) obj;
+    if (Double.doubleToLongBits(this.m_max) != Double.doubleToLongBits(other.m_max)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_min) != Double.doubleToLongBits(other.m_min)) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -146,7 +157,14 @@ public class Range implements Serializable {
    */
   @Override
   public int hashCode() {
-    return this.toString().hashCode();
+    final int prime = 31;
+    int result = 1;
+    long temp;
+    temp = Double.doubleToLongBits(this.m_max);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(this.m_min);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    return result;
   }
 
   /**
@@ -205,7 +223,7 @@ public class Range implements Serializable {
    */
   @Override
   public String toString() {
-    StringBuffer ret = new StringBuffer("Range[");
+    final StringBuffer ret = new StringBuffer("Range[");
     ret.append(this.m_min).append(',');
     ret.append(this.m_max).append(']');
     return ret.toString();

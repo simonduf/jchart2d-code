@@ -1,6 +1,6 @@
 /*
  *  TimeStampedValue, wrapper class for values marked with a timestamp.
- *  Copyright (C) 2004 - 2010 Achim Westermann.
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -33,15 +33,16 @@ import java.util.Map;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann</a>
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.11 $
  */
 public final class TimeStampedValue implements Map.Entry<Long, Object>,
     Comparable<TimeStampedValue> {
+
   /**
    * The time stamp (difference, measured in milliseconds, between the current
    * time and midnight, January 1, 1970 UTC).
    */
-  private long m_key;
+  private final long m_key;
 
   /** The time stamp value. */
   private Object m_value;
@@ -52,11 +53,11 @@ public final class TimeStampedValue implements Map.Entry<Long, Object>,
    * <p>
    * 
    * @param key
-   *            the time stamp (difference, measured in milliseconds, between
-   *            the current time and midnight, January 1, 1970 UTC).
+   *          the time stamp (difference, measured in milliseconds, between the
+   *          current time and midnight, January 1, 1970 UTC).
    * 
    * @param value
-   *            the value to time stamp.
+   *          the value to time stamp.
    */
   public TimeStampedValue(final long key, final Object value) {
     this.m_key = key;
@@ -69,7 +70,7 @@ public final class TimeStampedValue implements Map.Entry<Long, Object>,
    * <p>
    * 
    * @param value
-   *            the value to time stamp.
+   *          the value to time stamp.
    * 
    * @see System#currentTimeMillis()
    */
@@ -83,7 +84,7 @@ public final class TimeStampedValue implements Map.Entry<Long, Object>,
    * <p>
    * 
    * @param obj
-   *            the object to compare this to.
+   *          the object to compare this to.
    * 
    * @return see interface.
    * 
@@ -102,30 +103,31 @@ public final class TimeStampedValue implements Map.Entry<Long, Object>,
   }
 
   /**
-   * Returns true, if o!=null && this.key.equals(0) &&
-   * o.insanceOf(TimeStampedValue).
-   * 
-   * @param o
-   *            the {@link TimeStampedValue} to compare this instance to.
-   * 
-   * @return true, if o!=null && this.key.equals(0) &&
-   *         o.insanceOf(TimeStampedValue).
+   * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
-  public boolean equals(final Object o) {
-    if (o == null) {
-      return false;
-    }
-    TimeStampedValue compare = null;
-    try {
-      compare = (TimeStampedValue) o;
-    } catch (ClassCastException e) {
-      return false;
-    }
-    if (this.getTime() == compare.getTime()) {
+  public boolean equals(final Object obj) {
+    if (this == obj) {
       return true;
     }
-    return false;
+    if (obj == null) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final TimeStampedValue other = (TimeStampedValue) obj;
+    if (this.m_key != other.m_key) {
+      return false;
+    }
+    if (this.m_value == null) {
+      if (other.m_value != null) {
+        return false;
+      }
+    } else if (!this.m_value.equals(other.m_value)) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -168,17 +170,15 @@ public final class TimeStampedValue implements Map.Entry<Long, Object>,
   }
 
   /**
-   * 
    * @see java.lang.Object#hashCode()
    */
   @Override
   public int hashCode() {
-    int result = (int) this.m_key;
-    if (this.m_key > Integer.MAX_VALUE) {
-      result = -result;
-    }
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (int) (this.m_key ^ (this.m_key >>> 32));
+    result = prime * result + ((this.m_value == null) ? 0 : this.m_value.hashCode());
     return result;
-
   }
 
   /**
@@ -203,14 +203,14 @@ public final class TimeStampedValue implements Map.Entry<Long, Object>,
    * <p>
    * 
    * @param value
-   *            the new value to be marked with this timestamp.
+   *          the new value to be marked with this timestamp.
    * 
    * @return the previous value that was contained.
    * 
    * @see java.util.Map.Entry#setValue(java.lang.Object)
    */
   public Object setValue(final Object value) {
-    Object ret = this.m_value;
+    final Object ret = this.m_value;
     this.m_value = value;
     return ret;
   }

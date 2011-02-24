@@ -1,6 +1,6 @@
 /*
  * RangePolicyHighestValues.java,  points only the highest given values given. 
- * Copyright (c) 2007 - 2010  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2007 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -32,21 +32,20 @@ import info.monitorenter.util.Range;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.8 $
  * 
  */
-public final class RangePolicyHighestValues
-    extends ARangePolicy {
+public final class RangePolicyHighestValues extends ARangePolicy {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 3966377720997931343L;
-  
+
   /** The value range for the highest values to show. */
-  private double m_highestValueRangeToShow;
+  private final double m_highestValueRangeToShow;
 
   /**
-   * Creates a range policy with an unconfigured range ({@link Range#RANGE_UNBOUNDED})
-   * that will show the 50 hightest values.
+   * Creates a range policy with an unconfigured range (
+   * {@link Range#RANGE_UNBOUNDED}) that will show the 50 hightest values.
    * <p>
    */
   public RangePolicyHighestValues() {
@@ -54,8 +53,9 @@ public final class RangePolicyHighestValues
   }
 
   /**
-   * Creates a range policy with an unconfigured range ({@link Range#RANGE_UNBOUNDED})
-   * that will show the given amount of highest values.
+   * Creates a range policy with an unconfigured range (
+   * {@link Range#RANGE_UNBOUNDED}) that will show the given amount of highest
+   * values.
    * <p>
    * 
    * @param amountHighestValues
@@ -80,6 +80,28 @@ public final class RangePolicyHighestValues
   public RangePolicyHighestValues(final Range range, final double highestValueRangeToShow) {
     super(range);
     this.m_highestValueRangeToShow = highestValueRangeToShow;
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final RangePolicyHighestValues other = (RangePolicyHighestValues) obj;
+    if (Double.doubleToLongBits(this.m_highestValueRangeToShow) != Double
+        .doubleToLongBits(other.m_highestValueRangeToShow)) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -121,6 +143,19 @@ public final class RangePolicyHighestValues
    */
   public double getMin(final double chartMin, final double chartMax) {
     return Math.max(chartMax - this.m_highestValueRangeToShow, chartMin);
+  }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    long temp;
+    temp = Double.doubleToLongBits(this.m_highestValueRangeToShow);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    return result;
   }
 
 }

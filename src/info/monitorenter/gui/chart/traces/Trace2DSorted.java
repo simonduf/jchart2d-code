@@ -1,7 +1,7 @@
 /*
  *  Trace2DSorted, a TreeSet- based implementation of a ITrace2D that performs
  *  insertion- sort of TracePoint2D - instances by their x- value.
- *  Copyright (c) 2004 - 2010 Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2011 Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -49,14 +49,13 @@ import java.util.TreeSet;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.15 $
  */
-public class Trace2DSorted
-    extends ATrace2D implements ITrace2D {
-  
+public class Trace2DSorted extends ATrace2D implements ITrace2D {
+
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -3518797764292132652L;
-  
+
   /** The sorted set of points. */
   protected SortedSet<ITracePoint2D> m_points = new TreeSet<ITracePoint2D>();
 
@@ -88,6 +87,31 @@ public class Trace2DSorted
   }
 
   /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final Trace2DSorted other = (Trace2DSorted) obj;
+    if (this.m_points == null) {
+      if (other.m_points != null) {
+        return false;
+      }
+    } else if (!this.m_points.equals(other.m_points)) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#getMaxSize()
    */
   public int getMaxSize() {
@@ -99,6 +123,17 @@ public class Trace2DSorted
    */
   public int getSize() {
     return this.m_points.size();
+  }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((this.m_points == null) ? 0 : this.m_points.hashCode());
+    return result;
   }
 
   /**

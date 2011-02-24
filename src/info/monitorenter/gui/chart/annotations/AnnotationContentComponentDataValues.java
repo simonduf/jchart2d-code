@@ -1,7 +1,7 @@
 /*
  *  AnnotationContentComponentDataValues.java of project jchart2d, 
  *  annotation that displays the annotated point's data values. 
- *  Copyright (C) 2002 - 2010, Achim Westermann, created on 16.02.2009
+ *  Copyright (C) 2002 - 2011, Achim Westermann, created on 16.02.2009
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -21,8 +21,8 @@
  *
  *
  * File   : $Source: /cvsroot/jchart2d/jchart2d/src/info/monitorenter/gui/chart/annotations/AnnotationContentComponentDataValues.java,v $
- * Date   : $Date: 2010/06/01 21:34:30 $
- * Version: $Revision: 1.4 $
+ * Date   : $Date: 2011/01/14 08:36:11 $
+ * Version: $Revision: 1.5 $
  */
 
 package info.monitorenter.gui.chart.annotations;

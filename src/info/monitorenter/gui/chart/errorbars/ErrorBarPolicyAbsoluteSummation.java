@@ -2,7 +2,7 @@
  *  ErrorBarPolicyRelative.java of project jchart2d, configurable 
  *  info.monitorenter.gui.chart.IErrorBarPolicy that adds an 
  *  absolute error to the points to render.
- *  Copyright (c) 2006 - 2010 Achim Westermann, created on 10.08.2006 19:37:54.
+ *  Copyright (c) 2006 - 2011 Achim Westermann, created on 10.08.2006 19:37:54.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,7 @@ package info.monitorenter.gui.chart.errorbars;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
+import info.monitorenter.gui.chart.IErrorBarPolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 
@@ -52,7 +53,7 @@ import javax.swing.event.ChangeListener;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.19 $
  */
 public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable {
 
@@ -92,15 +93,39 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
   }
 
   /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final ErrorBarPolicyAbsoluteSummation other = (ErrorBarPolicyAbsoluteSummation) obj;
+    if (Double.doubleToLongBits(this.m_xError) != Double.doubleToLongBits(other.m_xError)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_yError) != Double.doubleToLongBits(other.m_yError)) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#getCustomConfigurator()
    */
   @Override
   public JComponent getCustomConfigurator() {
-    JPanel panel = new JPanel();
+    final JPanel panel = new JPanel();
     panel.setBorder(BorderFactory.createEtchedBorder());
 
     panel.setLayout(new GridBagLayout());
-    GridBagConstraints gbc = new GridBagConstraints();
+    final GridBagConstraints gbc = new GridBagConstraints();
     gbc.anchor = GridBagConstraints.WEST;
     gbc.fill = GridBagConstraints.NONE;
     gbc.gridwidth = 1;
@@ -110,13 +135,13 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
     gbc.gridy = 0;
     gbc.insets = new Insets(2, 2, 2, 2);
 
-    JLabel xErrorLable = new JLabel("Absolute X error ");
+    final JLabel xErrorLable = new JLabel("Absolute X error ");
 
     panel.add(xErrorLable, gbc);
 
-    SpinnerModel numberXModel = new SpinnerNumberModel(ErrorBarPolicyAbsoluteSummation.this
+    final SpinnerModel numberXModel = new SpinnerNumberModel(ErrorBarPolicyAbsoluteSummation.this
         .getXError(0), 0, 1000000, 10);
-    JSpinner xErrorSelector = new JSpinner(numberXModel);
+    final JSpinner xErrorSelector = new JSpinner(numberXModel);
 
     gbc.gridx = 1;
     gbc.weightx = 0.5;
@@ -132,7 +157,7 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
     gbc.fill = GridBagConstraints.NONE;
     gbc.weightx = 0;
 
-    JLabel yErrorLable = new JLabel("Absolute Y error ");
+    final JLabel yErrorLable = new JLabel("Absolute Y error ");
 
     gbc.gridx = 0;
     gbc.gridy = 1;
@@ -140,9 +165,9 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
 
     panel.add(yErrorLable, gbc);
 
-    SpinnerModel numberYModel = new SpinnerNumberModel(ErrorBarPolicyAbsoluteSummation.this
+    final SpinnerModel numberYModel = new SpinnerNumberModel(ErrorBarPolicyAbsoluteSummation.this
         .getYError(0), 0, 1000000, 10);
-    JSpinner yErrorSelector = new JSpinner(numberYModel);
+    final JSpinner yErrorSelector = new JSpinner(numberYModel);
 
     gbc.gridx = 1;
     gbc.weightx = 0.5;
@@ -152,18 +177,18 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
     // actions:
     xErrorSelector.addChangeListener(new ChangeListener() {
       public void stateChanged(final ChangeEvent e) {
-        JSpinner spinner = (JSpinner) e.getSource();
-        SpinnerNumberModel model = (SpinnerNumberModel) spinner.getModel();
-        Number number = model.getNumber();
+        final JSpinner spinner = (JSpinner) e.getSource();
+        final SpinnerNumberModel model = (SpinnerNumberModel) spinner.getModel();
+        final Number number = model.getNumber();
         ErrorBarPolicyAbsoluteSummation.this.setXError(number.doubleValue());
       }
     });
 
     yErrorSelector.addChangeListener(new ChangeListener() {
       public void stateChanged(final ChangeEvent e) {
-        JSpinner spinner = (JSpinner) e.getSource();
-        SpinnerNumberModel model = (SpinnerNumberModel) spinner.getModel();
-        Number number = model.getNumber();
+        final JSpinner spinner = (JSpinner) e.getSource();
+        final SpinnerNumberModel model = (SpinnerNumberModel) spinner.getModel();
+        final Number number = model.getNumber();
         ErrorBarPolicyAbsoluteSummation.this.setYError(number.doubleValue());
       }
     });
@@ -186,19 +211,34 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
   }
 
   /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    long temp;
+    temp = Double.doubleToLongBits(this.m_xError);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(this.m_yError);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    return result;
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeXError(int,
    *      int, info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
   protected int internalGetNegativeXError(final int xPixel, final int yPixel,
       final ITracePoint2D original) {
-    ITrace2D trace = this.getTrace();
-    Chart2D chart = trace.getRenderer();
-    IAxis axisX = chart.getAxisX();
+    final ITrace2D trace = this.getTrace();
+    final Chart2D chart = trace.getRenderer();
+    final IAxis axisX = chart.getAxisX();
     // We cannot use IAxis.translateRelativeValueToPX because non-linear
     // transformations of axis implementations (e.g. log) will put the distance
     // argument in relation to 0 and return wrong results:
-    int result = axisX.translateValueToPx(original.getX() - this.m_xError);
+    final int result = axisX.translateValueToPx(original.getX() - this.m_xError);
     return result;
   }
 
@@ -209,13 +249,13 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
   @Override
   protected int internalGetNegativeYError(final int xPixel, final int yPixel,
       final ITracePoint2D original) {
-    ITrace2D trace = this.getTrace();
-    Chart2D chart = trace.getRenderer();
-    IAxis axisY = chart.getAxisY();
+    final ITrace2D trace = this.getTrace();
+    final Chart2D chart = trace.getRenderer();
+    final IAxis axisY = chart.getAxisY();
     // We cannot use IAxis.translateRelativeValueToPX because non-linear
     // transformations of axis implementations (e.g. log) will put the distance
     // argument in relation to 0 and return wrong results:
-    int result = axisY.translateValueToPx(original.getY() - this.m_yError);
+    final int result = axisY.translateValueToPx(original.getY() - this.m_yError);
     return result;
   }
 
@@ -226,13 +266,14 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
   @Override
   protected int internalGetPositiveXError(final int xPixel, final int yPixel,
       final ITracePoint2D original) {
-    ITrace2D trace = this.getTrace();
-    Chart2D chart = trace.getRenderer();
-    IAxis axisX = chart.getAxisX();
-    // We cannot use IAxis.translateRelativeValueToPX with error only and then add / subtract because non-linear
+    final ITrace2D trace = this.getTrace();
+    final Chart2D chart = trace.getRenderer();
+    final IAxis axisX = chart.getAxisX();
+    // We cannot use IAxis.translateRelativeValueToPX with error only and then
+    // add / subtract because non-linear
     // transformations of axis implementations (e.g. log) will put the distance
     // argument in relation to 0 and return wrong results:
-    int result = axisX.translateValueToPx(original.getX() + this.m_xError);
+    final int result = axisX.translateValueToPx(original.getX() + this.m_xError);
     return result;
   }
 
@@ -243,13 +284,13 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
   @Override
   protected int internalGetPositiveYError(final int xPixel, final int yPixel,
       final ITracePoint2D original) {
-    ITrace2D trace = this.getTrace();
-    Chart2D chart = trace.getRenderer();
-    IAxis axisY = chart.getAxisY();
+    final ITrace2D trace = this.getTrace();
+    final Chart2D chart = trace.getRenderer();
+    final IAxis axisY = chart.getAxisY();
     // We cannot use IAxis.translateRelativeValueToPX because non-linear
     // transformations of axis implementations (e.g. log) will put the distance
     // argument in relation to 0 and return wrong results:
-    int result = axisY.translateValueToPx(original.getY() + this.m_yError);
+    final int result = axisY.translateValueToPx(original.getY() + this.m_yError);
     return result;
   }
 
@@ -271,10 +312,10 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
     if (xError < 0.0) {
       throw new IllegalArgumentException("Given absolute error (" + xError + ")has to be > 0.");
     }
-    boolean change = this.m_xError != xError;
+    final boolean change = this.m_xError != xError;
     if (change) {
       this.m_xError = xError;
-      this.firePropertyChange(PROPERTY_CONFIGURATION, null, null);
+      this.firePropertyChange(IErrorBarPolicy.PROPERTY_CONFIGURATION, null, null);
     }
   }
 
@@ -296,10 +337,10 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
     if (yError < 0.0) {
       throw new IllegalArgumentException("Given absolute error (" + yError + ")has to be > 0.");
     }
-    boolean change = this.m_yError != yError;
+    final boolean change = this.m_yError != yError;
     if (change) {
       this.m_yError = yError;
-      this.firePropertyChange(PROPERTY_CONFIGURATION, null, null);
+      this.firePropertyChange(IErrorBarPolicy.PROPERTY_CONFIGURATION, null, null);
     }
   }
 }

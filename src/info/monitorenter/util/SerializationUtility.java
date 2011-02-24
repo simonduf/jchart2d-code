@@ -1,7 +1,7 @@
 /*
  *  SerializationUtility.java of project jchart2d, helpers for missing 
  *  serialization mechanism in java. 
- *  Copyright (C) 2004 - 2010 Achim Westermann.
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,7 @@ import java.io.ObjectOutputStream;
  * 
  * @author David Gilbert (original)
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.6 $
  */
 public final class SerializationUtility {
 
@@ -71,7 +71,6 @@ public final class SerializationUtility {
       }
     }
     return result;
-
   }
 
   /**

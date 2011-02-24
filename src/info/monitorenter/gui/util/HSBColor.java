@@ -1,7 +1,7 @@
 /*
  *  HSBColor.java, translates RGB colors into Hue-Saturation-Brightness 
  *  colors.
- *  Copyright (C) 2004 - 2010 Achim Westermann.
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -26,11 +26,10 @@ package info.monitorenter.gui.util;
 /**
  * Color that internally works with the Hue Saturation Luminance color space.
  * <p>
- * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.7 $
  */
 public class HSBColor implements java.io.Serializable, Cloneable {
 
@@ -56,17 +55,17 @@ public class HSBColor implements java.io.Serializable, Cloneable {
    */
   public static HSBColor rgbToHSB(final java.awt.Color color) {
     // TODO: Fix alpha treatment!!!!
-    int rgb = color.getRGB();
-    int r = (rgb & 0xFF0000) >> 16;
-    int g = (rgb & 0xFF00) >> 8;
-    int b = (rgb & 0xFF);
-    HSBColor ret = new HSBColor();
+    final int rgb = color.getRGB();
+    final int r = (rgb & 0xFF0000) >> 16;
+    final int g = (rgb & 0xFF00) >> 8;
+    final int b = (rgb & 0xFF);
+    final HSBColor ret = new HSBColor();
 
-    int cmax = (r >= g) ? (r >= b) ? r : b : (g >= b) ? g : b;
-    int cmin = (r <= g) ? (r <= b) ? r : b : (g <= b) ? g : b;
+    final int cmax = (r >= g) ? (r >= b) ? r : b : (g >= b) ? g : b;
+    final int cmin = (r <= g) ? (r <= b) ? r : b : (g <= b) ? g : b;
     ret.m_lum = (cmax) / 255f;
     if (cmax != cmin) {
-      float difference = (cmax - cmin);
+      final float difference = (cmax - cmin);
       ret.m_sat = difference / (cmax);
       if (r == cmax) {
         ret.m_hue = (g - b) / difference;
@@ -158,15 +157,15 @@ public class HSBColor implements java.io.Serializable, Cloneable {
    *          standard java rgb color.
    */
   public HSBColor(final java.awt.Color rgbcolor) {
-    int rgb = rgbcolor.getRGB();
-    int r = (rgb & 0xFF0000) >> 16;
-    int g = (rgb & 0xFF00) >> 8;
-    int b = (rgb & 0xFF);
-    int cmax = (r >= g) ? (r >= b) ? r : b : (g >= b) ? g : b;
-    int cmin = (r <= g) ? (r <= b) ? r : b : (g <= b) ? g : b;
+    final int rgb = rgbcolor.getRGB();
+    final int r = (rgb & 0xFF0000) >> 16;
+    final int g = (rgb & 0xFF00) >> 8;
+    final int b = (rgb & 0xFF);
+    final int cmax = (r >= g) ? (r >= b) ? r : b : (g >= b) ? g : b;
+    final int cmin = (r <= g) ? (r <= b) ? r : b : (g <= b) ? g : b;
     this.m_lum = (cmax) / 255f;
     if (cmax != cmin) {
-      float difference = (cmax - cmin);
+      final float difference = (cmax - cmin);
       this.m_sat = difference / (cmax);
       if (r == cmax) {
         this.m_hue = (g - b) / difference;
@@ -210,7 +209,7 @@ public class HSBColor implements java.io.Serializable, Cloneable {
       result.m_lum = this.m_lum;
       result.m_sat = this.m_sat;
       result.m_alpha = this.m_alpha;
-    } catch (CloneNotSupportedException e) {
+    } catch (final CloneNotSupportedException e) {
       result = new HSBColor((float) this.m_hue, (float) this.m_sat, (float) this.m_lum, (int) Math
           .round(this.m_alpha));
     }
@@ -218,30 +217,33 @@ public class HSBColor implements java.io.Serializable, Cloneable {
   }
 
   /**
-   * Equals implementation.
-   * <p>
-   * 
-   * Returns true if :<br>
-   * <code>
-   * <span style="white-space:nowrap;">
-   * o.instanceof HSBColor && (this.hue==o.hue) && (this.sat == o.sat) && (this.lum == o.lum)
-   * </span>
-   * </code>
-   * <p>
-   * 
-   * @param o
-   *          the other {@link HSBColor} instance.
-   * 
-   * @return true if the colors are judged equal.
+   * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
-  public boolean equals(final Object o) {
-    if (!(o instanceof HSBColor)) {
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
       return false;
     }
-    HSBColor other = (HSBColor) o;
-    return (this.m_hue == other.m_hue) && (this.m_sat == other.m_sat)
-        && (this.m_lum == other.m_lum) && (this.m_alpha == other.m_alpha);
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final HSBColor other = (HSBColor) obj;
+    if (Double.doubleToLongBits(this.m_alpha) != Double.doubleToLongBits(other.m_alpha)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_hue) != Double.doubleToLongBits(other.m_hue)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_lum) != Double.doubleToLongBits(other.m_lum)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_sat) != Double.doubleToLongBits(other.m_sat)) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -252,12 +254,13 @@ public class HSBColor implements java.io.Serializable, Cloneable {
    */
 
   public java.awt.Color getRGBColor() {
-    int rgb = java.awt.Color.HSBtoRGB((float) this.m_hue, (float) this.m_sat, (float) this.m_lum);
+    final int rgb = java.awt.Color.HSBtoRGB((float) this.m_hue, (float) this.m_sat,
+        (float) this.m_lum);
     // This does not work as it filters out the alpha channel!
     // return new java.awt.Color(rgb);
-    int r = (rgb & 0xff0000) >> 16;
-    int g = (rgb & 0x00ff00) >> 8;
-    int b = (rgb & 0x0000ff);
+    final int r = (rgb & 0xff0000) >> 16;
+    final int g = (rgb & 0x00ff00) >> 8;
+    final int b = (rgb & 0x0000ff);
     return new java.awt.Color(r, g, b, (int) Math.round(this.m_alpha));
 
   }
@@ -267,7 +270,17 @@ public class HSBColor implements java.io.Serializable, Cloneable {
    */
   @Override
   public int hashCode() {
-
-    return (int) (this.m_hue * 10000 + this.m_sat * 1000 + this.m_lum * 100);
+    final int prime = 31;
+    int result = 1;
+    long temp;
+    temp = Double.doubleToLongBits(this.m_alpha);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(this.m_hue);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(this.m_lum);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(this.m_sat);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    return result;
   }
 }

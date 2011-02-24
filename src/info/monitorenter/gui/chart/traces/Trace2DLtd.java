@@ -1,6 +1,6 @@
 /*
  *  Trace2DLtd, a RingBuffer- based fast implementation of a ITrace2D.
- *  Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -39,18 +39,17 @@ import java.util.Iterator;
  * <li>If a new tracepoint is inserted and the maxsize has been reached, the
  * tracepoint residing for the longest time in this trace is thrown away.</li>
  * </UL>
- * Take this implementation to display frequently changing data (nonstatic, time -
- * dependant values). You will avoid a huge growing amount of tracepoints that
+ * Take this implementation to display frequently changing data (nonstatic, time
+ * - dependant values). You will avoid a huge growing amount of tracepoints that
  * would increase the time for scaling and painting until system hangs or
  * java.lang.OutOfMemoryError is thrown.
  * <p>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.19 $
  */
-public class Trace2DLtd
-    extends ATrace2D implements ITrace2D {
+public class Trace2DLtd extends ATrace2D implements ITrace2D {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -6664475237146326176L;
@@ -74,8 +73,8 @@ public class Trace2DLtd
    * <p>
    * 
    * @param maxsize
-   *            the buffer size for the maximum amount of points that will be
-   *            shown.
+   *          the buffer size for the maximum amount of points that will be
+   *          shown.
    */
   public Trace2DLtd(final int maxsize) {
     this(maxsize, Trace2DLtd.class.getName() + "-" + ATrace2D.getInstanceCount());
@@ -86,11 +85,11 @@ public class Trace2DLtd
    * <p>
    * 
    * @param maxsize
-   *            the buffer size for the maximum amount of points that will be
-   *            shown.
+   *          the buffer size for the maximum amount of points that will be
+   *          shown.
    * 
    * @param name
-   *            the name that will be displayed for this trace.
+   *          the name that will be displayed for this trace.
    */
   public Trace2DLtd(final int maxsize, final String name) {
     this.m_buffer = new RingBufferArrayFast<ITracePoint2D>(maxsize);
@@ -102,7 +101,7 @@ public class Trace2DLtd
    * <p>
    * 
    * @param name
-   *            the name that will be displayed for the trace.
+   *          the name that will be displayed for the trace.
    */
   public Trace2DLtd(final String name) {
     this(100, name);
@@ -114,7 +113,7 @@ public class Trace2DLtd
   @Override
   protected boolean addPointInternal(final ITracePoint2D p) {
 
-    ITracePoint2D removed = this.m_buffer.add(p);
+    final ITracePoint2D removed = this.m_buffer.add(p);
     double tmpx;
     double tmpy;
     if (removed != null) {
@@ -123,29 +122,54 @@ public class Trace2DLtd
       if (tmpx >= this.m_maxX) {
         tmpx = this.m_maxX;
         this.maxXSearch();
-        this.firePropertyChange(PROPERTY_MAX_X, new Double(tmpx), new Double(this.m_maxX));
+        this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(tmpx), new Double(this.m_maxX));
       } else if (tmpx <= this.m_minX) {
         tmpx = this.m_minX;
         this.minXSearch();
-        this.firePropertyChange(PROPERTY_MIN_X, new Double(tmpx), new Double(this.m_minX));
+        this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(tmpx), new Double(this.m_minX));
       }
       if (tmpy >= this.m_maxY) {
         tmpy = this.m_maxY;
         this.maxYSearch();
-        this.firePropertyChange(PROPERTY_MAX_Y, new Double(tmpy), new Double(this.m_maxY));
+        this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(tmpy), new Double(this.m_maxY));
       } else if (tmpy <= this.m_minY) {
         tmpy = this.m_minY;
         this.minYSearch();
-        this.firePropertyChange(PROPERTY_MIN_Y, new Double(tmpy), new Double(this.m_minY));
+        this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(tmpy), new Double(this.m_minY));
       }
       // scale the new point, check for new bounds!
       this.firePointAdded(p);
       // inform computing traces of removal:
       if (this.m_computingTraces.size() > 0) {
-        for (ITrace2D trace : this.m_computingTraces) {
+        for (final ITrace2D trace : this.m_computingTraces) {
           trace.removePoint(removed);
         }
       }
+    }
+    return true;
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final Trace2DLtd other = (Trace2DLtd) obj;
+    if (this.m_buffer == null) {
+      if (other.m_buffer != null) {
+        return false;
+      }
+    } else if (!this.m_buffer.equals(other.m_buffer)) {
+      return false;
     }
     return true;
   }
@@ -170,6 +194,17 @@ public class Trace2DLtd
   }
 
   /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((this.m_buffer == null) ? 0 : this.m_buffer.hashCode());
+    return result;
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#isEmpty()
    */
   public boolean isEmpty() {
@@ -183,7 +218,7 @@ public class Trace2DLtd
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("Trace2DLtd.iterator, 0 locks");
     }
-
+    this.ensureInitialized();
     synchronized (this.m_renderer) {
       if (Chart2D.DEBUG_THREADING) {
         System.out.println("Trace2DLtd.iterator, 1 lock");
@@ -212,7 +247,7 @@ public class Trace2DLtd
    * <p>
    * 
    * @param point
-   *            the point to remove.
+   *          the point to remove.
    * 
    * @return null always because internally a ring buffer is used which does not
    *         allow removing of values because that would break the contract of a
@@ -236,13 +271,14 @@ public class Trace2DLtd
    * test.
    * 
    * @param amount
-   *            the new maximum amount of points to show.
+   *          the new maximum amount of points to show.
    */
   public final void setMaxSize(final int amount) {
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("Trace2DLtd.setMaxSize, 0 locks");
     }
 
+    this.ensureInitialized();
     synchronized (this.m_renderer) {
       if (Chart2D.DEBUG_THREADING) {
         System.out.println("Trace2DLtd.setMaxSize, 1 lock");
@@ -253,28 +289,32 @@ public class Trace2DLtd
         }
         this.m_buffer.setBufferSize(amount);
 
-        double xmin = this.m_minX;
+        final double xmin = this.m_minX;
         this.minXSearch();
         if (this.m_minX != xmin) {
-          this.firePropertyChange(PROPERTY_MIN_X, new Double(xmin), new Double(this.m_minX));
+          this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(xmin),
+              new Double(this.m_minX));
         }
 
-        double xmax = this.m_maxX;
+        final double xmax = this.m_maxX;
         this.maxXSearch();
         if (this.m_maxX != xmax) {
-          this.firePropertyChange(PROPERTY_MAX_X, new Double(xmax), new Double(this.m_maxX));
+          this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(xmax),
+              new Double(this.m_maxX));
         }
 
-        double ymax = this.m_maxY;
+        final double ymax = this.m_maxY;
         this.maxYSearch();
         if (this.m_maxY != ymax) {
-          this.firePropertyChange(PROPERTY_MAX_Y, new Double(ymax), new Double(this.m_maxY));
+          this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(ymax),
+              new Double(this.m_maxY));
         }
 
-        double ymin = this.m_minY;
+        final double ymin = this.m_minY;
         this.minYSearch();
         if (this.m_minY != ymin) {
-          this.firePropertyChange(PROPERTY_MIN_Y, new Double(ymin), new Double(this.m_minY));
+          this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(ymin),
+              new Double(this.m_minY));
         }
       }
     }

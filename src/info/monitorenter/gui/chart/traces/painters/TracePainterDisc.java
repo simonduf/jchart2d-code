@@ -1,6 +1,6 @@
 /*
  *  TracePainterDisc.java,  <enter purpose here>.
- *  Copyright (c) 2004 - 2010 Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2011 Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -33,18 +33,16 @@ import java.awt.Graphics;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.20 $
  * 
  */
 public class TracePainterDisc extends ATracePainter {
-
-
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 8919406018882664083L;
 
   /** The implementation for rendering the point as a disc. */
-  private PointPainterDisc m_pointPainter;
+  private final PointPainterDisc m_pointPainter;
 
   /**
    * Creates an instance with a default disc size of 4.
@@ -77,13 +75,49 @@ public class TracePainterDisc extends ATracePainter {
   }
 
   /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final TracePainterDisc other = (TracePainterDisc) obj;
+    if (this.m_pointPainter == null) {
+      if (other.m_pointPainter != null) {
+        return false;
+      }
+    } else if (!this.m_pointPainter.equals(other.m_pointPainter)) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Returns the diameter of the discs to paint in pixel.
-   * <p> 
+   * <p>
    * 
    * @return the diameter of the discs to paint in pixel.
    */
   public int getDiscSize() {
     return this.m_pointPainter.getDiscSize();
+  }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((this.m_pointPainter == null) ? 0 : this.m_pointPainter.hashCode());
+    return result;
   }
 
   /**

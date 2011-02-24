@@ -1,7 +1,7 @@
 /*
  * RingBufferArray, an array- based implementation of a RingBuffer, which never
  * drops stored elements in case of decreasing the buffer size.
- * Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2004 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -54,7 +54,7 @@ import java.util.NoSuchElementException;
  * @param <T>
  *          the type to store.
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.10 $
  */
 public class RingBufferArray<T> extends RingBufferArrayFast<T> {
 
@@ -66,7 +66,7 @@ public class RingBufferArray<T> extends RingBufferArrayFast<T> {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.8 $
+   * @version $Revision: 1.10 $
    */
   abstract class ARingBufferIterator extends RingBufferArrayFast<T>.ARingBufferIterator {
 
@@ -77,11 +77,56 @@ public class RingBufferArray<T> extends RingBufferArrayFast<T> {
     protected int m_pendpos;
 
     /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(final Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (this.getClass() != obj.getClass()) {
+        return false;
+      }
+      final ARingBufferIterator other = (ARingBufferIterator) obj;
+      if (!this.getOuterType().equals(other.getOuterType())) {
+        return false;
+      }
+      if (this.m_pendpos != other.m_pendpos) {
+        return false;
+      }
+      return true;
+    }
+
+    /**
+     * Returns the outer instance.<p>
+     * 
+     * @return the outer instance.
+     */
+    private RingBufferArray<T> getOuterType() {
+      return RingBufferArray.this;
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + this.getOuterType().hashCode();
+      result = prime * result + this.m_pendpos;
+      return result;
+    }
+
+    /**
      * @see java.util.Iterator#hasNext()
      */
     @Override
     public boolean hasNext() {
-      return super.hasNext() || this.m_pendpos >= 0;
+      return super.hasNext() || (this.m_pendpos >= 0);
     }
 
     /**
@@ -144,6 +189,44 @@ public class RingBufferArray<T> extends RingBufferArrayFast<T> {
    */
   public RingBufferArray(final int aSize) {
     super(aSize);
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @SuppressWarnings("unchecked")
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final RingBufferArray<T> other = (RingBufferArray<T>) obj;
+    if (this.m_pendingremove == null) {
+      if (other.m_pendingremove != null) {
+        return false;
+      }
+    } else if (!this.m_pendingremove.equals(other.m_pendingremove)) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result
+        + ((this.m_pendingremove == null) ? 0 : this.m_pendingremove.hashCode());
+    return result;
   }
 
   /**
@@ -213,7 +296,7 @@ public class RingBufferArray<T> extends RingBufferArrayFast<T> {
   public T remove() {
     T result = null;
     if (this.m_pendingremove.size() > 0) {
-      if (DEBUG) {
+      if (RingBufferArrayFast.DEBUG) {
         System.out.println("Removing pending element!!!");
       }
       result = this.m_pendingremove.remove(0);
@@ -229,8 +312,8 @@ public class RingBufferArray<T> extends RingBufferArrayFast<T> {
   @SuppressWarnings("unchecked")
   @Override
   public T[] removeAll() {
-    Object[] ret = new Object[this.size() + this.m_pendingremove.size()];
-    int stop = this.m_pendingremove.size();
+    final Object[] ret = new Object[this.size() + this.m_pendingremove.size()];
+    final int stop = this.m_pendingremove.size();
     int i;
     for (i = 0; i < stop; i++) {
       ret[i] = this.m_pendingremove.remove(0);
@@ -262,15 +345,15 @@ public class RingBufferArray<T> extends RingBufferArrayFast<T> {
     List<T> newpending = null;
     if (this.size() > newSize) {
       newpending = new LinkedList<T>();
-      int stop = this.size();
+      final int stop = this.size();
       for (int i = newSize; i < stop; i++) {
-        T add = this.remove();
+        final T add = this.remove();
         newpending.add(add);
       }
     }
-    Object[] newbuffer = new Object[newSize];
+    final Object[] newbuffer = new Object[newSize];
     int i = 0;
-    if (DEBUG) {
+    if (RingBufferArrayFast.DEBUG) {
       System.out.println("setBufferSize(" + newSize + "): isEmpty(): " + this.isEmpty() + " tail: "
           + this.m_tailpointer + " head: " + this.m_headpointer);
     }
@@ -313,16 +396,16 @@ public class RingBufferArray<T> extends RingBufferArrayFast<T> {
   public String toString() {
     String result;
     if (this.isEmpty()) {
-      if (DEBUG) {
+      if (RingBufferArrayFast.DEBUG) {
         System.out.println("toString(): isEmpty: true");
       }
       result = "[]";
     } else {
 
-      Object[] actualcontent = new Object[this.size()];
+      final Object[] actualcontent = new Object[this.size()];
       int tmp = this.m_tailpointer;
-      int stop = this.m_pendingremove.size();
-      Iterator<T> it = this.m_pendingremove.iterator();
+      final int stop = this.m_pendingremove.size();
+      final Iterator<T> it = this.m_pendingremove.iterator();
       int i = 0;
       for (; i < stop; i++) {
         actualcontent[i] = it.next();
@@ -334,7 +417,7 @@ public class RingBufferArray<T> extends RingBufferArrayFast<T> {
         } else {
           tmp++;
         }
-        if (tmp == this.m_headpointer && this.m_empty) {
+        if ((tmp == this.m_headpointer) && this.m_empty) {
           break;
         }
       }

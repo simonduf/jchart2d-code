@@ -2,7 +2,7 @@
  * ErrorBarPolicyMultiAction.java of project jchart2d, 
  * highly proprietary error bar action that changes the behaviour 
  * depending on the <code>{@link JMenu}</code> from which it is triggered.
- * Copyright (C) 2007 - 2010 Achim Westermann, created on 17.08.2007 21:02:52.
+ * Copyright (C) 2007 - 2011 Achim Westermann, created on 17.08.2007 21:02:52.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -43,7 +43,7 @@ import javax.swing.JPopupMenu;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public final class ErrorBarPolicyMultiAction extends ATrace2DActionErrorBarPolicy {
 

@@ -1,7 +1,7 @@
 /*
  *  ErrorBarPolicyActionRemovePainter.java of project jchart2d, action 
  *  that removes the given IErrorBarPainter from the given IErrorBarPolicy. 
- *  Copyright (c) 2006 - 2010 Achim Westermann, created on 09.12.2006 00:14:25.
+ *  Copyright (c) 2006 - 2011 Achim Westermann, created on 09.12.2006 00:14:25.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -41,7 +41,7 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class ErrorBarPolicyActionRemovePainter extends AErrorBarPolicyAction {
 

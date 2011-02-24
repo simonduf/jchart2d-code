@@ -2,7 +2,7 @@
  *  AErrorBarPolicyConfigurable.java of project jchart2d, a basic 
  *  error bar policy implementation that allows configuration of 
  *  the dimension and direction error bars will be visible in. 
- *  Copyright (c) 2007 - 2010 Achim Westermann, created on 08.08.2006 08:05:54.
+ *  Copyright (c) 2007 - 2011 Achim Westermann, created on 08.08.2006 08:05:54.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -59,7 +59,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.37 $
+ * @version $Revision: 1.41 $
  */
 public abstract class AErrorBarPolicyConfigurable implements
     IErrorBarPolicy<AErrorBarPolicyConfigurable>, PropertyChangeListener {
@@ -68,21 +68,10 @@ public abstract class AErrorBarPolicyConfigurable implements
   private static final long serialVersionUID = -1163969612681194656L;
 
   /** The internal set of error bar painters delegated to. */
-  private Set<IErrorBarPainter> m_errorBarPainters = new LinkedHashSet<IErrorBarPainter>();
+  private final Set<IErrorBarPainter> m_errorBarPainters = new LinkedHashSet<IErrorBarPainter>();
 
   /** Flag to remember if a paint iteration has ended. */
   private boolean m_isEnded = false;
-
-  /**
-   * The last x coordinate that was sent to
-   * {@link #paintPoint(int, int, int, int, Graphics, ITracePoint2D)}.
-   * <p>
-   * It will be needed at {@link #endPaintIteration(Graphics)} as the former
-   * method only uses the first set of coordinates to store in the internal list
-   * to avoid duplicates.
-   * <p>
-   */
-  protected int m_lastX;
 
   /**
    * The last trace point coordinate that was sent to
@@ -95,6 +84,17 @@ public abstract class AErrorBarPolicyConfigurable implements
    */
 
   protected ITracePoint2D m_lastPoint;
+
+  /**
+   * The last x coordinate that was sent to
+   * {@link #paintPoint(int, int, int, int, Graphics, ITracePoint2D)}.
+   * <p>
+   * It will be needed at {@link #endPaintIteration(Graphics)} as the former
+   * method only uses the first set of coordinates to store in the internal list
+   * to avoid duplicates.
+   * <p>
+   */
+  protected int m_lastX;
 
   /**
    * The last y coordinate that was sent to
@@ -115,10 +115,8 @@ public abstract class AErrorBarPolicyConfigurable implements
   protected PropertyChangeSupport m_propertyChangeSupport = new SwingPropertyChangeSupport(this);
 
   /** Internal shared error bar pixel instance to save Object allocation. */
-  private ErrorBarPixel m_reusedErrorBarPixel = new ErrorBarPixel(null);
+  private final ErrorBarPixel m_reusedErrorBarPixel = new ErrorBarPixel(null);
 
-  /** Internal shared error bar value instance to save Object allocation. */
-  // private ErrorBarValue m_reusedErrorBarValue;
   /** Flag that controls display of negative errors in x dimension. */
   private boolean m_showNegativeXErrors;
 
@@ -201,7 +199,7 @@ public abstract class AErrorBarPolicyConfigurable implements
   /**
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
-  public int compareTo(AErrorBarPolicyConfigurable o) {
+  public int compareTo(final AErrorBarPolicyConfigurable o) {
     return this.getClass().getName().compareTo(o.getClass().getName());
   }
 
@@ -220,11 +218,64 @@ public abstract class AErrorBarPolicyConfigurable implements
     if (g2d != null) {
       this.calculateErrorBar(this.getPreviousX(), this.getPreviousY(), this.m_reusedErrorBarPixel,
           this.getPreviousTracePoint());
-      for (IErrorBarPainter painter : this.m_errorBarPainters) {
+      for (final IErrorBarPainter painter : this.m_errorBarPainters) {
         painter.paintErrorBar(this.getPreviousX(), this.getPreviousY(), this
             .getPreviousTracePoint(), g2d, this.m_reusedErrorBarPixel);
       }
     }
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final AErrorBarPolicyConfigurable other = (AErrorBarPolicyConfigurable) obj;
+    if (this.m_errorBarPainters == null) {
+      if (other.m_errorBarPainters != null) {
+        return false;
+      }
+    } else if (!this.m_errorBarPainters.equals(other.m_errorBarPainters)) {
+      return false;
+    }
+    if (this.m_isEnded != other.m_isEnded) {
+      return false;
+    }
+    if (this.m_lastPoint == null) {
+      if (other.m_lastPoint != null) {
+        return false;
+      }
+    } else if (!this.m_lastPoint.equals(other.m_lastPoint)) {
+      return false;
+    }
+    if (this.m_lastX != other.m_lastX) {
+      return false;
+    }
+    if (this.m_lastY != other.m_lastY) {
+      return false;
+    }
+    if (this.m_showNegativeXErrors != other.m_showNegativeXErrors) {
+      return false;
+    }
+    if (this.m_showNegativeYErrors != other.m_showNegativeYErrors) {
+      return false;
+    }
+    if (this.m_showPositiveXErrors != other.m_showPositiveXErrors) {
+      return false;
+    }
+    if (this.m_showPositiveYErrors != other.m_showPositiveYErrors) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -273,7 +324,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    *         {@link #paintPoint(int, int, int, int, Graphics, ITracePoint2D)}.
    */
   private ITracePoint2D getPreviousTracePoint() {
-    ITracePoint2D result = this.m_lastPoint;
+    final ITracePoint2D result = this.m_lastPoint;
     return result;
   }
 
@@ -290,7 +341,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    *         {@link #paintPoint(int, int, int, int, Graphics, ITracePoint2D)}.
    */
   private int getPreviousX() {
-    int result = this.m_lastX;
+    final int result = this.m_lastX;
     if (this.m_isEnded) {
       this.m_lastX = Integer.MIN_VALUE;
       if (this.m_lastY == Integer.MIN_VALUE) {
@@ -314,7 +365,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    *         {@link #paintPoint(int, int, int, int, Graphics, ITracePoint2D)}.
    */
   private int getPreviousY() {
-    int result = this.m_lastY;
+    final int result = this.m_lastY;
     if (this.m_isEnded) {
       this.m_lastY = Integer.MIN_VALUE;
       if (this.m_lastX == Integer.MIN_VALUE) {
@@ -332,6 +383,26 @@ public abstract class AErrorBarPolicyConfigurable implements
    */
   protected final ITrace2D getTrace() {
     return this.m_trace;
+  }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result
+        + ((this.m_errorBarPainters == null) ? 0 : this.m_errorBarPainters.hashCode());
+    result = prime * result + (this.m_isEnded ? 1231 : 1237);
+    result = prime * result + ((this.m_lastPoint == null) ? 0 : this.m_lastPoint.hashCode());
+    result = prime * result + this.m_lastX;
+    result = prime * result + this.m_lastY;
+    result = prime * result + (this.m_showNegativeXErrors ? 1231 : 1237);
+    result = prime * result + (this.m_showNegativeYErrors ? 1231 : 1237);
+    result = prime * result + (this.m_showPositiveXErrors ? 1231 : 1237);
+    result = prime * result + (this.m_showPositiveYErrors ? 1231 : 1237);
+    return result;
   }
 
   /**
@@ -451,7 +522,7 @@ public abstract class AErrorBarPolicyConfigurable implements
       final int nextY, final Graphics g, final ITracePoint2D original) {
 
     this.calculateErrorBar(nextX, nextY, this.m_reusedErrorBarPixel, original);
-    for (IErrorBarPainter painter : this.m_errorBarPainters) {
+    for (final IErrorBarPainter painter : this.m_errorBarPainters) {
       painter.paintErrorBar(nextX, nextY, original, g, this.m_reusedErrorBarPixel);
     }
 
@@ -472,14 +543,15 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
   public void propertyChange(final PropertyChangeEvent evt) {
-    this.firePropertyChange(PROPERTY_CONFIGURATION, evt.getOldValue(), evt.getNewValue());
+    this.firePropertyChange(IErrorBarPolicy.PROPERTY_CONFIGURATION, evt.getOldValue(), evt
+        .getNewValue());
   }
 
   /**
    * @see info.monitorenter.gui.chart.IErrorBarPolicy#removeErrorBarPainter(info.monitorenter.gui.chart.IErrorBarPainter)
    */
   public boolean removeErrorBarPainter(final IErrorBarPainter painter) {
-    boolean result = this.m_errorBarPainters.remove(painter);
+    final boolean result = this.m_errorBarPainters.remove(painter);
     painter.removePropertyChangeListener(IErrorBarPainter.PROPERTY_CONNECTION, this);
     painter.removePropertyChangeListener(IErrorBarPainter.PROPERTY_CONNECTION_COLOR, this);
     painter.removePropertyChangeListener(IErrorBarPainter.PROPERTY_ENDPOINT, this);
@@ -514,7 +586,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @see info.monitorenter.gui.chart.IErrorBarPolicy#setErrorBarPainter(info.monitorenter.gui.chart.IErrorBarPainter)
    */
   public void setErrorBarPainter(final IErrorBarPainter painter) {
-    Iterator<IErrorBarPainter> it = this.m_errorBarPainters.iterator();
+    final Iterator<IErrorBarPainter> it = this.m_errorBarPainters.iterator();
     IErrorBarPainter removePainter;
     while (it.hasNext()) {
       removePainter = it.next();
@@ -545,10 +617,10 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @see info.monitorenter.gui.chart.IErrorBarPolicy#setShowNegativeXErrors(boolean)
    */
   public final void setShowNegativeXErrors(final boolean showNegativeXErrors) {
-    boolean change = this.m_showNegativeXErrors ^ showNegativeXErrors;
+    final boolean change = this.m_showNegativeXErrors ^ showNegativeXErrors;
     if (change) {
       this.m_showNegativeXErrors = showNegativeXErrors;
-      this.firePropertyChange(PROPERTY_CONFIGURATION, null, null);
+      this.firePropertyChange(IErrorBarPolicy.PROPERTY_CONFIGURATION, null, null);
     }
 
   }
@@ -557,10 +629,10 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @see info.monitorenter.gui.chart.IErrorBarPolicy#setShowNegativeYErrors(boolean)
    */
   public final void setShowNegativeYErrors(final boolean showNegativeYErrors) {
-    boolean change = this.m_showNegativeYErrors ^ showNegativeYErrors;
+    final boolean change = this.m_showNegativeYErrors ^ showNegativeYErrors;
     if (change) {
       this.m_showNegativeYErrors = showNegativeYErrors;
-      this.firePropertyChange(PROPERTY_CONFIGURATION, null, null);
+      this.firePropertyChange(IErrorBarPolicy.PROPERTY_CONFIGURATION, null, null);
     }
   }
 
@@ -568,10 +640,10 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @see info.monitorenter.gui.chart.IErrorBarPolicy#setShowPositiveXErrors(boolean)
    */
   public final void setShowPositiveXErrors(final boolean showPositiveXErrors) {
-    boolean change = this.m_showPositiveXErrors ^ showPositiveXErrors;
+    final boolean change = this.m_showPositiveXErrors ^ showPositiveXErrors;
     if (change) {
       this.m_showPositiveXErrors = showPositiveXErrors;
-      this.firePropertyChange(PROPERTY_CONFIGURATION, null, null);
+      this.firePropertyChange(IErrorBarPolicy.PROPERTY_CONFIGURATION, null, null);
     }
   }
 
@@ -579,10 +651,10 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @see info.monitorenter.gui.chart.IErrorBarPolicy#setShowPositiveYErrors(boolean)
    */
   public final void setShowPositiveYErrors(final boolean showPositiveYErrors) {
-    boolean change = this.m_showPositiveYErrors ^ showPositiveYErrors;
+    final boolean change = this.m_showPositiveYErrors ^ showPositiveYErrors;
     if (change) {
       this.m_showPositiveYErrors = showPositiveYErrors;
-      this.firePropertyChange(PROPERTY_CONFIGURATION, null, null);
+      this.firePropertyChange(IErrorBarPolicy.PROPERTY_CONFIGURATION, null, null);
     }
   }
 

@@ -1,6 +1,6 @@
 /*
  *  Log10AxisChart.java, A demo chart that uses a logarithmic axis for Y.
- *  Copyright (C) 2007 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,8 @@
 package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.axis.AxisLog10;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterAutoUnits;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterNumber;
@@ -47,7 +47,7 @@ import javax.swing.JFrame;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.11 $
  * 
  */
 public final class Log10AxisChart {
@@ -63,11 +63,11 @@ public final class Log10AxisChart {
     // Create a chart:
     Chart2D chart = new Chart2D();
     // set a special axis:
-    IAxis axisy = new AxisLog10();
+    AAxis axisy = new AxisLog10();
     DecimalFormat df = new DecimalFormat();
     df.setMaximumFractionDigits(100);
+    chart.setAxisYLeft(axisy, 0);
     axisy.setFormatter(new LabelFormatterAutoUnits(new LabelFormatterNumber(df)));
-    chart.setAxisYLeft(new AxisLog10(), 0);
 
     // Create an ITrace:
     ITrace2D trace = new Trace2DSimple();

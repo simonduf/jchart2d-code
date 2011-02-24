@@ -1,7 +1,7 @@
 /*
  *  ColorIcon.java of project jchart2d, an icon that displays a 
  *  rectangular color.
- *  Copyright (C) 2004 - 2010 Achim Westermann.
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,7 @@ import javax.swing.Icon;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.7 $
  */
 public class ColorIcon implements Icon {
   /** The color for the icon. */
@@ -50,6 +50,31 @@ public class ColorIcon implements Icon {
    */
   public ColorIcon(final Color color) {
     this.m_color = color;
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final ColorIcon other = (ColorIcon) obj;
+    if (this.m_color == null) {
+      if (other.m_color != null) {
+        return false;
+      }
+    } else if (!this.m_color.equals(other.m_color)) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -77,11 +102,22 @@ public class ColorIcon implements Icon {
   }
 
   /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((this.m_color == null) ? 0 : this.m_color.hashCode());
+    return result;
+  }
+
+  /**
    * @see javax.swing.Icon#paintIcon(java.awt.Component, java.awt.Graphics, int,
    *      int)
    */
   public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
-    Color old = g.getColor();
+    final Color old = g.getColor();
     // border:
     g.setColor(c.getBackground().darker());
     g.drawRect(x, y, 10, 10);

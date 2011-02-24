@@ -1,12 +1,13 @@
 /*
  *  LayoutFactory.java  jchart2d, factory for creating user interface 
  *  controls for charts and traces. 
- *  Copyright (C) 2007 - 2010 Achim Westermann, created on 19.05.2005, 20:26:00
+ *  Copyright (c) 2007 - 2011 Achim Westermann, created on 09:50:20.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
  *  License as published by the Free Software Foundation; either
  *  version 2.1 of the License, or (at your option) any later version.
+ * 
  *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -24,8 +25,10 @@ package info.monitorenter.gui.chart.controls;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
+import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.gui.chart.IErrorBarPolicy;
-import info.monitorenter.gui.chart.IPointHighlighter;
+import info.monitorenter.gui.chart.IPointPainter;
+import info.monitorenter.gui.chart.IPointPainterConfigurableUI;
 import info.monitorenter.gui.chart.IToolTipType;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
@@ -35,11 +38,13 @@ import info.monitorenter.gui.chart.axis.AxisLog10;
 import info.monitorenter.gui.chart.axis.AxisLogE;
 import info.monitorenter.gui.chart.errorbars.ErrorBarPolicyAbsoluteSummation;
 import info.monitorenter.gui.chart.errorbars.ErrorBarPolicyRelative;
+import info.monitorenter.gui.chart.events.AxisActionSetFormatter;
 import info.monitorenter.gui.chart.events.AxisActionSetGrid;
 import info.monitorenter.gui.chart.events.AxisActionSetRange;
 import info.monitorenter.gui.chart.events.AxisActionSetRangePolicy;
 import info.monitorenter.gui.chart.events.AxisActionSetTitle;
 import info.monitorenter.gui.chart.events.AxisActionSetTitleFont;
+import info.monitorenter.gui.chart.events.Chart2DActionEnableAntialiasing;
 import info.monitorenter.gui.chart.events.Chart2DActionEnableHighlighting;
 import info.monitorenter.gui.chart.events.Chart2DActionPrintSingleton;
 import info.monitorenter.gui.chart.events.Chart2DActionSaveEpsSingletonApacheFop;
@@ -68,7 +73,9 @@ import info.monitorenter.gui.chart.events.Trace2DActionSetZindex;
 import info.monitorenter.gui.chart.events.Trace2DActionZindexDecrease;
 import info.monitorenter.gui.chart.events.Trace2DActionZindexIncrease;
 import info.monitorenter.gui.chart.events.ZoomableChartZoomOutAction;
-import info.monitorenter.gui.chart.pointhighlighters.PointHighlighterConfigurable;
+import info.monitorenter.gui.chart.labelformatters.LabelFormatterAutoUnits;
+import info.monitorenter.gui.chart.labelformatters.LabelFormatterDate;
+import info.monitorenter.gui.chart.labelformatters.LabelFormatterNumber;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyForcedPoint;
@@ -93,6 +100,10 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.WeakReference;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -117,7 +128,7 @@ import javax.swing.JRadioButtonMenuItem;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.50 $
+ * @version $Revision: 1.58 $
  */
 public final class LayoutFactory {
 
@@ -228,7 +239,7 @@ public final class LayoutFactory {
      * <p>
      * 
      * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-     * @version $Revision: 1.50 $
+     * @version $Revision: 1.58 $
      */
     private final class JMenuOrderingAction extends AbstractAction {
 
@@ -481,12 +492,10 @@ public final class LayoutFactory {
      */
     public PropertyChangeCheckBoxMenuItem(final JComponent component, final Action action,
         final boolean checked) {
+      // invokes setAction
       super(action);
       this.setState(checked);
       new BasicPropertyAdaptSupport(this, component);
-      if (action != null) {
-        action.addPropertyChangeListener(new SelectionPropertyAdaptSupport(this));
-      }
     }
 
     /**
@@ -580,7 +589,8 @@ public final class LayoutFactory {
     // * @param component
     // * The component to whose basic UI properties this item will adapt.
     // */
-    // protected PropertyChangeJRadioButtonMenuItem(final JComponent component)
+    // protected PropertyChangeJRadioButtonMenuItem(final JComponent
+    // component)
     // {
     // this(component, null);
     // }
@@ -603,12 +613,10 @@ public final class LayoutFactory {
      */
     public PropertyChangeJRadioButtonMenuItem(final JComponent component, final Action action,
         final boolean selected) {
+      // invokes setAction
       super(action);
       this.setSelected(selected);
       new BasicPropertyAdaptSupport(this, component);
-      if (action != null) {
-        action.addPropertyChangeListener(new SelectionPropertyAdaptSupport(this));
-      }
 
     }
 
@@ -781,11 +789,9 @@ public final class LayoutFactory {
      *          the initial state of the checkbox.
      */
     public SelectionAdaptJCheckBoxMenuItem(final Action action, final boolean state) {
+      // invokes setAction
       super(action);
       this.setSelected(state);
-      if (action != null) {
-        action.addPropertyChangeListener(new SelectionPropertyAdaptSupport(this));
-      }
     }
 
     /**
@@ -845,10 +851,8 @@ public final class LayoutFactory {
      *          if true this radio button will be initially selected.
      */
     public SelectionAdaptJRadioButtonMenuItem(final Action action, final boolean selected) {
+      // invokes setAction
       super(action);
-      if (action != null) {
-        action.addPropertyChangeListener(new SelectionPropertyAdaptSupport(this));
-      }
     }
 
     /**
@@ -900,6 +904,8 @@ public final class LayoutFactory {
         if (prop.equals(LayoutFactory.PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED)) {
           boolean state = ((Boolean) evt.getNewValue()).booleanValue();
           button.setSelected(state);
+          button.invalidate();
+          button.repaint();
         }
       } else {
         ((Component) evt.getSource()).removePropertyChangeListener(this);
@@ -999,6 +1005,15 @@ public final class LayoutFactory {
     return result;
   }
 
+  /** Boolean flag that controls showing the annotations menu. */
+  private boolean m_showAnnotationMenu = false;
+
+  /** Controls whether the antialiasing menu item is shown. */
+  private boolean m_showAntialiasingMenu = true;
+
+  /** Controls whether the axis label formatter menu is shown. */
+  private boolean m_showAxisFormatterMenu = true;
+
   /**
    * Boolean flag that controls showing the show grid menu item for the x axis.
    */
@@ -1051,32 +1066,49 @@ public final class LayoutFactory {
   /** Boolean flag that turns on showing the chart foreground color menu. */
   private boolean m_showChartForegroundMenu = true;
 
+  /** Controls whether the chart highlighter menu is shown. */
+  private boolean m_showChartHighlighterMenu = true;
+
   /** Boolean flag that controls showing the error bar wizard menu for traces. */
   private boolean m_showErrorBarWizardMenu = true;
 
   /** Boolean flag that turns on showing the grid color menu. */
   private boolean m_showGridColorMenu = true;
 
-  /** Boolean flag that controls showing the set physical units item for traces. */
+  /** Controls whether the grid menu is shown in the chart menu. */
+  private boolean m_showGridMenu = true;
+
+  /** Controls whether the highlight menu is shown. */
+  private boolean m_showHighlightMenu = true;
+
+  /**
+   * Boolean flag that controls showing the set physical units item for traces.
+   */
   private boolean m_showPhysicalUnitsMenu = true;
-
-  /** Boolean flag that controls showing the remove trace menu for traces. */
-  private boolean m_showRemoveTraceMenu = false;
-
-  /** Boolean flag that controls showing the save to image menu item. */
-  private boolean m_showSaveMenu = true;
-
-  /** Boolean flag that controls showing the annotations menu. */
-  private boolean m_showAnnotationMenu = false;
 
   /** Boolean flag that controls showing the print chart menu item. */
   private boolean m_showPrintMenu = true;
 
+  /** Boolean flag that controls showing the remove trace menu for traces. */
+  private boolean m_showRemoveTraceMenu = false;
+
   /** Boolean flag that controls showing the save to eps menu item. */
   private boolean m_showSaveEpsMenu = true;
 
+  /** Boolean flag that controls showing the save to image menu item. */
+  private boolean m_showSaveMenu = true;
+
+  /** Controls whether the tool tip for chart menu is shown. */
+  private boolean m_showToolTipMenu = true;
+
+  /** Controls whether the tool tip type for chart menu item is shown. */
+  private boolean m_showToolTipTypeMenu = true;
+
   /** Boolean flag that controls showing the color menu for traces. */
   private boolean m_showTraceColorMenu = true;
+
+  /** Controls whether the trace highlighter menu is shown. */
+  private boolean m_showTraceHighlighterMenu = true;
 
   /** Boolean flag that controls showing the set name menu item for traces. */
   private boolean m_showTraceNameMenu = true;
@@ -1093,7 +1125,9 @@ public final class LayoutFactory {
   /** Boolean flag that controls showing the z-index menu for traces. */
   private boolean m_showTraceZindexMenu = true;
 
-  /** Boolean flag that controls showing the zoom out menu for zoomable charts. */
+  /**
+   * Boolean flag that controls showing the zoom out menu for zoomable charts.
+   */
   private boolean m_showZoomOutMenu = true;
 
   /**
@@ -1105,42 +1139,6 @@ public final class LayoutFactory {
    * Shared strokes.
    */
   private Stroke[] m_strokes;
-
-  /** Controls whether the grid menu is shown in the chart menu. */
-  private boolean m_showGridMenu = true;
-
-  /** Controls whether the tool tip type for chart menu is shown. */
-  private boolean m_showToolTipTypeMenu = true;
-
-  /** Controls whether the tool tip for chart menu is shown. */
-  private boolean m_showToolTipMenu = true;
-
-  /** Controls whether the highlight menu is shown. */
-  private boolean m_showHighlightMenu = true;
-
-  /** Controls whether the trace highlighter menu is shown. */
-  private boolean m_showTraceHighlighterMenu = true;
-
-  /**
-   * Returns whether the trace highlighter menu is shown.
-   * <p>
-   * 
-   * @return true if the trace highlighter menu is visible.
-   */
-  public boolean isShowTraceHighlighterMenu() {
-    return this.m_showTraceHighlighterMenu;
-  }
-
-  /**
-   * Set whether the trace highlighter menu should be visible.
-   * <p>
-   * 
-   * @param showTraceHighlighterMenu
-   *          true if the trace highlighter menu should be visible.
-   */
-  public void setShowTraceHighlighterMenu(boolean showTraceHighlighterMenu) {
-    this.m_showTraceHighlighterMenu = showTraceHighlighterMenu;
-  }
 
   /**
    * Singleton constructor.
@@ -1199,6 +1197,208 @@ public final class LayoutFactory {
     return result;
   }
 
+  private Component createAxisFormatterMenu(Chart2D chart, IAxis axis, int axisDimension,
+      boolean adaptUI2Chart) {
+
+    IAxisLabelFormatter presetFormatter = axis.getFormatter();
+    // Use a button group to control unique selection state of radio
+    // buttons:
+    ButtonGroup buttonGroup = new ButtonGroup();
+    JMenu formatterMenu;
+    if (adaptUI2Chart) {
+      formatterMenu = new PropertyChangeMenu(chart, "Label formatter");
+    } else {
+      formatterMenu = new JMenu("Label formatter");
+    }
+    /*
+     * Submenu for number formatters.
+     */
+    JMenu numberMenu;
+    if (adaptUI2Chart) {
+      numberMenu = new PropertyChangeMenu(chart, "Numbers");
+    } else {
+      numberMenu = new JMenu("Numbers");
+    }
+    // add Number menu
+    formatterMenu.add(numberMenu);
+    boolean selected;
+    JMenuItem item;
+
+    // Integer instance
+    NumberFormat nf;
+    nf = NumberFormat.getIntegerInstance();
+    IAxisLabelFormatter formatter = new LabelFormatterNumber(nf);
+    AxisActionSetFormatter action = new AxisActionSetFormatter(chart, "Whole numbers",
+        axisDimension, formatter);
+    selected = formatter.equals(presetFormatter);
+    if (adaptUI2Chart) {
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+    } else {
+      item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
+    }
+    buttonGroup.add(item);
+    numberMenu.add(item);
+    // 1 fraction digit
+    nf = new DecimalFormat("#.#");
+    formatter = new LabelFormatterNumber(nf);
+    action = new AxisActionSetFormatter(chart, "1 fraction digit", axisDimension, formatter);
+    selected = formatter.equals(presetFormatter);
+    if (adaptUI2Chart) {
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+    } else {
+      item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
+    }
+    buttonGroup.add(item);
+    numberMenu.add(item);
+    // 2 fraction digit
+    nf = new DecimalFormat("#.##");
+    formatter = new LabelFormatterNumber(nf);
+    action = new AxisActionSetFormatter(chart, "2 fraction digits", axisDimension, formatter);
+    selected = formatter.equals(presetFormatter);
+    if (adaptUI2Chart) {
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+    } else {
+      item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
+    }
+    buttonGroup.add(item);
+    numberMenu.add(item);
+
+    /*
+     * Submenu for date formatters.
+     */
+
+    JMenu dateMenu;
+    if (adaptUI2Chart) {
+      dateMenu = new PropertyChangeMenu(chart, "Date/Time");
+    } else {
+      dateMenu = new JMenu("Date/Time");
+    }
+    formatterMenu.add(dateMenu);
+    String dateTooltip = "This works only if your values are milliseconds since January 1st 1970 (System.currentTimeMillis()).";
+    dateMenu.setToolTipText(dateTooltip);
+    // Date.SHORT
+    SimpleDateFormat df = (SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT);
+    formatter = new LabelFormatterDate(df);
+    action = new AxisActionSetFormatter(chart, "Date (short)", axisDimension, formatter);
+    selected = formatter.equals(presetFormatter);
+    if (adaptUI2Chart) {
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+    } else {
+      item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
+    }
+    item.setToolTipText(dateTooltip);
+    buttonGroup.add(item);
+    dateMenu.add(item);
+    // Date.MEDIUM
+    df = (SimpleDateFormat) DateFormat.getDateInstance(DateFormat.MEDIUM);
+    formatter = new LabelFormatterDate(df);
+    action = new AxisActionSetFormatter(chart, "Date (medium)", axisDimension, formatter);
+    selected = formatter.equals(presetFormatter);
+    if (adaptUI2Chart) {
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+    } else {
+      item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
+    }
+    item.setToolTipText(dateTooltip);
+    buttonGroup.add(item);
+    dateMenu.add(item);
+    // Date.LONG
+    df = (SimpleDateFormat) DateFormat.getDateInstance(DateFormat.LONG);
+    formatter = new LabelFormatterDate(df);
+    action = new AxisActionSetFormatter(chart, "Date (long)", axisDimension, formatter);
+    selected = formatter.equals(presetFormatter);
+    if (adaptUI2Chart) {
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+    } else {
+      item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
+    }
+    item.setToolTipText(dateTooltip);
+    buttonGroup.add(item);
+    dateMenu.add(item);
+
+    // Date.Short Time Short
+    df = (SimpleDateFormat) DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+    formatter = new LabelFormatterDate(df);
+    action = new AxisActionSetFormatter(chart, "Date & Time (short)", axisDimension, formatter);
+    selected = formatter.equals(presetFormatter);
+    if (adaptUI2Chart) {
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+    } else {
+      item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
+    }
+    item.setToolTipText(dateTooltip);
+    buttonGroup.add(item);
+    dateMenu.add(item);
+    // Date.MEDIUM Time Medium
+    df = (SimpleDateFormat) DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM);
+    formatter = new LabelFormatterDate(df);
+    action = new AxisActionSetFormatter(chart, "Date & Time (medium)", axisDimension, formatter);
+    selected = formatter.equals(presetFormatter);
+    if (adaptUI2Chart) {
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+    } else {
+      item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
+    }
+    item.setToolTipText(dateTooltip);
+    buttonGroup.add(item);
+    dateMenu.add(item);
+    // Date.LONG Time.LONG
+    df = (SimpleDateFormat) DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG);
+    formatter = new LabelFormatterDate(df);
+    action = new AxisActionSetFormatter(chart, "Date & Time (long)", axisDimension, formatter);
+    selected = formatter.equals(presetFormatter);
+    if (adaptUI2Chart) {
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+    } else {
+      item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
+    }
+    item.setToolTipText(dateTooltip);
+    buttonGroup.add(item);
+    dateMenu.add(item);
+
+    // auto units:
+    formatter = new LabelFormatterAutoUnits();
+    action = new AxisActionSetFormatter(chart, "Automatic unit (pico,nano,femto...)",
+        axisDimension, formatter);
+    selected = formatter.equals(presetFormatter);
+    if (adaptUI2Chart) {
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+    } else {
+      item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
+    }
+    buttonGroup.add(item);
+    formatterMenu.add(item);
+
+    // Percent
+    nf = NumberFormat.getPercentInstance();
+    formatter = new LabelFormatterNumber(nf);
+    action = new AxisActionSetFormatter(chart, "Percent", axisDimension, formatter);
+    selected = formatter.equals(presetFormatter);
+    if (adaptUI2Chart) {
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+    } else {
+      item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
+    }
+    buttonGroup.add(item);
+    formatterMenu.add(item);
+
+    // Currency
+    nf = NumberFormat.getCurrencyInstance();
+    formatter = new LabelFormatterNumber(nf);
+    action = new AxisActionSetFormatter(chart, "Currency (" + nf.getCurrency().getSymbol() + ")",
+        axisDimension, formatter);
+    selected = formatter.equals(presetFormatter);
+    if (adaptUI2Chart) {
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+    } else {
+      item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
+    }
+    buttonGroup.add(item);
+    formatterMenu.add(item);
+
+    return formatterMenu;
+  }
+
   /**
    * Creates a {@link JMenuItem} that allows to trigger the features related to
    * {@link info.monitorenter.gui.chart.axis.AAxis} features.
@@ -1232,6 +1432,11 @@ public final class LayoutFactory {
         || (this.m_showAxisYTypeMenu && axisDimension == Chart2D.Y)) {
       axisMenuItem.add(this.createAxisTypeMenu(chart, axis, axisDimension, adaptUI2Chart));
     }
+
+    if (this.m_showAxisFormatterMenu) {
+      axisMenuItem.add(this.createAxisFormatterMenu(chart, axis, axisDimension, adaptUI2Chart));
+    }
+
     if ((this.m_showAxisXRangePolicyMenu && axisDimension == Chart2D.X)
         || this.m_showAxisYRangePolicyMenu && axisDimension == Chart2D.Y) {
       axisMenuItem.add(this.createAxisRangePolicyMenu(chart, axis, adaptUI2Chart));
@@ -1285,7 +1490,8 @@ public final class LayoutFactory {
     } else {
       axisRangePolicy = new JMenu("Range policy");
     }
-    // Use a button group to control unique selection state of radio buttons:
+    // Use a button group to control unique selection state of radio
+    // buttons:
     ButtonGroup buttonGroup = new ButtonGroup();
     // check the default selected item:
     Class< ? > rangePolicyClass = axis.getRangePolicy().getClass();
@@ -1450,7 +1656,8 @@ public final class LayoutFactory {
     } else {
       axisType = new JMenu("Type");
     }
-    // Use a button group to control unique selection state of radio buttons:
+    // Use a button group to control unique selection state of radio
+    // buttons:
     ButtonGroup buttonGroup = new ButtonGroup();
     // check the default selected item:
     Class< ? > typeClass = axis.getClass();
@@ -1633,12 +1840,11 @@ public final class LayoutFactory {
       }
       gridMenu.add(item);
     }
-
     return gridMenu;
   }
 
   /**
-   * Creates a menu for controlling highlighting on the chart: enable and choose
+   * Creates a menu for controlling highliting on the chart: enable and choose
    * highlighter per trace.
    * <p>
    * 
@@ -1649,7 +1855,7 @@ public final class LayoutFactory {
    *          if true the menu will adapt it's basic UI properies (font,
    *          foreground and background color) to the given chart.
    * 
-   * @return a menu for controlling highlighting on the chart: enable and choose
+   * @return a menu for controlling highliting on the chart: enable and choose
    *         highlighter per trace.
    * 
    */
@@ -1674,71 +1880,12 @@ public final class LayoutFactory {
           "Enable"), isEnabledHighlighting);
     }
     highlightMenu.add(item);
-    if (this.m_showTraceHighlighterMenu) {
-
+    if (this.m_showChartHighlighterMenu) {
       highlightMenu.add(this.createChartTraceHighlighterMenu(chartPanel, adaptUI2Chart));
-
     }
 
     return highlightMenu;
 
-  }
-
-  /**
-   * Creates a menu for controlling the highlighters for every trace on the
-   * chart.
-   * <p>
-   * 
-   * @param chartPanel
-   *          the chart panel to access.
-   * 
-   * @param adaptUI2Chart
-   *          if true the menu will adapt it's basic UI properies (font,
-   *          foreground and background color) to the given chart.
-   * 
-   * @return a menu for controlling the highlighters for every trace on the
-   *         chart.
-   */
-  public JMenu createChartTraceHighlighterMenu(ChartPanel chartPanel, boolean adaptUI2Chart) {
-    JMenu result;
-    Chart2D chart = chartPanel.getChart();
-    if (adaptUI2Chart) {
-      result = new PropertyChangeMenu(chart, "Highlighter");
-    } else {
-      result = new JMenu("Highlighter");
-    }
-
-    JMenuItem item;
-    for (ITrace2D trace : chart.getTraces()) {
-      // Create a submenu for each trace
-      JMenu traceMenu;
-      if (adaptUI2Chart) {
-        traceMenu = new PropertyChangeMenu(chart, trace.getName());
-      } else {
-        traceMenu = new JMenu(trace.getName());
-      }
-      result.add(traceMenu);
-      // for each trace add all highlighters:
-      IPointHighlighter< ? >[] highlighters = new IPointHighlighter< ? >[] {
-          new PointHighlighterConfigurable(new PointPainterDisc(10), true),
-          new PointHighlighterConfigurable(new PointPainterDisc(20), true) };
-      String[] highlighterNames = new String[] {"Small disc", "Big disc" };
-      IPointHighlighter< ? > highlighter;
-      for (int i = 0; i < highlighters.length; i++) {
-        highlighter = highlighters[i];
-        if (adaptUI2Chart) {
-          item = new PropertyChangeCheckBoxMenuItem(chart, new Trace2DActionAddRemoveHighlighter(
-              trace, highlighterNames[i], highlighter), false);
-        } else {
-          item = new SelectionAdaptJRadioButtonMenuItem(new Trace2DActionAddRemoveHighlighter(
-              trace, highlighterNames[i], highlighter), false);
-        }
-        traceMenu.add(item);
-
-      }
-
-    }
-    return result;
   }
 
   /**
@@ -1769,6 +1916,19 @@ public final class LayoutFactory {
     if (this.m_showChartForegroundMenu) {
       chartMenu.add(this.createForegroundColorMenu(chartPanel, adaptUI2Chart));
     }
+    JMenuItem item;
+    if (this.m_showAntialiasingMenu) {
+
+      if (adaptUI2Chart) {
+        item = new PropertyChangeCheckBoxMenuItem(chart, new Chart2DActionEnableAntialiasing(chart,
+            "Antialiasing"), chart.isUseAntialiasing());
+      } else {
+        item = new SelectionAdaptJCheckBoxMenuItem(new Chart2DActionEnableAntialiasing(chart,
+            "Antialiasing"), chart.isUseAntialiasing());
+      }
+      item.setToolTipText("Antialiasing causes smoother edges but costs performance. ");
+      chartMenu.add(item);
+    }
     if (this.m_showGridMenu) {
       chartMenu.add(this.createChartGridMenu(chartPanel, adaptUI2Chart));
     }
@@ -1779,7 +1939,6 @@ public final class LayoutFactory {
       chartMenu.add(this.createChartHighlightMenu(chartPanel, adaptUI2Chart));
     }
 
-    JMenuItem item;
     if (this.m_showAxisXMenu || this.m_showAxisYMenu) {
       // Axis submenu:
       JMenu axisMenu;
@@ -2003,6 +2162,49 @@ public final class LayoutFactory {
       tooltipMenu.add(this.createChartSetToolTipTypeMenu(chartPanel, adaptUI2Chart));
     }
     return tooltipMenu;
+  }
+
+  /**
+   * Creates a menu for controlling highlighting on the chart: enable and choose
+   * highlighter per trace.
+   * <p>
+   * 
+   * @param chartPanel
+   *          the chart panel to access.
+   * 
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * 
+   * @return a menu for controlling highlighting on the chart: enable and choose
+   *         highlighter per trace.
+   * 
+   */
+  public JMenu createChartTraceHighlighterMenu(ChartPanel chartPanel, boolean adaptUI2Chart) {
+    JMenu result;
+    Chart2D chart = chartPanel.getChart();
+    if (adaptUI2Chart) {
+      result = new PropertyChangeMenu(chart, "Highlighter");
+    } else {
+      result = new JMenu("Highlighter");
+    }
+
+    for (ITrace2D trace : chart.getTraces()) {
+      // Create a submenu for each trace
+      JMenu traceMenu;
+      if (adaptUI2Chart) {
+        traceMenu = new PropertyChangeMenu(chart, trace.getName());
+      } else {
+        traceMenu = new JMenu(trace.getName());
+      }
+      result.add(traceMenu);
+      // for each trace add all highlighters:
+      List<JMenuItem> highlighterItems = this.createTraceHighlighterItems(trace, adaptUI2Chart);
+      for (JMenuItem item : highlighterItems) {
+        traceMenu.add(item);
+      }
+    }
+    return result;
   }
 
   /**
@@ -2463,16 +2665,16 @@ public final class LayoutFactory {
    * @param adaptUI2Chart
    *          if true the menu will adapt it's basic UI properies (font,
    *          foreground and background color) to the given chart.
-   * @return a label that offers a popup menue with controls for the given trace
-   *         or <code>null</code> if <code>{@link ITrace2D#getLabel()}</code> on
-   *         the given trace argument returns null.
+   * @return a label that offers a popup menu with controls for the given trace
+   *         or <code>null</code> if <code>{@link ITrace2D#getLabel()} </code>
+   *         on the given trace argument returns null.
    */
   public JLabel createTraceContextMenuLabel(final Chart2D chart, final ITrace2D trace,
       final boolean adaptUI2Chart) {
     String traceLabel = trace.getLabel();
     TraceJLabel ret = null;
     if (!StringUtil.isEmpty(traceLabel)) {
-      ret = new TraceJLabel(trace.getLabel());
+      ret = new TraceJLabel(traceLabel);
       JMenuItem item;
       // ret.setSize(new Dimension(20, 100));
       JPopupMenu popup = new PropertyChangePopupMenu(chart);
@@ -2527,6 +2729,10 @@ public final class LayoutFactory {
       if (this.m_showTracePainterMenu) {
         popup.add(this.createTracePainterMenu(chart, trace, adaptUI2Chart));
       }
+      if (this.m_showTraceHighlighterMenu) {
+        popup.add(this.createTraceHighlighterMenu(trace, adaptUI2Chart));
+      }
+
       if (this.m_showRemoveTraceMenu) {
         if (adaptUI2Chart) {
           item = new PropertyChangeMenuItem(chart, new Trace2DActionRemove(trace, "Remove"));
@@ -2548,6 +2754,80 @@ public final class LayoutFactory {
       chart.addPropertyChangeListener(Chart2D.PROPERTY_FONT, ret);
     }
     return ret;
+  }
+
+  /**
+   * Returns a list of menu items that offer higlighters to add/remove to/from
+   * the given trace.
+   * <p>
+   * 
+   * @param trace
+   *          the trace to add/remove highlighters to/from.
+   * 
+   * @param adaptUI2Chart
+   *          if true basic UI properties like background or font will be
+   *          adapted by the menu.
+   * 
+   * @return a list of menu items that offer higlighters to add/remove to/from
+   *         the given trace.
+   */
+  private List<JMenuItem> createTraceHighlighterItems(final ITrace2D trace,
+      final boolean adaptUI2Chart) {
+    List<JMenuItem> result = new LinkedList<JMenuItem>();
+
+    JMenuItem item;
+    // for each trace add all highlighters:
+    IPointPainterConfigurableUI< ? > pointPainterFilledDisc = new PointPainterDisc(20);
+    pointPainterFilledDisc.setColorFill(new Color(0xff, 0xfe, 0xe9, 0x88));
+    pointPainterFilledDisc.setTransparencyFill(200);
+    pointPainterFilledDisc.setColor(Color.BLACK);
+    pointPainterFilledDisc.setTransparency(255);
+    pointPainterFilledDisc.setStroke(new BasicStroke(3.f));
+    IPointPainter< ? >[] highlighters = new IPointPainter[] {new PointPainterDisc(10),
+        new PointPainterDisc(20), pointPainterFilledDisc };
+    String[] highlighterNames = new String[] {"Small disc", "Big disc", "Big disc filled yellow" };
+    IPointPainter< ? > highlighter;
+    for (int i = 0; i < highlighters.length; i++) {
+      highlighter = highlighters[i];
+      if (adaptUI2Chart) {
+        item = new PropertyChangeCheckBoxMenuItem(trace.getRenderer(),
+            new Trace2DActionAddRemoveHighlighter(trace, highlighterNames[i], highlighter), false);
+      } else {
+        item = new SelectionAdaptJCheckBoxMenuItem(new Trace2DActionAddRemoveHighlighter(trace,
+            highlighterNames[i], highlighter), false);
+      }
+      result.add(item);
+    }
+
+    return result;
+  }
+
+  /**
+   * Creates a trace menu that offers different highlighters to add/remove to
+   * the trace.
+   * <p>
+   * 
+   * 
+   * @param adaptUI2Chart
+   *          if true the menu will adapt to basic UI propertis such as
+   *          background or font.
+   * 
+   * @return a trace menu that offers different highlighters to add/remove to
+   *         the trace.
+   */
+  private JMenuItem createTraceHighlighterMenu(final ITrace2D trace, boolean adaptUI2Chart) {
+    JMenuItem result;
+    if (adaptUI2Chart) {
+      result = new PropertyChangeMenu(trace.getRenderer(), "Highlighting");
+    } else {
+      result = new JMenu("Highlighting");
+    }
+    // for each trace add all highlighters:
+    List<JMenuItem> highlighterItems = this.createTraceHighlighterItems(trace, adaptUI2Chart);
+    for (JMenuItem item : highlighterItems) {
+      result.add(item);
+    }
+    return result;
   }
 
   /**
@@ -2584,9 +2864,7 @@ public final class LayoutFactory {
       item = new OrderingCheckBoxMenuItem(new Trace2DActionAddRemoveTracePainter(trace, "discs",
           painter), painterMenu, trace.containsTracePainter(painter));
     }
-    // if (trace.getTracePainters().contains(painter)) {
-    // item.setSelected(true);
-    // }
+
     painterMenu.add(item);
 
     painter = new TracePainterPolyline();
@@ -2599,9 +2877,6 @@ public final class LayoutFactory {
           painter), painterMenu, trace.containsTracePainter(painter));
     }
     painterMenu.add(item);
-    // if (trace.getTracePainters().contains(painter)) {
-    // item.setSelected(true);
-    // }
 
     painter = new TracePainterFill(chart);
     if (adaptUI2Chart) {
@@ -2614,9 +2889,7 @@ public final class LayoutFactory {
 
     }
     painterMenu.add(item);
-    // if (trace.getTracePainters().contains(painter)) {
-    // item.setSelected(true);
-    // }
+
     painter = new TracePainterVerticalBar(chart);
     if (adaptUI2Chart) {
       item = new OrderingCheckBoxPropertyChangeMenuItem(chart,
@@ -2740,6 +3013,26 @@ public final class LayoutFactory {
   }
 
   /**
+   * Returns whether the antialiasing menu item is shown.
+   * <p>
+   * 
+   * @return whether the antialiasing menu item is shown.
+   */
+  public boolean isShowAntialiasingMenu() {
+    return this.m_showAntialiasingMenu;
+  }
+
+  /**
+   * Returns whether the axis label formatter menu is shown.
+   * <p>
+   * 
+   * @return whether the axis label formatter menu is shown.
+   */
+  public boolean isShowAxisFormatterMenu() {
+    return this.m_showAxisFormatterMenu;
+  }
+
+  /**
    * Returns wether the chart show x grid menu should be created.
    * <p>
    * 
@@ -2854,6 +3147,16 @@ public final class LayoutFactory {
   }
 
   /**
+   * Returns true if the chart menu for highlighting traces is shown.
+   * <p>
+   * 
+   * @return true if the chart menu for highlighting traces is shown.
+   */
+  public boolean isShowChartHighlighterMenu() {
+    return this.m_showChartHighlighterMenu;
+  }
+
+  /**
    * @return true if the error bar wizard menu should be shown.
    */
   public final boolean isShowErrorBarWizardMenu() {
@@ -2959,6 +3262,18 @@ public final class LayoutFactory {
   }
 
   /**
+   * Returns whether the trace highlighter menu is shown.
+   * <p>
+   * This is the highlighter menu triggered by right clicking the trace name.
+   * <p>
+   * 
+   * @return true if the trace highlighter menu is visible.
+   */
+  public boolean isShowTraceHighlighterMenu() {
+    return this.m_showTraceHighlighterMenu;
+  }
+
+  /**
    * @return the showTraceNameMenu.
    */
   public final boolean isShowTraceNameMenu() {
@@ -3016,6 +3331,28 @@ public final class LayoutFactory {
    */
   public final void setShowAnnotationMenu(final boolean showAnnotationMenu) {
     this.m_showAnnotationMenu = showAnnotationMenu;
+  }
+
+  /**
+   * Set whether the antialiasing menu item is shown.
+   * <p>
+   * 
+   * @param showAntialiasingMenu
+   *          true if the antialiasing menu item should be visible.
+   */
+  public void setShowAntialiasingMenu(boolean showAntialiasingMenu) {
+    this.m_showAntialiasingMenu = showAntialiasingMenu;
+  }
+
+  /**
+   * Sets whether the axis label formatter menu is shown.
+   * <p>
+   * 
+   * @param showAxisFormatterMenu
+   *          controls whether the axis label formatter menu is shown.
+   */
+  public void setShowAxisFormatterMenu(boolean showAxisFormatterMenu) {
+    this.m_showAxisFormatterMenu = showAxisFormatterMenu;
   }
 
   /**
@@ -3179,6 +3516,18 @@ public final class LayoutFactory {
   }
 
   /**
+   * Set whether the chart menu for highlighting traces should be visible.
+   * <p>
+   * 
+   * @param showChartHighlighterMenu
+   *          controls whether the chart menu for highlighting traces should be
+   *          visible.
+   */
+  public void setShowChartHighlighterMenu(boolean showChartHighlighterMenu) {
+    this.m_showChartHighlighterMenu = showChartHighlighterMenu;
+  }
+
+  /**
    * Set whether the error bar wizard menu should be shown.
    * 
    * @param showErrorBarWizardMenu
@@ -3301,6 +3650,20 @@ public final class LayoutFactory {
    */
   public final void setShowTraceColorMenu(final boolean showTraceColorMenu) {
     this.m_showTraceColorMenu = showTraceColorMenu;
+  }
+
+  /**
+   * Set whether the trace highlighter menu should be visible.
+   * <p>
+   * 
+   * This is the highlighter menu triggered by right clicking the trace name.
+   * <p>
+   * 
+   * @param showTraceHighlighterMenu
+   *          true if the trace highlighter menu should be visible.
+   */
+  public void setShowTraceHighlighterMenu(boolean showTraceHighlighterMenu) {
+    this.m_showTraceHighlighterMenu = showTraceHighlighterMenu;
   }
 
   /**

@@ -1,6 +1,7 @@
 /*
- *  TracePainterFill.java,  <enter purpose here>.
- *  Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
+ *  TracePainterFill.java of project jchart2d. A trace painter implementation 
+ *  that fills the area between trace an y=0,x=0.
+ *  Copyright (c) 2004 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -46,11 +47,10 @@ import java.util.List;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.21 $
  * 
  */
-public class TracePainterFill
-    extends ATracePainter {
+public class TracePainterFill extends ATracePainter {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -7194158082574997539L;
@@ -59,7 +59,7 @@ public class TracePainterFill
    * Stores the corresponding chart to know the coordinate roots for closing the
    * polygon to fill.
    */
-  private Chart2D m_chart;
+  private final Chart2D m_chart;
 
   /** The list of x coordinates collected in one paint iteration. */
   private List<Integer> m_xPoints;
@@ -72,7 +72,7 @@ public class TracePainterFill
    * <p>
    * 
    * @param chart
-   *            needed to get the start pixel coordinates of traces.
+   *          needed to get the start pixel coordinates of traces.
    */
   public TracePainterFill(final Chart2D chart) {
     this.m_chart = chart;
@@ -94,10 +94,10 @@ public class TracePainterFill
   public void endPaintIteration(final Graphics g2d) {
     if (g2d != null) {
 
-      int[] x = new int[this.m_xPoints.size() + 4];
+      final int[] x = new int[this.m_xPoints.size() + 4];
       x[0] = this.m_chart.getXChartStart();
       int count = 1;
-      for (Integer xpoint : this.m_xPoints) {
+      for (final Integer xpoint : this.m_xPoints) {
         x[count] = xpoint.intValue();
         count++;
       }
@@ -107,10 +107,10 @@ public class TracePainterFill
       // step back to startx,starty (root)
       x[count + 2] = this.m_chart.getXChartStart();
 
-      int[] y = new int[this.m_yPoints.size() + 4];
+      final int[] y = new int[this.m_yPoints.size() + 4];
       y[0] = this.m_chart.getYChartStart();
       count = 1;
-      for (Integer ypoint : this.m_yPoints) {
+      for (final Integer ypoint : this.m_yPoints) {
         y[count] = ypoint.intValue();
         count++;
       }
@@ -122,6 +122,58 @@ public class TracePainterFill
 
       g2d.fillPolygon(x, y, x.length);
     }
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final TracePainterFill other = (TracePainterFill) obj;
+    if (this.m_chart == null) {
+      if (other.m_chart != null) {
+        return false;
+      }
+    } else if (!this.m_chart.equals(other.m_chart)) {
+      return false;
+    }
+    if (this.m_xPoints == null) {
+      if (other.m_xPoints != null) {
+        return false;
+      }
+    } else if (!this.m_xPoints.equals(other.m_xPoints)) {
+      return false;
+    }
+    if (this.m_yPoints == null) {
+      if (other.m_yPoints != null) {
+        return false;
+      }
+    } else if (!this.m_yPoints.equals(other.m_yPoints)) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((this.m_chart == null) ? 0 : this.m_chart.hashCode());
+    result = prime * result + ((this.m_xPoints == null) ? 0 : this.m_xPoints.hashCode());
+    result = prime * result + ((this.m_yPoints == null) ? 0 : this.m_yPoints.hashCode());
+    return result;
   }
 
   /**
@@ -147,6 +199,4 @@ public class TracePainterFill
     this.m_yPoints = new LinkedList<Integer>();
   }
 
-  
-  
 }

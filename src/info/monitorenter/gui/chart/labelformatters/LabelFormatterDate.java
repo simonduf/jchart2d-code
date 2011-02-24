@@ -1,7 +1,7 @@
 /*
  *  LabelFormatterDate.java of project jchart2d. A label formatter that uses formatted 
  *  dates. 
- *  Copyright (C) 2005 - 2010 Achim Westermann, created on 20.04.2005, 11:56:36
+ *  Copyright (C) 2005 - 2011 Achim Westermann, created on 20.04.2005, 11:56:36
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -52,12 +52,12 @@ import java.util.Date;
  * Use: <br>
  * 
  * <pre>
- *
+ * 
  *     Chart2D chart = new &lt;Constructor&gt;
  *     Axis axis = new AxisSimple();
  *     axis.setFormatter(new LabelFormatterDate(DateFormat.getDateInstance()));
  *     chart.setAxisX(axis);
- *
+ * 
  * </pre>
  * 
  * to use this class.
@@ -65,13 +65,12 @@ import java.util.Date;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.11 $
  * 
  * @see java.util.Date
  */
-public class LabelFormatterDate
-    extends ALabelFormatter implements IAxisLabelFormatter {
-  
+public class LabelFormatterDate extends ALabelFormatter implements IAxisLabelFormatter {
+
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -7201853569619240987L;
 
@@ -81,12 +80,15 @@ public class LabelFormatterDate
   /** The date formatter that is used. */
   private SimpleDateFormat m_dateFormat;
 
-  /** The last value that was formatted - needed for the parse - format contract. */
+  /**
+   * The last value that was formatted - needed for the parse - format contract.
+   */
   private double m_lastFormatted = 0;
 
   /**
-   * Default constructor that uses the local datetime (<code>{@link DateFormat#getDateTimeInstance(int, int)}</code>)
-   * with <code>{@link DateFormat#SHORT}</code> style.
+   * Default constructor that uses the local datetime (
+   * <code>{@link DateFormat#getDateTimeInstance(int, int)}</code>) with
+   * <code>{@link DateFormat#SHORT}</code> style.
    * <p>
    * 
    */
@@ -104,6 +106,38 @@ public class LabelFormatterDate
   public LabelFormatterDate(final SimpleDateFormat dateFormat) {
     super();
     this.m_dateFormat = dateFormat;
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final LabelFormatterDate other = (LabelFormatterDate) obj;
+    if (this.m_cachedMaxAmountChars != other.m_cachedMaxAmountChars) {
+      return false;
+    }
+    if (this.m_dateFormat == null) {
+      if (other.m_dateFormat != null) {
+        return false;
+      }
+    } else if (!this.m_dateFormat.equals(other.m_dateFormat)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_lastFormatted) != Double
+        .doubleToLongBits(other.m_lastFormatted)) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -129,8 +163,8 @@ public class LabelFormatterDate
    */
   @Override
   public int getMaxAmountChars() {
-    Range range = this.getAxis().getRange();
-    double dRange = range.getExtent();
+    final Range range = this.getAxis().getRange();
+    final double dRange = range.getExtent();
     if (this.m_cachedMaxAmountChars == Integer.MAX_VALUE) {
       this.m_cachedMaxAmountChars = this.m_dateFormat.format(new Date((long) dRange)).length();
     }
@@ -165,8 +199,8 @@ public class LabelFormatterDate
    *      boolean)
    */
   public double getNextEvenValue(final double value, final boolean ceiling) {
-    Date d = new Date((long) value);
-    Calendar calendar = Calendar.getInstance();
+    final Date d = new Date((long) value);
+    final Calendar calendar = Calendar.getInstance();
     calendar.setTime(d);
     if (ceiling) {
       if (!SimpleDateFormatAnalyzer.displaysMillisecond(this.m_dateFormat)) {
@@ -214,6 +248,21 @@ public class LabelFormatterDate
       }
     }
     return calendar.getTimeInMillis();
+  }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + this.m_cachedMaxAmountChars;
+    result = prime * result + ((this.m_dateFormat == null) ? 0 : this.m_dateFormat.hashCode());
+    long temp;
+    temp = Double.doubleToLongBits(this.m_lastFormatted);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    return result;
   }
 
   /**

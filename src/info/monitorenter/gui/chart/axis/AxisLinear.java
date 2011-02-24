@@ -1,6 +1,6 @@
 /*
  *  AxisLinear.java of project jchart2d, Axis implementation with linear display.
- *  Copyright (c) 2007 - 2010 Achim Westermann, created on 20:33:13.
+ *  Copyright (c) 2007 - 2011 Achim Westermann, created on 20:33:13.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,8 +24,8 @@ package info.monitorenter.gui.chart.axis;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxisLabelFormatter;
-import info.monitorenter.util.MathUtil;
 import info.monitorenter.util.Range;
+import info.monitorenter.util.math.MathUtil;
 
 /**
  * An <code>{@link AAxis}</code> with linear display of values.
@@ -34,7 +34,7 @@ import info.monitorenter.util.Range;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.20 $
+ * @version $Revision: 1.22 $
  */
 public class AxisLinear extends AAxis {
 

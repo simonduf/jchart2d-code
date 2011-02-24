@@ -1,7 +1,7 @@
 /*
  *  IErrorBarPainter.java of project jchart2d, interface for a 
  *  renderer of error bars. 
- *  Copyright (c) 2004 - 2010 Achim Westermann.
+ *  Copyright (c) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -53,7 +53,7 @@ import java.io.Serializable;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.24 $
+ * @version $Revision: 1.27 $
  */
 public interface IErrorBarPainter extends Serializable {
 
@@ -66,7 +66,7 @@ public interface IErrorBarPainter extends Serializable {
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
-   * @version $Revision: 1.24 $
+   * @version $Revision: 1.27 $
    */
   public interface ISegment extends Serializable {
     /**
@@ -90,10 +90,12 @@ public interface IErrorBarPainter extends Serializable {
     public void addPropertyChangeListener(String property, PropertyChangeListener listener);
 
     /**
-     * Returns the color of this segment.
+     * Returns the color of this segment or null if none has been configured in the underlying 
+     * <code>{@link IPointPainterConfigurableUI}</code>.
      * <p>
      * 
-     * @return the color used.
+     * @return the color of this segment or null if none has been configured in the underlying 
+     * <code>{@link IPointPainterConfigurableUI}</code>.
      */
     public Color getColor();
 
@@ -111,7 +113,7 @@ public interface IErrorBarPainter extends Serializable {
      * 
      * @return the point painter used.
      */
-    public IPointPainter< ? > getPointPainter();
+    public IPointPainterConfigurableUI< ? > getPointPainter();
 
     /**
      * Returns the property name of the color property to use with
@@ -175,7 +177,7 @@ public interface IErrorBarPainter extends Serializable {
      * @param pointPainter
      *          the point painter to use.
      */
-    public void setPointPainter(IPointPainter< ? > pointPainter);
+    public void setPointPainter(IPointPainterConfigurableUI< ? > pointPainter);
   }
 
   /**
@@ -197,7 +199,7 @@ public interface IErrorBarPainter extends Serializable {
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_ENDPOINT = "IErrorBarPainter.PROPERTY_CONNECTION_COLOR";
+  public static final String PROPERTY_ENDPOINT = "IErrorBarPainter.PROPERTY_ENDPOINT";
 
   /**
    * The property key defining the <code>endPointColor</code> property. Use in
@@ -336,7 +338,7 @@ public interface IErrorBarPainter extends Serializable {
    * 
    * @return The painter for the end point of the error bar.
    */
-  public IPointPainter< ? > getEndPointPainter();
+  public IPointPainterConfigurableUI< ? > getEndPointPainter();
 
   /**
    * Returns all property change listeners for the given property.
@@ -383,6 +385,7 @@ public interface IErrorBarPainter extends Serializable {
    * Returns the color of the start point or null if unconfigured.
    * <p>
    * 
+   * 
    * @return the color of the start point or null if unconfigured.
    */
   public Color getStartPointColor();
@@ -393,7 +396,7 @@ public interface IErrorBarPainter extends Serializable {
    * 
    * @return the painter for the start point of the error bar.
    */
-  public IPointPainter< ? > getStartPointPainter();
+  public IPointPainterConfigurableUI< ? > getStartPointPainter();
 
   /**
    * Paint the error bar for the point given by absolute coordinates on the
@@ -451,7 +454,7 @@ public interface IErrorBarPainter extends Serializable {
    * Sets the color for the connection segment.
    * <p>
    * If this is not used or null is provided, the color of the corresponding
-   * trace will be used.
+   * trace will be used. If no underlying connection painter exists nothing will be done. 
    * <p>
    * 
    * @param connectionColor
@@ -481,13 +484,13 @@ public interface IErrorBarPainter extends Serializable {
    * @param connectionPainter
    *          The connection segmentPainter to set.
    */
-  public void setConnectionPainter(final IPointPainter< ? > connectionPainter);
+  public void setConnectionPainter(final IPointPainterConfigurableUI< ? > connectionPainter);
 
   /**
    * Sets the color for the end point.
    * <p>
    * If this is not used or null is provided, the color of the corresponding
-   * trace will be used.
+   * trace will be used. If no underlying end point painter exists nothing will be done. 
    * <p>
    * 
    * @param endPointColor
@@ -512,13 +515,13 @@ public interface IErrorBarPainter extends Serializable {
    * @param endPointPainter
    *          The end point painter to set.
    */
-  public void setEndPointPainter(final IPointPainter< ? > endPointPainter);
+  public void setEndPointPainter(final IPointPainterConfigurableUI< ? > endPointPainter);
 
   /**
    * Sets the color for the start point.
    * <p>
    * If this is not used or null is provided, the color of the corresponding
-   * trace will be used.
+   * trace will be used. If no underlying start point painter exists nothing will be done. 
    * <p>
    * 
    * @param startPointColor
@@ -542,6 +545,6 @@ public interface IErrorBarPainter extends Serializable {
    * @param startPointPainter
    *          The startPointPainter to set.
    */
-  public void setStartPointPainter(final IPointPainter< ? > startPointPainter);
+  public void setStartPointPainter(final IPointPainterConfigurableUI< ? > startPointPainter);
 
 }

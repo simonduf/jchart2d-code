@@ -1,7 +1,7 @@
 /*
  *  IErrorBarPolicy.java of project jchart2d, interface for a facade 
  *  towards painting error bars that adds a layer of configurability. 
- *  Copyright (c) 2004 - 2010 Achim Westermann.
+ *  Copyright (c) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -93,7 +93,7 @@ import javax.swing.JComponent;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.20 $
+ * @version $Revision: 1.21 $
  * 
  * @param <T>
  *          needed for generic comparable<T>.

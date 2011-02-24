@@ -1,7 +1,7 @@
 /*
  *  Trace2DActionAErrorBarPolicy, abstract action to act 
  *  with an IErrorBarPolicy on an ITrace2D.
- *  Copyright (C) 2004 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2004 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@ import info.monitorenter.gui.chart.ITrace2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public abstract class ATrace2DActionErrorBarPolicy extends ATrace2DAction {
 

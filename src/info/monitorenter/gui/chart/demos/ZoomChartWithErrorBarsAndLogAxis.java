@@ -1,7 +1,7 @@
 /*
  *  ZoomTest.java of project jchart2d, demonstration of a zoom-enabled 
  *  chart with error bars and a logarithmic y axis. 
- *  Copyright 2007 - 2010 (C) Achim Westermann, created on 23:59:21.
+ *  Copyright 2007 - 2011 (C) Achim Westermann, created on 23:59:21.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -51,7 +51,7 @@ import javax.swing.JFrame;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.14 $
  */
 public class ZoomChartWithErrorBarsAndLogAxis extends JFrame {
 
@@ -122,14 +122,14 @@ public class ZoomChartWithErrorBarsAndLogAxis extends JFrame {
     // Create ITrace
     ITrace2D trace = new Trace2DSimple("Trace");
     trace.setColor(Color.BLUE);
+    // Add the trace to the chart before adding any point / point highlighters / error bar policies! 
+    chart.addTrace(trace);
     IErrorBarPolicy< ? > errorBarPolicy = new ErrorBarPolicyAbsoluteSummation(4, 4);
     errorBarPolicy.setShowPositiveYErrors(true);
     IErrorBarPainter painter = new ErrorBarPainter();
     errorBarPolicy.addErrorBarPainter(painter);
     trace.addErrorBarPolicy(errorBarPolicy);
 
-    // Add the trace to the chart
-    chart.addTrace(trace);
     chart.setAxisYLeft(new AxisLogE(), 0);
 
     // Add all points, as it is static

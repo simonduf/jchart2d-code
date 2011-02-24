@@ -1,6 +1,6 @@
 /*
  *  TreeSetGreedy.java, special container for managing z-Indexes of traces in jchart2d.
- *  Copyright (C) 2004 - 2010 Achim Westermann.
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

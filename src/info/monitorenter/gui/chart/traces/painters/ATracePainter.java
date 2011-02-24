@@ -1,6 +1,6 @@
 /*
- * ATracePainter.java,  base class for ITracePainter implementations.
- * Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
+ * ATracePainter.java of project jchart2d. Base class for ITracePainter implementations.
+ * Copyright (c) 2004 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@ import java.awt.Graphics;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.24 $
+ * @version $Revision: 1.27 $
  * 
  */
 public abstract class ATracePainter implements
@@ -44,6 +44,17 @@ public abstract class ATracePainter implements
 
   /** Flag to remember if a paint iteration has ended. */
   private boolean m_isEnded = false;
+
+  /**
+   * The last trace point that was sent to
+   * {@link #paintPoint(int, int, int, int, Graphics, ITracePoint2D)}.
+   * <p>
+   * It will be needed at {@link #endPaintIteration(Graphics)} as the former
+   * method only uses the first set of coordinates to store in the internal list
+   * to avoid duplicates.
+   * <p>
+   */
+  private ITracePoint2D m_previousPoint = new TracePoint2D(0, 0);
 
   /**
    * The last x coordinate that was sent to
@@ -67,18 +78,7 @@ public abstract class ATracePainter implements
    */
   private int m_previousY;
 
-  /**
-   * The last trace point that was sent to
-   * {@link #paintPoint(int, int, int, int, Graphics, ITracePoint2D)}.
-   * <p>
-   * It will be needed at {@link #endPaintIteration(Graphics)} as the former
-   * method only uses the first set of coordinates to store in the internal list
-   * to avoid duplicates.
-   * <p>
-   */
-  private ITracePoint2D m_previousPoint = new TracePoint2D(0, 0);
-
-  public int compareTo(ATracePainter o) {
+  public int compareTo(final ATracePainter o) {
     return this.toString().compareTo(o.toString());
   }
 
@@ -98,23 +98,37 @@ public abstract class ATracePainter implements
   }
 
   /**
-   * Two instances are judged equal if they are of the same class.
-   * <p>
-   * This implies that any state of a <code>{@link ATracePainter}</code> is
-   * unimportant - implementations that have a state (e.g. the radius for discs
-   * to paint in <code>{@link TracePainterDisc}</code>) this method should be
-   * considered to be overridden (along with <code>{@link #hashCode()}</code> .
-   * <p>
-   * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
   public boolean equals(final Object obj) {
-    boolean result = false;
-    if (obj != null) {
-      result = (this.getClass() == obj.getClass());
+    if (this == obj) {
+      return true;
     }
-    return result;
+    if (obj == null) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final ATracePainter other = (ATracePainter) obj;
+    if (this.m_isEnded != other.m_isEnded) {
+      return false;
+    }
+    if (this.m_previousPoint == null) {
+      if (other.m_previousPoint != null) {
+        return false;
+      }
+    } else if (!this.m_previousPoint.equals(other.m_previousPoint)) {
+      return false;
+    }
+    if (this.m_previousX != other.m_previousX) {
+      return false;
+    }
+    if (this.m_previousY != other.m_previousY) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -146,7 +160,7 @@ public abstract class ATracePainter implements
    *         {@link #paintPoint(int, int, int, int, Graphics, ITracePoint2D)}.
    */
   public int getPreviousX() {
-    int result = this.m_previousX;
+    final int result = this.m_previousX;
     if (this.m_isEnded) {
       this.m_previousX = Integer.MIN_VALUE;
       if (this.m_previousY == Integer.MIN_VALUE) {
@@ -170,7 +184,7 @@ public abstract class ATracePainter implements
    *         {@link #paintPoint(int, int, int, int, Graphics, ITracePoint2D)}.
    */
   public int getPreviousY() {
-    int result = this.m_previousY;
+    final int result = this.m_previousY;
     if (this.m_isEnded) {
       this.m_previousY = Integer.MIN_VALUE;
       if (this.m_previousX == Integer.MIN_VALUE) {
@@ -185,7 +199,14 @@ public abstract class ATracePainter implements
    */
   @Override
   public int hashCode() {
-    return this.getClass().hashCode();
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (this.m_isEnded ? 1231 : 1237);
+    result = prime * result
+        + ((this.m_previousPoint == null) ? 0 : this.m_previousPoint.hashCode());
+    result = prime * result + this.m_previousX;
+    result = prime * result + this.m_previousY;
+    return result;
   }
 
   /**

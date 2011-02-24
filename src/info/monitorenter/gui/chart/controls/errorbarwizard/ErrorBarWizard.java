@@ -1,7 +1,7 @@
 /*
  *  ErrorBarWizard.java of project jchart2d, a wizard for 
  *  configuring error bars for a trace. 
- *  Copyright (c) 2007 - 2010 Achim Westermann, created on 09:50:20.
+ *  Copyright (c) 2007 - 2011 Achim Westermann, created on 09:50:20.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -52,7 +52,7 @@ import javax.swing.JTabbedPane;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class ErrorBarWizard
     extends JPanel {

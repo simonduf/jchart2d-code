@@ -1,6 +1,6 @@
 /*
  *  AdvancedStaticChart  jchart2d
- *  Copyright (C) 2007 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,10 +24,9 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
-import info.monitorenter.gui.chart.IPointHighlighter;
+import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterDate;
-import info.monitorenter.gui.chart.pointhighlighters.PointHighlighterConfigurable;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
@@ -114,9 +113,9 @@ public final class AdvancedStaticChart {
     chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
     
     // Feature: turn on highlighting: Two steps enable it on the chart and set a highlighter for the trace: 
-    Set<IPointHighlighter<?>> highlighters = trace.getPointHighlighters();
+    Set<IPointPainter<?>> highlighters = trace.getPointHighlighters();
     highlighters.clear();
-    trace.addPointHighlighter(new PointHighlighterConfigurable(new PointPainterDisc(20), true));
+    trace.addPointHighlighter(new PointPainterDisc(20));
     chart.enablePointHighlighting(true);
     
     // Add all points, as it is static:

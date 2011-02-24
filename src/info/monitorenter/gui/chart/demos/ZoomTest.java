@@ -1,7 +1,7 @@
 /*
  *  ZoomTest.java of project jchart2d, demonstration of a zoom-enabled 
  *  chart. 
- *  Copyright 2007 - 2010 (C) Achim Westermann, created on 23:59:21.
+ *  Copyright 2007 - 2011 (C) Achim Westermann, created on 23:59:21.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,6 @@ package info.monitorenter.gui.chart.demos;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ZoomableChart;
-import info.monitorenter.gui.chart.pointhighlighters.PointHighlighterConfigurable;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.views.ChartPanel;
@@ -47,7 +46,7 @@ import javax.swing.JFrame;
  * <p>
  * 
  * @author Alessio Sambarino (Contributor)
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.17 $
  */
 public class ZoomTest
     extends JFrame {
@@ -143,7 +142,7 @@ public class ZoomTest
 
     // Tool tips and highlighting: Both modes point out the neares trace point to the cursor: 
     chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
-    trace.setPointHighlighter(new PointHighlighterConfigurable(new PointPainterDisc(10),true));
+    trace.setPointHighlighter(new PointPainterDisc(10));
     chart.enablePointHighlighting(true);
 
     // Add chart to the pane

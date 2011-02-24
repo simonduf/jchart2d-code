@@ -1,7 +1,7 @@
 /*
  * Trace2DBijective, a list- based implementation of a ITrace2D that only
  *  allows a single occurance of a certain x- value.
- * Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2004 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -53,7 +53,7 @@ import java.util.Iterator;
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
  * 
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class Trace2DBijective
     extends Trace2DSimple {

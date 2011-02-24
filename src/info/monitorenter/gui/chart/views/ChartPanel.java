@@ -1,6 +1,6 @@
 /*
  *  ChartPanel.java, a decoration of a Chart2D that adds popup menues for traces and the chart.
- *  Copyright (C) 2005 - 2010 Achim Westermann.
+ *  Copyright (C) 2005 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -108,20 +108,20 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
    */
   public static void main(final String[] args) {
     // some data:
-    double[] data = new double[100];
+    final double[] data = new double[100];
     for (int i = 0; i < 100; i++) {
       data[i] = Math.random() * i + 1;
     }
-    JFrame frame = new JFrame("ChartPanel demo");
-    Chart2D chart = new Chart2D();
+    final JFrame frame = new JFrame("ChartPanel demo");
+    final Chart2D chart = new Chart2D();
     // trace 1
-    ITrace2D trace1 = new Trace2DLtd(100);
+    final ITrace2D trace1 = new Trace2DLtd(100);
     trace1.setName("Trace 1");
 
     // AbstractDataCollector collector1 = new
     // RandomDataCollectorOffset(trace1,500);
     // trace2
-    ITrace2D trace2 = new Trace2DLtd(100);
+    final ITrace2D trace2 = new Trace2DLtd(100);
     trace2.setName("Trace 2");
     // add to chart
     chart.addTrace(trace1);
@@ -133,7 +133,7 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
       trace2.addPoint(i + 2, 100 - data[i]);
     }
 
-    ChartPanel cPanel = new ChartPanel(chart);
+    final ChartPanel cPanel = new ChartPanel(chart);
     frame.getContentPane().add(cPanel);
     frame.setSize(new Dimension(400, 600));
     frame.addWindowListener(new WindowAdapter() {
@@ -149,13 +149,12 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
     frame.setJMenuBar(LayoutFactory.getInstance().createChartMenuBar(cPanel, false));
     frame.setVisible(true);
   }
-  
+
   /** The annotation creator factory for this panel. */
   private IAnnotationCreator m_annotationCreator = AnnotationCreatorBubble.getInstance();
 
   /** The decorated chart. */
-  private Chart2D m_chart;
-
+  private final Chart2D m_chart;
 
   /**
    * <p>
@@ -182,7 +181,7 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
     // we paint our own labels
     chart.setPaintLabels(false);
     // get the layout factory for popup menues:
-    LayoutFactory factory = LayoutFactory.getInstance();
+    final LayoutFactory factory = LayoutFactory.getInstance();
 
     factory.createChartPopupMenu(this, true);
 
@@ -196,7 +195,7 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
     this.m_labelPanel.setLayout(new FlowLayoutCorrectMinimumSize(FlowLayout.LEFT));
     this.m_labelPanel.setBackground(chart.getBackground());
     JLabel label;
-    for (ITrace2D trace : chart) {
+    for (final ITrace2D trace : chart) {
       label = factory.createTraceContextMenuLabel(chart, trace, true);
       if (label != null) {
         this.m_labelPanel.add(label);
@@ -209,8 +208,8 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
     this.add(this.m_labelPanel, BorderLayout.SOUTH);
     chart.addPropertyChangeListener(Chart2D.PROPERTY_BACKGROUND_COLOR, this);
     // listen to new traces and deleted ones:
-    List<IAxis> allAxes = chart.getAxes();
-    for (IAxis currentAxis : allAxes) {
+    final List<IAxis> allAxes = chart.getAxes();
+    for (final IAxis currentAxis : allAxes) {
       currentAxis.addPropertyChangeListener(IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
     }
     // a bit tricky: stay in touch with removed / added traces in case axes are
@@ -239,9 +238,9 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
    */
   private boolean containsTraceLabel(final ITrace2D tracetoAdd) {
     boolean result = false;
-    Component[] traceLabels = this.m_labelPanel.getComponents();
+    final Component[] traceLabels = this.m_labelPanel.getComponents();
     JLabel label;
-    String labelName = tracetoAdd.getLabel();
+    final String labelName = tracetoAdd.getLabel();
     for (int i = traceLabels.length - 1; i >= 0; i--) {
       label = (JLabel) traceLabels[i];
       if (labelName.equals(label.getText())) {
@@ -250,6 +249,45 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
       }
     }
     return result;
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final ChartPanel other = (ChartPanel) obj;
+    if (this.m_annotationCreator == null) {
+      if (other.m_annotationCreator != null) {
+        return false;
+      }
+    } else if (!this.m_annotationCreator.equals(other.m_annotationCreator)) {
+      return false;
+    }
+    if (this.m_chart == null) {
+      if (other.m_chart != null) {
+        return false;
+      }
+    } else if (!this.m_chart.equals(other.m_chart)) {
+      return false;
+    }
+    if (this.m_labelPanel == null) {
+      if (other.m_labelPanel != null) {
+        return false;
+      }
+    } else if (!this.m_labelPanel.equals(other.m_labelPanel)) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -273,6 +311,20 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
   }
 
   /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result
+        + ((this.m_annotationCreator == null) ? 0 : this.m_annotationCreator.hashCode());
+    result = prime * result + ((this.m_chart == null) ? 0 : this.m_chart.hashCode());
+    result = prime * result + ((this.m_labelPanel == null) ? 0 : this.m_labelPanel.hashCode());
+    return result;
+  }
+
+  /**
    * Listens for property "background" of the <code>Chart2D</code> instance that
    * is contained in this component and sets the background color.
    * <p>
@@ -280,9 +332,9 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
   public void propertyChange(final PropertyChangeEvent evt) {
-    String prop = evt.getPropertyName();
+    final String prop = evt.getPropertyName();
     if (prop.equals(Chart2D.PROPERTY_BACKGROUND_COLOR)) {
-      Color color = (Color) evt.getNewValue();
+      final Color color = (Color) evt.getNewValue();
       this.setBackground(color);
       this.m_labelPanel.setBackground(color);
     } else if (prop.equals(IAxis.PROPERTY_ADD_REMOVE_TRACE)) {
@@ -292,12 +344,13 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
        * resulting in two events per added trace: We have to avoid adding
        * duplicate labels!
        */
-      ITrace2D oldTrace = (ITrace2D) evt.getOldValue();
-      ITrace2D newTrace = (ITrace2D) evt.getNewValue();
+      final ITrace2D oldTrace = (ITrace2D) evt.getOldValue();
+      final ITrace2D newTrace = (ITrace2D) evt.getNewValue();
       JLabel label;
-      if (oldTrace == null && newTrace != null) {
+      if ((oldTrace == null) && (newTrace != null)) {
         if (!this.containsTraceLabel(newTrace)) {
-          label = LayoutFactory.getInstance().createTraceContextMenuLabel(this.m_chart, newTrace, true);
+          label = LayoutFactory.getInstance().createTraceContextMenuLabel(this.m_chart, newTrace,
+              true);
           if (label != null) {
             this.m_labelPanel.add(label);
             this.invalidate();
@@ -306,20 +359,20 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
             this.m_labelPanel.doLayout();
           }
         }
-      } else if (oldTrace != null && newTrace == null) {
+      } else if ((oldTrace != null) && (newTrace == null)) {
         // search for label:
-        String labelName = oldTrace.getLabel();
+        final String labelName = oldTrace.getLabel();
         if (!StringUtil.isEmpty(labelName)) {
-          Component[] labels = (this.m_labelPanel.getComponents());
-          for (int i = 0; i < labels.length; i++) {
-            if (((JLabel) labels[i]).getText().equals(labelName)) {
-              this.m_labelPanel.remove(labels[i]);
-              this.m_chart.removePropertyChangeListener((PropertyChangeListener) labels[i]);
-              oldTrace.removePropertyChangeListener((PropertyChangeListener) labels[i]);
+          final Component[] labels = (this.m_labelPanel.getComponents());
+          for (final Component label2 : labels) {
+            if (((JLabel) label2).getText().equals(labelName)) {
+              this.m_labelPanel.remove(label2);
+              this.m_chart.removePropertyChangeListener((PropertyChangeListener) label2);
+              oldTrace.removePropertyChangeListener((PropertyChangeListener) label2);
               // clear the popup menu listeners too:
-              MouseListener[] mouseListeners = labels[i].getMouseListeners();
-              for (int j = 0; j < mouseListeners.length; j++) {
-                labels[i].removeMouseListener(mouseListeners[j]);
+              final MouseListener[] mouseListeners = label2.getMouseListeners();
+              for (final MouseListener mouseListener2 : mouseListeners) {
+                label2.removeMouseListener(mouseListener2);
               }
               this.m_labelPanel.doLayout();
               this.doLayout();
@@ -328,8 +381,8 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
           }
         }
       } else if (prop.equals(Chart2D.PROPERTY_AXIS_X) || prop.equals(Chart2D.PROPERTY_AXIS_Y)) {
-        IAxis newAxis = (IAxis) evt.getNewValue();
-        IAxis oldAxis = (IAxis) evt.getOldValue();
+        final IAxis newAxis = (IAxis) evt.getNewValue();
+        final IAxis oldAxis = (IAxis) evt.getOldValue();
         if (oldAxis != null) {
           oldAxis.removePropertyChangeListener(IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
         }
@@ -337,21 +390,21 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
           newAxis.addPropertyChangeListener(IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
         }
       } else if (prop.equals(ITrace2D.PROPERTY_LABEL)) {
-        ITrace2D trace = (ITrace2D) evt.getSource();
-        String oldLabel = (String) evt.getOldValue();
-        String newLabel = (String) evt.getNewValue();
+        final ITrace2D trace = (ITrace2D) evt.getSource();
+        final String oldLabel = (String) evt.getOldValue();
+        final String newLabel = (String) evt.getNewValue();
 
         if ((!StringUtil.isEmpty(oldLabel)) && (StringUtil.isEmpty(newLabel))) {
-          Component[] labels = (this.m_labelPanel.getComponents());
-          for (int i = 0; i < labels.length; i++) {
-            if (((JLabel) labels[i]).getText().equals(oldLabel)) {
-              this.m_labelPanel.remove(labels[i]);
-              this.m_chart.removePropertyChangeListener((PropertyChangeListener) labels[i]);
-              trace.removePropertyChangeListener((PropertyChangeListener) labels[i]);
+          final Component[] labels = (this.m_labelPanel.getComponents());
+          for (final Component label2 : labels) {
+            if (((JLabel) label2).getText().equals(oldLabel)) {
+              this.m_labelPanel.remove(label2);
+              this.m_chart.removePropertyChangeListener((PropertyChangeListener) label2);
+              trace.removePropertyChangeListener((PropertyChangeListener) label2);
               // clear the popup menu listeners too:
-              MouseListener[] mouseListeners = labels[i].getMouseListeners();
-              for (int j = 0; j < mouseListeners.length; j++) {
-                labels[i].removeMouseListener(mouseListeners[j]);
+              final MouseListener[] mouseListeners = label2.getMouseListeners();
+              for (final MouseListener mouseListener2 : mouseListeners) {
+                label2.removeMouseListener(mouseListener2);
               }
               this.m_labelPanel.doLayout();
               this.doLayout();
@@ -360,8 +413,8 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
           }
         } else if ((StringUtil.isEmpty(oldLabel)) && (!StringUtil.isEmpty(newLabel))) {
           if (!this.containsTraceLabel(newTrace)) {
-            label = LayoutFactory.getInstance()
-                .createTraceContextMenuLabel(this.m_chart, newTrace, true);
+            label = LayoutFactory.getInstance().createTraceContextMenuLabel(this.m_chart, newTrace,
+                true);
             if (label != null) {
               this.m_labelPanel.add(label);
               this.invalidate();

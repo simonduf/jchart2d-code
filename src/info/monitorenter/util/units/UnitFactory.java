@@ -1,7 +1,7 @@
 /*
  *  UnitFactory.java, Singleton that caches instances of whole unit- systems 
  *  and provides you with the matching unit for a maximum value.
- *  Copyright (C) 2004 - 2010 Achim Westermann.
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -36,7 +36,7 @@ import java.util.Map;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.10 $
  * 
  * @see info.monitorenter.util.units.IUnitSystem
  * 
@@ -100,6 +100,10 @@ public final class UnitFactory
     if (choice == null) {
       choice = this.initUnitSystem(units);
     }
+
+    // in case we are below the lowest unit (absoluteMax < peek.getFactor() of
+    // the first) start from the lowest unit.
+    result = choice.get(0);
     // Now to find the right unit.
     for (AUnit peek : choice) {
       if (absoluteMax < (peek.getFactor())) {
@@ -156,12 +160,10 @@ public final class UnitFactory
         try {
           unit = (AUnit) clazzs[i].newInstance();
           choice.add(unit);
-          if (previous == null) {
-            previous = unit;
-          } else {
+          if (previous != null) {
             previous.m_nextHigherUnit = unit;
+            unit.m_nexLowerUnit = previous;
           }
-          unit.m_nexLowerUnit = previous;
           previous = unit;
         } catch (InstantiationException e) {
           System.err.println("UnitFactory encountered problems by instantiation of "

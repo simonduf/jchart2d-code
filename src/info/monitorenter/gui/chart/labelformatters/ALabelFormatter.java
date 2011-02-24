@@ -1,7 +1,7 @@
 /*
  * AbstractLabelFormatter.java, base class for ILabelFormatter 
  * implementations.  
- * Copyright (c) 2004 - 2010 Achim Westermann, Achim.Westermann@gmx.de 
+ * Copyright (c) 2004 - 2011 Achim Westermann, Achim.Westermann@gmx.de 
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -43,10 +43,10 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.10 $
  */
 public abstract class ALabelFormatter implements IAxisLabelFormatter {
-  
+
   /** Generated <code>serialVersionUID</code>. **/
   private static final long serialVersionUID = 5211073371003781159L;
 
@@ -80,6 +80,38 @@ public abstract class ALabelFormatter implements IAxisLabelFormatter {
   }
 
   /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final ALabelFormatter other = (ALabelFormatter) obj;
+    if (this.m_axis == null) {
+      if (other.m_axis != null) {
+        return false;
+      }
+    } else if (!this.m_axis.equals(other.m_axis)) {
+      return false;
+    }
+    if (this.m_propertyChangeSupport == null) {
+      if (other.m_propertyChangeSupport != null) {
+        return false;
+      }
+    } else if (!this.m_propertyChangeSupport.equals(other.m_propertyChangeSupport)) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Intended for {@link info.monitorenter.gui.chart.axis.AAxis} only.
    * <p>
    * 
@@ -91,16 +123,16 @@ public abstract class ALabelFormatter implements IAxisLabelFormatter {
 
   /**
    * Returns the maximum amount of characters that will be returned from
-   * {@link  #format(double)}.
+   * {@link #format(double)}.
    * <p>
    * 
    * @return the maximum amount of characters that will be returned from
-   *         {@link  #format(double)}.
+   *         {@link #format(double)}.
    */
   public int getMaxAmountChars() {
     // find the fractions by using range information:
     int fractionDigits = 0;
-    Range range = this.m_axis.getRange();
+    final Range range = this.m_axis.getRange();
     double dRange = range.getExtent();
     if (dRange < 1) {
       if (dRange == 0) {
@@ -129,7 +161,7 @@ public abstract class ALabelFormatter implements IAxisLabelFormatter {
     int integerDigits = 0;
     double max = range.getMax();
     double min = Math.abs(range.getMin());
-    if (max == 0 && min == 0) {
+    if ((max == 0) && (min == 0)) {
       integerDigits = 1;
     } else if (max < min) {
       while (min > 1) {
@@ -158,6 +190,19 @@ public abstract class ALabelFormatter implements IAxisLabelFormatter {
   public AUnit getUnit() {
 
     return ALabelFormatter.UNIT_UNCHANGED;
+  }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((this.m_axis == null) ? 0 : this.m_axis.hashCode());
+    result = prime * result
+        + ((this.m_propertyChangeSupport == null) ? 0 : this.m_propertyChangeSupport.hashCode());
+    return result;
   }
 
   /**

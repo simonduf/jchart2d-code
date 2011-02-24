@@ -1,7 +1,7 @@
 /*
  *  AxisLog10.java of project jchart2d, Axis implementation with log  base 10 
  *  display.
- *  Copyright (c) 2007 - 2010 Achim Westermann, created on 20:33:13.
+ *  Copyright (c) 2007 - 2011 Achim Westermann, created on 20:33:13.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -47,7 +47,7 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.15 $
  */
 public class AxisLog10 extends AAxisTransformation {
 
@@ -106,6 +106,9 @@ public class AxisLog10 extends AAxisTransformation {
     if (toTransform < 1) {
       // allow to transform the input for empty traces or all traces with empty
       // points:
+      if(this.m_accessor == null ) {
+        throw new IllegalStateException("Connect this axis ("+this.getAxisTitle().getTitle()+") to a chart first before doing this operation.");
+      }
       Iterator<ITrace2D> itTraces = this.m_accessor.getChart().getTraces().iterator();
       if (!itTraces.hasNext()) {
         toTransform = 1.0;

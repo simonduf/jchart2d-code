@@ -1,16 +1,28 @@
 /*
  * AnnotationPanel.java, a moveable panel containing annotations. Copyright (C) Achim Westermann.
  * 
- * This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
+ *  Copyright (C) 2002 - 2011, Achim Westermann, created on 13.02.2009
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
  * 
- * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- * 
- * If you modify or optimize the code in a useful way please let me know. Achim.Westermann@gmx.de
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ *  If you modify or optimize the code in a useful way please let me know.
+ *  Achim.Westermann@gmx.de
+ *
+ *
+ * File   : $Source: /cvsroot/jchart2d/jchart2d/src/info/monitorenter/gui/chart/annotations/bubble/AnnotationBubble.java,v $
+ * Date   : $Date: 2011/01/14 08:36:11 $
+ * Version: $Revision: 1.9 $
  */
 
 package info.monitorenter.gui.chart.annotations.bubble;
@@ -20,7 +32,6 @@ import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.util.UIUtil;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;

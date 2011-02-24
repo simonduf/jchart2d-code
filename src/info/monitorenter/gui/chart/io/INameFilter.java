@@ -1,7 +1,7 @@
 /*
  *
  *  INameFilter.java  of project jchart2d, a filter working with URLs instead of just Files. 
- *  Copyright (C) 2004 - 2010 Achim Westermann, created on 03.07.2004, 22:18:53
+ *  Copyright (C) 2004 - 2011 Achim Westermann, created on 03.07.2004, 22:18:53
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -37,7 +37,7 @@ package info.monitorenter.gui.chart.io;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  *
  */
 public interface INameFilter {

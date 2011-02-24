@@ -1,7 +1,7 @@
 /*
  *  MultipleAxesStaticChart.java of project jchart2d, a demonstration 
  *  of the minimal code to set up a chart with static data. 
- *  Copyright (C) 2007 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -49,7 +49,7 @@ import javax.swing.JPanel;
  * <p>
  * 
  * @author Achim Westermann
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.15 $
  */
 public final class MultiAxesStaticChart extends JPanel {
 
@@ -100,39 +100,16 @@ public final class MultiAxesStaticChart extends JPanel {
     apples.setColor(Color.RED);
     apples.setName("Apples");
 
-    // Add all points, as it is static:
-    double time = System.currentTimeMillis();
-    for (int i = 0; i < 120; i++) {
-      apples.addPoint(pointCreator.createTracePoint(time + i * 10000, (10.0 + Math.random()) * i));
-    }
 
     // Create pears trace:
     ITrace2D pears = new Trace2DSimple();
     pears.setColor(Color.BLUE);
     pears.setName("Pears");
-    // Add all points, as it is static:
-    ITracePoint2D copyPoint;
-    Iterator<ITracePoint2D> it = apples.iterator();
-    int i = 0;
-    while (it.hasNext()) {
-      copyPoint = it.next();
-      pears.addPoint(pointCreator.createTracePoint(i * 0.001, copyPoint.getY()
-          + (Math.random() * 1000)));
-      i++;
-    }
 
     // Create carrots trace:
     ITrace2D carrots = new Trace2DSimple();
     carrots.setColor(Color.MAGENTA);
     carrots.setName("Carrots");
-    // Add all points, as it is static:
-    it = apples.iterator();
-    i = 0;
-    while (it.hasNext()) {
-      copyPoint = it.next();
-      carrots.addPoint(pointCreator.createTracePoint(i * 100, 100 - copyPoint.getY()));
-      i++;
-    }
 
     // Use three y axes:
     AAxis yAxisApples = new AxisLinear();
@@ -175,6 +152,36 @@ public final class MultiAxesStaticChart extends JPanel {
     chart.addTrace(apples, xAxisApples, yAxisApples);
     chart.addTrace(pears, xAxisPears, yAxisPears);
     chart.addTrace(carrots, xAxisCarrots, yAxisCarrots);
+    
+    
+    // Only the trace is assigned to the chart points may be added! 
+    // Add all points, as it is static:
+    double time = System.currentTimeMillis();
+    int i;
+    for (i = 0; i < 120; i++) {
+      apples.addPoint(pointCreator.createTracePoint(time + i * 10000, (10.0 + Math.random()) * i));
+    }
+    // add pears:
+    ITracePoint2D copyPoint;
+    Iterator<ITracePoint2D> it = apples.iterator();
+    i = 0;
+    while (it.hasNext()) {
+      copyPoint = it.next();
+      pears.addPoint(pointCreator.createTracePoint(i * 0.001, copyPoint.getY()
+          + (Math.random() * 1000)));
+      i++;
+    }
+    // add carrots:
+    it = apples.iterator();
+    i = 0;
+    while (it.hasNext()) {
+      copyPoint = it.next();
+      carrots.addPoint(pointCreator.createTracePoint(i * 100, 100 - copyPoint.getY()));
+      i++;
+    }
+
+
+
 
     // Make it visible:
     this.add(new ChartPanel(chart), BorderLayout.CENTER);
