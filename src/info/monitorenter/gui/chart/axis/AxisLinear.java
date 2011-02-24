@@ -31,9 +31,7 @@ import info.monitorenter.util.Range;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * 
- * 
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.16 $
  */
 public class AxisLinear
     extends AAxis {
@@ -54,8 +52,7 @@ public class AxisLinear
    * <p>
    * 
    * @param formatter
-   *          needed for formatting labels of this axis.
-   * 
+   *            needed for formatting labels of this axis.
    */
   public AxisLinear(final IAxisLabelFormatter formatter) {
     super(formatter);
@@ -66,13 +63,15 @@ public class AxisLinear
    *      int)
    */
   protected AChart2DDataAccessor createAccessor(final Chart2D chart, final int dimension) {
+    AChart2DDataAccessor result;
     if (dimension == Chart2D.X) {
-      return new AAxis.XDataAccessor(chart);
+      result = new AAxis.XDataAccessor(chart);
     } else if (dimension == Chart2D.Y) {
-      return new AAxis.YDataAccessor(chart);
+      result = new AAxis.YDataAccessor(chart);
     } else {
       throw new IllegalArgumentException("Dimension has to be Chart2D.X or Chart2D.Y!");
     }
+    return result;
 
   }
 

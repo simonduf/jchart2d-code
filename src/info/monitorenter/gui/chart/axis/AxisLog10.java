@@ -47,7 +47,7 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class AxisLog10
     extends AAxisTransformation {
@@ -124,7 +124,7 @@ public class AxisLog10
       }
     }
     // TODO: change this to Math.log10 as soon as java 1.5 is used:
-    double result = Math.log(toTransform) / Math.log(10);
+    double result = Math.log10(toTransform) / Math.log(10);
     if (Double.isInfinite(result)) {
       result = Double.MAX_VALUE;
     }

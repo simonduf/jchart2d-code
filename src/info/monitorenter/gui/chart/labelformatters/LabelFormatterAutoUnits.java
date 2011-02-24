@@ -46,11 +46,14 @@ import java.util.Map;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  * 
  */
 public class LabelFormatterAutoUnits
     extends ALabelFormatter {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -7812902015853326946L;
 
   /**
    * Performance improvement: Maps the units to use to the powers of 10 of their

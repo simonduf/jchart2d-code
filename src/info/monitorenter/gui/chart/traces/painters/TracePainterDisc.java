@@ -33,10 +33,11 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.8 $
  * 
  */
-public class TracePainterDisc extends ATracePainter {
+public class TracePainterDisc
+    extends ATracePainter {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 8919406018882664083L;
@@ -44,7 +45,7 @@ public class TracePainterDisc extends ATracePainter {
   /** The implementation for rendering the point as a disc. */
   private PointPainterDisc m_pointPainter;
 
-  /**
+  /** 
    * Creates an instance with a default disc size of 4.
    * <p>
    */
@@ -56,7 +57,7 @@ public class TracePainterDisc extends ATracePainter {
    * Creates an instance with the given disc size.
    * 
    * @param discSize
-   *          the disc size in pixel to use.
+   *            the disc size in pixel to use.
    */
   public TracePainterDisc(final int discSize) {
     this.m_pointPainter = new PointPainterDisc(discSize);
@@ -83,7 +84,9 @@ public class TracePainterDisc extends ATracePainter {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int, int, java.awt.Graphics2D, info.monitorenter.gui.chart.TracePoint2D)
+   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int,
+   *      int, int, int, java.awt.Graphics2D,
+   *      info.monitorenter.gui.chart.TracePoint2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
       final int nextY, final Graphics2D g, final TracePoint2D original) {
@@ -96,7 +99,7 @@ public class TracePainterDisc extends ATracePainter {
    * <p>
    * 
    * @param discSize
-   *          the diameter of the discs to paint in pixel.
+   *            the diameter of the discs to paint in pixel.
    */
   public void setDiscSize(final int discSize) {
     this.m_pointPainter.setDiscSize(discSize);

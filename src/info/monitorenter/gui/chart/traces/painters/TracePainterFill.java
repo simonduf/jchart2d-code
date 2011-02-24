@@ -22,40 +22,35 @@
 package info.monitorenter.gui.chart.traces.painters;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.TracePoint2D;
 
 import java.awt.Graphics2D;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
- * A trace painter that fills the area between trace to render and the x axis
- * baseline with it's color.
+ * A trace painter that fills the area between trace to render and the x axis baseline with it's
+ * color.
  * <p>
- * 
- * Additionally it increases performance by summing up all points to render for
- * a paint iteration (submitted by {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)} 
- * between {@link #startPaintIteration(Graphics2D)} and 
- * {@link #endPaintIteration(Graphics2D)}) and only invoking only one polygon paint for a
- * paint call of the corresponding {@link info.monitorenter.gui.chart.Chart2D}.
+ * Additionally it increases performance by summing up all points to render for a paint iteration
+ * (submitted by {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)} between
+ * {@link #startPaintIteration(Graphics2D,ITrace2D)} and {@link #endPaintIteration(Graphics2D)}) and only
+ * invoking only one polygon paint for a paint call of the corresponding
+ * {@link info.monitorenter.gui.chart.Chart2D}.
  * <p>
- * 
- * 
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
- * @version $Revision: 1.6 $
- * 
+ * @version $Revision: 1.8 $
  */
-public class TracePainterFill extends ATracePainter {
+public class TracePainterFill
+    extends ATracePainter {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -7194158082574997539L;
 
   /**
-   * Stores the corresponding chart to know the coordinate roots for closing the
-   * polygon to fill.
+   * Stores the corresponding chart to know the coordinate roots for closing the polygon to fill.
    */
   private Chart2D m_chart;
 
@@ -70,18 +65,19 @@ public class TracePainterFill extends ATracePainter {
    * <p>
    * 
    * @param chart
-   *          needed to get the start pixel coordinates of traces.
+   *            needed to get the start pixel coordinates of traces.
    */
   public TracePainterFill(final Chart2D chart) {
     this.m_chart = chart;
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#discontinue(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#discontinue(java.awt.Graphics2D,
+   *      info.monitorenter.gui.chart.ITrace2D)
    */
-  public void discontinue(final Graphics2D g2d) {
+  public void discontinue(final Graphics2D g2d, final ITrace2D trace) {
     this.endPaintIteration(g2d);
-    this.startPaintIteration(g2d);
+    this.startPaintIteration(g2d, trace);
   }
 
   /**
@@ -123,7 +119,8 @@ public class TracePainterFill extends ATracePainter {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int, int, java.awt.Graphics2D, info.monitorenter.gui.chart.TracePoint2D)
+   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int, int, int, int,
+   *      java.awt.Graphics2D, info.monitorenter.gui.chart.TracePoint2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
       final int nextY, final Graphics2D g, final TracePoint2D original) {
@@ -134,10 +131,11 @@ public class TracePainterFill extends ATracePainter {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#startPaintIteration(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#startPaintIteration(java.awt.Graphics2D,
+   *      info.monitorenter.gui.chart.ITrace2D)
    */
-  public void startPaintIteration(final Graphics2D g2d) {
-    this.m_xPoints = new LinkedList();
-    this.m_yPoints = new LinkedList();
+  public void startPaintIteration(final Graphics2D g2d, final ITrace2D trace) {
+    this.m_xPoints.clear();
+    this.m_yPoints.clear();
   }
 }

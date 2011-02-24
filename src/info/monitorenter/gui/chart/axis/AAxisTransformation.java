@@ -28,48 +28,79 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.util.MathUtil;
 import info.monitorenter.util.Range;
 
 import java.awt.event.MouseEvent;
 import java.util.Iterator;
 
 /**
- * Base class for Axis implementations that transform the scale for changed
- * display.
+ * Base class for Axis implementations that transform the scale for changed display.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * 
- * 
- * @version $Revision: 1.20 $
+ * @version $Revision: 1.23 $
  */
 public abstract class AAxisTransformation
     extends AAxis {
 
   /**
-   * 
    * An accessor for the x axis of a chart.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de>Achim Westermann </a>
-   * 
    * @see Chart2D#getAxisX()
    */
   public final class XDataAccessor
       extends AAxis.XDataAccessor {
 
+    /** Generated <code>serialVersionUID</code>. */
+    private static final long serialVersionUID = 8775312615991487847L;
     /**
      * Creates an instance that accesses the given chart's x axis.
      * <p>
      * 
      * @param chart
-     *          the chart to access.
+     *            the chart to access.
      */
     public XDataAccessor(final Chart2D chart) {
 
       super(chart);
     }
-
+    /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.XDataAccessor#translateValueToPx(double)
+     */
+    public final int translateValueToPx(final double value) {
+      /*
+       * Note: This code (the math) is the combination of the scaleTrace code
+       * above for normalization plus the deflate-into-pixelspace code in
+       * Chart2D.paint.
+       */
+      int result;
+      double normalizedValue;
+      Range range = AAxisTransformation.this.getRange();
+      double scaler = range.getExtent();
+      double absolute = value;
+      try {
+        normalizedValue = (AAxisTransformation.this.transform(absolute) - range.getMin());
+        normalizedValue = normalizedValue / scaler;
+        if (!MathUtil.isDouble(normalizedValue)) {
+          normalizedValue = 0;
+        }
+      } catch (IllegalArgumentException e) {
+        long tstamp = System.currentTimeMillis();
+        if (tstamp - AAxisTransformation.this.m_outputErrorTstamp > AAxisTransformation.OUTPUT_ERROR_THRESHHOLD) {
+          System.out.println(e.getLocalizedMessage());
+          AAxisTransformation.this.m_outputErrorTstamp = tstamp;
+        }
+        normalizedValue = 0;
+      }
+      // Now the value is normalized:
+      Chart2D chart = this.getChart();
+      int pixelRange = this.getPixelRange();
+      result = (int) Math.round(chart.getXChartStart() + normalizedValue * pixelRange);
+      return result;
+    }
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.XDataAccessor#scaleTrace(info.monitorenter.gui.chart.ITrace2D,
      *      info.monitorenter.util.Range)
@@ -85,7 +116,7 @@ public abstract class AAxisTransformation
           point = (TracePoint2D) itPoints.next();
           double absolute = point.getX();
           try {
-            result = (transform(absolute) - range.getMin());
+            result = (AAxisTransformation.this.transform(absolute) - range.getMin());
             result = result / scaler;
             if (Double.isNaN(result) || Double.isInfinite(result)) {
               result = 0;
@@ -110,19 +141,57 @@ public abstract class AAxisTransformation
    * <p>
    * 
    * @see AAxis#setAccessor(info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor)
-   * 
    * @see Chart2D#getAxisY()
    */
 
   public final class YDataAccessor
       extends AAxis.YDataAccessor {
+    
+    /** Generated <code>serialVersionUID</code>. */
+    private static final long serialVersionUID = 5679356132414970926L;
 
+    /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateValueToPx(double)
+     */
+    public final int translateValueToPx(final double value) {
+      /*
+       * Note: This code (the math) is the combination of the scaleTrace code
+       * above for normalization plus the deflate-into-pixelspace code in
+       * Chart2D.paint.
+       */
+      int result = 0;
+      Range range = AAxisTransformation.this.getRange();
+      double scaler = range.getExtent();
+      double normalizedValue;
+      double absolute = value;
+      try {
+        // range.getMin() is based upon the transformed minimum (see getMin() of
+        // outer class)!
+        normalizedValue = (AAxisTransformation.this.transform(absolute) - range.getMin());
+        normalizedValue = normalizedValue / scaler;
+        if (!MathUtil.isDouble(normalizedValue)) {
+          normalizedValue = 0;
+        }
+      } catch (IllegalArgumentException e) {
+        long tstamp = System.currentTimeMillis();
+        if (tstamp - AAxisTransformation.this.m_outputErrorTstamp > AAxisTransformation.OUTPUT_ERROR_THRESHHOLD) {
+          System.out.println(e.getLocalizedMessage());
+          AAxisTransformation.this.m_outputErrorTstamp = tstamp;
+        }
+        normalizedValue = 0;
+      }
+      // Now the value is normalized:
+      Chart2D chart = this.getChart();
+      int pixelRange = this.getPixelRange();
+      result = (int) Math.round(chart.getYChartStart() - normalizedValue * pixelRange);
+      return result;
+    }
     /**
      * Creates an instance that accesses the y axis of the given chart.
      * <p>
      * 
      * @param chart
-     *          the chart to access.
+     *            the chart to access.
      */
     public YDataAccessor(final Chart2D chart) {
       super(chart);
@@ -142,7 +211,7 @@ public abstract class AAxisTransformation
           point = (TracePoint2D) itPoints.next();
           double absolute = point.getY();
           try {
-            result = (transform(absolute) - range.getMin());
+            result = (AAxisTransformation.this.transform(absolute) - range.getMin());
             result = result / scaler;
             if (Double.isNaN(result) || Double.isInfinite(result)) {
               result = 0;
@@ -162,10 +231,9 @@ public abstract class AAxisTransformation
   }
 
   /**
-   * Internal flag that defines that only every n milliseconds a transformation
-   * error (untransformable value was used in chart: this axis implementation of
-   * axis is not recommended for the data used) should be reported on system
-   * output.
+   * Internal flag that defines that only every n milliseconds a transformation error
+   * (untransformable value was used in chart: this axis implementation of axis is not recommended
+   * for the data used) should be reported on system output.
    */
   private static final int OUTPUT_ERROR_THRESHHOLD = 30000;
 
@@ -176,23 +244,20 @@ public abstract class AAxisTransformation
 
   /**
    * Creates a default instance that will use a
-   * {@link info.monitorenter.gui.chart.labelformatters.LabelFormatterAutoUnits}
-   * for formatting labels.
+   * {@link info.monitorenter.gui.chart.labelformatters.LabelFormatterAutoUnits} for formatting
+   * labels.
    * <p>
-   * 
    */
   public AAxisTransformation() {
     super();
   }
 
   /**
-   * Creates an instance that will the given label formatter for formatting
-   * labels.
+   * Creates an instance that will the given label formatter for formatting labels.
    * <p>
    * 
    * @param formatter
-   *          needed for formatting labels of this axis.
-   * 
+   *            needed for formatting labels of this axis.
    */
   public AAxisTransformation(final IAxisLabelFormatter formatter) {
     super(formatter);
@@ -203,13 +268,15 @@ public abstract class AAxisTransformation
    *      int)
    */
   protected AAxis.AChart2DDataAccessor createAccessor(final Chart2D chart, final int dimension) {
+    AAxis.AChart2DDataAccessor result;
     if (dimension == Chart2D.X) {
-      return new AAxisTransformation.XDataAccessor(chart);
+      result = new AAxisTransformation.XDataAccessor(chart);
     } else if (dimension == Chart2D.Y) {
-      return new AAxisTransformation.YDataAccessor(chart);
+      result = new AAxisTransformation.YDataAccessor(chart);
     } else {
       throw new IllegalArgumentException("Dimension has to be Chart2D.X or Chart2D.Y!");
     }
+    return result;
 
   }
 
@@ -241,14 +308,13 @@ public abstract class AAxisTransformation
 
   /**
    * @deprecated replaced by {@link #scaleTrace(ITrace2D)}
-   * 
    * @see info.monitorenter.gui.chart.IAxis#getScaledValue(double)
    */
   public final double getScaledValue(final double absolute) {
     double result;
     Range range = this.getRange();
     try {
-      result = (transform(absolute) - range.getMin());
+      result = (AAxisTransformation.this.transform(absolute) - range.getMin());
       double scaler = range.getExtent();
       result = result / scaler;
       if (Double.isNaN(result) || Double.isInfinite(result)) {
@@ -268,21 +334,16 @@ public abstract class AAxisTransformation
   /**
    * Template method for performing the axis transformation.
    * <p>
-   * 
-   * The argument should not be negative, so only normalized values (no chart
-   * values but their scaled values or pixel values) should be given here.
+   * The argument should not be negative, so only normalized values (no chart values but their
+   * scaled values or pixel values) should be given here.
    * <p>
    * 
-   * 
    * @param in
-   *          the value to transform.
-   * 
+   *            the value to transform.
    * @return the transformed value.
-   * 
    * @throws IllegalArgumentException
-   *           if scaling is impossible (due to some mathematical transformation
-   *           in implementations like
-   *           {@link info.monitorenter.gui.chart.axis.AxisLog10}
+   *             if scaling is impossible (due to some mathematical transformation in
+   *             implementations like {@link info.monitorenter.gui.chart.axis.AxisLog10}
    */
   protected abstract double transform(final double in) throws IllegalArgumentException;
 
@@ -302,22 +363,13 @@ public abstract class AAxisTransformation
   }
 
   /**
-   * @see info.monitorenter.gui.chart.axis.AAxis#translateValueToPx(double)
-   */
-  public int translateValueToPx(final double value) {
-    return (int) this.transform(this.m_accessor.translateValueToPx(value));
-  }
-
-  /**
    * Template method for performing the reverse axis transformation.
    * <p>
    * This is the counterpart to {@link #transform(double)}.
    * <p>
    * 
-   * 
    * @param in
-   *          the transformed value.
-   * 
+   *            the transformed value.
    * @return the normal value;
    */
   protected abstract double untransform(final double in);

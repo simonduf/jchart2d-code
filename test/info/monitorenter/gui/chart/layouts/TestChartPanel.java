@@ -40,34 +40,30 @@ import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * 
- * TestChartPanelMemoryLeak.java of project jchart2d, a test for a memory leak
- * detected by Pieter-Jan Busschaert.
+ * TestChartPanelMemoryLeak.java of project jchart2d, a test for a memory leak detected by
+ * Pieter-Jan Busschaert.
  * <p>
  * 
  * @author Pieter-Jan Busschaert
  * @author Holger Brandl
- * 
- * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class TestChartPanel
     extends TestCase {
   /**
-   * Main debug / profiler entry, do not drop - it's used from build xml to
-   * profile.
+   * Main debug / profiler entry, do not drop - it's used from build xml to profile.
    * <p>
    * 
    * @param args
-   *          ignored.
-   * 
+   *            ignored.
    * @throws Exception
-   *           if sth. goes wrong.
+   *             if sth. goes wrong.
    */
   public static void main(final String[] args) throws Exception {
     TestChartPanel test = new TestChartPanel(TestChartPanel.class.getName());
@@ -99,22 +95,19 @@ public class TestChartPanel
    * <p>
    * 
    * @param testName
-   *          the test name.
+   *            the test name.
    */
   public TestChartPanel(final String testName) {
     super(testName);
   }
 
   /**
-   * Creates a <code>{@link ChartPanel}</code> with a
-   * <code>{@link Chart2D}</code> that has many traces and shows it for some
-   * seconds.
+   * Creates a <code>{@link ChartPanel}</code> with a <code>{@link Chart2D}</code> that has many
+   * traces and shows it for some seconds.
    * <p>
-   * Warning: For now this is only a visual test, especially for seeing if the
-   * space for the labels works correctly. This test will never fail if sth. is
-   * wrong. So watch it!
+   * Warning: For now this is only a visual test, especially for seeing if the space for the labels
+   * works correctly. This test will never fail if sth. is wrong. So watch it!
    * <p>
-   * 
    */
   public void testManyTraces() {
     Chart2D chart = new Chart2D();
@@ -137,7 +130,7 @@ public class TestChartPanel
     JFrame frame = new JFrame();
     frame.getContentPane().add(p);
 
-//    frame.validate();
+    // frame.validate();
     frame.setSize(new Dimension(400, 400));
     frame.setVisible(true);
     try {
@@ -151,10 +144,9 @@ public class TestChartPanel
   }
 
   /**
-   * Tests a memory leak that was found in jchart2d-1.1.0 and was related to
-   * adding and removing traces with charts wrapped in a {@link ChartPanel}.
+   * Tests a memory leak that was found in jchart2d-1.1.0 and was related to adding and removing
+   * traces with charts wrapped in a {@link ChartPanel}.
    * <p>
-   * 
    */
   public void testMemoryLeak() {
     Chart2D chart = new Chart2D();
@@ -188,7 +180,7 @@ public class TestChartPanel
     int after = propertyChangeListeners.length;
     System.out.println("After chart.setBackground(Color):");
     System.out.println("chart.propertyChangeListeners().length: " + propertyChangeListeners.length);
-    assertTrue(after < before);
+    Assert.assertTrue(after < before);
 
     // reporting / analysis
     Map classes2count = new HashMap();
@@ -234,11 +226,9 @@ public class TestChartPanel
   }
 
   /**
-   * Creates a <code>{@link ChartPanel}</code> with a
-   * <code>{@link Chart2D}</code> that has no traces and shows it for some
-   * seconds.
+   * Creates a <code>{@link ChartPanel}</code> with a <code>{@link Chart2D}</code> that has no
+   * traces and shows it for some seconds.
    * <p>
-   * 
    */
   public void testNoTraces() {
     Chart2D chart = new Chart2D();

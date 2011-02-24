@@ -42,11 +42,15 @@ import java.text.NumberFormat;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  * 
  */
 public class LabelFormatterUnit
     extends ALabelFormatter {
+  
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -6180347628045892405L;
+
   /**
    * The decorated instance.
    */

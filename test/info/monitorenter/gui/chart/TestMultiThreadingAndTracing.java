@@ -31,33 +31,31 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.WeakHashMap;
 
+import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
- * Multiple <code>Producers</code> concurrently add points to an amount of
- * randomly shared <code>ITrace2D</code> instances.
+ * Multiple <code>Producers</code> concurrently add points to an amount of randomly shared
+ * <code>ITrace2D</code> instances.
  * <p>
- * One <code>Consumer</code> invokes paint on the <code>Chart2D</code> thus
- * allowing to drop pending changes stored in it.
+ * One <code>Consumer</code> invokes paint on the <code>Chart2D</code> thus allowing to drop
+ * pending changes stored in it.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
  */
 public class TestMultiThreadingAndTracing
     extends TestMultithreading {
 
   /**
-   * Runnable that will take a random break between 0 and
-   * <code>sleepRange</code> milliseconds and then consume added
-   * <code>{@link TracePoint2D}</code> (by <code>{@link Producer}</code>)
-   * by invoking <code>{@link Chart2D#paint(java.awt.Graphics)}</code>.
+   * Runnable that will take a random break between 0 and <code>sleepRange</code> milliseconds and
+   * then consume added <code>{@link TracePoint2D}</code> (by <code>{@link Producer}</code>) by
+   * invoking <code>{@link Chart2D#paint(java.awt.Graphics)}</code>.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
-   * 
-   * @version $Revision: 1.5 $
+   * @version $Revision: 1.6 $
    */
   class Consumer
       extends TestMultithreading.Consumer {
@@ -68,12 +66,12 @@ public class TestMultiThreadingAndTracing
     private boolean m_stop = false;
 
     /**
-     * Creates an instance that will take a random break between 0 and
-     * <code>sleepRange</code> milliseconds between two add operations.
+     * Creates an instance that will take a random break between 0 and <code>sleepRange</code>
+     * milliseconds between two add operations.
      * <p>
      * 
      * @param sleepRange
-     *          the maximum of milliseconds between two add operations.
+     *            the maximum of milliseconds between two add operations.
      */
     Consumer(final long sleepRange) {
       super(sleepRange);
@@ -86,7 +84,7 @@ public class TestMultiThreadingAndTracing
       MockGraphics2D mockGraphics = new MockGraphics2D();
       while (!(this.m_stop || TestMultiThreadingAndTracing.this.isAllProducersFinished())) {
         try {
-          sleep((long) (Math.random() * this.m_sleepRange));
+          Thread.sleep((long) (Math.random() * this.m_sleepRange));
         } catch (InterruptedException e) {
           e.printStackTrace();
           this.m_stop = true;
@@ -101,8 +99,7 @@ public class TestMultiThreadingAndTracing
   /**
    * Producer implementation that sleeps a random range of milliseconds within
    * <code>{@link #PRODUCER_SLEEPRANGE}</code> and then adds a newly created
-   * <code>{@link TracePoint2D}</code> to a random picked
-   * <code>{@link ITrace2D}</code> for
+   * <code>{@link TracePoint2D}</code> to a random picked <code>{@link ITrace2D}</code> for
    * <code>{@link #PRODUCER_ADD_POINT_AMOUNT}</code> times.
    * <p>
    */
@@ -119,15 +116,14 @@ public class TestMultiThreadingAndTracing
 
     /**
      * <p>
-     * Constructs a producer that will add <code>toAdd</code> points with
-     * random breaks of milliseconds between <code>maxSleep</code> and zero.
+     * Constructs a producer that will add <code>toAdd</code> points with random breaks of
+     * milliseconds between <code>maxSleep</code> and zero.
      * </p>
      * 
      * @param toAdd
-     *          the amount of points to add
+     *            the amount of points to add
      * @param sleepRange
-     *          the maxium time in milliseconds the Thread will sleep between
-     *          two points added
+     *            the maxium time in milliseconds the Thread will sleep between two points added
      */
     Producer(final long toAdd, final long sleepRange) {
       super(toAdd, sleepRange);
@@ -141,7 +137,7 @@ public class TestMultiThreadingAndTracing
       ITrace2D tmpTrace;
       while (this.m_toAdd > 0 && !this.m_stop) {
         try {
-          sleep((long) (Math.random() * this.m_sleepRange));
+          Thread.sleep((long) (Math.random() * this.m_sleepRange));
         } catch (InterruptedException e) {
           e.printStackTrace();
           this.m_stop = true;
@@ -194,7 +190,7 @@ public class TestMultiThreadingAndTracing
    * <p>
    * 
    * @param testName
-   *          the name of the test case.
+   *            the name of the test case.
    */
   public TestMultiThreadingAndTracing(final String testName) {
     super(testName);
@@ -237,8 +233,9 @@ public class TestMultiThreadingAndTracing
       System.out.println("Point " + it.next().toString() + " was not dropped.");
     }
     System.out.println("Points remaining in the weakMap: " + keys);
-    assertFalse("There are " + keys + " TracePoint2D instances not deleted from the WeakHashMap.",
-        keys > this.m_trace.getMaxSize());
+    Assert.assertFalse("There are " + keys
+        + " TracePoint2D instances not deleted from the WeakHashMap.", keys > this.m_trace
+        .getMaxSize());
   }
 
   /**
@@ -246,9 +243,8 @@ public class TestMultiThreadingAndTracing
    * <p>
    * 
    * @see info.monitorenter.gui.chart.TestMultithreading#setUp()
-   * 
    * @throws Exception
-   *           if something goes wrong.
+   *             if something goes wrong.
    */
   public void setUp() throws Exception {
     this.m_trace = (ITrace2D) TestMultiThreadingAndTracing.TRACE_CLASS.newInstance();
@@ -267,7 +263,7 @@ public class TestMultiThreadingAndTracing
       this.m_traces.add(tmpTrace);
     }
 
-    assertTrue(this.m_chart.getTraces().size() == 0);
+    Assert.assertTrue(this.m_chart.getTraces().size() == 0);
     // add all traces
     Iterator it = this.m_traces.iterator();
     while (it.hasNext()) {

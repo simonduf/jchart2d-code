@@ -31,44 +31,38 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * A <code>Set</code> that will always successfully add new instances and
- * guarantee that all the "<em>Comparable properties</em>" of the contained
- * <code>{@link info.monitorenter.util.collections.IComparableProperty}</code> instances will
- * build a set (no duplicates).
+ * A <code>Set</code> that will always successfully add new instances and guarantee that all the "<em>Comparable properties</em>"
+ * of the contained <code>{@link info.monitorenter.util.collections.IComparableProperty}</code>
+ * instances will build a set (no duplicates).
  * <p>
- * Although the interface of {@link java.util.Set} is preserved and allows
- * adding any <code>Object</code> <b>only
- * {@link info.monitorenter.util.collections.IComparableProperty} instances may
- * be added to <code>TreeSetGreedy</code> </b> because it uses a proprietary
+ * Although the interface of {@link java.util.Set} is preserved and allows adding any
+ * <code>Object</code> <b>only {@link info.monitorenter.util.collections.IComparableProperty}
+ * instances may be added to <code>TreeSetGreedy</code> </b> because it uses a proprietary
  * {@link java.util.Comparator}.
  * <p>
- * The added <code>IComparableProperty</code> instances with the lowest
- * {@link java.lang.Number} property (see
- * {@link info.monitorenter.util.collections.IComparableProperty#getComparableProperty()})
- * will be returned first from the retrievable <code>Iterator</code>
+ * The added <code>IComparableProperty</code> instances with the lowest {@link java.lang.Number}
+ * property (see
+ * {@link info.monitorenter.util.collections.IComparableProperty#getComparableProperty()}) will be
+ * returned first from the retrievable <code>Iterator</code>
  * <p>
  * <h2>Warning</h2>
- * If the <code>IComparableProperty</code> (thus meaning the member or
- * accessed data) is changed from outside, the internal order of this set will
- * get corrupted and iterations or add/remove calls may fail. Therefore it is
- * necessary to remove the instance before outside modification and later on add
- * it again.
+ * If the <code>IComparableProperty</code> (thus meaning the member or accessed data) is changed
+ * from outside, the internal order of this set will get corrupted and iterations or add/remove
+ * calls may fail. Therefore it is necessary to remove the instance before outside modification and
+ * later on add it again.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
  */
 public class TreeSetGreedy
     extends TreeSet implements Set {
 
   /**
-   * A <code>Comparator</code> that will compare {@link IComparableProperty}
-   * instances by their {@link IComparableProperty#getComparableProperty()}
-   * number.
+   * A <code>Comparator</code> that will compare {@link IComparableProperty} instances by their
+   * {@link IComparableProperty#getComparableProperty()} number.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * 
    */
   private static final class NumberPropertyComparator implements Comparator, Serializable {
 
@@ -84,67 +78,63 @@ public class TreeSetGreedy
     }
 
     /**
-     * Reference to an instance that has to be ordered in the
-     * <code>TreeSetGreedy</code> due to modification.
+     * Reference to an instance that has to be ordered in the <code>TreeSetGreedy</code> due to
+     * modification.
      */
     private IComparableProperty m_resort = null;
 
     /**
-     * Compares two Objects by casting them to {@link IComparableProperty} and
-     * using their {@link  IComparableProperty#getComparableProperty()}
-     * property.
+     * Compares two Objects by casting them to {@link IComparableProperty} and using their
+     * {@link  IComparableProperty#getComparableProperty()} property.
      * <p>
-     * This <code>Comparator</code> may only be used in {@link java.util.Set}
-     * instances that only contain <code>IComparableProperty</code> instances.
+     * This <code>Comparator</code> may only be used in {@link java.util.Set} instances that only
+     * contain <code>IComparableProperty</code> instances.
      * <p>
-     * For two instances that are judged equal (equal z-index) the first
-     * argument is decided to stay, the second instance gets assigned a higher
-     * {@link IComparableProperty#setComparableProperty(Number)} by one, then is
-     * removed from the <code>Set</code> it is working for and added anew thus
-     * getting the next index order.
+     * For two instances that are judged equal (equal z-index) the first argument is decided to
+     * stay, the second instance gets assigned a higher
+     * {@link IComparableProperty#setComparableProperty(Number)} by one, then is removed from the
+     * <code>Set</code> it is working for and added anew thus getting the next index order.
      * <p>
-     * This procedure is expensive (performs <em>O(n!)</em>) but easy to
-     * implement and guarantees that every <code>IComparableProperty</code>
-     * instance is added (never returns 0), all instances have a different
-     * values and the newest added instances definetely get their chosen value.
+     * This procedure is expensive (performs <em>O(n!)</em>) but easy to implement and guarantees
+     * that every <code>IComparableProperty</code> instance is added (never returns 0), all
+     * instances have a different values and the newest added instances definetely get their chosen
+     * value.
      * <p>
      * 
      * @param o1
-     *          the first instance for comparison.
-     * 
+     *            the first instance for comparison.
      * @param o2
-     *          the second instance for comparison.
-     * 
+     *            the second instance for comparison.
      * @throws ClassCastException
-     *           if one of the given arguments does not implement
-     *           {@link IComparableProperty}
-     * 
+     *             if one of the given arguments does not implement {@link IComparableProperty}
      * @return -1 if o1 is first, 0, if both are equal and +1 if o1 comes last.
-     * 
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
     public int compare(final Object o1, final Object o2) throws ClassCastException {
+      int result;
       // Don't take real identical elements (set policy)
       if (o1 == o2) {
-        return 0;
-      }
-      IComparableProperty prop1 = (IComparableProperty) o1;
-      IComparableProperty prop2 = (IComparableProperty) o2;
-      double i1 = prop1.getComparableProperty().doubleValue();
-      double i2 = prop2.getComparableProperty().doubleValue();
-
-      // fake and take equal elements.
-      if (i1 < i2) {
-        return -1;
-      } else if (i1 == i2) {
-        // here, we lie
-        // but increase the other
-        prop2.setComparableProperty(createIncreasedNumber(prop2.getComparableProperty()));
-        this.m_resort = prop2;
-        return 1;
+        result = 0;
       } else {
-        return 1;
+        IComparableProperty prop1 = (IComparableProperty) o1;
+        IComparableProperty prop2 = (IComparableProperty) o2;
+        double i1 = prop1.getComparableProperty().doubleValue();
+        double i2 = prop2.getComparableProperty().doubleValue();
+
+        // fake and take equal elements.
+        if (i1 < i2) {
+          result = -1;
+        } else if (i1 == i2) {
+          // here, we lie
+          // but increase the other
+          prop2.setComparableProperty(this.createIncreasedNumber(prop2.getComparableProperty()));
+          this.m_resort = prop2;
+          result = 1;
+        } else {
+          result = 1;
+        }
       }
+      return result;
 
     }
 
@@ -153,34 +143,35 @@ public class TreeSetGreedy
      * <p>
      * 
      * @param n
-     *          the number to increase.
-     * 
+     *            the number to increase.
      * @return a new number of the correct type increased by 1.
      */
     private Number createIncreasedNumber(final Number n) {
+      Number result;
       Class c = n.getClass();
       if (c == Integer.class) {
-        return new Integer(n.intValue() - 1);
+        result = new Integer(n.intValue() - 1);
       } else if (c == Double.class) {
-        return new Double(n.doubleValue() + 1);
+        result = new Double(n.doubleValue() + 1);
       } else if (c == Float.class) {
-        return new Float(n.floatValue() + 1);
+        result = new Float(n.floatValue() + 1);
       } else if (c == Short.class) {
-        return new Short((short) (n.shortValue() + 1));
+        result = new Short((short) (n.shortValue() + 1));
       } else if (c == Byte.class) {
-        return new Byte((byte) (n.byteValue() + 1));
+        result = new Byte((byte) (n.byteValue() + 1));
       } else if (c == Long.class) {
-        return new Long(n.longValue() + 1);
+        result = new Long(n.longValue() + 1);
       } else if (c == BigDecimal.class) {
         BigDecimal bd = new BigDecimal(n.toString());
         bd = bd.add(new BigDecimal(1));
-        return bd;
+        result = bd;
       } else {
         BigInteger bi = new BigInteger(n.toString());
         bi = bi.add(new BigInteger("1"));
-        return bi;
+        result = bi;
 
       }
+      return result;
     }
   }
 
@@ -193,8 +184,8 @@ public class TreeSetGreedy
   private NumberPropertyComparator m_comparator;
 
   /**
-   * Creates an instance with an internal <code>Comparator</code> to fulfill
-   * the contract of this class.
+   * Creates an instance with an internal <code>Comparator</code> to fulfill the contract of this
+   * class.
    */
   public TreeSetGreedy() {
     super(new NumberPropertyComparator());
@@ -215,8 +206,7 @@ public class TreeSetGreedy
    * <p>
    * 
    * @param o
-   *          the instance to add.
-   * 
+   *            the instance to add.
    * @return true if the instance was added.
    */
   private boolean addInternal(final Object o) {
@@ -237,13 +227,12 @@ public class TreeSetGreedy
   }
 
   /**
-   * Modifies the values of the comparable properties of the contained elements
-   * to have a continuous order of increasing integer values.
+   * Modifies the values of the comparable properties of the contained elements to have a continuous
+   * order of increasing integer values.
    * <p>
-   * As the real value of the comparable property is unimportant for this set
-   * but only the relation of the values (order) is of interest this method may
-   * change all values to use only the minimum integer range for expressing the
-   * order.
+   * As the real value of the comparable property is unimportant for this set but only the relation
+   * of the values (order) is of interest this method may change all values to use only the minimum
+   * integer range for expressing the order.
    * <p>
    * An example of the procedure:
    * 
@@ -254,12 +243,10 @@ public class TreeSetGreedy
    * <p>
    * This method allows to avoid exceeding bounds (e.g. between {
    * {@link info.monitorenter.gui.chart.ITrace2D#Z_INDEX_MIN} and
-   * {@link info.monitorenter.gui.chart.ITrace2D#ZINDEX_MAX}) and allows that
-   * changes of the comparable properties always have an effect. If in the
-   * example above the 2nd instance would increase it's property by one from 10
-   * to 11 nothing would happen to the order.
+   * {@link info.monitorenter.gui.chart.ITrace2D#ZINDEX_MAX}) and allows that changes of the
+   * comparable properties always have an effect. If in the example above the 2nd instance would
+   * increase it's property by one from 10 to 11 nothing would happen to the order.
    * <p>
-   * 
    */
   private void packComparableProperties() {
     Iterator it = this.iterator();

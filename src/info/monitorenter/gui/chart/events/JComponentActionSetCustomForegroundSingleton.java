@@ -36,18 +36,15 @@ import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 
 /**
- * Singleton <code>Action</code> that sets a custom foreground color of the
- * corresponding <code>JComponent</code> by showing a modal color chooser.
+ * Singleton <code>Action</code> that sets a custom foreground color of the corresponding
+ * <code>JComponent</code> by showing a modal color chooser.
  * <p>
  * Only one instance per target component may exist.
  * <p>
  * 
  * @see info.monitorenter.gui.chart.events.JComponentActionSetCustomForeground
- * 
- * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public final class JComponentActionSetCustomForegroundSingleton
     extends AJComponentAction {
@@ -58,24 +55,21 @@ public final class JComponentActionSetCustomForegroundSingleton
   private static final long serialVersionUID = 3904680491952451890L;
 
   /**
-   * Reference to the last custom color chosen to check wether the corresponding
-   * menu is selected.
+   * Reference to the last custom color chosen to check wether the corresponding menu is selected.
    */
   private Color m_lastChosenColor;
 
   /**
-   * Create an <code>Action</code> that accesses the trace and identifies
-   * itself with the given action String.
+   * Create an <code>Action</code> that accesses the trace and identifies itself with the given
+   * action String.
    * <p>
    * 
    * @param component
-   *          the target the action will work on.
-   * 
+   *            the target the action will work on.
    * @param description
-   *          the descriptive <code>String</code> that will be displayed by
-   *          {@link javax.swing.AbstractButton} subclasses that get this
-   *          <code>Action</code> assigned (
-   *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   *            the descriptive <code>String</code> that will be displayed by
+   *            {@link javax.swing.AbstractButton} subclasses that get this <code>Action</code>
+   *            assigned ( {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    */
   private JComponentActionSetCustomForegroundSingleton(final JComponent component,
       final String description) {
@@ -94,31 +88,25 @@ public final class JComponentActionSetCustomForegroundSingleton
   }
 
   /**
-   * Returns the single instance for the given component, potentially creating
-   * it.
+   * Returns the single instance for the given component, potentially creating it.
    * <p>
-   * 
-   * If an instance for the given component had been created the description
-   * String is ignored.
+   * If an instance for the given component had been created the description String is ignored.
    * <p>
    * 
    * @param component
-   *          the component to get the instance for (works as key).
-   * 
+   *            the component to get the instance for (works as key).
    * @param description
-   *          the description to use (ignored if instance for component has been
-   *          created before).
-   * 
+   *            the description to use (ignored if instance for component has been created before).
    * @return the single instance for the given component.
    */
   public static JComponentActionSetCustomForegroundSingleton getInstance(
       final JComponent component, final String description) {
-    JComponentActionSetCustomForegroundSingleton result = 
-      (JComponentActionSetCustomForegroundSingleton) JComponentActionSetCustomForegroundSingleton.instances
-        .get(key(component));
+    JComponentActionSetCustomForegroundSingleton result = (JComponentActionSetCustomForegroundSingleton) JComponentActionSetCustomForegroundSingleton.instances
+        .get(JComponentActionSetCustomForegroundSingleton.key(component));
     if (result == null) {
       result = new JComponentActionSetCustomForegroundSingleton(component, description);
-      JComponentActionSetCustomForegroundSingleton.instances.put(key(component), result);
+      JComponentActionSetCustomForegroundSingleton.instances.put(
+          JComponentActionSetCustomForegroundSingleton.key(component), result);
     }
     return result;
   }

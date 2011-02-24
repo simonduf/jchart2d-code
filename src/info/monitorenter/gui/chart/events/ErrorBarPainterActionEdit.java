@@ -35,9 +35,7 @@ import java.awt.event.ActionEvent;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * 
- * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class ErrorBarPainterActionEdit
     extends AErrorBarPainterAction {
@@ -46,20 +44,17 @@ public class ErrorBarPainterActionEdit
   private static final long serialVersionUID = 3337393664927952024L;
 
   /**
-   * Create an instance that accesses the error bar painter with a modal dialog
-   * to edit it and identifies itself with the given action String.
+   * Create an instance that accesses the error bar painter with a modal dialog to edit it and
+   * identifies itself with the given action String.
    * 
    * @param errorBarPainter
-   *          the target the action will work on.
-   * 
+   *            the target the action will work on.
    * @param description
-   *          the descriptive <code>String</code> that will be displayed by
-   *          {@link javax.swing.AbstractButton} subclasses that get this
-   *          <code>Action</code> assigned (
-   *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
-   * 
+   *            the descriptive <code>String</code> that will be displayed by
+   *            {@link javax.swing.AbstractButton} subclasses that get this <code>Action</code>
+   *            assigned ( {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    * @param dialogParent
-   *          the parent component for the modal dialog.
+   *            the parent component for the modal dialog.
    */
   public ErrorBarPainterActionEdit(final IErrorBarPainter errorBarPainter,
       final String description, final Component dialogParent) {
@@ -74,9 +69,9 @@ public class ErrorBarPainterActionEdit
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   public void actionPerformed(final ActionEvent e) {
-     // create a modal dialog:
+    // create a modal dialog:
     ModalDialog dialog = new ModalDialog(this.m_dialogParent, "title",
         new ErrorBarPainterEditPanel(this.m_errorBarPainter));
-    dialog.show();
+    dialog.setVisible(true);
   }
 }

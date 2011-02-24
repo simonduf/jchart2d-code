@@ -46,56 +46,54 @@ import javax.swing.JPopupMenu;
 /**
  * Class for modal dialogs with ok and cancel buttons.
  * <p>
- * This is a try for a better design approach to modal dialogs than offered in
- * the java development kit: <br>
- * The service of a modal dialog that offers cancel and ok is separated from the
- * retrieval of data of such a dialog. The component that queries the data from
- * this service is freely choosable. It may be passed to the contstructor and
- * will be returned from {@link #showDialog()}. The client code then is sure
- * that the modal dialog has been confirmed by the human interactor and may
- * query this component for input: it knows about the component that was used to
- * query inputs.
+ * This is a try for a better design approach to modal dialogs than offered in the java development
+ * kit: <br>
+ * The service of a modal dialog that offers cancel and ok is separated from the retrieval of data
+ * of such a dialog. The component that queries the data from this service is freely choosable. It
+ * may be passed to the contstructor and will be returned from {@link #showDialog()}. The client
+ * code then is sure that the modal dialog has been confirmed by the human interactor and may query
+ * this component for input: it knows about the component that was used to query inputs.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
- * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class ModalDialog
     extends JDialog {
-  
+
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 6915311633181971117L;
 
   /**
-   * Finds the frame of the given component that may be contained in a
-   * <code>{@link JDialog}</code> with support for modal dialogs that are
-   * launched from <code>{@link JPopupMenu}</code> instances.
+   * Finds the frame of the given component that may be contained in a <code>{@link JDialog}</code>
+   * with support for modal dialogs that are launched from <code>{@link JPopupMenu}</code>
+   * instances.
    * <p>
    * This also works for nested <code>{@link javax.swing.JMenu}</code> /
-   * <code>{@link javax.swing.JMenuItem}</code> trees. 
+   * <code>{@link javax.swing.JMenuItem}</code> trees.
    * <p>
    * 
    * @param component
-   *          the component to find the master the JFrame of.
-   *          
+   *            the component to find the master the JFrame of.
    * @return the frame of the given component that may be contained in a
-   *         <code>{@link JDialog}</code> with support for modal dialogs that
-   *         are launched from <code>{@link JPopupMenu}</code> instances.
+   *         <code>{@link JDialog}</code> with support for modal dialogs that are launched from
+   *         <code>{@link JPopupMenu}</code> instances.
    */
   public static JFrame getFrame(final Component component) {
 
+    JFrame result;
     Component comp = component;
     if (comp instanceof JFrame) {
-      return (JFrame) comp;
-    }
-    if (component instanceof JPopupMenu) {
-      comp = ((JPopupMenu) component).getInvoker();
+      result = (JFrame) comp;
     } else {
-      comp = component.getParent();
+      if (component instanceof JPopupMenu) {
+        comp = ((JPopupMenu) component).getInvoker();
+      } else {
+        comp = component.getParent();
+      }
+      result = ModalDialog.getFrame(comp);
     }
-    return getFrame(comp);
+    return result;
   }
 
   /** The ui controls and model to interact with. */
@@ -109,30 +107,17 @@ public class ModalDialog
    * <p>
    * 
    * @param dialogParent
-   *          the parent <code>Component</code> for the dialog.
-   * 
+   *            the parent <code>Component</code> for the dialog.
    * @param title
-   *          the String containing the dialog's title.
-   * 
+   *            the String containing the dialog's title.
    * @param controlComponent
-   *          the UI component that is additionally shown and returned from
-   *          {@link #showDialog()}.
+   *            the UI component that is additionally shown and returned from {@link #showDialog()}.
    */
   public ModalDialog(final Component dialogParent, final String title,
       final JComponent controlComponent) {
-    super(getFrame(dialogParent), title, true);
+    super(ModalDialog.getFrame(dialogParent), title, true);
     this.m_chooserPanel = controlComponent;
 
-    // Frame parent = getFrame(dialogParent);
-    // parent.addWindowStateListener(new WindowStateListener() {
-    // public void windowStateChanged(final WindowEvent e) {
-    // System.out.println("State of window " + e.getSource() + " changed: " +
-    // e);
-    //
-    // }
-    // }
-    //
-    // );
     Container contentPane = this.getContentPane();
     contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
     contentPane.add(this.m_chooserPanel);
@@ -160,7 +145,7 @@ public class ModalDialog
     ok.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         ModalDialog.this.m_ok = true;
-        setVisible(false);
+        ModalDialog.this.setVisible(false);
       }
     });
     okCancelPanel.add(ok);
@@ -169,7 +154,7 @@ public class ModalDialog
     cancel.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         ModalDialog.this.m_ok = false;
-        setVisible(false);
+        ModalDialog.this.setVisible(false);
       }
     });
     okCancelPanel.add(cancel);
@@ -193,20 +178,16 @@ public class ModalDialog
   /**
    * Shows a modal dialog and blocks until the dialog is hidden.
    * <p>
-   * If the user presses the "OK" button, then this method hides/disposes the
-   * dialog and returns the custom component that queries for user input. If the
-   * user presses the "Cancel" button or closes the dialog without pressing
-   * "OK", then this method hides/disposes the dialog and returns
+   * If the user presses the "OK" button, then this method hides/disposes the dialog and returns the
+   * custom component that queries for user input. If the user presses the "Cancel" button or closes
+   * the dialog without pressing "OK", then this method hides/disposes the dialog and returns
    * <code>null</code>.
    * <p>
    * 
-   * 
-   * @return the custom component given to the constructor with it's new
-   *         settings or <code>null</code> if the user opted out.
-   * 
+   * @return the custom component given to the constructor with it's new settings or
+   *         <code>null</code> if the user opted out.
    * @exception HeadlessException
-   *              if GraphicsEnvironment.isHeadless() returns true.
-   * 
+   *                if GraphicsEnvironment.isHeadless() returns true.
    * @see java.awt.GraphicsEnvironment#isHeadless
    */
   public JComponent showDialog() throws HeadlessException {

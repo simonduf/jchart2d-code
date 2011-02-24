@@ -46,7 +46,7 @@ import javax.swing.JFrame;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  * 
  */
 public final class Log10AxisChart {
@@ -73,7 +73,7 @@ public final class Log10AxisChart {
     trace.setTracePainter(new TracePainterDisc(1));
     trace.setColor(Color.DARK_GRAY);
     // Add the function 1/x + random
-    for (int i = 1; i < 10; i += 1) {
+    for (double i = 1; i < 10; i += 0.1) {
       trace.addPoint(i, Math.pow(10, i));
     }
     // Add the trace to the chart:

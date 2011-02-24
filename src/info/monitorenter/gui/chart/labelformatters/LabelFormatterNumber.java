@@ -33,11 +33,10 @@ import java.text.ParseException;
 /**
  * An ILabelFormatter that is based on a {@link java.text.NumberFormat}
  * <p>
- * To avoid loss of precision please choose a sufficient resolution for your
- * constructor given NumberFormat. Example: If you add new
- * {@link info.monitorenter.gui.chart.TracePoint2D} instances to the
- * {@link info.monitorenter.gui.chart.Chart2D} every second, prefer using a
- * NumberFormat that at least formats the seconds like (e.g.):
+ * To avoid loss of precision please choose a sufficient resolution for your constructor given
+ * NumberFormat. Example: If you add new {@link info.monitorenter.gui.chart.TracePoint2D} instances
+ * to the {@link info.monitorenter.gui.chart.Chart2D} every second, prefer using a NumberFormat that
+ * at least formats the seconds like (e.g.):
  * 
  * <pre>
  * NumberFormat format = new java.text.SimpleDateFormat(&quot;HH:mm:ss&quot;);
@@ -46,16 +45,18 @@ import java.text.ParseException;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.9 $
  */
 public class LabelFormatterNumber
     extends ALabelFormatter implements IAxisLabelFormatter {
 
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 7659252726783423615L;
+
   /**
-   * The internal cached minimum shift of value required to get to distinct
-   * Strings from method <code>{@link #format(double)}</code>. This value is
-   * computed once and cached because it's computation is expensive.
+   * The internal cached minimum shift of value required to get to distinct Strings from method
+   * <code>{@link #format(double)}</code>. This value is computed once and cached because it's
+   * computation is expensive.
    */
   private double m_cachedMinValueShift = Double.MAX_VALUE;
 
@@ -63,10 +64,8 @@ public class LabelFormatterNumber
   protected NumberFormat m_numberFormat;
 
   /**
-   * Default constructor that uses the defalut constructor of
-   * <code>{@link DecimalFormat}</code>.
+   * Default constructor that uses the defalut constructor of <code>{@link DecimalFormat}</code>.
    * <p>
-   * 
    */
   public LabelFormatterNumber() {
     this.m_numberFormat = new DecimalFormat();
@@ -77,7 +76,7 @@ public class LabelFormatterNumber
    * <p>
    * 
    * @param numberFormat
-   *          the number format to use.
+   *            the number format to use.
    */
   public LabelFormatterNumber(final NumberFormat numberFormat) {
     super();
@@ -183,24 +182,24 @@ public class LabelFormatterNumber
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getNextEvenValue(double,
-   *      boolean)
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getNextEvenValue(double, boolean)
    */
   public double getNextEvenValue(final double value, final boolean ceiling) {
+    double result;
     double divisor = Math.pow(10, this.m_numberFormat.getMaximumFractionDigits());
     if (ceiling) {
-      return Math.ceil(value * divisor) / divisor;
+      result = Math.ceil(value * divisor) / divisor;
     } else {
-      return Math.floor(value * divisor) / divisor;
+      result = Math.floor(value * divisor) / divisor;
     }
+    return result;
   }
 
   /**
-   * Returns the interal <code>NumberFormat</code>.
+   * Returns the internal <code>NumberFormat</code>.
    * <p>
    * 
-   * @return the interal <code>NumberFormat</code>.
-   * 
+   * @return the internal <code>NumberFormat</code>.
    */
   NumberFormat getNumberFormat() {
     return this.m_numberFormat;
@@ -220,15 +219,13 @@ public class LabelFormatterNumber
   /**
    * Sets the number formatter to use.
    * <p>
-   * 
-   * Fires a <code>{@link java.beans.PropertyChangeEvent}</code> to the
-   * listeners added via
+   * Fires a <code>{@link java.beans.PropertyChangeEvent}</code> to the listeners added via
    * <code>{@link #addPropertyChangeListener(String, java.beans.PropertyChangeListener)}</code>
    * with the property key <code>{@link #PROPERTY_FORMATCHANGE}</code>.
    * <p>
    * 
    * @param numberFormat
-   *          the number formatter to use.
+   *            the number formatter to use.
    */
   public final void setNumberFormat(final NumberFormat numberFormat) {
     NumberFormat old = this.m_numberFormat;

@@ -35,89 +35,82 @@ import java.util.Map;
 import javax.swing.JColorChooser;
 
 /**
- * Singleton <code>Action</code> that sets a custom grid color to the corresponding
- * chart ({@link Chart2D#setGridColor(Color)}) by showing a modal color
- * chooser.
+ * Singleton <code>Action</code> that sets a custom grid color to the corresponding chart ({@link Chart2D#setGridColor(Color)})
+ * by showing a modal color chooser.
  * <p>
  * Only one instance per target component may exist.
  * <p>
  * 
  * @see info.monitorenter.gui.chart.events.Chart2DActionSetCustomGridColor
- * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
-public final class Chart2DActionSetCustomGridColorSingleton extends AChart2DAction {
+public final class Chart2DActionSetCustomGridColorSingleton
+    extends AChart2DAction {
   /**
    * Generated <code>serialVersionUID</code>.
    */
   private static final long serialVersionUID = 3691034370412916788L;
+
   /**
    * Map for instances.
    */
   private static Map instances = new HashMap();
 
-  /** 
-   * Creates a key for the component for internal storage.<p>
+  /**
+   * Creates a key for the component for internal storage.
+   * <p>
    * 
-   *  @param chart the chart to generate the storage key for. 
-   *  
-   *  @return a storage key unique for the given chart instance. 
+   * @param chart
+   *            the chart to generate the storage key for.
+   * @return a storage key unique for the given chart instance.
    */
   private static String key(final Chart2D chart) {
     return chart.getClass().getName() + chart.hashCode();
   }
 
   /**
-   * Returns the single instance for the given component, potentially creating
-   * it.
+   * Returns the single instance for the given component, potentially creating it.
+   * <p>
+   * If an instance for the given component had been created the description String is ignored.
    * <p>
    * 
-   * If an instance for the given component had been created the description
-   * String is ignored.
-   * <p>
-   * 
-    * @param chart
-   *          the target the action will work on
+   * @param chart
+   *            the target the action will work on
    * @param colorName
-   *          the descriptive <code>String</code> that will be displayed by
-   *          {@link javax.swing.AbstractButton} subclasses that get this
-   *          <code>Action</code> assigned (
-   *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
-   * 
+   *            the descriptive <code>String</code> that will be displayed by
+   *            {@link javax.swing.AbstractButton} subclasses that get this <code>Action</code>
+   *            assigned ( {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    * @return the single instance for the given component.
    */
-  public static Chart2DActionSetCustomGridColorSingleton getInstance(
-      final Chart2D chart, final String colorName) {
-    Chart2DActionSetCustomGridColorSingleton result = 
-      (Chart2DActionSetCustomGridColorSingleton) Chart2DActionSetCustomGridColorSingleton.instances
-        .get(key(chart));
+  public static Chart2DActionSetCustomGridColorSingleton getInstance(final Chart2D chart,
+      final String colorName) {
+    Chart2DActionSetCustomGridColorSingleton result = (Chart2DActionSetCustomGridColorSingleton) Chart2DActionSetCustomGridColorSingleton.instances
+        .get(Chart2DActionSetCustomGridColorSingleton.key(chart));
     if (result == null) {
       result = new Chart2DActionSetCustomGridColorSingleton(chart, colorName);
-      Chart2DActionSetCustomGridColorSingleton.instances.put(key(chart), result);
+      Chart2DActionSetCustomGridColorSingleton.instances.put(
+          Chart2DActionSetCustomGridColorSingleton.key(chart), result);
     }
     return result;
   }
-  
+
   /**
-   * Reference to the last custom color chosen to check wether the corresponding
-   * menu is selected.
+   * Reference to the last custom color chosen to check wether the corresponding menu is selected.
    */
   private Color m_lastChosenColor;
 
   /**
-   * Create an <code>Action</code> that accesses the trace and identifies
-   * itself with the given action String.
+   * Create an <code>Action</code> that accesses the trace and identifies itself with the given
+   * action String.
    * <p>
    * 
    * @param chart
-   *          the target the action will work on
+   *            the target the action will work on
    * @param colorName
-   *          the descriptive <code>String</code> that will be displayed by
-   *          {@link javax.swing.AbstractButton} subclasses that get this
-   *          <code>Action</code> assigned (
-   *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   *            the descriptive <code>String</code> that will be displayed by
+   *            {@link javax.swing.AbstractButton} subclasses that get this <code>Action</code>
+   *            assigned ( {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    */
   private Chart2DActionSetCustomGridColorSingleton(final Chart2D chart, final String colorName) {
     super(chart, colorName);

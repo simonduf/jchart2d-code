@@ -22,34 +22,31 @@
  */
 package info.monitorenter.gui.chart.traces;
 
-
 import info.monitorenter.gui.chart.TracePoint2D;
 
 import java.util.Iterator;
 
 /**
- * In addition to the <code> Trace2DLtd</code> this class offers the guarantee
- * only to allow a single tracepoint with a certain x- value. If a new
- * tracepoint is added whose x- value is already contained, the new tracepoints
- * values will get assigned to the certain old tracepoint respecting the fact
- * that only an additional changed y- value occurs. <br>
- * The <code>add</code> methods increase complexity to factor n but some event -
- * handling may be saved (no change of x and y). <br>
- * Tracepoints with x- values not contained before will be appended to the end
- * of the internal data- structure. <br>
+ * In addition to the <code> Trace2DLtd</code> this class offers the guarantee only to allow a
+ * single tracepoint with a certain x- value. If a new tracepoint is added whose x- value is already
+ * contained, the new tracepoints values will get assigned to the certain old tracepoint respecting
+ * the fact that only an additional changed y- value occurs. <br>
+ * The <code>add</code> methods increase complexity to factor n but some event - handling may be
+ * saved (no change of x and y). <br>
+ * Tracepoints with x- values not contained before will be appended to the end of the internal data-
+ * structure. <br>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westerman </a>
- * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.8 $
  */
-public class Trace2DLtdReplacing extends Trace2DLtd {
-  
+public class Trace2DLtdReplacing
+    extends Trace2DLtd {
+
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -6048361222161598032L;
 
   /**
-   * Constructs a <code>Trace2DLtdReplacing</code> with a default buffer size
-   * of 100.
+   * Constructs a <code>Trace2DLtdReplacing</code> with a default buffer size of 100.
    */
   public Trace2DLtdReplacing() {
     this(100);
@@ -60,7 +57,7 @@ public class Trace2DLtdReplacing extends Trace2DLtd {
    * <p>
    * 
    * @param bufsize
-   *          the maximum amount of points that will be displayed.
+   *            the maximum amount of points that will be displayed.
    */
   public Trace2DLtdReplacing(final int bufsize) {
     super(bufsize);
@@ -70,6 +67,8 @@ public class Trace2DLtdReplacing extends Trace2DLtd {
    * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.TracePoint2D)
    */
   public boolean addPointInternal(final TracePoint2D p) {
+    boolean result = false;
+    boolean located = false;
     TracePoint2D tmp;
     double tmpx;
     double tmpy;
@@ -83,10 +82,14 @@ public class Trace2DLtdReplacing extends Trace2DLtd {
           // performs bound checks and fires property changes
           tmp.setLocation(tmpx, tmpy);
           // don't need bound checks of calling addPoint.
-          return false;
+          located = true;
         }
       }
     }
-    return super.addPointInternal(p);
+    if (!located) {
+      result = super.addPointInternal(p);
+
+    }
+    return result;
   }
 }

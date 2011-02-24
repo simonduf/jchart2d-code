@@ -42,7 +42,7 @@ import javax.swing.JFrame;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.3 $
  */
 public final class MinimalStaticChartLargeData {
 
@@ -68,7 +68,7 @@ public final class MinimalStaticChartLargeData {
     chart.addTrace(trace);
     // Make it visible:
     // Create a frame.
-    JFrame frame = new JFrame("MinimalStaticChart");
+    JFrame frame = new JFrame("MinimalStaticChartLargeData");
     // add the chart to the frame:
     frame.getContentPane().add(new ChartPanel(chart));
     frame.setSize(800, 600);

@@ -28,6 +28,10 @@ import info.monitorenter.gui.chart.test.ATestJChart2D;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 
 import java.awt.Color;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Iterator;
 
 import junit.framework.Assert;
@@ -39,18 +43,18 @@ import junit.framework.TestSuite;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * 
  */
-public class TestChart extends ATestJChart2D {
+public class TestChart2D
+    extends ATestJChart2D {
 
   /**
    * Constructor with the test name.
    * <p>
    * 
    * @param testname
-   *          the test name.
+   *            the test name.
    */
-  public TestChart(final String testname) {
+  public TestChart2D(final String testname) {
     super(testname);
   }
 
@@ -63,10 +67,12 @@ public class TestChart extends ATestJChart2D {
   public static Test suite() {
 
     TestSuite suite = new TestSuite();
-    suite.setName(TestChart.class.getName());
+    suite.setName(TestChart2D.class.getName());
 
-    suite.addTest(new TestChart("testAddInvisibleTrace"));
-    suite.addTest(new TestChart("testSetTraceName"));
+//    suite.addTest(new TestChart2D("testAddInvisibleTrace"));
+//    suite.addTest(new TestChart2D("testSetTraceName"));
+    suite.addTest(new TestChart2D("testSerializeChart"));
+    
 
     return suite;
   }
@@ -104,16 +110,15 @@ public class TestChart extends ATestJChart2D {
   /**
    * Tests adding an invisible trace for correct scaling.
    * <p>
-   * Invisible traces should not be scaled. If they are turned visible
-   * afterwards they should be scaled.
+   * Invisible traces should not be scaled. If they are turned visible afterwards they should be
+   * scaled.
    * <p>
    * 
-   * 
    * @throws InterruptedException
-   *           if sth. goes wrong.
+   *             if sth. goes wrong.
    */
   public void testAddInvisibleTrace() throws InterruptedException {
-    ITrace2D trace = new Trace2DSimple();
+    ITrace2D trace = this.m_trace;
     for (int i = 20; i < 40; i++) {
       trace.addPoint(i, 70 - i);
     }
@@ -167,6 +172,24 @@ public class TestChart extends ATestJChart2D {
     Assert.assertTrue("Visible trace was not scaled in x dimension", scaleXDetected);
     Assert.assertTrue("Visible trace was not scaled in y dimension", scaleYDetected);
 
+  }
+
+  /**
+   * Tries to serialize a chart.
+   * <p>
+   * 
+   * @throws IOException
+   *             if something goes wrong.
+   */
+  public void testSerializeChart() throws IOException {
+    for (int i = 0; i < 100; i++) {
+      this.m_trace.addPoint(i, (Math.random() + 1.0) * i);
+    }
+    java.io.File tmpOut = File.createTempFile("chart", "ser", null);
+    tmpOut.deleteOnExit();
+
+    ObjectOutputStream objOut = new ObjectOutputStream(new FileOutputStream(tmpOut));
+    objOut.writeObject(this.m_chart);
   }
 
   /**

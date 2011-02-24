@@ -28,6 +28,7 @@ import info.monitorenter.gui.chart.ITrace2D;
 
 import java.beans.PropertyChangeListener;
 
+import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -40,17 +41,6 @@ import junit.framework.TestSuite;
  */
 public class TestTrace2DSimple
     extends TestCase {
-  /**
-   * Creates a test case with the given name.
-   * <p>
-   * 
-   * @param testName
-   *          the name of the test.
-   */
-  public TestTrace2DSimple(final String testName) {
-    super(testName);
-  }
-
   /**
    * Test suite for this test class.
    * <p>
@@ -69,8 +59,19 @@ public class TestTrace2DSimple
   }
 
   /**
-   * Adds and removes a trace to a chart and asserts that only one and
-   * afterwards zero listeners are contained in the chart.
+   * Creates a test case with the given name.
+   * <p>
+   * 
+   * @param testName
+   *            the name of the test.
+   */
+  public TestTrace2DSimple(final String testName) {
+    super(testName);
+  }
+
+  /**
+   * Adds and removes a trace to a chart and asserts that only one and afterwards zero listeners are
+   * contained in the chart.
    * <p>
    */
   public void testMemoryLeakTrace2DListeners() {
@@ -80,20 +81,19 @@ public class TestTrace2DSimple
     for (int i = 0; i < 100; i++) {
       chart.addTrace(trace);
       listeners = trace.getPropertyChangeListeners(ITrace2D.PROPERTY_MAX_X);
-      assertEquals("Only one listener should be registered!", 1, listeners.length);
+      Assert.assertEquals("Only one listener should be registered!", 1, listeners.length);
       chart.removeTrace(trace);
       listeners = trace.getPropertyChangeListeners(ITrace2D.PROPERTY_MAX_X);
-      assertEquals("All listeners have to be deregistered!", 0, listeners.length);
+      Assert.assertEquals("All listeners have to be deregistered!", 0, listeners.length);
     }
 
   }
 
   /**
    * <p>
-   * Adds and removes a trace to a chart 100 times and asserts that only zero
-   * listeners are contained in the chart afterwards.
+   * Adds and removes a trace to a chart 100 times and asserts that only zero listeners are
+   * contained in the chart afterwards.
    * </p>
-   * 
    */
   public void testMemoryLeakTrace2DListenersSeverity() {
     Chart2D chart = new Chart2D();
@@ -104,7 +104,7 @@ public class TestTrace2DSimple
       chart.removeTrace(trace);
     }
     listeners = trace.getPropertyChangeListeners(ITrace2D.PROPERTY_MAX_X).length;
-    assertEquals("All listeners have to be deregistered!", 0, listeners);
+    Assert.assertEquals("All listeners have to be deregistered!", 0, listeners);
 
   }
 

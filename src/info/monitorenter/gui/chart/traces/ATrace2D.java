@@ -45,19 +45,17 @@ import java.util.TreeSet;
 import javax.swing.event.SwingPropertyChangeSupport;
 
 /**
- * The abstract basic implementation of
- * <code>{@link info.monitorenter.gui.chart.ITrace2D}</code> that provides the
- * major amount of aspects needed in order to work correctly together with
+ * The abstract basic implementation of <code>{@link info.monitorenter.gui.chart.ITrace2D}</code>
+ * that provides the major amount of aspects needed in order to work correctly together with
  * <code>{@link info.monitorenter.gui.chart.Chart2D}</code>.
  * <p>
- * Caching of minimum and maximum bounds, property change support, the complex
- * z-Index handling (incorporates calls to internals of <code>Chart2D</code>,
- * default naming, bound management and event handling are covered here.
+ * Caching of minimum and maximum bounds, property change support, the complex z-Index handling
+ * (incorporates calls to internals of <code>Chart2D</code>, default naming, bound management and
+ * event handling are covered here.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
- * @version $Revision: 1.43 $
+ * @version $Revision: 1.47 $
  */
 public abstract class ATrace2D implements ITrace2D {
 
@@ -69,17 +67,15 @@ public abstract class ATrace2D implements ITrace2D {
   /**
    * Returns the instanceCount for all <code>ATrace2D</code> subclasses.
    * 
-   * @return Returns the instanceCount for all <code>ATrace2D</code>
-   *         subclasses.
+   * @return Returns the instanceCount for all <code>ATrace2D</code> subclasses.
    */
   public static int getInstanceCount() {
     return ATrace2D.instanceCount;
   }
 
   /**
-   * {@link javax.swing.event.ChangeListener} instances (mainly
-   * <code>Char2D</code> instances that are interested in changes of internal
-   * <code>ITracePoint2D</code> instances.
+   * {@link javax.swing.event.ChangeListener} instances (mainly <code>Char2D</code> instances that
+   * are interested in changes of internal <code>ITracePoint2D</code> instances.
    */
   private List m_changeListeners = new LinkedList();
 
@@ -93,8 +89,7 @@ public abstract class ATrace2D implements ITrace2D {
   private Set m_errorBarPolicies = new TreeSet();
 
   /**
-   * Needed for special treatment of cached values in case of empty state (no
-   * points).
+   * Needed for special treatment of cached values in case of empty state (no points).
    */
   private boolean m_firsttime = true;
 
@@ -104,8 +99,7 @@ public abstract class ATrace2D implements ITrace2D {
   protected double m_maxX;
 
   /**
-   * Cached maximum x value with error bar extension for performance
-   * improvement.
+   * Cached maximum x value with error bar extension for performance improvement.
    */
   protected double m_maxXErrorBar = -Double.MAX_VALUE;
 
@@ -115,8 +109,7 @@ public abstract class ATrace2D implements ITrace2D {
   protected double m_maxY;
 
   /**
-   * Cached maximum y value with error bar extension for performance
-   * improvement.
+   * Cached maximum y value with error bar extension for performance improvement.
    */
   protected double m_maxYErrorBar = -Double.MAX_VALUE;
 
@@ -126,8 +119,7 @@ public abstract class ATrace2D implements ITrace2D {
   protected double m_minX;
 
   /**
-   * Cached minimum x value with error bar extension for performance
-   * improvement.
+   * Cached minimum x value with error bar extension for performance improvement.
    */
   protected double m_minXErrorBar = Double.MAX_VALUE;
 
@@ -137,8 +129,7 @@ public abstract class ATrace2D implements ITrace2D {
   protected double m_minY;
 
   /**
-   * Cached minimum y value with error bar extension for performance
-   * improvement.
+   * Cached minimum y value with error bar extension for performance improvement.
    */
   protected double m_minYErrorBar = Double.MAX_VALUE;
 
@@ -158,22 +149,21 @@ public abstract class ATrace2D implements ITrace2D {
   protected String m_physicalUnitsY = "";
 
   /**
-   * The instance that add support for firing <code>PropertyChangeEvents</code>
-   * and maintaining <code>PropertyChangeListeners</code>.
+   * The instance that add support for firing <code>PropertyChangeEvents</code> and maintaining
+   * <code>PropertyChangeListeners</code>.
    * <p>
    */
   protected PropertyChangeSupport m_propertyChangeSupport = new SwingPropertyChangeSupport(this);
 
   /**
-   * The <code>Chart2D</code> this trace is added to. Needed for
-   * synchronization.
+   * The <code>Chart2D</code> this trace is added to. Needed for synchronization.
    */
   protected Object m_renderer = new Object();
 
   /**
    * The stroke property.
    */
-  private Stroke m_stroke = new BasicStroke(1f);
+  private transient Stroke m_stroke = new BasicStroke(1f);
 
   /** The internal set of the painters to use. */
   private Set m_tracePainters = new TreeSet();
@@ -182,7 +172,7 @@ public abstract class ATrace2D implements ITrace2D {
    * The visible property.
    */
   private boolean m_visible = true;
-
+  
   /**
    * The zIndex property.
    */
@@ -237,15 +227,14 @@ public abstract class ATrace2D implements ITrace2D {
   /**
    * Add a point to this trace.
    * <p>
-   * Prefer calling <code>{@link #addPoint(TracePoint2D)}</code> for better
-   * performance (avoid one invokevirtual for delegation).
+   * Prefer calling <code>{@link #addPoint(TracePoint2D)}</code> for better performance (avoid one
+   * invokevirtual for delegation).
    * <p>
    * 
    * @param x
-   *          the x coordinate of the new point.
+   *            the x coordinate of the new point.
    * @param y
-   *          the y coordinate of the new point.
-   * 
+   *            the y coordinate of the new point.
    * @return true if the operation was successful, false else.
    */
   public final boolean addPoint(final double x, final double y) {
@@ -256,21 +245,18 @@ public abstract class ATrace2D implements ITrace2D {
   /**
    * Add the given point to this <code>ITrace2D</code>.
    * <p>
-   * This implementation performs caching of minimum and maximum values for x
-   * and y and the delegates to {@link #addPointInternal(TracePoint2D)} that has
-   * to perform the "real" add operation.
+   * This implementation performs caching of minimum and maximum values for x and y and the
+   * delegates to {@link #addPointInternal(TracePoint2D)} that has to perform the "real" add
+   * operation.
    * <p>
    * Property change events are fired as described in method
    * <code>{@link #firePointAdded(TracePoint2D)}</code>.
    * <p>
    * 
    * @see #firePointChanged(TracePoint2D, int)
-   * 
    * @param p
-   *          the <code>TracePoint2D</code> to add.
-   * 
+   *            the <code>TracePoint2D</code> to add.
    * @return true if the operation was successful, false else.
-   * 
    */
   public final boolean addPoint(final TracePoint2D p) {
     if (Chart2D.DEBUG_THREADING) {
@@ -310,8 +296,8 @@ public abstract class ATrace2D implements ITrace2D {
           // firePointAdded()->firePointChanged() method,
           // this is only the special case that a new point also marks the
           // minimum.
-          // Don't move this code block before the firePointAdded or 
-          // the minimum of the chart will be higher than the maximum 
+          // Don't move this code block before the firePointAdded or
+          // the minimum of the chart will be higher than the maximum
           // which causes an infinite loop in AxisAutoUnit!
           this.m_minX = p.getX();
           this.m_minY = p.getY();
@@ -329,26 +315,23 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * Override this template method for the custom add operation that depends on
-   * the policies of the implementation.
+   * Override this template method for the custom add operation that depends on the policies of the
+   * implementation.
    * <p>
-   * No property change events have to be fired by default. If this method
-   * returns <code>true</code> the outer logic of the calling method
-   * <code>{@link #addPoint(TracePoint2D)}</code> will perform bound checks
-   * for the new point and fire property changes as described in method
+   * No property change events have to be fired by default. If this method returns <code>true</code>
+   * the outer logic of the calling method <code>{@link #addPoint(TracePoint2D)}</code> will
+   * perform bound checks for the new point and fire property changes as described in method
    * <code>{@link #firePointChanged(TracePoint2D, int)}</code>.
    * <p>
-   * In special cases - when additional modifications to the internal set of
-   * points take place (e.g. a further point gets removed) this method should
-   * return false (regardless wether the new point was accepted or not) and
-   * perform bound checks and fire the property changes as mentioned above
+   * In special cases - when additional modifications to the internal set of points take place (e.g.
+   * a further point gets removed) this method should return false (regardless wether the new point
+   * was accepted or not) and perform bound checks and fire the property changes as mentioned above
    * "manually".
    * <p>
    * 
    * @param p
-   *          the point to add.
+   *            the point to add.
    * @return true if the given point was accepted or false if not.
-   * 
    */
   protected abstract boolean addPointInternal(TracePoint2D p);
 
@@ -443,8 +426,8 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * Internally takes into account that in case of error bars to render the
-   * maximum x value will be different.
+   * Internally takes into account that in case of error bars to render the maximum x value will be
+   * different.
    * <p>
    * Returns true if a change to <code>{@link #getMaxX()}</code> was done.
    * <p>
@@ -479,8 +462,8 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * Internally takes into account that in case of error bars to render the
-   * maximum y value will be different.
+   * Internally takes into account that in case of error bars to render the maximum y value will be
+   * different.
    * <p>
    * Returns true if a change to <code>{@link #getMaxY()}</code> was done.
    * <p>
@@ -515,8 +498,8 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * Internally takes into account that in case of error bars to render the
-   * minimum x value will be different.
+   * Internally takes into account that in case of error bars to render the minimum x value will be
+   * different.
    * <p>
    * Returns true if a change to <code>{@link #getMinX()}</code> was done.
    * <p>
@@ -550,8 +533,8 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * Internally takes into account that in case of error bars to render the
-   * minimum y value will be different.
+   * Internally takes into account that in case of error bars to render the minimum y value will be
+   * different.
    * <p>
    * Returns true if a change to <code>{@link #getMinY()}</code> was done.
    * <p>
@@ -590,7 +573,7 @@ public abstract class ATrace2D implements ITrace2D {
    * <p>
    * 
    * @throws Throwable
-   *           if sth. goes wrong.
+   *             if sth. goes wrong.
    */
   protected void finalize() throws Throwable {
     super.finalize();
@@ -600,18 +583,16 @@ public abstract class ATrace2D implements ITrace2D {
   /**
    * Fire property change events related to an added point.
    * <p>
-   * A property change event for property
-   * <code>{@link ITrace2D#PROPERTY_TRACEPOINT}</code> with null as the old
-   * value and the new point as the new value is fired. This allows e.g.
-   * rescaling of those instances (instead of having to rescale a whole trace).
+   * A property change event for property <code>{@link ITrace2D#PROPERTY_TRACEPOINT}</code> with
+   * null as the old value and the new point as the new value is fired. This allows e.g. rescaling
+   * of those instances (instead of having to rescale a whole trace).
    * <p>
-   * Additionally before this property change, property change events for bounds
-   * are fired as described in method
-   * <code>{@link #firePointChanged(TracePoint2D, int)}</code>.
+   * Additionally before this property change, property change events for bounds are fired as
+   * described in method <code>{@link #firePointChanged(TracePoint2D, int)}</code>.
    * <p>
    * 
    * @param added
-   *          the point that was added.
+   *            the point that was added.
    */
   protected void firePointAdded(final TracePoint2D added) {
     this.firePointChanged(added, TracePoint2D.STATE_ADDED);
@@ -619,33 +600,27 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * Method triggered by
-   * <code>{@link TracePoint2D#setLocation(double, double)}</code>,
+   * Method triggered by <code>{@link TracePoint2D#setLocation(double, double)}</code>,
    * <code>{@link #addPoint(TracePoint2D)}</code> or
    * <code>{@link #removePoint(TracePoint2D)}</code>.
    * <p>
    * Bound checks are performed and property change events for the properties
-   * <code>{@link ITrace2D#PROPERTY_MAX_X}</code>,
-   * <code>{@link ITrace2D#PROPERTY_MIN_X}</code>,
-   * <code>{@link ITrace2D#PROPERTY_MAX_Y}</code> and
-   * <code>{@link ITrace2D#PROPERTY_MIN_Y}</code> are fired if the add bounds
-   * have changed due to the modification of the point.
+   * <code>{@link ITrace2D#PROPERTY_MAX_X}</code>, <code>{@link ITrace2D#PROPERTY_MIN_X}</code>,
+   * <code>{@link ITrace2D#PROPERTY_MAX_Y}</code> and <code>{@link ITrace2D#PROPERTY_MIN_Y}</code>
+   * are fired if the add bounds have changed due to the modification of the point.
    * <p>
-   * 
-   * If <code>state</code> is <code>{@link TracePoint2D#STATE_CHANGED}</code>
-   * a property change event with
-   * <code>{@link ITrace2D#PROPERTY_POINT_CHANGED}</code> will be fired to all
+   * If <code>state</code> is <code>{@link TracePoint2D#STATE_CHANGED}</code> a property change
+   * event with <code>{@link ITrace2D#PROPERTY_POINT_CHANGED}</code> will be fired to all
    * listeners.
    * <p>
    * 
    * @param changed
-   *          the point that has been changed which may be a newly added point
-   *          (from <code>{@link #addPoint(TracePoint2D)}</code>, a removed
-   *          one or a modified one.
+   *            the point that has been changed which may be a newly added point (from
+   *            <code>{@link #addPoint(TracePoint2D)}</code>, a removed one or a modified one.
    * @param state
-   *          one of {<code>{@link TracePoint2D#STATE_ADDED}, {@link TracePoint2D#STATE_CHANGED},
+   *            one of {<code>{@link TracePoint2D#STATE_ADDED}, {@link TracePoint2D#STATE_CHANGED},
    *   {@link TracePoint2D#STATE_REMOVED}</code>}
-   *          to inform about the type of change.
+   *            to inform about the type of change.
    */
   public void firePointChanged(final TracePoint2D changed, final int state) {
     double tmpx = changed.getX();
@@ -751,18 +726,16 @@ public abstract class ATrace2D implements ITrace2D {
   /**
    * Fire property change events related to a removed point.
    * <p>
-   * A property change event for property
-   * <code>{@link ITrace2D#PROPERTY_TRACEPOINT}</code> with a point as the old
-   * value and null as the new value is fired. This allows e.g. rescaling of
-   * those instances (instead of having to rescale a whole trace).
+   * A property change event for property <code>{@link ITrace2D#PROPERTY_TRACEPOINT}</code> with a
+   * point as the old value and null as the new value is fired. This allows e.g. rescaling of those
+   * instances (instead of having to rescale a whole trace).
    * <p>
-   * Additionally before this property change, property change events for bounds
-   * are fired as described in method
-   * <code>{@link #firePointChanged(TracePoint2D, int)}</code>.
+   * Additionally before this property change, property change events for bounds are fired as
+   * described in method <code>{@link #firePointChanged(TracePoint2D, int)}</code>.
    * <p>
    * 
    * @param removed
-   *          the point that was removed.
+   *            the point that was removed.
    */
   protected void firePointRemoved(final TracePoint2D removed) {
     this.firePointChanged(removed, TracePoint2D.STATE_REMOVED);
@@ -774,15 +747,12 @@ public abstract class ATrace2D implements ITrace2D {
    * <p>
    * 
    * @param property
-   *          one of the <code>PROPERTY_XXX</code> constants defined in
-   *          <code>{@link ITrace2D}</code>.
-   * 
+   *            one of the <code>PROPERTY_XXX</code> constants defined in
+   *            <code>{@link ITrace2D}</code>.
    * @param oldvalue
-   *          the old value of the property.
-   * 
+   *            the old value of the property.
    * @param newvalue
-   *          the new value of the property.
-   * 
+   *            the new value of the property.
    */
   protected final void firePropertyChange(final String property, final Object oldvalue,
       final Object newvalue) {
@@ -841,9 +811,41 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getHasErrorBars()
+   */
+  public final boolean getHasErrorBars() {
+    boolean result = false;
+    if (this.m_errorBarPolicies.size() > 0) {
+      Iterator itErrorBarPolicies = this.m_errorBarPolicies.iterator();
+      IErrorBarPolicy errorBarPolicy;
+      while (itErrorBarPolicies.hasNext()) {
+        errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
+        if (errorBarPolicy.getErrorBarPainters().size() > 0) {
+          result |= errorBarPolicy.isShowNegativeXErrors();
+          if (result) {
+            break;
+          }
+          result |= errorBarPolicy.isShowPositiveXErrors();
+          if (result) {
+            break;
+          }
+          result |= errorBarPolicy.isShowNegativeYErrors();
+          if (result) {
+            break;
+          }
+          result |= errorBarPolicy.isShowPositiveYErrors();
+          if (result) {
+            break;
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
    * Returns a label for this trace.
    * <p>
-   * 
    * The label is constructed of
    * <ul>
    * <li>The name of this trace ({@link #getName()}).</li>
@@ -852,11 +854,8 @@ public abstract class ATrace2D implements ITrace2D {
    * <p>
    * 
    * @return a label for this trace.
-   * 
    * @see ITrace2D#getLabel()
-   * 
    * @see #getName()
-   * 
    * @see #getPhysicalUnits()
    */
   public final String getLabel() {
@@ -948,9 +947,7 @@ public abstract class ATrace2D implements ITrace2D {
    * <p>
    * 
    * @return the name of this trace.
-   * 
    * @see ITrace2D#getName()
-   * 
    * @see #setName(String s)
    */
   public final String getName() {
@@ -994,24 +991,21 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * Returns the chart that renders this instance or null, if this trace is not
-   * added to a chart.
+   * Returns the chart that renders this instance or null, if this trace is not added to a chart.
    * <p>
-   * 
    * The chart that renders this trace registers itself with this trace in
    * {@link Chart2D#addTrace(ITrace2D)}.
    * <p>
    * 
    * @return Returns the renderer.
-   * 
    * @see Chart2D#addTrace(ITrace2D)
    */
   public final Chart2D getRenderer() {
+    Chart2D result = null;
     if (this.m_renderer instanceof Chart2D) {
-      return (Chart2D) this.m_renderer;
-    } else {
-      return null;
+      result = (Chart2D) this.m_renderer;
     }
+    return result;
   }
 
   /**
@@ -1019,9 +1013,7 @@ public abstract class ATrace2D implements ITrace2D {
    * Get the <code>Stroke</code> object this instance will be painted with.
    * </p>
    * 
-   * @return the <code>Stroke</code> object this <code>ITrace2D</code> will
-   *         be painted with.
-   * 
+   * @return the <code>Stroke</code> object this <code>ITrace2D</code> will be painted with.
    * @see info.monitorenter.gui.chart.ITrace2D#getStroke()
    */
   public final Stroke getStroke() {
@@ -1072,10 +1064,9 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * Internal search for the maximum x value that is only invoked if no cached
-   * value is at hand or bounds have changed by adding new points.
+   * Internal search for the maximum x value that is only invoked if no cached value is at hand or
+   * bounds have changed by adding new points.
    * <p>
-   * 
    * The result is assigned to the property maxX.
    * <p>
    * 
@@ -1108,10 +1099,9 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * Internal search for the maximum y value that is only invoked if no cached
-   * value is at hand or bounds have changed by adding new points.
+   * Internal search for the maximum y value that is only invoked if no cached value is at hand or
+   * bounds have changed by adding new points.
    * <p>
-   * 
    * The result is assigned to the property maxY.
    * <p>
    * 
@@ -1145,10 +1135,9 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * Internal search for the minimum x value that is only invoked if no cached
-   * value is at hand or bounds have changed by adding new points.
+   * Internal search for the minimum x value that is only invoked if no cached value is at hand or
+   * bounds have changed by adding new points.
    * <p>
-   * 
    * The result is assigned to the property minX.
    * <p>
    * 
@@ -1182,10 +1171,9 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * Internal search for the minimum y value that is only invoked if no cached
-   * value is at hand or bounds have changed by adding new points.
+   * Internal search for the minimum y value that is only invoked if no cached value is at hand or
+   * bounds have changed by adding new points.
    * <p>
-   * 
    * The result is assigned to the property minY.
    * <p>
    * 
@@ -1232,8 +1220,8 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * Changes the internal state to empty to allow that the caching of bounds is
-   * cleared and delegates the call to {@link  #removeAllPointsInternal()}.
+   * Changes the internal state to empty to allow that the caching of bounds is cleared and
+   * delegates the call to {@link  #removeAllPointsInternal()}.
    * <p>
    * 
    * @see info.monitorenter.gui.chart.ITrace2D#removeAllPoints()
@@ -1276,12 +1264,11 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * Override this template method for the custom remove operation that depends
-   * on the <code>Collection</code> used in the implementation.
+   * Override this template method for the custom remove operation that depends on the
+   * <code>Collection</code> used in the implementation.
    * <p>
    * No change events have to be fired, this is done by {@link ATrace2D}.
    * <p>
-   * 
    */
   protected abstract void removeAllPointsInternal();
 
@@ -1325,21 +1312,18 @@ public abstract class ATrace2D implements ITrace2D {
   /**
    * Remove the given point from this <code>ITrace2D</code>.
    * <p>
-   * This implementation performs caching of minimum and maximum values for x
-   * and y and the delegates to
-   * <code>{@link #removePointInternal(TracePoint2D)}</code> that has to
-   * perform the "real" add remove operation.
+   * This implementation performs caching of minimum and maximum values for x and y and the
+   * delegates to <code>{@link #removePointInternal(TracePoint2D)}</code> that has to perform the
+   * "real" add remove operation.
    * <p>
    * Property change events are fired as described in method
    * <code>{@link #firePointRemoved(TracePoint2D)}</code>.
    * <p>
    * 
    * @param point
-   *          the <code>TracePoint2D</code> to remove.
-   * 
-   * @return true if the removal suceeded, false else: this could be that the
-   *         given point was not contained.
-   * 
+   *            the <code>TracePoint2D</code> to remove.
+   * @return true if the removal suceeded, false else: this could be that the given point was not
+   *         contained.
    * @see #firePointChanged(TracePoint2D, int)
    */
   public boolean removePoint(final TracePoint2D point) {
@@ -1394,37 +1378,30 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * Override this template method for the custom remove operation that depends
-   * on the internal storage the implementation.
+   * Override this template method for the custom remove operation that depends on the internal
+   * storage the implementation.
    * <p>
-   * The returned point may be the same as the given. But some "computing"
-   * traces like
-   * <code>{@link info.monitorenter.gui.chart.traces.computing.Trace2DArithmeticMean}</code>
-   * will internally delete a different point and return that one.
+   * The returned point may be the same as the given. But some "computing" traces like
+   * <code>{@link info.monitorenter.gui.chart.traces.computing.Trace2DArithmeticMean}</code> will
+   * internally delete a different point and return that one.
    * <p>
-   * 
-   * No property change events have to be fired by default. If this method
-   * returns <code>null</code> the outer logic of the calling method
-   * <code>{@link #removePoint(TracePoint2D)}</code> will perform bound checks
-   * for the returned point and fire property changes for the properties
-   * <code>{@link ITrace2D#PROPERTY_MAX_X}</code>,
-   * <code>{@link ITrace2D#PROPERTY_MIN_X}</code>,
-   * <code>{@link ITrace2D#PROPERTY_MAX_Y}</code> and
-   * <code>{@link ITrace2D#PROPERTY_MIN_Y}</code>.
+   * No property change events have to be fired by default. If this method returns <code>null</code>
+   * the outer logic of the calling method <code>{@link #removePoint(TracePoint2D)}</code> will
+   * perform bound checks for the returned point and fire property changes for the properties
+   * <code>{@link ITrace2D#PROPERTY_MAX_X}</code>, <code>{@link ITrace2D#PROPERTY_MIN_X}</code>,
+   * <code>{@link ITrace2D#PROPERTY_MAX_Y}</code> and <code>{@link ITrace2D#PROPERTY_MIN_Y}</code>.
    * <p>
-   * In special cases - when additional modifications to the internal set of
-   * points take place (e.g. a further point get added) this method should
-   * return false (regardless wether the old point was really removed or not)
-   * and perform bound checks and fire the property changes as mentioned above
-   * "manually".
+   * In special cases - when additional modifications to the internal set of points take place (e.g.
+   * a further point get added) this method should return false (regardless wether the old point was
+   * really removed or not) and perform bound checks and fire the property changes as mentioned
+   * above "manually".
    * <p>
    * 
    * @param point
-   *          the point to remove.
-   * 
-   * @return null if unsuccesful (and no events should be fired) or the point
-   *         that actually was removed (in case different than the given one it
-   *         should be somehow related to the given one).
+   *            the point to remove.
+   * @return null if unsuccesful (and no events should be fired) or the point that actually was
+   *         removed (in case different than the given one it should be somehow related to the given
+   *         one).
    */
   protected abstract TracePoint2D removePointInternal(final TracePoint2D point);
 
@@ -1445,15 +1422,13 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * Removes the given trace painter if an instance of the same class is
-   * contained and more painters are remaining.
+   * Removes the given trace painter if an instance of the same class is contained and more painters
+   * are remaining.
    * <p>
    * 
    * @param painter
-   *          the painter to remove.
-   * 
-   * @return true if a painter of the same class as the given painter was
-   *         removed.
+   *            the painter to remove.
+   * @return true if a painter of the same class as the given painter was removed.
    */
   public boolean removeTracePainter(final ITracePainter painter) {
     boolean result = false;
@@ -1476,7 +1451,7 @@ public abstract class ATrace2D implements ITrace2D {
    * </p>
    * 
    * @param color
-   *          the <code>Color</code> this trace will be painted with.
+   *            the <code>Color</code> this trace will be painted with.
    */
   public final void setColor(final Color color) {
     Color oldValue = this.m_color;
@@ -1534,14 +1509,11 @@ public abstract class ATrace2D implements ITrace2D {
   /**
    * Sets the descriptive name for this trace.
    * <p>
-   * 
-   * If the given argument is null or consists of whitespaces only nothing will
-   * be changed.
+   * If the given argument is null or consists of whitespaces only nothing will be changed.
    * <p>
    * 
    * @param name
-   *          the descriptive name for this trace.
-   * 
+   *            the descriptive name for this trace.
    * @see info.monitorenter.gui.chart.ITrace2D#setName(java.lang.String)
    */
   public final void setName(final String name) {
@@ -1570,12 +1542,11 @@ public abstract class ATrace2D implements ITrace2D {
   /**
    * Allows the chart this instance is painted by to register itself.
    * <p>
-   * This is internally required for synchronization and re-ordering due to
-   * z-Index changes.
+   * This is internally required for synchronization and re-ordering due to z-Index changes.
    * <p>
    * 
    * @param renderer
-   *          the chart that paints this instance.
+   *            the chart that paints this instance.
    */
   public final void setRenderer(final Chart2D renderer) {
     boolean requiresErrorBarCalculation = this.m_renderer != renderer;
@@ -1604,10 +1575,8 @@ public abstract class ATrace2D implements ITrace2D {
    * <p>
    * 
    * @param painter
-   *          the new sole painter to use.
-   * 
-   * @return the <code>Set&lt;{@link ITracePainter}&gt;</code> that was used
-   *         before.
+   *            the new sole painter to use.
+   * @return the <code>Set&lt;{@link ITracePainter}&gt;</code> that was used before.
    */
   public final Set setTracePainter(final ITracePainter painter) {
     Set result = this.m_tracePainters;
@@ -1624,13 +1593,11 @@ public abstract class ATrace2D implements ITrace2D {
    * Set the visible property of this instance.
    * </p>
    * <p>
-   * Invisible <code>ITrace2D</code> instances (visible == false) will not be
-   * painted.
+   * Invisible <code>ITrace2D</code> instances (visible == false) will not be painted.
    * </p>
    * 
    * @param visible
-   *          the visible property of this instance to set.
-   * 
+   *            the visible property of this instance to set.
    * @see info.monitorenter.gui.chart.ITrace2D#setVisible(boolean)
    */
   public final void setVisible(final boolean visible) {
@@ -1662,9 +1629,8 @@ public abstract class ATrace2D implements ITrace2D {
             System.out.println("trace.setZIndex, 2 locks");
           }
           /*
-           * see javadoc of TreeSetGreedy: we have to remove before outside
-           * modification of the IComparableProperty, then modify and finally
-           * add again.
+           * see javadoc of TreeSetGreedy: we have to remove before outside modification of the
+           * IComparableProperty, then modify and finally add again.
            */
           boolean rendered = this.m_renderer instanceof Chart2D;
           if (rendered) {

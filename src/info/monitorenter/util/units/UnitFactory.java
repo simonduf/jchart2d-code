@@ -31,18 +31,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * Singleton that caches instances of whole unit- systems and provides you with
- * the matching unit for a maximum value.
+ * Singleton that caches instances of whole unit- systems and provides you with the matching unit
+ * for a maximum value.
  * <p>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
- * 
- * @version $Revision: 1.4 $
- * 
+ * @version $Revision: 1.5 $
  * @see info.monitorenter.util.units.IUnitSystem
- * 
  */
-public final class UnitFactory extends Object {
+public final class UnitFactory
+    extends Object {
 
   /** Singleton instance. */
   private static UnitFactory instance;
@@ -72,7 +70,6 @@ public final class UnitFactory extends Object {
   /**
    * Singleton constructor.
    * <p>
-   * 
    */
   private UnitFactory() {
     // nop
@@ -81,20 +78,18 @@ public final class UnitFactory extends Object {
   /**
    * Returns the unit for the given argument absolute max.
    * <p>
-   * 
    * The unit is chosen in a way that
    * 
-   * 
    * @param absoluteMax
-   *          the absolute maximum value that has to be put into relation to the
-   *          unit to retrieve.
+   *            the absolute maximum value that has to be put into relation to the unit to retrieve.
    * @param units
-   *          the UnitSystem to use.
+   *            the UnitSystem to use.
    * @return the unit for the given argument absolute max.
    */
   public AUnit getUnit(final double absoluteMax, final IUnitSystem units) {
+    AUnit result = null;
     List choice;
-    // lazy initialisation
+    // lazy initialization
     choice = (List) UnitFactory.UNITSYSTEMS.get(units.getClass().getName());
     if (choice == null) {
       choice = this.initUnitSystem(units);
@@ -108,27 +103,29 @@ public final class UnitFactory extends Object {
       while (it.hasNext()) {
         ret = (AUnit) it.next();
         if (absoluteMax < (ret.getFactor())) {
-          return old;
+          result = old;
+          break;
         }
         old = ret;
       }
       // highest unit available
-      return old;
+      result = old;
     }
     // no clue
-    return UnitFactory.UNCHANGED;
+    if (result == null) {
+      result = UnitFactory.UNCHANGED;
+
+    }
+    return result;
   }
 
   /**
-   * Returns a list of all different {@link AUnit} instances available in the
-   * given unit system.
+   * Returns a list of all different {@link AUnit} instances available in the given unit system.
    * <p>
    * 
    * @param unitsystem
-   *          the unit system of interest.
-   * 
-   * @return a list of all different {@link AUnit} instances available in the
-   *         given unit system.
+   *            the unit system of interest.
+   * @return a list of all different {@link AUnit} instances available in the given unit system.
    */
   public List getUnits(final IUnitSystem unitsystem) {
     List choice = (List) UnitFactory.UNITSYSTEMS.get(unitsystem.getClass().getName());
@@ -145,8 +142,7 @@ public final class UnitFactory extends Object {
    * <p>
    * 
    * @param units
-   *          the unit system to initialize.
-   * 
+   *            the unit system to initialize.
    * @return the list of {@link AUnit} instances of the given unit system.
    */
   private List initUnitSystem(final IUnitSystem units) {

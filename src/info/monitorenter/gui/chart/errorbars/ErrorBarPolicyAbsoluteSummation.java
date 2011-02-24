@@ -23,6 +23,11 @@
  */
 package info.monitorenter.gui.chart.errorbars;
 
+import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxis;
+import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.TracePoint2D;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -47,7 +52,7 @@ import javax.swing.event.ChangeListener;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class ErrorBarPolicyAbsoluteSummation
     extends AErrorBarPolicyConfigurable {
@@ -179,42 +184,70 @@ public class ErrorBarPolicyAbsoluteSummation
     return this.m_yError;
   }
 
+
   /**
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeXError(int,
-   *      int)
+   *      int, info.monitorenter.gui.chart.TracePoint2D)
    */
-  protected int internalGetNegativeXError(final int xPixel, final int yPixel) {
-    return xPixel
-        - this.getTrace().getRenderer().getAxisX().translateRelativeValueToPx(this.m_xError);
+  protected int internalGetNegativeXError(final int xPixel, final int yPixel,
+      final TracePoint2D original) {
+    ITrace2D trace = this.getTrace();
+    Chart2D chart = trace.getRenderer();
+    IAxis axisX = chart.getAxisX();
+    // We cannot use IAxis.translateRelativeValueToPX because non-linear
+    // transformations of axis implementations (e.g. log) will put the distance
+    // argument in relation to 0 and return wrong results:
+    int result = axisX.translateValueToPx(original.getX() - this.m_xError);
+    return result;
   }
 
   /**
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeYError(int,
-   *      int)
+   *      int, info.monitorenter.gui.chart.TracePoint2D)
    */
-  protected int internalGetNegativeYError(final int xPixel, final int yPixel) {
-    return yPixel
-        + this.getTrace().getRenderer().getAxisY().translateRelativeValueToPx(this.m_yError);
+  protected int internalGetNegativeYError(final int xPixel, final int yPixel,
+      final TracePoint2D original) {
+    ITrace2D trace = this.getTrace();
+    Chart2D chart = trace.getRenderer();
+    IAxis axisY = chart.getAxisY();
+    // We cannot use IAxis.translateRelativeValueToPX because non-linear
+    // transformations of axis implementations (e.g. log) will put the distance
+    // argument in relation to 0 and return wrong results:
+    int result = axisY.translateValueToPx(original.getY() - this.m_yError);
+    return result;
   }
 
   /**
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetPositiveXError(int,
-   *      int)
+   *      int, info.monitorenter.gui.chart.TracePoint2D)
    */
-  protected int internalGetPositiveXError(final int xPixel, final int yPixel) {
-    return xPixel
-        + this.getTrace().getRenderer().getAxisX().translateRelativeValueToPx(this.m_xError);
+  protected int internalGetPositiveXError(final int xPixel, final int yPixel,
+      final TracePoint2D original) {
+    ITrace2D trace = this.getTrace();
+    Chart2D chart = trace.getRenderer();
+    IAxis axisX = chart.getAxisX();
+    // We cannot use IAxis.translateRelativeValueToPX because non-linear
+    // transformations of axis implementations (e.g. log) will put the distance
+    // argument in relation to 0 and return wrong results:
+    int result = axisX.translateValueToPx(original.getX() + this.m_xError);
+    return result;
   }
 
   /**
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetPositiveYError(int,
-   *      int)
+   *      int, info.monitorenter.gui.chart.TracePoint2D)
    */
-  protected int internalGetPositiveYError(final int xPixel, final int yPixel) {
-    return yPixel
-        - (this.getTrace().getRenderer().getAxisY().translateRelativeValueToPx(this.m_yError));
+  protected int internalGetPositiveYError(final int xPixel, final int yPixel,
+      final TracePoint2D original) {
+    ITrace2D trace = this.getTrace();
+    Chart2D chart = trace.getRenderer();
+    IAxis axisY = chart.getAxisY();
+    // We cannot use IAxis.translateRelativeValueToPX because non-linear
+    // transformations of axis implementations (e.g. log) will put the distance
+    // argument in relation to 0 and return wrong results:
+    int result = axisY.translateValueToPx(original.getY() + this.m_yError);
+    return result;
   }
-
   /**
    * Sets the absolute x error to add to each error bar.
    * <p>

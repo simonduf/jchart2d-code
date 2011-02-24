@@ -31,14 +31,13 @@ import java.util.NoSuchElementException;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ColorIterator implements Iterator {
 
   /**
-   * To allow clean reset of ColorIterator, also the start HSBColor has to be
-   * reset. This is done by a deep copy at construction time.
+   * To allow clean reset of ColorIterator, also the start HSBColor has to be reset. This is done by
+   * a deep copy at construction time.
    */
   private HSBColor m_start;
 
@@ -49,8 +48,8 @@ public class ColorIterator implements Iterator {
   private ColorIterator.ISteppingModel m_stepModel;
 
   /**
-   * To allow clean reset of ColorIterator, also the SteppingModel has to be
-   * reset. This is done by a deep copy at construction time.
+   * To allow clean reset of ColorIterator, also the SteppingModel has to be reset. This is done by
+   * a deep copy at construction time.
    */
   private ColorIterator.ISteppingModel m_resetModel;
 
@@ -75,7 +74,6 @@ public class ColorIterator implements Iterator {
    * <p>
    * 
    * @return true if more colors are available.
-   * 
    * @see java.util.Iterator#hasNext()
    */
   public boolean hasNext() {
@@ -83,14 +81,13 @@ public class ColorIterator implements Iterator {
   }
 
   /**
-   * Returns instances of java.awt.Color or throws a NoSuchElementException, if
-   * iterator has finished.
+   * Returns instances of java.awt.Color or throws a NoSuchElementException, if iterator has
+   * finished.
    * <p>
    * 
    * @return the next available Color.
-   * 
    * @throws NoSuchElementException
-   *           if {@link #hasNext()} returns false.
+   *             if {@link #hasNext()} returns false.
    */
   public Object next() throws NoSuchElementException {
     if (!this.m_hasnext) {
@@ -104,8 +101,7 @@ public class ColorIterator implements Iterator {
   }
 
   /**
-   * Resets the ColorIterator. It will be able to start a new iteration over the
-   * colorspace.
+   * Resets the ColorIterator. It will be able to start a new iteration over the colorspace.
    * <p>
    */
   public void reset() {
@@ -116,8 +112,7 @@ public class ColorIterator implements Iterator {
   }
 
   /**
-   * Nothing is done here. Do you really want to remove a color from the
-   * colorcircle model?
+   * Nothing is done here. Do you really want to remove a color from the colorcircle model?
    * <p>
    */
   public void remove() {
@@ -129,9 +124,7 @@ public class ColorIterator implements Iterator {
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * 
-   * 
-   * @version $Revision: 1.2 $
+   * @version $Revision: 1.3 $
    */
   public static interface ISteppingModel extends Cloneable {
     /**
@@ -139,7 +132,7 @@ public class ColorIterator implements Iterator {
      * <p>
      * 
      * @param tostep
-     *          the color iterator to perform a step on.
+     *            the color iterator to perform a step on.
      */
     public void doStep(final ColorIterator tostep);
 
@@ -155,8 +148,6 @@ public class ColorIterator implements Iterator {
   /**
    * Just for protected internal float stepping.
    * <p>
-   * 
-   * 
    */
   public abstract static class ADefaultStepping implements ColorIterator.ISteppingModel {
     /** The amount of stepping. */
@@ -175,10 +166,9 @@ public class ColorIterator implements Iterator {
      * <p>
      * 
      * @param stepping
-     *          a step length in-between 0.0 and 1.0.
-     * 
+     *            a step length in-between 0.0 and 1.0.
      * @throws IllegalArgumentException
-     *           if the stepping is <= 0.0 or >=1.0.
+     *             if the stepping is <= 0.0 or >=1.0.
      */
     public ADefaultStepping(final float stepping) throws IllegalArgumentException {
       if (stepping > 1.0f || stepping <= 0.0f) {
@@ -188,21 +178,20 @@ public class ColorIterator implements Iterator {
     }
 
     /**
-     * Too lazy to implement for each subclass. An overhead for newInstance()
-     * (return dynamic subtype) is paid here.
+     * Too lazy to implement for each subclass. An overhead for newInstance() (return dynamic
+     * subtype) is paid here.
      * <p>
      * 
      * @return a clone of the stepper.
      */
     public Object clone() {
-      ADefaultStepping result;
+      ADefaultStepping result = null;
       try {
         result = (ADefaultStepping) super.clone();
+        result.m_stepping = this.m_stepping;
       } catch (Throwable f) {
         f.printStackTrace();
-        return null;
       }
-      result.m_stepping = this.m_stepping;
       return result;
     }
   }
@@ -212,8 +201,7 @@ public class ColorIterator implements Iterator {
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * 
-   * @version $Revision: 1.2 $
+   * @version $Revision: 1.3 $
    */
   public static class HueStepper
       extends ColorIterator.ADefaultStepping {
@@ -230,10 +218,9 @@ public class ColorIterator implements Iterator {
      * <p>
      * 
      * @param stepping
-     *          a step length in-between 0.0 and 1.0.
-     * 
+     *            a step length in-between 0.0 and 1.0.
      * @throws IllegalArgumentException
-     *           if the stepping is <= 0.0 or >=1.0.
+     *             if the stepping is <= 0.0 or >=1.0.
      */
     public HueStepper(final float stepping) throws IllegalArgumentException {
       super(stepping);
@@ -242,16 +229,14 @@ public class ColorIterator implements Iterator {
     /**
      * Performs a hue step on the given ColorIterator's HSBColor.
      * <p>
-     * 
-     * The bounds are watched: if a hue step would cross 1.0f it will be
-     * continued beginning from 0. if a hue step would cross the hue value of
-     * the ColorIterator's start hue value, the step will only go as far as this
-     * value. Else there would be problems with finding the end of the
+     * The bounds are watched: if a hue step would cross 1.0f it will be continued beginning from 0.
+     * if a hue step would cross the hue value of the ColorIterator's start hue value, the step will
+     * only go as far as this value. Else there would be problems with finding the end of the
      * iteration.
      * <p>
      * 
      * @param tostep
-     *          the iterator to perform the step on.
+     *            the iterator to perform the step on.
      */
     public void doStep(final ColorIterator tostep) {
       float increment = tostep.m_iterate.m_hue;
@@ -287,8 +272,7 @@ public class ColorIterator implements Iterator {
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * 
-   * @version $Revision: 1.2 $
+   * @version $Revision: 1.3 $
    */
   public static class LuminanceStepper
       extends ColorIterator.ADefaultStepping {
@@ -301,15 +285,13 @@ public class ColorIterator implements Iterator {
     }
 
     /**
-     * Creates an instance with the given stepping to go on the luminance line
-     * of the color space.
+     * Creates an instance with the given stepping to go on the luminance line of the color space.
      * <p>
      * 
      * @param stepping
-     *          the stepping for each step in between 0.0 and 1.0.
-     * 
+     *            the stepping for each step in between 0.0 and 1.0.
      * @throws IllegalArgumentException
-     *           if stepping is <= 0.0 or >= 1.0.
+     *             if stepping is <= 0.0 or >= 1.0.
      */
     public LuminanceStepper(final float stepping) throws IllegalArgumentException {
       super(stepping);
@@ -318,16 +300,14 @@ public class ColorIterator implements Iterator {
     /**
      * Performs a luminance step on the given ColorIterator's HSBColor.
      * <p>
-     * 
-     * The bounds are watched: if a step would cross 1.0f, it will be continued
-     * beginning from 0. if a step would cross the luminance value of the
-     * ColorIterator's start luminance, the step will only go as far as this
-     * value. Else there would be problems with finding the end of the
+     * The bounds are watched: if a step would cross 1.0f, it will be continued beginning from 0. if
+     * a step would cross the luminance value of the ColorIterator's start luminance, the step will
+     * only go as far as this value. Else there would be problems with finding the end of the
      * iteration.
      * <p>
      * 
      * @param tostep
-     *          the color iterator to perform the step on.
+     *            the color iterator to perform the step on.
      */
     public void doStep(final ColorIterator tostep) {
       float increment = tostep.m_iterate.m_lum;
@@ -362,8 +342,7 @@ public class ColorIterator implements Iterator {
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * 
-   * @version $Revision: 1.2 $
+   * @version $Revision: 1.3 $
    */
   public static class SaturationStepper
       extends ColorIterator.ADefaultStepping {
@@ -376,15 +355,13 @@ public class ColorIterator implements Iterator {
     }
 
     /**
-     * Creates an instance with the given stepping to go on the saturation line
-     * of the color space.
+     * Creates an instance with the given stepping to go on the saturation line of the color space.
      * <p>
      * 
      * @param stepping
-     *          the stepping for each step in between 0.0 and 1.0.
-     * 
+     *            the stepping for each step in between 0.0 and 1.0.
      * @throws IllegalArgumentException
-     *           if stepping is <= 0.0 or >= 1.0.
+     *             if stepping is <= 0.0 or >= 1.0.
      */
     public SaturationStepper(final float stepping) throws IllegalArgumentException {
       super(stepping);
@@ -393,15 +370,14 @@ public class ColorIterator implements Iterator {
     /**
      * Performs a saturation step on the given ColorIterator's HSBColor.
      * <p>
-     * he bounds are watched: if a step would cross 1.0f, it will be continued
-     * beginning from 0. if a step would cross the luminance value of the
-     * ColorIterator's start luminance, the step will only go as far as this
-     * value. Else there would be problems with finding the end of the
+     * he bounds are watched: if a step would cross 1.0f, it will be continued beginning from 0. if
+     * a step would cross the luminance value of the ColorIterator's start luminance, the step will
+     * only go as far as this value. Else there would be problems with finding the end of the
      * iteration.
      * <p>
      * 
      * @param tostep
-     *          the color iterator to perform the step on.
+     *            the color iterator to perform the step on.
      */
     public void doStep(final ColorIterator tostep) {
       float increment = tostep.m_iterate.m_sat;
@@ -432,14 +408,12 @@ public class ColorIterator implements Iterator {
   }
 
   /**
-   * Base class for stepping models that may step in each direction of the Hue
-   * Saturation Luminance color space.
+   * Base class for stepping models that may step in each direction of the Hue Saturation Luminance
+   * color space.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * 
-   * 
-   * @version $Revision: 1.2 $
+   * @version $Revision: 1.3 $
    */
   public abstract static class APiggyBackStepper
       extends ColorIterator.ADefaultStepping {
@@ -461,21 +435,17 @@ public class ColorIterator implements Iterator {
     }
 
     /**
-     * Creates an instance that uses the given step lengths for hue, luminance
-     * and saturation.
+     * Creates an instance that uses the given step lengths for hue, luminance and saturation.
      * <p>
      * 
      * @param hueStepping
-     *          the step length on the hue line of the HSB color space.
-     * 
+     *            the step length on the hue line of the HSB color space.
      * @param satStepping
-     *          the step length on the saturation line of the HSB color space.
-     * 
+     *            the step length on the saturation line of the HSB color space.
      * @param lumStepping
-     *          the step length on the luminance line of the HSB color space.
-     * 
+     *            the step length on the luminance line of the HSB color space.
      * @throws IllegalArgumentException
-     *           if any of the arguments is <= 0.0 or >= 1.0.
+     *             if any of the arguments is <= 0.0 or >= 1.0.
      */
     public APiggyBackStepper(final float hueStepping, final float satStepping,
         final float lumStepping) throws IllegalArgumentException {
@@ -497,15 +467,13 @@ public class ColorIterator implements Iterator {
   }
 
   /**
-   * Performs hue steps until it has walked the whole hue line, then performs a
-   * saturation step to start with hue steps again. If the saturation steps have
-   * walked the whole saturation line, a luminance step is done before starting
-   * with hue steps again.
+   * Performs hue steps until it has walked the whole hue line, then performs a saturation step to
+   * start with hue steps again. If the saturation steps have walked the whole saturation line, a
+   * luminance step is done before starting with hue steps again.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * 
-   * @version $Revision: 1.2 $
+   * @version $Revision: 1.3 $
    */
   public static class HSBStepper
       extends ColorIterator.APiggyBackStepper {
@@ -535,13 +503,12 @@ public class ColorIterator implements Iterator {
   }
 
   /**
-   * Performs hue steps until it has walked the whole hue line, then performs a
-   * saturation step to start with hue steps again.
+   * Performs hue steps until it has walked the whole hue line, then performs a saturation step to
+   * start with hue steps again.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * 
-   * @version $Revision: 1.2 $
+   * @version $Revision: 1.3 $
    */
   public static class HSStepper
       extends ColorIterator.APiggyBackStepper {
@@ -572,7 +539,7 @@ public class ColorIterator implements Iterator {
    * <p>
    * 
    * @param args
-   *          ignored.
+   *            ignored.
    */
   public static void main(final String[] args) {
     final javax.swing.JFrame frame = new javax.swing.JFrame("ColorCircleIterator-test");

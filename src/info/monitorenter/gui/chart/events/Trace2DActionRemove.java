@@ -45,7 +45,7 @@ import javax.swing.UIManager;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public final class Trace2DActionRemove
     extends ATrace2DAction {
@@ -74,7 +74,7 @@ public final class Trace2DActionRemove
     super(trace, name);
     Icon closeIcon = UIManager.getDefaults().getIcon("InternalFrame.paletteCloseIcon");
     if (closeIcon != null) {
-      putValue(Action.SMALL_ICON, closeIcon);
+      this.putValue(Action.SMALL_ICON, closeIcon);
     }
   }
 

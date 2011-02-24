@@ -36,18 +36,15 @@ import javax.swing.JColorChooser;
 import javax.swing.JComponent;
 
 /**
- * Singleton <code>Action</code> that sets a custom background color of the
- * corresponding <code>JComponent</code> by showing a modal color chooser.
+ * Singleton <code>Action</code> that sets a custom background color of the corresponding
+ * <code>JComponent</code> by showing a modal color chooser.
  * <p>
  * Only one instance per target component may exist.
  * <p>
  * 
  * @see info.monitorenter.gui.chart.events.JComponentActionSetCustomBackground
- * 
- * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final class JComponentActionSetCustomBackgroundSingleton
     extends AJComponentAction {
@@ -58,30 +55,26 @@ public final class JComponentActionSetCustomBackgroundSingleton
   private static final long serialVersionUID = 3904680491952451890L;
 
   /**
-   * Reference to the last custom color chosen to check wether the corresponding
-   * menu is selected.
+   * Reference to the last custom color chosen to check wether the corresponding menu is selected.
    */
   private Color m_lastChosenColor;
 
   /**
-   * Create an <code>Action</code> that accesses the trace and identifies
-   * itself with the given action String.
+   * Create an <code>Action</code> that accesses the trace and identifies itself with the given
+   * action String.
    * <p>
    * 
    * @param component
-   *          the target the action will work on.
-   * 
+   *            the target the action will work on.
    * @param description
-   *          the descriptive <code>String</code> that will be displayed by
-   *          {@link javax.swing.AbstractButton} subclasses that get this
-   *          <code>Action</code> assigned (
-   *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   *            the descriptive <code>String</code> that will be displayed by
+   *            {@link javax.swing.AbstractButton} subclasses that get this <code>Action</code>
+   *            assigned ( {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    */
   private JComponentActionSetCustomBackgroundSingleton(final JComponent component,
       final String description) {
     super(component, description);
-    component.addPropertyChangeListener(
-        Chart2D.PROPERTY_BACKGROUND_COLOR, this);
+    component.addPropertyChangeListener(Chart2D.PROPERTY_BACKGROUND_COLOR, this);
   }
 
   /**
@@ -95,32 +88,25 @@ public final class JComponentActionSetCustomBackgroundSingleton
   }
 
   /**
-   * Returns the single instance for the given component, potentially creating
-   * it.
+   * Returns the single instance for the given component, potentially creating it.
    * <p>
-   * 
-   * If an instance for the given component had been created the description
-   * String is ignored.
+   * If an instance for the given component had been created the description String is ignored.
    * <p>
    * 
    * @param component
-   *          the component to get the instance for (works as key).
-   * 
+   *            the component to get the instance for (works as key).
    * @param description
-   *          the description to use (ignored if instance for component has been
-   *          created before).
-   * 
+   *            the description to use (ignored if instance for component has been created before).
    * @return the single instance for the given component.
    */
   public static JComponentActionSetCustomBackgroundSingleton getInstance(
       final JComponent component, final String description) {
-    JComponentActionSetCustomBackgroundSingleton result = 
-      (JComponentActionSetCustomBackgroundSingleton) JComponentActionSetCustomBackgroundSingleton.instances
-        .get(key(component));
+    JComponentActionSetCustomBackgroundSingleton result = (JComponentActionSetCustomBackgroundSingleton) JComponentActionSetCustomBackgroundSingleton.instances
+        .get(JComponentActionSetCustomBackgroundSingleton.key(component));
     if (result == null) {
       result = new JComponentActionSetCustomBackgroundSingleton(component, description);
       JComponentActionSetCustomBackgroundSingleton.instances.put(
-          key(component), result);
+          JComponentActionSetCustomBackgroundSingleton.key(component), result);
     }
     return result;
   }
@@ -129,9 +115,8 @@ public final class JComponentActionSetCustomBackgroundSingleton
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   public void actionPerformed(final ActionEvent e) {
-    Color chosen = JColorChooser.showDialog(
-        this.m_component, "choose background color for " + this.m_component.getName(),
-        this.m_component.getBackground());
+    Color chosen = JColorChooser.showDialog(this.m_component, "choose background color for "
+        + this.m_component.getName(), this.m_component.getBackground());
     if (chosen != null) {
       this.m_lastChosenColor = chosen;
       this.m_component.setBackground(chosen);
@@ -146,16 +131,12 @@ public final class JComponentActionSetCustomBackgroundSingleton
     if (property.equals(Chart2D.PROPERTY_BACKGROUND_COLOR)) {
       Color newColor = (Color) evt.getNewValue();
       if (newColor.equals(this.m_lastChosenColor)) {
-        this
-            .firePropertyChange(
-                PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, new Boolean(false), new Boolean(
-                    true));
+        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED,
+            new Boolean(false), new Boolean(true));
 
       } else {
-        this
-            .firePropertyChange(
-                PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, new Boolean(true), new Boolean(
-                    false));
+        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED,
+            new Boolean(true), new Boolean(false));
       }
     }
   }

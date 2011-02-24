@@ -61,7 +61,7 @@ import java.util.Set;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class Trace2DDebugger implements ITrace2D {
 
@@ -203,6 +203,13 @@ public class Trace2DDebugger implements ITrace2D {
    */
   public Set getErrorBarPolicies() {
     return this.m_delegate.getErrorBarPolicies();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getHasErrorBars()
+   */
+  public boolean getHasErrorBars() {
+    return this.m_delegate.getHasErrorBars();
   }
 
   /**

@@ -36,24 +36,23 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A delegator / proxy that delegates all calls to an internal constructor-given
- * ITrace2d and swaps the data of the added Point2D instances.
+ * A delegator / proxy that delegates all calls to an internal constructor-given ITrace2d and swaps
+ * the data of the added Point2D instances.
  * <p>
- * x values become y values and vice versa. Performance is bad, as unnecessary
- * instances are created (each TracePoint2D is instantiated twice) so this
- * instance is for debugging / testing purposes only.
+ * x values become y values and vice versa. Performance is bad, as unnecessary instances are created
+ * (each TracePoint2D is instantiated twice) so this instance is for debugging / testing purposes
+ * only.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class Trace2DAxisSwap implements ITrace2D {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -5987864541853522562L;
-  
-  /** The delagate instance to decorate with axis swapping. */
+
+  /** The delegate instance to decorate with axis swapping. */
   private ITrace2D m_delegate;
 
   /**
@@ -61,7 +60,7 @@ public class Trace2DAxisSwap implements ITrace2D {
    * <p>
    * 
    * @param trace
-   *          the delagate instance to decorate with axis swapping.
+   *            the delagate instance to decorate with axis swapping.
    */
   public Trace2DAxisSwap(final ITrace2D trace) {
     if (trace == null) {
@@ -132,9 +131,10 @@ public class Trace2DAxisSwap implements ITrace2D {
     return this.m_delegate.equals(obj);
   }
 
- /**
-  * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(info.monitorenter.gui.chart.TracePoint2D, int)
-  */
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(info.monitorenter.gui.chart.TracePoint2D,
+   *      int)
+   */
   public void firePointChanged(final TracePoint2D changed, final int state) {
     this.m_delegate.firePointChanged(changed, state);
   }
@@ -158,6 +158,13 @@ public class Trace2DAxisSwap implements ITrace2D {
    */
   public Set getErrorBarPolicies() {
     return this.m_delegate.getErrorBarPolicies();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getHasErrorBars()
+   */
+  public boolean getHasErrorBars() {
+    return this.m_delegate.getHasErrorBars();
   }
 
   /**
@@ -259,7 +266,6 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
-   * 
    * @see info.monitorenter.gui.chart.ITrace2D#getTracePainters()
    */
   public Set getTracePainters() {
@@ -388,8 +394,7 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#setPhysicalUnits(java.lang.String,
-   *      java.lang.String)
+   * @see info.monitorenter.gui.chart.ITrace2D#setPhysicalUnits(java.lang.String, java.lang.String)
    */
   public void setPhysicalUnits(final String xunit, final String yunit) {
     this.m_delegate.setPhysicalUnits(xunit, yunit);
@@ -410,7 +415,6 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
-   * 
    * @see info.monitorenter.gui.chart.ITrace2D#setTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
   public Set setTracePainter(final ITracePainter painter) {

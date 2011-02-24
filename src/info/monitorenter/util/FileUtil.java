@@ -47,7 +47,6 @@ import java.util.StringTokenizer;
  * <p>
  * 
  * @author Achim Westermann
- * 
  * @version 1.1
  */
 public final class FileUtil
@@ -61,9 +60,9 @@ public final class FileUtil
    * 
    * <pre>
    *   
-   *  "file//c:/work/programming/anyfile.jar" --> "anyfile.jar"
-   *  "http://jamwg.de"                       --> "" // No file part.
-   *  "ftp://files.com/directory2/"           --> "" // File part of URL denotes a directory.
+   *  &quot;file//c:/work/programming/anyfile.jar&quot; --&gt; &quot;anyfile.jar&quot;
+   *  &quot;http://jamwg.de&quot;                       --&gt; &quot;&quot; // No file part.
+   *  &quot;ftp://files.com/directory2/&quot;           --&gt; &quot;&quot; // File part of URL denotes a directory.
    *    
    * </pre>
    * 
@@ -71,10 +70,9 @@ public final class FileUtil
    * <p>
    * 
    * @param path
-   *          the absolute file path you want the mere file name of.
-   * 
-   * @return the <code>{@link java.util.Map.Entry}</code> consisting of path
-   *         information and file name.
+   *            the absolute file path you want the mere file name of.
+   * @return the <code>{@link java.util.Map.Entry}</code> consisting of path information and file
+   *         name.
    */
   public static Map.Entry cutDirectoryInformation(final java.net.URL path) {
     Map.Entry ret = null;
@@ -105,35 +103,33 @@ public final class FileUtil
   }
 
   /**
-   * Cuts the path information of the String that is interpreted as a filename
-   * into the directory part and the file part. The current operating system's
-   * path separator is used to cut all path information from the String.
+   * Cuts the path information of the String that is interpreted as a filename into the directory
+   * part and the file part. The current operating system's path separator is used to cut all path
+   * information from the String.
    * <p>
    * 
    * <pre>
    *   
-   *  "c:/work/programming/anyfile.jar" --> Map.Entry("c:/work/programming/","anyfile.jar");
-   *  "anyfile.jar"                     --> Map.Entry(new File(".").getAbsolutePath(),"anyfile.jar");
-   *  "c:/directory1/directory2/"       --> Map.Entry("c:/directory1/directory2/","");
-   *  "c:/directory1/directory2"        --> Map.Entry("c:/directory1/directory2/",""); // directory2 is a dir!
-   *  "c:/directory1/file2"             --> Map.Entry("c:/directory1/","file2");       // file2 is a file!
-   *  "c:/"                             --> Map.Entry("c:/","");
+   *  &quot;c:/work/programming/anyfile.jar&quot; --&gt; Map.Entry(&quot;c:/work/programming/&quot;,&quot;anyfile.jar&quot;);
+   *  &quot;anyfile.jar&quot;                     --&gt; Map.Entry(new File(&quot;.&quot;).getAbsolutePath(),&quot;anyfile.jar&quot;);
+   *  &quot;c:/directory1/directory2/&quot;       --&gt; Map.Entry(&quot;c:/directory1/directory2/&quot;,&quot;&quot;);
+   *  &quot;c:/directory1/directory2&quot;        --&gt; Map.Entry(&quot;c:/directory1/directory2/&quot;,&quot;&quot;); // directory2 is a dir!
+   *  &quot;c:/directory1/file2&quot;             --&gt; Map.Entry(&quot;c:/directory1/&quot;,&quot;file2&quot;);       // file2 is a file!
+   *  &quot;c:/&quot;                             --&gt; Map.Entry(&quot;c:/&quot;,&quot;&quot;);
    *    
    * </pre>
    * 
    * Assuming, that '/' is the current file separator character.
    * <p>
-   * 
    * <b>If your string is retrieved from an <tt>URL</tt> instance, use
-   * <tt>cutDirectoryInformation(URL path)</tt> instead, because URL's do not
-   * depend on the operating systems file separator! </b>
+   * <tt>cutDirectoryInformation(URL path)</tt> instead, because URL's do not depend on the
+   * operating systems file separator! </b>
    * <p>
    * 
    * @param path
-   *          the absolute file path you want the mere file name of.
-   * 
-   * @return the <code>{@link java.util.Map.Entry}</code> consisting of path
-   *         information and file name.
+   *            the absolute file path you want the mere file name of.
+   * @return the <code>{@link java.util.Map.Entry}</code> consisting of path information and file
+   *         name.
    */
   public static Map.Entry cutDirectoryInformation(final String path) {
     StringBuffer dir = new StringBuffer();
@@ -178,36 +174,32 @@ public final class FileUtil
   }
 
   /**
-   * Cuts a String into the part before the last dot and after the last dot. If
-   * only one dot is contained on the first position, it will completely be used
-   * as prefix part.
+   * Cuts a String into the part before the last dot and after the last dot. If only one dot is
+   * contained on the first position, it will completely be used as prefix part.
    * <p>
    * 
    * <pre>
-   * Map.Entry entry = FileUtil.getPotentialExtension("A.Very.Strange.Name.txt");
-   * String prefix = (String)entry.getKey(); // prefix is "A.Very.Strange.Name".
-   * String suffix = (String)entry.getValue(); // suffix is "txt";
+   * Map.Entry entry = FileUtil.getPotentialExtension(&quot;A.Very.Strange.Name.txt&quot;);
+   * String prefix = (String) entry.getKey(); // prefix is &quot;A.Very.Strange.Name&quot;.
+   * String suffix = (String) entry.getValue(); // suffix is &quot;txt&quot;;
    * 
-   * entry = FileUtil.getPotentialExtension(".profile");
-   * String prefix = (String)entry.getKey(); // prefix is ".profile".
-   * String suffix = (String)entry.getValue(); // suffix is "";
+   * entry = FileUtil.getPotentialExtension(&quot;.profile&quot;);
+   * String prefix = (String) entry.getKey(); // prefix is &quot;.profile&quot;.
+   * String suffix = (String) entry.getValue(); // suffix is &quot;&quot;;
    * 
-   * entry = FileUtil.getPotentialExtension("bash");
-   * String prefix = (String)entry.getKey(); // prefix is "bash".
-   * String suffix = (String)entry.getValue(); // suffix is "";
+   * entry = FileUtil.getPotentialExtension(&quot;bash&quot;);
+   * String prefix = (String) entry.getKey(); // prefix is &quot;bash&quot;.
+   * String suffix = (String) entry.getValue(); // suffix is &quot;&quot;;
    * 
    * </pre>
    * 
    * <p>
    * 
-   * 
    * @param filename
-   *          A String that is interpreted to be a file name: The last dot ('.')
-   *          is interpreted to be the extension delimiter.
-   * 
-   * @return A <tt> java.util.Map.Entry</tt> instance containing a String for
-   *         the filename at the key side and a String for the extension at the
-   *         value side.
+   *            A String that is interpreted to be a file name: The last dot ('.') is interpreted to
+   *            be the extension delimiter.
+   * @return A <tt> java.util.Map.Entry</tt> instance containing a String for the filename at the
+   *         key side and a String for the extension at the value side.
    */
   public static java.util.Map.Entry cutExtension(final String filename) {
     String prefix;
@@ -233,45 +225,44 @@ public final class FileUtil
   }
 
   /**
-   * Finds a filename based on the given name. If a file with the given name
-   * does not exist, <tt>name</tt> will be returned.
+   * Finds a filename based on the given name. If a file with the given name does not exist,
+   * <tt>name</tt> will be returned.
    * <p>
-   * 
    * Else:
    * 
    * <pre>
-   *  "myFile.out"     --> "myFile_0.out"
-   *  "myFile_0.out"   --> "myFile_1.out"
-   *  "myFile_1.out"   --> "myFile_2.out"
+   *  &quot;myFile.out&quot;     --&gt; &quot;myFile_0.out&quot;
+   *  &quot;myFile_0.out&quot;   --&gt; &quot;myFile_1.out&quot;
+   *  &quot;myFile_1.out&quot;   --&gt; &quot;myFile_2.out&quot;
    *  ....
    * </pre>
    * 
    * <p>
-   * 
-   * The potential extension is preserved, but a number is appended to the
-   * prefix name.
+   * The potential extension is preserved, but a number is appended to the prefix name.
    * <p>
    * 
    * @param name
-   *          A desired file name.
-   * 
-   * @return A String that sticks to the naming convention of the given String
-   *         but is unique in the directory scope of argument <tt>name</tt>.
+   *            A desired file name.
+   * @return A String that sticks to the naming convention of the given String but is unique in the
+   *         directory scope of argument <tt>name</tt>.
    */
   public static String getDefaultFileName(final String name) {
+    String result;
     File f = new File(name);
     if (!f.exists()) {
-      return f.getAbsolutePath();
+      result = f.getAbsolutePath();
+    } else {
+      java.util.Map.Entry cut = FileUtil.cutExtension(name);
+      String prefix = (String) cut.getKey();
+      String suffix = (String) cut.getValue();
+      int num = 0;
+      while (f.exists()) {
+        f = new File(prefix + '_' + num + '.' + suffix);
+        num++;
+      }
+      result = f.getAbsolutePath();
     }
-    java.util.Map.Entry cut = cutExtension(name);
-    String prefix = (String) cut.getKey();
-    String suffix = (String) cut.getValue();
-    int num = 0;
-    while (f.exists()) {
-      f = new File(prefix + '_' + num + '.' + suffix);
-      num++;
-    }
-    return f.getAbsolutePath();
+    return result;
   }
 
   /**
@@ -288,41 +279,36 @@ public final class FileUtil
   }
 
   /**
-   * Tests wether the given file only contains ASCII characters if interpreted
-   * by reading bytes (16 bit).
+   * Tests wether the given file only contains ASCII characters if interpreted by reading bytes (16
+   * bit).
    * <p>
-   * This does not mean that the file is really an ASCII text file. It just
-   * might be viewed with an editor showing only valid ASCII characters.
+   * This does not mean that the file is really an ASCII text file. It just might be viewed with an
+   * editor showing only valid ASCII characters.
    * <p>
    * 
    * @param f
-   *          the file to test.
-   * 
+   *            the file to test.
    * @return true if all bytes in the file are in the ASCII range.
-   * 
    * @throws IOException
-   *           on a bad day.
+   *             on a bad day.
    */
   public static boolean isAllASCII(final File f) throws IOException {
-    return isAllASCII(new FileInputStream(f));
+    return FileUtil.isAllASCII(new FileInputStream(f));
   }
 
   /**
-   * Tests wether the given input stream only contains ASCII characters if
-   * interpreted by reading bytes (16 bit).
+   * Tests wether the given input stream only contains ASCII characters if interpreted by reading
+   * bytes (16 bit).
    * <p>
-   * This does not mean that the underlying content is really an ASCII text
-   * file. It just might be viewed with an editor showing only valid ASCII
-   * characters.
+   * This does not mean that the underlying content is really an ASCII text file. It just might be
+   * viewed with an editor showing only valid ASCII characters.
    * <p>
    * 
    * @param in
-   *          the stream to test.
-   * 
+   *            the stream to test.
    * @return true if all bytes in the given input stream are in the ASCII range.
-   * 
    * @throws IOException
-   *           on a bad day.
+   *             on a bad day.
    */
   public static boolean isAllASCII(final InputStream in) throws IOException {
     boolean ret = true;
@@ -339,30 +325,24 @@ public final class FileUtil
   }
 
   /**
-   * Tests, wether the content of the given file is identical at character
-   * level, when it is opened with both different Charsets.
+   * Tests, wether the content of the given file is identical at character level, when it is opened
+   * with both different Charsets.
    * <p>
-   * This is most often the case, if the given file only contains ASCII codes
-   * but may also occur, when both codepages cover common ranges and the
-   * document only contains values m_out of those ranges (like the EUC-CN
-   * charset contains all mappings from BIG5).
+   * This is most often the case, if the given file only contains ASCII codes but may also occur,
+   * when both codepages cover common ranges and the document only contains values m_out of those
+   * ranges (like the EUC-CN charset contains all mappings from BIG5).
    * <p>
    * 
    * @param document
-   *          the file to test.
-   * 
+   *            the file to test.
    * @param a
-   *          the first character set to interpret the document in.
-   * 
+   *            the first character set to interpret the document in.
    * @param b
-   *          the 2nd character set to interpret the document in.
-   * 
+   *            the 2nd character set to interpret the document in.
    * @throws IOException
-   *           if sth. goes wrong.
-   * 
-   * @return true if both files have all equal contents if they are interpreted
-   *         as character data in both given encodings (they may differ at
-   *         binary level if both charsets are different).
+   *             if sth. goes wrong.
+   * @return true if both files have all equal contents if they are interpreted as character data in
+   *         both given encodings (they may differ at binary level if both charsets are different).
    */
   public static boolean isEqual(final File document, final Charset a, final Charset b)
       throws IOException {
@@ -402,40 +382,33 @@ public final class FileUtil
    * Invokes {@link #readRAM(File)}, but decorates the result with a
    * {@link java.io.ByteArrayInputStream}.
    * <p>
-   * This means: The complete content of the given File has been loaded before
-   * using the returned InputStream. There are no IO-delays afterwards but
-   * OutOfMemoryErrors may occur.
+   * This means: The complete content of the given File has been loaded before using the returned
+   * InputStream. There are no IO-delays afterwards but OutOfMemoryErrors may occur.
    * <p>
    * 
    * @param f
-   *          the file to cache.
-   * 
+   *            the file to cache.
    * @return an input stream backed by the file read into memory.
-   * 
    * @throws IOException
-   *           if sth. goes wrong.
+   *             if sth. goes wrong.
    */
   public static InputStream readCache(final File f) throws IOException {
-    return new ByteArrayInputStream(readRAM(f));
+    return new ByteArrayInputStream(FileUtil.readRAM(f));
   }
 
   /**
    * Reads the content of the given File into an array.
    * <p>
    * This method currently does not check for maximum length and might cause a
-   * java.lang.OutOfMemoryError. It is only intended for
-   * performance-measurements of data-based algorithms that want to exclude
-   * I/O-usage.
+   * java.lang.OutOfMemoryError. It is only intended for performance-measurements of data-based
+   * algorithms that want to exclude I/O-usage.
    * <p>
    * 
    * @param f
-   *          the file to read.
-   * 
+   *            the file to read.
    * @throws IOException
-   *           if sth. goes wrong.
-   * 
+   *             if sth. goes wrong.
    * @return the contents of the given file.
-   * 
    */
   public static byte[] readRAM(final File f) throws IOException {
     int total = (int) f.length();
@@ -459,81 +432,80 @@ public final class FileUtil
   /**
    * Removes the duplicate line breaks in the given file.
    * <p>
-   * 
-   * Be careful with big files: In order to avoid having to write a tmpfile
-   * (cannot read and directly write to the same file) a StringBuffer is used
-   * for manipulation. Big files will cost all RAM and terminate VM hard.
+   * Be careful with big files: In order to avoid having to write a tmpfile (cannot read and
+   * directly write to the same file) a StringBuffer is used for manipulation. Big files will cost
+   * all RAM and terminate VM hard.
    * <p>
    * 
    * @param f
-   *          the file to remove duplicate line breaks in.
+   *            the file to remove duplicate line breaks in.
    */
   public static void removeDuplicateLineBreaks(final File f) {
     String sep = StringUtil.getNewLine();
     if (!f.exists()) {
       System.err.println("FileUtil.removeDuplicateLineBreak(File f): " + f.getAbsolutePath()
           + " does not exist!");
-      return;
-    }
-    if (f.isDirectory()) {
-      System.err.println("FileUtil.removeDuplicateLineBreak(File f): " + f.getAbsolutePath()
-          + " is a directory!");
-      return;
-    }
-    // real file
-    FileInputStream inStream = null;
-    BufferedInputStream in = null;
-    FileWriter out = null;
-    try {
-      inStream = new FileInputStream(f);
-      in = new BufferedInputStream(inStream, 1024);
-      StringBuffer result = new StringBuffer();
-      int tmpread;
-      while ((tmpread = in.read()) != -1) {
-        result.append((char) tmpread);
-      }
-      String tmpstring;
-      StringTokenizer toke = new StringTokenizer(result.toString(), sep, true);
-      result = new StringBuffer();
-      int breaks = 0;
-      while (toke.hasMoreTokens()) {
-        tmpstring = toke.nextToken().trim();
-        if (tmpstring.equals("") && breaks > 0) {
-          breaks++;
-          // if(breaks<=2)result.append(sep);
-          continue;
-        }
-        if (tmpstring.equals("")) {
-          tmpstring = sep;
-          breaks++;
-        } else {
-          breaks = 0;
-        }
-        result.append(tmpstring);
-      }
-      // delete original file and write it new from tmpfile.
-      f.delete();
-      f.createNewFile();
-      out = new FileWriter(f);
-      out.write(result.toString());
-    } catch (FileNotFoundException e) {
-      // does never happen.
-    } catch (IOException g) {
-      g.printStackTrace(System.err);
-    } finally {
-      if (in != null) {
+    } else {
+      if (f.isDirectory()) {
+        System.err.println("FileUtil.removeDuplicateLineBreak(File f): " + f.getAbsolutePath()
+            + " is a directory!");
+      } else {
+        // real file
+        FileInputStream inStream = null;
+        BufferedInputStream in = null;
+        FileWriter out = null;
         try {
-          in.close();
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-      }
-      if (out != null) {
-        try {
-          out.flush();
-          out.close();
-        } catch (IOException e) {
-          e.printStackTrace();
+          inStream = new FileInputStream(f);
+          in = new BufferedInputStream(inStream, 1024);
+          StringBuffer result = new StringBuffer();
+          int tmpread;
+          while ((tmpread = in.read()) != -1) {
+            result.append((char) tmpread);
+          }
+          String tmpstring;
+          StringTokenizer toke = new StringTokenizer(result.toString(), sep, true);
+          result = new StringBuffer();
+          int breaks = 0;
+          while (toke.hasMoreTokens()) {
+            tmpstring = toke.nextToken().trim();
+            if (tmpstring.equals("") && breaks > 0) {
+              breaks++;
+              // if(breaks<=2)result.append(sep);
+              continue;
+            }
+            if (tmpstring.equals("")) {
+              tmpstring = sep;
+              breaks++;
+            } else {
+              breaks = 0;
+            }
+            result.append(tmpstring);
+          }
+          // delete original file and write it new from tmpfile.
+          f.delete();
+          f.createNewFile();
+          out = new FileWriter(f);
+          out.write(result.toString());
+        } catch (FileNotFoundException e) {
+          // does never happen.
+        } catch (IOException g) {
+          g.printStackTrace(System.err);
+        } finally {
+          if (in != null) {
+            try {
+              in.close();
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+          }
+          if (out != null) {
+            try {
+              out.flush();
+              out.close();
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+          }
         }
       }
     }
@@ -551,18 +523,14 @@ public final class FileUtil
   }
 
   /**
-   * Returns the formatted filesize to Bytes, KB, MB or GB depending on the
-   * given value.
+   * Returns the formatted filesize to Bytes, KB, MB or GB depending on the given value.
    * <p>
    * 
    * @param filesize
-   *          in bytes
-   * 
+   *            in bytes
    * @param locale
-   *          the locale to translate the result to (e.g. in France they us
-   * 
-   * @return the formatted filesize to Bytes, KB, MB or GB depending on the
-   *         given value.
+   *            the locale to translate the result to (e.g. in France they us
+   * @return the formatted filesize to Bytes, KB, MB or GB depending on the given value.
    */
   public String formatFilesize(final long filesize, final Locale locale) {
 

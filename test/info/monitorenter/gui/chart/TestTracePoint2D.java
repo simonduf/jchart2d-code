@@ -35,12 +35,12 @@ import junit.framework.TestSuite;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  * 
  * @since 7.0.0
  * 
  */
-public class TestTracePoint2D extends TestChart {
+public class TestTracePoint2D extends TestChart2D {
   /**
    * Constructor with the test name.
    * <p>

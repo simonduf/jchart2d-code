@@ -36,18 +36,12 @@ import java.util.Iterator;
 /**
  * An {@link AAxis} with inverse display of values.
  * <p>
- * 
- * Labels and values are starting from the highest value and go down to the
- * lowest one.
+ * Labels and values are starting from the highest value and go down to the lowest one.
  * <p>
  * 
- * 
  * @author Andrea Plotegher (initial contribution)
- * 
- * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- *         (adaption for core)
- * 
- * @version $Revision: 1.9 $
+ * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a> (adaption for core)
+ * @version $Revision: 1.11 $
  */
 
 public class AxisInverse
@@ -57,23 +51,24 @@ public class AxisInverse
   private static final long serialVersionUID = -1688970969107347292L;
 
   /**
-   * 
    * An accessor for the x axis of a chart.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de>Achim Westermann </a>
-   * 
    * @see Chart2D#getAxisX()
    */
   public class XDataInverseAccessor
       extends AAxis.XDataAccessor {
+
+    /** Generated <code>serialVersionUID</code>. */
+    private static final long serialVersionUID = -4369216673741667248L;
 
     /**
      * Creates an instance that accesses the given chart's x axis.
      * <p>
      * 
      * @param chart
-     *          the chart to access.
+     *            the chart to access.
      */
     public XDataInverseAccessor(final Chart2D chart) {
 
@@ -151,18 +146,20 @@ public class AxisInverse
    * <p>
    * 
    * @see AAxis#setAccessor(info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor)
-   * 
    * @see Chart2D#getAxisY()
    */
   public class YDataInverseAccessor
       extends AAxis.YDataAccessor {
+
+    /** Generated <code>serialVersionUID</code>. */
+    private static final long serialVersionUID = 4952735935221684021L;
 
     /**
      * Creates an instance that accesses the y axis of the given chart.
      * <p>
      * 
      * @param chart
-     *          the chart to access.
+     *            the chart to access.
      */
     public YDataInverseAccessor(final Chart2D chart) {
 
@@ -243,8 +240,7 @@ public class AxisInverse
    * <p>
    * 
    * @param formatter
-   *          needed for formatting labels of this axis.
-   * 
+   *            needed for formatting labels of this axis.
    */
   public AxisInverse(final IAxisLabelFormatter formatter) {
     super(formatter);
@@ -255,26 +251,27 @@ public class AxisInverse
    *      int)
    */
   protected AChart2DDataAccessor createAccessor(final Chart2D chart, final int dimension) {
+    AChart2DDataAccessor result;
     if (dimension == Chart2D.X) {
-      return new AxisInverse.XDataInverseAccessor(chart);
+      result = new AxisInverse.XDataInverseAccessor(chart);
     } else if (dimension == Chart2D.Y) {
-      return new AxisInverse.YDataInverseAccessor(chart);
+      result = new AxisInverse.YDataInverseAccessor(chart);
     } else {
       throw new IllegalArgumentException("Dimension has to be Chart2D.X or Chart2D.Y!");
     }
+    return result;
   }
 
   /**
    * Returns the labels for this axis.
    * <p>
-   * The labels will have at least the given argument <code>resolution</code>
-   * as distance in the value domain of the chart.
+   * The labels will have at least the given argument <code>resolution</code> as distance in the
+   * value domain of the chart.
    * <p>
    * 
    * @param resolution
-   *          the distance in the value domain of the chart that has to be at
-   *          least between to labels.
-   * 
+   *            the distance in the value domain of the chart that has to be at least between to
+   *            labels.
    * @return the labels for this axis.
    */
 

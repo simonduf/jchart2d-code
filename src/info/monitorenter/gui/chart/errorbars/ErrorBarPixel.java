@@ -31,9 +31,12 @@ import info.monitorenter.gui.chart.ITrace2D;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ErrorBarPixel implements IErrorBarPixel {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -8982331911629960274L;
 
   /** The negative x error in pixel. */
   private int m_negativeXErrorPixel = ERROR_PIXEL_NONE;

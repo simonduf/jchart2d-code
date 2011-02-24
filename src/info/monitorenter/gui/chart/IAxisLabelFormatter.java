@@ -26,6 +26,7 @@ package info.monitorenter.gui.chart;
 import info.monitorenter.util.units.AUnit;
 
 import java.beans.PropertyChangeListener;
+import java.io.Serializable;
 
 /**
  * An interface used by Axis to format labels and determine the maximum width
@@ -40,9 +41,9 @@ import java.beans.PropertyChangeListener;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public interface IAxisLabelFormatter {
+public interface IAxisLabelFormatter extends Serializable {
   /**
    * Constant for <code>{@link java.beans.PropertyChangeEvent}</code> fired
    * when the configuration changes.

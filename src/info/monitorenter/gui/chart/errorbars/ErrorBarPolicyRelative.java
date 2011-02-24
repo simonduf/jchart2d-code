@@ -23,6 +23,8 @@
  */
 package info.monitorenter.gui.chart.errorbars;
 
+import info.monitorenter.gui.chart.TracePoint2D;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -39,20 +41,16 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
- * Configurable <code>{@link info.monitorenter.gui.chart.IErrorBarPolicy}</code>
- * that adds a relative error (relative to the absolute values) to the points to
- * render.
+ * Configurable <code>{@link info.monitorenter.gui.chart.IErrorBarPolicy}</code> that adds a
+ * relative error (relative to the absolute values) to the points to render.
  * <p>
- * 
- * You should not use this if you have a small value range but very high values:
- * The relative value will cause exteremely long lines (be much higher than the
- * value range to display) and fold the trace to a minimum line.
+ * You should not use this if you have a small value range but very high values: The relative value
+ * will cause exteremely long lines (be much higher than the value range to display) and fold the
+ * trace to a minimum line.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * 
- * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class ErrorBarPolicyRelative
     extends AErrorBarPolicyConfigurable {
@@ -69,18 +67,14 @@ public class ErrorBarPolicyRelative
   /**
    * Creates an instance with the given relative errors.
    * <p>
-   * 
-   * The relative error is related to the absolut x and y values to render. It
-   * has to be between 0.0 and 1.0.
+   * The relative error is related to the absolut x and y values to render. It has to be between 0.0
+   * and 1.0.
    * <p>
    * 
    * @param relativeError
-   *          the relative error value between 0.0 and 1.0 for x and y
-   *          dimension.
-   * 
+   *            the relative error value between 0.0 and 1.0 for x and y dimension.
    * @throws IllegalArgumentException
-   *           if the argument is not between 0.0 and 1.0.
-   * 
+   *             if the argument is not between 0.0 and 1.0.
    * @see #ErrorBarPolicyRelative(double, double)
    */
   public ErrorBarPolicyRelative(final double relativeError) throws IllegalArgumentException {
@@ -90,19 +84,16 @@ public class ErrorBarPolicyRelative
   /**
    * Creates an instance with the given relative errors.
    * <p>
-   * 
-   * The relative error is related to the absolut x and y values to render. It
-   * has to be between 0.0 and 1.0.
+   * The relative error is related to the absolut x and y values to render. It has to be between 0.0
+   * and 1.0.
    * <p>
    * 
    * @param relativeXError
-   *          the relative x error value between 0.0 and 1.0.
-   * 
+   *            the relative x error value between 0.0 and 1.0.
    * @param relativeYError
-   *          the relative y error value between 0.0 and 1.0.
-   * 
+   *            the relative y error value between 0.0 and 1.0.
    * @throws IllegalArgumentException
-   *           if the argument is not between 0.0 and 1.0.
+   *             if the argument is not between 0.0 and 1.0.
    */
   public ErrorBarPolicyRelative(final double relativeXError, final double relativeYError)
       throws IllegalArgumentException {
@@ -211,9 +202,10 @@ public class ErrorBarPolicyRelative
 
   /**
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeXError(int,
-   *      int)
+   *      int, info.monitorenter.gui.chart.TracePoint2D)
    */
-  protected int internalGetNegativeXError(final int xPixel, final int yPixel) {
+  protected int internalGetNegativeXError(final int xPixel, final int yPixel,
+      final TracePoint2D original) {
     double error = (xPixel - this.getTrace().getRenderer().getXChartStart())
         * this.m_relativeXError;
     int result = (int) Math.round(xPixel - error);
@@ -222,9 +214,10 @@ public class ErrorBarPolicyRelative
 
   /**
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeYError(int,
-   *      int)
+   *      int, info.monitorenter.gui.chart.TracePoint2D)
    */
-  protected int internalGetNegativeYError(final int xPixel, final int yPixel) {
+  protected int internalGetNegativeYError(final int xPixel, final int yPixel,
+      final TracePoint2D original) {
     int error = (int) Math.round((this.getTrace().getRenderer().getYChartStart() - yPixel)
         * this.m_relativeYError);
     return yPixel + error;
@@ -233,9 +226,10 @@ public class ErrorBarPolicyRelative
 
   /**
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetPositiveXError(int,
-   *      int)
+   *      int, info.monitorenter.gui.chart.TracePoint2D)
    */
-  protected int internalGetPositiveXError(final int xPixel, final int yPixel) {
+  protected int internalGetPositiveXError(final int xPixel, final int yPixel,
+      final TracePoint2D original) {
     double error = (xPixel - this.getTrace().getRenderer().getXChartStart())
         * this.m_relativeXError;
     int result = (int) Math.round(xPixel + error);
@@ -244,11 +238,12 @@ public class ErrorBarPolicyRelative
 
   /**
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetPositiveYError(int,
-   *      int)
+   *      int, info.monitorenter.gui.chart.TracePoint2D)
    */
-  protected int internalGetPositiveYError(final int xPixel, final int yPixel) {
+  protected int internalGetPositiveYError(final int xPixel, final int yPixel,
+      final TracePoint2D original) {
     // y pixel are bigger the lower the value is, so inversion
-    // is neede here:
+    // is needed here:
     int error = (int) Math.round((this.getTrace().getRenderer().getYChartStart() - yPixel)
         * this.m_relativeYError);
     return yPixel - error;
@@ -257,16 +252,14 @@ public class ErrorBarPolicyRelative
   /**
    * Sets the relative X error to add to each error bar.
    * <p>
-   * 
-   * The relative error is related to the absolut x values to render. It has to
-   * be between 0.0 and 1.0.
+   * The relative error is related to the absolut x values to render. It has to be between 0.0 and
+   * 1.0.
    * <p>
    * 
    * @param relativeXError
-   *          a value between 0.0 and 1.0.
-   * 
+   *            a value between 0.0 and 1.0.
    * @throws IllegalArgumentException
-   *           if the argument is not between 0.0 and 1.0.
+   *             if the argument is not between 0.0 and 1.0.
    */
   public final void setRelativeXError(final double relativeXError) throws IllegalArgumentException {
     if (relativeXError <= 0.0 || relativeXError >= 1.0) {
@@ -283,16 +276,14 @@ public class ErrorBarPolicyRelative
   /**
    * Sets the relative Y error to add to each error bar.
    * <p>
-   * 
-   * The relative error is related to the absolut y values to render. It has to
-   * be between 0.0 and 1.0.
+   * The relative error is related to the absolut y values to render. It has to be between 0.0 and
+   * 1.0.
    * <p>
    * 
    * @param relativeYError
-   *          a value between 0.0 and 1.0.
-   * 
+   *            a value between 0.0 and 1.0.
    * @throws IllegalArgumentException
-   *           if the argument is not between 0.0 and 1.0.
+   *             if the argument is not between 0.0 and 1.0.
    */
   public final void setRelativeYError(final double relativeYError) throws IllegalArgumentException {
     if (relativeYError <= 0.0 || relativeYError >= 1.0) {

@@ -65,12 +65,16 @@ import java.util.Date;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  * 
  * @see java.util.Date
  */
 public class LabelFormatterDate
     extends ALabelFormatter implements IAxisLabelFormatter {
+  
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -7201853569619240987L;
+
   /** The cached maximum amount of characters that will be used. */
   private int m_cachedMaxAmountChars = Integer.MAX_VALUE;
 

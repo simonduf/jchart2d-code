@@ -50,22 +50,19 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
 /**
- * Basic junit test method hook that searches for files in this package with
- * name "textX.properties" (where "X" is a number that starts from 1) collects
- * the data in the files and shows a chart with a trace that contains this data
- * along with buttons for judging the display as right or wrong.
+ * Basic junit test method hook that searches for files in this package with name "textX.properties"
+ * (where "X" is a number that starts from 1) collects the data in the files and shows a chart with
+ * a trace that contains this data along with buttons for judging the display as right or wrong.
  * <p>
- * Note that the test files have to be named with ascending numbers to ensure
- * all are shown.
+ * Note that the test files have to be named with ascending numbers to ensure all are shown.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
- * @version $Revision: 1.5 $
- * 
+ * @version $Revision: 1.6 $
  */
 public abstract class ADisplayTest
     extends TestCase {
@@ -74,24 +71,23 @@ public abstract class ADisplayTest
   private JFrame m_frame;
 
   /**
-   * Chart2D inistance that failed, set by UI Threads to trigger failure on the
-   * junit testcase Thread.
+   * Chart2D inistance that failed, set by UI Threads to trigger failure on the junit testcase
+   * Thread.
    * <p>
    */
   protected Chart2D m_failure = null;
 
   /**
-   * Basic junit test method hook that searches for files in this package with
-   * name "textX.properties" (where "X" is a number that starts from 1) collects
-   * the data in the files and shows a chart with a trace that contains this
-   * data along with buttons for judging the display as right or wrong.
+   * Basic junit test method hook that searches for files in this package with name
+   * "textX.properties" (where "X" is a number that starts from 1) collects the data in the files
+   * and shows a chart with a trace that contains this data along with buttons for judging the
+   * display as right or wrong.
    * <p>
    * 
    * @throws IOException
-   *           if sth. goes wrong.
-   * 
+   *             if sth. goes wrong.
    * @throws InterruptedException
-   *           if sleeping is interrupted.
+   *             if sleeping is interrupted.
    */
   public final void testDisplay() throws IOException, InterruptedException {
     StaticCollectorChart chart;
@@ -108,14 +104,12 @@ public abstract class ADisplayTest
   }
 
   /**
-   * Template method that returns the next chart to test or null if no further
-   * chart is available.
+   * Template method that returns the next chart to test or null if no further chart is available.
    * <p>
    * 
    * @return the next chart to test or null if no further chart is available.
-   * 
    * @throws IOException
-   *           if sth. goes wrong.
+   *             if sth. goes wrong.
    */
   protected abstract StaticCollectorChart getNextChart() throws IOException;
 
@@ -124,8 +118,8 @@ public abstract class ADisplayTest
    * <p>
    * 
    * @param wrong
-   *          the chart that failed.
-   *          <p>
+   *            the chart that failed.
+   *            <p>
    */
   public final void fail(final Chart2D wrong) {
     this.m_failure = wrong;
@@ -137,7 +131,7 @@ public abstract class ADisplayTest
    * <p>
    * 
    * @param testName
-   *          the name of the test case.
+   *            the name of the test case.
    */
   public ADisplayTest(final String testName) {
     super(testName);
@@ -156,7 +150,7 @@ public abstract class ADisplayTest
    * <p>
    * 
    * @param chart
-   *          the chart that will be shown.
+   *            the chart that will be shown.
    */
   protected abstract void configure(StaticCollectorChart chart);
 
@@ -165,10 +159,9 @@ public abstract class ADisplayTest
    * <p>
    * 
    * @param chart
-   *          the chart to display.
-   * 
+   *            the chart to display.
    * @throws InterruptedException
-   *           if sleeping fails.
+   *             if sleeping fails.
    */
   private final void show(final StaticCollectorChart chart) throws InterruptedException {
 
@@ -190,7 +183,7 @@ public abstract class ADisplayTest
     JButton fail = new JButton("fail");
     fail.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent ae) {
-        fail(chart.getChart());
+        ADisplayTest.this.fail(chart.getChart());
       }
     });
     JButton ok = new JButton("Ok");
@@ -218,7 +211,7 @@ public abstract class ADisplayTest
     this.m_frame.setSize(600, 600);
     this.m_frame.setVisible(true);
     Thread.sleep(1000);
-    description.setText(describe(chart));
+    description.setText(this.describe(chart));
     while (this.m_frame.isVisible()) {
       try {
         Thread.sleep(1000);
@@ -227,7 +220,7 @@ public abstract class ADisplayTest
           this.m_frame.dispose();
           this.m_frame = null;
 
-          fail("Display Test judged bad:\n" + describe(this.m_failure));
+          Assert.fail("Display Test judged bad:\n" + this.describe(this.m_failure));
         }
       } catch (InterruptedException e1) {
         e1.printStackTrace();
@@ -244,12 +237,11 @@ public abstract class ADisplayTest
    * <p>
    * 
    * @param collectorchart
-   *          the instance to describe.
-   * 
+   *            the instance to describe.
    * @return the description of the given instance.
    */
   private final String describe(final StaticCollectorChart collectorchart) {
-    return describe(collectorchart.getChart());
+    return this.describe(collectorchart.getChart());
   }
 
   /**
@@ -257,8 +249,7 @@ public abstract class ADisplayTest
    * <p>
    * 
    * @param chart
-   *          the instance to describe.
-   * 
+   *            the instance to describe.
    * @return the description of the given instance.
    */
   private final String describe(final Chart2D chart) {

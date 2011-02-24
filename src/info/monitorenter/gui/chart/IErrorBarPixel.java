@@ -21,28 +21,27 @@
  */
 package info.monitorenter.gui.chart;
 
+import java.io.Serializable;
+
 /**
- * Interface for an error bar in the pixel domain (vs. value domain) for a
- * single {@link info.monitorenter.gui.chart.TracePoint2D}.
+ * Interface for an error bar in the pixel domain (vs. value domain) for a single
+ * {@link info.monitorenter.gui.chart.TracePoint2D}.
  * <p>
- * Errors returned from the getters represent only the error part and not the
- * absolute value. Errors are always absolute values (vs. relative to the
- * original value to add the error to.
+ * Errors returned from the getters represent only the error part and not the absolute value. Errors
+ * are always absolute values (vs. relative to the original value to add the error to.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * 
- * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.6 $
  */
-public interface IErrorBarPixel {
+public interface IErrorBarPixel extends Serializable {
 
   /** Constant that identifies a resulting error to be non-existant. */
   public static final int ERROR_PIXEL_NONE = Integer.MAX_VALUE;
 
   /**
-   * Returns the negative error (positive value) in X dimension as a pixel value
-   * or {@link #ERROR_PIXEL_NONE}.
+   * Returns the negative error (positive value) in X dimension as a pixel value or
+   * {@link #ERROR_PIXEL_NONE}.
    * <p>
    * 
    * @return the negative error in X dimension or {@link #ERROR_PIXEL_NONE}.
@@ -50,8 +49,8 @@ public interface IErrorBarPixel {
   public int getNegativeXErrorPixel();
 
   /**
-   * Returns the negative error (positive value) in Y dimension as a pixel value
-   * or {@link #ERROR_PIXEL_NONE}.
+   * Returns the negative error (positive value) in Y dimension as a pixel value or
+   * {@link #ERROR_PIXEL_NONE}.
    * <p>
    * 
    * @return the negative error in Y dimension or {@link #ERROR_PIXEL_NONE}.
@@ -59,8 +58,7 @@ public interface IErrorBarPixel {
   public int getNegativeYErrorPixel();
 
   /**
-   * Returns the positive error in X dimension as a pixel value or
-   * {@link #ERROR_PIXEL_NONE}.
+   * Returns the positive error in X dimension as a pixel value or {@link #ERROR_PIXEL_NONE}.
    * <p>
    * 
    * @return the positive error in X dimension or {@link #ERROR_PIXEL_NONE}.

@@ -35,6 +35,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
+import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -46,7 +47,7 @@ import junit.framework.TestSuite;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class TestChart2DHeadless extends TestCase {
 
@@ -115,7 +116,7 @@ public class TestChart2DHeadless extends TestCase {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-    assertEquals(0, chartMap.size());
+    Assert.assertEquals(0, chartMap.size());
   }
 
   /**

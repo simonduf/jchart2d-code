@@ -27,18 +27,16 @@ import java.util.Map;
 /**
  * Simple wrapper around a time in ms and a value Object.
  * <p>
- * 
  * The key is the time in ms and may be used in a Map.
  * <code>{@link #compareTo(java.lang.Object)}</code> compares the key.
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann</a>
- * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public final class TimeStampedValue implements Map.Entry, Comparable {
   /**
-   * The timestamp (difference, measured in milliseconds, between the current
-   * time and midnight, January 1, 1970 UTC).
+   * The timestamp (difference, measured in milliseconds, between the current time and midnight,
+   * January 1, 1970 UTC).
    */
   private long m_key;
 
@@ -46,16 +44,14 @@ public final class TimeStampedValue implements Map.Entry, Comparable {
   private Object m_value;
 
   /**
-   * Creates an instance with the given timestamp key and the value to
-   * timestamp.
+   * Creates an instance with the given timestamp key and the value to timestamp.
    * <p>
    * 
    * @param key
-   *          the timestamp (difference, measured in milliseconds, between the
-   *          current time and midnight, January 1, 1970 UTC).
-   * 
+   *            the timestamp (difference, measured in milliseconds, between the current time and
+   *            midnight, January 1, 1970 UTC).
    * @param value
-   *          the value to timestamp.
+   *            the value to timestamp.
    */
   public TimeStampedValue(final long key, final Object value) {
     this.m_key = key;
@@ -63,13 +59,11 @@ public final class TimeStampedValue implements Map.Entry, Comparable {
   }
 
   /**
-   * Creates an instance for the given value that is timestamped with the
-   * current time.
+   * Creates an instance for the given value that is timestamped with the current time.
    * <p>
    * 
    * @param value
-   *          the value to timestamp.
-   * 
+   *            the value to timestamp.
    * @see System#currentTimeMillis()
    */
   public TimeStampedValue(final Object value) {
@@ -77,13 +71,11 @@ public final class TimeStampedValue implements Map.Entry, Comparable {
   }
 
   /**
-   * Returns the {@link Long} that marks the timestamp (difference, measured in
-   * milliseconds, between the current time and midnight, January 1, 1970 UTC).
+   * Returns the {@link Long} that marks the timestamp (difference, measured in milliseconds,
+   * between the current time and midnight, January 1, 1970 UTC).
    * 
-   * @return the {@link Long} that marks the timestamp (difference, measured in
-   *         milliseconds, between the current time and midnight, January 1,
-   *         1970 UTC).
-   * 
+   * @return the {@link Long} that marks the timestamp (difference, measured in milliseconds,
+   *         between the current time and midnight, January 1, 1970 UTC).
    * @see java.util.Map.Entry#getKey()
    */
   public Object getKey() {
@@ -95,7 +87,6 @@ public final class TimeStampedValue implements Map.Entry, Comparable {
    * <p>
    * 
    * @return the timestamped instance.
-   * 
    * @see java.util.Map.Entry#getValue()
    */
   public Object getValue() {
@@ -103,27 +94,23 @@ public final class TimeStampedValue implements Map.Entry, Comparable {
   }
 
   /**
-   * Returns the timestamp (difference, measured in milliseconds, between the
-   * current time and midnight, January 1, 1970 UTC).
+   * Returns the timestamp (difference, measured in milliseconds, between the current time and
+   * midnight, January 1, 1970 UTC).
    * <p>
    * 
-   * @return the timestamp (difference, measured in milliseconds, between the
-   *         current time and midnight, January 1, 1970 UTC).
-   * 
+   * @return the timestamp (difference, measured in milliseconds, between the current time and
+   *         midnight, January 1, 1970 UTC).
    */
   public long getTime() {
     return this.m_key;
   }
 
   /**
-   * Returns true, if o!=null && this.key.equals(0) &&
-   * o.insanceOf(TimeStampedValue).
+   * Returns true, if o!=null && this.key.equals(0) && o.insanceOf(TimeStampedValue).
    * 
    * @param o
-   *          the {@link TimeStampedValue} to compare this instance to.
-   * 
-   * @return true, if o!=null && this.key.equals(0) &&
-   *         o.insanceOf(TimeStampedValue).
+   *            the {@link TimeStampedValue} to compare this instance to.
+   * @return true, if o!=null && this.key.equals(0) && o.insanceOf(TimeStampedValue).
    */
   public boolean equals(final Object o) {
     if (o == null) {
@@ -142,7 +129,6 @@ public final class TimeStampedValue implements Map.Entry, Comparable {
   }
 
   /**
-   * 
    * @see java.lang.Object#hashCode()
    */
   public int hashCode() {
@@ -159,10 +145,8 @@ public final class TimeStampedValue implements Map.Entry, Comparable {
    * <p>
    * 
    * @param value
-   *          the new value to be marked with this timestamp.
-   * 
+   *            the new value to be marked with this timestamp.
    * @return the previous value that was contained.
-   * 
    * @see java.util.Map.Entry#setValue(java.lang.Object)
    */
   public Object setValue(final Object value) {
@@ -172,39 +156,37 @@ public final class TimeStampedValue implements Map.Entry, Comparable {
   }
 
   /**
-   * Compares the given {@link TimeStampedValue} to this by the internal
-   * {@link #getTime()}.
+   * Compares the given {@link TimeStampedValue} to this by the internal {@link #getTime()}.
    * <p>
    * 
    * @param obj
-   *          the object to compare this to.
-   * 
-   * 
+   *            the object to compare this to.
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   public int compareTo(final java.lang.Object obj) {
+    int result;
     TimeStampedValue other = (TimeStampedValue) obj;
     if (this.m_key < other.m_key) {
-      return -1;
+      result = -1;
+    } else {
+      if (this.m_key == other.m_key) {
+        result = 0;
+      } else {
+        result = 1;
+      }
     }
-    if (this.m_key == other.m_key) {
-      return 0;
-    }
-    return 1;
+    return result;
   }
 
   /**
    * Returns wethter the internal timestamp marks a time in the past or not.
    * <p>
-   * 
-   * For normal a timestamp represents a value regarded at a time. But it is
-   * also thinkable to mark a value for expiration in the future. This method
-   * returns true if the internal time- representing key is smaller than the
-   * actual time.
+   * For normal a timestamp represents a value regarded at a time. But it is also thinkable to mark
+   * a value for expiration in the future. This method returns true if the internal time-
+   * representing key is smaller than the actual time.
    * <p>
    * 
-   * @return true if the internal timestamp marks a moment in the past, false
-   *         else.
+   * @return true if the internal timestamp marks a moment in the past, false else.
    */
   public boolean isPast() {
     return this.m_key < System.currentTimeMillis();

@@ -29,6 +29,7 @@ import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.reflection.ObjRecorder2Trace2DAdapter;
 import info.monitorenter.util.Range;
+import info.monitorenter.util.UIUtil;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -48,7 +49,7 @@ import javax.swing.JFrame;
  * <p>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'> Achim Westermann </a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.10 $
  */
 public class RunningChart
     extends JFrame {
@@ -58,7 +59,7 @@ public class RunningChart
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * @version $Revision: 1.7 $
+   * @version $Revision: 1.10 $
    */
   static class RandomBumper
       extends Thread {
@@ -93,6 +94,7 @@ public class RunningChart
       }
       this.m_factor = factor;
       this.setDaemon(true);
+      this.setName(this.getClass().getName());
       this.start();
     }
 
@@ -110,7 +112,7 @@ public class RunningChart
         }
 
         try {
-          sleep(40);
+          Thread.sleep(40);
         } catch (InterruptedException e) {
           // nop
         }
@@ -174,15 +176,15 @@ public class RunningChart
 
     super(label);
     this.m_chart = chart;
-    addWindowListener(new WindowAdapter() {
+    this.addWindowListener(new WindowAdapter() {
 
       public void windowClosing(final WindowEvent e) {
 
         RunningChart.this.setVisible(false);
-        RunningChart.this.dispose();
+        UIUtil.findWindow(RunningChart.this).dispose();
       }
     });
-    Container contentPane = getContentPane();
+    Container contentPane = this.getContentPane();
     contentPane.setLayout(new BorderLayout());
     contentPane.add(new ChartPanel(this.m_chart), BorderLayout.CENTER);
   }

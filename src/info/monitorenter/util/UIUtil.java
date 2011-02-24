@@ -26,45 +26,39 @@ import java.awt.Component;
 import java.awt.Window;
 
 /**
- * Utility class for UI / layout operations. 
+ * Utility class for UI / layout operations.
  * <p>
- *
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * 
- * 
- *  @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public final class UIUtil {
-/**
- * Utility class constructor.<p>
- *
- */
+  /**
+   * Utility class constructor.
+   * <p>
+   */
   private UIUtil() {
     // nop
   }
-  
 
   /**
-   * Returns the window the given component is contained in or null if this is
-   * not the case.
+   * Returns the window the given component is contained in or null if this is not the case.
    * <p>
    * 
    * @param c
-   *          the component to search the parent modal dialog of.
-   * 
-   * @return the window the given component is contained in or null if this is
-   *         not the case.
+   *            the component to search the parent modal dialog of.
+   * @return the window the given component is contained in or null if this is not the case.
    */
   public static Window findWindow(final Component c) {
+    Window result = null;
     if (c instanceof Window) {
-      return (Window) c;
-    }
-    Component parent = c.getParent();
-    if (parent == null) {
-      return null;
+      result = (Window) c;
     } else {
-      return findWindow(parent);
+      Component parent = c.getParent();
+      if (parent != null) {
+        result = UIUtil.findWindow(parent);
+      }
     }
-
+    return result;
   }
 }

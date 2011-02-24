@@ -36,9 +36,12 @@ package info.monitorenter.util.units;
  *
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public final class UnitFemto extends AUnit {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -7538715067965710254L;
 
   /**
    * Defcon.

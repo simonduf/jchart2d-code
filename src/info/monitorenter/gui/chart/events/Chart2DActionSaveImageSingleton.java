@@ -48,29 +48,26 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 /**
- * Singleton <code>Action</code> that saves the current chart to an image at
- * the location specified by showing a modal file chooser save dialog.
+ * Singleton <code>Action</code> that saves the current chart to an image at the location
+ * specified by showing a modal file chooser save dialog.
  * <p>
  * Only one instance per target component may exist.
  * <p>
  * 
  * @see info.monitorenter.gui.chart.events.Chart2DActionSetCustomGridColor
- * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
-public final class Chart2DActionSaveImageSingleton extends AChart2DAction {
+public final class Chart2DActionSaveImageSingleton
+    extends AChart2DAction {
   /**
    * Generated <code>serial version UID</code>.
    * <p>
-   * 
    */
   private static final long serialVersionUID = -2800571545563022874L;
 
   /**
-   * The <code>JFileChooser</code> used to choose the location for saving
-   * snapshot images.
+   * The <code>JFileChooser</code> used to choose the location for saving snapshot images.
    * <p>
    */
   private JFileChooser m_filechooser;
@@ -80,65 +77,60 @@ public final class Chart2DActionSaveImageSingleton extends AChart2DAction {
    */
   private static Map instances = new HashMap();
 
-  /** 
-   * Creates a key for the component for internal storage.<p>
+  /**
+   * Creates a key for the component for internal storage.
+   * <p>
    * 
-   *  @param chart the chart to generate the storage key for. 
-   *  
-   *  @return a storage key unique for the given chart instance. 
+   * @param chart
+   *            the chart to generate the storage key for.
+   * @return a storage key unique for the given chart instance.
    */
   private static String key(final Chart2D chart) {
     return chart.getClass().getName() + chart.hashCode();
   }
 
   /**
-   * Returns the single instance for the given component, potentially creating
-   * it.
+   * Returns the single instance for the given component, potentially creating it.
    * <p>
-   * 
-   * If an instance for the given component had been created the description
-   * String is ignored.
+   * If an instance for the given component had been created the description String is ignored.
    * <p>
    * 
    * @param chart
-   *          the target the action will work on
+   *            the target the action will work on
    * @param actionName
-   *          the descriptive <code>String</code> that will be displayed by
-   *          {@link javax.swing.AbstractButton} subclasses that get this
-   *          <code>Action</code> assigned (
-   *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
-   * 
+   *            the descriptive <code>String</code> that will be displayed by
+   *            {@link javax.swing.AbstractButton} subclasses that get this <code>Action</code>
+   *            assigned ( {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    * @return the single instance for the given component.
    */
   public static Chart2DActionSaveImageSingleton getInstance(final Chart2D chart,
       final String actionName) {
     Chart2DActionSaveImageSingleton result = (Chart2DActionSaveImageSingleton) Chart2DActionSaveImageSingleton.instances
-        .get(key(chart));
+        .get(Chart2DActionSaveImageSingleton.key(chart));
     if (result == null) {
       result = new Chart2DActionSaveImageSingleton(chart, actionName);
-      Chart2DActionSaveImageSingleton.instances.put(key(chart), result);
+      Chart2DActionSaveImageSingleton.instances.put(Chart2DActionSaveImageSingleton.key(chart),
+          result);
     }
     return result;
   }
 
   /**
-   * Reference to the last custom color chosen to check wether the corresponding
-   * menu is selected.
+   * Reference to the last custom color chosen to check wether the corresponding menu is selected.
    */
   private Color m_lastChosenColor;
 
   /**
-   * Create an <code>Action</code> that accesses the trace and identifies
-   * itself with the given action String.
+   * Create an <code>Action</code> that accesses the trace and identifies itself with the given
+   * action String.
    * <p>
    * 
    * @param chart
-   *          the target the action will work on
+   *            the target the action will work on
    * @param colorName
-   *          the descriptive <code>String</code> that will be displayed by
-   *          {@link javax.swing.AbstractButton} subclasses that get this
-   *          <code>Action</code> assigned (
-   *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   *            the descriptive <code>String</code> that will be displayed by
+   *            {@link javax.swing.AbstractButton} subclasses that get this <code>Action</code>
+   *            assigned ( {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    */
   private Chart2DActionSaveImageSingleton(final Chart2D chart, final String colorName) {
     super(chart, colorName);

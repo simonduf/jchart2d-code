@@ -39,7 +39,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -50,8 +49,7 @@ import javax.swing.JFrame;
  * <p>
  * 
  * @author Achim Westermann
- * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.5 $
  */
 public class ZoomChartWithErrorBarsAndLogAxis
     extends JFrame {
@@ -71,12 +69,12 @@ public class ZoomChartWithErrorBarsAndLogAxis
     private ZoomableChart m_zoomableChart;
 
     /**
-     * Creates an instance that will reset zooming on the given zoomable chart
-     * upon the triggered action.
+     * Creates an instance that will reset zooming on the given zoomable chart upon the triggered
+     * action.
      * <p>
      * 
      * @param chart
-     *          the target to reset zoomin on.
+     *            the target to reset zoomin on.
      */
     public ZoomAllAdapter(final ZoomableChart chart) {
       this.m_zoomableChart = chart;
@@ -95,7 +93,7 @@ public class ZoomChartWithErrorBarsAndLogAxis
    * <p>
    * 
    * @param args
-   *          ignored.
+   *            ignored.
    */
   public static void main(final String[] args) {
 
@@ -114,7 +112,7 @@ public class ZoomChartWithErrorBarsAndLogAxis
 
     super("ZoomableChart with log y axis and errorbars");
 
-    Container c = getContentPane();
+    Container c = this.getContentPane();
     c.setLayout(new BorderLayout());
 
     // Create a chart
@@ -132,10 +130,8 @@ public class ZoomChartWithErrorBarsAndLogAxis
     chart.setAxisY(new AxisLogE());
 
     // Add all points, as it is static
-    Random random = new Random();
-
-    for (int i = 100; i < 200; i++) {
-      trace.addPoint(i, random.nextDouble() * 10.0 + i);
+    for (int i = 1; i < 100; i++) {
+      trace.addPoint(i, i);
     }
 
     // Add the trace to the chart
@@ -152,7 +148,7 @@ public class ZoomChartWithErrorBarsAndLogAxis
     c.add(zoomAllButton, BorderLayout.NORTH);
 
     // Enable the termination button:
-    addWindowListener(new WindowAdapter() {
+    this.addWindowListener(new WindowAdapter() {
       public void windowClosing(final WindowEvent e) {
         System.exit(0);
       }

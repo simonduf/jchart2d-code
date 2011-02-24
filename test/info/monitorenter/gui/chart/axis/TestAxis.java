@@ -29,6 +29,7 @@ import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.test.ATestJChart2D;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.util.Range;
+import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -37,7 +38,6 @@ import junit.framework.TestSuite;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * 
  */
 public class TestAxis
     extends ATestJChart2D {
@@ -64,7 +64,7 @@ public class TestAxis
    * <p>
    * 
    * @param testname
-   *          the test name.
+   *            the test name.
    */
   public TestAxis(final String testname) {
     super(testname);
@@ -112,12 +112,12 @@ public class TestAxis
     IRangePolicy rangePolicy = new RangePolicyFixedViewport(range);
     this.m_axisX.setRangePolicy(rangePolicy);
     Range axisRange = this.m_axisX.getRangePolicy().getRange();
-    assertEquals(range.getMin(), axisRange.getMin(), 0);
-    assertSame(range, axisRange);
+    Assert.assertEquals(range.getMin(), axisRange.getMin(), 0);
+    Assert.assertSame(range, axisRange);
     this.m_axisY.setRangePolicy(rangePolicy);
     axisRange = this.m_axisY.getRangePolicy().getRange();
-    assertEquals(range.getMin(), axisRange.getMin(), 0);
-    assertSame(range, axisRange);
+    Assert.assertEquals(range.getMin(), axisRange.getMin(), 0);
+    Assert.assertSame(range, axisRange);
   }
 
   /**
@@ -129,72 +129,70 @@ public class TestAxis
     int pixel = 100;
     double value = this.m_axisX.translatePxToValue(pixel);
     int retransform = this.m_axisX.m_accessor.translateValueToPx(value);
-    assertEquals(pixel, retransform);
+    Assert.assertEquals(pixel, retransform);
 
     pixel = 222;
     value = this.m_axisX.m_accessor.translatePxToValue(pixel);
     retransform = this.m_axisX.m_accessor.translateValueToPx(value);
-    assertEquals(pixel, retransform);
-
+    Assert.assertEquals(pixel, retransform);
 
     pixel = 399;
     value = this.m_axisX.m_accessor.translatePxToValue(pixel);
     retransform = this.m_axisX.m_accessor.translateValueToPx(value);
-    assertEquals(pixel, retransform);
+    Assert.assertEquals(pixel, retransform);
 
     // direction test: higher x px have to be transformed to lower px:
     pixel = 400;
     double higherValue = this.m_axisX.m_accessor.translatePxToValue(pixel);
-    assertTrue(higherValue > value);
+    Assert.assertTrue(higherValue > value);
 
     // Y-axis
     pixel = 100;
     value = this.m_axisY.m_accessor.translatePxToValue(pixel);
     retransform = this.m_axisY.m_accessor.translateValueToPx(value);
-    assertEquals(pixel, retransform);
+    Assert.assertEquals(pixel, retransform);
 
     pixel = 222;
     value = this.m_axisY.m_accessor.translatePxToValue(pixel);
     retransform = this.m_axisY.m_accessor.translateValueToPx(value);
-    assertEquals(pixel, retransform);
+    Assert.assertEquals(pixel, retransform);
 
     // Direction test: higher y px have to be transformed to lower values,
     // as y starts from top in awt:
     pixel = 300;
     higherValue = this.m_axisY.m_accessor.translatePxToValue(pixel);
-    assertTrue(higherValue < value);
+    Assert.assertTrue(higherValue < value);
 
   }
 
   /**
    * Tests the method {@link AAxis.AChart2DDataAccessor#translatePxToValue(int)}.
    * <p>
-   * 
    */
   public void testTransformValueToPx() {
     double value = 50;
     int pixel = this.m_axisX.m_accessor.translateValueToPx(value);
     double retransform = this.m_axisX.m_accessor.translatePxToValue(pixel);
-    assertEquals(value, retransform, 3);
+    Assert.assertEquals(value, retransform, 3);
 
     // the first transformation value to px will cause a change (int rounding)
     // the 2nd try should be exact as the value matches an exact px:
     value = retransform;
     pixel = this.m_axisX.m_accessor.translateValueToPx(value);
     retransform = this.m_axisX.m_accessor.translatePxToValue(pixel);
-    assertEquals(value, retransform, 0);
+    Assert.assertEquals(value, retransform, 0);
 
     // y Axis
     value = 50;
     pixel = this.m_axisY.m_accessor.translateValueToPx(value);
     retransform = this.m_axisY.m_accessor.translatePxToValue(pixel);
-    assertEquals(value, retransform, 3);
+    Assert.assertEquals(value, retransform, 3);
 
     // the first transformation value to px will cause a change (int rounding)
     // the 2nd try should be exact as the value matches an exact px:
     value = retransform;
     pixel = this.m_axisY.m_accessor.translateValueToPx(value);
     retransform = this.m_axisY.m_accessor.translatePxToValue(pixel);
-    assertEquals(value, retransform, 0);
+    Assert.assertEquals(value, retransform, 0);
   }
 }

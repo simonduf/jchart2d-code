@@ -39,7 +39,7 @@ import java.io.InputStream;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  * 
  */
 public abstract class ADisplayTestPropertyDataBased
@@ -59,7 +59,7 @@ public abstract class ADisplayTestPropertyDataBased
     if (in == null) {
       chart = null;
     } else {
-      trace = createTrace();
+      trace = this.createTrace();
       chart = new StaticCollectorChart(new PropertyFileStaticDataCollector(trace, in));
     }
     this.m_count++;

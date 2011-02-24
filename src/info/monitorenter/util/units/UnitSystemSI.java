@@ -34,9 +34,12 @@ package info.monitorenter.util.units;
  *
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public final class UnitSystemSI implements IUnitSystem {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -5311055613864145489L;
 
   /** Singleton instance. */
   private static IUnitSystem instance;

@@ -50,7 +50,7 @@ import java.io.Serializable;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  *
  */
 
@@ -71,7 +71,7 @@ public interface IComparableProperty extends Serializable {
    *
    * Note that a <code>ComparableProperty</code> has to allow by contract that
    * it's <code>Number</code> property it lays open to be compared by has to
-   * be modifyable from outside!
+   * be modifiable from outside!
    * <p>
    *
    * @param n

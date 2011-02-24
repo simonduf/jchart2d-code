@@ -47,9 +47,12 @@ import java.beans.PropertyChangeSupport;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class AxisTitlePainterDefault implements IAxisTitlePainter {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 708574068345824849L;
 
   /** Internal support for property change management.*/
   private PropertyChangeSupport m_propertyChangeSupport = new PropertyChangeSupport(this);

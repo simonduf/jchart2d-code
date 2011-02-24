@@ -30,20 +30,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.WeakHashMap;
 
+import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Junit test that tests jchart2d in multithreading mode: Several Threads write
- * data to a weak map - a single consumer periodically renders the data on a
- * <code>{@link ITrace2D}</code> the chart.
+ * Junit test that tests jchart2d in multithreading mode: Several Threads write data to a weak map -
+ * a single consumer periodically renders the data on a <code>{@link ITrace2D}</code> the chart.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
  */
-public class TestMultithreading extends TestCase {
+public class TestMultithreading
+    extends TestCase {
 
   /** The chart used for testing. */
   protected Chart2D m_chart;
@@ -77,8 +77,8 @@ public class TestMultithreading extends TestCase {
   protected static final int PRODUCER_AMOUNT = 10;
 
   /**
-   * Range of millisieconds to pick a random sleep time out between producing
-   * two <code>{@link TracePoint2D}</code> instances.
+   * Range of millisieconds to pick a random sleep time out between producing two
+   * <code>{@link TracePoint2D}</code> instances.
    */
   protected static final int PRODUCER_SLEEPRANGE = 100;
 
@@ -92,8 +92,7 @@ public class TestMultithreading extends TestCase {
   protected static final int CONSUMER_SLEEPRANGE = 1000;
 
   /**
-   * The <code>{@link ITrace2D}</code> class to use an instance of for the
-   * test.
+   * The <code>{@link ITrace2D}</code> class to use an instance of for the test.
    */
   private static final Class TRACE_CLASS = Trace2DLtd.class;
 
@@ -110,9 +109,8 @@ public class TestMultithreading extends TestCase {
    * <p>
    * 
    * @see junit.framework.TestCase#setUp()
-   * 
    * @throws Exception
-   *           if something goes wrong.
+   *             if something goes wrong.
    */
   public void setUp() throws Exception {
     super.setUp();
@@ -129,9 +127,8 @@ public class TestMultithreading extends TestCase {
 
   /**
    * @see junit.framework.TestCase#tearDown()
-   * 
    * @throws Exception
-   *           if something goes wrong.
+   *             if something goes wrong.
    */
   protected void tearDown() throws Exception {
     super.tearDown();
@@ -188,12 +185,10 @@ public class TestMultithreading extends TestCase {
   }
 
   /**
-   * Start the Producer Threads and one Consumer Thread and blocks until all
-   * Threads are finished to avoid that teardown will be called and further
-   * tests are executed at the same time the calling test method has initiated
-   * the Threads for it's test.
+   * Start the Producer Threads and one Consumer Thread and blocks until all Threads are finished to
+   * avoid that teardown will be called and further tests are executed at the same time the calling
+   * test method has initiated the Threads for it's test.
    * <p>
-   * 
    */
   protected void startThreads() {
     Iterator it = this.m_producers.iterator();
@@ -234,8 +229,9 @@ public class TestMultithreading extends TestCase {
       System.out.println("Point " + it.next().toString() + " was not dropped.");
     }
     System.out.println("Points remaining in the weakMap: " + keys);
-    assertFalse("There are " + keys + " TracePoint2D instances not deleted from the WeakHashMap.",
-        keys > this.m_trace.getMaxSize());
+    Assert.assertFalse("There are " + keys
+        + " TracePoint2D instances not deleted from the WeakHashMap.", keys > this.m_trace
+        .getMaxSize());
   }
 
   // ////////////////////////////
@@ -243,15 +239,14 @@ public class TestMultithreading extends TestCase {
   // ////////////////////////////
 
   /**
-   * Thread implementation that adds random points to the trace of the outer
-   * classes's chart and takes a random sleep time between 0 and a constructor
-   * given value between two add operations.
+   * Thread implementation that adds random points to the trace of the outer classes's chart and
+   * takes a random sleep time between 0 and a constructor given value between two add operations.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * 
    */
-  class Producer extends Thread {
+  class Producer
+      extends Thread {
     /** The amount of points to add before termination. */
     private long m_toAdd;
 
@@ -263,17 +258,14 @@ public class TestMultithreading extends TestCase {
 
     /**
      * <p>
-     * Constructs a producer that will add <code>toAdd</code> points with
-     * random breaks of milliseconds between <code>maxSleep</code> and zero.
+     * Constructs a producer that will add <code>toAdd</code> points with random breaks of
+     * milliseconds between <code>maxSleep</code> and zero.
      * </p>
      * 
      * @param toAdd
-     *          the amount of points to add.
-     * 
+     *            the amount of points to add.
      * @param sleepRange
-     *          the maxium time in milliseconds the Thread will sleep between
-     *          two points added.
-     * 
+     *            the maxium time in milliseconds the Thread will sleep between two points added.
      */
     Producer(final long toAdd, final long sleepRange) {
       this.m_toAdd = toAdd;
@@ -288,7 +280,7 @@ public class TestMultithreading extends TestCase {
       TracePoint2D point;
       while (this.m_toAdd > 0 && !this.m_stop) {
         try {
-          sleep((long) (Math.random() * this.m_sleepRange));
+          Thread.sleep((long) (Math.random() * this.m_sleepRange));
         } catch (InterruptedException e) {
           e.printStackTrace();
           this.m_stop = true;
@@ -306,26 +298,24 @@ public class TestMultithreading extends TestCase {
   }
 
   /**
-   * Thread that invokes paint operations with a mock graphics context (thus
-   * consumes pending unscaled points) interrupted by a sleep between 0 and a
-   * configurable amount of milliseconds.
+   * Thread that invokes paint operations with a mock graphics context (thus consumes pending
+   * unscaled points) interrupted by a sleep between 0 and a configurable amount of milliseconds.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * 
    */
-  class Consumer extends Thread {
+  class Consumer
+      extends Thread {
 
     /** The maximum sleep time between two paint operations. */
     private long m_sleepRange;
 
     /**
-     * Creates an instance that mock-paints the chart every
-     * <code>0 ..  sleeprange</code> ms.
+     * Creates an instance that mock-paints the chart every <code>0 ..  sleeprange</code> ms.
      * <p>
      * 
      * @param sleepRange
-     *          the maximum sleep range between two rendering operations.
+     *            the maximum sleep range between two rendering operations.
      */
     Consumer(final long sleepRange) {
       this.m_sleepRange = sleepRange;
@@ -342,7 +332,7 @@ public class TestMultithreading extends TestCase {
       MockGraphics2D mockGraphics = new MockGraphics2D();
       while (!(this.m_stop || TestMultithreading.this.isAllProducersFinished())) {
         try {
-          sleep((long) (Math.random() * this.m_sleepRange));
+          Thread.sleep((long) (Math.random() * this.m_sleepRange));
         } catch (InterruptedException e) {
           e.printStackTrace();
           this.m_stop = true;

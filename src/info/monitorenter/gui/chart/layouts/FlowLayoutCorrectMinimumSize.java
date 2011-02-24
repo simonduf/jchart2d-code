@@ -42,7 +42,7 @@ import java.awt.Insets;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class FlowLayoutCorrectMinimumSize
     extends FlowLayout {
@@ -226,7 +226,7 @@ public class FlowLayoutCorrectMinimumSize
             x += d.width;
             rowh = Math.max(rowh, d.height);
           } else {
-            moveComponents(target, insets.left + hgap, y, maxwidth - x, rowh, start, i, ltr);
+            this.moveComponents(target, insets.left + hgap, y, maxwidth - x, rowh, start, i, ltr);
             x = d.width;
             y += vgap + rowh;
             rowh = d.height;
@@ -234,7 +234,7 @@ public class FlowLayoutCorrectMinimumSize
           }
         }
       }
-      moveComponents(target, insets.left + hgap, y, maxwidth - x, rowh, start, nmembers, ltr);
+      this.moveComponents(target, insets.left + hgap, y, maxwidth - x, rowh, start, nmembers, ltr);
     }
   }
 

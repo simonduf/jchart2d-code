@@ -38,10 +38,11 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  * 
  */
-public class TracePainterVerticalBar extends ATracePainter {
+public class TracePainterVerticalBar
+    extends ATracePainter {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 6151930248938945671L;
@@ -54,7 +55,7 @@ public class TracePainterVerticalBar extends ATracePainter {
    * <p>
    * 
    * @param chart
-   *          needed for bound information.
+   *            needed for bound information.
    */
   public TracePainterVerticalBar(final Chart2D chart) {
     this(4, chart);
@@ -64,10 +65,10 @@ public class TracePainterVerticalBar extends ATracePainter {
    * Creates an instance with the bar width.
    * 
    * @param barWidth
-   *          the bar width in pixel to use.
+   *            the bar width in pixel to use.
    * 
    * @param chart
-   *          needed for bound information.
+   *            needed for bound information.
    */
   public TracePainterVerticalBar(final int barWidth, final Chart2D chart) {
     this.m_pointPainter = new PointPainterVerticalBar(barWidth, chart);
@@ -78,7 +79,8 @@ public class TracePainterVerticalBar extends ATracePainter {
    */
   public void endPaintIteration(final Graphics2D g2d) {
     if (g2d != null) {
-      this.m_pointPainter.paintPoint(this.getPreviousX(), this.getPreviousY(), 0, 0, g2d, this.getPreviousPoint());
+      this.m_pointPainter.paintPoint(this.getPreviousX(), this.getPreviousY(), 0, 0, g2d, this
+          .getPreviousPoint());
     }
   }
 
@@ -93,7 +95,9 @@ public class TracePainterVerticalBar extends ATracePainter {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int, int, java.awt.Graphics2D, info.monitorenter.gui.chart.TracePoint2D)
+   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int,
+   *      int, int, int, java.awt.Graphics2D,
+   *      info.monitorenter.gui.chart.TracePoint2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
       final int nextY, final Graphics2D g, final TracePoint2D original) {
@@ -106,7 +110,7 @@ public class TracePainterVerticalBar extends ATracePainter {
    * <p>
    * 
    * @param barWidth
-   *          the width of the bars to paint in pixel.
+   *            the width of the bars to paint in pixel.
    */
   public void setBarWidth(final int barWidth) {
     this.m_pointPainter.setBarWidth(barWidth);

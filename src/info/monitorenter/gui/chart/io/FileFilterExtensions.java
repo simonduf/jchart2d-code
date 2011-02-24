@@ -34,21 +34,19 @@ import javax.swing.filechooser.FileSystemView;
 
 /**
  * <p>
- * Configureable implementation of {@link javax.swing.filechooser.FileFilter}
- * that filters files by their extension (e.g.: ".txt").
+ * Configureable implementation of {@link javax.swing.filechooser.FileFilter} that filters files by
+ * their extension (e.g.: ".txt").
  * </p>
  * <p>
- * The extension Strings are provided to the constructor (no configuration of
- * initialized instance provided yet) and have to be the sole extension without
- * the dot.
+ * The extension Strings are provided to the constructor (no configuration of initialized instance
+ * provided yet) and have to be the sole extension without the dot.
  * </p>
  * <p>
- * This class is most often used to configure {@link javax.swing.JFileChooser}
- * dialogs. Therefore it accepts all directories to allow browsing.
+ * This class is most often used to configure {@link javax.swing.JFileChooser} dialogs. Therefore it
+ * accepts all directories to allow browsing.
  * </p>
  * <h3>Example usage:</h3>
  * <p>
- * 
  * <code>
  *  
  *    ...
@@ -58,7 +56,6 @@ import javax.swing.filechooser.FileSystemView;
  *    ...
  *  
  * </code>
- * 
  * </p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de>Achim Westermann </a>
@@ -76,10 +73,10 @@ public final class FileFilterExtensions
    * <p>
    * 
    * @param extensionsWithoutDot
-   *          A String[] containing extension strings without the dot like:
-   *          <nobr><code>new String[]{"bat","txt","dict"}</code> </nobr>.
+   *            A String[] containing extension strings without the dot like: <nobr><code>new String[]{"bat","txt","dict"}</code>
+   *            </nobr>.
    * @throws IllegalArgumentException
-   *           if the given extensions are inivalid.
+   *             if the given extensions are inivalid.
    */
   public FileFilterExtensions(final String[] extensionsWithoutDot) throws IllegalArgumentException {
     this.verify(extensionsWithoutDot);
@@ -92,20 +89,27 @@ public final class FileFilterExtensions
    * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
    */
   public boolean accept(final File pathname) {
+    boolean result;
     if (pathname.isDirectory()) {
-      return true;
+      result = true;
+    } else {
+      result = this.acceptNoDirectory(pathname.getAbsolutePath());
+
     }
-    return acceptNoDirectory(pathname.getAbsolutePath());
+    return result;
   }
 
   /**
    * @see INameFilter#accept(String)
    */
   public boolean accept(final String urlstring) {
-    if (isDirectory(urlstring)) {
-      return true;
+    boolean result;
+    if (this.isDirectory(urlstring)) {
+      result = true;
+    } else {
+      result = this.acceptNoDirectory(urlstring);
     }
-    return acceptNoDirectory(urlstring);
+    return result;
   }
 
   /**
@@ -113,7 +117,7 @@ public final class FileFilterExtensions
    * <p>
    * 
    * @param noDirFileNoURL
-   *          the path to the file.
+   *            the path to the file.
    * @return true if the file denoted by the given path is accepted.
    */
   private boolean acceptNoDirectory(final String noDirFileNoURL) {
@@ -156,7 +160,7 @@ public final class FileFilterExtensions
    * <p>
    * 
    * @param urlstring
-   *          the url format String pointing to a file.
+   *            the url format String pointing to a file.
    * @return true if the given String denotes a directory.
    */
   private boolean isDirectory(final String urlstring) {
@@ -204,8 +208,8 @@ public final class FileFilterExtensions
 
   /**
    * Needed for {@link #isDirectory(String)}: We cannot use
-   * {@link System#getProperty(java.lang.String)} to determine file separators
-   * in applet context. That would possibly throw an SecurityAccessException.
+   * {@link System#getProperty(java.lang.String)} to determine file separators in applet context.
+   * That would possibly throw an SecurityAccessException.
    * <p>
    * 
    * @return true if current OS is windows.
@@ -227,9 +231,9 @@ public final class FileFilterExtensions
    * <p>
    * 
    * @param extensions
-   *          The array with the Strings of extensions.
+   *            The array with the Strings of extensions.
    * @throws IllegalArgumentException
-   *           If a String of the array is null or contains a dot ('.').
+   *             If a String of the array is null or contains a dot ('.').
    */
   private void verify(final String[] extensions) throws IllegalArgumentException {
     String current;

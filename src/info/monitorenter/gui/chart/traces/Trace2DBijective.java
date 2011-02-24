@@ -28,32 +28,25 @@ import info.monitorenter.gui.chart.TracePoint2D;
 import java.util.Iterator;
 
 /**
- * A <code> Trace2D</code> who only allows a single occurance of a tracepoint
- * with a certain x- value xi. <br>
+ * A <code> Trace2D</code> who only allows a single occurance of a tracepoint with a certain x-
+ * value xi. <br>
  * <p>
  * From <i>y1 = f(x1) = f(x2) </i> follows: <i>x1==x2 </i> (injective) <br>
- * For every y- value yi contained there exists at least one value xi
- * (surjective) <br>
- * Both qualities joined result in a bijective assignment between x and y
- * values.
+ * For every y- value yi contained there exists at least one value xi (surjective) <br>
+ * Both qualities joined result in a bijective assignment between x and y values.
  * </p>
  * <p>
- * The policy for both <code>addPoint</code>- methods is implemented as
- * follows: <br>
+ * The policy for both <code>addPoint</code>- methods is implemented as follows: <br>
  * <ul>
- * <li>Every point whose x- value is not contained yet is appended at the end
- * of the internal list.</li>
- * <li>If the x- value is contained before, the tracepoint with that value is
- * removed and the new point is added to the end of the internal list. <b>In
- * that case the new tracepoint is not inserted at the location where the old
- * point used to be! </b></li>
+ * <li>Every point whose x- value is not contained yet is appended at the end of the internal list.</li>
+ * <li>If the x- value is contained before, the tracepoint with that value is removed and the new
+ * point is added to the end of the internal list. <b>In that case the new tracepoint is not
+ * inserted at the location where the old point used to be! </b></li>
  * </ul>
  * </p>
  * 
- * @author Achim Westermann <a
- *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
- * 
- * @version $Revision: 1.6 $
+ * @author Achim Westermann <a href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
+ * @version $Revision: 1.7 $
  */
 public class Trace2DBijective
     extends Trace2DSimple {
@@ -72,6 +65,7 @@ public class Trace2DBijective
    * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.TracePoint2D)
    */
   public boolean addPointInternal(final TracePoint2D p) {
+    boolean result;
     double px = p.getX();
     synchronized (this) {
       Iterator it = this.m_points.iterator();
@@ -88,9 +82,11 @@ public class Trace2DBijective
       if (removed != null) {
         this.removePoint(removed);
         // dont use bound check routines of calling addPoint.
-        return false;
+        result = false;
+      } else {
+        result = super.addPointInternal(p);
       }
-      return super.addPointInternal(p);
     }
+    return result;
   }
 }

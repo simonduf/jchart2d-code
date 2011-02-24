@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -38,7 +39,6 @@ import junit.framework.TestSuite;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * 
  */
 public class TestTrace2DLtd
     extends TestCase {
@@ -63,18 +63,17 @@ public class TestTrace2DLtd
    * <p>
    * 
    * @param testName
-   *          the name of the test case.
+   *            the name of the test case.
    */
   public TestTrace2DLtd(final String testName) {
     super(testName);
   }
 
   /**
-   * Adds 1000000 <code>{@link TracePoint2D}</code> instances to a
-   * <code>{@link Trace2DLtd}</code> and asserts that not more points than
-   * <code>{@link Trace2DLtd#getMaxSize()} </code> are remaining in memory.
+   * Adds 1000000 <code>{@link TracePoint2D}</code> instances to a <code>{@link Trace2DLtd}</code>
+   * and asserts that not more points than <code>{@link Trace2DLtd#getMaxSize()} </code> are
+   * remaining in memory.
    * <p>
-   * 
    */
   public void testMemoryLeak() {
     int traceSize = 10;
@@ -108,7 +107,7 @@ public class TestTrace2DLtd
       System.out.println("Point " + it.next().toString() + " was not dropped.");
     }
     System.out.println("Points remaining in the weakMap: " + keys);
-    assertFalse("There are " + keys + " TracePoint2D instances not deleted from the WeakHashMap.",
-        keys > traceSize);
+    Assert.assertFalse("There are " + keys
+        + " TracePoint2D instances not deleted from the WeakHashMap.", keys > traceSize);
   }
 }

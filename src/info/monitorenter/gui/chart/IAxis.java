@@ -36,7 +36,7 @@ import java.io.Serializable;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.25 $
+ * @version $Revision: 1.26 $
  */
 public interface IAxis extends Serializable {
 
@@ -128,26 +128,6 @@ public interface IAxis extends Serializable {
    * @return the awt pixel value corresponding to the chart data value.
    */
   public int translateValueToPx(final double value);
-
-  /**
-   * Transforms an arbitrary value distance in value space into the
-   * corresponding awt pixel distance value for the chart.
-   * <p>
-   * 
-   * Compared to <code>{@link #translateValueToPx(double)}</code> the given
-   * value is not interpreted to be an absolute point within the value bounds (a
-   * data point) but just taken as a distance in value space. The same goes for
-   * the result: It is not an absolute pixel coordinate of the chart but just
-   * the corresponding distance in pixel.
-   * <p>
-   * 
-   * @param distance
-   *          a chart data distance.
-   * 
-   * @return the awt pixel value distance corresponding to the chart data value
-   *         distance.
-   */
-  public int translateRelativeValueToPx(final double distance);
 
   /**
    * Scales all <code>{@link ITrace2D}</code> instances in the dimension

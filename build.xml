@@ -11,7 +11,7 @@
     <property name="builddir" value="${basedir}/bin" />
     <property name="sourcedir" value="${basedir}/src" />
     <property name="sourcedir.test" value="${basedir}/test" />
-    <property name="project.version" value="2.2.2" />
+    <property name="project.version" value="2.2.3" />
 
     <!-- Taskdefs -->
     <!--
@@ -162,18 +162,44 @@
                 <method access="public" name="*" />
                 <constructor />
             </keep>
+            <!-- keep all error bar stuff -->
             <keep access="public"
                   name="info.monitorenter.gui.chart.errorbars.**">
                 <constructor />
             </keep>
+            <!-- keep all label formatters -->
             <keep access="public"
                   name="info.monitorenter.gui.chart.labelformatters.**">
+            </keep>
+            <!-- keep all axis title painters -->
+            <keep access="public"
+                  name="info.monitorenter.gui.chart.axistitlepainters.**">
+            </keep>
+            <!-- keep all axis tick painters -->
+            <keep access="public"
+                  name="info.monitorenter.gui.chart.axistickpainters.**">
+            </keep>
+            <!-- keep all point painters -->
+            <keep access="public"
+                  name="info.monitorenter.gui.chart.pointpainters.**">
+            </keep>
+            <!-- keep all range policies -->
+            <keep access="public"
+                  name="info.monitorenter.gui.chart.rangepolicies.**">
             </keep>
             <!-- keep all constructors for traces -->
             <keep name="info.monitorenter.gui.chart.traces.*">
                 <constructor />
             </keep>
-            <!-- keep all IAxis implementations -->
+            <!-- keep all computing traces -->
+            <keep access="public"
+                  name="info.monitorenter.gui.chart.traces.computing.*">
+            </keep>
+            <!-- keep all trace painters -->
+            <keep access="public"
+                  name="info.monitorenter.gui.chart.traces.painters.*">
+            </keep>
+          <!-- keep all IAxis implementations -->
             <keep name="info.monitorenter.gui.chart.axis.*">
             </keep>
             <!-- keep all getters and setters of classes that are preserved -->

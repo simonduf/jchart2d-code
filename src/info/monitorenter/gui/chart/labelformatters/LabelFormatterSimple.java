@@ -34,10 +34,14 @@ import java.text.DecimalFormat;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  *
  */
 public final class LabelFormatterSimple extends LabelFormatterNumber implements IAxisLabelFormatter {
+ 
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 432931329620546628L;
+
   /**
    * Default constructor that limits the internal maximum fraction digits to 2
    * and the maximum integer digits to 16.

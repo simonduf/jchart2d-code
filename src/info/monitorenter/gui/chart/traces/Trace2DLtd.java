@@ -47,7 +47,7 @@ import java.util.Iterator;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class Trace2DLtd extends ATrace2D implements ITrace2D {
 
@@ -128,7 +128,7 @@ public class Trace2DLtd extends ATrace2D implements ITrace2D {
    *          shown.
    */
   public Trace2DLtd(final int maxsize) {
-    this(maxsize, Trace2DLtd.class.getName() + "-" + getInstanceCount());
+    this(maxsize, Trace2DLtd.class.getName() + "-" + ATrace2D.getInstanceCount());
   }
 
   /**

@@ -31,7 +31,7 @@ package info.monitorenter.util;
  * 
  * @author Achim.Westermann@gmx.de
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public final class MathUtil {
   /** Singleton instance. */
@@ -52,6 +52,27 @@ public final class MathUtil {
       MathUtil.instance = new MathUtil();
     }
     return MathUtil.instance;
+  }
+  
+  /**
+   * Tests that the given double is not invalid for calculation.
+   * <p>
+   * It must not be one of:
+   * <ul>
+   * <li> {@link Double#NaN} </li>
+   * <li> {@link Double#NEGATIVE_INFINITY} </li>
+   * <li> {@link Double#POSITIVE_INFINITY} </li>
+   * </ul>
+   * <p>
+   * 
+   * @param d
+   *            the double to test.
+   * 
+   * @return true if the given double is valid for calculation (not infinite or
+   *         NaN).
+   */
+  public static boolean isDouble(final double d) {
+    return !(Double.isInfinite(d) || Double.isNaN(d));
   }
 
   /**

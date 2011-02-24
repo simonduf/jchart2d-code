@@ -29,6 +29,7 @@ import info.monitorenter.gui.chart.labelformatters.LabelFormatterDate;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -40,7 +41,7 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class TestChart2DSetAxis extends TestCase {
 
@@ -94,7 +95,7 @@ public class TestChart2DSetAxis extends TestCase {
     axis.setFormatter(formatter);
     Chart2D chart = new Chart2D();
     chart.setAxisX(axis);
-    assertSame(formatter, chart.getAxisX().getFormatter());
+    Assert.assertSame(formatter, chart.getAxisX().getFormatter());
 
   }
 }
