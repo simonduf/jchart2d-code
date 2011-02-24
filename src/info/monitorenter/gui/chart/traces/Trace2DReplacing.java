@@ -1,6 +1,6 @@
 /*
  *  Trace2DReplacing, a list- based implementation of a ITrace2D.
- *  Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2010 Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
 
 package info.monitorenter.gui.chart.traces;
 
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 
 
 /**
@@ -44,7 +44,7 @@ import info.monitorenter.gui.chart.TracePoint2D;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.10 $
  */
 public class Trace2DReplacing extends Trace2DSimple {
 
@@ -72,10 +72,10 @@ public class Trace2DReplacing extends Trace2DSimple {
    *         showns successfully added.
    */
   @Override
-  public boolean addPointInternal(final TracePoint2D p) {
+  public boolean addPointInternal(final ITracePoint2D p) {
     boolean result = true;
     int index = -1;
-    TracePoint2D old;
+    ITracePoint2D old;
     index = this.m_points.indexOf(p);
     if (index != -1) {
       // already contained.

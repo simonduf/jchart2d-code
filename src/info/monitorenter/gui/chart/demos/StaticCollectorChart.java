@@ -1,6 +1,6 @@
 /*
  *  StaticCollectorChart.java, utility test class for jchart2d.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -48,7 +48,7 @@ import javax.swing.JPanel;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  */
 public class StaticCollectorChart extends JPanel {
 
@@ -105,11 +105,12 @@ public class StaticCollectorChart extends JPanel {
   public StaticCollectorChart(final AStaticDataCollector datacollector) throws IOException {
     this.setLayout(new BorderLayout());
     this.m_chart = new Chart2D();
+    // Add the trace to the chart before data collection (because the chart
+    // tells the trace which point instances to use)!!!:
+    this.m_chart.addTrace(datacollector.getTrace());
 
     // Add all points, as it is static:
     datacollector.collectData();
-    // Add the trace to the chart:
-    this.m_chart.addTrace(datacollector.getTrace());
 
     // Make it visible:
     this.add(new ChartPanel(this.m_chart), BorderLayout.CENTER);

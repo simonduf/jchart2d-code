@@ -2,7 +2,7 @@
  * LabelFormatterAutoUnits.java, a label formatter that adds 
  * an automatic choice of the unit SI prefix to a decorated 
  * label formatter. 
- * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -45,18 +45,17 @@ import java.util.Map;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.19 $
  * 
  */
-public class LabelFormatterAutoUnits
-    extends ALabelFormatter {
+public class LabelFormatterAutoUnits extends ALabelFormatter {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -7812902015853326946L;
 
   /**
    * Performance improvement: Maps the units to use to the powers of 10 of their
-   * factor <nobr>(1*10^x = unit.factor) </nobr>.
+   * factor <span style="white-space: nowrap;">(1*10^x = unit.factor) </span>.
    * <p>
    * 
    * This is used to modify the result of {@link #getMaxAmountChars()} as this
@@ -120,7 +119,7 @@ public class LabelFormatterAutoUnits
    * <p>
    * 
    * @param delegate
-   *            the formatter that will be decorated with units.
+   *          the formatter that will be decorated with units.
    */
   public LabelFormatterAutoUnits(final ALabelFormatter delegate) {
     super();
@@ -138,17 +137,17 @@ public class LabelFormatterAutoUnits
   }
 
   /**
-   * Internally sets the correct <code>{@link AUnit}</code> corresponding to
-   * the range of this axis.
+   * Internally sets the correct <code>{@link AUnit}</code> corresponding to the
+   * range of this axis.
    * <p>
    * 
    * This is used in this implementations for calculation of the labels.
    * <p>
    * 
    * @param min
-   *            the minimum value of the axis.
+   *          the minimum value of the axis.
    * @param max
-   *            the maximum value of the axis.
+   *          the maximum value of the axis.
    * 
    */
   private final void chooseUnit(final double min, final double max) {
@@ -187,7 +186,7 @@ public class LabelFormatterAutoUnits
    * Returns the decorated label formatter.
    * <p>
    * 
-   * @return the the decoroated label formatter.
+   * @return the the decorated label formatter.
    */
   final ALabelFormatter getDelegate() {
     return this.m_delegate;
@@ -335,8 +334,8 @@ public class LabelFormatterAutoUnits
    * <p>
    * 
    * @param delegate
-   *            the label formatter to decorate by the feature of automatic unit
-   *            choice.
+   *          the label formatter to decorate by the feature of automatic unit
+   *          choice.
    */
   final void setDelegate(final ALabelFormatter delegate) {
     this.m_delegate = delegate;

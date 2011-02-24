@@ -1,7 +1,7 @@
 /*
  *  Chart2DActionSaveImageSingleton, 
  *  singleton action that saves the chart to an image.
- *  Copyright (C) 2008 Achim Westermann
+ *  Copyright (C) 2007 - 2010 Achim Westermann
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -54,7 +54,7 @@ import javax.swing.filechooser.FileFilter;
  * 
  * @see info.monitorenter.gui.chart.events.Chart2DActionSetCustomGridColor
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.11 $
  */
 public final class Chart2DActionSaveImageSingleton
     extends AChart2DAction {
@@ -63,29 +63,6 @@ public final class Chart2DActionSaveImageSingleton
    * <p>
    */
   private static final long serialVersionUID = -2800571545563022874L;
-
-  /**
-   * The <code>JFileChooser</code> used to choose the location for saving snapshot images.
-   * <p>
-   */
-  private JFileChooser m_filechooser;
-
-  /**
-   * Map for instances.
-   */
-  private static Map<String, Chart2DActionSaveImageSingleton> instances = new HashMap<String, Chart2DActionSaveImageSingleton>();
-
-  /**
-   * Creates a key for the component for internal storage.
-   * <p>
-   * 
-   * @param chart
-   *            the chart to generate the storage key for.
-   * @return a storage key unique for the given chart instance.
-   */
-  private static String key(final Chart2D chart) {
-    return chart.getClass().getName() + chart.hashCode();
-  }
 
   /**
    * Returns the single instance for the given component, potentially creating it.
@@ -111,6 +88,29 @@ public final class Chart2DActionSaveImageSingleton
           result);
     }
     return result;
+  }
+
+  /**
+   * The <code>JFileChooser</code> used to choose the location for saving snapshot images.
+   * <p>
+   */
+  private JFileChooser m_filechooser;
+
+  /**
+   * Map for instances.
+   */
+  private static Map<String, Chart2DActionSaveImageSingleton> instances = new HashMap<String, Chart2DActionSaveImageSingleton>();
+
+  /**
+   * Creates a key for the component for internal storage.
+   * <p>
+   * 
+   * @param chart
+   *            the chart to generate the storage key for.
+   * @return a storage key unique for the given chart instance.
+   */
+  private static String key(final Chart2D chart) {
+    return chart.getClass().getName() + chart.hashCode();
   }
 
   /**

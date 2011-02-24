@@ -1,7 +1,7 @@
 /*
  *  ErrorBarPainterEditPanel.java of project jchart2d, a panel 
  *  for configuration of a single ErrorBarConfigurable. 
- *  Copyright (c) 2007 Achim Westermann, created on 09:50:20.
+ *  Copyright (c) 2007 - 2010 Achim Westermann, created on 09:50:20.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -58,7 +58,7 @@ import javax.swing.border.TitledBorder;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.12 $
  */
 public class ErrorBarPainterEditPanel
     extends JPanel {
@@ -79,7 +79,7 @@ public class ErrorBarPainterEditPanel
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.10 $
+   * @version $Revision: 1.12 $
    */
   private class SegmentChooserPanel
       extends JPanel {
@@ -94,7 +94,7 @@ public class ErrorBarPainterEditPanel
      * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
      * 
      * 
-     * @version $Revision: 1.10 $
+     * @version $Revision: 1.12 $
      */
     final class ColorIconUpdater implements PropertyChangeListener {
 
@@ -168,8 +168,8 @@ public class ErrorBarPainterEditPanel
       // TODO: maybe check not to allow point painters that connect start and
       // end (e.g. line) to use in start and end segment.
       JComboBox painterSelector = new JComboBox();
-      IPointPainter pointPainter;
-      IPointPainter usedPainter = errorBarPainterSegement.getPointPainter();
+      IPointPainter<?> pointPainter;
+      IPointPainter<?> usedPainter = errorBarPainterSegement.getPointPainter();
       Action action;
 
       pointPainter = null;

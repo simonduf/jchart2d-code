@@ -2,7 +2,7 @@
  * RangePolicyUnbounded.java  of project jchart2d, a viewport 
  * that always shows every point in every trace of a chart but uses no 
  * more space than necessary. 
- * Copyright (C) Achim Westermann, created on 20.04.2005, 10:30:29
+ * Copyright (C) 2005 - 2010 Achim Westermann, created on 20.04.2005, 10:30:29
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import info.monitorenter.util.Range;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public final class RangePolicyUnbounded
     extends ARangePolicy {

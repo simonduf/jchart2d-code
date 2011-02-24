@@ -1,7 +1,7 @@
 /*
  *  ZoomTest.java of project jchart2d, demonstration of a zoom-enabled 
  *  chart with error bars and a logarithmic y axis. 
- *  Copyright 2007 (C) Achim Westermann, created on 23:59:21.
+ *  Copyright 2007 - 2010 (C) Achim Westermann, created on 23:59:21.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -44,22 +44,16 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 
 /**
- * Demonstration of a zoom - enabled chart ({@link info.monitorenter.gui.chart.ZoomableChart})
- * with error bars and an <code>{@link AxisLogE}</code> for the y axis.
+ * Demonstration of a zoom - enabled chart (
+ * {@link info.monitorenter.gui.chart.ZoomableChart}) with error bars and an
+ * <code>{@link AxisLogE}</code> for the y axis.
  * <p>
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.12 $
  */
-public class ZoomChartWithErrorBarsAndLogAxis
-    extends JFrame {
-
-  /**
-   * Generated <code>serial version UID</code>.
-   * <p>
-   */
-  private static final long serialVersionUID = 1497610918434714345L;
+public class ZoomChartWithErrorBarsAndLogAxis extends JFrame {
 
   /**
    * Action adapter for zoomAllButton.
@@ -88,6 +82,12 @@ public class ZoomChartWithErrorBarsAndLogAxis
       this.m_zoomableChart.zoomAll();
     }
   }
+
+  /**
+   * Generated <code>serial version UID</code>.
+   * <p>
+   */
+  private static final long serialVersionUID = 1497610918434714345L;
 
   /**
    * Main startup method.
@@ -122,21 +122,20 @@ public class ZoomChartWithErrorBarsAndLogAxis
     // Create ITrace
     ITrace2D trace = new Trace2DSimple("Trace");
     trace.setColor(Color.BLUE);
-    IErrorBarPolicy errorBarPolicy = new ErrorBarPolicyAbsoluteSummation(4, 4);
+    IErrorBarPolicy< ? > errorBarPolicy = new ErrorBarPolicyAbsoluteSummation(4, 4);
     errorBarPolicy.setShowPositiveYErrors(true);
     IErrorBarPainter painter = new ErrorBarPainter();
     errorBarPolicy.addErrorBarPainter(painter);
     trace.addErrorBarPolicy(errorBarPolicy);
 
-    chart.setAxisYLeft(new AxisLogE());
-
-    // Add all points, as it is static
-       for (int i = 1; i < 100; i++) {
-      trace.addPoint(i, i);
-    }
-
     // Add the trace to the chart
     chart.addTrace(trace);
+    chart.setAxisYLeft(new AxisLogE(), 0);
+
+    // Add all points, as it is static
+    for (int i = 1; i < 100; i++) {
+      trace.addPoint(i, i);
+    }
 
     // Add chart to the pane
     c.add(new ChartPanel(chart));

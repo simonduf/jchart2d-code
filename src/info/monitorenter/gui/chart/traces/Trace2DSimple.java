@@ -1,6 +1,6 @@
 /*
  *  Trace2DSimple, a list- based simple implementation of a ITrace2D.
- *  Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2010 Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
 package info.monitorenter.gui.chart.traces;
 
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -47,7 +47,7 @@ import java.util.List;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.14 $
  */
 public class Trace2DSimple
     extends ATrace2D implements ITrace2D {
@@ -56,7 +56,7 @@ public class Trace2DSimple
   private static final long serialVersionUID = -132333501493433766L;
   
   /** Internal List &lt;ITracePoint2D&gt;. */
-  protected List<TracePoint2D> m_points = new LinkedList<TracePoint2D>();
+  protected List<ITracePoint2D> m_points = new LinkedList<ITracePoint2D>();
 
   /**
    * Creates an empty trace.
@@ -78,10 +78,10 @@ public class Trace2DSimple
   }
 
   /**
-   * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.TracePoint2D)
+   * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  protected boolean addPointInternal(final TracePoint2D p) {
+  protected boolean addPointInternal(final ITracePoint2D p) {
     this.m_points.add(p);
     return true;
   }
@@ -110,7 +110,7 @@ public class Trace2DSimple
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#iterator()
    */
-  public Iterator<TracePoint2D> iterator() {
+  public Iterator<ITracePoint2D> iterator() {
     return this.m_points.iterator();
   }
 
@@ -123,11 +123,11 @@ public class Trace2DSimple
   }
 
   /**
-   * @see ATrace2D#removePointInternal(info.monitorenter.gui.chart.TracePoint2D)
+   * @see ATrace2D#removePointInternal(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  protected TracePoint2D removePointInternal(final TracePoint2D point) {
-    TracePoint2D result = null;
+  protected ITracePoint2D removePointInternal(final ITracePoint2D point) {
+    ITracePoint2D result = null;
     if (this.m_points.remove(point)) {
       result = point;
     }

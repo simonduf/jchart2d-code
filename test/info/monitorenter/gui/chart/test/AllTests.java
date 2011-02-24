@@ -33,20 +33,11 @@ import junit.framework.TestSuite;
  * <p>
  * 
  * @author Achim Westermann
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  * 
  * @since 2.1.0
  */
 public final class AllTests {
-  /**
-   * Hide constructor to prevent generation of class instances.
-   * <p>
-   */
-  private AllTests() {
-
-    // empty
-  }
-
   /**
    * Creates the JChart2D JUnit test suite.
    * <p>
@@ -87,5 +78,14 @@ public final class AllTests {
     };
 
     return wrapper;
+  }
+
+  /**
+   * Hide constructor to prevent generation of class instances.
+   * <p>
+   */
+  private AllTests() {
+
+    // empty
   }
 }

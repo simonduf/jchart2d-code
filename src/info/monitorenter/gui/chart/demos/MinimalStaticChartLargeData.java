@@ -1,7 +1,7 @@
 /*
  *  MinimalDynamicChartLargeData.java of project jchart2d, a demonstration 
  *  that on certain computer a chart can carry 70.000 data points. 
- *  Copyright (C) Achim Westermann, created on 20.06.2007, 22:44:55
+ *  Copyright (C) 2007 - 2010 Achim Westermann, created on 20.06.2007, 22:44:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -42,7 +42,7 @@ import javax.swing.JFrame;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.6 $
  */
 public final class MinimalStaticChartLargeData {
 
@@ -58,14 +58,14 @@ public final class MinimalStaticChartLargeData {
     ZoomableChart chart = new ZoomableChart();
     // Create an ITrace:
     ITrace2D trace = new Trace2DSimple();
+    // Add the trace to the chart:
+    chart.addTrace(trace);
     // Add all points, as it is static:
     Random random = new Random();
 
     for (int i = 0; i < 70000; i++) {
       trace.addPoint(i, (60 + random.nextDouble()) * i);
     }
-    // Add the trace to the chart:
-    chart.addTrace(trace);
     // Make it visible:
     // Create a frame.
     JFrame frame = new JFrame("MinimalStaticChartLargeData");

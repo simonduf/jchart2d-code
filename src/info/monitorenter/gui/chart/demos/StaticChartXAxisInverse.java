@@ -2,7 +2,7 @@
  *  StaticChartXAxisInverse.java of project jchart2d, a demonstration 
  *  of the minimal code to set up a chart with static data and an 
  *  inverse x axis. 
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -48,7 +48,7 @@ import javax.swing.JPanel;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.6 $
  */
 public final class StaticChartXAxisInverse extends JPanel {
 
@@ -90,12 +90,14 @@ public final class StaticChartXAxisInverse extends JPanel {
     this.setLayout(new BorderLayout());
     Chart2D chart = new Chart2D();
     AAxis axisXinverted = new AxisInverse();
-    chart.setAxisXBottom(axisXinverted);
+    chart.setAxisXBottom(axisXinverted, 0);
 
     // Create an ITrace:
     // Note that dynamic charts need limited amount of values!!!
     // ITrace2D trace = new Trace2DLtd(200);
     ITrace2D trace = new Trace2DSimple();
+    // Add the trace to the chart:
+    chart.addTrace(trace);
     trace.setColor(Color.RED);
 
     // Add all points, as it is static:
@@ -103,8 +105,6 @@ public final class StaticChartXAxisInverse extends JPanel {
     for (int i = 0; i < 120; i++) {
       trace.addPoint(xValue + i, i);
     }
-    // Add the trace to the chart:
-    chart.addTrace(trace);
 
     // Make it visible:
     this.add(new ChartPanel(chart), BorderLayout.CENTER);

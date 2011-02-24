@@ -1,7 +1,7 @@
 /*
  * Trace2DBijective, a list- based implementation of a ITrace2D that only
  *  allows a single occurance of a certain x- value.
- * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@
 
 package info.monitorenter.gui.chart.traces;
 
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.util.Iterator;
 
@@ -53,7 +53,7 @@ import java.util.Iterator;
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.14 $
  */
 public class Trace2DBijective
     extends Trace2DSimple {
@@ -69,17 +69,16 @@ public class Trace2DBijective
   }
 
   /**
-   * 
-   * @see info.monitorenter.gui.chart.traces.Trace2DSimple#addPointInternal(info.monitorenter.gui.chart.TracePoint2D)
+   * @see info.monitorenter.gui.chart.traces.Trace2DSimple#addPointInternal(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  protected boolean addPointInternal(final TracePoint2D p) {
+  protected boolean addPointInternal(final ITracePoint2D p) {
     boolean result = false;
     double px = p.getX();
     synchronized (this) {
-      Iterator<TracePoint2D> it = this.m_points.iterator();
-      TracePoint2D tmp = null;
-      TracePoint2D removed = null;
+      Iterator<ITracePoint2D> it = this.m_points.iterator();
+      ITracePoint2D tmp = null;
+      ITracePoint2D removed = null;
       while (it.hasNext()) {
         tmp = it.next();
         if (tmp.getX() == px) {

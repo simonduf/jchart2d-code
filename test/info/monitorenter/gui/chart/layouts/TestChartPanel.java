@@ -54,7 +54,7 @@ import junit.framework.TestSuite;
  * @author Holger Brandl
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class TestChartPanel
     extends TestCase {
@@ -123,11 +123,11 @@ public class TestChartPanel
     ITrace2D trace;
     for (int i = 0; i < 10; i++) {
       trace = new Trace2DSimple();
+      chart.addTrace(trace);
       for (int j = 0; j < 20; j++) {
         trace.addPoint(j, (Math.random() + 1) * j);
       }
       trace.setName("trace-" + i);
-      chart.addTrace(trace);
     }
 
     JPanel p = new JPanel();

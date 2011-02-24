@@ -1,6 +1,6 @@
 /*
  * ILabelPainter.java,  interface to paint labels for a trace
- * Copyright (C) 2005  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (C) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -37,7 +37,7 @@ import java.io.Serializable;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  * 
  */
 public interface IAxisTickPainter extends Serializable {

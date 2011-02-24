@@ -3,7 +3,7 @@
  *  that displays all ErrorBarPainterConfigurable instances of an IErrorBarPolicy 
  *  and offers their edit and remove buttons as well as 
  *  an add button for a new IErrorBarPainter. 
- *  Copyright (c) 2007 Achim Westermann, created on 09:50:20.
+ *  Copyright (c) 2007 - 2010 Achim Westermann, created on 09:50:20.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -55,55 +55,10 @@ import javax.swing.JPanel;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.10 $
  */
 public class ErrorBarPaintersPanel
     extends JPanel implements PropertyChangeListener {
-
-  /** Generated <code>serialVersionUID</code>. */
-  private static final long serialVersionUID = 2293007395124251482L;
-
-  /** The add painter button. */
-  private JButton m_addButton;
-
-  /**
-   * Creates an instance that hooks as a control (view & controller) to the
-   * error bar policy model instance.
-   * <p>
-   * 
-   * @param errorBarPolicy
-   *            the error bar policy to control directions of display of.
-   */
-  public ErrorBarPaintersPanel(final IErrorBarPolicy errorBarPolicy) {
-
-    super();
-
-    this.setBorder(BorderFactory.createEtchedBorder());
-    this.setLayout(new GridBagLayout());
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.anchor = GridBagConstraints.NORTHWEST;
-    gbc.gridx = 0;
-    gbc.gridwidth = 1;
-    gbc.gridheight = 1;
-    gbc.gridy = 0;
-    gbc.insets = new Insets(2, 2, 2, 2);
-
-    // adding a row for each IErrorBarPainter:
-    Iterator<IErrorBarPainter> itErrorBarPainters = errorBarPolicy.getErrorBarPainters().iterator();
-    IErrorBarPainter painter;
-
-    while (itErrorBarPainters.hasNext()) {
-      painter = itErrorBarPainters.next();
-      this.add(new ErrorBarPainterConfigurablePanel(painter, errorBarPolicy), gbc);
-      gbc.gridy++;
-    }
-
-    // add the add button
-    this.m_addButton = new JButton(new ErrorBarPolicyActionAddPainter(errorBarPolicy, "Add"));
-    this.add(this.m_addButton, gbc);
-    // register for add operations to add a new painter row:
-    errorBarPolicy.addPropertyChangeListener(IErrorBarPolicy.PROPERTY_ERRORBARPAINTER, this);
-  }
 
   /**
    * A panel that displays a single
@@ -116,7 +71,7 @@ public class ErrorBarPaintersPanel
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.7 $
+   * @version $Revision: 1.10 $
    */
   public class ErrorBarPainterConfigurablePanel
       extends JPanel implements PropertyChangeListener {
@@ -140,7 +95,7 @@ public class ErrorBarPaintersPanel
      * 
      */
     public ErrorBarPainterConfigurablePanel(final IErrorBarPainter errorBarPainter,
-        final IErrorBarPolicy errorBarPolicy) {
+        final IErrorBarPolicy<?> errorBarPolicy) {
 
       super();
       this.m_errorBarPainter = errorBarPainter;
@@ -184,7 +139,7 @@ public class ErrorBarPaintersPanel
     public void propertyChange(final PropertyChangeEvent evt) {
       String property = evt.getPropertyName();
       if (IErrorBarPolicy.PROPERTY_ERRORBARPAINTER.equals(property)) {
-        IErrorBarPolicy errorBarPolicy = (IErrorBarPolicy) evt.getSource();
+        IErrorBarPolicy<?> errorBarPolicy = (IErrorBarPolicy<?>) evt.getSource();
         IErrorBarPainter oldValue = (IErrorBarPainter) evt.getOldValue();
         IErrorBarPainter newValue = (IErrorBarPainter) evt.getNewValue();
         if (oldValue == this.m_errorBarPainter) {
@@ -214,6 +169,51 @@ public class ErrorBarPaintersPanel
     }
   }
 
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 2293007395124251482L;
+
+  /** The add painter button. */
+  private JButton m_addButton;
+
+  /**
+   * Creates an instance that hooks as a control (view & controller) to the
+   * error bar policy model instance.
+   * <p>
+   * 
+   * @param errorBarPolicy
+   *            the error bar policy to control directions of display of.
+   */
+  public ErrorBarPaintersPanel(final IErrorBarPolicy<?> errorBarPolicy) {
+
+    super();
+
+    this.setBorder(BorderFactory.createEtchedBorder());
+    this.setLayout(new GridBagLayout());
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.anchor = GridBagConstraints.NORTHWEST;
+    gbc.gridx = 0;
+    gbc.gridwidth = 1;
+    gbc.gridheight = 1;
+    gbc.gridy = 0;
+    gbc.insets = new Insets(2, 2, 2, 2);
+
+    // adding a row for each IErrorBarPainter:
+    Iterator<IErrorBarPainter> itErrorBarPainters = errorBarPolicy.getErrorBarPainters().iterator();
+    IErrorBarPainter painter;
+
+    while (itErrorBarPainters.hasNext()) {
+      painter = itErrorBarPainters.next();
+      this.add(new ErrorBarPainterConfigurablePanel(painter, errorBarPolicy), gbc);
+      gbc.gridy++;
+    }
+
+    // add the add button
+    this.m_addButton = new JButton(new ErrorBarPolicyActionAddPainter(errorBarPolicy, "Add"));
+    this.add(this.m_addButton, gbc);
+    // register for add operations to add a new painter row:
+    errorBarPolicy.addPropertyChangeListener(IErrorBarPolicy.PROPERTY_ERRORBARPAINTER, this);
+  }
+
   /**
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
@@ -225,7 +225,7 @@ public class ErrorBarPaintersPanel
       if (oldPainter == null) {
         // painter was added, do a trick to add a new row and push down
         // the add button:
-        IErrorBarPolicy errorBarPolicy = (IErrorBarPolicy) evt.getSource();
+        IErrorBarPolicy<?> errorBarPolicy = (IErrorBarPolicy<?>) evt.getSource();
         GridBagLayout layout = (GridBagLayout) this.getLayout();
         GridBagConstraints gbc = layout.getConstraints(this.m_addButton);
         gbc.gridy++;

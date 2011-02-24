@@ -48,20 +48,20 @@ import junit.textui.TestRunner;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.10 $
  */
 public class TestChart2DHeadless
     extends TestCase {
 
   /**
-   * Constructor with test name.
+   * Junit test ui runner.
    * <p>
    * 
-   * @param testName
-   *            the name of the test.
+   * @param args
+   *            ignored.
    */
-  public TestChart2DHeadless(final String testName) {
-    super(testName);
+  public static void main(final String[] args) {
+    TestRunner.run(TestChart2DHeadless.class);
   }
 
   /**
@@ -79,6 +79,17 @@ public class TestChart2DHeadless
     suite.addTest(new TestChart2DHeadless("testSnapshot"));
 
     return suite;
+  }
+
+  /**
+   * Constructor with test name.
+   * <p>
+   * 
+   * @param testName
+   *            the name of the test.
+   */
+  public TestChart2DHeadless(final String testName) {
+    super(testName);
   }
 
   /**
@@ -136,10 +147,10 @@ public class TestChart2DHeadless
     ITrace2D trace;
     chart = new Chart2D();
     trace = new Trace2DSimple();
+    chart.addTrace(trace);
     for (int i = 0; i < 100; i++) {
       trace.addPoint(i, Math.random() + 1 * i);
     }
-    chart.addTrace(trace);
     Chart2DActionSaveImageSingleton saver = Chart2DActionSaveImageSingleton.getInstance(chart,
         "BLUE");
     saver.actionPerformed(null);
@@ -172,17 +183,6 @@ public class TestChart2DHeadless
         e.printStackTrace();
       }
     }
-  }
-
-  /**
-   * Junit test ui runner.
-   * <p>
-   * 
-   * @param args
-   *            ignored.
-   */
-  public static void main(final String[] args) {
-    TestRunner.run(TestChart2DHeadless.class);
   }
 
 }

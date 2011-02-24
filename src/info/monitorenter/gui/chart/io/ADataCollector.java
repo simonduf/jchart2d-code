@@ -1,5 +1,5 @@
 /*
- * AbstractDataCollector.java jchart2d Copyright (C) Achim Westermann, created
+ * AbstractDataCollector.java jchart2d Copyright (C) 2004 - 2010 Achim Westermann, created
  * on 10.12.2004, 14:48:09 
  * 
  *  This library is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@
 package info.monitorenter.gui.chart.io;
 
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 
 
 /**
@@ -53,7 +53,7 @@ import info.monitorenter.gui.chart.TracePoint2D;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.9 $
  */
 public abstract class ADataCollector implements Runnable {
 
@@ -106,7 +106,7 @@ public abstract class ADataCollector implements Runnable {
    * 
    * @return the collected point.
    */
-  public abstract TracePoint2D collectData();
+  public abstract ITracePoint2D collectData();
 
   /**
    * @see java.lang.Object#finalize()
@@ -158,7 +158,7 @@ public abstract class ADataCollector implements Runnable {
     this.m_isRunning = true;
     long lasttime;
     this.m_stop = false;
-    TracePoint2D point;
+    ITracePoint2D point;
     while (!this.m_stop) {
       lasttime = System.currentTimeMillis();
       point = this.collectData();

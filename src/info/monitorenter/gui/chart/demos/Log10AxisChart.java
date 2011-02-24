@@ -1,6 +1,6 @@
 /*
  *  Log10AxisChart.java, A demo chart that uses a logarithmic axis for Y.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -40,13 +40,14 @@ import java.text.DecimalFormat;
 import javax.swing.JFrame;
 
 /**
- * A demo chart that uses a logarithmic axis for Y ({@link info.monitorenter.gui.chart.axis.AxisLog10})
- * and a trace painter for discs ({@link info.monitorenter.gui.chart.traces.painters.TracePainterDisc}).
+ * A demo chart that uses a logarithmic axis for Y (
+ * {@link info.monitorenter.gui.chart.axis.AxisLog10}) and a trace painter for
+ * discs ({@link info.monitorenter.gui.chart.traces.painters.TracePainterDisc}).
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.9 $
  * 
  */
 public final class Log10AxisChart {
@@ -66,18 +67,18 @@ public final class Log10AxisChart {
     DecimalFormat df = new DecimalFormat();
     df.setMaximumFractionDigits(100);
     axisy.setFormatter(new LabelFormatterAutoUnits(new LabelFormatterNumber(df)));
-    chart.setAxisYLeft(new AxisLog10());
+    chart.setAxisYLeft(new AxisLog10(), 0);
 
     // Create an ITrace:
     ITrace2D trace = new Trace2DSimple();
+    // Add the trace to the chart:
+    chart.addTrace(trace);
     trace.setTracePainter(new TracePainterDisc(1));
     trace.setColor(Color.DARK_GRAY);
     // Add the function 1/x + random
-    for (int i = 1; i < 10; i += 1) {
+    for (double i = 1; i < 10; i += 0.1) {
       trace.addPoint(i, Math.pow(10, i));
     }
-    // Add the trace to the chart:
-    chart.addTrace(trace);
 
     // Make it visible:
     // Create a frame.

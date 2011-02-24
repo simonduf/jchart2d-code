@@ -2,7 +2,7 @@
  * AxisTickPainterDefault.java,  default IAxisTickPainter 
  * implementation for a tick painter that uses all given arguments 
  * (no proprietary behavior)
- * Copyright (C) 2007 Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (C) 2007 - 2010 Achim Westermann, Achim.Westermann@gmx.de
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -34,7 +34,7 @@ import java.awt.Graphics;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.6 $
  * 
  */
 public class AxisTickPainterDefault implements IAxisTickPainter {
@@ -54,6 +54,21 @@ public class AxisTickPainterDefault implements IAxisTickPainter {
    */
   public AxisTickPainterDefault() {
     // nop
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxisTickPainter#getMajorTickLength()
+   */
+  public int getMajorTickLength() {
+
+    return AxisTickPainterDefault.MAJOR_TICK_LENGTH;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxisTickPainter#getMinorTickLength()
+   */
+  public int getMinorTickLength() {
+    return AxisTickPainterDefault.MINOR_TICK_LENGTH;
   }
 
   /**
@@ -112,20 +127,5 @@ public class AxisTickPainterDefault implements IAxisTickPainter {
         g.drawLine(x, y, x + AxisTickPainterDefault.MINOR_TICK_LENGTH, y);
       }
     }
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IAxisTickPainter#getMajorTickLength()
-   */
-  public int getMajorTickLength() {
-
-    return AxisTickPainterDefault.MAJOR_TICK_LENGTH;
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IAxisTickPainter#getMinorTickLength()
-   */
-  public int getMinorTickLength() {
-    return AxisTickPainterDefault.MINOR_TICK_LENGTH;
   }
 }

@@ -1,7 +1,7 @@
 /*
  *  ErrorBarWizard.java of project jchart2d, a wizard for 
  *  configuring error bars for a trace. 
- *  Copyright (c) 2007 Achim Westermann, created on 09:50:20.
+ *  Copyright (c) 2007 - 2010 Achim Westermann, created on 09:50:20.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -52,7 +52,7 @@ import javax.swing.JTabbedPane;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.10 $
  */
 public class ErrorBarWizard
     extends JPanel {
@@ -61,40 +61,6 @@ public class ErrorBarWizard
    * Generated <code>serialVersionUID</code>.
    */
   private static final long serialVersionUID = 6973894101328190445L;
-
-  /**
-   * Creates a wizard for controlling the error bars of the given trace.
-   * 
-   * @param trace
-   *            the trace to control the error bars of.
-   */
-  public ErrorBarWizard(final ITrace2D trace) {
-
-    super();
-    JTabbedPane tabPolicies = new JTabbedPane();
-
-    this.setLayout(new GridBagLayout());
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.anchor = GridBagConstraints.NORTHWEST;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.gridx = 0;
-    gbc.gridy = 0;
-    gbc.insets = new Insets(2, 2, 2, 2);
-
-    Iterator<IErrorBarPolicy> it = trace.getErrorBarPolicies().iterator();
-    IErrorBarPolicy policy;
-    String tabName;
-    while (it.hasNext()) {
-      policy = it.next();
-      // maybe unstable: we use a file suffix semantics method to find the
-      // class file name without package information:
-      tabName = FileUtil.cutExtension(policy.getClass().getName()).getValue();
-      tabPolicies.addTab(tabName, null, new ErrorBarPolicyPanel(policy), "Does nothing");
-    }
-
-    this.setLayout(new BorderLayout());
-    this.add(tabPolicies);
-  }
 
   /**
    * Main method for testing.
@@ -112,7 +78,7 @@ public class ErrorBarWizard
     ITrace2D trace = new Trace2DSimple();
     trace.setColor(Color.RED);
     // create an error bar policy and configure it
-    IErrorBarPolicy errorBarPolicy = new ErrorBarPolicyRelative(0.2, 0.2);
+    IErrorBarPolicy<?> errorBarPolicy = new ErrorBarPolicyRelative(0.2, 0.2);
     errorBarPolicy.setShowNegativeYErrors(true);
     errorBarPolicy.setShowPositiveYErrors(true);
     // errorBarPolicy.setShowNegativeXErrors(true);
@@ -152,9 +118,43 @@ public class ErrorBarWizard
       }
     });
     // frame.setSize(600, 600);
-    frame.pack();
+//    frame.pack();
     frame.setVisible(true);
 
+  }
+
+  /**
+   * Creates a wizard for controlling the error bars of the given trace.
+   * 
+   * @param trace
+   *            the trace to control the error bars of.
+   */
+  public ErrorBarWizard(final ITrace2D trace) {
+
+    super();
+    JTabbedPane tabPolicies = new JTabbedPane();
+
+    this.setLayout(new GridBagLayout());
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.anchor = GridBagConstraints.NORTHWEST;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.insets = new Insets(2, 2, 2, 2);
+
+    Iterator<IErrorBarPolicy<?>> it = trace.getErrorBarPolicies().iterator();
+    IErrorBarPolicy<?> policy;
+    String tabName;
+    while (it.hasNext()) {
+      policy = it.next();
+      // maybe unstable: we use a file suffix semantics method to find the
+      // class file name without package information:
+      tabName = FileUtil.cutExtension(policy.getClass().getName()).getValue();
+      tabPolicies.addTab(tabName, null, new ErrorBarPolicyPanel(policy), "Does nothing");
+    }
+
+    this.setLayout(new BorderLayout());
+    this.add(tabPolicies);
   }
 
 }

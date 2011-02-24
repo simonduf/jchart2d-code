@@ -1,7 +1,7 @@
 /*
  *  JComponentActionSetCustomBackgroundSingleton, 
  *  singleton action to set a custom background color of a JComponent.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2004 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -47,7 +47,7 @@ import javax.swing.JComponent;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.6 $
  */
 public final class JComponentActionSetCustomBackgroundSingleton extends AJComponentAction {
 
@@ -63,45 +63,13 @@ public final class JComponentActionSetCustomBackgroundSingleton extends AJCompon
   private Color m_lastChosenColor;
 
   /**
-   * Create an <code>Action</code> that accesses the trace and identifies
-   * itself with the given action String.
-   * <p>
-   * 
-   * @param component
-   *            the target the action will work on.
-   * 
-   * @param description
-   *            the descriptive <code>String</code> that will be displayed by
-   *            {@link javax.swing.AbstractButton} subclasses that get this
-   *            <code>Action</code> assigned (
-   *            {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
-   */
-  private JComponentActionSetCustomBackgroundSingleton(final JComponent component,
-      final String description) {
-    super(component, description);
-    component.addPropertyChangeListener(Chart2D.PROPERTY_BACKGROUND_COLOR, this);
-  }
-
-  /**
    * Map for instances.
    */
   private static Map<String, JComponentActionSetCustomBackgroundSingleton> instances;
+
   static {
     JComponentActionSetCustomBackgroundSingleton.instances = new HashMap<String, JComponentActionSetCustomBackgroundSingleton>();
   }
-
-  /**
-   * Creates a key for the component for internal storage.
-   * 
-   * @param component
-   *            the component to create the key for internal storage.
-   * 
-   * @return a key for the component for internal storage.
-   */
-  private static String key(final JComponent component) {
-    return component.getClass().getName() + component.hashCode();
-  }
-
   /**
    * Returns the single instance for the given component, potentially creating
    * it.
@@ -130,6 +98,38 @@ public final class JComponentActionSetCustomBackgroundSingleton extends AJCompon
           JComponentActionSetCustomBackgroundSingleton.key(component), result);
     }
     return result;
+  }
+
+  /**
+   * Creates a key for the component for internal storage.
+   * 
+   * @param component
+   *            the component to create the key for internal storage.
+   * 
+   * @return a key for the component for internal storage.
+   */
+  private static String key(final JComponent component) {
+    return component.getClass().getName() + component.hashCode();
+  }
+
+  /**
+   * Create an <code>Action</code> that accesses the trace and identifies
+   * itself with the given action String.
+   * <p>
+   * 
+   * @param component
+   *            the target the action will work on.
+   * 
+   * @param description
+   *            the descriptive <code>String</code> that will be displayed by
+   *            {@link javax.swing.AbstractButton} subclasses that get this
+   *            <code>Action</code> assigned (
+   *            {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   */
+  private JComponentActionSetCustomBackgroundSingleton(final JComponent component,
+      final String description) {
+    super(component, description);
+    component.addPropertyChangeListener(Chart2D.PROPERTY_BACKGROUND_COLOR, this);
   }
 
   /**

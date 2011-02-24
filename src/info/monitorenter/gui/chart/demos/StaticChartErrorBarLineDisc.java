@@ -2,7 +2,7 @@
  *  StaticChartErrorBarLineDisc.java of project jchart2d, a demonstration 
  *  of the minimal code to set up a chart with static data and 
  *  an relative error bar policy that paints error bars by lines only. 
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ import info.monitorenter.gui.chart.IErrorBarPainter;
 import info.monitorenter.gui.chart.IErrorBarPolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.errorbars.ErrorBarPainter;
-import info.monitorenter.gui.chart.errorbars.ErrorBarPolicyRelative;
+import info.monitorenter.gui.chart.errorbars.ErrorBarPolicyAbsoluteSummation;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.pointpainters.PointPainterLine;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
@@ -55,7 +55,7 @@ import javax.swing.JPanel;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.12 $
  */
 public final class StaticChartErrorBarLineDisc extends JPanel {
   /**
@@ -99,9 +99,11 @@ public final class StaticChartErrorBarLineDisc extends JPanel {
     // Create an ITrace:
     // Note that dynamic charts need limited amount of values!!!
     ITrace2D trace = new Trace2DSimple();
+    // Add the trace to the chart:
+    chart.addTrace(trace);
     trace.setColor(Color.RED);
     // create an error bar policy and configure it
-    IErrorBarPolicy errorBarPolicy = new ErrorBarPolicyRelative(0.2, 0.2);
+    IErrorBarPolicy< ? > errorBarPolicy = new ErrorBarPolicyAbsoluteSummation(10, 10);
     errorBarPolicy.setShowNegativeYErrors(true);
     errorBarPolicy.setShowPositiveYErrors(true);
     // errorBarPolicy.setShowNegativeXErrors(true);
@@ -124,8 +126,6 @@ public final class StaticChartErrorBarLineDisc extends JPanel {
     for (double i = 2; i < 40; i++) {
       trace.addPoint(i * 100, Math.random() * i + i * 10);
     }
-    // Add the trace to the chart:
-    chart.addTrace(trace);
 
     // Make it visible:
     this.add(new ChartPanel(chart), BorderLayout.CENTER);

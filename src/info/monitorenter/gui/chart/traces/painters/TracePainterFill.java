@@ -1,6 +1,6 @@
 /*
  *  TracePainterFill.java,  <enter purpose here>.
- *  Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
 package info.monitorenter.gui.chart.traces.painters;
 
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.awt.Graphics;
 import java.util.LinkedList;
@@ -35,7 +35,7 @@ import java.util.List;
  * 
  * Additionally it increases performance by summing up all points to render for
  * a paint iteration (submitted by
- * {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)} between
+ * {@link #paintPoint(int, int, int, int, Graphics, ITracePoint2D)} between
  * {@link #startPaintIteration(Graphics)} and
  * {@link #endPaintIteration(Graphics)}) and only invoking only one polygon
  * paint for a paint call of the corresponding
@@ -46,7 +46,7 @@ import java.util.List;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.18 $
  * 
  */
 public class TracePainterFill
@@ -127,11 +127,11 @@ public class TracePainterFill
   /**
    * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int,
    *      int, int, int, java.awt.Graphics,
-   *      info.monitorenter.gui.chart.TracePoint2D)
+   *      info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final TracePoint2D original) {
+      final int nextY, final Graphics g, final ITracePoint2D original) {
 
     this.m_xPoints.add(Integer.valueOf(absoluteX));
     this.m_yPoints.add(Integer.valueOf(absoluteY));
@@ -146,4 +146,7 @@ public class TracePainterFill
     this.m_xPoints = new LinkedList<Integer>();
     this.m_yPoints = new LinkedList<Integer>();
   }
+
+  
+  
 }

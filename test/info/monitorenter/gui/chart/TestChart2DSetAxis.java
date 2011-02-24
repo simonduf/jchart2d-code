@@ -41,7 +41,7 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.11 $
  */
 public class TestChart2DSetAxis extends TestCase {
 
@@ -51,21 +51,6 @@ public class TestChart2DSetAxis extends TestCase {
    */
   public TestChart2DSetAxis() {
     // nop
-  }
-
-  /**
-   * Test suite for this test class.
-   * <p>
-   * 
-   * @return the test suite
-   */
-  public static Test suite() {
-
-    TestSuite suite = new TestSuite();
-    suite.setName(TestChart2DSetAxis.class.getName());
-
-    suite.addTest(new TestChart2DSetAxis("testSetAxisLabelFormatters"));
-    return suite;
   }
 
   /**
@@ -83,19 +68,21 @@ public class TestChart2DSetAxis extends TestCase {
    * Tests the policy of adding axis to charts.
    * <p>
    * 
-   * Configures an {@link IAxis} sets it to a chart and verifies, if the
-   * {@link IAxisLabelFormatter} remains the same.
-   * <p>
+   * Checks the old formatter of the x axis and adds a new x axis with a different formatter: 
+   * after the call the new axis should have the formatter of the previous axis due to the 
+   * replace semantics of the {@link Chart2D#setAxisXBottom(AAxis, int)}.<p>
    * 
    */
-  public void testSetAxisLabelFormatters() {
+  @org.junit.Test
+  public void testSetAxis() {
+    Chart2D chart = new Chart2D();
+    IAxisLabelFormatter oldFormatter = chart.getAxisX().getFormatter();
     AAxis axis = new AxisLinear();
     IAxisLabelFormatter formatter = new LabelFormatterDate((SimpleDateFormat) DateFormat
         .getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT));
     axis.setFormatter(formatter);
-    Chart2D chart = new Chart2D();
-    chart.setAxisXBottom(axis);
-    Assert.assertSame(formatter, chart.getAxisX().getFormatter());
+    chart.setAxisXBottom(axis, 0);
+    Assert.assertSame(oldFormatter, chart.getAxisX().getFormatter());
 
   }
 }

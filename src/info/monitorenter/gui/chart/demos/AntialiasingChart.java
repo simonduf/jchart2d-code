@@ -1,6 +1,6 @@
 /*
  * RunningChart, a test for the Chart2D.
- * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2007 - 2010  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -32,6 +32,7 @@ import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.reflection.ObjRecorder2Trace2DAdapter;
 import info.monitorenter.util.Range;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -50,16 +51,16 @@ import javax.swing.JFrame;
  * <p>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'> Achim Westermann </a>
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.3 $
  */
-public class RunningChart extends JFrame {
+public class AntialiasingChart extends JFrame {
   /**
    * Helper class that holds an internal number that is randomly modified by a
    * Thread.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * @version $Revision: 1.12 $
+   * @version $Revision: 1.3 $
    */
   static class RandomBumper extends Thread {
     /** Streches or compresses the grade of jumping of the internal number. */
@@ -135,17 +136,19 @@ public class RunningChart extends JFrame {
   public static void main(final String[] args) {
 
     Chart2D chart = new Chart2D();
+    chart.setUseAntialiasing(true);
     chart.setMinPaintLatency(20);
     ITrace2D data = new Trace2DLtd(300);
+    data.setStroke(new BasicStroke(3));
     data.setColor(new Color(255, 0, 0, 255));
     data.setName("random");
     data.setPhysicalUnits("hertz", "ms");
 
-    ITracePainter dotPainter = new TracePainterPolyline();
+    ITracePainter<?> dotPainter = new TracePainterPolyline();
     data.setTracePainter(dotPainter);
     chart.addTrace(data);
 
-    RunningChart wnd = new RunningChart(chart, "RunningChart");
+    AntialiasingChart wnd = new AntialiasingChart(chart, "RunningChart");
     chart.getAxisX().setPaintGrid(true);
     chart.getAxisX().setStartMajorTick(false);
     chart.getAxisY().setPaintGrid(true);
@@ -176,7 +179,7 @@ public class RunningChart extends JFrame {
    * @param label
    *          the name of the trace too display.
    */
-  public RunningChart(final Chart2D chart, final String label) {
+  public AntialiasingChart(final Chart2D chart, final String label) {
 
     super(label);
     this.m_chart = chart;
@@ -187,8 +190,8 @@ public class RunningChart extends JFrame {
       @Override
       public void windowClosing(final WindowEvent e) {
 
-        RunningChart.this.setVisible(false);
-        RunningChart.this.dispose();
+        AntialiasingChart.this.setVisible(false);
+        AntialiasingChart.this.dispose();
         System.exit(0);
 
       }

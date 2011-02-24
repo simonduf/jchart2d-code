@@ -1,7 +1,7 @@
 /*
  *  Chart2DActionSetCustomGridColorSingleton, 
  *  singleton action that sets a custom grid color to the chart.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -46,7 +46,7 @@ import javax.swing.JColorChooser;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.7 $
  */
 public final class Chart2DActionSetCustomGridColorSingleton extends AChart2DAction {
   /**
@@ -60,19 +60,6 @@ public final class Chart2DActionSetCustomGridColorSingleton extends AChart2DActi
   private static Map<String, Chart2DActionSetCustomGridColorSingleton> instances;
   static {
     Chart2DActionSetCustomGridColorSingleton.instances = new HashMap<String, Chart2DActionSetCustomGridColorSingleton>();
-  }
-
-  /**
-   * Creates a key for the component for internal storage.
-   * <p>
-   * 
-   * @param chart
-   *            the chart to generate the storage key for.
-   * 
-   * @return a storage key unique for the given chart instance.
-   */
-  private static String key(final Chart2D chart) {
-    return chart.getClass().getName() + chart.hashCode();
   }
 
   /**
@@ -104,6 +91,19 @@ public final class Chart2DActionSetCustomGridColorSingleton extends AChart2DActi
           Chart2DActionSetCustomGridColorSingleton.key(chart), result);
     }
     return result;
+  }
+
+  /**
+   * Creates a key for the component for internal storage.
+   * <p>
+   * 
+   * @param chart
+   *            the chart to generate the storage key for.
+   * 
+   * @return a storage key unique for the given chart instance.
+   */
+  private static String key(final Chart2D chart) {
+    return chart.getClass().getName() + chart.hashCode();
   }
 
   /**

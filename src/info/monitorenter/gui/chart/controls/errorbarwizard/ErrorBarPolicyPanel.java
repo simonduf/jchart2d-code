@@ -1,7 +1,7 @@
 /*
  *  ErrorBarPolicyPanel.java of project jchart2d, a panel 
  *  for selection of an error bar policy. 
- *  Copyright (c) 2007 Achim Westermann, created on 09:50:20.
+ *  Copyright (c) 2007 - 2010 Achim Westermann, created on 09:50:20.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -38,7 +38,7 @@ import javax.swing.JPanel;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.8 $
  */
 public class ErrorBarPolicyPanel
     extends JPanel {
@@ -53,7 +53,7 @@ public class ErrorBarPolicyPanel
    * @param errorBarPolicy
    *          the error bar policy to control.
    */
-  public ErrorBarPolicyPanel(final IErrorBarPolicy errorBarPolicy) {
+  public ErrorBarPolicyPanel(final IErrorBarPolicy<?> errorBarPolicy) {
 
     super();
 

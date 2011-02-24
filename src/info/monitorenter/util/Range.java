@@ -1,6 +1,6 @@
 /*
  *  Range.java, a simple data structure to express min and max.
- *  Copyright (C) Achim Westermann, created on 09.09.2004, 12:38:21
+ *  Copyright (C) 2004 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

@@ -36,6 +36,7 @@ import javax.swing.JFrame;
 import javax.swing.JTextArea;
 
 import junit.framework.Assert;
+import junit.framework.TestCase;
 
 /**
  * Base class for visual method invocation test for a
@@ -51,88 +52,90 @@ import junit.framework.Assert;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.15 $
  */
-public abstract class ATestChartOperations extends ATestJChart2D {
+public abstract class ATestChartOperations extends TestCase {
 
   /**
-   * Encapsulation of an action to perform upon the chart to test.
+   * Base class for chart operations that manages the name property.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
-   * @version $Revision: 1.11 $
+   * 
+   * @version $Revision: 1.15 $
    */
-  public interface IChart2DOperation {
-    /**
-     * Check any pre condition for the operation to test and throw an exception
-     * to signal a fail.
-     * <p>
-     * 
-     * @param chart
-     *          the chart to invoke the operation on.
-     * 
-     * @throws Exception
-     *           if the preCondition is not fulfilled.
-     */
-    public void preCondition(final Chart2D chart) throws Exception;
+  public abstract class AChartOperation implements ATestChartOperations.IChart2DOperation {
+
+    /** The name of this operation. */
+    private String m_name;
 
     /**
-     * Check any pre condition for the operation to test and throw an exception
-     * to signal a fail.
+     * Constructor with the operation's name.
      * <p>
      * 
-     * @param chart
-     *          the chart the operation was tested on.
-     * 
-     * @param result
-     *          the result of the operation or null if there is none.
-     * 
-     * @throws Exception
-     *           if the postCondition was not fulfilled.
+     * @param name
+     *          the name of this operation.
      */
-    public void postCondition(final Chart2D chart, Object result) throws Exception;
+    public AChartOperation(final String name) {
+      this.m_name = name;
+    }
 
     /**
-     * Perform the method on the chart to test.
-     * <p>
-     * 
-     * @param chart
-     *          the chart to test the action upon.
-     * 
-     * @return null or a result of the operation.
-     * 
-     * @throws Exception
-     *           if sth. goes wrong.
+     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#createChartInstance()
      */
-    public Object action(final Chart2D chart) throws Exception;
+    public Chart2D createChartInstance() {
+
+      return new Chart2D();
+    }
 
     /**
-     * Returns the name of the action to perform.
-     * <p>
-     * 
-     * @return the name of the action to perform.
+     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#createTraces()
      */
-    public String getName();
+    public ITrace2D[] createTraces() {
+      ITrace2D result = new Trace2DSimple();
+      return new ITrace2D[] {result };
+    }
 
     /**
-     * Simply create the proper <code>{@link Chart2D}</code> instance.
-     * <p>
-     * This allows to test subclasses (e.g.
-     * <code>{@link info.monitorenter.gui.chart.ZoomableChart}</code>) too.
-     * <p>
-     * 
-     * @return the chart instance to test.
+     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#fillTrace(info.monitorenter.gui.chart.ITrace2D)
      */
-    public Chart2D createChartInstance();
+    public void fillTrace(final ITrace2D trace) {
+      for (int i = 0; i < 101; i++) {
+        trace.addPoint(i, i * (1 + Math.random()));
+      }
+
+    }
 
     /**
-     * Create a trace and fill it with the proper data points here.
-     * <p>
-     * 
-     * @return a trace filled with datapoints
+     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#getName()
      */
-    public ITrace2D createTrace();
+    public final String getName() {
+      return this.m_name;
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#postCondition(info.monitorenter.gui.chart.Chart2D,
+     *      java.lang.Object)
+     */
+    public void postCondition(final Chart2D chart, final Object result) throws Exception {
+      // nop
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#preCondition(info.monitorenter.gui.chart.Chart2D)
+     */
+    public void preCondition(final Chart2D chart) throws Exception {
+      // nop
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+      return this.getName();
+    }
   }
 
   /**
@@ -154,7 +157,7 @@ public abstract class ATestChartOperations extends ATestJChart2D {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.11 $
+   * @version $Revision: 1.15 $
    */
   public abstract class AChartOperationReflectionBased implements
       ATestChartOperations.IChart2DOperation {
@@ -164,27 +167,6 @@ public abstract class ATestChartOperations extends ATestJChart2D {
 
     /** The arguments for the operation to test. */
     private Object[] m_arguments;
-
-    /**
-     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#createTrace()
-     */
-    public ITrace2D createTrace() {
-      ITrace2D result = new Trace2DSimple();
-      long timeOffset = System.currentTimeMillis();
-      for (int i = 0; i < 101; i++) {
-        result.addPoint(timeOffset + i, i);
-      }
-      return result;
-    }
-
-    /**
-     * 
-     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#createChartInstance()
-     */
-    public Chart2D createChartInstance() {
-
-      return new Chart2D();
-    }
 
     /**
      * Creates an operation that will invoke the method of class {@link Chart2D}
@@ -210,28 +192,32 @@ public abstract class ATestChartOperations extends ATestJChart2D {
     }
 
     /**
-     * Internal helper for method lookup.
-     * <p>
-     * 
-     * @param args
-     *          the argument instances for the method to invoke.
-     * 
-     * @return the argument types for the method to invoke.
-     */
-    private final Class< ? >[] toTypeArray(final Object[] args) {
-      Class< ? >[] result = new Class< ? >[args.length];
-      for (int i = 0; i < args.length; i++) {
-        result[i] = args[i].getClass();
-      }
-      return result;
-    }
-
-    /**
      * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
      */
     public Object action(final Chart2D chart) throws Exception {
       Object result = this.m_operation.invoke(chart, this.m_arguments);
       return result;
+    }
+
+    /**
+     * 
+     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#createChartInstance()
+     */
+    public Chart2D createChartInstance() {
+
+      return new Chart2D();
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#createTraces()
+     */
+    public ITrace2D[] createTraces() {
+      ITrace2D result = new Trace2DSimple();
+      long timeOffset = System.currentTimeMillis();
+      for (int i = 0; i < 101; i++) {
+        result.addPoint(timeOffset + i, i);
+      }
+      return new ITrace2D[] {result };
     }
 
     /**
@@ -249,82 +235,112 @@ public abstract class ATestChartOperations extends ATestJChart2D {
       return this.getName();
     }
 
-  }
-
-  /**
-   * Base class for chart operations that manages the name property.
-   * <p>
-   * 
-   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
-   * 
-   * 
-   * @version $Revision: 1.11 $
-   */
-  public abstract class AChartOperation implements ATestChartOperations.IChart2DOperation {
-
-    /** The name of this operation. */
-    private String m_name;
-
     /**
-     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#createTrace()
+     * Internal helper for method lookup.
+     * <p>
+     * 
+     * @param args
+     *          the argument instances for the method to invoke.
+     * 
+     * @return the argument types for the method to invoke.
      */
-    public ITrace2D createTrace() {
-      ITrace2D result = new Trace2DSimple();
-      long timeOffset = System.currentTimeMillis();
-      for (int i = 0; i < 101; i++) {
-        result.addPoint(timeOffset + i, i);
+    private final Class< ? >[] toTypeArray(final Object[] args) {
+      Class< ? >[] result = new Class< ? >[args.length];
+      for (int i = 0; i < args.length; i++) {
+        result[i] = args[i].getClass();
       }
       return result;
     }
 
+  }
+
+  /**
+   * Encapsulation of an action to perform upon the chart to test.
+   * <p>
+   * 
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
+   * 
+   * @version $Revision: 1.15 $
+   */
+  public interface IChart2DOperation {
     /**
-     * Construtor with the operation's name.
+     * Perform the method on the chart to test.
      * <p>
      * 
-     * @param name
-     *          the name of this operation.
+     * @param chart
+     *          the chart to test the action upon.
+     * 
+     * @return null or a result of the operation.
+     * 
+     * @throws Exception
+     *           if sth. goes wrong.
      */
-    public AChartOperation(final String name) {
-      this.m_name = name;
-    }
+    public Object action(final Chart2D chart) throws Exception;
 
     /**
-     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#getName()
+     * Simply create the proper <code>{@link Chart2D}</code> instance.
+     * <p>
+     * This allows to test subclasses (e.g.
+     * <code>{@link info.monitorenter.gui.chart.ZoomableChart}</code>) too.
+     * <p>
+     * 
+     * @return the chart instance to test.
      */
-    public final String getName() {
-      return this.m_name;
-    }
+    public Chart2D createChartInstance();
 
     /**
-     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#createChartInstance()
+     * Create the traces here.
+     * <p>
+     * 
+     * @return the traces to test.
      */
-    public Chart2D createChartInstance() {
-
-      return new Chart2D();
-    }
-
-    /**
-     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#preCondition(info.monitorenter.gui.chart.Chart2D)
-     */
-    public void preCondition(final Chart2D chart) throws Exception {
-      // nop
-    }
+    public ITrace2D[] createTraces();
 
     /**
-     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#postCondition(info.monitorenter.gui.chart.Chart2D,
-     *      java.lang.Object)
+     * Fill the given trace with data points.
+     * <p>
+     * 
+     * @param trace
+     *          the trace to fill with data points.
      */
-    public void postCondition(final Chart2D chart, final Object result) throws Exception {
-      // nop
-    }
+    public void fillTrace(ITrace2D trace);
 
     /**
-     * @see java.lang.Object#toString()
+     * Returns the name of the action to perform.
+     * <p>
+     * 
+     * @return the name of the action to perform.
      */
-    @Override
-    public String toString() {
-      return this.getName();
-    }
+    public String getName();
+
+    /**
+     * Check any pre condition for the operation to test and throw an exception
+     * to signal a fail.
+     * <p>
+     * 
+     * @param chart
+     *          the chart the operation was tested on.
+     * 
+     * @param result
+     *          the result of the operation or null if there is none.
+     * 
+     * @throws Exception
+     *           if the postCondition was not fulfilled.
+     */
+    public void postCondition(final Chart2D chart, Object result) throws Exception;
+
+    /**
+     * Check any pre condition for the operation to test and throw an exception
+     * to signal a fail.
+     * <p>
+     * 
+     * @param chart
+     *          the chart to invoke the operation on.
+     * 
+     * @throws Exception
+     *           if the preCondition is not fulfilled.
+     */
+    public void preCondition(final Chart2D chart) throws Exception;
   }
 
   /** The operation to test for the current test method. */
@@ -357,6 +373,15 @@ public abstract class ATestChartOperations extends ATestJChart2D {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.test.ATestJChart2D#setUp()
+   */
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+  }
+
+
+  /**
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#tearDown()
    */
   @Override
@@ -365,45 +390,47 @@ public abstract class ATestChartOperations extends ATestJChart2D {
         "Test method has to invoke setTestOperation(ATestChartOperations.IChart2DOperation)",
         this.m_testOperation);
 
-    this.m_axisX = this.createAxisX();
-    this.m_axisY = this.createAxisY();
-    this.m_trace = this.m_testOperation.createTrace();
+    // this.m_axisX = this.createAxisX();
+    // this.m_axisY = this.createAxisY();
+    ITrace2D[] traces = this.m_testOperation.createTraces();
 
-    this.m_chart = this.m_testOperation.createChartInstance();
-    this.m_chart.setAxisXBottom(this.m_axisX);
-    this.m_chart.setAxisYLeft(this.m_axisY);
-    this.m_chart.addTrace(this.m_trace);
-    Assert.assertNotSame(this.m_axisX, this.m_axisY);
+    Chart2D chart = this.m_testOperation.createChartInstance();
+     for (int i = 0; i < traces.length; i++) {
+     chart.addTrace(traces[i]);
+     this.m_testOperation.fillTrace(traces[i]);
+     }
+    // Assert.assertNotSame(this.m_axisX, this.m_axisY);
 
-    this.m_frame = new JFrame();
-    this.m_frame.getContentPane().add(this.m_chart);
+    JFrame frame = new JFrame();
+    frame.getContentPane().add(chart);
     // this.m_frame.add(new ChartPanel(this.m_chart));
-    this.m_frame.setSize(400, 600);
-    this.m_frame.setLocation(new Point(200, 200));
-    this.m_frame.setVisible(true);
+    frame.setSize(400, 600);
+    frame.setLocation(new Point(200, 200));
+    frame.setVisible(true);
 
     Thread.sleep(1000);
 
-    this.m_testOperation.preCondition(this.m_chart);
+    this.m_testOperation.preCondition(chart);
 
     // Modal dialog for announcing the test:
     JTextArea textArea = new JTextArea();
     textArea.setEditable(false);
     textArea.setText(this.m_testOperation.getName());
-    ModalDialog dialog = new ModalDialog(this.m_frame, "Operation to test...", textArea);
+    ModalDialog dialog = new ModalDialog(frame, "Operation to test...", textArea);
     dialog.setSize(new Dimension(400, 100));
     dialog.showDialog();
     boolean failure = false;
+    Object result;
     if (dialog.isOk()) {
-      this.m_testOperation.action(this.m_chart);
+      result = this.m_testOperation.action(chart);
       // let tester take a look:
       try {
         Thread.sleep(2000);
       } catch (InterruptedException ie) {
         // nop
       }
-      this.m_testOperation.postCondition(this.m_chart, this.m_chart);
-      // Modal dialog after the test for human judgement of success:
+      this.m_testOperation.postCondition(chart, result);
+      // Modal dialog after the test for human judgment of success:
       textArea.setText("Does the result look ok?");
       dialog.setTitle("Judge operation " + this.m_testOperation.getName());
       dialog.showDialog();
@@ -411,20 +438,16 @@ public abstract class ATestChartOperations extends ATestJChart2D {
         failure = true;
       }
     }
+    frame.setVisible(false);
+    frame.dispose();
+
     super.tearDown();
     if (failure) {
       Assert
           .fail("Operation test " + this.m_testOperation.getName() + " was judged as a failure. ");
     }
     this.m_testOperation = null;
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.test.ATestJChart2D#setUp()
-   */
-  @Override
-  protected void setUp() throws Exception {
-    // nop
+    super.tearDown();
   }
 
 }

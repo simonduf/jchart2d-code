@@ -1,6 +1,6 @@
 /*
  *  IColorDistributor.java, interface for choosing visual different colors.
- *  Copyright (C) Achim Westermann, created on 19.05.2005, 22:01:51
+ *  Copyright (C) 2004 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

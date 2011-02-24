@@ -2,7 +2,7 @@
  *
  *  FileFilterExtensions.java, a FileFilter implementation that
  *  filters files by their extension.
- *  Copyright (C) Achim Westermann, created on 01.07.2004, 12:18:29
+ *  Copyright (C) 2004 - 2010 Achim Westermann, created on 01.07.2004, 12:18:29
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

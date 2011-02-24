@@ -41,7 +41,7 @@ import junit.framework.TestSuite;
  * 
  * @author zoola
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final class TestAddRemoveTrace
     extends TestCase {
@@ -50,6 +50,22 @@ public final class TestAddRemoveTrace
    * Generated <code>serialVersionUID</code>.
    */
   private static final long serialVersionUID = 3689069560279873588L;
+
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
+
+    TestSuite suite = new TestSuite();
+    suite.setName(TestAddRemoveTrace.class.getName());
+
+    suite.addTest(new TestAddRemoveTrace("testAddRemoveTrace"));
+
+    return suite;
+  }
 
   /**
    * Creates a test case with the given name.
@@ -84,21 +100,5 @@ public final class TestAddRemoveTrace
     while (frame.isVisible()) {
       Thread.sleep(1000);
     }
-  }
-
-  /**
-   * Test suite for this test class.
-   * <p>
-   * 
-   * @return the test suite
-   */
-  public static Test suite() {
-
-    TestSuite suite = new TestSuite();
-    suite.setName(TestAddRemoveTrace.class.getName());
-
-    suite.addTest(new TestAddRemoveTrace("testAddRemoveTrace"));
-
-    return suite;
   }
 }

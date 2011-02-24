@@ -1,6 +1,6 @@
 /*
  *  AxisActionSetRangePolicy.java of project jchart2d
- *  Copyright (c) 2007 Achim Westermann, created on 00:13:29.
+ *  Copyright (c) 2007 - 2010 Achim Westermann, created on 00:13:29.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBox
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.AbstractButton;
 
 /**
  * <code>Action</code> that invokes
@@ -38,37 +38,25 @@ import javax.swing.JCheckBoxMenuItem;
  * <p>
  * 
  * <h2>Caution</h2>
- * This implementation only works if assigned to a
- * {@link javax.swing.JCheckBoxMenuItem}: It assumes that the source instance
- * given to {@link #actionPerformed(ActionEvent)} within the action event is of
- * that type as the state information (turn grid visible or turn grid invisible)
- * is needed.
+ * This implementation only works if assigned to a {@link AbstractButton}: It
+ * assumes that the source instance given to
+ * {@link #actionPerformed(ActionEvent)} within the action event is of that type
+ * as the state information (turn grid visible or turn grid invisible) is
+ * needed.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.13 $
  */
-public class AxisActionSetGrid
-    extends AAxisAction {
+public class AxisActionSetGrid extends AAxisAction {
 
   /**
    * Generated <code>serial version UID</code>.
    * <p>
    */
   private static final long serialVersionUID = -5816028313134616682L;
-
-  /**
-   * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-   */
-  public void propertyChange(final PropertyChangeEvent evt) {
-    String property = evt.getPropertyName();
-    if (property.equals(IAxis.PROPERTY_PAINTGRID)) {
-      this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, evt.getOldValue(),
-          evt.getNewValue());
-    }
-  }
 
   /**
    * Create an <code>Action</code> that accesses the chart's axis by argument
@@ -82,8 +70,8 @@ public class AxisActionSetGrid
    *          the owner of the axis to trigger actions upon.
    * 
    * @param axis
-   *          needed to identify the axis of the chart: one of {@link Chart2D#X},
-   *          {@link Chart2D#Y}.
+   *          needed to identify the axis of the chart: one of {@link Chart2D#X}
+   *          , {@link Chart2D#Y}.
    * 
    * @param description
    *          the descriptive <code>String</code> that will be displayed by
@@ -97,8 +85,10 @@ public class AxisActionSetGrid
 
     if (axis == Chart2D.X) {
       chart.getAxisX().addPropertyChangeListener(IAxis.PROPERTY_PAINTGRID, this);
+      chart.addPropertyChangeListener(Chart2D.PROPERTY_AXIS_X, this);
     } else if (axis == Chart2D.Y) {
       chart.getAxisY().addPropertyChangeListener(IAxis.PROPERTY_PAINTGRID, this);
+      chart.addPropertyChangeListener(Chart2D.PROPERTY_AXIS_Y, this);
     }
   }
 
@@ -106,8 +96,23 @@ public class AxisActionSetGrid
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   public void actionPerformed(final ActionEvent e) {
-    JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
-    boolean state = item.getState();
+    AbstractButton item = (AbstractButton) e.getSource();
+    boolean state = item.isSelected();
     this.getAxis().setPaintGrid(state);
+  }
+
+  /**
+   * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+   */
+  @Override
+  public void propertyChange(final PropertyChangeEvent evt) {
+    // will check for an axis replacement and transfer listening to the new axis if so: 
+    super.propertyChange(evt);
+    String property = evt.getPropertyName();
+    if (property.equals(IAxis.PROPERTY_PAINTGRID)) {
+      // someone else changed the paintgrid property via API: Inform the outer menu item UI:
+      this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, evt.getOldValue(),
+          evt.getNewValue());
+    }
   }
 }

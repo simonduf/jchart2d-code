@@ -64,7 +64,7 @@ import junit.framework.TestCase;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.10 $
  * 
  */
 public abstract class ADisplayTest extends TestCase {
@@ -80,67 +80,24 @@ public abstract class ADisplayTest extends TestCase {
   protected Chart2D m_failure = null;
 
   /**
-   * Basic junit test method hook that searches for files in this package with
-   * name "textX.properties" (where "X" is a number that starts from 1) collects
-   * the data in the files and shows a chart with a trace that contains this
-   * data along with buttons for judging the display as right or wrong.
-   * <p>
-   * 
-   * @throws IOException
-   *             if sth. goes wrong.
-   * 
-   * @throws InterruptedException
-   *             if sleeping is interrupted.
-   */
-  public final void testDisplay() throws IOException, InterruptedException {
-    StaticCollectorChart chart;
-    boolean foundData = true;
-    do {
-      chart = this.getNextChart();
-      if (chart == null) {
-        foundData = false;
-      } else {
-        this.configure(chart);
-        this.show(chart);
-      }
-    } while (foundData);
-  }
-
-  /**
-   * Template method that returns the next chart to test or null if no further
-   * chart is available.
-   * <p>
-   * 
-   * @return the next chart to test or null if no further chart is available.
-   * 
-   * @throws IOException
-   *             if sth. goes wrong.
-   */
-  protected abstract StaticCollectorChart getNextChart() throws IOException;
-
-  /**
-   * Marks this test as failure.
-   * <p>
-   * 
-   * @param wrong
-   *            the chart that failed.
-   *            <p>
-   */
-  public final void fail(final Chart2D wrong) {
-    this.m_failure = wrong;
-
-  }
-
-  /**
    * Creates a test case with the name.
    * <p>
    * 
    * @param testName
-   *            the name of the test case.
+   *          the name of the test case.
    */
   public ADisplayTest(final String testName) {
     super(testName);
   }
+
+  /**
+   * Template method that allows to configure the chart to show.
+   * <p>
+   * 
+   * @param chart
+   *          the chart that will be shown.
+   */
+  protected abstract void configure(StaticCollectorChart chart);
 
   /**
    * Template method that has to return a trace that may be configured.
@@ -151,23 +108,124 @@ public abstract class ADisplayTest extends TestCase {
   protected abstract ITrace2D createTrace();
 
   /**
-   * Template method that allows to configure the chart to show.
+   * Internal helper that describes a Chart2D.
    * <p>
    * 
    * @param chart
-   *            the chart that will be shown.
+   *          the instance to describe.
+   * 
+   * @return the description of the given instance.
    */
-  protected abstract void configure(StaticCollectorChart chart);
+  private final String describe(final Chart2D chart) {
+    StringBuffer result = new StringBuffer();
+    result.append("Chart2D\n");
+    result.append("-------\n");
+
+    IAxisTickPainter labelPainter = chart.getAxisTickPainter();
+    result.append("LabelPainter: ").append(labelPainter.getClass().getName()).append("\n");
+
+    // X axis
+    IAxis axis = chart.getAxisX();
+    result.append("Axis x:\n");
+    IRangePolicy rangePolicy = axis.getRangePolicy();
+    result.append("  RangePolicy: " + rangePolicy.getClass().getName() + ":\n");
+    Range range = rangePolicy.getRange();
+    result.append("    min: " + range.getMin() + "\n");
+    result.append("    max: " + range.getMax() + "\n");
+    IAxisLabelFormatter labelFormatter = axis.getFormatter();
+    result.append("  LabelFormatter: ").append(labelFormatter.getClass().getName()).append("\n");
+    AUnit unit = labelFormatter.getUnit();
+    result.append("  Unit: " + unit.getClass().getName()).append("\n");
+    result.append("  Major tick spacing: ").append(axis.getMajorTickSpacing()).append("\n");
+    result.append("  Minor tick spacing: ").append(axis.getMajorTickSpacing()).append("\n");
+
+    // Y axis
+    axis = chart.getAxisY();
+    result.append("Axis y:\n");
+    rangePolicy = axis.getRangePolicy();
+    result.append("  RangePolicy: " + rangePolicy.getClass().getName() + ":\n");
+    range = rangePolicy.getRange();
+    result.append("    min: " + range.getMin() + "\n");
+    result.append("    max: " + range.getMax() + "\n");
+    labelFormatter = axis.getFormatter();
+    result.append("  LabelFormatter: ").append(labelFormatter.getClass().getName()).append("\n");
+    unit = labelFormatter.getUnit();
+    result.append("  Unit: " + unit.getClass().getName()).append("\n");
+    result.append("  Major tick spacing: ").append(axis.getMajorTickSpacing()).append("\n");
+    result.append("  Minor tick spacing: ").append(axis.getMajorTickSpacing()).append("\n");
+
+    // Traces
+    result.append("  Traces:\n");
+    Stroke stroke;
+    for (ITrace2D trace : chart.getTraces()) {
+      result.append("    ").append(trace.getClass().getName()).append(":\n");
+      result.append("      amount of poijnts : ").append(trace.getSize()).append("\n");
+      result.append("      x-range: [").append(trace.getMinX()).append(",").append(trace.getMaxX())
+          .append("]\n");
+      result.append("      y-range: [").append(trace.getMinY()).append(",").append(trace.getMaxY())
+          .append("]\n");
+      result.append("      Color: ").append(trace.getColor()).append("\n");
+      result.append("      Label: ").append(trace.getLabel()).append("\n");
+      result.append("      Visible: ").append(trace.isVisible()).append("\n");
+      result.append("      Z-index: ").append(trace.getZIndex()).append("\n");
+      result.append("      TracePainters: \n");
+      for (ITracePainter< ? > tracePainter : trace.getTracePainters()) {
+        result.append("        ").append(tracePainter.getClass().getName()).append("\n");
+      }
+      stroke = trace.getStroke();
+      result.append("       Stroke: ").append(stroke.getClass().getName()).append("\n");
+    }
+
+    return result.toString();
+  }
+
+  /**
+   * Internal helper that describes a StaticCollectorChart.
+   * <p>
+   * 
+   * @param collectorchart
+   *          the instance to describe.
+   * 
+   * @return the description of the given instance.
+   */
+  private final String describe(final StaticCollectorChart collectorchart) {
+    return this.describe(collectorchart.getChart());
+  }
+
+  /**
+   * Marks this test as failure.
+   * <p>
+   * 
+   * @param wrong
+   *          the chart that failed.
+   *          <p>
+   */
+  public final void fail(final Chart2D wrong) {
+    this.m_failure = wrong;
+
+  }
+
+  /**
+   * Template method that returns the next chart to test or null if no further
+   * chart is available.
+   * <p>
+   * 
+   * @return the next chart to test or null if no further chart is available.
+   * 
+   * @throws IOException
+   *           if sth. goes wrong.
+   */
+  protected abstract StaticCollectorChart getNextChart() throws IOException;
 
   /**
    * Internal helper that shows the chart in a frame.
    * <p>
    * 
    * @param chart
-   *            the chart to display.
+   *          the chart to display.
    * 
    * @throws InterruptedException
-   *             if sleeping fails.
+   *           if sleeping fails.
    */
   private final void show(final StaticCollectorChart chart) throws InterruptedException {
 
@@ -243,87 +301,29 @@ public abstract class ADisplayTest extends TestCase {
   }
 
   /**
-   * Internal helper that describes a StaticCollectorChart.
+   * Basic junit test method hook that searches for files in this package with
+   * name "textX.properties" (where "X" is a number that starts from 1) collects
+   * the data in the files and shows a chart with a trace that contains this
+   * data along with buttons for judging the display as right or wrong.
    * <p>
    * 
-   * @param collectorchart
-   *            the instance to describe.
+   * @throws IOException
+   *           if sth. goes wrong.
    * 
-   * @return the description of the given instance.
+   * @throws InterruptedException
+   *           if sleeping is interrupted.
    */
-  private final String describe(final StaticCollectorChart collectorchart) {
-    return this.describe(collectorchart.getChart());
-  }
-
-  /**
-   * Internal helper that describes a Chart2D.
-   * <p>
-   * 
-   * @param chart
-   *            the instance to describe.
-   * 
-   * @return the description of the given instance.
-   */
-  private final String describe(final Chart2D chart) {
-    StringBuffer result = new StringBuffer();
-    result.append("Chart2D\n");
-    result.append("-------\n");
-
-    IAxisTickPainter labelPainter = chart.getAxisTickPainter();
-    result.append("LabelPainter: ").append(labelPainter.getClass().getName()).append("\n");
-
-    // X axis
-    IAxis axis = chart.getAxisX();
-    result.append("Axis x:\n");
-    IRangePolicy rangePolicy = axis.getRangePolicy();
-    result.append("  RangePolicy: " + rangePolicy.getClass().getName() + ":\n");
-    Range range = rangePolicy.getRange();
-    result.append("    min: " + range.getMin() + "\n");
-    result.append("    max: " + range.getMax() + "\n");
-    IAxisLabelFormatter labelFormatter = axis.getFormatter();
-    result.append("  LabelFormatter: ").append(labelFormatter.getClass().getName()).append("\n");
-    AUnit unit = labelFormatter.getUnit();
-    result.append("  Unit: " + unit.getClass().getName()).append("\n");
-    result.append("  Major tick spacing: ").append(axis.getMajorTickSpacing()).append("\n");
-    result.append("  Minor tick spacing: ").append(axis.getMajorTickSpacing()).append("\n");
-
-    // Y axis
-    axis = chart.getAxisY();
-    result.append("Axis y:\n");
-    rangePolicy = axis.getRangePolicy();
-    result.append("  RangePolicy: " + rangePolicy.getClass().getName() + ":\n");
-    range = rangePolicy.getRange();
-    result.append("    min: " + range.getMin() + "\n");
-    result.append("    max: " + range.getMax() + "\n");
-    labelFormatter = axis.getFormatter();
-    result.append("  LabelFormatter: ").append(labelFormatter.getClass().getName()).append("\n");
-    unit = labelFormatter.getUnit();
-    result.append("  Unit: " + unit.getClass().getName()).append("\n");
-    result.append("  Major tick spacing: ").append(axis.getMajorTickSpacing()).append("\n");
-    result.append("  Minor tick spacing: ").append(axis.getMajorTickSpacing()).append("\n");
-
-    // Traces
-    result.append("  Traces:\n");
-    Stroke stroke;
-    for (ITrace2D trace : chart.getTraces()) {
-      result.append("    ").append(trace.getClass().getName()).append(":\n");
-      result.append("      amount of poijnts : ").append(trace.getSize()).append("\n");
-      result.append("      x-range: [").append(trace.getMinX()).append(",").append(trace.getMaxX())
-          .append("]\n");
-      result.append("      y-range: [").append(trace.getMinY()).append(",").append(trace.getMaxY())
-          .append("]\n");
-      result.append("      Color: ").append(trace.getColor()).append("\n");
-      result.append("      Label: ").append(trace.getLabel()).append("\n");
-      result.append("      Visible: ").append(trace.isVisible()).append("\n");
-      result.append("      Z-index: ").append(trace.getZIndex()).append("\n");
-      result.append("      TracePainters: \n");
-      for (ITracePainter tracePainter : trace.getTracePainters()) {
-        result.append("        ").append(tracePainter.getClass().getName()).append("\n");
+  public final void testDisplay() throws IOException, InterruptedException {
+    StaticCollectorChart chart;
+    boolean foundData = true;
+    do {
+      chart = this.getNextChart();
+      if (chart == null) {
+        foundData = false;
+      } else {
+        this.configure(chart);
+        this.show(chart);
       }
-      stroke = trace.getStroke();
-      result.append("       Stroke: ").append(stroke.getClass().getName()).append("\n");
-    }
-
-    return result.toString();
+    } while (foundData);
   }
 }

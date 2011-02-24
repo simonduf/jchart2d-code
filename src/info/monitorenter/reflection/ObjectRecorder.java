@@ -1,7 +1,7 @@
 /*
  * ObjectRecorder, a class that takes records of an objects state using 
  * reflection.
- * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de.
+ * Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -58,7 +58,7 @@ import javax.swing.event.EventListenerList;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class ObjectRecorder
     extends Thread {
@@ -70,7 +70,7 @@ public class ObjectRecorder
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.7 $
+   * @version $Revision: 1.8 $
    */
   public final class ObjectInspection {
 

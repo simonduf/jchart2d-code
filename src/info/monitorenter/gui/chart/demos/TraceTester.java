@@ -24,6 +24,7 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.TracePoint2D;
 import info.monitorenter.gui.chart.traces.Trace2DBijective;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
@@ -50,7 +51,7 @@ import javax.swing.JFrame;
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public final class TraceTester {
 
@@ -64,7 +65,7 @@ public final class TraceTester {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.6 $
+   * @version $Revision: 1.7 $
    */
   static class HalfRandomPoints extends TraceTester.RandomPoints {
 
@@ -104,7 +105,7 @@ public final class TraceTester {
      * @see info.monitorenter.gui.chart.demos.TraceTester.RandomPoints#nextPoint()
      */
     @Override
-    public TracePoint2D nextPoint() {
+    public ITracePoint2D nextPoint() {
       if (this.m_samexcount == 10) {
         this.m_samexcount = 0;
         this.m_oldx = this.m_rand.nextDouble() * this.m_xrange + this.m_xmin;
@@ -120,7 +121,7 @@ public final class TraceTester {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.6 $
+   * @version $Revision: 1.7 $
    */
   private static class RandomPoints {
     /** Used for randomization. */
@@ -175,7 +176,7 @@ public final class TraceTester {
      * 
      * @return the next random point.
      */
-    public TracePoint2D nextPoint() {
+    public ITracePoint2D nextPoint() {
       return new TracePoint2D(this.m_rand.nextDouble() * this.m_xrange + this.m_xmin, this.m_rand
           .nextDouble()
           * this.m_yrange + this.m_ymin);

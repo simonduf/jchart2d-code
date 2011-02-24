@@ -1,6 +1,6 @@
 /*
  *  AErrorBarPolicyAction.ava, base for actions to trigger on IErrorBarPolicy
- *  instances. Copyright (C) Achim Westermann, created on 09.12.2006, 00:05:55
+ *  instances. Copyright (C) 2007 - 2010 Achim Westermann, created on 09.12.2006, 00:05:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -38,7 +38,7 @@ import javax.swing.AbstractAction;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  * 
  */
 public abstract class AErrorBarPolicyAction extends AbstractAction implements
@@ -48,7 +48,7 @@ public abstract class AErrorBarPolicyAction extends AbstractAction implements
   private static final long serialVersionUID = -5125972469704790485L;
 
   /** The error bar policy to trigger the action upon. */
-  protected IErrorBarPolicy m_errorBarPolicy;
+  protected IErrorBarPolicy< ? > m_errorBarPolicy;
 
   /**
    * Create an <code>Action</code> that accesses the error bar policy and
@@ -63,7 +63,7 @@ public abstract class AErrorBarPolicyAction extends AbstractAction implements
    *          <code>Action</code> assigned (
    *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    */
-  public AErrorBarPolicyAction(final IErrorBarPolicy errorBarPolicy, final String description) {
+  public AErrorBarPolicyAction(final IErrorBarPolicy< ? > errorBarPolicy, final String description) {
     super(description);
     this.m_errorBarPolicy = errorBarPolicy;
   }

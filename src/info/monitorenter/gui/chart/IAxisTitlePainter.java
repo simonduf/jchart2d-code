@@ -1,7 +1,7 @@
 /*
  *  IAxisTitlePainter.java of project jchart2d, interface for an painter of the 
  *  title of an axis of the Chart2D.
- *  Copyright 2007 (C) Achim Westermann.
+ *  Copyright 2004 - 2010 (C) Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import java.io.Serializable;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  * 
  * @since 2.2.1
  * 

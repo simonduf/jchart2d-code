@@ -1,6 +1,6 @@
 /*
  *  LinePainter.java,  <enter purpose here>.
- *  Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
 package info.monitorenter.gui.chart.traces.painters;
 
 import info.monitorenter.gui.chart.IPointPainter;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.pointpainters.PointPainterLine;
 
 import java.awt.Graphics;
@@ -33,7 +33,7 @@ import java.awt.Graphics;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.20 $
  * 
  */
 public class TracePainterLine extends ATracePainter {
@@ -42,7 +42,7 @@ public class TracePainterLine extends ATracePainter {
   private static final long serialVersionUID = -3310431930065989648L;
 
   /** The implementation for rendering the point as a line. */
-  private IPointPainter m_pointPainter;
+  private IPointPainter< ? > m_pointPainter;
 
   /**
    * Defcon.
@@ -53,16 +53,24 @@ public class TracePainterLine extends ATracePainter {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#endPaintIteration(java.awt.Graphics)
+   */
+  @Override
+  public void endPaintIteration(final Graphics g2d) {
+    this.m_pointPainter.endPaintIteration(g2d);
+  }
+
+  /**
    * Paints a line from current to next point.
    * <p>
    * 
    * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int,
    *      int, int, int, java.awt.Graphics,
-   *      info.monitorenter.gui.chart.TracePoint2D)
+   *      info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final TracePoint2D original) {
+      final int nextY, final Graphics g, final ITracePoint2D original) {
     super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
     this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
   }
@@ -74,13 +82,4 @@ public class TracePainterLine extends ATracePainter {
   public void startPaintIteration(final Graphics g2d) {
     this.m_pointPainter.startPaintIteration(g2d);
   }
-
-  /**
-   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#endPaintIteration(java.awt.Graphics)
-   */
-  @Override
-  public void endPaintIteration(final Graphics g2d) {
-    this.m_pointPainter.endPaintIteration(g2d);
-  }
-
 }

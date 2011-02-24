@@ -22,7 +22,7 @@
 package info.monitorenter.gui.chart.views;
 
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -42,7 +42,7 @@ import javax.swing.JTextField;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class ChartCoordinateView extends JPanel {
 
@@ -88,7 +88,7 @@ public class ChartCoordinateView extends JPanel {
        */
       @Override
       public void mouseMoved(final MouseEvent me) {
-        TracePoint2D value = ChartCoordinateView.this.m_chart2D.translateMousePosition(me);
+        ITracePoint2D value = ChartCoordinateView.this.m_chart2D.translateMousePosition(me);
         if (value != null) {
           ChartCoordinateView.this.m_xView.setText(ChartCoordinateView.this.m_chart2D.getAxisX()
               .getFormatter().format(value.getX()));

@@ -1,6 +1,6 @@
 /*
  *  AUnit.java, base class for units in jchart2d.
- *  Copyright (C) Achim Westermann, created on 12.05.2005, 20:11:17
+ *  Copyright (C) 2004 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import java.io.Serializable;
  *
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  *
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  *
  * @see info.monitorenter.util.units.UnitFactory
  *

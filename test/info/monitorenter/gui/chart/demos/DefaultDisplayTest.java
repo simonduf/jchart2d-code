@@ -36,38 +36,11 @@ import junit.framework.TestSuite;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  * 
  */
 public class DefaultDisplayTest
     extends ADisplayTestPropertyDataBased {
-
-  /**
-   * Returns a {@link Trace2DSimple} that is configured with a custom
-   * {@link ITrace2D#setColor(Color)}.
-   * <p>
-   * 
-   * @return a {@link Trace2DSimple} that is configured with a custom
-   *         {@link ITrace2D#setColor(Color)}.
-   * 
-   * @see info.monitorenter.gui.chart.demos.ADisplayTest#createTrace()
-   */
-  @Override
-  protected ITrace2D createTrace() {
-    ITrace2D result = new Trace2DSimple();
-    result.setColor(Color.RED);
-    return result;
-  }
-
-
-  /**
-   * @see info.monitorenter.gui.chart.demos.ADisplayTest#configure(info.monitorenter.gui.chart.demos.StaticCollectorChart)
-   */
-  @Override
-  protected void configure(final StaticCollectorChart chart) {
-    // chart.getChart().getAxisY().setFormatter(new LabelFormatterNumber(new
-    // DecimalFormat("#.###")));
-  }
 
   /**
    * Test suite for this test class.
@@ -85,6 +58,7 @@ public class DefaultDisplayTest
     return suite;
   }
 
+
   /**
    * Creates a test case with the given name.
    * <p>
@@ -94,6 +68,32 @@ public class DefaultDisplayTest
    */
   public DefaultDisplayTest(final String testName) {
     super(testName);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.demos.ADisplayTest#configure(info.monitorenter.gui.chart.demos.StaticCollectorChart)
+   */
+  @Override
+  protected void configure(final StaticCollectorChart chart) {
+    // chart.getChart().getAxisY().setFormatter(new LabelFormatterNumber(new
+    // DecimalFormat("#.###")));
+  }
+
+  /**
+   * Returns a {@link Trace2DSimple} that is configured with a custom
+   * {@link ITrace2D#setColor(Color)}.
+   * <p>
+   * 
+   * @return a {@link Trace2DSimple} that is configured with a custom
+   *         {@link ITrace2D#setColor(Color)}.
+   * 
+   * @see info.monitorenter.gui.chart.demos.ADisplayTest#createTrace()
+   */
+  @Override
+  protected ITrace2D createTrace() {
+    ITrace2D result = new Trace2DSimple();
+    result.setColor(Color.RED);
+    return result;
   }
 
 }

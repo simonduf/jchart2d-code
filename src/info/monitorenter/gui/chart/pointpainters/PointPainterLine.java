@@ -1,6 +1,6 @@
 /*
- *  LinePainter.java,  <enter purpose here>.
- *  Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ *  LinePainter.java,  point painter that paints lines. 
+ *  Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -21,8 +21,8 @@
  */
 package info.monitorenter.gui.chart.pointpainters;
 
-import info.monitorenter.gui.chart.IPointPainter;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
+import info.monitorenter.util.MathUtil;
 
 import java.awt.Graphics;
 
@@ -32,10 +32,10 @@ import java.awt.Graphics;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.15 $
  * 
  */
-public class PointPainterLine extends APointPainter implements IPointPainter {
+public class PointPainterLine extends APointPainter {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 4325801979289678143L;
@@ -53,10 +53,11 @@ public class PointPainterLine extends APointPainter implements IPointPainter {
    * <p>
    * 
    * @see info.monitorenter.gui.chart.IPointPainter#paintPoint(int, int, int,
-   *      int, java.awt.Graphics, info.monitorenter.gui.chart.TracePoint2D)
+   *      int, java.awt.Graphics, info.monitorenter.gui.chart.ITracePoint2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final TracePoint2D point) {
+      final int nextY, final Graphics g, final ITracePoint2D point) {
     g.drawLine(absoluteX, absoluteY, nextX, nextY);
   }
+
 }

@@ -87,11 +87,11 @@ public class TestAxis extends ATestJChart2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.test.ATestJChart2D#createTrace()
+   * @see info.monitorenter.gui.chart.test.ATestJChart2D#createTraces()
    */
   @Override
-  protected ITrace2D createTrace() {
-    return new Trace2DSimple();
+  protected ITrace2D[] createTraces() {
+    return new ITrace2D[] {new Trace2DSimple()};
   }
 
   /**
@@ -100,7 +100,7 @@ public class TestAxis extends ATestJChart2D {
   @Override
   protected void fillTrace(final ITrace2D trace2D) {
     for (int i = 0; i < 101; i++) {
-      this.m_trace.addPoint(i, i);
+      trace2D.addPoint(i, i);
     }
   }
 
@@ -108,10 +108,7 @@ public class TestAxis extends ATestJChart2D {
    * Tests <code>{@link AAxis#setRangePolicy(IRangePolicy)}</code> with a <code>
    * {@link RangePolicyFixedViewport}</code>.
    * <p>
-   * 
-   * @see info.monitorenter.gui.chart.test.ATestJChart2D#testSetRangePolicyFixedViewPort()
    */
-  @Override
   public void testSetRangePolicyFixedViewPort() {
     Range range = new Range(1, 2);
     IRangePolicy rangePolicy = new RangePolicyFixedViewport(range);

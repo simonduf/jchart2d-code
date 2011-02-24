@@ -1,6 +1,6 @@
 /*
  *  ChartPanel.java, a decoration of a Chart2D that adds popup menues for traces and the chart.
- *  Copyright (C) Achim Westermann, created on 19.05.2005, 22:01:51
+ *  Copyright (C) 2005 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,8 @@ package info.monitorenter.gui.chart.views;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.annotations.IAnnotationCreator;
+import info.monitorenter.gui.chart.annotations.bubble.AnnotationCreatorBubble;
 import info.monitorenter.gui.chart.controls.LayoutFactory;
 import info.monitorenter.gui.chart.layouts.FlowLayoutCorrectMinimumSize;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
@@ -44,13 +46,12 @@ import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 
 /**
- * A decoration for {@link info.monitorenter.gui.chart.Chart2D} that adds
- * various controls for a {@link info.monitorenter.gui.chart.Chart2D} and it's
- * {@link info.monitorenter.gui.chart.ITrace2D} instances in form of popup
- * menues.
+ * A decoration for {@link Chart2D} that adds various controls for a
+ * {@link Chart2D} and it's {@link ITrace2D} instances in form of popup menues.
  * <p>
  * <h2>Performance note</h2>
  * The context menu items register themselves with the chart to adapt their
@@ -91,7 +92,7 @@ import javax.swing.JPanel;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  */
-public class ChartPanel extends JPanel implements PropertyChangeListener {
+public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
 
   /**
    * Generated <code>serialVersionUID</code>.
@@ -122,6 +123,9 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
     // trace2
     ITrace2D trace2 = new Trace2DLtd(100);
     trace2.setName("Trace 2");
+    // add to chart
+    chart.addTrace(trace1);
+    chart.addTrace(trace2);
     // AbstractDataCollector collector2 = new
     // RandomDataCollectorOffset(trace2,500);
     for (int i = 0; i < 100; i++) {
@@ -129,10 +133,8 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
       trace2.addPoint(i + 2, 100 - data[i]);
     }
 
-    // add to chart
-    chart.addTrace(trace1);
-    chart.addTrace(trace2);
-    frame.getContentPane().add(new ChartPanel(chart));
+    ChartPanel cPanel = new ChartPanel(chart);
+    frame.getContentPane().add(cPanel);
     frame.setSize(new Dimension(400, 600));
     frame.addWindowListener(new WindowAdapter() {
       /**
@@ -144,12 +146,16 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
       }
 
     });
-    frame.setJMenuBar(LayoutFactory.getInstance().createMenuBar(chart, false));
+    frame.setJMenuBar(LayoutFactory.getInstance().createChartMenuBar(cPanel, false));
     frame.setVisible(true);
   }
+  
+  /** The annotation creator factory for this panel. */
+  private IAnnotationCreator m_annotationCreator = AnnotationCreatorBubble.getInstance();
 
   /** The decorated chart. */
   private Chart2D m_chart;
+
 
   /**
    * <p>
@@ -178,7 +184,7 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
     // get the layout factory for popup menues:
     LayoutFactory factory = LayoutFactory.getInstance();
 
-    factory.createPopupMenu(chart, true);
+    factory.createChartPopupMenu(this, true);
 
     // layout
     this.setLayout(new BorderLayout());
@@ -191,7 +197,7 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
     this.m_labelPanel.setBackground(chart.getBackground());
     JLabel label;
     for (ITrace2D trace : chart) {
-      label = factory.createContextMenuLabel(chart, trace, true);
+      label = factory.createTraceContextMenuLabel(chart, trace, true);
       if (label != null) {
         this.m_labelPanel.add(label);
       }
@@ -247,6 +253,26 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
   }
 
   /**
+   * Returns the annotationCreator.
+   * <p>
+   * 
+   * @return the annotationCreator
+   */
+  public final IAnnotationCreator getAnnotationCreator() {
+    return this.m_annotationCreator;
+  }
+
+  /**
+   * Returns the chart.
+   * <p>
+   * 
+   * @return the chart
+   */
+  public final Chart2D getChart() {
+    return this.m_chart;
+  }
+
+  /**
    * Listens for property "background" of the <code>Chart2D</code> instance that
    * is contained in this component and sets the background color.
    * <p>
@@ -271,7 +297,7 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
       JLabel label;
       if (oldTrace == null && newTrace != null) {
         if (!this.containsTraceLabel(newTrace)) {
-          label = LayoutFactory.getInstance().createContextMenuLabel(this.m_chart, newTrace, true);
+          label = LayoutFactory.getInstance().createTraceContextMenuLabel(this.m_chart, newTrace, true);
           if (label != null) {
             this.m_labelPanel.add(label);
             this.invalidate();
@@ -335,7 +361,7 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
         } else if ((StringUtil.isEmpty(oldLabel)) && (!StringUtil.isEmpty(newLabel))) {
           if (!this.containsTraceLabel(newTrace)) {
             label = LayoutFactory.getInstance()
-                .createContextMenuLabel(this.m_chart, newTrace, true);
+                .createTraceContextMenuLabel(this.m_chart, newTrace, true);
             if (label != null) {
               this.m_labelPanel.add(label);
               this.invalidate();
@@ -349,5 +375,16 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
         throw new IllegalArgumentException("Bad property change event for add / remove trace.");
       }
     }
+  }
+
+  /**
+   * Sets the annotationCreator.
+   * <p>
+   * 
+   * @param annotationCreator
+   *          the annotationCreator to set
+   */
+  public final void setAnnotationCreator(final IAnnotationCreator annotationCreator) {
+    this.m_annotationCreator = annotationCreator;
   }
 }

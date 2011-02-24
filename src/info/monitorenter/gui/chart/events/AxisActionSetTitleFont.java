@@ -1,7 +1,7 @@
 /*
  *  AxisActionSetTitle.java of project jchart2d, an action  implementation 
  *  to set the title font of an IAxis.
- *  Copyright (c) 2007 Achim Westermann. 
+ *  Copyright (c) 2007 - 2010 Achim Westermann. 
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  */
 public class AxisActionSetTitleFont
     extends AAxisAction {
@@ -89,7 +89,10 @@ public class AxisActionSetTitleFont
   /**
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
+  @Override
   public void propertyChange(final PropertyChangeEvent evt) {
+    // will check for an axis replacement and transfer listening to the new axis if so: 
+    super.propertyChange(evt);
     String property = evt.getPropertyName();
     if (property.equals(IAxis.AxisTitle.PROPERTY_TITLEFONT)) {
       Font newFont = (Font) evt.getNewValue();

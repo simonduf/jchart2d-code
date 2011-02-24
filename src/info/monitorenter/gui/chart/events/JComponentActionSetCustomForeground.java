@@ -1,6 +1,6 @@
 /*
  *  JComponentActionSetCustomForeground, action for setting a custom foreground color of a JComponent.
- *  Copyright (C) 2007 by Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2004 - 2010 by Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ import javax.swing.JComponent;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.7 $
  */
 public final class JComponentActionSetCustomForeground extends AJComponentAction {
 
@@ -50,10 +50,10 @@ public final class JComponentActionSetCustomForeground extends AJComponentAction
   private static final long serialVersionUID = 3904680491952451890L;
 
   /**
-   * Reference to the last custom color chosen to check wether the corresponding
+   * Reference to the last custom color chosen to check whether the corresponding
    * menu is selected.
    */
-  private Color m_lastChosenColor;
+  private Color m_lastChosenColor = null;
 
   /**
    * Create an <code>Action</code> that accesses the trace and identifies
@@ -71,8 +71,6 @@ public final class JComponentActionSetCustomForeground extends AJComponentAction
    */
   public JComponentActionSetCustomForeground(final JComponent component, final String description) {
     super(component, description);
-    // fool find bugs "unwritten field":
-    this.m_lastChosenColor = null;
     component.addPropertyChangeListener(Chart2D.PROPERTY_FOREGROUND_COLOR, this);
   }
 
@@ -83,6 +81,7 @@ public final class JComponentActionSetCustomForeground extends AJComponentAction
     Color chosen = JColorChooser.showDialog(this.m_component, "choose foreground color for "
         + this.m_component.getName(), this.m_component.getForeground());
     this.m_component.setForeground(chosen);
+    this.m_lastChosenColor = chosen;
   }
 
   /**

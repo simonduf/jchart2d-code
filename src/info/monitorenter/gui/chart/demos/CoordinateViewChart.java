@@ -26,6 +26,8 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.controls.LayoutFactory;
 import info.monitorenter.gui.chart.io.AStaticDataCollector;
 import info.monitorenter.gui.chart.io.PropertyFileStaticDataCollector;
+import info.monitorenter.gui.chart.pointhighlighters.PointHighlighterConfigurable;
+import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.gui.chart.views.ChartCoordinateView;
 import info.monitorenter.gui.chart.views.ChartPanel;
@@ -47,7 +49,7 @@ import javax.swing.JFrame;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  */
 public class CoordinateViewChart extends JFrame {
 
@@ -56,6 +58,30 @@ public class CoordinateViewChart extends JFrame {
    * <p>
    */
   private static final long serialVersionUID = 1195707820931595997L;
+
+  /**
+   * Demo application startup method.
+   * <p>
+   * 
+   * @param args
+   *          ignored.
+   * @throws IOException
+   *           if loading data for the demo chart fails.
+   */
+  public static void main(final String[] args) throws IOException {
+    Chart2D chart = new Chart2D();
+    chart.enablePointHighlighting(true);
+    chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
+    ITrace2D trace = new Trace2DLtd(400);
+    trace.setPointHighlighter(new PointHighlighterConfigurable(new PointPainterDisc(10), true));
+    
+    AStaticDataCollector collector = new PropertyFileStaticDataCollector(trace,
+        CoordinateViewChart.class.getResourceAsStream("data.properties"));
+    collector.collectData();
+    chart.addTrace(trace);
+    new CoordinateViewChart(chart);
+
+  }
 
   /** The chart to display and query for coordinates. */
   private Chart2D m_chart;
@@ -115,27 +141,6 @@ public class CoordinateViewChart extends JFrame {
 
     this.setSize(new Dimension(400, 300));
     this.setVisible(true);
-
-  }
-
-  /**
-   * Demo application startup method.
-   * <p>
-   * 
-   * @param args
-   *          ignored.
-   * @throws IOException
-   *           if loading data for the demo chart fails.
-   */
-  public static void main(final String[] args) throws IOException {
-    Chart2D chart = new Chart2D();
-
-    ITrace2D trace = new Trace2DLtd(400);
-    AStaticDataCollector collector = new PropertyFileStaticDataCollector(trace,
-        CoordinateViewChart.class.getResourceAsStream("data.properties"));
-    collector.collectData();
-    chart.addTrace(trace);
-    new CoordinateViewChart(chart);
 
   }
 

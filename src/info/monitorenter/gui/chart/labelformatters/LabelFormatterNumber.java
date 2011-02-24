@@ -1,7 +1,7 @@
 /*
  *  LabelFormatterNumber.java of jchart2d, a label formatter that 
  *  formats the labels with a number format. 
- *  Copyright (C) Achim Westermann, created on 20.04.2005, 22:34:16
+ *  Copyright (C) 2005 - 2010 Achim Westermann, created on 20.04.2005, 22:34:16
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -47,10 +47,9 @@ import java.text.ParseException;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.15 $
  */
-public class LabelFormatterNumber
-    extends ALabelFormatter implements IAxisLabelFormatter {
+public class LabelFormatterNumber extends ALabelFormatter implements IAxisLabelFormatter {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 7659252726783423615L;
@@ -171,9 +170,9 @@ public class LabelFormatterNumber
     }
 
     // <sign> integerDigits <dot> fractionDigits:
-    return 1 + integerDigits + 1 + fractionDigits;
-
-  }
+    int result = 1 + integerDigits + 1 + fractionDigits;
+    return result;
+   }
 
   /**
    * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getMinimumValueShiftForChange()

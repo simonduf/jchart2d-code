@@ -1,7 +1,7 @@
 /*
  *
- *  LabelFormatterSimple.java  jchart2d
- *  Copyright (C) Achim Westermann, created on 20.04.2005, 09:54:15
+ *  LabelFormatterSimple.java of project jchart2d. The most simple label formatter. 
+ *  Copyright (C) 2005 - 2010 Achim Westermann, created on 20.04.2005, 09:54:15
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -34,7 +34,7 @@ import java.text.DecimalFormat;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.9 $
  *
  */
 public final class LabelFormatterSimple extends LabelFormatterNumber implements IAxisLabelFormatter {
@@ -50,7 +50,7 @@ public final class LabelFormatterSimple extends LabelFormatterNumber implements 
    */
   public LabelFormatterSimple() {
     super(new DecimalFormat("#.#"));
-    this.m_numberFormat.setMaximumFractionDigits(2);
+    this.m_numberFormat.setMaximumFractionDigits(4);
     this.m_numberFormat.setMaximumIntegerDigits(16);
   }
 

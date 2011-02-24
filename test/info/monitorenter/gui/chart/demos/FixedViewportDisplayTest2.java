@@ -47,58 +47,11 @@ import junit.framework.TestSuite;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  * 
  */
 public class FixedViewportDisplayTest2
     extends ADisplayTestPropertyDataBased {
-
-  /**
-   * Creates a test case with the given name.
-   * <p>
-   * 
-   * @param testName
-   *          the name of the test case.
-   */
-  public FixedViewportDisplayTest2(final String testName) {
-    super(testName);
-  }
-
-  /**
-   * Returns a {@link Trace2DSimple} that has a painter for discs and a painter
-   * for lines (in that order).
-   * <p>
-   * 
-   * @return a {@link Trace2DSimple} that has a painter for discs and a painter
-   *         for lines (in that order).
-   * 
-   * @see info.monitorenter.gui.chart.demos.ADisplayTest#createTrace()
-   */
-  @Override
-  protected ITrace2D createTrace() {
-    ITrace2D result = new Trace2DSimple();
-    result.setTracePainter(new TracePainterDisc());
-    result.addTracePainter(new TracePainterLine());
-    result.setColor(Color.RED);
-    return result;
-  }
-
-  /**
-   * Sets up a {@link RangePolicyFixedViewport} with a range from 0 to 100 for
-   * the x axis and a range from -40 to 40 for the y axis.
-   * <p>
-   * 
-   * @see info.monitorenter.gui.chart.demos.ADisplayTest#configure(info.monitorenter.gui.chart.demos.StaticCollectorChart)
-   */
-  @Override
-  protected void configure(final StaticCollectorChart chart) {
-    IAxis axis = chart.getChart().getAxisX();
-    axis.setRangePolicy(new RangePolicyFixedViewport());
-    axis.setRange(new Range(0, 100));
-    axis = chart.getChart().getAxisY();
-    axis.setRangePolicy(new RangePolicyFixedViewport());
-    axis.setRange(new Range(-40, 40));
-  }
 
   /**
    * Main debug hook.
@@ -137,6 +90,53 @@ public class FixedViewportDisplayTest2
     suite.addTest(new FixedViewportDisplayTest2("testDisplay"));
 
     return suite;
+  }
+
+  /**
+   * Creates a test case with the given name.
+   * <p>
+   * 
+   * @param testName
+   *          the name of the test case.
+   */
+  public FixedViewportDisplayTest2(final String testName) {
+    super(testName);
+  }
+
+  /**
+   * Sets up a {@link RangePolicyFixedViewport} with a range from 0 to 100 for
+   * the x axis and a range from -40 to 40 for the y axis.
+   * <p>
+   * 
+   * @see info.monitorenter.gui.chart.demos.ADisplayTest#configure(info.monitorenter.gui.chart.demos.StaticCollectorChart)
+   */
+  @Override
+  protected void configure(final StaticCollectorChart chart) {
+    IAxis axis = chart.getChart().getAxisX();
+    axis.setRangePolicy(new RangePolicyFixedViewport());
+    axis.setRange(new Range(0, 100));
+    axis = chart.getChart().getAxisY();
+    axis.setRangePolicy(new RangePolicyFixedViewport());
+    axis.setRange(new Range(-40, 40));
+  }
+
+  /**
+   * Returns a {@link Trace2DSimple} that has a painter for discs and a painter
+   * for lines (in that order).
+   * <p>
+   * 
+   * @return a {@link Trace2DSimple} that has a painter for discs and a painter
+   *         for lines (in that order).
+   * 
+   * @see info.monitorenter.gui.chart.demos.ADisplayTest#createTrace()
+   */
+  @Override
+  protected ITrace2D createTrace() {
+    ITrace2D result = new Trace2DSimple();
+    result.setTracePainter(new TracePainterDisc());
+    result.addTracePainter(new TracePainterLine());
+    result.setColor(Color.RED);
+    return result;
   }
 
 }

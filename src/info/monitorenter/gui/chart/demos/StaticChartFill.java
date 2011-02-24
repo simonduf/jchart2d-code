@@ -1,7 +1,7 @@
 /*
  *
  *  StaticChartFill.java, rendering demo of jchart2d.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -43,7 +43,7 @@ import javax.swing.JFrame;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  * 
  */
 public final class StaticChartFill {
@@ -61,6 +61,8 @@ public final class StaticChartFill {
 
     // Create an ITrace:
     ITrace2D trace = new Trace2DSimple();
+    // Add the trace to the chart:
+    chart.addTrace(trace);
     trace.setTracePainter(new TracePainterFill(chart));
     trace.setColor(Color.DARK_GRAY);
     // Add all points, as it is static:
@@ -74,8 +76,6 @@ public final class StaticChartFill {
       value = random.nextDouble() * 10.0 + i;
       trace.addPoint(place, value);
     }
-    // Add the trace to the chart:
-    chart.addTrace(trace);
 
     // Make it visible:
     // Create a frame.

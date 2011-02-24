@@ -1,7 +1,7 @@
 /*
  *  MinimalStaticChart.java of project jchart2d, a demonstration 
  *  of the minimal code to set up a chart with static data. 
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -25,9 +25,7 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
-import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -46,10 +44,9 @@ import javax.swing.JPanel;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.13 $
  */
-public final class MinimalStaticChart
-    extends JPanel {
+public final class MinimalStaticChart extends JPanel {
   /**
    * Generated for <code>serialVersionUID</code>.
    */
@@ -94,20 +91,19 @@ public final class MinimalStaticChart
     ITrace2D trace = new Trace2DSimple();
     trace.setColor(Color.RED);
 
+    // Add the trace to the chart:
+    chart.addTrace(trace);
+
     // Add all points, as it is static:
     double time = System.currentTimeMillis();
     for (int i = 0; i < 120; i++) {
       trace.addPoint(time + i, i);
     }
-    // Add the trace to the chart:
-    chart.addTrace(trace);
-
 
     chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
-    chart.setPointHighlighter(new PointPainterDisc(8));
 
     // Make it visible:
-    this.add(new ChartPanel(chart), BorderLayout.CENTER);
+    this.add(chart, BorderLayout.CENTER);
 
   }
 

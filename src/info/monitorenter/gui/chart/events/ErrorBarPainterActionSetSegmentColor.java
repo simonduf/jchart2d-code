@@ -1,7 +1,7 @@
 /*
  *  AErrorBarPainterActionSetSegmentColor, action that 
  *  sets a custom color to a segment of the error bar painter.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2004 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -41,7 +41,7 @@ import javax.swing.JComponent;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  */
 public final class ErrorBarPainterActionSetSegmentColor
     extends AbstractAction {
@@ -55,6 +55,13 @@ public final class ErrorBarPainterActionSetSegmentColor
    * The segment of the painter to set the color of.
    */
   private IErrorBarPainter.ISegment m_segment;
+
+  /**
+   * Needed as the parent UI component of the modal dialog which will be blocked
+   * by the modal color chooser dialog that pops up.
+   * 
+   */
+  private JComponent m_dialogParent;
 
   /**
    * Create an <code>Action</code> that accesses the error bar painter and
@@ -80,13 +87,6 @@ public final class ErrorBarPainterActionSetSegmentColor
     this.m_segment = errorBarPainterFacade;
     this.m_dialogParent = dialogParent;
   }
-
-  /**
-   * Needed as the parent UI component of the modal dialog which will be blocked
-   * by the modal color chooser dialog that pops up.
-   * 
-   */
-  private JComponent m_dialogParent;
 
   /**
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)

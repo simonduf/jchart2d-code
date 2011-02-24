@@ -25,6 +25,7 @@ package info.monitorenter.gui.chart.traces;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.TracePoint2D;
 
 import java.awt.Color;
@@ -237,7 +238,7 @@ public class TestTrace2D
    */
   public void testMemoryLeakTrace2PointDListeners() {
     ITrace2D trace = new Trace2DSimple();
-    TracePoint2D point = new TracePoint2D(1, 1);
+    ITracePoint2D point = new TracePoint2D(1, 1);
     trace.addPoint(point);
     Assert.assertEquals(1, trace.getSize());
     trace.removePoint(point);
@@ -262,7 +263,7 @@ public class TestTrace2D
      * 
      * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
      * 
-     * @version $Revision: 1.5 $
+     * @version $Revision: 1.6 $
      */
     class PropertyChangeDetector implements PropertyChangeListener {
 

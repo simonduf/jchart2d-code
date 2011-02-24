@@ -1,7 +1,7 @@
 /*
  *  ColorIterator.java, something that walks over the Hue-Saturation-Brightness 
  *  color space. 
- *  Copyright (C) Achim Westermann, created on 19.05.2005, 22:01:51
+ *  Copyright (C) 2004 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -33,12 +33,9 @@ import java.util.NoSuchElementException;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.8 $
  */
 public class ColorIterator implements Iterator<Color> {
-
-  /** Flag to control the direction of iteration. */
-  private boolean m_ascendingDirection = true;
 
   /**
    * Just for protected internal float stepping.
@@ -99,6 +96,112 @@ public class ColorIterator implements Iterator<Color> {
   }
 
   /**
+   * A stepping model that steps on the alpha channel of the HSB color space.
+   * <p>
+   * 
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   * 
+   * @version $Revision: 1.8 $
+   */
+  public static class AlphaStepper extends ColorIterator.ADefaultStepping {
+    /**
+     * Creates an instance with 100 alpha steps.
+     * <p>
+     */
+    public AlphaStepper() {
+      super();
+    }
+
+    /**
+     * Creates an instance with the given stepping to go on the alpha channel of
+     * the color space.
+     * <p>
+     * 
+     * @param steps
+     *            the amount of steps to take on the saturation line.
+     * 
+     */
+    public AlphaStepper(final int steps) {
+      super(steps);
+    }
+
+    /**
+     * Performs a alpha step on the given ColorIterator's HSBColor.
+     * <p>
+     * The bounds are watched: if a step would cross 255, it will be continued
+     * beginning from 0. if a step would cross the alpha value of the
+     * ColorIterator's start alpha, the step will only go as far as this value.
+     * Else there would be problems with finding the end of the iteration.
+     * <p>
+     * 
+     * @param tostep
+     *            the color iterator to perform the step on.
+     */
+    public void doStep(final ColorIterator tostep) {
+      double increment = tostep.m_iterate.m_alpha;
+      double bound = tostep.m_startColor.m_alpha;
+      // + operations:
+      if (tostep.isAscendingDirection()) {
+        // naive step without watching bounds:
+        increment += this.m_stepping;
+        // 1) check if we crossed the bound:;
+        if ((tostep.m_iterate.m_alpha < bound) && (increment > bound)) {
+          increment = bound;
+        } else {
+          // 2.a) check if we crossed the value range:
+          if (increment > 255) {
+            // 2.b) if so, shift by the value range (overflow)
+            increment -= 255;
+            // 2.c) check if we crossed the bound now:
+            if (increment > bound) {
+              // this test is sufficient as we know that we
+              // started from lowest value due to the overflow
+              // and still are higher than bound.
+              increment = bound;
+            }
+          } else {
+            // Nothing because we were bigger than bound before
+            // the step and still did not hit the overflow!
+          }
+        }
+      } else {
+        // - operations:
+        // naive step without watching bounds:
+        increment -= this.m_stepping;
+        // 1) check if we crossed the bound:;
+        if ((tostep.m_iterate.m_alpha > bound) && (increment < bound)) {
+          increment = bound;
+        } else {
+          // 2.a) check if we crossed the value range:
+          if (increment < 0) {
+            // 2.b) if so, shift by the value range (overflow)
+            increment += 255;
+            // 2.c) check if we crossed the bound now:
+            if (increment < bound) {
+              // this test is sufficient as we know that we
+              // started from lowest value due to the overflow
+              // and still are higher than bound.
+              increment = bound;
+            }
+          } else {
+            // Nothing because we were bigger than bound before
+            // the step and still did not hit the overflow!
+          }
+        }
+      }
+      tostep.m_iterate.m_alpha = increment;
+    }
+
+    /**
+     * @see info.monitorenter.gui.util.ColorIterator.ADefaultStepping#setSteps(int)
+     */
+    @Override
+    public void setSteps(final int steps) {
+      this.m_stepping = 255.0 / steps;
+    }
+  }
+
+  /**
    * Base class for stepping models that may step in each direction of the Hue
    * Saturation Luminance color space.
    * <p>
@@ -106,7 +209,7 @@ public class ColorIterator implements Iterator<Color> {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.5 $
+   * @version $Revision: 1.8 $
    */
   public abstract static class APiggyBackStepper implements ColorIterator.ISteppingModel {
     /** The hue stepper to use. */
@@ -187,7 +290,7 @@ public class ColorIterator implements Iterator<Color> {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.5 $
+   * @version $Revision: 1.8 $
    */
   public static class HSBStepper extends ColorIterator.APiggyBackStepper {
     /**
@@ -224,7 +327,7 @@ public class ColorIterator implements Iterator<Color> {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.5 $
+   * @version $Revision: 1.8 $
    */
   public static class HSStepper extends ColorIterator.APiggyBackStepper {
     /**
@@ -256,7 +359,7 @@ public class ColorIterator implements Iterator<Color> {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.5 $
+   * @version $Revision: 1.8 $
    */
   public static class HueStepper extends ColorIterator.ADefaultStepping {
     /**
@@ -356,7 +459,7 @@ public class ColorIterator implements Iterator<Color> {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.5 $
+   * @version $Revision: 1.8 $
    */
   public static interface ISteppingModel extends Cloneable {
     /**
@@ -392,7 +495,7 @@ public class ColorIterator implements Iterator<Color> {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.5 $
+   * @version $Revision: 1.8 $
    */
   public static class LuminanceStepper extends ColorIterator.ADefaultStepping {
     /**
@@ -492,7 +595,7 @@ public class ColorIterator implements Iterator<Color> {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.5 $
+   * @version $Revision: 1.8 $
    */
   public static class SaturationStepper extends ColorIterator.ADefaultStepping {
     /**
@@ -587,110 +690,81 @@ public class ColorIterator implements Iterator<Color> {
   }
 
   /**
-   * A stepping model that steps on the alpha channel of the HSB color space.
+   * Main entry for a test application.
    * <p>
    * 
-   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * 
-   * @version $Revision: 1.5 $
+   * @param args
+   *            ignored.
    */
-  public static class AlphaStepper extends ColorIterator.ADefaultStepping {
-    /**
-     * Creates an instance with 100 alpha steps.
-     * <p>
-     */
-    public AlphaStepper() {
-      super();
-    }
+  public static void main(final String[] args) {
+    final javax.swing.JFrame frame = new javax.swing.JFrame(Messages.getString("ColorIterator.0")); //$NON-NLS-1$
 
-    /**
-     * @see info.monitorenter.gui.util.ColorIterator.ADefaultStepping#setSteps(int)
-     */
-    @Override
-    public void setSteps(final int steps) {
-      this.m_stepping = 255.0 / steps;
-    }
+    javax.swing.JPanel panel = new javax.swing.JPanel() {
+      /**
+       * Generated <code>serialVersionUID</code>.
+       */
+      private static final long serialVersionUID = 3258408422146715703L;
 
-    /**
-     * Creates an instance with the given stepping to go on the alpha channel of
-     * the color space.
-     * <p>
-     * 
-     * @param steps
-     *            the amount of steps to take on the saturation line.
-     * 
-     */
-    public AlphaStepper(final int steps) {
-      super(steps);
-    }
-
-    /**
-     * Performs a alpha step on the given ColorIterator's HSBColor.
-     * <p>
-     * The bounds are watched: if a step would cross 255, it will be continued
-     * beginning from 0. if a step would cross the alpha value of the
-     * ColorIterator's start alpha, the step will only go as far as this value.
-     * Else there would be problems with finding the end of the iteration.
-     * <p>
-     * 
-     * @param tostep
-     *            the color iterator to perform the step on.
-     */
-    public void doStep(final ColorIterator tostep) {
-      double increment = tostep.m_iterate.m_alpha;
-      double bound = tostep.m_startColor.m_alpha;
-      // + operations:
-      if (tostep.isAscendingDirection()) {
-        // naive step without watching bounds:
-        increment += this.m_stepping;
-        // 1) check if we crossed the bound:;
-        if ((tostep.m_iterate.m_alpha < bound) && (increment > bound)) {
-          increment = bound;
-        } else {
-          // 2.a) check if we crossed the value range:
-          if (increment > 255) {
-            // 2.b) if so, shift by the value range (overflow)
-            increment -= 255;
-            // 2.c) check if we crossed the bound now:
-            if (increment > bound) {
-              // this test is sufficient as we know that we
-              // started from lowest value due to the overflow
-              // and still are higher than bound.
-              increment = bound;
-            }
-          } else {
-            // Nothing because we were bigger than bound before
-            // the step and still did not hit the overflow!
-          }
+      private ColorIterator m_color = new ColorIterator();
+      {
+        // System.out.println("start: " + color.start.toString());
+        // System.out.println("iterate: " + color.iterate.toString());
+        int wdt = 0;
+        while (this.m_color.hasNext()) {
+          wdt++;
+          this.m_color.next();
         }
-      } else {
-        // - operations:
-        // naive step without watching bounds:
-        increment -= this.m_stepping;
-        // 1) check if we crossed the bound:;
-        if ((tostep.m_iterate.m_alpha > bound) && (increment < bound)) {
-          increment = bound;
-        } else {
-          // 2.a) check if we crossed the value range:
-          if (increment < 0) {
-            // 2.b) if so, shift by the value range (overflow)
-            increment += 255;
-            // 2.c) check if we crossed the bound now:
-            if (increment < bound) {
-              // this test is sufficient as we know that we
-              // started from lowest value due to the overflow
-              // and still are higher than bound.
-              increment = bound;
-            }
-          } else {
-            // Nothing because we were bigger than bound before
-            // the step and still did not hit the overflow!
+        System.out.println(Messages.getString("ColorIterator.1") + wdt + Messages.getString("ColorIterator.2")); //$NON-NLS-1$ //$NON-NLS-2$
+        System.out.println(Messages.getString("ColorIterator.3") + wdt); //$NON-NLS-1$
+        this.setSize(wdt, 100);
+        this.setPreferredSize(new java.awt.Dimension(wdt, 100));
+        this.setMinimumSize(new java.awt.Dimension(wdt, 100));
+      }
+
+      /**
+       * @see java.awt.Component#paint(java.awt.Graphics)
+       */
+      @Override
+      public void paint(final java.awt.Graphics g) {
+        super.paint(g);
+        // refresh iterator
+        this.m_color.reset();
+        int width = this.getWidth();
+        int height = this.getHeight();
+        int pxdrawn = 0;
+        while (this.m_color.hasNext()) {
+          if (pxdrawn == width) {
+            break;
           }
+          g.setColor(this.m_color.next());
+          g.drawLine(pxdrawn, 0, pxdrawn, height);
+          pxdrawn++;
         }
       }
-      tostep.m_iterate.m_alpha = increment;
-    }
+    };
+
+    javax.swing.JScrollPane scroll = new javax.swing.JScrollPane(panel);
+    java.awt.Container contentPane = frame.getContentPane();
+    contentPane.setLayout(new java.awt.BorderLayout());
+    contentPane.add(scroll, java.awt.BorderLayout.CENTER);
+
+    frame.setLocation(200, 200);
+    frame.setSize(new java.awt.Dimension(400, 100));
+    frame.addWindowListener(new java.awt.event.WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
+      public void windowClosing(final java.awt.event.WindowEvent e) {
+        System.exit(0);
+      }
+    });
+    frame.setResizable(true);
+    frame.setVisible(true);
   }
+
+  /** Flag to control the direction of iteration. */
+  private boolean m_ascendingDirection = true;
 
   /** Flag to show if more colors are iterateable. */
   private boolean m_hasnext = true;
@@ -748,80 +822,6 @@ public class ColorIterator implements Iterator<Color> {
   }
 
   /**
-   * Main entry for a test application.
-   * <p>
-   * 
-   * @param args
-   *            ignored.
-   */
-  public static void main(final String[] args) {
-    final javax.swing.JFrame frame = new javax.swing.JFrame("ColorCircleIterator-test");
-
-    javax.swing.JPanel panel = new javax.swing.JPanel() {
-      /**
-       * Generated <code>serialVersionUID</code>.
-       */
-      private static final long serialVersionUID = 3258408422146715703L;
-
-      private ColorIterator m_color = new ColorIterator();
-      {
-        // System.out.println("start: " + color.start.toString());
-        // System.out.println("iterate: " + color.iterate.toString());
-        int wdt = 0;
-        while (this.m_color.hasNext()) {
-          wdt++;
-          this.m_color.next();
-        }
-        System.out.println("found " + wdt + " different colors.");
-        System.out.println("size: " + wdt);
-        this.setSize(wdt, 100);
-        this.setPreferredSize(new java.awt.Dimension(wdt, 100));
-        this.setMinimumSize(new java.awt.Dimension(wdt, 100));
-      }
-
-      /**
-       * @see java.awt.Component#paint(java.awt.Graphics)
-       */
-      @Override
-      public void paint(final java.awt.Graphics g) {
-        super.paint(g);
-        // refresh iterator
-        this.m_color.reset();
-        int width = this.getWidth();
-        int height = this.getHeight();
-        int pxdrawn = 0;
-        while (this.m_color.hasNext()) {
-          if (pxdrawn == width) {
-            break;
-          }
-          g.setColor(this.m_color.next());
-          g.drawLine(pxdrawn, 0, pxdrawn, height);
-          pxdrawn++;
-        }
-      }
-    };
-
-    javax.swing.JScrollPane scroll = new javax.swing.JScrollPane(panel);
-    java.awt.Container contentPane = frame.getContentPane();
-    contentPane.setLayout(new java.awt.BorderLayout());
-    contentPane.add(scroll, java.awt.BorderLayout.CENTER);
-
-    frame.setLocation(200, 200);
-    frame.setSize(new java.awt.Dimension(400, 100));
-    frame.addWindowListener(new java.awt.event.WindowAdapter() {
-      /**
-       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
-       */
-      @Override
-      public void windowClosing(final java.awt.event.WindowEvent e) {
-        System.exit(0);
-      }
-    });
-    frame.setResizable(true);
-    frame.setVisible(true);
-  }
-
-  /**
    * Returns the starting color which is also used to detect if a whole
    * iteration has been performed.
    * <p>
@@ -846,6 +846,18 @@ public class ColorIterator implements Iterator<Color> {
   }
 
   /**
+   * Returns the ascendingDirection.
+   * <p>
+   * 
+   * @see #setAscendingDirection(boolean)
+   * 
+   * @return the ascendingDirection
+   */
+  public final boolean isAscendingDirection() {
+    return this.m_ascendingDirection;
+  }
+
+  /**
    * Returns instances of java.awt.Color or throws a NoSuchElementException, if
    * iterator has finished.
    * <p>
@@ -857,7 +869,7 @@ public class ColorIterator implements Iterator<Color> {
    */
   public Color next() throws NoSuchElementException {
     if (!this.m_hasnext) {
-      throw new java.util.NoSuchElementException("No more colors to give (call reset for new run!)");
+      throw new java.util.NoSuchElementException(Messages.getString("ColorIterator.4")); //$NON-NLS-1$
     }
     if (!this.m_firstTime) {
       this.m_stepModel.doStep(this);
@@ -893,6 +905,18 @@ public class ColorIterator implements Iterator<Color> {
   }
 
   /**
+   * Sets whether the color space should be iterated in ascending direction (+
+   * operations) or descending direction(- operations).
+   * <p>
+   * 
+   * @param ascendingDirection
+   *            if true the color space will be iterated in ascending direction.
+   */
+  public final void setAscendingDirection(final boolean ascendingDirection) {
+    this.m_ascendingDirection = ascendingDirection;
+  }
+
+  /**
    * Sets the starting color which is also used to detect if a whole iteration
    * has been performed.
    * <p>
@@ -917,29 +941,5 @@ public class ColorIterator implements Iterator<Color> {
     this.m_resetModel.setSteps(steps);
     this.m_stepModel.setSteps(steps);
 
-  }
-
-  /**
-   * Returns the ascendingDirection.
-   * <p>
-   * 
-   * @see #setAscendingDirection(boolean)
-   * 
-   * @return the ascendingDirection
-   */
-  public final boolean isAscendingDirection() {
-    return this.m_ascendingDirection;
-  }
-
-  /**
-   * Sets whether the color space should be iterated in ascending direction (+
-   * operations) or descending direction(- operations).
-   * <p>
-   * 
-   * @param ascendingDirection
-   *            if true the color space will be iterated in ascending direction.
-   */
-  public final void setAscendingDirection(final boolean ascendingDirection) {
-    this.m_ascendingDirection = ascendingDirection;
   }
 }

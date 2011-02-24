@@ -1,6 +1,6 @@
 /*
  *  ErrorBarPixel.java of project jchart2d, a plain data container implementation. 
- *  Copyright (c) 2007 Achim Westermann, created on 02.10.2006 08:21:35.
+ *  Copyright (c) 2007 - 2010 Achim Westermann, created on 02.10.2006 08:21:35.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import info.monitorenter.gui.chart.ITrace2D;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.9 $
  */
 public class ErrorBarPixel implements IErrorBarPixel {
 
@@ -54,7 +54,7 @@ public class ErrorBarPixel implements IErrorBarPixel {
    * The trace the corresponding
    * {@link info.monitorenter.gui.chart.IErrorBarPolicy} is assigned to. This is
    * needed for the transformation. Although for the transformation the
-   * underlying chart instance is neede the trace has to be stored as
+   * underlying chart instance is needed the trace has to be stored as
    * reassigning the trace to another chart would break the chain and transform
    * values based upon the wrong chart.
    */

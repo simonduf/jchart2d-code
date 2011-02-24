@@ -1,6 +1,6 @@
 /*
  *  AErrorBarPolicyAction.java, base for actions to trigger on IErrorBarPolicy 
- *  instances. Copyright (C) Achim Westermann, created on 09.12.2006, 00:05:55
+ *  instances. Copyright (C) 2007 - 2010 Achim Westermann, created on 09.12.2006, 00:05:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -36,7 +36,7 @@ import javax.swing.AbstractAction;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  * 
  */
 public abstract class AErrorBarPainterAction extends AbstractAction {

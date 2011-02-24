@@ -2,7 +2,7 @@
  *  AAxisInverse.java of project jchart2d, 
  *  an IAxis implementations that inverts the values and shows 
  *  decreasing values (10, 9,... 1).  
- *  Copyright (c) 2007 Achim Westermann, created on 20:33:13.
+ *  Copyright (c) 2007 - 2010 Achim Westermann, created on 20:33:13.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -27,8 +27,8 @@ package info.monitorenter.gui.chart.axis;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.LabeledValue;
-import info.monitorenter.gui.chart.TracePoint2D;
 import info.monitorenter.util.MathUtil;
 import info.monitorenter.util.Range;
 
@@ -49,14 +49,11 @@ import java.util.List;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  *         (adaption for core)
  * 
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.18 $
  */
 
 public class AxisInverse
     extends AAxis {
-
-  /** Generated <code>serialVersionUID</code>. */
-  private static final long serialVersionUID = -1688970969107347292L;
 
   /**
    * 
@@ -91,11 +88,11 @@ public class AxisInverse
      */
     @Override
     protected void scaleTrace(final ITrace2D trace, final Range range) {
-      Iterator<TracePoint2D> itPoints;
+      Iterator<ITracePoint2D> itPoints;
       final double scaler = range.getExtent();
       if (trace.isVisible()) {
         itPoints = trace.iterator();
-        TracePoint2D point;
+        ITracePoint2D point;
         while (itPoints.hasNext()) {
           point = itPoints.next();
           double absolute = point.getX();
@@ -128,28 +125,6 @@ public class AxisInverse
       }
       return result;
     }
-
-//    /**
-//     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateValueToPx(double)
-//     */
-//    public int translateValueToPx(final double value) {
-//
-//      int result = 0;
-//      // first normalize to [00.0..1.0]
-//      double valueNormalized;
-//      // the same as AAxis.this.getRange().getExtend()
-//      double valueRange = AxisInverse.this.getMax() - AxisInverse.this.getMin();
-//      valueNormalized = 1 - ((value - AxisInverse.this.getMin()) / valueRange);
-//      // no expand into the pixel space:
-//      int rangeX = this.m_chart.getXChartEnd() - this.m_chart.getXChartStart();
-//      if (rangeX == 0) {
-//        // return null
-//      } else {
-//        double tmpResult = (valueNormalized * rangeX + this.m_chart.getXChartStart());
-//        result = (int) Math.round(tmpResult);
-//      }
-//      return result;
-//    }
   }
 
   /**
@@ -186,8 +161,8 @@ public class AxisInverse
     protected void scaleTrace(final ITrace2D trace, final Range range) {
       if (trace.isVisible()) {
         double scaler = range.getExtent();
-        Iterator<TracePoint2D> itPoints = trace.iterator();
-        TracePoint2D point;
+        Iterator<ITracePoint2D> itPoints = trace.iterator();
+        ITracePoint2D point;
         while (itPoints.hasNext()) {
           point = itPoints.next();
           double absolute = point.getY();
@@ -240,6 +215,9 @@ public class AxisInverse
 //      return result;
 //    }
   }
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -1688970969107347292L;
 
   /**
    * Defcon.

@@ -1,7 +1,7 @@
 /*
  *  LayoutFactory.java  jchart2d, factory for creating user interface 
  *  controls for charts and traces. 
- *  Copyright (C) Achim Westermann, created on 19.05.2005, 20:26:00
+ *  Copyright (C) 2007 - 2010 Achim Westermann, created on 19.05.2005, 20:26:00
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,8 @@ package info.monitorenter.gui.chart.controls;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.IErrorBarPolicy;
+import info.monitorenter.gui.chart.IPointHighlighter;
+import info.monitorenter.gui.chart.IToolTipType;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.ZoomableChart;
@@ -38,18 +40,22 @@ import info.monitorenter.gui.chart.events.AxisActionSetRange;
 import info.monitorenter.gui.chart.events.AxisActionSetRangePolicy;
 import info.monitorenter.gui.chart.events.AxisActionSetTitle;
 import info.monitorenter.gui.chart.events.AxisActionSetTitleFont;
+import info.monitorenter.gui.chart.events.Chart2DActionEnableHighlighting;
 import info.monitorenter.gui.chart.events.Chart2DActionPrintSingleton;
-import info.monitorenter.gui.chart.events.Chart2DActionSaveEpsSingleton;
+import info.monitorenter.gui.chart.events.Chart2DActionSaveEpsSingletonApacheFop;
 import info.monitorenter.gui.chart.events.Chart2DActionSaveImageSingleton;
 import info.monitorenter.gui.chart.events.Chart2DActionSetAxis;
 import info.monitorenter.gui.chart.events.Chart2DActionSetCustomGridColorSingleton;
 import info.monitorenter.gui.chart.events.Chart2DActionSetGridColor;
+import info.monitorenter.gui.chart.events.ChartActionSetToolTipType;
+import info.monitorenter.gui.chart.events.ChartPanelActionAddAnnotation;
 import info.monitorenter.gui.chart.events.ErrorBarPolicyMultiAction;
 import info.monitorenter.gui.chart.events.JComponentActionSetBackground;
 import info.monitorenter.gui.chart.events.JComponentActionSetCustomBackgroundSingleton;
 import info.monitorenter.gui.chart.events.JComponentActionSetCustomForegroundSingleton;
 import info.monitorenter.gui.chart.events.JComponentActionSetForeground;
 import info.monitorenter.gui.chart.events.PopupListener;
+import info.monitorenter.gui.chart.events.Trace2DActionAddRemoveHighlighter;
 import info.monitorenter.gui.chart.events.Trace2DActionAddRemoveTracePainter;
 import info.monitorenter.gui.chart.events.Trace2DActionRemove;
 import info.monitorenter.gui.chart.events.Trace2DActionSetColor;
@@ -62,6 +68,8 @@ import info.monitorenter.gui.chart.events.Trace2DActionSetZindex;
 import info.monitorenter.gui.chart.events.Trace2DActionZindexDecrease;
 import info.monitorenter.gui.chart.events.Trace2DActionZindexIncrease;
 import info.monitorenter.gui.chart.events.ZoomableChartZoomOutAction;
+import info.monitorenter.gui.chart.pointhighlighters.PointHighlighterConfigurable;
+import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyForcedPoint;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyHighestValues;
@@ -71,6 +79,7 @@ import info.monitorenter.gui.chart.traces.painters.TracePainterDisc;
 import info.monitorenter.gui.chart.traces.painters.TracePainterFill;
 import info.monitorenter.gui.chart.traces.painters.TracePainterPolyline;
 import info.monitorenter.gui.chart.traces.painters.TracePainterVerticalBar;
+import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.StringUtil;
 
@@ -104,12 +113,11 @@ import javax.swing.JRadioButtonMenuItem;
 
 /**
  * Factory that provides creational methods for adding UI controls to
- * {@link info.monitorenter.gui.chart.Chart2D} instances and
- * {@link info.monitorenter.gui.chart.ITrace2D} instances.
+ * {@link Chart2D} instances and {@link ITrace2D} instances.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.34 $
+ * @version $Revision: 1.50 $
  */
 public final class LayoutFactory {
 
@@ -155,6 +163,20 @@ public final class LayoutFactory {
     }
 
     /**
+     * Removes the listener for basic property changes from the component to
+     * adapt to.
+     * <p>
+     * 
+     * @throws Throwable
+     *           if something goes wrong cleaning up.
+     */
+    @Override
+    protected void finalize() throws Throwable {
+      super.finalize();
+      this.m_adaptee.removePropertyChangeListener(this);
+    }
+
+    /**
      * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
      */
     public void propertyChange(final PropertyChangeEvent evt) {
@@ -187,261 +209,11 @@ public final class LayoutFactory {
         ((Component) evt.getSource()).removePropertyChangeListener(this);
       }
     }
-
-    /**
-     * Removes the listener for basic property changes from the component to
-     * adapt to.
-     * <p>
-     * 
-     * @throws Throwable
-     *           if something goes wrong cleaning up.
-     */
-    @Override
-    protected void finalize() throws Throwable {
-      super.finalize();
-      this.m_adaptee.removePropertyChangeListener(this);
-    }
   }
 
   /**
-   * A <code>JCheckBoxMenuItem</code> that listens for changes of background
-   * color, foreground color and font of the given <code>JComponent</code> and
-   * adapts it's own settings.
-   * <p>
-   * Additionally - as this item has a state - it is possible to let the state
-   * be changed from outside (unlike only changing it from the UI): Sth. that
-   * seems to have been forgotten in the java implementation. It's state (
-   * {@link JCheckBoxMenuItem#setState(boolean)},
-   * {@link javax.swing.AbstractButton#setSelected(boolean)}) listens on
-   * property {@link #PROPERTY_SELECTED} for changes of the state. These events
-   * are normally fired by the custom {@link Action} implementations like
-   * {@link Chart2DActionSetAxis}.
-   * <p>
-   * Instances register themselves to receive events from the action given to
-   * their constructor.
-   * <p>
-   * 
-   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   */
-  public static class PropertyChangeCheckBoxMenuItem extends JCheckBoxMenuItem {
-
-    /** The property identifying a change of selection. */
-    public static final String PROPERTY_SELECTED = "";
-
-    /**
-     * Generated <code>serialVersionUID</code>.
-     */
-    private static final long serialVersionUID = 3690196534012752439L;
-
-    /**
-     * Creates an instance with the given name that listens to the components
-     * background color, foreground color and font.
-     * <p>
-     * The source of the {@link java.awt.event.ActionEvent} given to the
-     * {@link Action} ({@link java.util.EventObject#getSource()}) will be of
-     * type {@link JCheckBoxMenuItem}- the state (selected / deselected) may be
-     * obtained from it.
-     * <p>
-     * 
-     * @param component
-     *          The component to whose basic UI properties this item will adapt.
-     * @param action
-     *          The <code>Action</code> to trigger when this item is clicked.
-     * @param checked
-     *          the inital state of the checkbox.
-     */
-    public PropertyChangeCheckBoxMenuItem(final JComponent component, final Action action,
-        final boolean checked) {
-      super(action);
-      this.setState(checked);
-      new BasicPropertyAdaptSupport(this, component);
-      if (action != null) {
-        action.addPropertyChangeListener(new SelectionPropertyAdaptSupport(this));
-      }
-    }
-
-    /**
-     * Internal constructor that should not be used unless
-     * {@link javax.swing.AbstractButton#setAction(javax.swing.Action)} is
-     * invoked afterwards on this instance (else NPE!).
-     * <p>
-     * 
-     * @param component
-     *          The component to whose basic UI properties this item will adapt.
-     * @param checked
-     *          the inital state of the checkbox.
-     */
-    protected PropertyChangeCheckBoxMenuItem(final JComponent component, final boolean checked) {
-      this(component, null, checked);
-    }
-
-    /**
-     * @see javax.swing.AbstractButton#setAction(javax.swing.Action)
-     */
-    @Override
-    public void setAction(final Action a) {
-      if (a != null) {
-        super.setAction(a);
-        a.addPropertyChangeListener(new SelectionPropertyAdaptSupport(this));
-      }
-    }
-  }
-
-  /**
-   * A <code>JMenuItem</code> that listens for changes of background color,
-   * foreground color and font of the given <code>JComponent</code> and adapts
-   * it's own settings.
-   * <p>
-   * 
-   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   */
-  public static class PropertyChangeMenuItem extends JMenuItem {
-
-    /**
-     * Generated <code>serialVersionUID</code>.
-     */
-    private static final long serialVersionUID = 3690196534012752439L;
-
-    /**
-     * Weak reference (suspicion of cyclic reference) to the <code>
-     * {@link JComponent}</code> that is used to adapt basic UI properties to.
-     */
-    private WeakReference<JComponent> m_component;
-
-    /**
-     * Creates an instance with the given name that listens to the components
-     * background color, foreground color and font.
-     * <p>
-     * 
-     * @param component
-     *          The component to whose background color this item will adapt.
-     * @param action
-     *          The <code>Action</code> to trigger when this item is clicked.
-     */
-    public PropertyChangeMenuItem(final JComponent component, final Action action) {
-      super(action);
-      new BasicPropertyAdaptSupport(this, component);
-      this.m_component = new WeakReference<JComponent>(component);
-    }
-
-    /**
-     * Returns the adaptee this menu item adapts basic UI properties to if still
-     * not garbage collected or null.
-     * <p>
-     * 
-     * @return the adaptee this menu item adapts basic UI properties to if still
-     *         not garbage collected or null.
-     */
-    public JComponent getUIAdaptee() {
-      return this.m_component.get();
-    }
-  }
-
-  /**
-   * Implementation for a <code>PropertyChangeListener</code> that adpapts a
-   * wrapped <code>JComponent</code> to the following properties.
-   * <p>
-   * <ul>
-   * <li>background color</li>
-   * <li>foreground color (text)</li>
-   * <li>font</li>
-   * </ul>
-   * <p>
-   * 
-   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   */
-  public static class SelectionPropertyAdaptSupport implements PropertyChangeListener {
-
-    /** The model to adapt selection upon. */
-    protected WeakReference<AbstractButton> m_delegate;
-
-    /**
-     * @param delegate
-     *          The component to adapt the properties on.
-     */
-    public SelectionPropertyAdaptSupport(final AbstractButton delegate) {
-      this.m_delegate = new WeakReference<AbstractButton>(delegate);
-    }
-
-    /**
-     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-     */
-    public void propertyChange(final PropertyChangeEvent evt) {
-      String prop = evt.getPropertyName();
-      AbstractButton button = this.m_delegate.get();
-      if (button != null) {
-        if (prop.equals(LayoutFactory.PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED)) {
-          boolean state = ((Boolean) evt.getNewValue()).booleanValue();
-          button.setSelected(state);
-        }
-      } else {
-        ((Component) evt.getSource()).removePropertyChangeListener(this);
-      }
-    }
-
-  }
-
-  /**
-   * A <code>JLabel</code> that implements <code>ActionListener</code> in order
-   * to change it's text color whenever the color of a corresponding
-   * {@link ITrace2D} is changed.
-   * <p>
-   * 
-   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   */
-  final class TraceJLabel extends JLabel implements PropertyChangeListener {
-
-    /**
-     * Generated <code>serialVersionUID</code>.
-     */
-    private static final long serialVersionUID = 3617290112636172342L;
-
-    /**
-     * Creates a label with the given name.
-     * <p>
-     * 
-     * @param name
-     *          the name of the label.
-     */
-    public TraceJLabel(final String name) {
-      super(name);
-    }
-
-    /**
-     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-     */
-    public void propertyChange(final PropertyChangeEvent evt) {
-      String propertyName = evt.getPropertyName();
-      if (propertyName.equals(ITrace2D.PROPERTY_COLOR)) {
-        Color color = (Color) evt.getNewValue();
-        Color background = this.getBackground();
-        if (color.equals(background)) {
-          this.setBackground(this.getForeground());
-        }
-        this.setForeground(color);
-      } else if (propertyName.equals(Chart2D.PROPERTY_BACKGROUND_COLOR)) {
-        Color background = (Color) evt.getNewValue();
-        Color foreground = this.getForeground();
-        if (background.equals(foreground)) {
-          this.setForeground(this.getBackground());
-        }
-        this.setBackground(background);
-      } else if (propertyName.equals(Chart2D.PROPERTY_FONT)) {
-        Font font = (Font) evt.getNewValue();
-        this.setFont(font);
-      } else if (propertyName.equals(ITrace2D.PROPERTY_NAME)) {
-        ITrace2D source = (ITrace2D) evt.getSource();
-        this.setText(source.getLabel());
-      } else if (propertyName.equals(ITrace2D.PROPERTY_PHYSICALUNITS)) {
-        ITrace2D source = (ITrace2D) evt.getSource();
-        this.setText(source.getLabel());
-      }
-    }
-  }
-
-  /**
-   * A checkbox menu item that will change it's order in the known {@link JMenu}
-   * it is contained in whenever it's state changes.
+   * A check box menu item that will change it's order in the known
+   * {@link JMenu} it is contained in whenever it's state changes.
    * <p>
    * Whenever it is unselected it is put to the end, whenever it is selected it
    * will put itself to the top. Not very fast but close to minimal code.
@@ -456,7 +228,7 @@ public final class LayoutFactory {
      * <p>
      * 
      * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-     * @version $Revision: 1.34 $
+     * @version $Revision: 1.50 $
      */
     private final class JMenuOrderingAction extends AbstractAction {
 
@@ -515,7 +287,7 @@ public final class LayoutFactory {
        * @see javax.swing.AbstractAction#addPropertyChangeListener(java.beans.PropertyChangeListener)
        */
       @Override
-      public void addPropertyChangeListener(final PropertyChangeListener listener) {
+      public synchronized void addPropertyChangeListener(final PropertyChangeListener listener) {
         this.m_action.addPropertyChangeListener(listener);
       }
 
@@ -564,7 +336,7 @@ public final class LayoutFactory {
        * @see javax.swing.AbstractAction#removePropertyChangeListener(java.beans.PropertyChangeListener)
        */
       @Override
-      public void removePropertyChangeListener(final PropertyChangeListener listener) {
+      public synchronized void removePropertyChangeListener(final PropertyChangeListener listener) {
         this.m_action.removePropertyChangeListener(listener);
       }
 
@@ -661,6 +433,90 @@ public final class LayoutFactory {
   }
 
   /**
+   * A <code>JCheckBoxMenuItem</code> that listens for changes of background
+   * color, foreground color and font of the given <code>JComponent</code> and
+   * adapts it's own settings.
+   * <p>
+   * Additionally - as this item has a state - it is possible to let the state
+   * be changed from outside (unlike only changing it from the UI): Sth. that
+   * seems to have been forgotten in the java implementation. It's state (
+   * {@link JCheckBoxMenuItem#setState(boolean)},
+   * {@link javax.swing.AbstractButton#setSelected(boolean)}) listens on
+   * property {@link #PROPERTY_SELECTED} for changes of the state. These events
+   * are normally fired by the custom {@link Action} implementations like
+   * {@link Chart2DActionSetAxis}.
+   * <p>
+   * Instances register themselves to receive events from the action given to
+   * their constructor.
+   * <p>
+   * 
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   */
+  public static class PropertyChangeCheckBoxMenuItem extends JCheckBoxMenuItem {
+
+    /** The property identifying a change of selection. */
+    public static final String PROPERTY_SELECTED = "";
+
+    /**
+     * Generated <code>serialVersionUID</code>.
+     */
+    private static final long serialVersionUID = 3690196534012752439L;
+
+    /**
+     * Creates an instance with the given name that listens to the components
+     * background color, foreground color and font.
+     * <p>
+     * The source of the {@link java.awt.event.ActionEvent} given to the
+     * {@link Action} ({@link java.util.EventObject#getSource()}) will be of
+     * type {@link JCheckBoxMenuItem}- the state (selected / deselected) may be
+     * obtained from it.
+     * <p>
+     * 
+     * @param component
+     *          The component to whose basic UI properties this item will adapt.
+     * @param action
+     *          The <code>Action</code> to trigger when this item is clicked.
+     * @param checked
+     *          the inital state of the checkbox.
+     */
+    public PropertyChangeCheckBoxMenuItem(final JComponent component, final Action action,
+        final boolean checked) {
+      super(action);
+      this.setState(checked);
+      new BasicPropertyAdaptSupport(this, component);
+      if (action != null) {
+        action.addPropertyChangeListener(new SelectionPropertyAdaptSupport(this));
+      }
+    }
+
+    /**
+     * Internal constructor that should not be used unless
+     * {@link javax.swing.AbstractButton#setAction(javax.swing.Action)} is
+     * invoked afterwards on this instance (else NPE!).
+     * <p>
+     * 
+     * @param component
+     *          The component to whose basic UI properties this item will adapt.
+     * @param checked
+     *          the inital state of the checkbox.
+     */
+    protected PropertyChangeCheckBoxMenuItem(final JComponent component, final boolean checked) {
+      this(component, null, checked);
+    }
+
+    /**
+     * @see javax.swing.AbstractButton#setAction(javax.swing.Action)
+     */
+    @Override
+    public void setAction(final Action a) {
+      if (a != null) {
+        super.setAction(a);
+        a.addPropertyChangeListener(new SelectionPropertyAdaptSupport(this));
+      }
+    }
+  }
+
+  /**
    * A <code>JPopupMenu</code> that listens for changes of background color,
    * foreground color and font of the given <code>JComponent</code> and adapts
    * it's own settings.
@@ -715,6 +571,20 @@ public final class LayoutFactory {
      */
     private static final long serialVersionUID = 3933408706693522564L;
 
+    // /**
+    // * Internal constructor that should not be used unless
+    // * {@link javax.swing.AbstractButton#setAction(javax.swing.Action)} is
+    // * invoked afterwards on this instance (else NPE!).
+    // * <p>
+    // *
+    // * @param component
+    // * The component to whose basic UI properties this item will adapt.
+    // */
+    // protected PropertyChangeJRadioButtonMenuItem(final JComponent component)
+    // {
+    // this(component, null);
+    // }
+
     /**
      * Creates an instance with the given name that listens to the components
      * background color, foreground color and font.
@@ -728,27 +598,18 @@ public final class LayoutFactory {
      *          The component to whose basic UI properties this item will adapt.
      * @param action
      *          The <code>Action</code> to trigger when this item is clicked.
+     * @param selected
+     *          if true this radio button will be initially selected.
      */
-    public PropertyChangeJRadioButtonMenuItem(final JComponent component, final Action action) {
+    public PropertyChangeJRadioButtonMenuItem(final JComponent component, final Action action,
+        final boolean selected) {
       super(action);
+      this.setSelected(selected);
       new BasicPropertyAdaptSupport(this, component);
       if (action != null) {
         action.addPropertyChangeListener(new SelectionPropertyAdaptSupport(this));
       }
 
-    }
-
-    /**
-     * Internal constructor that should not be used unless
-     * {@link javax.swing.AbstractButton#setAction(javax.swing.Action)} is
-     * invoked afterwards on this instance (else NPE!).
-     * <p>
-     * 
-     * @param component
-     *          The component to whose basic UI properties this item will adapt.
-     */
-    protected PropertyChangeJRadioButtonMenuItem(final JComponent component) {
-      this(component, null);
     }
 
     /**
@@ -798,6 +659,57 @@ public final class LayoutFactory {
       this.setOpaque(true);
       new BasicPropertyAdaptSupport(this, component);
 
+    }
+  }
+
+  /**
+   * A <code>JMenuItem</code> that listens for changes of background color,
+   * foreground color and font of the given <code>JComponent</code> and adapts
+   * it's own settings.
+   * <p>
+   * 
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   */
+  public static class PropertyChangeMenuItem extends JMenuItem {
+
+    /**
+     * Generated <code>serialVersionUID</code>.
+     */
+    private static final long serialVersionUID = 3690196534012752439L;
+
+    /**
+     * Weak reference (suspicion of cyclic reference) to the <code>
+     * {@link JComponent}</code>
+     * that is used to adapt basic UI properties to.
+     */
+    private WeakReference<JComponent> m_component;
+
+    /**
+     * Creates an instance with the given name that listens to the components
+     * background color, foreground color and font.
+     * <p>
+     * 
+     * @param component
+     *          The component to whose background color this item will adapt.
+     * @param action
+     *          The <code>Action</code> to trigger when this item is clicked.
+     */
+    public PropertyChangeMenuItem(final JComponent component, final Action action) {
+      super(action);
+      new BasicPropertyAdaptSupport(this, component);
+      this.m_component = new WeakReference<JComponent>(component);
+    }
+
+    /**
+     * Returns the adaptee this menu item adapts basic UI properties to if still
+     * not garbage collected or null.
+     * <p>
+     * 
+     * @return the adaptee this menu item adapts basic UI properties to if still
+     *         not garbage collected or null.
+     */
+    public JComponent getUIAdaptee() {
+      return this.m_component.get();
     }
   }
 
@@ -928,8 +840,11 @@ public final class LayoutFactory {
      * 
      * @param action
      *          The <code>Action</code> to trigger when this item is clicked.
+     * 
+     * @param selected
+     *          if true this radio button will be initially selected.
      */
-    public SelectionAdaptJRadioButtonMenuItem(final Action action) {
+    public SelectionAdaptJRadioButtonMenuItem(final Action action, final boolean selected) {
       super(action);
       if (action != null) {
         action.addPropertyChangeListener(new SelectionPropertyAdaptSupport(this));
@@ -949,8 +864,140 @@ public final class LayoutFactory {
 
   }
 
+  /**
+   * Implementation for a <code>PropertyChangeListener</code> that adpapts a
+   * wrapped <code>JComponent</code> to the following properties.
+   * <p>
+   * <ul>
+   * <li>background color</li>
+   * <li>foreground color (text)</li>
+   * <li>font</li>
+   * </ul>
+   * <p>
+   * 
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   */
+  public static class SelectionPropertyAdaptSupport implements PropertyChangeListener {
+
+    /** The model to adapt selection upon. */
+    protected WeakReference<AbstractButton> m_delegate;
+
+    /**
+     * @param delegate
+     *          The component to adapt the properties on.
+     */
+    public SelectionPropertyAdaptSupport(final AbstractButton delegate) {
+      this.m_delegate = new WeakReference<AbstractButton>(delegate);
+    }
+
+    /**
+     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+     */
+    public void propertyChange(final PropertyChangeEvent evt) {
+      String prop = evt.getPropertyName();
+      AbstractButton button = this.m_delegate.get();
+      if (button != null) {
+        if (prop.equals(LayoutFactory.PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED)) {
+          boolean state = ((Boolean) evt.getNewValue()).booleanValue();
+          button.setSelected(state);
+        }
+      } else {
+        ((Component) evt.getSource()).removePropertyChangeListener(this);
+      }
+    }
+
+  }
+
+  /**
+   * A <code>JLabel</code> that implements <code>ActionListener</code> in order
+   * to change it's text color whenever the color of a corresponding
+   * {@link ITrace2D} is changed.
+   * <p>
+   * 
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   */
+  final class TraceJLabel extends JLabel implements PropertyChangeListener {
+
+    /**
+     * Generated <code>serialVersionUID</code>.
+     */
+    private static final long serialVersionUID = 3617290112636172342L;
+
+    /**
+     * Creates a label with the given name.
+     * <p>
+     * 
+     * @param name
+     *          the name of the label.
+     */
+    public TraceJLabel(final String name) {
+      super(name);
+    }
+
+    /**
+     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+     */
+    public void propertyChange(final PropertyChangeEvent evt) {
+      String propertyName = evt.getPropertyName();
+      if (propertyName.equals(ITrace2D.PROPERTY_COLOR)) {
+        Color color = (Color) evt.getNewValue();
+        Color background = this.getBackground();
+        if (color.equals(background)) {
+          this.setBackground(this.getForeground());
+        }
+        this.setForeground(color);
+      } else if (propertyName.equals(Chart2D.PROPERTY_BACKGROUND_COLOR)) {
+        Color background = (Color) evt.getNewValue();
+        Color foreground = this.getForeground();
+        if (background.equals(foreground)) {
+          this.setForeground(this.getBackground());
+        }
+        this.setBackground(background);
+      } else if (propertyName.equals(Chart2D.PROPERTY_FONT)) {
+        Font font = (Font) evt.getNewValue();
+        this.setFont(font);
+      } else if (propertyName.equals(ITrace2D.PROPERTY_NAME)) {
+        ITrace2D source = (ITrace2D) evt.getSource();
+        this.setText(source.getLabel());
+      } else if (propertyName.equals(ITrace2D.PROPERTY_PHYSICALUNITS)) {
+        ITrace2D source = (ITrace2D) evt.getSource();
+        this.setText(source.getLabel());
+      }
+    }
+  }
+
   /** The singleton instance of this factory. */
   private static LayoutFactory instance;
+
+  /**
+   * Singleton retrival method.
+   * <p>
+   * 
+   * @return the single instance of this factory within this VM.
+   */
+  public static LayoutFactory getInstance() {
+    if (LayoutFactory.instance == null) {
+      LayoutFactory.instance = new LayoutFactory();
+    }
+    return LayoutFactory.instance;
+  }
+
+  /**
+   * Helper that returns the system fonts in the given point size.
+   * 
+   * @param pointSize
+   *          the size for the fonts to return.
+   * @return the system fonts in the given point size
+   */
+  private static Font[] getSystemFonts(final float pointSize) {
+
+    Font[] result = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
+    // set to bigger size:
+    for (int i = result.length - 1; i > -1; i--) {
+      result[i] = result[i].deriveFont(pointSize);
+    }
+    return result;
+  }
 
   /**
    * Boolean flag that controls showing the show grid menu item for the x axis.
@@ -1019,6 +1066,9 @@ public final class LayoutFactory {
   /** Boolean flag that controls showing the save to image menu item. */
   private boolean m_showSaveMenu = true;
 
+  /** Boolean flag that controls showing the annotations menu. */
+  private boolean m_showAnnotationMenu = false;
+
   /** Boolean flag that controls showing the print chart menu item. */
   private boolean m_showPrintMenu = true;
 
@@ -1056,6 +1106,42 @@ public final class LayoutFactory {
    */
   private Stroke[] m_strokes;
 
+  /** Controls whether the grid menu is shown in the chart menu. */
+  private boolean m_showGridMenu = true;
+
+  /** Controls whether the tool tip type for chart menu is shown. */
+  private boolean m_showToolTipTypeMenu = true;
+
+  /** Controls whether the tool tip for chart menu is shown. */
+  private boolean m_showToolTipMenu = true;
+
+  /** Controls whether the highlight menu is shown. */
+  private boolean m_showHighlightMenu = true;
+
+  /** Controls whether the trace highlighter menu is shown. */
+  private boolean m_showTraceHighlighterMenu = true;
+
+  /**
+   * Returns whether the trace highlighter menu is shown.
+   * <p>
+   * 
+   * @return true if the trace highlighter menu is visible.
+   */
+  public boolean isShowTraceHighlighterMenu() {
+    return this.m_showTraceHighlighterMenu;
+  }
+
+  /**
+   * Set whether the trace highlighter menu should be visible.
+   * <p>
+   * 
+   * @param showTraceHighlighterMenu
+   *          true if the trace highlighter menu should be visible.
+   */
+  public void setShowTraceHighlighterMenu(boolean showTraceHighlighterMenu) {
+    this.m_showTraceHighlighterMenu = showTraceHighlighterMenu;
+  }
+
   /**
    * Singleton constructor.
    * <p>
@@ -1080,37 +1166,95 @@ public final class LayoutFactory {
     this.m_strokes[5] = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1.5f,
         new float[] {10f, 2f }, 1f);
     this.m_strokeNames[5] = "dashed thick";
-    
+
   }
 
   /**
-   * Singleton retrival method.
+   * Creates a menu for adding annotations to the chart panel.
    * <p>
    * 
-   * @return the single instance of this factory within this VM.
+   * @param chartPanel
+   *          needed to adapt the basic ui properties to (font, foreground
+   *          color, background color).
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * @return a menu for adding annotations to the chart panel.
    */
-  public static LayoutFactory getInstance() {
-    if (LayoutFactory.instance == null) {
-      LayoutFactory.instance = new LayoutFactory();
+
+  public JMenu createAnnoationsMenu(final ChartPanel chartPanel, final boolean adaptUI2Chart) {
+    JMenu result;
+    JMenuItem item;
+    Chart2D chart = chartPanel.getChart();
+    if (adaptUI2Chart) {
+      result = new PropertyChangeMenu(chart, "Annotate");
+      item = new PropertyChangeMenuItem(chart, new ChartPanelActionAddAnnotation(chartPanel,
+          "Annotation 1"));
+      result.add(item);
+    } else {
+      result = new JMenu("Annotate");
+      item = new JMenuItem(new ChartPanelActionAddAnnotation(chartPanel, "Annotation 1"));
+      result.add(item);
     }
-    return LayoutFactory.instance;
+    return result;
   }
 
   /**
-   * Helper that returns the system fonts in the given point size.
+   * Creates a {@link JMenuItem} that allows to trigger the features related to
+   * {@link info.monitorenter.gui.chart.axis.AAxis} features.
+   * <p>
    * 
-   * @param pointSize
-   *          the size for the fonts to return.
-   * @return the system fonts in the given point size
+   * @param axis
+   *          the axis to control.
+   * @param axisDimension
+   *          Identifies which dimension the axis controls in the chart: either
+   *          {@link Chart2D#X} or {@link Chart2D#Y}
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * @return a {@link JMenuItem} that allows to trigger the features related to
+   *         {@link info.monitorenter.gui.chart.axis.AAxis} features.
    */
-  private static Font[] getSystemFonts(final float pointSize) {
+  public JMenuItem createAxisMenuItem(final IAxis axis, final int axisDimension,
+      final boolean adaptUI2Chart) {
+    final Chart2D chart = axis.getAccessor().getChart();
+    JMenuItem item;
 
-    Font[] result = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
-    // set to bigger size:
-    for (int i = result.length - 1; i > -1; i--) {
-      result[i] = result[i].deriveFont(pointSize);
+    // axis submenu
+    JMenuItem axisMenuItem;
+    if (adaptUI2Chart) {
+      axisMenuItem = new PropertyChangeMenu(chart, "Axis" + axis.getAccessor().toString());
+    } else {
+      axisMenuItem = new JMenu("Axis" + axis.getAccessor().toString());
     }
-    return result;
+
+    if ((this.m_showAxisXTypeMenu && axisDimension == Chart2D.X)
+        || (this.m_showAxisYTypeMenu && axisDimension == Chart2D.Y)) {
+      axisMenuItem.add(this.createAxisTypeMenu(chart, axis, axisDimension, adaptUI2Chart));
+    }
+    if ((this.m_showAxisXRangePolicyMenu && axisDimension == Chart2D.X)
+        || this.m_showAxisYRangePolicyMenu && axisDimension == Chart2D.Y) {
+      axisMenuItem.add(this.createAxisRangePolicyMenu(chart, axis, adaptUI2Chart));
+
+      // Axis -> Range menu
+      if (adaptUI2Chart) {
+
+        item = new PropertyChangeMenuItem(chart, new AxisActionSetRange(chart, "Range",
+            axisDimension));
+      } else {
+        item = new JMenuItem(new AxisActionSetRange(chart, "Range", axisDimension));
+      }
+      if (!AxisActionSetRange.RANGE_CHOOSER_SUPPORTED) {
+        item.setToolTipText("This is disabled as bislider.jar is missing on the class path.");
+      }
+      axisMenuItem.add(item);
+    }
+    if ((this.m_showAxisXTitleMenu && axisDimension == Chart2D.X)
+        || (this.m_showAxisYTitleMenu && axisDimension == Chart2D.Y)) {
+      axisMenuItem.add(this.createAxisTitleMenu(chart, axis, axisDimension, adaptUI2Chart));
+    }
+
+    return axisMenuItem;
   }
 
   /**
@@ -1145,80 +1289,70 @@ public final class LayoutFactory {
     ButtonGroup buttonGroup = new ButtonGroup();
     // check the default selected item:
     Class< ? > rangePolicyClass = axis.getRangePolicy().getClass();
+    boolean selected = rangePolicyClass == RangePolicyFixedViewport.class;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(chart,
-          "Fixed viewport", axis.getDimension(), new RangePolicyFixedViewport()));
+          "Fixed viewport", axis.getDimension(), new RangePolicyFixedViewport()), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(chart,
-          "Fixed viewport", axis.getDimension(), new RangePolicyFixedViewport()));
+          "Fixed viewport", axis.getDimension(), new RangePolicyFixedViewport()), selected);
     }
     item
         .setToolTipText("Zooms or expands to the configured range without respect to the data to display. ");
     axisRangePolicy.add(item);
     buttonGroup.add(item);
-    if (rangePolicyClass == RangePolicyFixedViewport.class) {
-      buttonGroup.setSelected(item.getModel(), true);
-    }
 
+    selected = rangePolicyClass == RangePolicyUnbounded.class;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(chart,
-          "Minimum viewport", axis.getDimension(), new RangePolicyUnbounded()));
+          "Minimum viewport", axis.getDimension(), new RangePolicyUnbounded()), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(chart,
-          "Minimum viewport", axis.getDimension(), new RangePolicyUnbounded()));
+          "Minimum viewport", axis.getDimension(), new RangePolicyUnbounded()), selected);
     }
     axisRangePolicy.add(item);
     item.setToolTipText("Ensures all data is shown with minimal bounds.");
     buttonGroup.add(item);
-    if (rangePolicyClass == RangePolicyUnbounded.class) {
-      buttonGroup.setSelected(item.getModel(), true);
-    }
 
+    selected = rangePolicyClass == RangePolicyMinimumViewport.class;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(chart,
           "Minimum viewport with range", axis.getDimension(), new RangePolicyMinimumViewport(
-              new Range(10, 10))));
+              new Range(10, 10))), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(chart,
           "Minimum viewport with range", axis.getDimension(), new RangePolicyMinimumViewport(
-              new Range(10, 10))));
+              new Range(10, 10))), selected);
     }
     item.setToolTipText("Ensures that all data is shown and expands if range is higher. ");
     axisRangePolicy.add(item);
     buttonGroup.add(item);
-    if (rangePolicyClass == RangePolicyMinimumViewport.class) {
-      buttonGroup.setSelected(item.getModel(), true);
-    }
 
+    selected = rangePolicyClass == RangePolicyForcedPoint.class;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(chart,
-          "Ensure visible point", axis.getDimension(), new RangePolicyForcedPoint(0)));
+          "Ensure visible point", axis.getDimension(), new RangePolicyForcedPoint(0)), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(chart,
-          "Ensure visible point", axis.getDimension(), new RangePolicyForcedPoint(0)));
+          "Ensure visible point", axis.getDimension(), new RangePolicyForcedPoint(0)), selected);
     }
     item.setToolTipText("Only the minimum value of the axis' range will be ensured to be visible.");
     axisRangePolicy.add(item);
     buttonGroup.add(item);
-    if (rangePolicyClass == RangePolicyForcedPoint.class) {
-      buttonGroup.setSelected(item.getModel(), true);
-    }
 
+    selected = rangePolicyClass == RangePolicyHighestValues.class;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(chart,
           "Highest points within max-50 to max.", axis.getDimension(),
-          new RangePolicyHighestValues(50)));
+          new RangePolicyHighestValues(50)), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(chart,
           "Highest points within max-50 to max.", axis.getDimension(),
-          new RangePolicyHighestValues(50)));
+          new RangePolicyHighestValues(50)), selected);
     }
     item.setToolTipText("Shows the highest values from max-50 to max.");
     axisRangePolicy.add(item);
     buttonGroup.add(item);
-    if (rangePolicyClass == RangePolicyHighestValues.class) {
-      buttonGroup.setSelected(item.getModel(), true);
-    }
     return axisRangePolicy;
   }
 
@@ -1322,43 +1456,41 @@ public final class LayoutFactory {
     Class< ? > typeClass = axis.getClass();
     JMenuItem item;
 
+    boolean selected = typeClass == AxisLinear.class;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new Chart2DActionSetAxis(chart,
-          new AxisLinear(), "Linear", axisDimension));
+          new AxisLinear(), "Linear", axisDimension), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetAxis(chart,
-          new AxisLinear(), "Linear", axisDimension));
+          new AxisLinear(), "Linear", axisDimension), selected);
     }
     axisType.add(item);
     buttonGroup.add(item);
-    if (typeClass == AxisLinear.class) {
-      buttonGroup.setSelected(item.getModel(), true);
-    }
+
+    selected = typeClass == AxisLogE.class;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new Chart2DActionSetAxis(chart,
-          new AxisLogE(), "Log E", axisDimension));
+          new AxisLogE(), "Log E", axisDimension), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetAxis(chart, new AxisLogE(),
-          "Log E", axisDimension));
+          "Log E", axisDimension), selected);
     }
     axisType.add(item);
     buttonGroup.add(item);
-    if (typeClass == AxisLogE.class) {
-      buttonGroup.setSelected(item.getModel(), true);
-    }
+    // if (typeClass == AxisLogE.class) {
+    // buttonGroup.setSelected(item.getModel(), true);
+    // }
+
+    selected = typeClass == AxisLog10.class;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new Chart2DActionSetAxis(chart,
-          new AxisLog10(), "Log 10", axisDimension));
+          new AxisLog10(), "Log 10", axisDimension), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetAxis(chart,
-          new AxisLog10(), "Log 10", axisDimension));
+          new AxisLog10(), "Log 10", axisDimension), selected);
     }
     axisType.add(item);
     buttonGroup.add(item);
-    if (typeClass == AxisLog10.class) {
-      buttonGroup.setSelected(item.getModel(), true);
-    }
-
     return axisType;
   }
 
@@ -1366,15 +1498,18 @@ public final class LayoutFactory {
    * Creates a menu for choosing the background color of the given chart.
    * <p>
    * 
-   * @param chart
-   *          the chart to set the background color of by the menu to return.
+   * @param chartPanel
+   *          the chart panel to set the background color of by the menu to
+   *          return.
    * @param adaptUI2Chart
    *          if true the menu will adapt it's basic UI properies (font,
    *          foreground and background color) to the given chart.
    * @return a menu for choosing the background color of the given chart.
    */
-  public JMenu createBackgroundColorMenu(final Chart2D chart, final boolean adaptUI2Chart) {
-    Color backgroundColor = chart.getBackground();
+  public JMenu createBackgroundColorMenu(final ChartPanel chartPanel, final boolean adaptUI2Chart) {
+
+    Chart2D chart = chartPanel.getChart();
+    Color backgroundColor = chartPanel.getBackground();
     boolean nonStandardColor = true;
 
     // Background color menu:
@@ -1387,179 +1522,493 @@ public final class LayoutFactory {
     }
 
     ButtonGroup buttonGroup = new ButtonGroup();
+    boolean selected = backgroundColor.equals(Color.WHITE);
+    nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetBackground(chart,
-          "White", Color.WHITE));
+          "White", Color.WHITE), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new JComponentActionSetBackground(chart,
-          "White", Color.WHITE));
-    }
-    if (backgroundColor.equals(Color.WHITE)) {
-      item.setSelected(true);
-      nonStandardColor = false;
+          "White", Color.WHITE), selected);
     }
     buttonGroup.add(item);
     bgColorMenu.add(item);
+
+    selected = backgroundColor.equals(Color.GRAY);
+    nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetBackground(chart,
-          "Gray", Color.GRAY));
+          "Gray", Color.GRAY), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new JComponentActionSetBackground(chart,
-          "Gray", Color.GRAY));
-    }
-    if (backgroundColor.equals(Color.GRAY)) {
-      item.setSelected(true);
-      nonStandardColor = false;
+          "Gray", Color.GRAY), selected);
     }
     buttonGroup.add(item);
     bgColorMenu.add(item);
+
+    selected = backgroundColor.equals(Color.LIGHT_GRAY);
+    nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetBackground(chart,
-          "Light gray", Color.LIGHT_GRAY));
+          "Light gray", Color.LIGHT_GRAY), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new JComponentActionSetBackground(chart,
-          "Light gray", Color.LIGHT_GRAY));
-    }
-    if (backgroundColor.equals(Color.LIGHT_GRAY)) {
-      item.setSelected(true);
-      nonStandardColor = false;
+          "Light gray", Color.LIGHT_GRAY), selected);
     }
     buttonGroup.add(item);
     bgColorMenu.add(item);
+
+    selected = backgroundColor.equals(Color.BLACK);
+    nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetBackground(chart,
-          "Black", Color.BLACK));
+          "Black", Color.BLACK), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new JComponentActionSetBackground(chart,
-          "Black", Color.BLACK));
+          "Black", Color.BLACK), selected);
     }
-    if (backgroundColor.equals(Color.BLACK)) {
-      item.setSelected(true);
-      nonStandardColor = false;
-    }
+
     buttonGroup.add(item);
     bgColorMenu.add(item);
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart,
-          JComponentActionSetCustomBackgroundSingleton.getInstance(chart, "Custom Color"));
+          JComponentActionSetCustomBackgroundSingleton.getInstance(chart, "Custom Color"),
+          nonStandardColor);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(JComponentActionSetCustomBackgroundSingleton
-          .getInstance(chart, "Custom Color"));
+          .getInstance(chart, "Custom Color"), nonStandardColor);
     }
-    item.setSelected(nonStandardColor);
     buttonGroup.add(item);
     bgColorMenu.add(item);
     return bgColorMenu;
   }
 
   /**
-   * Creates a <code>JLabel</code> that is capable of triggering a
-   * <code>JPopupMenu</code> for the settings available for the
-   * <code>ITrace2D</code> or <code>null</code> if <code>
-   * {@link ITrace2D#getLabel()}</code> on the given trace argument returns
-   * null.
+   * Creates a menu for controlling the grid (show x, show y, color).
    * <p>
    * 
-   * @param chart
-   *          The chart the given trace is a member of. This will be used for
-   *          getting a <code>PopupMenu</code> that adapts to layout properties
-   *          (such as background color).
-   * @param trace
-   *          The trace on which the <code>JPopupMenu</code> of the
-   *          <code>JLabel</code> will act.
+   * @param chartPanel
+   *          for adapting ui to and obtaining chart from.
+   * 
    * @param adaptUI2Chart
    *          if true the menu will adapt it's basic UI properies (font,
    *          foreground and background color) to the given chart.
-   * @return a label that offers a popup menue with controls for the given trace
-   *         or <code>null</code> if <code>{@link ITrace2D#getLabel()}</code> on
-   *         the given trace argument returns null.
+   * 
+   * @return a menu for controlling the grid (show x, show y, color).
    */
-  public JLabel createContextMenuLabel(final Chart2D chart, final ITrace2D trace,
-      final boolean adaptUI2Chart) {
-    String traceLabel = trace.getLabel();
-    TraceJLabel ret = null;
-    if (!StringUtil.isEmpty(traceLabel)) {
-      ret = new TraceJLabel(trace.getLabel());
-      JMenuItem item;
-      // ret.setSize(new Dimension(20, 100));
-      JPopupMenu popup = new PropertyChangePopupMenu(chart);
-      // set the initial background color:
-      Color background = chart.getBackground();
-      ret.setBackground(background);
-      ret.setForeground(trace.getColor());
-
-      // item for setVisible
-      if (this.m_showTraceVisibleMenu) {
-        if (adaptUI2Chart) {
-          item = new PropertyChangeCheckBoxMenuItem(chart, new Trace2DActionSetVisible(trace,
-              "Visible"), trace.isVisible());
-        } else {
-          item = new SelectionAdaptJCheckBoxMenuItem(new Trace2DActionSetVisible(trace, "Visible"),
-              trace.isVisible());
-        }
-        popup.add(item);
-      }
-
-      // item for setName
-      if (this.m_showTraceNameMenu) {
-        if (adaptUI2Chart) {
-          item = new PropertyChangeMenuItem(chart, new Trace2DActionSetName(trace, "Name", chart));
-        } else {
-          item = new JMenuItem(new Trace2DActionSetName(trace, "Name", chart));
-        }
-        popup.add(item);
-      }
-      // item for setPhysicalUnits
-      if (this.m_showPhysicalUnitsMenu) {
-        if (adaptUI2Chart) {
-          item = new PropertyChangeMenuItem(chart, new Trace2DActionSetPhysicalUnits(trace,
-              "Physical Units", chart));
-        } else {
-          item = new JMenuItem(new Trace2DActionSetPhysicalUnits(trace, "Physical Units", chart));
-
-        }
-        popup.add(item);
-      }
-
-      // add the submenus
-      if (this.m_showTraceColorMenu) {
-        popup.add(this.createTraceColorMenu(chart, trace, ret, adaptUI2Chart));
-      }
-      if (this.m_showTraceZindexMenu) {
-        popup.add(this.createTraceZindexMenu(chart, trace, adaptUI2Chart));
-      }
-      if (this.m_showTraceStrokeMenu) {
-        popup.add(this.createTraceStrokesMenu(chart, trace, adaptUI2Chart));
-      }
-      if (this.m_showTracePainterMenu) {
-        popup.add(this.createTracePainterMenu(chart, trace, adaptUI2Chart));
-      }
-      if (this.m_showRemoveTraceMenu) {
-        if (adaptUI2Chart) {
-          item = new PropertyChangeMenuItem(chart, new Trace2DActionRemove(trace, "Remove"));
-        } else {
-          item = new JMenuItem(new Trace2DActionRemove(trace, "Remove"));
-        }
-        popup.add(item);
-      }
-
-      if (this.m_showErrorBarWizardMenu) {
-        popup.add(this.createErrorBarWizardMenu(chart, trace, adaptUI2Chart));
-      }
-      ret.addMouseListener(new PopupListener(popup));
-      // The label itself should always look like the trace
-      // foreground and contain the propert name.
-      trace.addPropertyChangeListener(ITrace2D.PROPERTY_COLOR, ret);
-      trace.addPropertyChangeListener(ITrace2D.PROPERTY_NAME, ret);
-      trace.addPropertyChangeListener(ITrace2D.PROPERTY_PHYSICALUNITS, ret);
-      chart.addPropertyChangeListener(Chart2D.PROPERTY_FONT, ret);
+  public JMenuItem createChartGridMenu(ChartPanel chartPanel, boolean adaptUI2Chart) {
+    Chart2D chart = chartPanel.getChart();
+    // Grid submenu:
+    JMenu gridMenu;
+    if (adaptUI2Chart) {
+      gridMenu = new PropertyChangeMenu(chart, "Grid");
+    } else {
+      gridMenu = new JMenu("Grid");
     }
-    return ret;
+    if (this.m_showGridColorMenu) {
+      gridMenu.add(this.createGridColorMenu(chartPanel, adaptUI2Chart));
+    }
+
+    JMenuItem item;
+
+    if (this.m_showAxisXGridMenu) {
+      // Grid -> show x grid submenu
+      if (adaptUI2Chart) {
+        item = new PropertyChangeCheckBoxMenuItem(chart, new AxisActionSetGrid(chart, "Grid X",
+            Chart2D.X), chart.getAxisX().isPaintGrid());
+      } else {
+        item = new SelectionAdaptJCheckBoxMenuItem(
+            new AxisActionSetGrid(chart, "Grid X", Chart2D.X), chart.getAxisX().isPaintGrid());
+      }
+      gridMenu.add(item);
+    }
+    if (this.m_showAxisYGridMenu) {
+      // Grid -> show y grid submenu
+      if (adaptUI2Chart) {
+        item = new PropertyChangeCheckBoxMenuItem(chart, new AxisActionSetGrid(chart, "Grid Y",
+            Chart2D.Y), chart.getAxisY().isPaintGrid());
+      } else {
+        item = new SelectionAdaptJCheckBoxMenuItem(
+            new AxisActionSetGrid(chart, "Grid Y", Chart2D.Y), chart.getAxisX().isPaintGrid());
+      }
+      gridMenu.add(item);
+    }
+
+    return gridMenu;
+  }
+
+  /**
+   * Creates a menu for controlling highlighting on the chart: enable and choose
+   * highlighter per trace.
+   * <p>
+   * 
+   * @param chartPanel
+   *          the chart panel to access.
+   * 
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * 
+   * @return a menu for controlling highlighting on the chart: enable and choose
+   *         highlighter per trace.
+   * 
+   */
+  public JMenuItem createChartHighlightMenu(ChartPanel chartPanel, boolean adaptUI2Chart) {
+
+    Chart2D chart = chartPanel.getChart();
+    // Tooltip submenu:
+    JMenu highlightMenu;
+    if (adaptUI2Chart) {
+      highlightMenu = new PropertyChangeMenu(chart, "Highlighting");
+    } else {
+      highlightMenu = new JMenu("Highlighting");
+    }
+
+    boolean isEnabledHighlighting = chart.isEnabledPointHighlighting();
+    JMenuItem item;
+    if (adaptUI2Chart) {
+      item = new PropertyChangeCheckBoxMenuItem(chart, new Chart2DActionEnableHighlighting(chart,
+          "Enable"), isEnabledHighlighting);
+    } else {
+      item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionEnableHighlighting(chart,
+          "Enable"), isEnabledHighlighting);
+    }
+    highlightMenu.add(item);
+    if (this.m_showTraceHighlighterMenu) {
+
+      highlightMenu.add(this.createChartTraceHighlighterMenu(chartPanel, adaptUI2Chart));
+
+    }
+
+    return highlightMenu;
+
+  }
+
+  /**
+   * Creates a menu for controlling the highlighters for every trace on the
+   * chart.
+   * <p>
+   * 
+   * @param chartPanel
+   *          the chart panel to access.
+   * 
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * 
+   * @return a menu for controlling the highlighters for every trace on the
+   *         chart.
+   */
+  public JMenu createChartTraceHighlighterMenu(ChartPanel chartPanel, boolean adaptUI2Chart) {
+    JMenu result;
+    Chart2D chart = chartPanel.getChart();
+    if (adaptUI2Chart) {
+      result = new PropertyChangeMenu(chart, "Highlighter");
+    } else {
+      result = new JMenu("Highlighter");
+    }
+
+    JMenuItem item;
+    for (ITrace2D trace : chart.getTraces()) {
+      // Create a submenu for each trace
+      JMenu traceMenu;
+      if (adaptUI2Chart) {
+        traceMenu = new PropertyChangeMenu(chart, trace.getName());
+      } else {
+        traceMenu = new JMenu(trace.getName());
+      }
+      result.add(traceMenu);
+      // for each trace add all highlighters:
+      IPointHighlighter< ? >[] highlighters = new IPointHighlighter< ? >[] {
+          new PointHighlighterConfigurable(new PointPainterDisc(10), true),
+          new PointHighlighterConfigurable(new PointPainterDisc(20), true) };
+      String[] highlighterNames = new String[] {"Small disc", "Big disc" };
+      IPointHighlighter< ? > highlighter;
+      for (int i = 0; i < highlighters.length; i++) {
+        highlighter = highlighters[i];
+        if (adaptUI2Chart) {
+          item = new PropertyChangeCheckBoxMenuItem(chart, new Trace2DActionAddRemoveHighlighter(
+              trace, highlighterNames[i], highlighter), false);
+        } else {
+          item = new SelectionAdaptJRadioButtonMenuItem(new Trace2DActionAddRemoveHighlighter(
+              trace, highlighterNames[i], highlighter), false);
+        }
+        traceMenu.add(item);
+
+      }
+
+    }
+    return result;
+  }
+
+  /**
+   * Creates a menu that offers various controls over the given chart.
+   * <p>
+   * 
+   * @param chartPanel
+   *          the chart panel to access.
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * @return a menu that offers various controls over the given chart.
+   */
+  public JMenu createChartMenu(final ChartPanel chartPanel, final boolean adaptUI2Chart) {
+
+    Chart2D chart = chartPanel.getChart();
+    JMenu chartMenu;
+    if (adaptUI2Chart) {
+      chartMenu = new PropertyChangeMenu(chartPanel, "Chart");
+    } else {
+      chartMenu = new JMenu("Chart");
+    }
+
+    // fill top-level popup menu
+    if (this.m_showChartBackgroundMenu) {
+      chartMenu.add(this.createBackgroundColorMenu(chartPanel, adaptUI2Chart));
+    }
+    if (this.m_showChartForegroundMenu) {
+      chartMenu.add(this.createForegroundColorMenu(chartPanel, adaptUI2Chart));
+    }
+    if (this.m_showGridMenu) {
+      chartMenu.add(this.createChartGridMenu(chartPanel, adaptUI2Chart));
+    }
+    if (this.m_showToolTipMenu) {
+      chartMenu.add(this.createChartToolTipMenu(chartPanel, adaptUI2Chart));
+    }
+    if (this.m_showHighlightMenu) {
+      chartMenu.add(this.createChartHighlightMenu(chartPanel, adaptUI2Chart));
+    }
+
+    JMenuItem item;
+    if (this.m_showAxisXMenu || this.m_showAxisYMenu) {
+      // Axis submenu:
+      JMenu axisMenu;
+      if (adaptUI2Chart) {
+        axisMenu = new PropertyChangeMenu(chart, "Axis");
+      } else {
+        axisMenu = new JMenu("Axis");
+      }
+
+      // X axis submenu
+      if (this.m_showAxisXMenu) {
+        JMenuItem xAxisMenuItem = this.createAxisMenuItem(chart.getAxisX(), Chart2D.X,
+            adaptUI2Chart);
+        axisMenu.add(xAxisMenuItem);
+      }
+      // Y axis submenu
+      if (this.m_showAxisYMenu) {
+        JMenuItem yAxisMenuItem = this.createAxisMenuItem(chart.getAxisY(), Chart2D.Y,
+            adaptUI2Chart);
+        axisMenu.add(yAxisMenuItem);
+      }
+      chartMenu.add(axisMenu);
+    }
+
+    // save menu
+    if (this.m_showSaveMenu) {
+      item = this.createSaveMenu(chartPanel, adaptUI2Chart);
+      chartMenu.add(item);
+    }
+    // print menu:
+    if (this.m_showPrintMenu) {
+      if (adaptUI2Chart) {
+        item = new PropertyChangeMenuItem(chart, Chart2DActionPrintSingleton.getInstance(chart,
+            "Print chart"));
+      } else {
+        item = new JMenuItem(Chart2DActionPrintSingleton.getInstance(chart, "Print chart"));
+      }
+      chartMenu.add(item);
+    }
+
+    if (this.m_showAnnotationMenu) {
+      item = this.createAnnoationsMenu(chartPanel, adaptUI2Chart);
+      chartMenu.add(item);
+    }
+
+    if (chart instanceof ZoomableChart && this.m_showZoomOutMenu) {
+      if (adaptUI2Chart) {
+        item = new PropertyChangeMenuItem(chart, new ZoomableChartZoomOutAction(
+            (ZoomableChart) chart, "Zoom Out"));
+      } else {
+        item = new JMenuItem(new ZoomableChartZoomOutAction((ZoomableChart) chart, "Zoom Out"));
+      }
+      chartMenu.add(item);
+    }
+    return chartMenu;
+  }
+
+  /**
+   * Creates a menu bar that offers various controls over the given chart.
+   * <p>
+   * 
+   * @param chartPanel
+   *          the chart panel to access.
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * @return a menu bar that offers various controls over the given chart.
+   */
+  public JMenuBar createChartMenuBar(final ChartPanel chartPanel, final boolean adaptUI2Chart) {
+
+    JMenu chartMenu = this.createChartMenu(chartPanel, adaptUI2Chart);
+    JMenuBar menubar;
+    if (adaptUI2Chart) {
+      menubar = new PropertyChangeJMenuBar(chartPanel);
+    } else {
+      menubar = new JMenuBar();
+    }
+    menubar.add(chartMenu);
+    return menubar;
+  }
+
+  /**
+   * Adds a popup menu to the given chart that offers various controls over it.
+   * <p>
+   * 
+   * @param chartpanel
+   *          the chart panel to add the popup menue to.
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   */
+  public void createChartPopupMenu(final ChartPanel chartpanel, final boolean adaptUI2Chart) {
+
+    // fill top-level popup menu
+    JPopupMenu popup;
+    if (adaptUI2Chart) {
+      popup = new PropertyChangePopupMenu(chartpanel);
+    } else {
+      popup = new JPopupMenu();
+    }
+
+    /*
+     * Avoid code - duplication by reusing the menu tree of the following call.
+     * This might cause some performance overhead but prevents inconsitent popup
+     * menu and window menu which happened several times when new features were
+     * added.
+     */
+
+    JMenu menu = this.createChartMenu(chartpanel, adaptUI2Chart);
+    for (Component component : menu.getMenuComponents()) {
+      menu.remove(component);
+      popup.add(component);
+    }
+
+    PopupListener listener = new PopupListener(popup);
+    chartpanel.getChart().addMouseListener(listener);
+  }
+
+  /**
+   * Creates a menu for choosing the tool tip type of the chart.
+   * <p>
+   * 
+   * @see Chart2D#setToolTipType(info.monitorenter.gui.chart.IToolTipType)
+   * 
+   * @param chartPanel
+   *          for adapting ui to and obtaining chart from.
+   * 
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * 
+   * @return a menu for controlling tool tips of a chart (enable, type).
+   */
+  public JMenu createChartSetToolTipTypeMenu(ChartPanel chartPanel, boolean adaptUI2Chart) {
+    JMenu tooltipMenu;
+    Chart2D chart = chartPanel.getChart();
+    if (adaptUI2Chart) {
+      tooltipMenu = new PropertyChangeMenu(chart, "Type");
+    } else {
+      tooltipMenu = new JMenu("Type");
+    }
+
+    IToolTipType actualType = chart.getToolTipType();
+    JMenuItem item;
+    ButtonGroup buttonGroup = new ButtonGroup();
+
+    IToolTipType type = Chart2D.ToolTipType.NONE;
+    boolean selected = actualType.getClass() == type.getClass();
+    if (adaptUI2Chart) {
+      item = new PropertyChangeJRadioButtonMenuItem(chart, new ChartActionSetToolTipType(chart,
+          type.getDescription(), type), selected);
+    } else {
+      item = new SelectionAdaptJCheckBoxMenuItem(new ChartActionSetToolTipType(chart, type
+          .getDescription(), type), selected);
+    }
+    buttonGroup.add(item);
+    tooltipMenu.add(item);
+
+    type = Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS;
+    selected = actualType.getClass() == type.getClass();
+    if (adaptUI2Chart) {
+      item = new PropertyChangeJRadioButtonMenuItem(chart, new ChartActionSetToolTipType(chart,
+          type.getDescription(), type), selected);
+    } else {
+      item = new SelectionAdaptJCheckBoxMenuItem(new ChartActionSetToolTipType(chart, type
+          .getDescription(), type), selected);
+    }
+    buttonGroup.add(item);
+    tooltipMenu.add(item);
+
+    type = Chart2D.ToolTipType.DATAVALUES;
+    selected = actualType.getClass() == type.getClass();
+    if (adaptUI2Chart) {
+      item = new PropertyChangeJRadioButtonMenuItem(chart, new ChartActionSetToolTipType(chart,
+          type.getDescription(), type), selected);
+    } else {
+      item = new SelectionAdaptJCheckBoxMenuItem(new ChartActionSetToolTipType(chart, type
+          .getDescription(), type), selected);
+    }
+    buttonGroup.add(item);
+    tooltipMenu.add(item);
+
+    type = Chart2D.ToolTipType.PIXEL;
+    selected = actualType.getClass() == type.getClass();
+    if (adaptUI2Chart) {
+      item = new PropertyChangeJRadioButtonMenuItem(chart, new ChartActionSetToolTipType(chart,
+          type.getDescription(), type), selected);
+    } else {
+      item = new SelectionAdaptJCheckBoxMenuItem(new ChartActionSetToolTipType(chart, type
+          .getDescription(), type), selected);
+    }
+    buttonGroup.add(item);
+    tooltipMenu.add(item);
+
+    return tooltipMenu;
+  }
+
+  /**
+   * Creates a menu for controlling tool tips of a chart (enable, type).
+   * <p>
+   * 
+   * @param chartPanel
+   *          for adapting ui to and obtaining chart from.
+   * 
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * 
+   * @return a menu for controlling tool tips of a chart (enable, type).
+   */
+  public JMenuItem createChartToolTipMenu(ChartPanel chartPanel, boolean adaptUI2Chart) {
+    Chart2D chart = chartPanel.getChart();
+    // Tooltip submenu:
+    JMenu tooltipMenu;
+    if (adaptUI2Chart) {
+      tooltipMenu = new PropertyChangeMenu(chart, "Tool tips");
+    } else {
+      tooltipMenu = new JMenu("Tool tips");
+    }
+    if (this.m_showToolTipTypeMenu) {
+      tooltipMenu.add(this.createChartSetToolTipTypeMenu(chartPanel, adaptUI2Chart));
+    }
+    return tooltipMenu;
   }
 
   /**
    * Creates a menu for showing the wizard for the <code>{@link IErrorBarPolicy}
-   * </code> instances of the given trace.
+   * </code> instances of the
+   * given trace.
    * <p>
    * 
    * @param chart
@@ -1627,13 +2076,13 @@ public final class LayoutFactory {
 
     // set of all error bar policies available, needed for finding
     // addable / removable error bar policies.
-    Set<IErrorBarPolicy> allErrorBarPolicies = new TreeSet<IErrorBarPolicy>();
+    Set<IErrorBarPolicy< ? >> allErrorBarPolicies = new TreeSet<IErrorBarPolicy< ? >>();
     allErrorBarPolicies.add(new ErrorBarPolicyRelative(0.02, 0.02));
     allErrorBarPolicies.add(new ErrorBarPolicyAbsoluteSummation(4, 4));
 
     // the edit action items (show wizard for existing error bar policies):
-    Set<IErrorBarPolicy> errorBarPolicies = trace.getErrorBarPolicies();
-    for (IErrorBarPolicy errorBarPolicy : errorBarPolicies) {
+    Set<IErrorBarPolicy< ? >> errorBarPolicies = trace.getErrorBarPolicies();
+    for (IErrorBarPolicy< ? > errorBarPolicy : errorBarPolicies) {
       if (adaptUI2Chart) {
         item = new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(trace,
             errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
@@ -1646,13 +2095,14 @@ public final class LayoutFactory {
     }
 
     // find the error bar policies to add:
-    Set<IErrorBarPolicy> addableErrorBarPolicies = new TreeSet<IErrorBarPolicy>(allErrorBarPolicies);
-    for (IErrorBarPolicy errorBarPolicy : errorBarPolicies) {
+    Set<IErrorBarPolicy< ? >> addableErrorBarPolicies = new TreeSet<IErrorBarPolicy< ? >>(
+        allErrorBarPolicies);
+    for (IErrorBarPolicy< ? > errorBarPolicy : errorBarPolicies) {
       addableErrorBarPolicies.remove(errorBarPolicy);
     }
 
     // now add them:
-    for (IErrorBarPolicy errorBarPolicy : addableErrorBarPolicies) {
+    for (IErrorBarPolicy< ? > errorBarPolicy : addableErrorBarPolicies) {
       if (adaptUI2Chart) {
         errorBarAddMenu.add(new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(trace,
             errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
@@ -1666,7 +2116,7 @@ public final class LayoutFactory {
     }
 
     // the error bar policies to remove
-    for (IErrorBarPolicy errorBarPolicy : errorBarPolicies) {
+    for (IErrorBarPolicy< ? > errorBarPolicy : errorBarPolicies) {
       if (adaptUI2Chart) {
         errorBarRemoveMenu.add(new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(
             trace, errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
@@ -1685,17 +2135,21 @@ public final class LayoutFactory {
    * Creates a menu for choosing the foreground color of the given chart.
    * <p>
    * 
-   * @param chart
-   *          the chart to set the foreground color of by the menu to return.
+   * @param chartPanel
+   *          the chart panel to set the foreground color of by the menu to
+   *          return.
    * @param adaptUI2Chart
    *          if true the menu will adapt it's basic UI properies (font,
    *          foreground and background color) to the given chart.
    * @return a menu for choosing the foreground color of the given chart.
    */
-  public JMenuItem createForegroundColorMenu(final Chart2D chart, final boolean adaptUI2Chart) {
+  public JMenuItem createForegroundColorMenu(final ChartPanel chartPanel,
+      final boolean adaptUI2Chart) {
 
+    Chart2D chart = chartPanel.getChart();
     Color foregroundColor = chart.getForeground();
     boolean nonStandardColor = true;
+    boolean selected;
     ButtonGroup buttonGroup = new ButtonGroup();
 
     JMenuItem item;
@@ -1705,66 +2159,68 @@ public final class LayoutFactory {
     } else {
       fgColorMenu = new JMenu("Foreground color");
     }
+
+    selected = foregroundColor.equals(Color.WHITE);
+    nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetForeground(chart,
-          "White", Color.WHITE));
+          "White", Color.WHITE), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new JComponentActionSetForeground(chart,
-          "White", Color.WHITE));
+          "White", Color.WHITE), selected);
     }
-    if (foregroundColor.equals(Color.WHITE)) {
-      item.setSelected(true);
-      nonStandardColor = false;
+    // if (foregroundColor.equals(Color.WHITE)) {
+    // item.setSelected(true);
+    // nonStandardColor = false;
+    // }
+    buttonGroup.add(item);
+    fgColorMenu.add(item);
+
+    selected = foregroundColor.equals(Color.GRAY);
+    nonStandardColor &= !selected;
+    if (adaptUI2Chart) {
+      item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetForeground(
+          chartPanel.getChart(), "Gray", Color.GRAY), selected);
+    } else {
+      item = new SelectionAdaptJRadioButtonMenuItem(new JComponentActionSetForeground(chart,
+          "Gray", Color.GRAY), selected);
     }
     buttonGroup.add(item);
     fgColorMenu.add(item);
+
+    selected = foregroundColor.equals(Color.LIGHT_GRAY);
+    nonStandardColor &= !selected;
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetForeground(chart,
-          "Gray", Color.GRAY));
+      item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetForeground(
+          chartPanel.getChart(), "Light gray", Color.LIGHT_GRAY), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new JComponentActionSetForeground(chart,
-          "Gray", Color.GRAY));
-    }
-    if (foregroundColor.equals(Color.GRAY)) {
-      item.setSelected(true);
-      nonStandardColor = false;
+          "Light gray", Color.LIGHT_GRAY), selected);
     }
     buttonGroup.add(item);
     fgColorMenu.add(item);
+
+    selected = foregroundColor.equals(Color.BLACK);
+    nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetForeground(chart,
-          "Light gray", Color.LIGHT_GRAY));
+          "Black", Color.BLACK), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new JComponentActionSetForeground(chart,
-          "Light gray", Color.LIGHT_GRAY));
-    }
-    if (foregroundColor.equals(Color.LIGHT_GRAY)) {
-      item.setSelected(true);
-      nonStandardColor = false;
+          "Black", Color.BLACK), selected);
     }
     buttonGroup.add(item);
     fgColorMenu.add(item);
+
+    // kille
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetForeground(chart,
-          "Black", Color.BLACK));
-    } else {
-      item = new SelectionAdaptJRadioButtonMenuItem(new JComponentActionSetForeground(chart,
-          "Black", Color.BLACK));
-    }
-    if (foregroundColor.equals(Color.BLACK)) {
-      item.setSelected(true);
-      nonStandardColor = false;
-    }
-    buttonGroup.add(item);
-    fgColorMenu.add(item);
-    if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart,
-          JComponentActionSetCustomForegroundSingleton.getInstance(chart, "Custom Color"));
+      item = new PropertyChangeJRadioButtonMenuItem(chartPanel.getChart(),
+          JComponentActionSetCustomForegroundSingleton.getInstance(chartPanel.getChart(),
+              "Custom Color"), nonStandardColor);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(JComponentActionSetCustomForegroundSingleton
-          .getInstance(chart, "Custom Color"));
+          .getInstance(chartPanel.getChart(), "Custom Color"), nonStandardColor);
     }
-    item.setSelected(nonStandardColor);
     buttonGroup.add(item);
     fgColorMenu.add(item);
     return fgColorMenu;
@@ -1774,17 +2230,19 @@ public final class LayoutFactory {
    * Creates a menu for choosing the grid color of the given chart.
    * <p>
    * 
-   * @param chart
-   *          the chart to set the grid color of by the menu to return.
+   * @param chartPanel
+   *          the chart panel to set the grid color of by the menu to return.
    * @param adaptUI2Chart
    *          if true the menu will adapt it's basic UI properies (font,
    *          foreground and background color) to the given chart.
    * @return a menu for choosing the grid color of the given chart.
    */
-  public JMenu createGridColorMenu(final Chart2D chart, final boolean adaptUI2Chart) {
+  public JMenu createGridColorMenu(final ChartPanel chartPanel, final boolean adaptUI2Chart) {
     JMenuItem item;
+    Chart2D chart = chartPanel.getChart();
     Color gridColor = chart.getGridColor();
     boolean nonStandardColor = true;
+    boolean selected;
     ButtonGroup buttonGroup = new ButtonGroup();
 
     JMenu gridColorMenu;
@@ -1794,213 +2252,64 @@ public final class LayoutFactory {
       gridColorMenu = new JMenu("Grid color");
     }
 
+    selected = gridColor.equals(Color.GRAY);
+    nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new Chart2DActionSetGridColor(chart,
-          "Gray", Color.GRAY));
+          "Gray", Color.GRAY), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetGridColor(chart, "Gray",
-          Color.GRAY));
-    }
-    if (gridColor.equals(Color.GRAY)) {
-      item.setSelected(true);
-      nonStandardColor = false;
+          Color.GRAY), selected);
     }
     buttonGroup.add(item);
     gridColorMenu.add(item);
+
+    selected = gridColor.equals(Color.LIGHT_GRAY);
+    nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new Chart2DActionSetGridColor(chart,
-          "Light gray", Color.LIGHT_GRAY));
+          "Light gray", Color.LIGHT_GRAY), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetGridColor(chart,
-          "Light gray", Color.LIGHT_GRAY));
+          "Light gray", Color.LIGHT_GRAY), selected);
     }
-    if (gridColor.equals(Color.LIGHT_GRAY)) {
-      item.setSelected(true);
-      nonStandardColor = false;
-    }
-
     buttonGroup.add(item);
     gridColorMenu.add(item);
+
+    selected = gridColor.equals(Color.BLACK);
+    nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new Chart2DActionSetGridColor(chart,
-          "Black", Color.BLACK));
+          "Black", Color.BLACK), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetGridColor(chart, "Black",
-          Color.BLACK));
-    }
-    if (gridColor.equals(Color.BLACK)) {
-      item.setSelected(true);
-      nonStandardColor = false;
+          Color.BLACK), selected);
     }
     buttonGroup.add(item);
     gridColorMenu.add(item);
+
+    selected = gridColor.equals(Color.WHITE);
+    nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new Chart2DActionSetGridColor(chart,
-          "White", Color.WHITE));
+          "White", Color.WHITE), selected);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetGridColor(chart, "White",
-          Color.WHITE));
-    }
-    if (gridColor.equals(Color.WHITE)) {
-      item.setSelected(true);
-      nonStandardColor = false;
+          Color.WHITE), selected);
     }
     buttonGroup.add(item);
     gridColorMenu.add(item);
+
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, Chart2DActionSetCustomGridColorSingleton
-          .getInstance(chart, "Custom"));
+          .getInstance(chart, "Custom"), nonStandardColor);
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(Chart2DActionSetCustomGridColorSingleton
-          .getInstance(chart, "Custom"));
+          .getInstance(chart, "Custom"), nonStandardColor);
     }
-    item.setSelected(nonStandardColor);
     buttonGroup.add(item);
     gridColorMenu.add(item);
     return gridColorMenu;
-  }
-
-  /**
-   * Creates a menu that offers various controls over the given chart.
-   * <p>
-   * 
-   * @param chart
-   *          the chart to access.
-   * @param adaptUI2Chart
-   *          if true the menu will adapt it's basic UI properies (font,
-   *          foreground and background color) to the given chart.
-   * @return a menu that offers various controls over the given chart.
-   */
-  public JMenu createMenu(final Chart2D chart, final boolean adaptUI2Chart) {
-
-    JMenu chartMenu;
-    if (adaptUI2Chart) {
-      chartMenu = new PropertyChangeMenu(chart, "Chart");
-    } else {
-      chartMenu = new JMenu("Chart");
-    }
-
-    // fill top-level popup menu
-    if (this.m_showChartBackgroundMenu) {
-      chartMenu.add(this.createBackgroundColorMenu(chart, adaptUI2Chart));
-    }
-    if (this.m_showChartForegroundMenu) {
-      chartMenu.add(this.createForegroundColorMenu(chart, adaptUI2Chart));
-    }
-    if (this.m_showGridColorMenu) {
-      chartMenu.add(this.createGridColorMenu(chart, adaptUI2Chart));
-    }
-    JMenuItem item;
-    if (this.m_showAxisXMenu || this.m_showAxisYMenu) {
-      // Axis submenu:
-      JMenu axisMenu;
-      if (adaptUI2Chart) {
-        axisMenu = new PropertyChangeMenu(chart, "Axis");
-      } else {
-        axisMenu = new JMenu("Axis");
-      }
-
-      // X axis submenu
-      if (this.m_showAxisXMenu) {
-        JMenuItem xAxisMenuItem = this.createAxisMenuItem(chart.getAxisX(), Chart2D.X,
-            adaptUI2Chart);
-        axisMenu.add(xAxisMenuItem);
-      }
-      // Y axis submenu
-      if (this.m_showAxisYMenu) {
-        JMenuItem yAxisMenuItem = this.createAxisMenuItem(chart.getAxisY(), Chart2D.Y,
-            adaptUI2Chart);
-        axisMenu.add(yAxisMenuItem);
-      }
-      chartMenu.add(axisMenu);
-    }
-
-    // save menu
-    if (this.m_showSaveMenu) {
-      item = this.createSaveMenu(chart, adaptUI2Chart);
-      chartMenu.add(item);
-    }
-    // print menu:
-    if (this.m_showPrintMenu) {
-      if (adaptUI2Chart) {
-        item = new PropertyChangeMenuItem(chart, Chart2DActionPrintSingleton.getInstance(chart,
-            "Print chart"));
-      } else {
-        item = new JMenuItem(Chart2DActionPrintSingleton.getInstance(chart, "Print chart"));
-      }
-      chartMenu.add(item);
-    }
-
-    if (chart instanceof ZoomableChart && this.m_showZoomOutMenu) {
-      if (adaptUI2Chart) {
-        item = new PropertyChangeMenuItem(chart, new ZoomableChartZoomOutAction(
-            (ZoomableChart) chart, "Zoom Out"));
-      } else {
-        item = new JMenuItem(new ZoomableChartZoomOutAction((ZoomableChart) chart, "Zoom Out"));
-      }
-      chartMenu.add(item);
-    }
-    return chartMenu;
-  }
-
-  /**
-   * Creates a menu bar that offers various controls over the given chart.
-   * <p>
-   * 
-   * @param chart
-   *          the chart to access.
-   * @param adaptUI2Chart
-   *          if true the menu will adapt it's basic UI properies (font,
-   *          foreground and background color) to the given chart.
-   * @return a menu bar that offers various controls over the given chart.
-   */
-  public JMenuBar createMenuBar(final Chart2D chart, final boolean adaptUI2Chart) {
-
-    JMenu chartMenu = this.createMenu(chart, adaptUI2Chart);
-    JMenuBar menubar;
-    if (adaptUI2Chart) {
-      menubar = new PropertyChangeJMenuBar(chart);
-    } else {
-      menubar = new JMenuBar();
-    }
-    menubar.add(chartMenu);
-    return menubar;
-  }
-
-  /**
-   * Adds a popup menu to the given chart that offers various controls over it.
-   * <p>
-   * 
-   * @param chart
-   *          the chart to add the popup menue to.
-   * @param adaptUI2Chart
-   *          if true the menu will adapt it's basic UI properies (font,
-   *          foreground and background color) to the given chart.
-   */
-  public void createPopupMenu(final Chart2D chart, final boolean adaptUI2Chart) {
-
-    // fill top-level popup menu
-    JPopupMenu popup;
-    if (adaptUI2Chart) {
-      popup = new PropertyChangePopupMenu(chart);
-    } else {
-      popup = new JPopupMenu();
-    }
-
-    /*
-     * Avoid code - duplication by reusing the menu tree of the following call.
-     * This might cause some performance overhead but prevents inconsitent popup
-     * menu and window menu which happened several times when new features were
-     * added.
-     */
-
-    JMenu menu = this.createMenu(chart, adaptUI2Chart);
-    for (Component component : menu.getMenuComponents()) {
-      menu.remove(component);
-      popup.add(component);
-    }
-
-    chart.addMouseListener(new PopupListener(popup));
   }
 
   /**
@@ -2008,7 +2317,7 @@ public final class LayoutFactory {
    * an encapsulated postscript file.
    * <p>
    * 
-   * @param chart
+   * @param chartPanel
    *          needed to adapt the basic ui properties to (font, foreground
    *          color, background color).
    * @param adaptUI2Chart
@@ -2018,28 +2327,32 @@ public final class LayoutFactory {
    *         an encapsulated postscript file.
    */
 
-  public JMenu createSaveMenu(final Chart2D chart, final boolean adaptUI2Chart) {
+  public JMenu createSaveMenu(final ChartPanel chartPanel, final boolean adaptUI2Chart) {
+    Chart2D chart = chartPanel.getChart();
     JMenu result;
     JMenuItem item;
+    Action action = Chart2DActionSaveEpsSingletonApacheFop.getInstance(chart, "Save eps");
     if (adaptUI2Chart) {
       result = new PropertyChangeMenu(chart, "Save");
       item = new PropertyChangeMenuItem(chart, Chart2DActionSaveImageSingleton.getInstance(chart,
           "Save image"));
       result.add(item);
       if (this.m_showSaveEpsMenu) {
-        item = new PropertyChangeMenuItem(chart, Chart2DActionSaveEpsSingleton.getInstance(chart,
-            "Save eps"));
-        result.add(item);
+        item = new PropertyChangeMenuItem(chart, action);
       }
     } else {
       result = new JMenu("Save");
       item = new JMenuItem(Chart2DActionSaveImageSingleton.getInstance(chart, "Save image"));
       result.add(item);
       if (this.m_showSaveEpsMenu) {
-        item = new JMenuItem(Chart2DActionSaveEpsSingleton.getInstance(chart, "Save eps"));
-        result.add(item);
+        item = new JMenuItem(action);
       }
     }
+    if (!Chart2DActionSaveEpsSingletonApacheFop.EPS_SUPPORTED) {
+      item
+          .setToolTipText("This is disabled as xmlgraphics-commons-<version>.jar is missing on the classpath.");
+    }
+    result.add(item);
     return result;
   }
 
@@ -2133,6 +2446,111 @@ public final class LayoutFactory {
   }
 
   /**
+   * Creates a <code>JLabel</code> that is capable of triggering a
+   * <code>JPopupMenu</code> for the settings available for the
+   * <code>ITrace2D</code> or <code>null</code> if <code>
+   * {@link ITrace2D#getLabel()}</code>
+   * on the given trace argument returns null.
+   * <p>
+   * 
+   * @param chart
+   *          The chart the given trace is a member of. This will be used for
+   *          getting a <code>PopupMenu</code> that adapts to layout properties
+   *          (such as background color).
+   * @param trace
+   *          The trace on which the <code>JPopupMenu</code> of the
+   *          <code>JLabel</code> will act.
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * @return a label that offers a popup menue with controls for the given trace
+   *         or <code>null</code> if <code>{@link ITrace2D#getLabel()}</code> on
+   *         the given trace argument returns null.
+   */
+  public JLabel createTraceContextMenuLabel(final Chart2D chart, final ITrace2D trace,
+      final boolean adaptUI2Chart) {
+    String traceLabel = trace.getLabel();
+    TraceJLabel ret = null;
+    if (!StringUtil.isEmpty(traceLabel)) {
+      ret = new TraceJLabel(trace.getLabel());
+      JMenuItem item;
+      // ret.setSize(new Dimension(20, 100));
+      JPopupMenu popup = new PropertyChangePopupMenu(chart);
+      // set the initial background color:
+      Color background = chart.getBackground();
+      ret.setBackground(background);
+      ret.setForeground(trace.getColor());
+
+      // item for setVisible
+      if (this.m_showTraceVisibleMenu) {
+        if (adaptUI2Chart) {
+          item = new PropertyChangeCheckBoxMenuItem(chart, new Trace2DActionSetVisible(trace,
+              "Visible"), trace.isVisible());
+        } else {
+          item = new SelectionAdaptJCheckBoxMenuItem(new Trace2DActionSetVisible(trace, "Visible"),
+              trace.isVisible());
+        }
+        popup.add(item);
+      }
+
+      // item for setName
+      if (this.m_showTraceNameMenu) {
+        if (adaptUI2Chart) {
+          item = new PropertyChangeMenuItem(chart, new Trace2DActionSetName(trace, "Name", chart));
+        } else {
+          item = new JMenuItem(new Trace2DActionSetName(trace, "Name", chart));
+        }
+        popup.add(item);
+      }
+      // item for setPhysicalUnits
+      if (this.m_showPhysicalUnitsMenu) {
+        if (adaptUI2Chart) {
+          item = new PropertyChangeMenuItem(chart, new Trace2DActionSetPhysicalUnits(trace,
+              "Physical Units", chart));
+        } else {
+          item = new JMenuItem(new Trace2DActionSetPhysicalUnits(trace, "Physical Units", chart));
+
+        }
+        popup.add(item);
+      }
+
+      // add the submenus
+      if (this.m_showTraceColorMenu) {
+        popup.add(this.createTraceColorMenu(chart, trace, ret, adaptUI2Chart));
+      }
+      if (this.m_showTraceZindexMenu) {
+        popup.add(this.createTraceZindexMenu(chart, trace, adaptUI2Chart));
+      }
+      if (this.m_showTraceStrokeMenu) {
+        popup.add(this.createTraceStrokesMenu(chart, trace, adaptUI2Chart));
+      }
+      if (this.m_showTracePainterMenu) {
+        popup.add(this.createTracePainterMenu(chart, trace, adaptUI2Chart));
+      }
+      if (this.m_showRemoveTraceMenu) {
+        if (adaptUI2Chart) {
+          item = new PropertyChangeMenuItem(chart, new Trace2DActionRemove(trace, "Remove"));
+        } else {
+          item = new JMenuItem(new Trace2DActionRemove(trace, "Remove"));
+        }
+        popup.add(item);
+      }
+
+      if (this.m_showErrorBarWizardMenu) {
+        popup.add(this.createErrorBarWizardMenu(chart, trace, adaptUI2Chart));
+      }
+      ret.addMouseListener(new PopupListener(popup));
+      // The label itself should always look like the trace
+      // foreground and contain the propert name.
+      trace.addPropertyChangeListener(ITrace2D.PROPERTY_COLOR, ret);
+      trace.addPropertyChangeListener(ITrace2D.PROPERTY_NAME, ret);
+      trace.addPropertyChangeListener(ITrace2D.PROPERTY_PHYSICALUNITS, ret);
+      chart.addPropertyChangeListener(Chart2D.PROPERTY_FONT, ret);
+    }
+    return ret;
+  }
+
+  /**
    * Creates a menu for choosing the {@link ITracePainter} of the given trace.
    * <p>
    * 
@@ -2157,7 +2575,7 @@ public final class LayoutFactory {
       painterMenu = new JMenu("renderer");
     }
 
-    ITracePainter painter = new TracePainterDisc(4);
+    ITracePainter< ? > painter = new TracePainterDisc(4);
     if (adaptUI2Chart) {
       item = new OrderingCheckBoxPropertyChangeMenuItem(chart,
           new Trace2DActionAddRemoveTracePainter(trace, "discs", painter), painterMenu, trace
@@ -2166,9 +2584,9 @@ public final class LayoutFactory {
       item = new OrderingCheckBoxMenuItem(new Trace2DActionAddRemoveTracePainter(trace, "discs",
           painter), painterMenu, trace.containsTracePainter(painter));
     }
-    if (trace.getTracePainters().contains(painter)) {
-      item.setSelected(true);
-    }
+    // if (trace.getTracePainters().contains(painter)) {
+    // item.setSelected(true);
+    // }
     painterMenu.add(item);
 
     painter = new TracePainterPolyline();
@@ -2181,9 +2599,9 @@ public final class LayoutFactory {
           painter), painterMenu, trace.containsTracePainter(painter));
     }
     painterMenu.add(item);
-    if (trace.getTracePainters().contains(painter)) {
-      item.setSelected(true);
-    }
+    // if (trace.getTracePainters().contains(painter)) {
+    // item.setSelected(true);
+    // }
 
     painter = new TracePainterFill(chart);
     if (adaptUI2Chart) {
@@ -2196,9 +2614,9 @@ public final class LayoutFactory {
 
     }
     painterMenu.add(item);
-    if (trace.getTracePainters().contains(painter)) {
-      item.setSelected(true);
-    }
+    // if (trace.getTracePainters().contains(painter)) {
+    // item.setSelected(true);
+    // }
     painter = new TracePainterVerticalBar(chart);
     if (adaptUI2Chart) {
       item = new OrderingCheckBoxPropertyChangeMenuItem(chart,
@@ -2312,6 +2730,16 @@ public final class LayoutFactory {
   }
 
   /**
+   * Returns the showAnnotationMenu.
+   * <p>
+   * 
+   * @return the showAnnotationMenu
+   */
+  public final boolean isShowAnnotationMenu() {
+    return this.m_showAnnotationMenu;
+  }
+
+  /**
    * Returns wether the chart show x grid menu should be created.
    * <p>
    * 
@@ -2339,6 +2767,13 @@ public final class LayoutFactory {
    */
   public final boolean isShowAxisXRangePolicyMenu() {
     return this.m_showAxisXRangePolicyMenu;
+  }
+
+  /**
+   * @return true if axis title x menu should be shown.
+   */
+  public final boolean isShowAxisXTitleMenu() {
+    return this.m_showAxisXTitleMenu;
   }
 
   /**
@@ -2382,6 +2817,13 @@ public final class LayoutFactory {
   }
 
   /**
+   * @return true if axis title y menu should be shown.
+   */
+  public final boolean isShowAxisYTitleMenu() {
+    return this.m_showAxisYTitleMenu;
+  }
+
+  /**
    * Returns whether the axis y type menu is shown.
    * <p>
    * 
@@ -2412,6 +2854,13 @@ public final class LayoutFactory {
   }
 
   /**
+   * @return true if the error bar wizard menu should be shown.
+   */
+  public final boolean isShowErrorBarWizardMenu() {
+    return this.m_showErrorBarWizardMenu;
+  }
+
+  /**
    * Returns whether the chart grid color menu is shown.
    * <p>
    * 
@@ -2422,6 +2871,33 @@ public final class LayoutFactory {
   }
 
   /**
+   * Returns whether the chart grid menu is shown.
+   * <p>
+   * 
+   * @return true if the chart grid menu is shown.
+   */
+  public boolean isShowGridMenu() {
+    return this.m_showGridMenu;
+  }
+
+  /**
+   * Returns whether the highlight menu item is shown.
+   * <p>
+   * 
+   * @return true if the highlight menu item is visible.
+   */
+  public boolean isShowHighlightMenu() {
+    return this.m_showHighlightMenu;
+  }
+
+  /**
+   * @return the showPhysicalUnitsMenu.
+   */
+  public final boolean isShowPhysicalUnitsMenu() {
+    return this.m_showPhysicalUnitsMenu;
+  }
+
+  /**
    * Returns the showPrintMenu.
    * <p>
    * 
@@ -2429,6 +2905,13 @@ public final class LayoutFactory {
    */
   public final boolean isShowPrintMenu() {
     return this.m_showPrintMenu;
+  }
+
+  /**
+   * @return the showRemoveTraceMenu.
+   */
+  public final boolean isShowRemoveTraceMenu() {
+    return this.m_showRemoveTraceMenu;
   }
 
   /**
@@ -2446,6 +2929,26 @@ public final class LayoutFactory {
    */
   public final boolean isShowSaveMenu() {
     return this.m_showSaveMenu;
+  }
+
+  /**
+   * Returns whether the tool tip for chart menu item is shown.
+   * <p>
+   * 
+   * @return true if the tool tip for chart menu item is visible.
+   */
+  public boolean isShowToolTipMenu() {
+    return this.m_showToolTipMenu;
+  }
+
+  /**
+   * Returns whether the tool tip type for chart menu item is shown.
+   * <p>
+   * 
+   * @return true if the tool tip type for chart menu item is shown..
+   */
+  public boolean isShowToolTipTypeMenu() {
+    return this.m_showToolTipTypeMenu;
   }
 
   /**
@@ -2491,10 +2994,28 @@ public final class LayoutFactory {
   }
 
   /**
+   * @return true if the zoom out menu should be shown.
+   */
+  public final boolean isShowZoomOutMenu() {
+    return this.m_showZoomOutMenu;
+  }
+
+  /**
    * @return the showZoomOutMenu.
    */
   public final boolean isZoomOutMenu() {
     return this.m_showZoomOutMenu;
+  }
+
+  /**
+   * Sets the showAnnotationMenu.
+   * <p>
+   * 
+   * @param showAnnotationMenu
+   *          the showAnnotationMenu to set
+   */
+  public final void setShowAnnotationMenu(final boolean showAnnotationMenu) {
+    this.m_showAnnotationMenu = showAnnotationMenu;
   }
 
   /**
@@ -2537,6 +3058,16 @@ public final class LayoutFactory {
    */
   public final void setShowAxisXRangePolicyMenu(final boolean showAxisXRangePolicyMenu) {
     this.m_showAxisXRangePolicyMenu = showAxisXRangePolicyMenu;
+  }
+
+  /**
+   * Set whether the axis x title menu should be shown.
+   * 
+   * @param showAxisXTitleMenu
+   *          true if the axis x title menu should be shown.
+   */
+  public final void setShowAxisXTitleMenu(final boolean showAxisXTitleMenu) {
+    this.m_showAxisXTitleMenu = showAxisXTitleMenu;
   }
 
   /**
@@ -2596,6 +3127,16 @@ public final class LayoutFactory {
   }
 
   /**
+   * Set whether the axis y title menu should be shown.
+   * 
+   * @param showAxisYTitleMenu
+   *          true if the axis y title menu should be shown.
+   */
+  public final void setShowAxisYTitleMenu(final boolean showAxisYTitleMenu) {
+    this.m_showAxisYTitleMenu = showAxisYTitleMenu;
+  }
+
+  /**
    * Set wether the axis y type menu should be created.
    * <p>
    * Configure this before using any instance of
@@ -2638,6 +3179,16 @@ public final class LayoutFactory {
   }
 
   /**
+   * Set whether the error bar wizard menu should be shown.
+   * 
+   * @param showErrorBarWizardMenu
+   *          true if the error bar wizard menu should be shown.
+   */
+  public final void setShowErrorBarWizardMenu(final boolean showErrorBarWizardMenu) {
+    this.m_showErrorBarWizardMenu = showErrorBarWizardMenu;
+  }
+
+  /**
    * Set wether the chart grid color menu should be created.
    * <p>
    * Configure this before using any instance of
@@ -2652,6 +3203,36 @@ public final class LayoutFactory {
   }
 
   /**
+   * Set whether the chart grid menu is shown.
+   * <p>
+   * 
+   * @param showGridMenu
+   *          true if the chart grid menu should be visible.
+   */
+  public void setShowGridMenu(boolean showGridMenu) {
+    this.m_showGridMenu = showGridMenu;
+  }
+
+  /**
+   * Set whether the highlight menu item should be visible.
+   * <p>
+   * 
+   * @param showHighlightMenu
+   *          true if the highlight menu item should be visible.
+   */
+  public void setShowHighlightMenu(boolean showHighlightMenu) {
+    this.m_showHighlightMenu = showHighlightMenu;
+  }
+
+  /**
+   * @param showPhysicalUnitsMenu
+   *          The showPhysicalUnitsMenu to set.
+   */
+  public final void setShowPhysicalUnitsMenu(final boolean showPhysicalUnitsMenu) {
+    this.m_showPhysicalUnitsMenu = showPhysicalUnitsMenu;
+  }
+
+  /**
    * Sets the showPrintMenu.
    * <p>
    * 
@@ -2660,6 +3241,14 @@ public final class LayoutFactory {
    */
   public final void setShowPrintMenu(final boolean showPrintMenu) {
     this.m_showPrintMenu = showPrintMenu;
+  }
+
+  /**
+   * @param showRemoveTraceMenu
+   *          The showRemoveTraceMenu to set.
+   */
+  public final void setShowRemoveTraceMenu(final boolean showRemoveTraceMenu) {
+    this.m_showRemoveTraceMenu = showRemoveTraceMenu;
   }
 
   /**
@@ -2682,6 +3271,28 @@ public final class LayoutFactory {
    */
   public final void setShowSaveMenu(final boolean showSaveMenu) {
     this.m_showSaveMenu = showSaveMenu;
+  }
+
+  /**
+   * Set whether the tool tip type for chart menu item is shown.
+   * <p>
+   * 
+   * @param showToolTipTypeMenu
+   *          true if the tool tip type for chart menu item should be visible.
+   */
+  public void setShowTooltipEnableMenu(boolean showToolTipTypeMenu) {
+    this.m_showToolTipTypeMenu = showToolTipTypeMenu;
+  }
+
+  /**
+   * Sets whether the tool tip for chart menu item should be shown.
+   * <p>
+   * 
+   * @param showToolTipMenu
+   *          true if the tool tip for chart menu item should be visible.
+   */
+  public void setShowToolTipMenu(boolean showToolTipMenu) {
+    this.m_showToolTipMenu = showToolTipMenu;
   }
 
   /**
@@ -2733,106 +3344,20 @@ public final class LayoutFactory {
   }
 
   /**
+   * Set whether the zoom out menu should be shown.
+   * 
+   * @param showZoomOutMenu
+   *          true if the zoom out menu should be shown.
+   */
+  public final void setShowZoomOutMenu(final boolean showZoomOutMenu) {
+    this.m_showZoomOutMenu = showZoomOutMenu;
+  }
+
+  /**
    * @param showZoomOutMenu
    *          The showZoomOutMenu to set.
    */
   public final void setZoomOutMenu(final boolean showZoomOutMenu) {
     this.m_showZoomOutMenu = showZoomOutMenu;
-  }
-
-  /**
-   * Creates a {@link JMenuItem} that allows to trigger the features related to
-   * {@link info.monitorenter.gui.chart.axis.AAxis} features.
-   * <p>
-   * 
-   * @param axis
-   *          the axis to control.
-   * @param axisDimension
-   *          Identifies which dimension the axis controls in the chart: either
-   *          {@link Chart2D#X} or {@link Chart2D#Y}
-   * @param adaptUI2Chart
-   *          if true the menu will adapt it's basic UI properies (font,
-   *          foreground and background color) to the given chart.
-   * @return a {@link JMenuItem} that allows to trigger the features related to
-   *         {@link info.monitorenter.gui.chart.axis.AAxis} features.
-   */
-  protected JMenuItem createAxisMenuItem(final IAxis axis, final int axisDimension,
-      final boolean adaptUI2Chart) {
-    final Chart2D chart = axis.getAccessor().getChart();
-    JMenuItem item;
-
-    // axis submenu
-    JMenuItem axisMenuItem;
-    if (adaptUI2Chart) {
-      axisMenuItem = new PropertyChangeMenu(chart, "Axis" + axis.getAccessor().toString());
-    } else {
-      axisMenuItem = new JMenu("Axis" + axis.getAccessor().toString());
-    }
-
-    if ((this.m_showAxisXTypeMenu && axisDimension == Chart2D.X)
-        || (this.m_showAxisYTypeMenu && axisDimension == Chart2D.Y)) {
-      axisMenuItem.add(this.createAxisTypeMenu(chart, axis, axisDimension, adaptUI2Chart));
-    }
-    if ((this.m_showAxisXRangePolicyMenu && axisDimension == Chart2D.X)
-        || this.m_showAxisYRangePolicyMenu && axisDimension == Chart2D.Y) {
-      axisMenuItem.add(this.createAxisRangePolicyMenu(chart, axis, adaptUI2Chart));
-
-      // Axis -> Range menu
-      if (adaptUI2Chart) {
-        item = new PropertyChangeMenuItem(chart, new AxisActionSetRange(chart, "Range",
-            axisDimension));
-      } else {
-        item = new JMenuItem(new AxisActionSetRange(chart, "Range", axisDimension));
-      }
-      axisMenuItem.add(item);
-    }
-    if ((this.m_showAxisXTitleMenu && axisDimension == Chart2D.X)
-        || (this.m_showAxisYTitleMenu && axisDimension == Chart2D.Y)) {
-      axisMenuItem.add(this.createAxisTitleMenu(chart, axis, axisDimension, adaptUI2Chart));
-    }
-
-    if ((this.m_showAxisXGridMenu && axisDimension == Chart2D.X) || this.m_showAxisYGridMenu
-        && axisDimension == Chart2D.Y) {
-      // Axis -> show grid submenu
-      if (adaptUI2Chart) {
-        item = new PropertyChangeCheckBoxMenuItem(chart, new AxisActionSetGrid(chart, "Grid",
-            axisDimension), axis.isPaintGrid());
-      } else {
-        item = new SelectionAdaptJCheckBoxMenuItem(new AxisActionSetGrid(chart, "Grid",
-            axisDimension), axis.isPaintGrid());
-      }
-      axisMenuItem.add(item);
-    }
-    return axisMenuItem;
-  }
-
-  /**
-   * @return the showPhysicalUnitsMenu.
-   */
-  protected final boolean isShowPhysicalUnitsMenu() {
-    return this.m_showPhysicalUnitsMenu;
-  }
-
-  /**
-   * @return the showRemoveTraceMenu.
-   */
-  protected final boolean isShowRemoveTraceMenu() {
-    return this.m_showRemoveTraceMenu;
-  }
-
-  /**
-   * @param showPhysicalUnitsMenu
-   *          The showPhysicalUnitsMenu to set.
-   */
-  protected final void setShowPhysicalUnitsMenu(final boolean showPhysicalUnitsMenu) {
-    this.m_showPhysicalUnitsMenu = showPhysicalUnitsMenu;
-  }
-
-  /**
-   * @param showRemoveTraceMenu
-   *          The showRemoveTraceMenu to set.
-   */
-  protected final void setShowRemoveTraceMenu(final boolean showRemoveTraceMenu) {
-    this.m_showRemoveTraceMenu = showRemoveTraceMenu;
   }
 }

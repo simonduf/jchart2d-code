@@ -1,7 +1,7 @@
 /*
  *  ErrorBarPolicyActionEdit.java of project jchart2d, action 
  *  that pops up a modal dialog to edit the given IErrorBarPolicy. 
- *  Copyright (c) 2007 Achim Westermann, created on 09.12.2006 00:14:25.
+ *  Copyright (c) 2007 - 2010 Achim Westermann, created on 09.12.2006 00:14:25.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -37,13 +37,16 @@ import java.awt.event.ActionEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.9 $
  */
 public class ErrorBarPainterActionEdit
     extends AErrorBarPainterAction {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 3337393664927952024L;
+
+  /** The parent component for the color chooser dialog to show. */
+  private Component m_dialogParent;
 
   /**
    * Create an instance that accesses the error bar painter with a modal dialog
@@ -66,9 +69,6 @@ public class ErrorBarPainterActionEdit
     super(errorBarPainter, description);
     this.m_dialogParent = dialogParent;
   }
-
-  /** The parent component for the color chooser dialog to show. */
-  private Component m_dialogParent;
 
   /**
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)

@@ -1,6 +1,7 @@
 /*
- * RangePolicyMinimumViewport.java  jchart2d
- * Copyright (C) Achim Westermann, created on 20.04.2005, 11:12:12
+ * RangePolicyMinimumViewport.java  of project jchart2d. Shows all points given 
+ * but not any additional void space. 
+ * Copyright (C) 2005 - 2010 Achim Westermann, created on 20.04.2005, 11:12:12
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -42,7 +43,7 @@ import info.monitorenter.util.Range;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class RangePolicyMinimumViewport extends ARangePolicy {
 

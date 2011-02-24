@@ -1,6 +1,6 @@
 /*
  *  SimpleDateFormatAnalyzer.java  jchart2d
- *  Copyright (C) Achim Westermann, created on 09.07.2005, 15:29:54
+ *  Copyright (C) 2004 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ import java.text.SimpleDateFormat;
  * information about the fields that will be displayed.
  * <p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *

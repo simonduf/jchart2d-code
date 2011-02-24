@@ -1,6 +1,6 @@
 /*
  *  Showcase.java, the main demo application of project jchart2d.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -63,7 +63,7 @@ import javax.swing.event.ChangeListener;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.13 $
  * 
  */
 public final class Showcase
@@ -76,7 +76,7 @@ public final class Showcase
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.10 $
+   * @version $Revision: 1.13 $
    */
   final class ControlPanel
       extends JPanel {
@@ -207,7 +207,7 @@ public final class Showcase
        * <p>
        * 
        * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-       * @version $Revision: 1.10 $
+       * @version $Revision: 1.13 $
        */
       final class ColorItem
           extends Color {
@@ -442,9 +442,10 @@ public final class Showcase
     Container content = this.getContentPane();
     content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
     LayoutFactory factory = LayoutFactory.getInstance();
-    this.setJMenuBar(factory.createMenuBar(chart, false));
-
     ChartPanel chartpanel = new ChartPanel(chart);
+
+    this.setJMenuBar(factory.createChartMenuBar(chartpanel, false));
+
     content.add(chartpanel);
     content.addPropertyChangeListener(chartpanel);
     this.setCollector(new RandomDataCollectorOffset(this.getTrace(), 50));

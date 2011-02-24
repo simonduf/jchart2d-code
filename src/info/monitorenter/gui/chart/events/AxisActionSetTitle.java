@@ -1,7 +1,7 @@
 /*
  *  AxisActionSetTitle.java of project jchart2d, an action  implementation 
  *  to set the title String of an IAxis.
- *  Copyright (c) 2007 Achim Westermann, created on 20:30:06.
+ *  Copyright (c) 2007 - 2010 Achim Westermann, created on 20:30:06.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -39,7 +39,7 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  */
 public class AxisActionSetTitle extends AAxisAction {
 
@@ -86,8 +86,12 @@ public class AxisActionSetTitle extends AAxisAction {
   /**
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
+  @Override
   public void propertyChange(final PropertyChangeEvent evt) {
+    // will check for an axis replacement and transfer listening to the new axis if so: 
+    super.propertyChange(evt);
     // nop as this action will not be used
     // by checkbox or radio button menu items that have a state.
+
   }
 }

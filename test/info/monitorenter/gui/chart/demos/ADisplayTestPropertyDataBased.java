@@ -39,13 +39,24 @@ import java.io.InputStream;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  * 
  */
 public abstract class ADisplayTestPropertyDataBased extends ADisplayTest {
 
   /** Internal counter for search routine of property files. */
   private int m_count = 0;
+
+  /**
+   * Creates a test case with the name.
+   * <p>
+   * 
+   * @param testName
+   *          the name of the test case.
+   */
+  public ADisplayTestPropertyDataBased(final String testName) {
+    super(testName);
+  }
 
   /**
    * @see info.monitorenter.gui.chart.demos.ADisplayTest#getNextChart()
@@ -65,17 +76,6 @@ public abstract class ADisplayTestPropertyDataBased extends ADisplayTest {
     }
     this.m_count++;
     return chart;
-  }
-
-  /**
-   * Creates a test case with the name.
-   * <p>
-   * 
-   * @param testName
-   *          the name of the test case.
-   */
-  public ADisplayTestPropertyDataBased(final String testName) {
-    super(testName);
   }
 
 }

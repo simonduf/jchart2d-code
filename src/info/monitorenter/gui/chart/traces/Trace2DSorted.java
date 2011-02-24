@@ -1,7 +1,7 @@
 /*
  *  Trace2DSorted, a TreeSet- based implementation of a ITrace2D that performs
  *  insertion- sort of TracePoint2D - instances by their x- value.
- *  Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2010 Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@
 package info.monitorenter.gui.chart.traces;
 
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.util.Iterator;
 import java.util.SortedSet;
@@ -49,7 +49,7 @@ import java.util.TreeSet;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.13 $
  */
 public class Trace2DSorted
     extends ATrace2D implements ITrace2D {
@@ -58,7 +58,7 @@ public class Trace2DSorted
   private static final long serialVersionUID = -3518797764292132652L;
   
   /** The sorted set of points. */
-  protected SortedSet<TracePoint2D> m_points = new TreeSet<TracePoint2D>();
+  protected SortedSet<ITracePoint2D> m_points = new TreeSet<ITracePoint2D>();
 
   /**
    * Defcon.
@@ -81,7 +81,7 @@ public class Trace2DSorted
    * @return true if the given point was successfully added.
    */
   @Override
-  protected boolean addPointInternal(final TracePoint2D p) {
+  protected boolean addPointInternal(final ITracePoint2D p) {
     // remove eventually contained to allow adding of new one
     this.removePoint(p);
     return this.m_points.add(p);
@@ -111,12 +111,12 @@ public class Trace2DSorted
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#iterator()
    */
-  public Iterator<TracePoint2D> iterator() {
+  public Iterator<ITracePoint2D> iterator() {
     return this.m_points.iterator();
   }
 
   /**
-   * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.TracePoint2D)
+   * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
   protected void removeAllPointsInternal() {
@@ -124,11 +124,11 @@ public class Trace2DSorted
   }
 
   /**
-   * @see ATrace2D#removePointInternal(info.monitorenter.gui.chart.TracePoint2D)
+   * @see ATrace2D#removePointInternal(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  protected TracePoint2D removePointInternal(final TracePoint2D point) {
-    TracePoint2D result = null;
+  protected ITracePoint2D removePointInternal(final ITracePoint2D point) {
+    ITracePoint2D result = null;
     if (this.m_points.remove(point)) {
       result = point;
     }

@@ -1,7 +1,7 @@
 /*
  *  SerializationUtility.java of project jchart2d, helpers for missing 
  *  serialization mechanism in java. 
- *  Copyright 2008 (C) Achim Westermann, created on 01.06.2008 02:01:28.
+ *  Copyright (C) 2004 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -35,17 +35,9 @@ import java.io.ObjectOutputStream;
  * 
  * @author David Gilbert (original)
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  */
 public final class SerializationUtility {
-
-  /**
-   * Utility class constructor.
-   * <p>
-   */
-  private SerializationUtility() {
-    // nop
-  }
 
   /**
    * Reads a <code>Stroke</code> object that has been serialized by the
@@ -113,5 +105,13 @@ public final class SerializationUtility {
     } else {
       stream.writeBoolean(true);
     }
+  }
+
+  /**
+   * Utility class constructor.
+   * <p>
+   */
+  private SerializationUtility() {
+    // nop
   }
 }

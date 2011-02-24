@@ -1,6 +1,6 @@
 /*
- * ITracePainter.java,  <enter purpose here>.
- * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ * ITracePainter.java, part of a trace responsible for painting it.
+ * Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -40,15 +40,17 @@ import java.awt.Graphics;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.14 $
+ * @param <T> demonstration of unknown comparable and inheritance idiom or bad generics design for this case. 
+ * 
  */
-public interface ITracePainter extends Comparable<ITracePainter>, IPointPainter {
+public interface ITracePainter<T extends ITracePainter<T>> extends IPointPainter<T> {
 
   /**
    * Invoked to inform the painter that a discontinue in the trace to # paint has occured.
    * <p>
    * This only has to be implemented by painters that collect several points of
-   * {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)} to draw them as polygons (e.g.:
+   * {@link #paintPoint(int, int, int, int, Graphics, ITracePoint2D)} to draw them as polygons (e.g.:
    * {@link java.awt.Graphics#drawPolyline(int[], int[], int)}).
    * <p>
    * 

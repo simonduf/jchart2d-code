@@ -1,6 +1,7 @@
 /*
- * SampleChart, a test for memory leak contributed by Martin Rojo.
- * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ *  MinimalStaticChartWithNanValues.java of project jchart2d, a demonstration 
+ *  of the minimal code to set up a chart with static data with NaN values. 
+ *  Copyright (C) 2007 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -18,19 +19,16 @@
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
+ *
  */
 package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.io.ADataCollector;
-import info.monitorenter.gui.chart.io.RandomDataCollectorOffset;
-import info.monitorenter.gui.chart.traces.Trace2DLtd;
-import info.monitorenter.gui.chart.views.ChartPanel;
+import info.monitorenter.gui.chart.traces.Trace2DSimple;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -38,27 +36,19 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
+ * Title: MinimalStaticChart
  * <p>
- * Sample chart from Java 2D open source package.
- * </p>
  * 
+ * Description: A minimal example for rendering a static chart.
  * <p>
- * Copyright: sample code taken from http://jchart2d.sourceforge.net/usage.shtml
- * </p>
  * 
- * <p>
- * Company: Infotility
- * </p>
+ * @author Achim Westermann
  * 
- * @author Martin Rojo
- * 
- * @author Achim Westermann (modified)
- * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.2 $
  */
-public class SampleChart extends JPanel {
+public final class MinimalStaticChartWithNanValues extends JPanel {
   /**
-   * Generated <code>serialVersionUID</code>.
+   * Generated for <code>serialVersionUID</code>.
    */
   private static final long serialVersionUID = 3257009847668192306L;
 
@@ -72,7 +62,7 @@ public class SampleChart extends JPanel {
   public static void main(final String[] args) {
     for (int i = 0; i < 1; i++) {
       JFrame frame = new JFrame("SampleChart");
-      frame.getContentPane().add(new SampleChart());
+      frame.getContentPane().add(new MinimalStaticChartWithNanValues());
       frame.addWindowListener(new WindowAdapter() {
         /**
          * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
@@ -82,7 +72,7 @@ public class SampleChart extends JPanel {
           System.exit(0);
         }
       });
-      frame.setSize(600, 300);
+      frame.setSize(600, 600);
       frame.setLocation(i % 3 * 200, i / 3 * 100);
       frame.setVisible(true);
     }
@@ -90,36 +80,36 @@ public class SampleChart extends JPanel {
 
   /**
    * Defcon.
-   * <p>
    */
-  public SampleChart() {
+  private MinimalStaticChartWithNanValues() {
     this.setLayout(new BorderLayout());
-    this.setMaximumSize(new Dimension(600, 600));
-    this.setPreferredSize(new Dimension(500, 600));
     Chart2D chart = new Chart2D();
+
     // Create an ITrace:
     // Note that dynamic charts need limited amount of values!!!
     // ITrace2D trace = new Trace2DLtd(200);
-    // 3/11/-5 , let's try something else too:
-    // ITrace2D trace = new Trace2DLtdReplacing(100);
-    ITrace2D trace = new Trace2DLtd(8000);
+    ITrace2D trace = new Trace2DSimple();
     trace.setColor(Color.RED);
 
     // Add the trace to the chart:
     chart.addTrace(trace);
 
+    // Add all points, as it is static:
+    trace.addPoint(0, 0);
+    trace.addPoint(1, 10);
+    trace.addPoint(2, Double.NaN);
+    trace.addPoint(3, 10);
+    trace.addPoint(4, 15);
+    trace.addPoint(5, Double.NaN);
+    trace.addPoint(6, 16);
+    trace.addPoint(7, 14);
+    trace.addPoint(8, 13);
+   
+    chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
+
     // Make it visible:
-    this.add(new ChartPanel(chart), BorderLayout.CENTER);
+    this.add(chart, BorderLayout.CENTER);
 
-    /**
-     * ** removing this for now, potential memory leak ? 3/11/05
-     */
-
-    // Enable the termination button [cross on the upper right edge]:
-    // Every 50 milliseconds a new value is collected.
-    ADataCollector collector = new RandomDataCollectorOffset(trace, 100);
-    // Start a Thread that adds the values:
-    collector.start();
-    /** ********** potential memory leak ? 3/1//05 */
   }
+
 }

@@ -1,6 +1,6 @@
 /*
  *  AbstractDataCollector.java  a configurable threaded collector for tracepoints in jchart2d.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 14:48:09
+ *  Copyright (C) 2004 - 2010 Achim Westermann, created on 10.12.2004, 14:48:09
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -37,7 +37,7 @@ import java.io.IOException;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public abstract class AStaticDataCollector {
 

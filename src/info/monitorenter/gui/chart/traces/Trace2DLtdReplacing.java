@@ -1,7 +1,7 @@
 /*
  * Trace2DLtdReplcacing, an array- based fast implementation of an ITrace2D
  * that only allows a single tracepoint with a certain x- value.
- * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
  */
 package info.monitorenter.gui.chart.traces;
 
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.util.Iterator;
 
@@ -37,7 +37,7 @@ import java.util.Iterator;
  * structure. <br>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westerman </a>
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.15 $
  */
 public class Trace2DLtdReplacing
     extends Trace2DLtd {
@@ -64,16 +64,16 @@ public class Trace2DLtdReplacing
   }
 
   /**
-   * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.TracePoint2D)
+   * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  protected boolean addPointInternal(final TracePoint2D p) {
+  protected boolean addPointInternal(final ITracePoint2D p) {
     boolean result = false;
     boolean located = false;
-    TracePoint2D tmp;
+    ITracePoint2D tmp;
     double tmpx;
     double tmpy;
-    Iterator<TracePoint2D> it = this.m_buffer.iteratorF2L();
+    Iterator<ITracePoint2D> it = this.m_buffer.iteratorF2L();
     while (it.hasNext()) {
       
       tmp = it.next();

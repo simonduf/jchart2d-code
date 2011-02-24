@@ -52,6 +52,24 @@ public class TestChart2D
     extends ATestJChart2D {
 
   /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
+
+    TestSuite suite = new TestSuite();
+    suite.setName(TestChart2D.class.getName());
+
+    suite.addTest(new TestChart2D("testAddInvisibleTrace"));
+    suite.addTest(new TestChart2D("testSetTraceName"));
+    suite.addTest(new TestChart2D("testSerializeChart"));
+
+    return suite;
+  }
+
+  /**
    * Constructor with the test name.
    * <p>
    * 
@@ -63,21 +81,11 @@ public class TestChart2D
   }
 
   /**
-   * Test suite for this test class.
-   * <p>
-   * 
-   * @return the test suite
+   * @see info.monitorenter.gui.chart.test.ATestJChart2D#createAxisX()
    */
-  public static Test suite() {
-
-    TestSuite suite = new TestSuite();
-    suite.setName(TestChart2D.class.getName());
-
-    // suite.addTest(new TestChart2D("testAddInvisibleTrace"));
-    // suite.addTest(new TestChart2D("testSetTraceName"));
-    suite.addTest(new TestChart2D("testSerializeChart"));
-
-    return suite;
+  @Override
+  protected AAxis createAxisX() {
+    return new AxisLinear();
   }
 
   /**
@@ -89,19 +97,11 @@ public class TestChart2D
   }
 
   /**
-   * @see info.monitorenter.gui.chart.test.ATestJChart2D#createAxisX()
+   * @see info.monitorenter.gui.chart.test.ATestJChart2D#createTraces()
    */
   @Override
-  protected AAxis createAxisX() {
-    return new AxisLinear();
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.test.ATestJChart2D#createTrace()
-   */
-  @Override
-  protected ITrace2D createTrace() {
-    return new Trace2DSimple();
+  protected ITrace2D[] createTraces() {
+    return new ITrace2D[]{ new Trace2DSimple()};
   }
 
   /**
@@ -110,7 +110,7 @@ public class TestChart2D
   @Override
   protected void fillTrace(final ITrace2D trace2D) {
     for (int i = 0; i < 101; i++) {
-      this.m_trace.addPoint(i, i);
+      trace2D.addPoint(i, i);
     }
   }
 
@@ -125,7 +125,7 @@ public class TestChart2D
    *             if something threads wrong.
    */
   public void testAddInvisibleTrace() throws InterruptedException {
-    ITrace2D trace = this.m_trace;
+    ITrace2D trace = this.m_traces[0];
     for (int i = 20; i < 40; i++) {
       trace.addPoint(i, 70 - i);
     }
@@ -136,8 +136,8 @@ public class TestChart2D
     this.m_chart.addTrace(trace);
     Thread.sleep(1000);
     // test all points:
-    Iterator<TracePoint2D> itpoints = trace.iterator();
-    TracePoint2D point;
+    Iterator<ITracePoint2D> itpoints = trace.iterator();
+    ITracePoint2D point;
     double forbidden = 0.0;
     boolean scaleXDetected = false;
     boolean scaleYDetected = false;
@@ -194,7 +194,7 @@ public class TestChart2D
    */
   public void testSerializeChart() throws IOException, ClassNotFoundException, InterruptedException {
     for (int i = 0; i < 100; i++) {
-      this.m_trace.addPoint(i, (Math.random() + 1.0) * i);
+      this.m_traces[0].addPoint(i, (Math.random() + 1.0) * i);
     }
 
      java.io.File tmpOut = File.createTempFile("chart", ".ser", null);
@@ -222,7 +222,7 @@ public class TestChart2D
    * <p>
    */
   public void testSetTraceName() {
-    this.m_trace.setName("Iphigenie");
+    this.m_traces[0].setName("Iphigenie");
     try {
       Thread.sleep(2000);
     } catch (InterruptedException e) {

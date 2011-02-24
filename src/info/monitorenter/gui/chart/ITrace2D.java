@@ -1,6 +1,6 @@
 /*
  * ITrace2D, the interface for all traces used by the Chart2D.
- * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -21,11 +21,10 @@
  */
 package info.monitorenter.gui.chart;
 
-import info.monitorenter.util.collections.IComparableProperty;
-
 import java.awt.Color;
 import java.awt.Stroke;
 import java.beans.PropertyChangeListener;
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -140,6 +139,23 @@ import java.util.Set;
  * <td><code>null</code>, indicating that a painter was removed.</td>
  * </tr>
  * <tr>
+ * <td>
+ * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_POINT_HIGHLIGHTERS}</code>
+ * </td>
+ * <td><code>{@link ITrace2D}</code> that changed</td>
+ * <td><code>null</code>, indicating that a point highlighter was added.</td>
+ * <td><code>{@link info.monitorenter.gui.chart.IPointHighlighter}</code>, the
+ * new highlighter.</td>
+ * </tr>
+ * <tr>
+ * <td>
+ * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_PAINTERS}</code></td>
+ * <td><code>{@link ITrace2D}</code> that changed</td>
+ * <td><code>{@link info.monitorenter.gui.chart.IPointHighlighter}</code>, the
+ * old highlighter.</td>
+ * <td><code>null</code>, indicating that a highlighter was removed.</td>
+ * </tr>
+ * <tr>
  * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_STROKE}</code>
  * </td>
  * <td><code>{@link ITrace2D}</code> that changed</td>
@@ -224,9 +240,69 @@ import java.util.Set;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.28 $
+ * @version $Revision: 1.36 $
  */
-public interface ITrace2D extends IComparableProperty, PropertyChangeListener, Comparable<ITrace2D> {
+public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, Serializable {
+
+  /**
+   * Simple struct just for allowing to return a trace point along with a
+   * weighted distance.
+   * <p>
+   * TODO: change this to an interface and implement in abstract base class to
+   * hide constructor.
+   * <p>
+   * 
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
+   * @version $Revision: 1.36 $
+   */
+  public final class ManhattanDistancePoint {
+    /** The point with the distance. */
+    private ITracePoint2D m_point;
+
+    /** Constant for unfound manhattan distance. */
+    public static final ManhattanDistancePoint EMPTY = new ManhattanDistancePoint();
+
+    /** The measured Manhattan distance. */
+    private double m_manhattanDistance;
+
+    /**
+     * Defcon.
+     */
+    public ManhattanDistancePoint() {
+      // nop.
+    }
+
+    /**
+     * @return the manhattandistance.
+     */
+    public final double getManhattanDistance() {
+      return this.m_manhattanDistance;
+    }
+
+    /**
+     * @return the point.
+     */
+    public final ITracePoint2D getPoint() {
+      return this.m_point;
+    }
+
+    /**
+     * @param manhattandistance
+     *          the manhattandistance to set
+     */
+    public final void setManhattanDistance(final double manhattandistance) {
+      this.m_manhattanDistance = manhattandistance;
+    }
+
+    /**
+     * @param point
+     *          the point to set
+     */
+    public final void setPoint(final ITracePoint2D point) {
+      this.m_point = point;
+    }
+
+  }
 
   /**
    * The property key defining the <code>color</code> property. Use in
@@ -299,10 +375,19 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
 
   /**
    * The property key defining a change in the set of <code>
-   * {@link ITracePainter}</code> instances. Use in combination with
+   * {@link ITracePainter}</code>
+   * instances. Use in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
   public static final String PROPERTY_PAINTERS = "ITrace2D.PROPERTY_PAINTERS";
+
+  /**
+   * The property key defining a change in the set of <code>
+   * {@link IPointHighlighter}</code>
+   * instances. Use in combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   */
+  public static final String PROPERTY_POINT_HIGHLIGHTERS = "ITrace2D.PROPERTY_POINT_HIGHLIGHTERS";
 
   /**
    * The property key defining the <code>physicalUnits</code> property. Use in
@@ -313,7 +398,8 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
 
   /**
    * The property key defining any change of a location of a contained <code>
-   * {@link TracePoint2D} </code>.
+   * {@link TracePoint2D} </code>
+   * .
    * <p>
    * Use in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
@@ -334,8 +420,9 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
 
   /**
    * The property key defining a change in the collection of <code>
-   * {@link TracePoint2D}</code> instances within this trace. Use in combination
-   * with {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   * {@link TracePoint2D}</code>
+   * instances within this trace. Use in combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
   public static final String PROPERTY_TRACEPOINT = "ITrace2D.PROPERTY_TRACEPOINT";
 
@@ -388,10 +475,11 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
 
   /**
    * Adds a trace that "should" compute values from the points added via <code>
-   * {@link #addPoint(TracePoint2D)}</code>.
+   * {@link #addPoint(ITracePoint2D)}</code>
+   * .
    * <p>
    * The given trace will be informed in case an add operation on this trace
-   * succeeds via <code>{@link #addPoint(TracePoint2D)}</code>.
+   * succeeds via <code>{@link #addPoint(ITracePoint2D)}</code>.
    * 
    * @param trace
    *          the trace that will calculate it's points from the added points of
@@ -410,19 +498,27 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
    * @return true if the painter was added (same instance was not contained
    *         before).
    */
-  public boolean addErrorBarPolicy(IErrorBarPolicy errorBarPolicy);
+  public boolean addErrorBarPolicy(IErrorBarPolicy<?> errorBarPolicy);
 
   /**
-   * Adds a tracepoint to the internal data.
+   * Adds a trace point to the internal data.
+   * <p>
+   * <b>Warning</b>:<br/>
+   * Do not call this method before this trace has been added to a chart or you
+   * will not succeed as the chart is needed to get the proper <code>
+   *             {@link Chart2D#getTracePointProvider()}</code>.
    * <p>
    * 
-   * @see #addPoint(TracePoint2D p)
+   * 
+   * @see #addPoint(ITracePoint2D p)
    * @param x
    *          the x-value of the point to add.
    * @param y
    *          the y-value of the point to add.
+   * 
    * @return true if the operation was successful, false else.
-   */
+   * 
+   **/
   public boolean addPoint(double x, double y);
 
   /**
@@ -444,7 +540,21 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
    *          the point to add.
    * @return true if the operation was successful, false else.
    */
-  public boolean addPoint(TracePoint2D p);
+  public boolean addPoint(ITracePoint2D p);
+
+  /**
+   * Adds the given point highlighter to the internal set of point highlighters.
+   * <p>
+   * It will be the last point highlighter to paint if highlighting is done.
+   * <p>
+   * 
+   * @param highlighter
+   *          the highlighter to add for highlighting this trace.
+   * 
+   * @return true if the highlighter was added (class of instance not contained
+   *         before).
+   */
+  public boolean addPointHighlighter(IPointHighlighter<?> highlighter);
 
   /**
    * Registers a property change listener that will be informed about changes of
@@ -470,22 +580,23 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
    * @return true if the painter was added (class of instance not contained
    *         before).
    */
-  public boolean addTracePainter(ITracePainter painter);
+  public boolean addTracePainter(ITracePainter<?> painter);
 
   /**
    * Returns true if the given painter is contained in this compound painter.
    * <p>
    * 
    * @param painter
-   *          the painter to check wether it is contained.
+   *          the painter to check whether it is contained.
    * @return true if the given painter is contained in this compound painter.
    */
-  public boolean containsTracePainter(final ITracePainter painter);
+  public boolean containsTracePainter(final ITracePainter<?> painter);
 
   /**
    * Method to trigger by <code>{@link TracePoint2D#setLocation(double, double)}
-   * </code>, <code>{@link #addPoint(TracePoint2D)}</code> or <code>
-   * {@link #removePoint(TracePoint2D)}</code>.
+   * </code>, <code>{@link #addPoint(ITracePoint2D)}</code>
+   * or <code>
+   * {@link #removePoint(ITracePoint2D)}</code>.
    * <p>
    * Bound checks are performed and property change events for the properties
    * <code>{@link ITrace2D#PROPERTY_MAX_X}</code>,
@@ -497,15 +608,15 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
    * 
    * @param changed
    *          the point that has been changed which may be a newly added point
-   *          (from <code>{@link #addPoint(TracePoint2D)}</code>, a removed one
+   *          (from <code>{@link #addPoint(ITracePoint2D)}</code>, a removed one
    *          or a modified one.
    * @param state
-   *          one of {<code>{@link TracePoint2D#STATE_ADDED},
-   *          {@link TracePoint2D#STATE_CHANGED},
-   *          {@link TracePoint2D#STATE_REMOVED}</code> to inform about the type
-   *          of change.
+   *          one of {<code>{@link ITracePoint2D#STATE_ADDED},
+   *          {@link ITracePoint2D#STATE_CHANGED},
+   *          {@link ITracePoint2D#STATE_REMOVED}</code> to inform about the
+   *          type of change.
    */
-  public void firePointChanged(final TracePoint2D changed, final int state);
+  public void firePointChanged(final ITracePoint2D changed, final int state);
 
   /**
    * Because the color is data common to a trace of a <code>Chart2D</code> it is
@@ -531,14 +642,14 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
   public Color getColor();
 
   /**
-   * Returns the <code>Set&lt;{@link IErrorBarPolicy}&gt;</code> that will be
-   * used to render error bars for this trace.
+   * Returns the <code>Set&lt;{@link IErrorBarPolicy}&gt;</code> that will be used to render
+   * error bars for this trace.
    * <p>
    * 
    * @return the <code>Set&lt;{@link IErrorBarPolicy}&gt;</code> that will be
    *         used to render error bars for this trace.
    */
-  public Set<IErrorBarPolicy> getErrorBarPolicies();
+  public Set<IErrorBarPolicy<?>> getErrorBarPolicies();
 
   /**
    * Returns true if this trace has error bars configured.
@@ -651,66 +762,6 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
   public String getName();
 
   /**
-   * Simple struct just for allowing to return a trace point along with a
-   * weighted distance.
-   * <p>
-   * TODO: change this to an interface and implement in abstract base class to
-   * hide constructor.
-   * <p>
-   * 
-   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
-   * @version $Revision: 1.28 $
-   */
-  public final class ManhattanDistancePoint {
-    /** The point with the distance. */
-    private TracePoint2D m_point;
-
-    /** Constant for unfound manhattan distance. */
-    public static final ManhattanDistancePoint EMPTY = new ManhattanDistancePoint();
-
-    /**
-     * Defcon.
-     */
-    public ManhattanDistancePoint() {
-      // nop.
-    }
-
-    /** The measured Manhattan distance. */
-    private double m_manhattanDistance;
-
-    /**
-     * @return the point.
-     */
-    public final TracePoint2D getPoint() {
-      return this.m_point;
-    }
-
-    /**
-     * @return the manhattandistance.
-     */
-    public final double getManhattanDistance() {
-      return this.m_manhattanDistance;
-    }
-
-    /**
-     * @param point
-     *          the point to set
-     */
-    public final void setPoint(final TracePoint2D point) {
-      this.m_point = point;
-    }
-
-    /**
-     * @param manhattandistance
-     *          the manhattandistance to set
-     */
-    public final void setManhattanDistance(final double manhattandistance) {
-      this.m_manhattanDistance = manhattandistance;
-    }
-
-  }
-
-  /**
    * Returns the nearest point to the given normalized value coordinates of this
    * trace in Manhattan distance.
    * <p>
@@ -763,6 +814,18 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
   public String getPhysicalUnitsY();
 
   /**
+   * Returns the <code>Set&lt;{@link IPointHighlighter}&gt;</code> that may be used to
+   * highlight points.
+   * <p>
+   * This is used by the point highlighting feature for tool tips :
+   * <code>{@link Chart2D.ToolTipType#VALUE_SNAP_TO_TRACEPOINTS}</code>
+   * 
+   * @return the <code>Set&lt;{@link IPointHighlighter}&gt;</code> that may be
+   *         used to highlight points.
+   */
+  public Set<IPointHighlighter<?>> getPointHighlighters();
+
+  /**
    * Returns all property change listeners for the given property.
    * <p>
    * 
@@ -797,26 +860,30 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
   public Stroke getStroke();
 
   /**
-   * Returns the <code>Set&lt;{@link ITracePainter}&gt;</code> that will be used
-   * to paint this trace.
+   * Returns the <code>Set&lt;{@link ITracePainter}&gt;</code> that will be used to paint
+   * this trace.
+   * <p>
+   * 
+   * The original set should be returned by contract to allow adding painters
+   * "silently" (vs. using
+   * <code>{@link ITrace2D#addTracePainter(ITracePainter)}</code>).
    * <p>
    * 
    * @return the <code>Set&lt;{@link ITracePainter}&gt;</code> that will be used
    *         to paint this trace.
    */
-  public Set<ITracePainter> getTracePainters();
+  public Set<ITracePainter<?>> getTracePainters();
 
   /**
    * The z-index defines the order in which this instance will be painted.
    * <p>
-   * A lower value will bring it more "to the front".
+   * A higher value will bring it more "to the front".
    * <p>
    * 
    * @return the z-index that will define the order in which this instance will
    *         be painted.
    */
   public Integer getZIndex();
-
   /**
    * Returns false if internal <code>{@link TracePoint2D}</code> instances are
    * contained or true if not.
@@ -837,7 +904,8 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
 
   /**
    * Returns an <code>Iterator</code> over the internal <code>
-   * {@link TracePoint2D}</code> instances.
+   * {@link TracePoint2D}</code>
+   * instances.
    * <p>
    * Implementations should be synchronized. This method is meant to allow
    * modifications of the intenal <code>TracePoint2D</code> instances, so the
@@ -852,7 +920,21 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
    * @return an <code>Iterator</code> over the internal <code>
    *         {@link TracePoint2D}</code> instances.
    */
-  public Iterator<TracePoint2D> iterator();
+  public Iterator<ITracePoint2D> iterator();
+
+  /**
+   * Clears all internal point highlighters used.<p>
+   * 
+   * Returns the <code>Set&lt;{@link IPointHighlighter}&gt;</code> that was used to
+   * highlight points.
+   * <p>
+   * This is used by the point highlighting feature for tool tips :
+   * <code>{@link Chart2D.ToolTipType#VALUE_SNAP_TO_TRACEPOINTS}</code>
+   * 
+   * @return the <code>Set&lt;{@link IPointHighlighter}&gt;</code> that was be
+   *         used to highlight points.
+   */
+  public Set<IPointHighlighter<?>> removeAllPointHighlighters();
 
   /**
    * Removes all internal <code>TracePoint2D</code>.{@link #isEmpty()} will
@@ -863,7 +945,7 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
 
   /**
    * Remove a trace that "should" compute values from the points added via
-   * <code>{@link #addPoint(TracePoint2D)}</code>.
+   * <code>{@link #addPoint(ITracePoint2D)}</code>.
    * <p>
    * 
    * @param trace
@@ -883,7 +965,7 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
    *          the error bar policy to remove.
    * @return true if the painter was removed (same instance contained before).
    */
-  public boolean removeErrorBarPolicy(IErrorBarPolicy errorBarPolicy);
+  public boolean removeErrorBarPolicy(IErrorBarPolicy<?> errorBarPolicy);
 
   /**
    * Removes the given point from this trace.
@@ -893,7 +975,19 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
    *          the point to remove.
    * @return true if the remove opertation was successful, false else.
    */
-  public boolean removePoint(TracePoint2D point);
+  public boolean removePoint(ITracePoint2D point);
+
+  /**
+   * Removes the given point highlighter, if it's class is contained.
+   * <p>
+   * 
+   * @param highlighter
+   *          the highlighter to remove.
+   * 
+   * @return true if a point highlighter of the class of the given argument was
+   *         removed.
+   */
+  public boolean removePointHighlighter(final IPointHighlighter<?> highlighter);
 
   /**
    * Deregisters a property change listener that has been registerd for
@@ -928,7 +1022,7 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
    * @return true if a trace painter of the class of the given argument was
    *         removed.
    */
-  public boolean removeTracePainter(final ITracePainter painter);
+  public boolean removeTracePainter(final ITracePainter<?> painter);
 
   /**
    * Set a <code>java.awt.Color</code> for this trace.
@@ -948,7 +1042,7 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
    * @return the <code>Set&lt;{@link IErrorBarPolicy}&gt;</code> that was used
    *         before.
    */
-  public Set<IErrorBarPolicy> setErrorBarPolicy(IErrorBarPolicy errorBarPolicy);
+  public Set<IErrorBarPolicy<?>> setErrorBarPolicy(IErrorBarPolicy<?> errorBarPolicy);
 
   /**
    * Assingns a specific name to the <code>ITrace2D</code> which will be
@@ -973,6 +1067,18 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
    *          the physical unit for the y axis.
    */
   public void setPhysicalUnits(final String xunit, final String yunit);
+
+  /**
+   * Replaces all internal point highlighters by the new one.
+   * <p>
+   * 
+   * @param highlighter
+   *          the new sole highlighter to use.
+   * 
+   * @return the <code>Set&lt;{@link IPointHighlighter}&gt;</code> that was used
+   *         before or null if nothing changed.
+   */
+  public Set<IPointHighlighter<?>> setPointHighlighter(IPointHighlighter<?> highlighter);
 
   /**
    * This is a callback from {@link Chart2D#addTrace(ITrace2D)} and must not be
@@ -1007,7 +1113,7 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
    * @return the <code>Set&lt;{@link ITracePainter}&gt;</code> that was used
    *         before.
    */
-  public Set<ITracePainter> setTracePainter(ITracePainter painter);
+  public Set<ITracePainter<?>> setTracePainter(ITracePainter<?> painter);
 
   /**
    * Set the visibility. If argument is false, this instance will not be
@@ -1023,7 +1129,7 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener, C
    * Sets the internal z-index property. This decides the order in which
    * different traces within the same <code>{@link Chart2D}</code> are painted.
    * <p>
-   * The lower the given value is the more this trace will be brought to front.
+   * The higher the given value is the more this trace will be brought to front.
    * <p>
    * The value must not be lower than {@link #Z_INDEX_MIN}(0) and higher than
    * {@link #ZINDEX_MAX}(100).

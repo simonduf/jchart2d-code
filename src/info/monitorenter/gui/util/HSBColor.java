@@ -1,7 +1,7 @@
 /*
  *  HSBColor.java, translates RGB colors into Hue-Saturation-Brightness 
  *  colors.
- *  Copyright (C) 2008 Achim Westermann
+ *  Copyright (C) 2004 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -30,7 +30,7 @@ package info.monitorenter.gui.util;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class HSBColor implements java.io.Serializable, Cloneable {
 

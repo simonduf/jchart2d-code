@@ -1,6 +1,6 @@
 /*
  *  MathUtil, utility class for math operations.
- *  Copyright (C) Achim Westermann, created on 09.09.2004, 12:38:21
+ *  Copyright (C) 2004 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -31,20 +31,11 @@ package info.monitorenter.util;
  * 
  * @author Achim.Westermann@gmx.de
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  */
 public final class MathUtil {
   /** Singleton instance. */
   private static MathUtil instance = null;
-
-  /**
-   * Avoids creation from outside for singleton support.
-   * <p>
-   * 
-   */
-  private MathUtil() {
-    // nop
-  }
 
   /**
    * Asserts that the given double is not invalid for calculation.
@@ -139,5 +130,14 @@ public final class MathUtil {
    */
   public static boolean isDouble(final double d) {
     return !(Double.isInfinite(d) || Double.isNaN(d));
+  }
+
+  /**
+   * Avoids creation from outside for singleton support.
+   * <p>
+   * 
+   */
+  private MathUtil() {
+    // nop
   }
 }

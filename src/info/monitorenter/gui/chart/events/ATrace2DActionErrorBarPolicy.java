@@ -1,7 +1,7 @@
 /*
  *  Trace2DActionAErrorBarPolicy, abstract action to act 
  *  with an IErrorBarPolicy on an ITrace2D.
- *  Copyright (C) 2007 Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2004 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -33,10 +33,9 @@ import info.monitorenter.gui.chart.ITrace2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.3 $
  */
-public abstract class ATrace2DActionErrorBarPolicy
-    extends ATrace2DAction {
+public abstract class ATrace2DActionErrorBarPolicy extends ATrace2DAction {
 
   /**
    * Generated <code>serialVersionUID</code>.
@@ -44,11 +43,11 @@ public abstract class ATrace2DActionErrorBarPolicy
   private static final long serialVersionUID = -6043978306287017533L;
 
   /** The error bar policy to use. */
-  private IErrorBarPolicy m_errorBarPolicy;
+  private IErrorBarPolicy< ? > m_errorBarPolicy;
 
   /**
-   * Create an <code>Action</code> that accesses the trace and identifies
-   * itself with the given action String.
+   * Create an <code>Action</code> that accesses the trace and identifies itself
+   * with the given action String.
    * <p>
    * 
    * @param trace
@@ -56,16 +55,16 @@ public abstract class ATrace2DActionErrorBarPolicy
    * 
    * @param description
    *          the descriptive <code>String</code> that will be displayed by
-   *          {@link  javax.swing.AbstractButton} subclasses that get this
+   *          {@link javax.swing.AbstractButton} subclasses that get this
    *          <code>Action</code> assigned (
-   *          {@link  javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    * 
    * @param errorBarPolicy
    *          the error bar policy to use by this action.
    * 
    */
   public ATrace2DActionErrorBarPolicy(final ITrace2D trace, final String description,
-      final IErrorBarPolicy errorBarPolicy) {
+      final IErrorBarPolicy< ? > errorBarPolicy) {
     super(trace, description);
     this.m_errorBarPolicy = errorBarPolicy;
   }
@@ -76,7 +75,7 @@ public abstract class ATrace2DActionErrorBarPolicy
    * 
    * @return the error bar policy that is used by this action.
    */
-  final IErrorBarPolicy getErrorBarPolicy() {
+  final IErrorBarPolicy< ? > getErrorBarPolicy() {
     return this.m_errorBarPolicy;
   }
 

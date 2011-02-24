@@ -1,7 +1,7 @@
 /*
- *  LabelFormatterDate.java a label formatter that uses formatted 
+ *  LabelFormatterDate.java of project jchart2d. A label formatter that uses formatted 
  *  dates. 
- *  Copyright (C) Achim Westermann, created on 20.04.2005, 11:56:36
+ *  Copyright (C) 2005 - 2010 Achim Westermann, created on 20.04.2005, 11:56:36
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -65,7 +65,7 @@ import java.util.Date;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  * 
  * @see java.util.Date
  */

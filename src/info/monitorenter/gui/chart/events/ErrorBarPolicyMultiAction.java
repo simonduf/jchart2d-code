@@ -2,7 +2,7 @@
  * ErrorBarPolicyMultiAction.java of project jchart2d, 
  * highly proprietary error bar action that changes the behaviour 
  * depending on the <code>{@link JMenu}</code> from which it is triggered.
- * Copyright 2007 (C) Achim Westermann, created on 17.08.2007 21:02:52.
+ * Copyright (C) 2007 - 2010 Achim Westermann, created on 17.08.2007 21:02:52.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,17 +36,16 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 /**
- * Highly proprietary error bar action that changes the behaviour depending on
+ * Highly proprietary error bar action that changes the behavior depending on
  * the <code>{@link JMenu}</code> from which it is triggered.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.7 $
  */
-public final class ErrorBarPolicyMultiAction
-    extends ATrace2DActionErrorBarPolicy {
+public final class ErrorBarPolicyMultiAction extends ATrace2DActionErrorBarPolicy {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -4976003066220869828L;
@@ -82,8 +81,8 @@ public final class ErrorBarPolicyMultiAction
   private JMenu m_removeMenu;
 
   /**
-   * Create an <code>Action</code> that accesses the trace and identifies
-   * itself with the given action String.
+   * Create an <code>Action</code> that accesses the trace and identifies itself
+   * with the given action String.
    * <p>
    * 
    * @param trace
@@ -91,9 +90,9 @@ public final class ErrorBarPolicyMultiAction
    * 
    * @param description
    *          the descriptive <code>String</code> that will be displayed by
-   *          {@link  javax.swing.AbstractButton} subclasses that get this
+   *          {@link javax.swing.AbstractButton} subclasses that get this
    *          <code>Action</code> assigned (
-   *          {@link  javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    * 
    * @param errorBarPolicy
    *          the error bar policy to use by this action.
@@ -115,7 +114,7 @@ public final class ErrorBarPolicyMultiAction
    * 
    */
   public ErrorBarPolicyMultiAction(final ITrace2D trace, final String description,
-      final IErrorBarPolicy errorBarPolicy, final JMenu addMenu, final JMenu removeMenu,
+      final IErrorBarPolicy< ? > errorBarPolicy, final JMenu addMenu, final JMenu removeMenu,
       final JMenu editMenu) {
     super(trace, description, errorBarPolicy);
     this.m_addAction = new Trace2DActionAddErrorBarPolicy(trace, description, errorBarPolicy);
@@ -132,16 +131,16 @@ public final class ErrorBarPolicyMultiAction
   public void actionPerformed(final ActionEvent e) {
     JMenuItem item = (JMenuItem) e.getSource();
     /*
-     * This is horrible since early java versions! item.getParent() returns the "magic" PopupMenu
-     * item.getAccessibleContext().getAccessibleParent() returns the parent JMenu but not any more
-     * in java 1.6.
+     * This is horrible since early java versions! item.getParent() returns the
+     * "magic" PopupMenu item.getAccessibleContext().getAccessibleParent()
+     * returns the parent JMenu but not any more in java 1.6.
      */
     JPopupMenu popup = (JPopupMenu) item.getParent();
     JMenu menu = (JMenu) popup.getInvoker();
     String text = menu.getText();
     if (text.equals("+")) {
       // add action:
-   
+
       JMenuItem removeItem;
       JMenuItem editItem;
       // add a new JMenuItem to the remove menu and to the edit menu:
@@ -154,13 +153,13 @@ public final class ErrorBarPolicyMultiAction
         removeItem = new JMenuItem(this);
         editItem = new JMenuItem(this);
       }
-     
 
       // do the adding to the model:
       this.m_addAction.actionPerformed(e);
       // also open the edit screen for the new error bar policy:
       this.m_editAction.actionPerformed(e);
-      // this has to be done after actionPerformed because parent frame search will hit 
+      // this has to be done after actionPerformed because parent frame search
+      // will hit
       // null else as action is triggered by add menu:
       menu.remove(item);
       this.m_removeMenu.add(removeItem);
@@ -179,7 +178,8 @@ public final class ErrorBarPolicyMultiAction
       this.m_addMenu.add(addItem);
 
       this.m_removeAction.actionPerformed(e);
-      // this has to be done after actionPerformed because parent frame search will hit 
+      // this has to be done after actionPerformed because parent frame search
+      // will hit
       // null else as action is triggered by add menu:
       menu.remove(item);
       // remove also the edit menu, this is a bit trickier:

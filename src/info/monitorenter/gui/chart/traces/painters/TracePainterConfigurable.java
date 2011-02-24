@@ -1,7 +1,7 @@
 /*
  *  TracePainterConfigurable.java, an ITracePainter implementation 
  *  that works on a given IPointPainter.
- *  Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2010 Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@
 package info.monitorenter.gui.chart.traces.painters;
 
 import info.monitorenter.gui.chart.IPointPainter;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.awt.Graphics;
 
@@ -34,25 +34,28 @@ import java.awt.Graphics;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.12 $
+ * 
+ * @param <T>
+ *          needed for comparable<T>.
  * 
  */
-public class TracePainterConfigurable extends ATracePainter {
+public class TracePainterConfigurable<T extends IPointPainter<T>> extends ATracePainter {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 548540923475344855L;
 
   /** The implementation for rendering the point as a disc. */
-  private IPointPainter m_pointPainter;
+  private IPointPainter<T> m_pointPainter;
 
   /**
    * Creates an instance that works with the given point painter.
    * <p>
    * 
    * @param pointPainter
-   *            the point painter to use.
+   *          the point painter to use.
    */
-  public TracePainterConfigurable(final IPointPainter pointPainter) {
+  public TracePainterConfigurable(final IPointPainter<T> pointPainter) {
     this.m_pointPainter = pointPainter;
   }
 
@@ -69,6 +72,18 @@ public class TracePainterConfigurable extends ATracePainter {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int,
+   *      int, int, int, java.awt.Graphics,
+   *      info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
+      final int nextY, final Graphics g, final ITracePoint2D original) {
+    super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
+    this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#startPaintIteration(java.awt.Graphics)
    */
   @Override
@@ -76,15 +91,4 @@ public class TracePainterConfigurable extends ATracePainter {
     this.m_pointPainter.startPaintIteration(g2d);
   }
 
-  /**
-   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int,
-   *      int, int, int, java.awt.Graphics,
-   *      info.monitorenter.gui.chart.TracePoint2D)
-   */
-  @Override
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final TracePoint2D original) {
-    super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
-    this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
-  }
 }

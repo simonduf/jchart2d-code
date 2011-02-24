@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-  var update="12/16/2007";
+  var update="05/30/2010";
  </script>
  <body id="usage">
   <div id="wrapper">
@@ -24,7 +24,7 @@
      <p>
       Before you start you might want to take a look at JChart2D's realtime performance. 
       This may be done on the <a href="./applet.shtml">applet</a> page or by downloading the 
-      binary jar file, let's say <em>jchart2d-3.1.0.jar</em>
+      binary jar file, let's say <em>jchart2d-3.2.0.jar</em>
       <ol>
        <li>
        Download the file to a directory &lt;dir&gt;. 
@@ -47,7 +47,7 @@
      <p>
       Now go to &lt;dir&gt; via the "cd" command and type. 
       <blockquote>
-       java -jar jchart2d-3.1.0.jar 
+       java -jar jchart2d-3.2.0.jar 
       </blockquote>
       The showcase example chart starts. 
      </p>
@@ -61,7 +61,7 @@
      <p>
       Another example with multithreaded traces may be viewed by typing: 
       <blockquote>
-       java -cp jchart2d-3.1.0.jar info.monitorenter.gui.chart.demos.MultiTracing
+       java -cp jchart2d-3.2.0.jar info.monitorenter.gui.chart.demos.MultiTracing
       </blockquote>
       You may resize the window and see how the scaling takes advantage of more space. 
       The command looks different to the first. This is because the first command tells 
@@ -74,11 +74,11 @@
      binary distribution zip file in the class path of the java process. <br/>
      For Windows type:  
      <blockquote>
-       java -cp jchart2d-3.1.0.jar;jlibeps-0.1.jar info.monitorenter.gui.chart.demos.MultiTracing
+       java -cp jchart2d-3.2.0.jar;xmlgraphics-commons-1.3.1.jar;bslider.jar info.monitorenter.gui.chart.demos.MultiTracing
      </blockquote> 
      For Linux type: 
      <blockquote>
-       java -cp jchart2d-3.1.0.jar:jlibeps-0.1.jar info.monitorenter.gui.chart.demos.MultiTracing
+       java -cp jchart2d-3.2.0.jar:jxmlgraphics-commons-1.3.1.jar:bslider.jar info.monitorenter.gui.chart.demos.MultiTracing
      </blockquote> 
      </p>
      
@@ -170,7 +170,7 @@
       For playing around with the demo code provided I recommend to use an IDE like 
       <a href="http://eclipse.org" target="_blank">eclipse</a>. Download the binary distribution 
       in form of a jar file here: 
-      <a href="http://prdownloads.sourceforge.net/jchart2d/jchart2d-2.2.2.jar?download" target="_blank">jchart2d-2.2.2.jar</a>. 
+      <a href="http://prdownloads.sourceforge.net/jchart2d/jchart2d-3.2.0.jar?download" target="_blank">jchart2d-3.2.0.jar</a>. 
       Put this jar file into the classpath of your IDE. Under eclipse this is done by copying 
       the file in your eclipse workspace/&lt;projectname&gt; directory and then choosing: 
       <PRE>
@@ -186,7 +186,7 @@
      
      <p>
       <pre class="code">
-package info.monitorenter.gui.chart.demo;
+package info.monitorenter.gui.chart.demos;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -228,7 +228,7 @@ public class MinimalStaticChart {
           }
         }
       );
-    frame.show();
+    frame.setVisible(true);
   }
 }
        
@@ -261,17 +261,19 @@ public class MinimalStaticChart {
      </p>
      <p>
       <pre class="code">
-package info.monitorenter.chart.demos;
+package info.monitorenter.gui.chart.demos;
+
+import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.io.ADataCollector;
+import info.monitorenter.gui.chart.io.RandomDataCollectorOffset;
+import info.monitorenter.gui.chart.traces.Trace2DLtd;
 
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
 import javax.swing.JFrame;
-import info.monitorenter.gui.chart.io.ADataCollector;
-import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.io.RandomDataCollectorOffset;
-import info.monitorenter.gui.chart.traces.Trace2DLtd;
 
 public class MinimalDynamicChart {
   private MinimalDynamicChart() {
@@ -303,9 +305,9 @@ public class MinimalDynamicChart {
           }
         }
       );
-    frame.show(); 
+    frame.setVisible(true); 
 <span class="comment">    // Every 50 milliseconds a new value is collected. </span>
-    AbstractDataCollector collector = new RandomDataCollector(trace,50);
+   ADataCollector collector = new RandomDataCollectorOffset(trace, 100);
 <span class="comment">    // Start an internal Thread that adds the values: </span>
     collector.start();
   }

@@ -1,6 +1,6 @@
 /*
- * RangePolicyHighestValues.java,  <enter purpose here>.
- * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ * RangePolicyHighestValues.java,  points only the highest given values given. 
+ * Copyright (c) 2007 - 2010  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,7 @@ import info.monitorenter.util.Range;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  * 
  */
 public final class RangePolicyHighestValues

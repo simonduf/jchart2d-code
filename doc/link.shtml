@@ -96,6 +96,27 @@
 	</tr>
 </table>
 
+<h2>Software using JChart2D</h2>
+
+<table border="0">
+	<tr>
+		<td id="box"><a href="http://www.cospandesign.com/?p=124" rel="_blank">JEvalCharter by Cospan Design</a></td>
+		<td>Function evaluator combined with chart output.</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td id="box"><a href="http://www.lionsracing.de/content/view/480/23/lang,en/" rel="_blank">Lionsracing</a></td>
+		<td>Formula student race car telemetry system (real time).</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>
+
+
+
 
 </div>
 <!-- End of contents div --> <!-- The counter --> <!--#include virtual="./footer.shtml" -->

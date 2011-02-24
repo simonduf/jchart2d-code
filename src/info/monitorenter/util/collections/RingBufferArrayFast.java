@@ -1,6 +1,6 @@
 /*
  * RingBufferArrayFast, an array- based fast implementation of a RingBuffer.
- * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -60,7 +60,7 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.9 $
+   * @version $Revision: 1.11 $
    */
   protected abstract class ARingBufferIterator implements Iterator<T> {
     /**
@@ -239,6 +239,14 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
   }
 
   /**
+   * @see java.lang.Object#clone()
+   */
+  @Override
+  protected Object clone() throws CloneNotSupportedException {
+    return super.clone();
+  }
+
+  /**
    * @see info.monitorenter.util.collections.IRingBuffer#getBufferSize()
    */
   public int getBufferSize() {
@@ -328,6 +336,16 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
   }
 
   /**
+   * Delegates to <code>{@link RingBufferArrayFast#iteratorL2F()}</code>.
+   * <p>
+   * 
+   * @see java.lang.Iterable#iterator()
+   */
+  public java.util.Iterator<T> iterator() {
+    return this.iteratorL2F();
+  }
+
+  /**
    * Returns an <code>Iterator</code> that will return the elements in exactly
    * the inverse order the subsequent call to <code>remove()</code> would do.
    * <p>
@@ -360,16 +378,6 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
         }
       }
     };
-  }
-
-  /**
-   * Delegates to <code>{@link RingBufferArrayFast#iteratorL2F()}</code>.
-   * <p>
-   * 
-   * @see java.lang.Iterable#iterator()
-   */
-  public java.util.Iterator<T> iterator() {
-    return this.iteratorL2F();
   }
 
   /**
@@ -531,14 +539,6 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
       result = StringUtil.arrayToString(actualcontent);
     }
     return result;
-  }
-
-  /**
-   * @see java.lang.Object#clone()
-   */
-  @Override
-  protected Object clone() throws CloneNotSupportedException {
-    return super.clone();
   }
 
 }

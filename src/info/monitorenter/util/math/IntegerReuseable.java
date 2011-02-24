@@ -1,6 +1,6 @@
 /*
  *  IntegerReusable.java, a mutable Integer for  jchart2d.
- *  Copyright (C) Achim Westermann, created on 12.05.2005, 20:11:17
+ *  Copyright (C) 2004 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

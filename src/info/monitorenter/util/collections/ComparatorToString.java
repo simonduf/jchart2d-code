@@ -1,6 +1,6 @@
 /*
  *  ComparatorToString.java  jchart2d
- *  Copyright (C) Achim Westermann, created on 30.05.2005, 20:14:59
+ *  Copyright (C) 2004 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@ import java.util.Comparator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  * @param <T> the type to compare by <code>{@link Object#toString()}</code>.
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public final class ComparatorToString<T> implements Comparator<T>, Serializable {
 

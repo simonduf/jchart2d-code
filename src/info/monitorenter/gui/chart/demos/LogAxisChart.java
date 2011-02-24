@@ -1,7 +1,7 @@
 /*
  *
  *  LogAxisChart.java, rendering demo of jchart2d.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -26,6 +26,7 @@ package info.monitorenter.gui.chart.demos;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.axis.AxisLogE;
+import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.traces.painters.TracePainterDisc;
 import info.monitorenter.gui.chart.views.ChartPanel;
@@ -43,7 +44,7 @@ import javax.swing.JFrame;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.9 $
  * 
  */
 public final class LogAxisChart {
@@ -60,18 +61,28 @@ public final class LogAxisChart {
     // Create a chart:
     Chart2D chart = new Chart2D();
     // set a special axis:
-    chart.setAxisYLeft(new AxisLogE());
+    chart.setAxisYLeft(new AxisLogE(), 0);
 
     // Create an ITrace:
     ITrace2D trace = new Trace2DSimple();
+    // Add the trace to the chart:
+    chart.addTrace(trace);
+    // configure trace:
     trace.setTracePainter(new TracePainterDisc());
     trace.setColor(Color.DARK_GRAY);
     // Add the function 1/x + random
     for (int i = 1; i < 50; i++) {
       trace.addPoint(i, Math.exp(i));
     }
-    // Add the trace to the chart:
-    chart.addTrace(trace);
+    
+    ITrace2D trace2 = new Trace2DLtd();
+    trace2.setTracePainter(new TracePainterDisc());
+    trace2.setColor(Color.BLUE);
+    chart.addTrace(trace2);
+    for (int i = 1; i < 50; i++) {
+      trace2.addPoint(i, i);
+    }
+    
 
     // Make it visible:
     // Create a frame.

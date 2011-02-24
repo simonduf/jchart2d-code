@@ -80,339 +80,19 @@ public class MockGraphics2D
   }
 
   /**
-   * @see java.awt.Graphics2D#clip(java.awt.Shape)
-   */
-  @Override
-  public void clip(final Shape s) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#draw(java.awt.Shape)
-   */
-  @Override
-  public void draw(final Shape s) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#drawGlyphVector(java.awt.font.GlyphVector, float,
-   *      float)
-   */
-  @Override
-  public void drawGlyphVector(final GlyphVector g, final float x, final float y) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#drawImage(java.awt.image.BufferedImage,
-   *      java.awt.image.BufferedImageOp, int, int)
-   */
-  @Override
-  public void drawImage(final BufferedImage img, final BufferedImageOp op, final int x, final int y) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#drawImage(java.awt.Image,
-   *      java.awt.geom.AffineTransform, java.awt.image.ImageObserver)
-   */
-  @Override
-  public boolean drawImage(final Image img, final AffineTransform xform, final ImageObserver obs) {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  /**
-   * @see java.awt.Graphics2D#drawRenderableImage(java.awt.image.renderable.RenderableImage,
-   *      java.awt.geom.AffineTransform)
-   */
-  @Override
-  public void drawRenderableImage(final RenderableImage img, final AffineTransform xform) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#drawRenderedImage(java.awt.image.RenderedImage,
-   *      java.awt.geom.AffineTransform)
-   */
-  @Override
-  public void drawRenderedImage(final RenderedImage img, final AffineTransform xform) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#drawString(java.text.AttributedCharacterIterator,
-   *      float, float)
-   */
-  @Override
-  public void drawString(final AttributedCharacterIterator iterator, final float x, final float y) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics#drawString(java.text.AttributedCharacterIterator,
-   *      int, int)
-   */
-  @Override
-  public void drawString(final AttributedCharacterIterator iterator, final int x, final int y) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#drawString(java.lang.String, float, float)
-   */
-  @Override
-  public void drawString(final String s, final float x, final float y) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics#drawString(java.lang.String, int, int)
-   */
-  @Override
-  public void drawString(final String str, final int x, final int y) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#fill(java.awt.Shape)
-   */
-  @Override
-  public void fill(final Shape s) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#getBackground()
-   */
-  @Override
-  public Color getBackground() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * @see java.awt.Graphics2D#getComposite()
-   */
-  @Override
-  public Composite getComposite() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * @see java.awt.Graphics2D#getDeviceConfiguration()
-   */
-  @Override
-  public GraphicsConfiguration getDeviceConfiguration() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * @see java.awt.Graphics2D#getFontRenderContext()
-   */
-  @Override
-  public FontRenderContext getFontRenderContext() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * @see java.awt.Graphics2D#getPaint()
-   */
-  @Override
-  public Paint getPaint() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * @see java.awt.Graphics2D#getRenderingHint(java.awt.RenderingHints.Key)
-   */
-  @Override
-  public Object getRenderingHint(final Key hintKey) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * @see java.awt.Graphics2D#getRenderingHints()
-   */
-  @Override
-  public RenderingHints getRenderingHints() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * @see java.awt.Graphics2D#getStroke()
-   */
-  @Override
-  public Stroke getStroke() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * @see java.awt.Graphics2D#getTransform()
-   */
-  @Override
-  public AffineTransform getTransform() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /**
-   * @see java.awt.Graphics2D#hit(java.awt.Rectangle, java.awt.Shape, boolean)
-   */
-  @Override
-  public boolean hit(final Rectangle rect, final Shape s, final boolean onStroke) {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  /**
-   * @see java.awt.Graphics2D#rotate(double, double, double)
-   */
-  @Override
-  public void rotate(final double theta, final double x, final double y) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#rotate(double)
-   */
-  @Override
-  public void rotate(final double theta) {
-    // nop
-  }
-
-  /**
-   * @see java.awt.Graphics2D#scale(double, double)
-   */
-  @Override
-  public void scale(final double sx, final double sy) {
-    // nop
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#setBackground(java.awt.Color)
-   */
-  @Override
-  public void setBackground(final Color color) {
-    // nop
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#setComposite(java.awt.Composite)
-   */
-  @Override
-  public void setComposite(final Composite comp) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#setPaint(java.awt.Paint)
-   */
-  @Override
-  public void setPaint(final Paint paint) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#setRenderingHint(java.awt.RenderingHints.Key,
-   *      java.lang.Object)
-   */
-  @Override
-  public void setRenderingHint(final Key hintKey, final Object hintValue) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#setRenderingHints(java.util.Map)
-   */
-  @Override
-  public void setRenderingHints(final Map< ? , ? > hints) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#setStroke(java.awt.Stroke)
-   */
-  @Override
-  public void setStroke(final Stroke s) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#setTransform(java.awt.geom.AffineTransform)
-   */
-  @Override
-  public void setTransform(final AffineTransform tx) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
-   * @see java.awt.Graphics2D#shear(double, double)
-   */
-  @Override
-  public void shear(final double shx, final double shy) {
-    // nop
-  }
-
-  /**
-   * 
-   * @see java.awt.Graphics2D#transform(java.awt.geom.AffineTransform)
-   */
-  @Override
-  public void transform(final AffineTransform tx) {
-    // nop
-  }
-
-  /**
-   * @see java.awt.Graphics2D#translate(double, double)
-   */
-  @Override
-  public void translate(final double tx, final double ty) {
-    // nop
-  }
-
-  /**
-   * @see java.awt.Graphics#translate(int, int)
-   */
-  @Override
-  public void translate(final int x, final int y) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
    * @see java.awt.Graphics#clearRect(int, int, int, int)
    */
   @Override
   public void clearRect(final int x, final int y, final int width, final int height) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @see java.awt.Graphics2D#clip(java.awt.Shape)
+   */
+  @Override
+  public void clip(final Shape s) {
     // TODO Auto-generated method stub
 
   }
@@ -455,6 +135,15 @@ public class MockGraphics2D
   }
 
   /**
+   * @see java.awt.Graphics2D#draw(java.awt.Shape)
+   */
+  @Override
+  public void draw(final Shape s) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
    * @see java.awt.Graphics#drawArc(int, int, int, int, int, int)
    */
   @Override
@@ -462,6 +151,36 @@ public class MockGraphics2D
       final int startAngle, final int arcAngle) {
     // TODO Auto-generated method stub
 
+  }
+
+  /**
+   * @see java.awt.Graphics2D#drawGlyphVector(java.awt.font.GlyphVector, float,
+   *      float)
+   */
+  @Override
+  public void drawGlyphVector(final GlyphVector g, final float x, final float y) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @see java.awt.Graphics2D#drawImage(java.awt.image.BufferedImage,
+   *      java.awt.image.BufferedImageOp, int, int)
+   */
+  @Override
+  public void drawImage(final BufferedImage img, final BufferedImageOp op, final int x, final int y) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @see java.awt.Graphics2D#drawImage(java.awt.Image,
+   *      java.awt.geom.AffineTransform, java.awt.image.ImageObserver)
+   */
+  @Override
+  public boolean drawImage(final Image img, final AffineTransform xform, final ImageObserver obs) {
+    // TODO Auto-generated method stub
+    return false;
   }
 
   /**
@@ -568,11 +287,78 @@ public class MockGraphics2D
   }
 
   /**
+   * @see java.awt.Graphics2D#drawRenderableImage(java.awt.image.renderable.RenderableImage,
+   *      java.awt.geom.AffineTransform)
+   */
+  @Override
+  public void drawRenderableImage(final RenderableImage img, final AffineTransform xform) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @see java.awt.Graphics2D#drawRenderedImage(java.awt.image.RenderedImage,
+   *      java.awt.geom.AffineTransform)
+   */
+  @Override
+  public void drawRenderedImage(final RenderedImage img, final AffineTransform xform) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
    * @see java.awt.Graphics#drawRoundRect(int, int, int, int, int, int)
    */
   @Override
   public void drawRoundRect(final int x, final int y, final int width, final int height,
       final int arcWidth, final int arcHeight) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @see java.awt.Graphics2D#drawString(java.text.AttributedCharacterIterator,
+   *      float, float)
+   */
+  @Override
+  public void drawString(final AttributedCharacterIterator iterator, final float x, final float y) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @see java.awt.Graphics#drawString(java.text.AttributedCharacterIterator,
+   *      int, int)
+   */
+  @Override
+  public void drawString(final AttributedCharacterIterator iterator, final int x, final int y) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @see java.awt.Graphics2D#drawString(java.lang.String, float, float)
+   */
+  @Override
+  public void drawString(final String s, final float x, final float y) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @see java.awt.Graphics#drawString(java.lang.String, int, int)
+   */
+  @Override
+  public void drawString(final String str, final int x, final int y) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @see java.awt.Graphics2D#fill(java.awt.Shape)
+   */
+  @Override
+  public void fill(final Shape s) {
     // TODO Auto-generated method stub
 
   }
@@ -625,6 +411,15 @@ public class MockGraphics2D
   }
 
   /**
+   * @see java.awt.Graphics2D#getBackground()
+   */
+  @Override
+  public Color getBackground() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
    * @see java.awt.Graphics#getClip()
    */
   @Override
@@ -652,6 +447,24 @@ public class MockGraphics2D
   }
 
   /**
+   * @see java.awt.Graphics2D#getComposite()
+   */
+  @Override
+  public Composite getComposite() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
+   * @see java.awt.Graphics2D#getDeviceConfiguration()
+   */
+  @Override
+  public GraphicsConfiguration getDeviceConfiguration() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
    * @see java.awt.Graphics#getFont()
    */
   @Override
@@ -667,6 +480,104 @@ public class MockGraphics2D
   public FontMetrics getFontMetrics(final Font f) {
     // TODO Auto-generated method stub
     return new MockFontMetrics(new Font("SansSerif", Font.PLAIN, 10));
+  }
+
+  /**
+   * @see java.awt.Graphics2D#getFontRenderContext()
+   */
+  @Override
+  public FontRenderContext getFontRenderContext() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
+   * @see java.awt.Graphics2D#getPaint()
+   */
+  @Override
+  public Paint getPaint() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
+   * @see java.awt.Graphics2D#getRenderingHint(java.awt.RenderingHints.Key)
+   */
+  @Override
+  public Object getRenderingHint(final Key hintKey) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
+   * @see java.awt.Graphics2D#getRenderingHints()
+   */
+  @Override
+  public RenderingHints getRenderingHints() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
+   * @see java.awt.Graphics2D#getStroke()
+   */
+  @Override
+  public Stroke getStroke() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
+   * @see java.awt.Graphics2D#getTransform()
+   */
+  @Override
+  public AffineTransform getTransform() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /**
+   * @see java.awt.Graphics2D#hit(java.awt.Rectangle, java.awt.Shape, boolean)
+   */
+  @Override
+  public boolean hit(final Rectangle rect, final Shape s, final boolean onStroke) {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  /**
+   * @see java.awt.Graphics2D#rotate(double)
+   */
+  @Override
+  public void rotate(final double theta) {
+    // nop
+  }
+
+  /**
+   * @see java.awt.Graphics2D#rotate(double, double, double)
+   */
+  @Override
+  public void rotate(final double theta, final double x, final double y) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @see java.awt.Graphics2D#scale(double, double)
+   */
+  @Override
+  public void scale(final double sx, final double sy) {
+    // nop
+
+  }
+
+  /**
+   * @see java.awt.Graphics2D#setBackground(java.awt.Color)
+   */
+  @Override
+  public void setBackground(final Color color) {
+    // nop
+
   }
 
   /**
@@ -697,11 +608,29 @@ public class MockGraphics2D
   }
 
   /**
+   * @see java.awt.Graphics2D#setComposite(java.awt.Composite)
+   */
+  @Override
+  public void setComposite(final Composite comp) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
    * @see java.awt.Graphics#setFont(java.awt.Font)
    */
   @Override
   public void setFont(final Font font) {
     // TODO Auto-generated method stub
+  }
+
+  /**
+   * @see java.awt.Graphics2D#setPaint(java.awt.Paint)
+   */
+  @Override
+  public void setPaint(final Paint paint) {
+    // TODO Auto-generated method stub
+
   }
 
   /**
@@ -714,10 +643,81 @@ public class MockGraphics2D
   }
 
   /**
+   * @see java.awt.Graphics2D#setRenderingHint(java.awt.RenderingHints.Key,
+   *      java.lang.Object)
+   */
+  @Override
+  public void setRenderingHint(final Key hintKey, final Object hintValue) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @see java.awt.Graphics2D#setRenderingHints(java.util.Map)
+   */
+  @Override
+  public void setRenderingHints(final Map< ? , ? > hints) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @see java.awt.Graphics2D#setStroke(java.awt.Stroke)
+   */
+  @Override
+  public void setStroke(final Stroke s) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @see java.awt.Graphics2D#setTransform(java.awt.geom.AffineTransform)
+   */
+  @Override
+  public void setTransform(final AffineTransform tx) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
    * @see java.awt.Graphics#setXORMode(java.awt.Color)
    */
   @Override
   public void setXORMode(final Color c1) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * @see java.awt.Graphics2D#shear(double, double)
+   */
+  @Override
+  public void shear(final double shx, final double shy) {
+    // nop
+  }
+
+  /**
+   * 
+   * @see java.awt.Graphics2D#transform(java.awt.geom.AffineTransform)
+   */
+  @Override
+  public void transform(final AffineTransform tx) {
+    // nop
+  }
+
+  /**
+   * @see java.awt.Graphics2D#translate(double, double)
+   */
+  @Override
+  public void translate(final double tx, final double ty) {
+    // nop
+  }
+
+  /**
+   * @see java.awt.Graphics#translate(int, int)
+   */
+  @Override
+  public void translate(final int x, final int y) {
     // TODO Auto-generated method stub
 
   }

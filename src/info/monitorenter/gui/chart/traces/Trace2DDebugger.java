@@ -1,6 +1,6 @@
 /*
  *  Trace2DDebugger.java  jchart2d
- *  Copyright (C) Achim Westermann, created on 04.03.2005, 12:33:48
+ *  Copyright (C) 2004 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,9 +24,10 @@ package info.monitorenter.gui.chart.traces;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IErrorBarPolicy;
+import info.monitorenter.gui.chart.IPointHighlighter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.util.Range;
 
 import java.awt.Color;
@@ -59,7 +60,7 @@ import java.util.Set;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.22 $
+ * @version $Revision: 1.30 $
  */
 public class Trace2DDebugger implements ITrace2D {
 
@@ -84,7 +85,7 @@ public class Trace2DDebugger implements ITrace2D {
   private Range m_yRange = new Range(-Double.MAX_VALUE, +Double.MAX_VALUE);
 
   /**
-   * Creates an inistance to debug the given trace for valid points added.
+   * Creates an instance to debug the given trace for valid points added.
    * <p>
    * 
    * @param debug
@@ -105,32 +106,24 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @param debug
-   *            The ITrace to debug.
-   */
-
-  /**
    * @see info.monitorenter.gui.chart.ITrace2D#addErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
    */
-  public boolean addErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
+  public boolean addErrorBarPolicy(final IErrorBarPolicy <?>errorBarPolicy) {
     return this.m_delegate.addErrorBarPolicy(errorBarPolicy);
   }
-
-  // /////////////////////////////////
-  // Proxy methods
 
   /**
    * @see ITrace2D#addPoint(double, double)
    */
   public boolean addPoint(final double x, final double y) {
-    TracePoint2D p = new TracePoint2D(x, y);
+    ITracePoint2D p = this.getRenderer().getTracePointProvider().createTracePoint(x, y);
     return this.addPoint(p);
   }
 
   /**
-   * @see ITrace2D#addPoint(TracePoint2D)
+   * @see ITrace2D#addPoint(ITracePoint2D)
    */
-  public boolean addPoint(final TracePoint2D p) {
+  public boolean addPoint(final ITracePoint2D p) {
     double x = p.getX();
     double y = p.getY();
     if (!this.m_xRange.isContained(x)) {
@@ -144,6 +137,10 @@ public class Trace2DDebugger implements ITrace2D {
     return this.m_delegate.addPoint(p);
   }
 
+  public boolean addPointHighlighter(IPointHighlighter<?> highlighter) {
+    return this.m_delegate.addPointHighlighter(highlighter);
+  }
+
   /**
    * @see ITrace2D#addPropertyChangeListener(String, PropertyChangeListener)
    */
@@ -153,11 +150,19 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
+   * @param debug
+   *            The ITrace to debug.
+   */
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#addTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
-  public boolean addTracePainter(final ITracePainter painter) {
+  public boolean addTracePainter(final ITracePainter<?> painter) {
     return this.m_delegate.addTracePainter(painter);
   }
+
+  // /////////////////////////////////
+  // Proxy methods
 
   /**
    * @param o
@@ -172,7 +177,7 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#containsTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
-  public boolean containsTracePainter(final ITracePainter painter) {
+  public boolean containsTracePainter(final ITracePainter<?> painter) {
     return this.m_delegate.containsTracePainter(painter);
   }
 
@@ -185,10 +190,10 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(info.monitorenter.gui.chart.TracePoint2D,
+   * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(info.monitorenter.gui.chart.ITracePoint2D,
    *      int)
    */
-  public void firePointChanged(final TracePoint2D changed, final int state) {
+  public void firePointChanged(final ITracePoint2D changed, final int state) {
     this.m_delegate.firePointChanged(changed, state);
   }
 
@@ -200,16 +205,9 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.util.collections.IComparableProperty#getComparableProperty()
-   */
-  public Number getComparableProperty() {
-    return this.m_delegate.getComparableProperty();
-  }
-
-  /**
    * @see info.monitorenter.gui.chart.ITrace2D#getErrorBarPolicies()
    */
-  public Set<IErrorBarPolicy> getErrorBarPolicies() {
+  public Set<IErrorBarPolicy<?>> getErrorBarPolicies() {
     return this.m_delegate.getErrorBarPolicies();
   }
 
@@ -233,6 +231,7 @@ public class Trace2DDebugger implements ITrace2D {
   public int getMaxSize() {
     return this.m_delegate.getMaxSize();
   }
+
 
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#getMaxX()
@@ -297,6 +296,10 @@ public class Trace2DDebugger implements ITrace2D {
     return this.m_delegate.getPhysicalUnitsY();
   }
 
+  public Set<IPointHighlighter<?>> getPointHighlighters() {
+    return this.m_delegate.getPointHighlighters();
+  }
+
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#getPropertyChangeListeners(java.lang.String)
    */
@@ -328,7 +331,7 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#getTracePainters()
    */
-  public final Set<ITracePainter> getTracePainters() {
+  public final Set<ITracePainter<?>> getTracePainters() {
     return this.m_delegate.getTracePainters();
   }
 
@@ -384,7 +387,7 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#iterator()
    */
-  public Iterator<TracePoint2D> iterator() {
+  public Iterator<ITracePoint2D> iterator() {
     return this.m_delegate.iterator();
   }
 
@@ -393,6 +396,13 @@ public class Trace2DDebugger implements ITrace2D {
    */
   public void propertyChange(final PropertyChangeEvent evt) {
     this.m_delegate.propertyChange(evt);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#removeAllPointHighlighters()
+   */
+  public Set<IPointHighlighter< ? >> removeAllPointHighlighters() {
+    return this.m_delegate.removeAllPointHighlighters();
   }
 
   /**
@@ -412,15 +422,19 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#removeErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
    */
-  public boolean removeErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
+  public boolean removeErrorBarPolicy(final IErrorBarPolicy<?> errorBarPolicy) {
     return this.m_delegate.removeErrorBarPolicy(errorBarPolicy);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#removePoint(info.monitorenter.gui.chart.TracePoint2D)
+   * @see info.monitorenter.gui.chart.ITrace2D#removePoint(info.monitorenter.gui.chart.ITracePoint2D)
    */
-  public boolean removePoint(final TracePoint2D point) {
+  public boolean removePoint(final ITracePoint2D point) {
     return this.m_delegate.removePoint(point);
+  }
+
+  public boolean removePointHighlighter(IPointHighlighter<?> highlighter) {
+    return this.m_delegate.removePointHighlighter(highlighter);
   }
 
   /**
@@ -442,7 +456,7 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#removeTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
-  public boolean removeTracePainter(final ITracePainter painter) {
+  public boolean removeTracePainter(final ITracePainter<?> painter) {
     return this.m_delegate.removeTracePainter(painter);
   }
 
@@ -454,18 +468,12 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.util.collections.IComparableProperty#setComparableProperty(java.lang.Number)
-   */
-  public void setComparableProperty(final Number n) {
-    this.m_delegate.setComparableProperty(n);
-  }
-
-  /**
    * @see info.monitorenter.gui.chart.ITrace2D#setErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
    */
-  public Set<IErrorBarPolicy> setErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
+  public Set<IErrorBarPolicy<?>> setErrorBarPolicy(final IErrorBarPolicy<?> errorBarPolicy) {
     return this.m_delegate.setErrorBarPolicy(errorBarPolicy);
   }
+
 
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#setName(java.lang.String)
@@ -479,6 +487,10 @@ public class Trace2DDebugger implements ITrace2D {
    */
   public void setPhysicalUnits(final String xunit, final String yunit) {
     this.m_delegate.setPhysicalUnits(xunit, yunit);
+  }
+
+  public Set<IPointHighlighter<?>> setPointHighlighter(IPointHighlighter<?> highlighter) {
+    return this.m_delegate.setPointHighlighter(highlighter);
   }
 
   /**
@@ -498,7 +510,7 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#setTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
-  public final Set<ITracePainter> setTracePainter(final ITracePainter painter) {
+  public final Set<ITracePainter<?>> setTracePainter(final ITracePainter<?> painter) {
     return this.m_delegate.setTracePainter(painter);
   }
 

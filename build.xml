@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="jchart2d" default="build">
+<project name="jchart2d" default="makejarBinary">
 	<description>
   A swing-widget for precise visualisation of charts.
  </description>
@@ -7,7 +7,7 @@
 	<!-- General Properties -->
 
 	<property name="project.name" value="jchart2d" />
-	<property name="project.version" value="3.1.0" />
+	<property name="project.version" value="3.2.0" />
 	<property name="libdir" value="${basedir}/ext" />
 	<property name="outjar" value="${basedir}/${project.name}-${project.version}.jar" />
 	<property name="distfolder" value="${basedir}/${project.name}-${project.version}/" />
@@ -54,7 +54,9 @@
 
 	<fileset dir="${basedir}" id="licenses" description="License files of JChart2d and it's 3rd party jar files.">
 		<include name="lgpl.txt" />
-		<include name="license-infovis.txt" />
+		<include name="LICENSE-apache-xmlgraphics-commons" />
+		<include name="NOTICE-apache-xmlgraphics-commons" />
+		<include name="LICENSE-infovis.txt" />
 		<include name="3rdpartylicenses.txt" />
 	</fileset>
 
@@ -235,7 +237,7 @@
      init will be kept.
     </description>
 
-		<proguard obfuscate="true" shrink="true" overloadaggressively="true" warn="true" verbose="true" ignorewarnings="true" printmapping="true">
+		<proguard obfuscate="false" shrink="true" overloadaggressively="false" warn="true" verbose="true" ignorewarnings="true" printmapping="true" allowaccessmodification="false" optimize="false">
 			<libraryjar name="${java.home}/lib/rt.jar" />
 			<!--
              caution: The name attribut value has to be the same expression
@@ -247,10 +249,13 @@
 			<keep access="public" name="info.monitorenter.gui.chart.demos.Showcase">
 				<method access="public" name="init" />
 			</keep>
-			<keep access="public" name="info.monitorenter.gui.chart.errorbars.ErrorBarPolicy*">
+			<!-- keep all error bar stuff -->
+			<keep access="public" name="info.monitorenter.gui.chart.errorbars.**" allowoptimization="false">
+				<constructor />
+				<method access="public" name="**"/>
 			</keep>
 		</proguard>
-		<signjar jar="${basedir}/${project.name}-applet.jar" alias="sourceforge" storepass="password" />
+		<signjar jar="${basedir}/${project.name}-applet.jar" alias="jchart2.sourceforge.net" storepass="password" keypass="tracerunner" />
 	</target>
 
 	<!-- Dependency only for ensuring validity -->
@@ -270,7 +275,8 @@
 			<include name="${project.name}/.cvsignore" />
 			<!-- The eclipse builders -->
 			<include name="${project.name}/.externalToolBuilders/**/*" />
-			<fileset refid="licenses"></fileset>
+			<fileset refid="licenses">
+			</fileset>
 		</zip>
 	</target>
 
@@ -279,7 +285,7 @@
 		<javadoc destdir="${basedir}/doc/docs/javadoc" access="protected" use="false" notree="false" nonavbar="false" noindex="false" splitindex="true" Author="true" version="true" nodeprecatedlist="false" nodeprecated="false" doctitle="JChart2D API documentation, Version ${project.version}" windowtitle="JChart2D API documentation, Version ${project.version}" Verbose="true" stylesheetfile="${basedir}/doc/docs/javadoc/jchart2d.css" charset="UTF-8" docencoding="UTF-8">
 			<classpath refid="classpath" />
 			<bottom>
-				<![CDATA[<i>Copyright &#169; 2001 - 2008 <a href="http://www.opensource.org/licenses/lgpl-license.php" target="_blank">LGPL</a>, All Rights Footloose.</i>]]></bottom>
+				<![CDATA[<i>Copyright &#169; 2001 - 2010 <a href="http://www.opensource.org/licenses/lgpl-license.php" target="_blank">LGPL</a>, All Rights Footloose.</i>]]></bottom>
 		<fileset refid="sourcefiles" />
 		<link offline="false" href="http://java.sun.com/j2se/1.5.0/docs/api/" packagelistLoc="${java.home}/docs/api/" />
 		<link offline="false" href="http://logging.apache.org/log4j/1.2/apidocs/" packagelistLoc="http://logging.apache.org/log4j/1.2/apidocs/package-list" />

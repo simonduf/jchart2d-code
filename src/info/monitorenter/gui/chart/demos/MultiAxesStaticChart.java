@@ -1,7 +1,7 @@
 /*
  *  MultipleAxesStaticChart.java of project jchart2d, a demonstration 
  *  of the minimal code to set up a chart with static data. 
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,8 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
+import info.monitorenter.gui.chart.ITracePointProvider;
 import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
@@ -48,7 +49,7 @@ import javax.swing.JPanel;
  * <p>
  * 
  * @author Achim Westermann
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.13 $
  */
 public final class MultiAxesStaticChart extends JPanel {
 
@@ -89,6 +90,10 @@ public final class MultiAxesStaticChart extends JPanel {
     this.setLayout(new BorderLayout());
     Chart2D chart = new Chart2D();
     chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
+    // This is not important: We do this just because we want to add points
+    // before
+    // configuring the axes and add the traces to the chart:
+    ITracePointProvider pointCreator = chart.getTracePointProvider();
 
     // Create apples trace:
     ITrace2D apples = new Trace2DSimple();
@@ -98,7 +103,7 @@ public final class MultiAxesStaticChart extends JPanel {
     // Add all points, as it is static:
     double time = System.currentTimeMillis();
     for (int i = 0; i < 120; i++) {
-      apples.addPoint(time + i * 10000, (10.0 + Math.random()) * i);
+      apples.addPoint(pointCreator.createTracePoint(time + i * 10000, (10.0 + Math.random()) * i));
     }
 
     // Create pears trace:
@@ -106,12 +111,13 @@ public final class MultiAxesStaticChart extends JPanel {
     pears.setColor(Color.BLUE);
     pears.setName("Pears");
     // Add all points, as it is static:
-    TracePoint2D copyPoint;
-    Iterator<TracePoint2D> it = apples.iterator();
+    ITracePoint2D copyPoint;
+    Iterator<ITracePoint2D> it = apples.iterator();
     int i = 0;
     while (it.hasNext()) {
       copyPoint = it.next();
-      pears.addPoint(i * 0.001, copyPoint.getY() + (Math.random() * 1000));
+      pears.addPoint(pointCreator.createTracePoint(i * 0.001, copyPoint.getY()
+          + (Math.random() * 1000)));
       i++;
     }
 
@@ -124,7 +130,7 @@ public final class MultiAxesStaticChart extends JPanel {
     i = 0;
     while (it.hasNext()) {
       copyPoint = it.next();
-      carrots.addPoint(i * 100, 100 - copyPoint.getY());
+      carrots.addPoint(pointCreator.createTracePoint(i * 100, 100 - copyPoint.getY()));
       i++;
     }
 
@@ -142,8 +148,8 @@ public final class MultiAxesStaticChart extends JPanel {
     yAxisCarrots.getAxisTitle().setTitleColor(Color.MAGENTA);
 
     // Add these axes to the chart:
-    chart.setAxisYLeft(yAxisApples);
-    chart.setAxisYRight(yAxisPears);
+    chart.setAxisYLeft(yAxisApples, 0);
+    chart.setAxisYRight(yAxisPears, 0);
     chart.addAxisYLeft(yAxisCarrots);
 
     // use three x axes:
@@ -160,8 +166,8 @@ public final class MultiAxesStaticChart extends JPanel {
     xAxisCarrots.getAxisTitle().setTitleColor(Color.MAGENTA);
 
     // Add these axes to the chart:
-    chart.setAxisXBottom(xAxisApples);
-    chart.setAxisXTop(xAxisPears);
+    chart.setAxisXBottom(xAxisApples, 0);
+    chart.setAxisXTop(xAxisPears, 0);
     chart.addAxisXBottom(xAxisCarrots);
 
     // TODO: Also test adding the traces directly to the axes!

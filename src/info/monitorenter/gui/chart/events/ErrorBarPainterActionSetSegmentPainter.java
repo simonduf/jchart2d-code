@@ -1,7 +1,7 @@
 /*
  *  ErrorBarPainterActionSetSegmentPainter.java, action that 
  *  sets an IPointPainter to a segment of the error bar painter.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2004 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -31,18 +31,16 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 
-
 /**
- * <code>Action</code> that sets an <code>{@link IPointPainter}</code> to
- * the corresponding segment of an error bar painter.
+ * <code>Action</code> that sets an <code>{@link IPointPainter}</code> to the
+ * corresponding segment of an error bar painter.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  */
-public final class ErrorBarPainterActionSetSegmentPainter
-    extends AbstractAction {
+public final class ErrorBarPainterActionSetSegmentPainter extends AbstractAction {
 
   /**
    * Generated <code>serialVersionUID</code>.
@@ -50,7 +48,7 @@ public final class ErrorBarPainterActionSetSegmentPainter
   private static final long serialVersionUID = -7759456438679504271L;
 
   /** The point painter to set to the segment of the error bar painter. */
-  private IPointPainter m_pointPainter;
+  private IPointPainter< ? > m_pointPainter;
 
   /**
    * The segment of the painter to set the color of.
@@ -74,7 +72,7 @@ public final class ErrorBarPainterActionSetSegmentPainter
    *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    */
   public ErrorBarPainterActionSetSegmentPainter(
-      final IErrorBarPainter.ISegment errorBarPainterFacade, final IPointPainter pointPainter,
+      final IErrorBarPainter.ISegment errorBarPainterFacade, final IPointPainter< ? > pointPainter,
       final String name) {
     super(name);
     this.m_segment = errorBarPainterFacade;

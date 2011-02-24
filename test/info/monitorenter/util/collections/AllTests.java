@@ -31,20 +31,11 @@ import junit.framework.TestSuite;
  * <p>
  * 
  * @author Achim westermann
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  * 
  * @since 2.1.0
  */
 public final class AllTests {
-  /**
-   * Hide constructor to prevent generation of class instances.
-   * <p>
-   */
-  private AllTests() {
-
-    // empty
-  }
-
   /**
    * Returns the JUnit test suite for this package.
    * <p>
@@ -58,6 +49,15 @@ public final class AllTests {
     suite.addTest(TestRingBufferArrayFast.suite());
     // $JUnit-END$
     return suite;
+  }
+
+  /**
+   * Hide constructor to prevent generation of class instances.
+   * <p>
+   */
+  private AllTests() {
+
+    // empty
   }
 
 }

@@ -2,7 +2,7 @@
  * StaticChartWithBoxAndTitle.java of project jchart2d, a demonstration 
  * of the minimal code to set up a chart with static data surrounded 
  * by a titeled box. 
- * Copyright (C) 2007 Achim Westermann
+ * Copyright (C) 2007 - 2010 Achim Westermann
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -48,7 +48,7 @@ import javax.swing.border.TitledBorder;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  */
 public final class StaticChartWithBoxAndTitle extends JPanel {
   /**
@@ -93,6 +93,8 @@ public final class StaticChartWithBoxAndTitle extends JPanel {
     // Note that dynamic charts need limited amount of values!!!
     // ITrace2D trace = new Trace2DLtd(200);
     ITrace2D trace = new Trace2DSimple();
+    // Add the trace to the chart:
+    chart.addTrace(trace);
     trace.setColor(Color.RED);
 
     // Add all points, as it is static:
@@ -100,8 +102,6 @@ public final class StaticChartWithBoxAndTitle extends JPanel {
     for (int i = 0; i < 120; i++) {
       trace.addPoint(time + i, i);
     }
-    // Add the trace to the chart:
-    chart.addTrace(trace);
 
     ChartPanel chartPanel = new ChartPanel(chart);
     // add a titlede border:

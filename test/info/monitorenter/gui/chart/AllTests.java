@@ -24,26 +24,26 @@
  */
 package info.monitorenter.gui.chart;
 
+import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
-import junit.framework.TestSuite;
+
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * Main test suite for the package <code>{@link info.monitorenter.gui.chart}</code>.<p>
  * 
  * @author Achim westermann
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.6 $
  * 
  * @since 2.1.0
  */
+
+@RunWith(Suite.class)
+@SuiteClasses( { TestMultiThreadingAndTracing.class, TestChart2DSetAxis.class, TestChart2DHeadless.class,TestMultithreading.class,TestChartOperationsVisual.class})
+
 public final class AllTests {
-
-  /**
-   * Hide constructor to prevent generation of class instances.<p>
-   */
-  private AllTests() {
-
-    // empty
-  }
 
   /**
    * Returns the JUnit test suite for this package.<p>
@@ -52,14 +52,15 @@ public final class AllTests {
    */
   public static Test suite() {
 
-    TestSuite suite = new TestSuite("Tests for package " + AllTests.class.getPackage().getName());
-    //$JUnit-BEGIN$
-    suite.addTest(TestMultiThreadingAndTracing.suite());
-    suite.addTest(TestChart2DSetAxis.suite());
-    suite.addTest(TestChart2DHeadless.suite());
-    suite.addTest(TestMultithreading.suite());
-    suite.addTest(TestChartOperationsVisual.suite());
-    //$JUnit-END$
-    return suite;
+    return new JUnit4TestAdapter(AllTests.class);
+
+  }
+
+  /**
+   * Hide constructor to prevent generation of class instances.<p>
+   */
+  private AllTests() {
+
+    // empty
   }
 }

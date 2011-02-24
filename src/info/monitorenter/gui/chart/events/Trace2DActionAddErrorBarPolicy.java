@@ -1,7 +1,7 @@
 /*
  *  Trace2DActionAddErrorBarPolicy, action to add an IErrorBarPolicy 
  *  to an ITrace2D.
- *  Copyright (C) 2007 Achim Westermann
+ *  Copyright (C) 2007 - 2010 Achim Westermann
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -36,10 +36,9 @@ import info.monitorenter.gui.chart.ITrace2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.4 $
  */
-public final class Trace2DActionAddErrorBarPolicy
-    extends ATrace2DActionErrorBarPolicy {
+public final class Trace2DActionAddErrorBarPolicy extends ATrace2DActionErrorBarPolicy {
 
   /**
    * Generated <code>serialVersionUID</code>.
@@ -47,8 +46,8 @@ public final class Trace2DActionAddErrorBarPolicy
   private static final long serialVersionUID = -6819371146517378618L;
 
   /**
-   * Create an <code>Action</code> that accesses the trace and identifies
-   * itself with the given action String.
+   * Create an <code>Action</code> that accesses the trace and identifies itself
+   * with the given action String.
    * <p>
    * 
    * @param trace
@@ -56,24 +55,17 @@ public final class Trace2DActionAddErrorBarPolicy
    * 
    * @param description
    *          the descriptive <code>String</code> that will be displayed by
-   *          {@link  javax.swing.AbstractButton} subclasses that get this
+   *          {@link javax.swing.AbstractButton} subclasses that get this
    *          <code>Action</code> assigned (
-   *          {@link  javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    * 
    * @param errorBarPolicy
    *          the error bar policy to use by this action.
    * 
    */
   public Trace2DActionAddErrorBarPolicy(final ITrace2D trace, final String description,
-      final IErrorBarPolicy errorBarPolicy) {
+      final IErrorBarPolicy< ? > errorBarPolicy) {
     super(trace, description, errorBarPolicy);
-  }
-
-  /**
-   * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-   */
-  public void propertyChange(final PropertyChangeEvent evt) {
-    // TODO Auto-generated method stub
   }
 
   /**
@@ -81,5 +73,12 @@ public final class Trace2DActionAddErrorBarPolicy
    */
   public void actionPerformed(final ActionEvent e) {
     this.m_trace.addErrorBarPolicy(this.getErrorBarPolicy());
+  }
+
+  /**
+   * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+   */
+  public void propertyChange(final PropertyChangeEvent evt) {
+    // TODO Auto-generated method stub
   }
 }

@@ -56,7 +56,7 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
-   * @version $Revision: 1.10 $
+   * @version $Revision: 1.11 $
    */
   class Consumer extends TestMultithreading.Consumer {
 
@@ -136,7 +136,7 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
      */
     @Override
     public void run() {
-      TracePoint2D point;
+      ITracePoint2D point;
       ITrace2D tmpTrace;
       while (this.m_toAdd > 0 && !this.m_stop) {
         try {
@@ -231,7 +231,7 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
     keys = this.m_weakMap.size();
     System.out.println("Points remaining in the weakMap: " + keys);
     keys = 0;
-    for (TracePoint2D point : this.m_weakMap.keySet()) {
+    for (ITracePoint2D point : this.m_weakMap.keySet()) {
       keys++;
       System.out.println("Point " + point.toString() + " was not dropped.");
     }
@@ -254,7 +254,7 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
   public void setUp() throws Exception {
     this.m_trace = (ITrace2D) TestMultiThreadingAndTracing.TRACE_CLASS.newInstance();
     this.m_chart = new Chart2D();
-    this.m_weakMap = new WeakHashMap<TracePoint2D, String>();
+    this.m_weakMap = new WeakHashMap<ITracePoint2D, String>();
     this.m_producers = new LinkedList<TestMultithreading.Producer>();
     for (int add = PRODUCER_AMOUNT; add > 0; add--) {
       this.m_producers.add(new Producer(PRODUCER_ADD_POINT_AMOUNT, PRODUCER_SLEEPRANGE));

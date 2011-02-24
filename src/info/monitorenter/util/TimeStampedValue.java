@@ -1,6 +1,6 @@
 /*
  *  TimeStampedValue, wrapper class for values marked with a timestamp.
- *  Copyright (C) Achim Westermann, created on 09.09.2004, 12:38:21
+ *  Copyright (C) 2004 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@ import java.util.Map;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann</a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.9 $
  */
 public final class TimeStampedValue implements Map.Entry<Long, Object>,
     Comparable<TimeStampedValue> {
@@ -78,42 +78,27 @@ public final class TimeStampedValue implements Map.Entry<Long, Object>,
   }
 
   /**
-   * Returns the {@link Long} that marks the time stamp (difference, measured in
-   * milliseconds, between the current time and midnight, January 1, 1970 UTC).
-   * 
-   * @return the {@link Long} that marks the time stamp (difference, measured in
-   *         milliseconds, between the current time and midnight, January 1,
-   *         1970 UTC).
-   * 
-   * @see java.util.Map.Entry#getKey()
-   */
-  public Long getKey() {
-    return new Long(this.m_key);
-  }
-
-  /**
-   * Returns the time stamp.
+   * Compares the given {@link TimeStampedValue} to this by the internal
+   * {@link #getTime()}.
    * <p>
    * 
-   * @return the time stamp.
+   * @param obj
+   *            the object to compare this to.
    * 
-   * @see java.util.Map.Entry#getValue()
+   * @return see interface.
+   * 
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
-  public Object getValue() {
-    return this.m_value;
-  }
-
-  /**
-   * Returns the time stamp (difference, measured in milliseconds, between the
-   * current time and midnight, January 1, 1970 UTC).
-   * <p>
-   * 
-   * @return the time stamp (difference, measured in milliseconds, between the
-   *         current time and midnight, January 1, 1970 UTC).
-   * 
-   */
-  public long getTime() {
-    return this.m_key;
+  public int compareTo(final TimeStampedValue obj) {
+    int result;
+    if (this.m_key < obj.m_key) {
+      result = -1;
+    } else if (this.m_key == obj.m_key) {
+      result = 0;
+    } else {
+      result = 1;
+    }
+    return result;
   }
 
   /**
@@ -144,6 +129,45 @@ public final class TimeStampedValue implements Map.Entry<Long, Object>,
   }
 
   /**
+   * Returns the {@link Long} that marks the time stamp (difference, measured in
+   * milliseconds, between the current time and midnight, January 1, 1970 UTC).
+   * 
+   * @return the {@link Long} that marks the time stamp (difference, measured in
+   *         milliseconds, between the current time and midnight, January 1,
+   *         1970 UTC).
+   * 
+   * @see java.util.Map.Entry#getKey()
+   */
+  public Long getKey() {
+    return new Long(this.m_key);
+  }
+
+  /**
+   * Returns the time stamp (difference, measured in milliseconds, between the
+   * current time and midnight, January 1, 1970 UTC).
+   * <p>
+   * 
+   * @return the time stamp (difference, measured in milliseconds, between the
+   *         current time and midnight, January 1, 1970 UTC).
+   * 
+   */
+  public long getTime() {
+    return this.m_key;
+  }
+
+  /**
+   * Returns the time stamp.
+   * <p>
+   * 
+   * @return the time stamp.
+   * 
+   * @see java.util.Map.Entry#getValue()
+   */
+  public Object getValue() {
+    return this.m_value;
+  }
+
+  /**
    * 
    * @see java.lang.Object#hashCode()
    */
@@ -155,47 +179,6 @@ public final class TimeStampedValue implements Map.Entry<Long, Object>,
     }
     return result;
 
-  }
-
-  /**
-   * Assigns a different value to the timestamp.
-   * <p>
-   * 
-   * @param value
-   *            the new value to be marked with this timestamp.
-   * 
-   * @return the previous value that was contained.
-   * 
-   * @see java.util.Map.Entry#setValue(java.lang.Object)
-   */
-  public Object setValue(final Object value) {
-    Object ret = this.m_value;
-    this.m_value = value;
-    return ret;
-  }
-
-  /**
-   * Compares the given {@link TimeStampedValue} to this by the internal
-   * {@link #getTime()}.
-   * <p>
-   * 
-   * @param obj
-   *            the object to compare this to.
-   * 
-   * @return see interface.
-   * 
-   * @see java.lang.Comparable#compareTo(java.lang.Object)
-   */
-  public int compareTo(final TimeStampedValue obj) {
-    int result;
-    if (this.m_key < obj.m_key) {
-      result = -1;
-    } else if (this.m_key == obj.m_key) {
-      result = 0;
-    } else {
-      result = 1;
-    }
-    return result;
   }
 
   /**
@@ -213,5 +196,22 @@ public final class TimeStampedValue implements Map.Entry<Long, Object>,
    */
   public boolean isPast() {
     return this.m_key < System.currentTimeMillis();
+  }
+
+  /**
+   * Assigns a different value to the timestamp.
+   * <p>
+   * 
+   * @param value
+   *            the new value to be marked with this timestamp.
+   * 
+   * @return the previous value that was contained.
+   * 
+   * @see java.util.Map.Entry#setValue(java.lang.Object)
+   */
+  public Object setValue(final Object value) {
+    Object ret = this.m_value;
+    this.m_value = value;
+    return ret;
   }
 }

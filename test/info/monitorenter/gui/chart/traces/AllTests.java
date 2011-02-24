@@ -30,19 +30,11 @@ import junit.framework.TestSuite;
  * Main test suite for the package <code>{@link info.monitorenter.gui.chart.traces}</code>.<p>
  * 
  * @author Achim westermann
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  * 
  * @since 2.1.0
  */
 public final class AllTests {
-
-  /**
-   * Hide constructor to prevent generation of class instances.<p>
-   */
-  private AllTests() {
-
-    // empty
-  }
 
   /**
    * Returns the JUnit test suite for this package.<p>
@@ -58,5 +50,13 @@ public final class AllTests {
   suite.addTest(TestTrace2DSimple.suite());
     //$JUnit-END$
     return suite;
+  }
+
+  /**
+   * Hide constructor to prevent generation of class instances.<p>
+   */
+  private AllTests() {
+
+    // empty
   }
 }

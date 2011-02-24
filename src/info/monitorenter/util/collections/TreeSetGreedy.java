@@ -1,6 +1,6 @@
 /*
  *  TreeSetGreedy.java, special container for managing z-Indexes of traces in jchart2d.
- *  Copyright (C) Achim Westermann, created on 12.05.2005, 20:11:17
+ *  Copyright (C) 2004 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -43,13 +43,13 @@ import java.util.TreeSet;
  * <p>
  * The added <code>IComparableProperty</code> instances with the lowest
  * {@link java.lang.Number} property (see
- * {@link info.monitorenter.util.collections.IComparableProperty#getComparableProperty()})
- * will be returned first from the retrievable <code>Iterator</code>
+ * {@link info.monitorenter.util.collections.IComparableProperty#getComparableProperty()}
+ * ) will be returned first from the retrievable <code>Iterator</code>
  * <p>
  * <h2>Warning</h2>
- * If the <code>IComparableProperty</code> (thus meaning the member or
- * accessed data) is changed from outside, the internal order of this set will
- * get corrupted and iterations or add/remove calls may fail. Therefore it is
+ * If the <code>IComparableProperty</code> (thus meaning the member or accessed
+ * data) is changed from outside, the internal order of this set will get
+ * corrupted and iterations or add/remove calls may fail. Therefore it is
  * necessary to remove the instance before outside modification and later on add
  * it again.
  * <p>
@@ -57,10 +57,9 @@ import java.util.TreeSet;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  * @param <T>
- *            the type of instances to store.
+ *          the type of instances to store.
  */
-public class TreeSetGreedy<T extends IComparableProperty>
-    extends TreeSet<T> implements Set<T> {
+public class TreeSetGreedy<T extends IComparableProperty> extends TreeSet<T> implements Set<T> {
 
   /**
    * A <code>Comparator</code> that will compare {@link IComparableProperty}
@@ -71,7 +70,7 @@ public class TreeSetGreedy<T extends IComparableProperty>
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * @param <T>
-   *            the type of instances to compare.
+   *          the type of instances to compare.
    */
   private static final class NumberPropertyComparator<T extends IComparableProperty> implements
       Comparator<T>, Serializable {
@@ -88,15 +87,8 @@ public class TreeSetGreedy<T extends IComparableProperty>
     }
 
     /**
-     * Reference to an instance that has to be ordered in the
-     * <code>TreeSetGreedy</code> due to modification.
-     */
-    protected T m_resort = null;
-
-    /**
      * Compares two Objects by casting them to {@link IComparableProperty} and
-     * using their {@link  IComparableProperty#getComparableProperty()}
-     * property.
+     * using their {@link IComparableProperty#getComparableProperty()} property.
      * <p>
      * This <code>Comparator</code> may only be used in {@link java.util.Set}
      * instances that only contain <code>IComparableProperty</code> instances.
@@ -114,14 +106,14 @@ public class TreeSetGreedy<T extends IComparableProperty>
      * <p>
      * 
      * @param o1
-     *            the first instance for comparison.
+     *          the first instance for comparison.
      * 
      * @param o2
-     *            the second instance for comparison.
+     *          the second instance for comparison.
      * 
      * @throws ClassCastException
-     *             if one of the given arguments does not implement
-     *             {@link IComparableProperty}
+     *           if one of the given arguments does not implement
+     *           {@link IComparableProperty}
      * 
      * @return -1 if o1 is first, 0, if both are equal and +1 if o1 comes last.
      * 
@@ -140,11 +132,7 @@ public class TreeSetGreedy<T extends IComparableProperty>
         if (i1 < i2) {
           result = -1;
         } else if (i1 == i2) {
-          // here, we lie
-          // but increase the other
-          o2.setComparableProperty(this.createIncreasedNumber(o2.getComparableProperty()));
-          this.m_resort = o2;
-          result = 1;
+          result = 0;
         } else {
           result = 1;
         }
@@ -152,41 +140,6 @@ public class TreeSetGreedy<T extends IComparableProperty>
       return result;
     }
 
-    /**
-     * Creates a new number of the correct type increased by 1.
-     * <p>
-     * 
-     * @param n
-     *            the number to increase.
-     * 
-     * @return a new number of the correct type increased by 1.
-     */
-    private Number createIncreasedNumber(final Number n) {
-      Number result;
-      Class< ? > c = n.getClass();
-      if (c == Integer.class) {
-        result = new Integer(n.intValue() - 1);
-      } else if (c == Double.class) {
-        result = new Double(n.doubleValue() + 1);
-      } else if (c == Float.class) {
-        result = new Float(n.floatValue() + 1);
-      } else if (c == Short.class) {
-        result = new Short((short) (n.shortValue() + 1));
-      } else if (c == Byte.class) {
-        result = new Byte((byte) (n.byteValue() + 1));
-      } else if (c == Long.class) {
-        result = new Long(n.longValue() + 1);
-      } else if (c == BigDecimal.class) {
-        BigDecimal bd = new BigDecimal(n.toString());
-        bd = bd.add(new BigDecimal(1));
-        result = bd;
-      } else {
-        BigInteger bi = new BigInteger(n.toString());
-        bi = bi.add(new BigInteger("1"));
-        result = bi;
-      }
-      return result;
-    }
   }
 
   /**
@@ -194,17 +147,48 @@ public class TreeSetGreedy<T extends IComparableProperty>
    */
   private static final long serialVersionUID = 3258130237048173623L;
 
-  /** The comparator to use. */
-  private NumberPropertyComparator<T> m_comparator;
+  /**
+   * Creates a new number of the correct type increased by 1.
+   * <p>
+   * 
+   * @param n
+   *          the number to increase.
+   * 
+   * @return a new number of the correct type increased by 1.
+   */
+  private static Number createDecreasedNumber(final Number n) {
+    Number result;
+    Class< ? > c = n.getClass();
+    if (c == Integer.class) {
+      result = new Integer(n.intValue() - 1);
+    } else if (c == Double.class) {
+      result = new Double(n.doubleValue() - 1);
+    } else if (c == Float.class) {
+      result = new Float(n.floatValue() - 1);
+    } else if (c == Short.class) {
+      result = new Short((short) (n.shortValue() - 1));
+    } else if (c == Byte.class) {
+      result = new Byte((byte) (n.byteValue() - 1));
+    } else if (c == Long.class) {
+      result = new Long(n.longValue() - 1);
+    } else if (c == BigDecimal.class) {
+      BigDecimal bd = new BigDecimal(n.toString());
+      bd = bd.subtract(new BigDecimal(1));
+      result = bd;
+    } else {
+      BigInteger bi = new BigInteger(n.toString());
+      bi = bi.subtract(new BigInteger("1"));
+      result = bi;
+    }
+    return result;
+  }
 
   /**
-   * Creates an instance with an internal <code>Comparator</code> to fulfill
-   * the contract of this class.
+   * Creates an instance with an internal <code>Comparator</code> to fulfill the
+   * contract of this class.
    */
-  @SuppressWarnings("unchecked")
   public TreeSetGreedy() {
     super(new NumberPropertyComparator<IComparableProperty>());
-    this.m_comparator = (NumberPropertyComparator<T>) this.comparator();
   }
 
   /**
@@ -212,14 +196,14 @@ public class TreeSetGreedy<T extends IComparableProperty>
    * <p>
    * 
    * @param o
-   *            the T to add.
+   *          the T to add.
    * @return see superclass.
    * @see java.util.TreeSet#add(java.lang.Object)
    */
   @Override
   public synchronized boolean add(final T o) {
     boolean ret = this.addInternal(o);
-    this.packComparableProperties();
+    // this.packComparableProperties();
     return ret;
   }
 
@@ -228,25 +212,32 @@ public class TreeSetGreedy<T extends IComparableProperty>
    * <p>
    * 
    * @param o
-   *            the instance to add.
+   *          the instance to add.
    * 
    * @return true if the instance was added.
    */
   private boolean addInternal(final T o) {
-    boolean ret = super.add(o);
-    boolean success = false;
-    T resort = this.m_comparator.m_resort;
-    this.m_comparator.m_resort = null;
-    if (resort != null) {
-      success = this.remove(resort);
-      if (!success) {
-        System.err.println("Could not remove: " + resort);
+    if (!this.isEmpty()) {
+      // check if we have to manipulate the order to be able to store the
+      // element.
+      // Policy is: never change comparable property if it is avoidable!
+      boolean alreadyThrere = this.contains(o);
+      if (alreadyThrere) {
+        T first = this.first();
+        o.setComparableProperty(TreeSetGreedy.createDecreasedNumber(first.getComparableProperty()));
       }
-      // do it after add and see a StackOverflowError.
-      // then puzzle some hours why this happens... ;-)
-      this.addInternal(resort);
     }
+    boolean ret = super.add(o);
     return ret;
+  }
+
+  /**
+   * @see java.util.TreeSet#remove(java.lang.Object)
+   */
+  @Override
+  public boolean remove(final Object o) {
+    boolean result = super.remove(o);
+    return result;
   }
 
   /**
@@ -274,14 +265,11 @@ public class TreeSetGreedy<T extends IComparableProperty>
    * <p>
    * 
    */
-  private void packComparableProperties() {
-    int i = 0;
-    for (IComparableProperty prop : this) {
-      prop.setComparableProperty(new Integer(i));
-      i++;
-    }
-  }
-
-
+  // private void packComparableProperties() {
+  // int i = ITrace2D.ZINDEX_MAX;
+  // for (IComparableProperty prop : this) {
+  // prop.setComparableProperty(new Integer(i));
+  // i++;
+  // }
+  // }
 }
-

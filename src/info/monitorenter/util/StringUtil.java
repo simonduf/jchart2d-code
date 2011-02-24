@@ -1,6 +1,6 @@
 /*
  *  StringUtil, utility class for string operations.
- *  Copyright (C) Achim Westermann, created on 09.09.2004, 12:38:21
+ *  Copyright (C) 2004 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -34,7 +34,7 @@ import java.util.List;
  * 
  * @author Achim.Westermann@gmx.de
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public final class StringUtil {
   /** Singleton instance. */

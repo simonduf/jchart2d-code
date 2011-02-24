@@ -2,7 +2,7 @@
  *  AAxisTransformation.java of project jchart2d, 
  *  base class for Axis implementations that transform the scale 
  *  for changed display.  
- *  Copyright (c) 2007 Achim Westermann, created on 20:33:13.
+ *  Copyright (C) 2007 -2010 Achim Westermann, created on 20:33:13.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@ package info.monitorenter.gui.chart.axis;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.util.MathUtil;
 import info.monitorenter.util.Range;
 
@@ -40,12 +40,9 @@ import java.util.Iterator;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.27 $
+ * @version $Revision: 1.30 $
  */
 public abstract class AAxisTransformation extends AAxis {
-
-  /** Generated <code>serialVersionUID</code>. **/
-  private static final long serialVersionUID = -4665444421196939779L;
 
   /**
    * An accessor for the x axis of a chart.
@@ -78,8 +75,8 @@ public abstract class AAxisTransformation extends AAxis {
     @Override
     protected void scaleTrace(final ITrace2D trace, final Range range) {
       if (trace.isVisible()) {
-        Iterator<TracePoint2D> itPoints = trace.iterator();
-        TracePoint2D point;
+        Iterator<ITracePoint2D> itPoints = trace.iterator();
+        ITracePoint2D point;
         double result;
         double scaler = range.getExtent();
         itPoints = trace.iterator();
@@ -175,10 +172,10 @@ public abstract class AAxisTransformation extends AAxis {
     @Override
     protected void scaleTrace(final ITrace2D trace, final Range range) {
       if (trace.isVisible()) {
-        TracePoint2D point;
+        ITracePoint2D point;
         double scaler = range.getExtent();
         double result;
-        Iterator<TracePoint2D> itPoints = trace.iterator();
+        Iterator<ITracePoint2D> itPoints = trace.iterator();
         while (itPoints.hasNext()) {
           point = itPoints.next();
           double absolute = point.getY();
@@ -242,6 +239,9 @@ public abstract class AAxisTransformation extends AAxis {
     }
 
   }
+
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = -4665444421196939779L;
 
   /**
    * Internal flag that defines that only every n milliseconds a transformation

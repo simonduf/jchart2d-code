@@ -1,6 +1,6 @@
 /*
  *  AxisActionSetRangePolicy.java of project jchart2d
- *  Copyright (c) 2007 Achim Westermann, created on 00:13:29.
+ *  Copyright (c) 2007 - 2010 Achim Westermann, created on 00:13:29.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -43,7 +43,7 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.15 $
  */
 public class AxisActionSetRangePolicy
     extends AAxisAction {
@@ -107,7 +107,11 @@ public class AxisActionSetRangePolicy
   /**
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
+  @Override
   public void propertyChange(final PropertyChangeEvent evt) {
+    // will check for an axis replacement and transfer listening to the new axis if so: 
+    super.propertyChange(evt);
+    
     String property = evt.getPropertyName();
     if (property.equals(IAxis.PROPERTY_RANGEPOLICY)) {
       Class< ? > rangepolicyClass = evt.getNewValue().getClass();

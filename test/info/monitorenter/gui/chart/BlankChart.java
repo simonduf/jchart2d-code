@@ -38,7 +38,7 @@ import junit.framework.TestSuite;
  * 
  * @author zoola
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final class BlankChart
     extends TestCase {
@@ -47,18 +47,6 @@ public final class BlankChart
    * Generated <code>serialVersionUID</code>.
    */
   private static final long serialVersionUID = 3258408426458525753L;
-
-  /**
-   * Creates a test case with the given name.
-   * <p>
-   * 
-   * @param testName
-   *          the name of the test case.
-   */
-  public BlankChart(final String testName) {
-    super(testName);
-
-  }
 
   /**
    * Test suite for this test class.
@@ -74,6 +62,18 @@ public final class BlankChart
     suite.addTest(new BlankChart("testBlankChart"));
 
     return suite;
+  }
+
+  /**
+   * Creates a test case with the given name.
+   * <p>
+   * 
+   * @param testName
+   *          the name of the test case.
+   */
+  public BlankChart(final String testName) {
+    super(testName);
+
   }
 
   /**

@@ -1,7 +1,7 @@
 /*
  *  TracePainterBar.java, a trace painter that renders a bar 
  *  for each point.
- *  Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@
 package info.monitorenter.gui.chart.traces.painters;
 
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.pointpainters.PointPainterVerticalBar;
 
 import java.awt.Graphics;
@@ -38,11 +38,10 @@ import java.awt.Graphics;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.17 $
  * 
  */
-public class TracePainterVerticalBar
-    extends ATracePainter {
+public class TracePainterVerticalBar extends ATracePainter {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 6151930248938945671L;
@@ -98,11 +97,11 @@ public class TracePainterVerticalBar
   /**
    * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int,
    *      int, int, int, java.awt.Graphics,
-   *      info.monitorenter.gui.chart.TracePoint2D)
+   *      info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final TracePoint2D original) {
+      final int nextY, final Graphics g, final ITracePoint2D original) {
     super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
     this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
   }

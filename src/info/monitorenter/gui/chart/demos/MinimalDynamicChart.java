@@ -1,7 +1,7 @@
 /*
  *  MinimalDynamicChart.java of project jchart2d, a demonstration 
  *  of the minimal code to set up a chart with dynamic data. 
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2010 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,7 @@
 package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.io.ADataCollector;
 import info.monitorenter.gui.chart.io.RandomDataCollectorOffset;
@@ -56,12 +57,14 @@ public final class MinimalDynamicChart {
     Chart2D chart = new Chart2D();
     // Create an ITrace:
     // Note that dynamic charts need limited amount of values!!!
-    ITrace2D trace = new Trace2DLtd(1000);
+    ITrace2D trace = new Trace2DLtd(100);
     trace.setColor(Color.RED);
 
     // Add the trace to the chart:
     chart.addTrace(trace);
-
+    IAxis axisX = chart.getAxisX();
+    axisX.setStartMajorTick(false);
+    axisX.setMajorTickSpacing(10);
     // Make it visible:
     // Create a frame.
     JFrame frame = new JFrame("MinimalDynamicChart");
@@ -80,7 +83,7 @@ public final class MinimalDynamicChart {
     });
     frame.setVisible(true);
     // Every 20 milliseconds a new value is collected.
-    ADataCollector collector = new RandomDataCollectorOffset(trace, 20);
+    ADataCollector collector = new RandomDataCollectorOffset(trace, 100);
     collector.start();
   }
 

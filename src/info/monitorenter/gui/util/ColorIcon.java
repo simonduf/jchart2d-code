@@ -1,7 +1,7 @@
 /*
  *  ColorIcon.java of project jchart2d, an icon that displays a 
  *  rectangular color.
- *  Copyright 2007 (C) Achim Westermann, created on 01.04.2007 13:20:33.
+ *  Copyright (C) 2004 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,7 @@ import javax.swing.Icon;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  */
 public class ColorIcon implements Icon {
   /** The color for the icon. */
@@ -50,6 +50,16 @@ public class ColorIcon implements Icon {
    */
   public ColorIcon(final Color color) {
     this.m_color = color;
+  }
+
+  /**
+   * Returns the color of this icon.
+   * <p>
+   * 
+   * @return the color of this icon.
+   */
+  public final Color getColor() {
+    return this.m_color;
   }
 
   /**
@@ -79,16 +89,6 @@ public class ColorIcon implements Icon {
     g.setColor(this.m_color);
     g.fillRect(x + 1, y + 1, 9, 9);
     g.setColor(old);
-  }
-
-  /**
-   * Returns the color of this icon.
-   * <p>
-   * 
-   * @return the color of this icon.
-   */
-  public final Color getColor() {
-    return this.m_color;
   }
 
   /**

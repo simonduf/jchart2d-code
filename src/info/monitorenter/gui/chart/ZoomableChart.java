@@ -1,7 +1,7 @@
 /*
  *  ZoomableChart.java of project jchart2d, a chart enriched 
  *  by zoom functionality in x dimension. 
- *  Copyright 2007 (C) Achim Westermann, created on 23:58:31.
+ *  Copyright (C) 2004 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -42,7 +42,7 @@ import java.awt.geom.Rectangle2D;
  * 
  * @author Alessio Sambarino (Contributor)
  * 
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.16 $
  * 
  * @author Klaus Pesendorfer (klaus.pesendorfer@fabalabs.org)
  * 
@@ -234,7 +234,7 @@ public class ZoomableChart
    * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
    */
   @Override
-  protected void paintComponent(final Graphics g) {
+  protected synchronized void paintComponent(final Graphics g) {
 
     super.paintComponent(g);
 

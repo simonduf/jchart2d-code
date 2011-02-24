@@ -1,6 +1,6 @@
 /*
  *  AxisActionSetRange.java of project jchart2d
- *  Copyright (c) 2007 Achim Westermann, created on 20:30:06.
+ *  Copyright (c) 2007 - 2010 Achim Westermann, created on 20:30:06.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -32,19 +32,45 @@ import java.beans.PropertyChangeEvent;
 
 /**
  * <code>Action</code> that sets the range of an
- * {@link info.monitorenter.gui.chart.axis.AAxis} of a chart ({@link info.monitorenter.gui.chart.Chart2D})
- * that will be used by it's viewport (
- * {@link info.monitorenter.gui.chart.axis.AAxis#setRangePolicy(info.monitorenter.gui.chart.IRangePolicy)})
- * by showing a modal range chooser.
+ * {@link info.monitorenter.gui.chart.axis.AAxis} of a chart (
+ * {@link info.monitorenter.gui.chart.Chart2D}) that will be used by it's
+ * viewport (
+ * {@link info.monitorenter.gui.chart.axis.AAxis#setRangePolicy(info.monitorenter.gui.chart.IRangePolicy)}
+ * ) by showing a modal range chooser.
+ * <p>
+ * 
+ * This only works if the bislider.jar file is in the classpath.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.11 $
  */
-public class AxisActionSetRange
-    extends AAxisAction {
+public class AxisActionSetRange extends AAxisAction {
+
+  /**
+   * Flag set whenever the proper jar file (apache-xmlgraphics-commons) is in
+   * the classpath.
+   */
+  public static final boolean RANGE_CHOOSER_SUPPORTED;
+
+  static {
+    Class< ? > test = null;
+    try {
+      // Do a fake operation that will not be inlined by the compiler:
+      test = Class.forName("com.visutools.nav.bislider.BiSlider");
+
+    } catch (Throwable ncde) {
+      // nop
+    } finally {
+      if (test != null) {
+        RANGE_CHOOSER_SUPPORTED = true;
+      } else {
+        RANGE_CHOOSER_SUPPORTED = false;
+      }
+    }
+  }
 
   /**
    * Generated <code>serialVersionUID</code>.
@@ -60,8 +86,8 @@ public class AxisActionSetRange
    *          the owner of the axis to trigger actions upon.
    * 
    * @param axis
-   *          needed to identify the axis of the chart: one of {@link Chart2D#X},
-   *          {@link Chart2D#Y}.
+   *          needed to identify the axis of the chart: one of {@link Chart2D#X}
+   *          , {@link Chart2D#Y}.
    * 
    * @param description
    *          the descriptive <code>String</code> that will be displayed by
@@ -71,6 +97,9 @@ public class AxisActionSetRange
    */
   public AxisActionSetRange(final Chart2D chart, final String description, final int axis) {
     super(chart, description, axis);
+    if (!RANGE_CHOOSER_SUPPORTED) {
+      this.setEnabled(false);
+    }
   }
 
   /**
@@ -89,7 +118,10 @@ public class AxisActionSetRange
   /**
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
+  @Override
   public void propertyChange(final PropertyChangeEvent evt) {
+    // will check for an axis replacement and transfer listening to the new axis if so: 
+    super.propertyChange(evt);
     // nop as this action will not be used
     // by checkbox or radio button menu items that have a state.
   }

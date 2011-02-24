@@ -1,7 +1,8 @@
 /*
  *
- *  RandomDataCollector.java  jchart2d
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 15:04:16
+ *  RandomDataCollector.java  of project jchart2d, collects random data for 
+ *  demo purposes. 
+ *  Copyright (C) 2004 - 2010 Achim Westermann, created on 10.12.2004, 15:04:16
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,7 +25,9 @@
 package info.monitorenter.gui.chart.io;
 
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.TracePoint2D;
+
 
 /**
  * A proof of concept dummy implementation for the supertype.
@@ -38,7 +41,7 @@ import info.monitorenter.gui.chart.TracePoint2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.8 $
  */
 public class RandomDataCollectorOffset extends ADataCollector {
 
@@ -67,7 +70,7 @@ public class RandomDataCollectorOffset extends ADataCollector {
    * @see ADataCollector#collectData()
    */
   @Override
-  public TracePoint2D collectData() {
+  public ITracePoint2D collectData() {
     double rand = Math.random();
     boolean add = (rand >= 0.5) ? true : false;
     this.m_y = (add) ? this.m_y + Math.random() : this.m_y - Math.random();

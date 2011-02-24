@@ -2,7 +2,7 @@
  *  Chart2DActionSaveEpsSingleton, 
  *  singleton action that saves the chart to an encapsulated postscript
  *  file.
- *  Copyright (C) 2008 Achim Westermann
+ *  Copyright (C) 2007 - 2010 Achim Westermann
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -40,26 +40,28 @@ import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
+import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
+
 /**
- * Singleton <code>Action</code> that saves the current chart to an
- * encapsulated postscript file at the the location specified by showing a modal
- * file chooser save dialog.
+ * Singleton <code>Action</code> that saves the current chart to an encapsulated
+ * postscript file at the the location specified by showing a modal file chooser
+ * save dialog.
  * <p>
  * Only one instance per target component may exist.
  * <p>
  * 
  * @see info.monitorenter.gui.chart.events.Chart2DActionSetCustomGridColor
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.3 $
  */
-public final class Chart2DActionSaveEpsSingleton {
+public final class Chart2DActionSaveEpsSingletonApacheFop {
 
   /**
    * Dummy action that is always disabled.
    * <p>
    * 
    */
-  public static class ActionDisabledDummy extends AbstractAction {
+  private static class ActionDisabledDummy extends AbstractAction {
     /** Generated <code>serialVersionUID</code>. */
     private static final long serialVersionUID = 5537391176736852739L;
 
@@ -121,9 +123,10 @@ public final class Chart2DActionSaveEpsSingleton {
      *          the descriptive <code>String</code> that will be displayed by
      *          {@link javax.swing.AbstractButton} subclasses that get this
      *          <code>Action</code> assigned (
-     *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+     *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}
+     *          ).
      */
-    private Chart2DActionSaveEps(final Chart2D chart, final String colorName) {
+    public Chart2DActionSaveEps(final Chart2D chart, final String colorName) {
       super(chart, colorName);
       chart.addPropertyChangeListener(Chart2D.PROPERTY_GRID_COLOR, this);
       // configure the file chooser:
@@ -152,11 +155,19 @@ public final class Chart2DActionSaveEpsSingleton {
         // get the encoding
         try {
           FileOutputStream outStream = new FileOutputStream(file);
-          org.sourceforge.jlibeps.epsgraphics.EpsGraphics2D g = new org.sourceforge.jlibeps.epsgraphics.EpsGraphics2D(
-              "Title", outStream, 0, 0, this.m_chart.getWidth(), this.m_chart.getHeight());
-          this.m_chart.paint(g);
-          g.flush();
-          g.close();
+          
+          EPSDocumentGraphics2D g2d = new EPSDocumentGraphics2D(true);
+          g2d.setGraphicContext(new org.apache.xmlgraphics.java2d.GraphicContext());
+          g2d.setupDocument(outStream, this.m_chart.getWidth(),this.m_chart.getHeight()); 
+
+//          org.sourceforge.jlibeps.epsgraphics.EpsGraphics2D g = new org.sourceforge.jlibeps.epsgraphics.EpsGraphics2D(
+//              "Title", outStream, 0, 0, this.m_chart.getWidth(), this.m_chart.getHeight());
+          //g.scale(0.24, 0.24);
+
+          
+          this.m_chart.paint(g2d);
+//          g.flush();
+//          g.close();
           outStream.close();
         } catch (IOException e1) {
           e1.printStackTrace();
@@ -172,10 +183,11 @@ public final class Chart2DActionSaveEpsSingleton {
       // nop
     }
   }
+
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -7446202109342192546L;
 
-  /** Flag set whenever the proper jar file (jlibeps) is in the classpath. */
+  /** Flag set whenever the proper jar file (apache-xmlgraphics-commons) is in the classpath. */
   public static final boolean EPS_SUPPORTED;
 
   /**
@@ -184,10 +196,10 @@ public final class Chart2DActionSaveEpsSingleton {
   private static Map<String, Action> instances = new HashMap<String, Action>();
 
   static {
-    Class<?> test = null;
+    Class< ? > test = null;
     try {
       // Do a fake operation that will not be inlined by the compiler:
-      test = Class.forName("org.sourceforge.jlibeps.epsgraphics.EpsGraphics2D");
+      test = Class.forName("org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D");
 
     } catch (Throwable ncde) {
       // nop
@@ -218,15 +230,15 @@ public final class Chart2DActionSaveEpsSingleton {
    * @return the single instance for the given component.
    */
   public static Action getInstance(final Chart2D chart, final String actionName) {
-    Action result = Chart2DActionSaveEpsSingleton.instances.get(Chart2DActionSaveEpsSingleton
+    Action result = Chart2DActionSaveEpsSingletonApacheFop.instances.get(Chart2DActionSaveEpsSingletonApacheFop
         .key(chart));
     if (result == null) {
-      if (EPS_SUPPORTED) {
+      if (Chart2DActionSaveEpsSingletonApacheFop.EPS_SUPPORTED) {
         result = new Chart2DActionSaveEps(chart, actionName);
       } else {
         result = new ActionDisabledDummy(actionName);
       }
-      Chart2DActionSaveEpsSingleton.instances.put(Chart2DActionSaveEpsSingleton.key(chart), result);
+      Chart2DActionSaveEpsSingletonApacheFop.instances.put(Chart2DActionSaveEpsSingletonApacheFop.key(chart), result);
     }
     return result;
   }
@@ -241,5 +253,13 @@ public final class Chart2DActionSaveEpsSingleton {
    */
   private static String key(final Chart2D chart) {
     return chart.getClass().getName() + chart.hashCode();
+  }
+
+  /**
+   * Singleton constructor.
+   * <p>
+   */
+  private Chart2DActionSaveEpsSingletonApacheFop() {
+    // nop
   }
 }

@@ -23,6 +23,7 @@
 package info.monitorenter.gui.chart.traces;
 
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.TracePoint2D;
 
 import java.util.Map;
@@ -82,8 +83,8 @@ public class TestTrace2DLtd
     long max = 1000000;
     long percentModulo = max / 20;
     System.out.println("Adding " + max + " points to a Trace2DLtd and a WeakHashMap...");
-    TracePoint2D point;
-    Map<TracePoint2D, String> weakMap = new WeakHashMap<TracePoint2D, String>();
+    ITracePoint2D point;
+    Map<ITracePoint2D, String> weakMap = new WeakHashMap<ITracePoint2D, String>();
     for (long i = 0; i < max; i++) {
       point = new TracePoint2D(i, i);
       trace.addPoint(point);
@@ -102,7 +103,7 @@ public class TestTrace2DLtd
     System.out.println("System.gc()... ");
     System.gc();
     keys = 0;
-    for (TracePoint2D pt : weakMap.keySet()) {
+    for (ITracePoint2D pt : weakMap.keySet()) {
       keys++;
       System.out.println("Point " + pt.toString() + " was not dropped.");
     }

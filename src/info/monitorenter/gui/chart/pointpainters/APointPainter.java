@@ -2,11 +2,7 @@
  *  APointPainter.java of project jchart2d, adapter class 
  *  that implements the optional methods of the interface 
  *  IPointPainter with "no operations". 
- *  Copyright (c) 2007 Achim Westermann,/*
- *  PointPainterColorStepper.java of project jchart2d, wrapper 
- *  for IPointPainter implementations that adds color stepping 
- *  of subsequent paint point invocations. 
- *  Copyright (c) 2007 Achim Westermann, created on 03.09.2006 20:27:06.
+ *  Copyright (c) 2006 - 2010 Achim Westermann, created on 03.09.2006 20:27:06.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -38,28 +34,51 @@ import java.awt.Graphics;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.9 $
  * 
  * @since 3.0.0
- * 
  */
-public abstract class APointPainter implements IPointPainter {
+public abstract class APointPainter implements IPointPainter<APointPainter>  {
+
+
 
   /** Generated <code>serialVersionUID</code>. **/
   private static final long serialVersionUID = -8279972259015294590L;
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#endPaintIteration(java.awt.Graphics)
+   * Default constructor (sets the consumed by paint flag to false).
+   * <p>
    */
-  public void endPaintIteration(final Graphics g2d) {
+  public APointPainter() {
     // nop
   }
+
+
+
+  public final int compareTo(APointPainter o) {
+    int result;
+    result = this.toString().compareTo(o.toString());
+    return result;
+  }
+
+
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#endPaintIteration(java.awt.Graphics)
+   */
+  public final void endPaintIteration(final Graphics g2d) {
+    // wipeout
+  }
+
 
   /**
    * @see info.monitorenter.gui.chart.IPointPainter#startPaintIteration(java.awt.Graphics)
    */
-  public void startPaintIteration(final Graphics g2d) {
-    // nop
+  public final void startPaintIteration(final Graphics g2d) {
+    // wipeout
   }
 
+
+  
+  
 }

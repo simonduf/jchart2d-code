@@ -1,7 +1,7 @@
 /*
  *  IPaintPointer.java of project jchart2d, generic interface for 
  *  instances that have to render a point in pixel coordinates.
- *  Copyright (c) 2007 Achim Westermann, created on 03.09.2006 19:50:38.
+ *  Copyright (c) 2004 - 2010 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -42,10 +42,11 @@ import java.io.Serializable;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
+ * @param <T> demonstration of unknown comparable and inheritance idiom or bad generics design for this case. 
  * 
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.17 $
  */
-public interface IPointPainter extends Serializable {
+public interface IPointPainter<T extends IPointPainter<T>> extends Serializable, Comparable<T>  {
   /**
    * Invoked to inform implementations that a paint iteration ends for the
    * corresponding {@link info.monitorenter.gui.chart.ITrace2D}.
@@ -55,16 +56,6 @@ public interface IPointPainter extends Serializable {
    *          provided in case pending paint operations have to be performed.
    */
   public void endPaintIteration(Graphics g2d);
-
-  /**
-   * Invoked to inform implementations that a paint iteration starts for the
-   * corresponding {@link info.monitorenter.gui.chart.ITrace2D}.
-   * <p>
-   * 
-   * @param g2d
-   *          provided in case pending paint operations have to be performed.
-   */
-  public void startPaintIteration(Graphics g2d);
 
   /**
    * Paint the point given by absolute coordinates on the given graphic context.
@@ -103,6 +94,16 @@ public interface IPointPainter extends Serializable {
    *            it should not be changed too!
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final TracePoint2D original);
+      final int nextY, final Graphics g, final ITracePoint2D original);
+
+  /**
+   * Invoked to inform implementations that a paint iteration starts for the
+   * corresponding {@link info.monitorenter.gui.chart.ITrace2D}.
+   * <p>
+   * 
+   * @param g2d
+   *          provided in case pending paint operations have to be performed.
+   */
+  public void startPaintIteration(Graphics g2d);
 
 }

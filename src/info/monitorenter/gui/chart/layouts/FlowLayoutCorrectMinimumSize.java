@@ -1,5 +1,5 @@
 /*  FlowLayoutCorrectMinimumSize.java of project jchart2d, <purpose>
- *  Copyright (c) 2007 Achim Westermann, created on 08.10.2006 14:44:18.
+ *  Copyright (c) 2006 - 2010 Achim Westermann, created on 08.10.2006 14:44:18.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -42,7 +42,7 @@ import java.awt.Insets;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.12 $
  */
 public class FlowLayoutCorrectMinimumSize extends FlowLayout {
 
@@ -86,54 +86,53 @@ public class FlowLayoutCorrectMinimumSize extends FlowLayout {
   }
 
   /**
-   * Returns the preferred dimensions for this layout given the <i>visible</i>
-   * components in the specified target container.
+   * Lays out the container. This method lets each <i>visible</i> component
+   * take its preferred size by reshaping the components in the target container
+   * in order to satisfy the alignment of this <code>FlowLayout</code> object.
    * 
    * @param target
-   *            the container that needs to be laid out
-   * @return the preferred dimensions to lay out the subcomponents of the
-   *         specified container
+   *            the specified component being laid out
    * @see Container
-   * @see #minimumLayoutSize
-   * @see java.awt.Container#getPreferredSize
+   * @see java.awt.Container#doLayout
    */
   @Override
-  public Dimension preferredLayoutSize(final Container target) {
+  public void layoutContainer(final Container target) {
     synchronized (target.getTreeLock()) {
       int hgap = this.getHgap();
       int vgap = this.getVgap();
+
       Insets insets = target.getInsets();
       int maxwidth = target.getWidth() - (insets.left + insets.right + hgap * 2);
-
       int nmembers = target.getComponentCount();
-      boolean firstVisibleComponent = true;
+      int x = 0;
+      int y = insets.top + vgap;
+      int rowh = 0;
+      int start = 0;
 
-      int rowWidth = 0;
-      int maxRowWidth = 0;
-      int height = 0;
+      boolean ltr = target.getComponentOrientation().isLeftToRight();
+
       for (int i = 0; i < nmembers; i++) {
         Component m = target.getComponent(i);
         if (m.isVisible()) {
           Dimension d = m.getPreferredSize();
-          if (firstVisibleComponent) {
-            height = d.height;
-            firstVisibleComponent = false;
-          }
-          if (rowWidth + hgap + d.width > maxwidth) {
-            maxRowWidth = Math.max(rowWidth, maxRowWidth);
-            height += (vgap + d.height);
-            rowWidth = d.width;
+          m.setSize(d.width, d.height);
+
+          if ((x == 0) || ((x + d.width) <= maxwidth)) {
+            if (x > 0) {
+              x += hgap;
+            }
+            x += d.width;
+            rowh = Math.max(rowh, d.height);
           } else {
-            rowWidth += (hgap + d.width);
+            this.moveComponents(target, insets.left + hgap, y, maxwidth - x, rowh, start, i, ltr);
+            x = d.width;
+            y += vgap + rowh;
+            rowh = d.height;
+            start = i;
           }
         }
       }
-
-      Dimension dim = new Dimension(maxRowWidth, height);
-
-      dim.width += insets.left + insets.right + hgap * 2;
-      dim.height += insets.top + insets.bottom + vgap * 2;
-      return dim;
+      this.moveComponents(target, insets.left + hgap, y, maxwidth - x, rowh, start, nmembers, ltr);
     }
   }
 
@@ -186,57 +185,6 @@ public class FlowLayoutCorrectMinimumSize extends FlowLayout {
       dim.width += insets.left + insets.right + hgap * 2;
       dim.height += insets.top + insets.bottom + vgap * 2;
       return dim;
-    }
-  }
-
-  /**
-   * Lays out the container. This method lets each <i>visible</i> component
-   * take its preferred size by reshaping the components in the target container
-   * in order to satisfy the alignment of this <code>FlowLayout</code> object.
-   * 
-   * @param target
-   *            the specified component being laid out
-   * @see Container
-   * @see java.awt.Container#doLayout
-   */
-  @Override
-  public void layoutContainer(final Container target) {
-    synchronized (target.getTreeLock()) {
-      int hgap = this.getHgap();
-      int vgap = this.getVgap();
-
-      Insets insets = target.getInsets();
-      int maxwidth = target.getWidth() - (insets.left + insets.right + hgap * 2);
-      int nmembers = target.getComponentCount();
-      int x = 0;
-      int y = insets.top + vgap;
-      int rowh = 0;
-      int start = 0;
-
-      boolean ltr = target.getComponentOrientation().isLeftToRight();
-
-      for (int i = 0; i < nmembers; i++) {
-        Component m = target.getComponent(i);
-        if (m.isVisible()) {
-          Dimension d = m.getPreferredSize();
-          m.setSize(d.width, d.height);
-
-          if ((x == 0) || ((x + d.width) <= maxwidth)) {
-            if (x > 0) {
-              x += hgap;
-            }
-            x += d.width;
-            rowh = Math.max(rowh, d.height);
-          } else {
-            this.moveComponents(target, insets.left + hgap, y, maxwidth - x, rowh, start, i, ltr);
-            x = d.width;
-            y += vgap + rowh;
-            rowh = d.height;
-            start = i;
-          }
-        }
-      }
-      this.moveComponents(target, insets.left + hgap, y, maxwidth - x, rowh, start, nmembers, ltr);
     }
   }
 
@@ -296,6 +244,58 @@ public class FlowLayoutCorrectMinimumSize extends FlowLayout {
           xMod += m.getWidth() + hgap;
         }
       }
+    }
+  }
+
+  /**
+   * Returns the preferred dimensions for this layout given the <i>visible</i>
+   * components in the specified target container.
+   * 
+   * @param target
+   *            the container that needs to be laid out
+   * @return the preferred dimensions to lay out the subcomponents of the
+   *         specified container
+   * @see Container
+   * @see #minimumLayoutSize
+   * @see java.awt.Container#getPreferredSize
+   */
+  @Override
+  public Dimension preferredLayoutSize(final Container target) {
+    synchronized (target.getTreeLock()) {
+      int hgap = this.getHgap();
+      int vgap = this.getVgap();
+      Insets insets = target.getInsets();
+      int maxwidth = target.getWidth() - (insets.left + insets.right + hgap * 2);
+
+      int nmembers = target.getComponentCount();
+      boolean firstVisibleComponent = true;
+
+      int rowWidth = 0;
+      int maxRowWidth = 0;
+      int height = 0;
+      for (int i = 0; i < nmembers; i++) {
+        Component m = target.getComponent(i);
+        if (m.isVisible()) {
+          Dimension d = m.getPreferredSize();
+          if (firstVisibleComponent) {
+            height = d.height;
+            firstVisibleComponent = false;
+          }
+          if (rowWidth + hgap + d.width > maxwidth) {
+            maxRowWidth = Math.max(rowWidth, maxRowWidth);
+            height += (vgap + d.height);
+            rowWidth = d.width;
+          } else {
+            rowWidth += (hgap + d.width);
+          }
+        }
+      }
+
+      Dimension dim = new Dimension(maxRowWidth, height);
+
+      dim.width += insets.left + insets.right + hgap * 2;
+      dim.height += insets.top + insets.bottom + vgap * 2;
+      return dim;
     }
   }
 }

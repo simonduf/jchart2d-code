@@ -1,7 +1,7 @@
 /*
  *  Chart2DActionPrintSingleton, 
  *  singleton action that prints the chart with a dialog.
- *  Copyright (C) 2008 Achim Westermann
+ *  Copyright (C) 2007 - 2010 Achim Westermann
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ import java.util.Map;
  * 
  * @see info.monitorenter.gui.chart.events.Chart2DActionSetCustomGridColor
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.6 $
  */
 public final class Chart2DActionPrintSingleton
     extends AChart2DAction {
@@ -54,27 +54,17 @@ public final class Chart2DActionPrintSingleton
   private static Map<String, Chart2DActionPrintSingleton> instances = new HashMap<String, Chart2DActionPrintSingleton>();
 
   /**
-   * This is set to true when this action is triggered internally.
-   * <p>
-   * This signals the chart that is painting that a print cycle is running triggered by this action
-   * and the chart should be printed on the whole page.
-   * <p>
-   * Requesting this value has to be synchronized together with the method
-   * <code>{@link Chart2D#paint(java.awt.Graphics)}</code> method and reset to false from there.
-   * <p>
-   */
-  private transient boolean m_printWholePage = false;
-
-  /**
-   * Creates a key for the component for internal storage.
+   * Returns the single instance for the given component or null, if it is not existing.
    * <p>
    * 
    * @param chart
-   *            the chart to generate the storage key for.
-   * @return a storage key unique for the given chart instance.
+   *            the target the action will work on
+   * @return the single instance for the given component or null.
    */
-  private static String key(final Chart2D chart) {
-    return chart.getClass().getName() + chart.hashCode();
+  public static Chart2DActionPrintSingleton getInstance(final Chart2D chart) {
+    Chart2DActionPrintSingleton result = Chart2DActionPrintSingleton.instances
+        .get(Chart2DActionPrintSingleton.key(chart));
+    return result;
   }
 
   /**
@@ -101,18 +91,28 @@ public final class Chart2DActionPrintSingleton
   }
 
   /**
-   * Returns the single instance for the given component or null, if it is not existing.
+   * Creates a key for the component for internal storage.
    * <p>
    * 
    * @param chart
-   *            the target the action will work on
-   * @return the single instance for the given component or null.
+   *            the chart to generate the storage key for.
+   * @return a storage key unique for the given chart instance.
    */
-  public static Chart2DActionPrintSingleton getInstance(final Chart2D chart) {
-    Chart2DActionPrintSingleton result = Chart2DActionPrintSingleton.instances
-        .get(Chart2DActionPrintSingleton.key(chart));
-    return result;
+  private static String key(final Chart2D chart) {
+    return chart.getClass().getName() + chart.hashCode();
   }
+
+  /**
+   * This is set to true when this action is triggered internally.
+   * <p>
+   * This signals the chart that is painting that a print cycle is running triggered by this action
+   * and the chart should be printed on the whole page.
+   * <p>
+   * Requesting this value has to be synchronized together with the method
+   * <code>{@link Chart2D#paint(java.awt.Graphics)}</code> method and reset to false from there.
+   * <p>
+   */
+  private transient boolean m_printWholePage = false;
 
   /**
    * Create an <code>Action</code> that accesses the trace and identifies itself with the given
@@ -152,13 +152,6 @@ public final class Chart2DActionPrintSingleton
   }
 
   /**
-   * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-   */
-  public void propertyChange(final PropertyChangeEvent evt) {
-    // nop
-  }
-
-  /**
    * Returns true if this action triggered a print request for the corresponding chart.
    * <p>
    * 
@@ -166,6 +159,13 @@ public final class Chart2DActionPrintSingleton
    */
   public final boolean isPrintWholePage() {
     return this.m_printWholePage;
+  }
+
+  /**
+   * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+   */
+  public void propertyChange(final PropertyChangeEvent evt) {
+    // nop
   }
 
   /**

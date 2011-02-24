@@ -23,11 +23,8 @@
 package info.monitorenter.gui.chart.test;
 
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.IRangePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.axis.AAxis;
-import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
-import info.monitorenter.util.Range;
 
 import javax.swing.JFrame;
 
@@ -49,8 +46,8 @@ public abstract class ATestJChart2D extends TestCase {
   /** The y axis configured for the test chart. */
   protected AAxis m_axisY;
 
-  /** The trace configured for the test chart. */
-  protected ITrace2D m_trace;
+  /** The traces configured for the test chart. */
+  protected ITrace2D[] m_traces;
 
   /** The test chart. */
   protected Chart2D m_chart;
@@ -70,46 +67,6 @@ public abstract class ATestJChart2D extends TestCase {
   }
 
   /**
-   * Returns the chart.
-   * <p>
-   * 
-   * @return the chart
-   */
-  public final Chart2D getChart() {
-    return this.m_chart;
-  }
-
-  /**
-   * Returns the trace.
-   * <p>
-   * 
-   * @return the trace
-   */
-  public final ITrace2D getTrace() {
-    return this.m_trace;
-  }
-
-  /**
-   * Creates a range policy with fixed viewport and a configured range, sets it
-   * to the both axis and tests wether the configured range is modified in
-   * bounds.
-   * <p>
-   * 
-   */
-  public void testSetRangePolicyFixedViewPort() {
-    Range range = new Range(1, 2);
-    IRangePolicy rangePolicy = new RangePolicyFixedViewport(range);
-    this.m_axisX.setRangePolicy(rangePolicy);
-    Range axisRange = this.m_axisX.getRangePolicy().getRange();
-    Assert.assertEquals(range.getMin(), axisRange.getMin(), 0);
-    Assert.assertSame(range, axisRange);
-    this.m_axisY.setRangePolicy(rangePolicy);
-    axisRange = this.m_axisY.getRangePolicy().getRange();
-    Assert.assertEquals(range.getMin(), axisRange.getMin(), 0);
-    Assert.assertSame(range, axisRange);
-  }
-
-  /**
    * Implement and return an instance of the type to test.
    * <p>
    * 
@@ -125,13 +82,14 @@ public abstract class ATestJChart2D extends TestCase {
    */
   protected abstract AAxis createAxisY();
 
+
   /**
-   * Implement and return an instance of the type to test.
+   * Implement and return the instances of the type to test.
    * <p>
    * 
-   * @return the trace to test.
+   * @return the traces to test.
    */
-  protected abstract ITrace2D createTrace();
+  protected abstract ITrace2D[] createTraces();
 
   /**
    * Template method that fills the configured trace with data.
@@ -141,6 +99,26 @@ public abstract class ATestJChart2D extends TestCase {
    *          this class will use the internal configured trace for the test.
    */
   protected abstract void fillTrace(ITrace2D trace2D);
+
+  /**
+   * Returns the chart.
+   * <p>
+   * 
+   * @return the chart
+   */
+  public final Chart2D getChart() {
+    return this.m_chart;
+  }
+
+  /**
+   * Returns the traces.
+   * <p>
+   * 
+   * @return the traces
+   */
+  public final ITrace2D[] getTraces() {
+    return this.m_traces;
+  }
 
   /**
    * Sets up a chart and shows it in a frame.
@@ -153,15 +131,18 @@ public abstract class ATestJChart2D extends TestCase {
     super.setUp();
     this.m_axisX = this.createAxisX();
     this.m_axisY = this.createAxisY();
-    this.m_trace = this.createTrace();
-    this.fillTrace(this.m_trace);
+    this.m_traces = this.createTraces();
 
     this.m_chart = new Chart2D();
-    this.m_chart.setAxisXBottom(this.m_axisX);
-    this.m_chart.setAxisYLeft(this.m_axisY);
-    this.m_chart.addTrace(this.m_trace);
+    this.m_chart.setAxisXBottom(this.m_axisX, 0);
+    this.m_chart.setAxisYLeft(this.m_axisY, 0);
+    for (int i = 0; i < this.m_traces.length; i++) {
+      this.m_chart.addTrace(this.m_traces[i]);
+    }
     Assert.assertNotSame(this.m_axisX, this.m_axisY);
-
+    for (int i = 0; i < this.m_traces.length; i++) {
+      this.fillTrace(this.m_traces[i]);
+    }
     this.m_frame = new JFrame();
     this.m_frame.getContentPane().add(this.m_chart);
     this.m_frame.setSize(400, 600);

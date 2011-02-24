@@ -1,7 +1,7 @@
 /*
  *  ErrorBarPolicyActionAddPainter.java of project jchart2d, action 
  *  that adds a new ErrorBarPainterConfigureable to the given IErrorBarPolicy. 
- *  Copyright 2007 (C) Achim Westermann, created on 09.12.2006 00:14:25.
+ *  Copyright (C) 2006 - 2010 Achim Westermann, created on 09.12.2006 00:14:25.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -41,10 +41,9 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.8 $
  */
-public class ErrorBarPolicyActionAddPainter
-    extends AErrorBarPolicyAction {
+public class ErrorBarPolicyActionAddPainter extends AErrorBarPolicyAction {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -697786192464802918L;
@@ -63,7 +62,7 @@ public class ErrorBarPolicyActionAddPainter
    *          <code>Action</code> assigned (
    *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    */
-  public ErrorBarPolicyActionAddPainter(final IErrorBarPolicy errorBarPolicy,
+  public ErrorBarPolicyActionAddPainter(final IErrorBarPolicy< ? > errorBarPolicy,
       final String description) {
     super(errorBarPolicy, description);
 
@@ -77,10 +76,10 @@ public class ErrorBarPolicyActionAddPainter
     this.m_errorBarPolicy.addErrorBarPainter(painter);
     // update UI:
     Component component = (Component) e.getSource();
-    Window dialog = UIUtil.findFrame(component);
+    Window dialog = UIUtil.findDialogWindow(component);
+    dialog.validate();
     dialog.pack();
   }
-
 
   /**
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)

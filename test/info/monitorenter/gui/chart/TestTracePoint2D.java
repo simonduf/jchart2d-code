@@ -35,23 +35,12 @@ import junit.framework.TestSuite;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.9 $
  * 
  * @since 7.0.0
  * 
  */
-public class TestTracePoint2D extends TestChart {
-  /**
-   * Constructor with the test name.
-   * <p>
-   * 
-   * @param testname
-   *          the test name.
-   */
-  public TestTracePoint2D(final String testname) {
-    super(testname);
-  }
-
+public class TestTracePoint2D extends TestChart2D {
   /**
    * Test suite for this test class.
    * <p>
@@ -69,6 +58,25 @@ public class TestTracePoint2D extends TestChart {
   }
 
   /**
+   * Constructor with the test name.
+   * <p>
+   * 
+   * @param testname
+   *          the test name.
+   */
+  public TestTracePoint2D(final String testname) {
+    super(testname);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.test.ATestJChart2D#createTraces()
+   */
+  @Override
+  protected ITrace2D[] createTraces() {
+    return new ITrace2D[] {new Trace2DLtd(200) };
+  }
+
+  /**
    * Test for <code>{@link TracePoint2D#setLocation(double, double)}.</code>
    * <p>
    * 
@@ -77,19 +85,11 @@ public class TestTracePoint2D extends TestChart {
    * 
    */
   public void testSetLocationDoubleDouble() throws InterruptedException {
-    TracePoint2D point = this.m_trace.iterator().next();
+    ITracePoint2D point = this.getTraces()[0].iterator().next();
     Thread.sleep(2000);
     point.setLocation(point.getX(), point.getY() + 20);
     Thread.sleep(2000);
 
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.test.ATestJChart2D#createTrace()
-   */
-  @Override
-  protected ITrace2D createTrace() {
-    return new Trace2DLtd(200);
   }
 
 }

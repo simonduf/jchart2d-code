@@ -2,7 +2,7 @@
  *  Trace2DLtdSorting, a TreeSet based implementation of a ITrace2D, which
  *  has a maximum amount of TracePoints (fifo) and performs an insertion sort
  *  of the TracePoint2D- instances.
- *  Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@
 
 package info.monitorenter.gui.chart.traces;
 
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 
 /**
  * Additional to the <code>Trace2DLtdReplacing</code> all tracepoints will be
@@ -38,7 +38,7 @@ import info.monitorenter.gui.chart.TracePoint2D;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.10 $
  */
 public class Trace2DLtdSorted extends Trace2DSorted {
 
@@ -84,13 +84,13 @@ public class Trace2DLtdSorted extends Trace2DSorted {
    * @return true if the point was successfully removed.
    */
   @Override
-  protected boolean addPointInternal(final TracePoint2D point) {
+  protected boolean addPointInternal(final ITracePoint2D point) {
 
     boolean rem = this.removePoint(point);
     this.m_points.add(point);
     if (!rem) {
       if (this.m_points.size() > this.m_maxsize) {
-        TracePoint2D remove =  this.m_points.last();
+        ITracePoint2D remove =  this.m_points.last();
         this.removePoint(remove);
       }
     }

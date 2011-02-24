@@ -1,6 +1,6 @@
 /*
  *  TracePainterDisc.java,  <enter purpose here>.
- *  Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2010 Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -21,7 +21,7 @@
  */
 package info.monitorenter.gui.chart.traces.painters;
 
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 
 import java.awt.Graphics;
@@ -33,11 +33,12 @@ import java.awt.Graphics;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.18 $
  * 
  */
-public class TracePainterDisc
-    extends ATracePainter {
+public class TracePainterDisc extends ATracePainter {
+
+
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 8919406018882664083L;
@@ -74,18 +75,10 @@ public class TracePainterDisc
     }
     this.m_pointPainter.endPaintIteration(g2d);
   }
-  /**
-   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#startPaintIteration(java.awt.Graphics)
-   */
-  @Override
-  public void startPaintIteration(final Graphics g2d) {
-    this.m_pointPainter.startPaintIteration(g2d);
-  }
-
 
   /**
    * Returns the diameter of the discs to paint in pixel.
-   * <p>
+   * <p> 
    * 
    * @return the diameter of the discs to paint in pixel.
    */
@@ -96,11 +89,11 @@ public class TracePainterDisc
   /**
    * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int,
    *      int, int, int, java.awt.Graphics,
-   *      info.monitorenter.gui.chart.TracePoint2D)
+   *      info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final TracePoint2D original) {
+      final int nextY, final Graphics g, final ITracePoint2D original) {
     super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
     this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
   }
@@ -114,5 +107,13 @@ public class TracePainterDisc
    */
   public void setDiscSize(final int discSize) {
     this.m_pointPainter.setDiscSize(discSize);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#startPaintIteration(java.awt.Graphics)
+   */
+  @Override
+  public void startPaintIteration(final Graphics g2d) {
+    this.m_pointPainter.startPaintIteration(g2d);
   }
 }

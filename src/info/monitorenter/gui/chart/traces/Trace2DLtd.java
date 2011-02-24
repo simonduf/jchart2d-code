@@ -1,6 +1,6 @@
 /*
  *  Trace2DLtd, a RingBuffer- based fast implementation of a ITrace2D.
- *  Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2010  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@ package info.monitorenter.gui.chart.traces;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.util.collections.IRingBuffer;
 import info.monitorenter.util.collections.RingBufferArrayFast;
 
@@ -47,7 +47,7 @@ import java.util.Iterator;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.16 $
  */
 public class Trace2DLtd
     extends ATrace2D implements ITrace2D {
@@ -59,7 +59,7 @@ public class Trace2DLtd
    * Internal fast FIFO buffer implementation based upon indexed access to an
    * array.
    */
-  protected IRingBuffer<TracePoint2D> m_buffer;
+  protected IRingBuffer<ITracePoint2D> m_buffer;
 
   /**
    * Constructs an instance with a default buffer size of 100.
@@ -93,7 +93,7 @@ public class Trace2DLtd
    *            the name that will be displayed for this trace.
    */
   public Trace2DLtd(final int maxsize, final String name) {
-    this.m_buffer = new RingBufferArrayFast<TracePoint2D>(maxsize);
+    this.m_buffer = new RingBufferArrayFast<ITracePoint2D>(maxsize);
     this.setName(name);
   }
 
@@ -109,12 +109,12 @@ public class Trace2DLtd
   }
 
   /**
-   * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.TracePoint2D)
+   * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  protected boolean addPointInternal(final TracePoint2D p) {
+  protected boolean addPointInternal(final ITracePoint2D p) {
 
-    TracePoint2D removed = this.m_buffer.add(p);
+    ITracePoint2D removed = this.m_buffer.add(p);
     double tmpx;
     double tmpy;
     if (removed != null) {
@@ -179,7 +179,7 @@ public class Trace2DLtd
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#iterator()
    */
-  public Iterator<TracePoint2D> iterator() {
+  public Iterator<ITracePoint2D> iterator() {
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("Trace2DLtd.iterator, 0 locks");
     }
@@ -220,7 +220,7 @@ public class Trace2DLtd
    * 
    */
   @Override
-  protected TracePoint2D removePointInternal(final TracePoint2D point) {
+  protected ITracePoint2D removePointInternal(final ITracePoint2D point) {
     return null;
   }
 

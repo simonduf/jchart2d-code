@@ -1,7 +1,7 @@
 /*
  *  ZoomTest.java of project jchart2d, demonstration of a zoom-enabled 
  *  chart. 
- *  Copyright 2007 (C) Achim Westermann, created on 23:59:21.
+ *  Copyright 2007 - 2010 (C) Achim Westermann, created on 23:59:21.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,7 @@ package info.monitorenter.gui.chart.demos;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ZoomableChart;
+import info.monitorenter.gui.chart.pointhighlighters.PointHighlighterConfigurable;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.views.ChartPanel;
@@ -46,16 +47,10 @@ import javax.swing.JFrame;
  * <p>
  * 
  * @author Alessio Sambarino (Contributor)
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.15 $
  */
 public class ZoomTest
     extends JFrame {
-
-  /**
-   * Generated <code>serial version UID</code>.
-   * <p>
-   */
-  private static final long serialVersionUID = -2249660781499017221L;
 
   /**
    * Action adapter for zoomAllButton.
@@ -84,6 +79,12 @@ public class ZoomTest
       this.m_zoomableChart.zoomAll();
     }
   }
+
+  /**
+   * Generated <code>serial version UID</code>.
+   * <p>
+   */
+  private static final long serialVersionUID = -2249660781499017221L;
 
   /**
    * Main startup method.
@@ -117,6 +118,7 @@ public class ZoomTest
 
     // Create ITrace
     ITrace2D trace = new Trace2DSimple("Trace");
+    chart.addTrace(trace);
     trace.setColor(Color.RED);
     trace.setStroke(new BasicStroke(2));
 
@@ -128,10 +130,9 @@ public class ZoomTest
     trace.addPoint(4, 1);
     trace.addPoint(5, 0);
 
-    // Add the trace to the chart
-    chart.addTrace(trace);
     
     trace = new Trace2DSimple();
+    chart.addTrace(trace);
     trace.addPoint(0, 3);
     trace.addPoint(1, 2);
     trace.addPoint(2, 2);
@@ -139,10 +140,11 @@ public class ZoomTest
     trace.addPoint(4, -1);
     trace.addPoint(5, 1);
     trace.setColor(Color.BLUE);
-    chart.addTrace(trace);
 
+    // Tool tips and highlighting: Both modes point out the neares trace point to the cursor: 
     chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
-    chart.setPointHighlighter(new PointPainterDisc(8));
+    trace.setPointHighlighter(new PointHighlighterConfigurable(new PointPainterDisc(10),true));
+    chart.enablePointHighlighting(true);
 
     // Add chart to the pane
     c.add(new ChartPanel(chart));
