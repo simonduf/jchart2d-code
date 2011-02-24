@@ -1,0 +1,90 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+ <!--#include virtual="./head.shtml" -->
+ <script language="javascript">
+  var update="12/09/2004";
+ </script>
+ <body id="feature">
+  <div id="wrapper">
+   <div id="main">
+    <!-- Header -->
+    <!--#include virtual="./header.shtml" -->
+
+    
+    <!--#include virtual="./navigation.shtml" -->
+    <!-- Navigation -->
+    <div id="content">
+    
+     <h2>Features</h2>
+     <p>
+      <ol>
+       <li>
+        Easy usage: only a few lines of code are necessary to use a chart. 
+        No complex specification of data points, labels or grids necessary. 
+        This is done per default and may optionally be configured. 
+       <li> 
+        Multiple traces with different behaviour may be added to a single 
+        chart.
+       <li>
+        Efficient event - handling. The event chain starts from the single 
+        tracepoint traverses the trace and stops at the chart. All changed or 
+        newly added tracepoints will be reflected in the view. If the range 
+        of an axis is not changed, no rescaling has to be done. Else it is still 
+        distinguished between rescaling the x - axis or y - axis.
+       <li>
+        Caching of scaled values at tracepoint - level. 
+       <li>
+        Automatic choice of the unit - prefix (multiplier) according to the 
+        scientific unit system (nano , milli, tera, ..). 
+       <li> 
+        Choosable display of grids, labels, labeled scalepoints, decimals 
+        of labeled scalepoints. 
+       <li>
+        Exact visualisation of labeled scalepoints. No label of a scalepoint 
+        is ever rounded to the next current chosen decimal, instead the scalepoint 
+        is shifted to a position which represents an exact decimal. 
+       <li>
+        Fully resizable. The amount of labeled scalepoints may increase on 
+        choosing a bigger size. 
+       <li>
+        Deadlock - safe. Even this is hard to claim because testing depends 
+        on runtime behaviour of the current system, i did not encounter a deadlock 
+        situation while letting several threads modifiy traces all contained 
+        in the same chart (only the awt painting system may gets pretty busy).  
+       <li>
+        Trace - implementations with different behaviour: unordered, ringbuffered, 
+        ordered, bijective, ...
+      </ol>
+     </p>
+     
+     
+     <h2>Request new features</h2>
+     <p>
+      JChart2D is quite stable now. But still some features are missing and may 
+      be desireable. Ideas are: image - snapshots, triggers for exceeded bounds or 
+      custom painters on trace level. <em>But features will only be implemented by contributors 
+      or requests for features</em>. Open source is not paid and personally I do it for 
+      feedback and the knowledge, that anyone has a benefit out of it.   
+      <br>
+      It will be tried to add features in a clever order: 
+      First the basic features that will be needed by the more advanced ones. 
+      This allows to keeps it clean and stable without long terms of blind development 
+      (unable to perform a build). 
+     </p>
+     <p>
+      Regardless of the unofficial roadmap it is important to know, 
+      which features are most desirable for the users. <br>
+      So it is important to let us (by now only me) know about 
+      it: <br> 
+      <a href="https://sourceforge.net/tracker/?group_id=50440&atid=459737" target="blank">
+      Request a feature</a>.
+     </p>
+    </div>
+    <!-- End of contents div -->
+    <!-- The counter -->
+    <!--#include virtual="./footer.shtml" -->
+   </div>
+   <!-- End of main div -->
+  </div>	
+  <!-- End of wrapper div -->
+ </body>
+</html>

@@ -1,0 +1,109 @@
+/*
+jchart2d javadoc style file.
+*/
+
+html, body {
+   margin: 5px 5px;
+   color: #000;
+   background-color: #fff;
+   font: 10pt/12pt Verdana, sans-serif;
+}
+
+/* For the navigation - frame (in a table): kick margin-left. */
+table {
+  //margin-left: -10px;
+}
+
+.FrameItemFont {
+  font-size: 8pt;
+}
+
+.FrameTitleFont {
+  font-size: 10pt;
+}
+
+h1 {
+  font-size: 16pt;
+}
+
+h2 {
+  font-size: 14pt;
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 4px;
+  border: 0;
+}
+
+
+tr.TableRowColor td {
+  border: 1px solid #CCCCCC;
+}
+
+tr.TableHeadingColor td {
+  border: 1px ridge #888888;
+}
+
+
+
+hr {
+  border: 1px solid #ccc;	
+  height: 8px;
+}
+/* font size bugfix for "Packages" */
+td font b {
+  font-size: 12pt;
+}
+/* font size bugfix for "Packages" bugfix for navigation bar level 2. */
+td font a b {
+  font-size: 8pt;
+}
+/* font size bugfix for "Packages" bugfix for navigation bar level 1. */
+td a font b {
+  font-size: 8pt;
+}
+/* font size bugfix for "Packages" bugfix for navigation bar level 1, selected. */
+td.NavBarCell1Rev font b {
+  font-size: 8pt;
+}
+
+
+
+th,table#userstyle td {
+  padding:4px;
+  text-align: left;
+  vertical-align:top;
+  border: 1px solid #ccc;
+}
+
+th{
+  border: 1px solid #000;
+}
+
+:link {
+   color: #336699;
+   background-color: transparent;
+   text-decoration: none;
+   font-weight: bold;
+}
+
+:visited {
+   color: #336699;
+   background-color: transparent;
+   text-decoration: none;
+   font-weight: bold;
+}
+
+:link:hover, :visited:hover {
+   color: #6FA3C1;
+   background-color: transparent;
+   text-decoration: underline;
+}
+
+:link:active, :visited:active {
+   color: #FF0000;
+   background-color: transparent;
+   text-decoration: none;
+   font-weight: bold;
+}
