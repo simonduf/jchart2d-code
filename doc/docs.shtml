@@ -5,6 +5,7 @@
   by the generic footer via a "document.write(update);" - script.
  -->
  <script language="javascript">
+<<<<<<< OURS
   var update="02/06/2010";
  </script>
  <body id="docs">
@@ -36,6 +37,35 @@
        <a href="/docs/javadoc/index.html" target="blank">Browse javadoc of version 3</a>
        <br/>
        <a href="http://prdownloads.sourceforge.net/jchart2d/jchart2d-doc-3.2.0.zip?download" target="_blank">Download javadoc of version 3.2.0</a> (.zip format)
+=======
+  var update="05/21/2006";
+ </script>
+ <body id="docs">
+  <div id="wrapper">
+   <div id="main">
+    <!-- Header -->
+    <!--#include virtual="./header.shtml" -->
+
+    
+    <!--#include virtual="./navigation.shtml" -->
+    <!-- Navigation -->
+    <div id="content">
+     
+      <h2>Documentation</h2>
+     
+      <h3>Java API documentation</h3>
+      <p>
+       JChart2D's API is documented quite well. It provides 
+       helpful information for java developers. Look especially at  
+       the documentation for class info.monitorenter.gui.chart.Chart2D and the interfaces. <br>  
+       It is available 
+       for online-browsing and in form of a zip file (hosted at 
+       the sourceforge project page).
+       <br>
+       <a href="/docs/javadoc/index.html" target="blank">Browse javadoc</a>
+       <br>
+       <a href="http://sourceforge.net/project/showfiles.php?group_id=50440&package_id=44150&release_id=288670" target="_blank">Download javadoc</a> (.zip format)
+>>>>>>> THEIRS
       </p>
      </div>     
     <!-- End of contents div -->
