@@ -1,0 +1,110 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+ <!--#include virtual="./head.shtml" -->
+ <!--
+  Some trick: seting the date here allows to include it (client - side) 
+  by the generic footer via a "document.write(update);" - script.
+ -->
+ <script language="javascript">
+  var update="11/02/2005";
+ </script>
+ <body id="screenshot">
+  <div id="wrapper">
+   <div id="main">
+    <!-- Header -->
+    <!--#include virtual="./header.shtml" -->
+
+    
+    <!--#include virtual="./navigation.shtml" -->
+    <!-- Navigation -->
+    <div id="content">
+     
+     <table border="0">
+      <tr id="hspace">
+       <td colspan="3">&nbsp;</td>
+      </tr>
+   
+      <tr>
+       <td>&nbsp;</td>
+       <td>
+        <h2>Screenshots</h2><br>
+       </td> 
+       <td> &nbsp; </td>
+      </tr>
+   
+      <tr>
+       <td>&nbsp;</td>
+       <td>
+        <img src="./img/showcase.png" width="341px" height="335px" alt="Showcase demo application."/><br>
+        <br>
+        <font size="2">The showcase demo application: Interact with data collectors, traces and save images.</font>
+       </td>
+       <td>&nbsp;</td>
+      </tr>
+      
+      <tr id="vspacer">
+       <td colspan="3">&nbsp;</td>
+      </tr>
+   
+      <tr>
+       <td>&nbsp;</td>
+       <td>
+        <img src="./img/staticchartfill.png" width="400px" height="299px" alt="A chart with a trace that uses TracePainterFill."/><br>
+        <br>
+        <font size="2">A chart with custom colors and a trace that uses TracePainterFill.</font>
+       </td>
+       <td>&nbsp;</td>
+      </tr>
+      
+      <tr id="vspacer">
+       <td colspan="3">&nbsp;</td>
+      </tr>
+   
+      <tr>
+       <td>&nbsp;</td>
+       <td>
+        <img src="./img/staticchartdiscs.png" width="468px" height="339px" alt="A chart with a trace that uses TracePainterDisc."/><br>
+        <br>
+        <font size="2">A chart showing it's context menue and a trace that uses TracePainterDisc.</font>
+       </td>
+       <td>&nbsp;</td>
+      </tr>
+   
+      <tr id="vspacer">
+       <td colspan="3">&nbsp;</td>
+      </tr>
+   
+      <tr>
+       <td>&nbsp;</td>
+       <td>
+        <img src="./img/runningchart1.01.gif" width="700px" height="376px" alt="Running chart [dynamic]with limited amount of values."/><br>
+        <br>
+        <font size="2">Running chart [dynamic]with limited amount of values.</font>
+       </td>
+       <td>&nbsp;</td>
+      </tr>
+   
+      <tr id="vspacer">
+       <td colspan="3">&nbsp;</td>
+      </tr>
+   
+      <tr>
+       <td>&nbsp;</td>
+       <td>
+         <img border="0" src="./img/multitracing1.gif" width="499px" height="299px" alt="Multiple Threads painting." /><br>
+         <br>
+         <font size="2">Multiple Threads paint to the same chart.</font>
+       </td>
+       <td>&nbsp;</td>
+      </tr>
+     </table>
+      
+     </div>     
+    <!-- End of contents div -->
+    <!-- The counter -->
+    <!--#include virtual="./footer.shtml" -->
+   </div>
+   <!-- End of main div -->
+  </div>	
+  <!-- End of wrapper div -->
+ </body>
+</html>

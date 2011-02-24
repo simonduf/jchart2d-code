@@ -1,0 +1,18 @@
+
+ <head> 
+  <meta name="description" content="JChart2D, a free swing widget for precise runtime display of tuples in form of stripe charts.">
+  <meta name="keywords" content="free swing widget, measurements, visualisation of data, precise plotting, gnuplot, Achim Westermann">
+  <meta name="author" content="Achim.Westermann@gmx.de">
+  <meta name="robots" content="follow">
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  <script type="text/javascript"></script>
+  <style type="text/css" media="all">
+    @import "./pastel.css";
+    @import "./navigation.css";
+  </style>
+  
+  <title>
+  JChart2D, precise visualization of data.
+  </title>
+ </head>
+ 
