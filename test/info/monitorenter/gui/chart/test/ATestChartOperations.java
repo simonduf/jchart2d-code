@@ -1,5 +1,7 @@
 /*
- *  ATestChartOperations.java of project jchart2d, <purpose>
+ *  ATestChartOperations.java of project jchart2d, 
+ *  base class for visual method invocation test for a
+ *  info.monitorenter.gui.chart.Chart2D.
  *  Copyright 2007 (C) Achim Westermann, created on 25.02.2007 18:59:08.
  *
  *  This library is free software; you can redistribute it and/or
@@ -22,10 +24,13 @@
 package info.monitorenter.gui.chart.test;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.dialogs.ModalDialog;
+import info.monitorenter.gui.chart.traces.Trace2DSimple;
 
 import java.lang.reflect.Method;
 
+import javax.swing.JFrame;
 import javax.swing.JTextArea;
 
 /**
@@ -41,7 +46,7 @@ import javax.swing.JTextArea;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.7 $
  */
 public abstract class ATestChartOperations
     extends ATestJChart2D {
@@ -52,7 +57,7 @@ public abstract class ATestChartOperations
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
-   * @version $Revision: 1.4 $
+   * @version $Revision: 1.7 $
    */
   interface IChart2DOperation {
     /**
@@ -105,6 +110,25 @@ public abstract class ATestChartOperations
      * @return the name of the action to perform.
      */
     public String getName();
+
+    /**
+     * Simply create the proper <code>{@link Chart2D}</code> instance.
+     * <p>
+     * This allows to test subclasses (e.g.
+     * <code>{@link info.monitorenter.gui.chart.ZoomableChart}</code>) too.
+     * <p>
+     * 
+     * @return the chart instance to test.
+     */
+    public Chart2D createChartInstance();
+
+    /**
+     * Create a trace and fill it with the proper data points here.
+     * <p>
+     * 
+     * @return a trace filled with datapoints
+     */
+    public ITrace2D createTrace();
   }
 
   /**
@@ -126,7 +150,7 @@ public abstract class ATestChartOperations
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.4 $
+   * @version $Revision: 1.7 $
    */
   public abstract class AChartOperationReflectionBased implements
       ATestChartOperations.IChart2DOperation {
@@ -136,6 +160,26 @@ public abstract class ATestChartOperations
 
     /** The arguments for the operation to test. */
     private Object[] m_arguments;
+
+    /**
+     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#createTrace()
+     */
+    public ITrace2D createTrace() {
+      ITrace2D result = new Trace2DSimple();
+      long timeOffset = System.currentTimeMillis();
+      for (int i = 0; i < 101; i++) {
+        result.addPoint(timeOffset + i, i);
+      }
+      return result;
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#createChartInstance()
+     */
+    public Chart2D createChartInstance() {
+
+      return new Chart2D();
+    }
 
     /**
      * Creates an operation that will invoke the method of class {@link Chart2D}
@@ -208,12 +252,24 @@ public abstract class ATestChartOperations
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.4 $
+   * @version $Revision: 1.7 $
    */
   public abstract class AChartOperation implements ATestChartOperations.IChart2DOperation {
 
     /** The name of this operation. */
     private String m_name;
+
+    /**
+     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#createTrace()
+     */
+    public ITrace2D createTrace() {
+      ITrace2D result = new Trace2DSimple();
+      long timeOffset = System.currentTimeMillis();
+      for (int i = 0; i < 101; i++) {
+        result.addPoint(timeOffset + i, i);
+      }
+      return result;
+    }
 
     /**
      * Construtor with the operation's name.
@@ -231,6 +287,14 @@ public abstract class ATestChartOperations
      */
     public final String getName() {
       return this.m_name;
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#createChartInstance()
+     */
+    public Chart2D createChartInstance() {
+
+      return new Chart2D();
     }
 
     /**
@@ -292,6 +356,24 @@ public abstract class ATestChartOperations
     assertNotNull(
         "Test method has to invoke setTestOperation(ATestChartOperations.IChart2DOperation)",
         this.m_testOperation);
+
+    this.m_axisX = this.createAxisX();
+    this.m_axisY = this.createAxisY();
+    this.m_trace = this.m_testOperation.createTrace();
+
+    this.m_chart = this.m_testOperation.createChartInstance();
+    this.m_chart.setAxisX(this.m_axisX);
+    this.m_chart.setAxisY(this.m_axisY);
+    this.m_chart.addTrace(this.m_trace);
+    assertNotSame(this.m_axisX, this.m_axisY);
+
+    this.m_frame = new JFrame();
+    this.m_frame.getContentPane().add(this.m_chart);
+    // this.m_frame.add(new ChartPanel(this.m_chart));
+    this.m_frame.setSize(400, 600);
+    this.m_frame.setVisible(true);
+    Thread.sleep(1000);
+
     this.m_testOperation.preCondition(this.m_chart);
 
     // Modal dialog for announcing the test:
@@ -300,6 +382,7 @@ public abstract class ATestChartOperations
     textArea.setText(this.m_testOperation.getName());
     ModalDialog dialog = new ModalDialog(this.m_frame, "Operation to test...", textArea);
     dialog.showDialog();
+    boolean failure = false;
     if (dialog.isOk()) {
       this.m_testOperation.action(this.m_chart);
       // let tester take a look:
@@ -314,20 +397,21 @@ public abstract class ATestChartOperations
       dialog.setTitle("Judge operation " + this.m_testOperation.getName());
       dialog.showDialog();
       if (!dialog.isOk()) {
-        fail("Operation test " + this.m_testOperation.getName() + " was judged as a failure. ");
+        failure = true;
       }
     }
-
-    this.m_testOperation = null;
     super.tearDown();
-
+    if (failure) {
+      fail("Operation test " + this.m_testOperation.getName() + " was judged as a failure. ");
+    }
+    this.m_testOperation = null;
   }
 
   /**
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#setUp()
    */
   protected void setUp() throws Exception {
-    super.setUp();
+    // nop
   }
 
 }

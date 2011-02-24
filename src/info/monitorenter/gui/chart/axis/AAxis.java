@@ -20,24 +20,27 @@
  *  Achim.Westermann@gmx.de
  *
  */
-
 package info.monitorenter.gui.chart.axis;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
-import info.monitorenter.gui.chart.ILabelFormatter;
+import info.monitorenter.gui.chart.IAxisLabelFormatter;
+import info.monitorenter.gui.chart.IAxisTitlePainter;
 import info.monitorenter.gui.chart.IRangePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.LabeledValue;
 import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.axistitlepainters.AxisTitlePainterDefault;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterAutoUnits;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyUnbounded;
 import info.monitorenter.util.Range;
+import info.monitorenter.util.StringUtil;
 
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -49,19 +52,18 @@ import java.util.LinkedList;
  * The base class for an axis of the <code>{@link Chart2D}</code>.
  * <p>
  * Normally - as the design and interaction of an <code>Axis</code> with the
- * <code>Chart2D</code> is very fine-grained - it is not instantiated by users
- * of jchart2d: It is automatically instantiated by the constructor of
- * <code>Chart2D</code>. It then may be retrieved from the
+ * <code>{@link Chart2D}D</code> is very fine-grained - it is not
+ * instantiated by users of jchart2d: It is automatically instantiated by the
+ * constructor of <code>Chart2D</code>. It then may be retrieved from the
  * <code>Chart2D</code> by the methods {@link Chart2D#getAxisX()} and
  * {@link Chart2D#getAxisY()} for further configuration.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.23 $
  */
 public abstract class AAxis implements IAxis {
-
   /**
    * An internal connector class that will connect the axis to the a Chart2D.
    * <p>
@@ -76,7 +78,6 @@ public abstract class AAxis implements IAxis {
    * 
    */
   public abstract class AChart2DDataAccessor {
-
     /** The chart that is acessed. */
     protected Chart2D m_chart;
 
@@ -118,6 +119,20 @@ public abstract class AAxis implements IAxis {
      *         assigned to a chart.
      */
     public abstract int getDimension();
+
+    /**
+     * Returns the height in pixel the corresponding axis needs to paint itself.
+     * <p>
+     * 
+     * This includes the axis line, it's ticks and labels and it's title.
+     * <p>
+     * 
+     * @param g2d
+     *          needed for font metric information.
+     * 
+     * @return the height in pixel the corresponding axis needs to paint itself.
+     */
+    public abstract int getHeight(Graphics2D g2d);
 
     /**
      * Returns the maximum value from the Chart2D's axis (X or Y) this instance
@@ -235,6 +250,20 @@ public abstract class AAxis implements IAxis {
     protected abstract double getValueDistanceForPixel(int pixel);
 
     /**
+     * Returns the width in pixel the corresponding axis needs to paint itself.
+     * <p>
+     * 
+     * This includes the axis line, it's ticks and labels and it's title.
+     * <p>
+     * 
+     * @param g2d
+     *          needed for font metric information.
+     * 
+     * @return the width in pixel the corresponding axis needs to paint itself.
+     */
+    public abstract int getWidth(Graphics2D g2d);
+
+    /**
      * Scales all <code>{@link ITrace2D}</code> instances in the dimension
      * represented by this axis.
      * <p>
@@ -269,7 +298,10 @@ public abstract class AAxis implements IAxis {
      * @param rangePolicy
      *          The rangePolicy to set.
      */
-    public void setRangePolicy(final IRangePolicy rangePolicy) {
+    public final void setRangePolicy(final IRangePolicy rangePolicy) {
+
+      double max = this.getMax();
+      double min = this.getMin();
 
       this.m_rangePolicy.removePropertyChangeListener(this.m_chart, IRangePolicy.PROPERTY_RANGE);
       this.m_rangePolicy
@@ -281,6 +313,13 @@ public abstract class AAxis implements IAxis {
       this.m_rangePolicy.addPropertyChangeListener(IRangePolicy.PROPERTY_RANGE, this.m_chart);
       this.m_rangePolicy.addPropertyChangeListener(IRangePolicy.PROPERTY_RANGE_MAX, this.m_chart);
       this.m_rangePolicy.addPropertyChangeListener(IRangePolicy.PROPERTY_RANGE_MIN, this.m_chart);
+
+      // check for scaling changes:
+      if (max != this.getMax() || min != this.getMin()) {
+        this.m_chart.propertyChange(new PropertyChangeEvent(rangePolicy,
+            IRangePolicy.PROPERTY_RANGE, new Range(min, max), this.m_rangePolicy.getRange()));
+      }
+
     }
 
     /**
@@ -293,6 +332,7 @@ public abstract class AAxis implements IAxis {
      * 
      * @param mouseEvent
      *          a mouse event that has been fired on this component.
+     *          
      * @return the translation of the mouse event coordinates of the given mouse
      *         event to the value within the chart for the dimension covered by
      *         this axis (x or y) or null if no calculations could be performed
@@ -302,7 +342,7 @@ public abstract class AAxis implements IAxis {
 
     /**
      * Transforms the given pixel value (which has to be a awt value like
-     * {@link MouseEvent#getX()} into the chart value.
+     * {@link java.awt.event.MouseEvent#getX()} into the chart value.
      * <p>
      * 
      * Internal use only, the interface does not guarantee that the pixel
@@ -372,9 +412,23 @@ public abstract class AAxis implements IAxis {
     }
 
     /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getHeight(java.awt.Graphics2D)
+     */
+    public int getHeight(final Graphics2D g2d) {
+      FontMetrics fontdim = g2d.getFontMetrics();
+      // the height of the font:
+      int height = fontdim.getHeight();
+      // and the height of a major tick mark:
+      height += getChart().getAxisTickPainter().getMajorTickLength();
+      // and the height of the axis title:
+      height += AAxis.this.getTitlePainter().getHeight(AAxis.this, g2d);
+      return height;
+    }
+
+    /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMax()
      */
-    protected double getMax() {
+    protected final double getMax() {
       return this.m_rangePolicy.getMax(this.m_chart.getMinX(), this.m_chart.getMaxX());
     }
 
@@ -389,7 +443,7 @@ public abstract class AAxis implements IAxis {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMaximumPixelForLabel(Graphics)
      */
-    protected double getMaximumPixelForLabel(final Graphics g2d) {
+    protected final double getMaximumPixelForLabel(final Graphics g2d) {
 
       FontMetrics fontdim = g2d.getFontMetrics();
       int fontwidth = fontdim.charWidth('0');
@@ -446,7 +500,7 @@ public abstract class AAxis implements IAxis {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getValueDistanceForPixel(int)
      */
-    protected double getValueDistanceForPixel(final int pixel) {
+    protected final double getValueDistanceForPixel(final int pixel) {
       Dimension d = this.m_chart.getSize();
       int pxrangex = (int) d.getWidth() - 60;
       if (pxrangex <= 0) {
@@ -456,6 +510,18 @@ public abstract class AAxis implements IAxis {
       double pxToValue = valuerangex / pxrangex;
       double ret = pxToValue * pixel;
       return ret;
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getWidth(java.awt.Graphics2D)
+     */
+    public int getWidth(final Graphics2D g2d) {
+      FontMetrics fontdim = g2d.getFontMetrics();
+      // only the space required for the right side lable:
+      int fontwidth = fontdim.charWidth('0');
+      int rightSideOverhang = (AAxis.this.getFormatter().getMaxAmountChars()) * fontwidth;
+
+      return rightSideOverhang;
     }
 
     /**
@@ -494,21 +560,6 @@ public abstract class AAxis implements IAxis {
     }
 
     /**
-     * @see AAxis.AChart2DDataAccessor#setRangePolicy(info.monitorenter.gui.chart.IRangePolicy)
-     */
-    public void setRangePolicy(final IRangePolicy rangePolicy) {
-
-      double xmax = this.getMax();
-      double xmin = this.getMin();
-      super.setRangePolicy(rangePolicy);
-      // check for scaling changes:
-      if (xmax != this.getMax() || xmin != this.getMin()) {
-        this.m_chart.propertyChange(new PropertyChangeEvent(rangePolicy,
-            IRangePolicy.PROPERTY_RANGE, new Range(xmin, xmax), this.m_rangePolicy.getRange()));
-      }
-    }
-
-    /**
      * Returns "X".
      * <p>
      * 
@@ -521,7 +572,7 @@ public abstract class AAxis implements IAxis {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateMousePosition(java.awt.event.MouseEvent)
      */
-    public double translateMousePosition(final MouseEvent mouseEvent) {
+    public final double translateMousePosition(final MouseEvent mouseEvent) {
 
       return this.translatePxToValue(mouseEvent.getX());
     }
@@ -575,7 +626,6 @@ public abstract class AAxis implements IAxis {
    * 
    * @see Chart2D#getAxisY()
    */
-
   public class YDataAccessor
       extends AAxis.AChart2DDataAccessor {
 
@@ -594,8 +644,19 @@ public abstract class AAxis implements IAxis {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getDimension()
      */
-    public int getDimension() {
+    public final int getDimension() {
       return Chart2D.Y;
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getHeight(java.awt.Graphics2D)
+     */
+    public final int getHeight(final Graphics2D g2d) {
+      FontMetrics fontdim = g2d.getFontMetrics();
+      // only the space required for the right side lable:
+      int fontHeight = fontdim.getHeight();
+      return fontHeight;
+
     }
 
     /**
@@ -620,7 +681,7 @@ public abstract class AAxis implements IAxis {
      *          is required.
      * 
      */
-    protected double getMaximumPixelForLabel(final Graphics g2d) {
+    protected final double getMaximumPixelForLabel(final Graphics g2d) {
 
       FontMetrics fontdim = g2d.getFontMetrics();
       int fontheight = fontdim.getHeight();
@@ -664,14 +725,14 @@ public abstract class AAxis implements IAxis {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getPixelRange()
      */
-    protected int getPixelRange() {
+    protected final int getPixelRange() {
       return this.m_chart.getYChartStart() - this.m_chart.getYChartEnd();
     }
 
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getValueDistanceForPixel(int)
      */
-    protected double getValueDistanceForPixel(final int pixel) {
+    protected final double getValueDistanceForPixel(final int pixel) {
       Dimension d = this.m_chart.getSize();
       int pxrangey = (int) d.getHeight() - 40;
       if (pxrangey <= 0) {
@@ -681,6 +742,23 @@ public abstract class AAxis implements IAxis {
       double pxToValue = valuerangey / pxrangey;
       double ret = pxToValue * pixel;
       return ret;
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getWidth(java.awt.Graphics2D)
+     */
+    public final int getWidth(final Graphics2D g2d) {
+      FontMetrics fontdim = g2d.getFontMetrics();
+      // the width of the font:
+      int fontWidth = fontdim.charWidth('0');
+      // times the maximum amount of chars:
+      int height = fontWidth * AAxis.this.getFormatter().getMaxAmountChars();
+      // and the height of a major tick mark:
+      height += getChart().getAxisTickPainter().getMajorTickLength();
+      // and the Width of the axis title:
+      height += AAxis.this.getTitlePainter().getWidth(AAxis.this, g2d);
+      return height;
+
     }
 
     /**
@@ -717,20 +795,6 @@ public abstract class AAxis implements IAxis {
         }
       }
 
-    }
-
-    /**
-     * @see AAxis.AChart2DDataAccessor#setRangePolicy(IRangePolicy)
-     */
-    public void setRangePolicy(final IRangePolicy rangePolicy) {
-      double ymax = this.getMax();
-      double ymin = this.getMin();
-      super.setRangePolicy(rangePolicy);
-      // check for scaling changes:
-      if (ymax != this.getMax() || ymin != this.getMin()) {
-        this.m_chart.propertyChange(new PropertyChangeEvent(rangePolicy,
-            IRangePolicy.PROPERTY_RANGE, new Range(ymin, ymax), this.m_rangePolicy.getRange()));
-      }
     }
 
     /**
@@ -806,7 +870,7 @@ public abstract class AAxis implements IAxis {
   /**
    * Formatting of the labels.
    */
-  protected ILabelFormatter m_formatter;
+  protected IAxisLabelFormatter m_formatter;
 
   /**
    * The major tick spacing for label generations.
@@ -849,6 +913,15 @@ public abstract class AAxis implements IAxis {
    */
   private boolean m_startMajorTick = false;
 
+  /** The title of this axis. */
+  private String m_title;
+
+  /**
+   * The painter of the title of this axis, by default
+   * <code>{@link AxisTitlePainterDefault}</code>.
+   */
+  private IAxisTitlePainter m_titlePainter = new AxisTitlePainterDefault();
+
   /**
    * Default constructor that uses a {@link LabelFormatterAutoUnits} for
    * formatting labels.
@@ -867,7 +940,7 @@ public abstract class AAxis implements IAxis {
    *          needed for formatting labels of this axis.
    * 
    */
-  public AAxis(final ILabelFormatter formatter) {
+  public AAxis(final IAxisLabelFormatter formatter) {
     this.m_propertyChangeSupport = new PropertyChangeSupport(this);
     this.setFormatter(formatter);
 
@@ -890,10 +963,14 @@ public abstract class AAxis implements IAxis {
    * @param chart
    *          the chart to access.
    * 
+   * @param dimension
+   *          <code>{@link Chart2D#X}</code> or <code>{@link Chart2D#Y}</code>.
+   * 
+   * 
    * @return the proper <code>{@link AAxis.AChart2DDataAccessor}</code>
    *         implementation.
    */
-  protected abstract AChart2DDataAccessor createAccessor(Chart2D chart);
+  protected abstract AChart2DDataAccessor createAccessor(Chart2D chart, int dimension);
 
   /**
    * Returns the accessor to the chart.
@@ -919,9 +996,17 @@ public abstract class AAxis implements IAxis {
   /**
    * @return Returns the formatter.
    */
-  public final ILabelFormatter getFormatter() {
+  public final IAxisLabelFormatter getFormatter() {
 
     return this.m_formatter;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#getHeight(java.awt.Graphics2D)
+   */
+  public final int getHeight(final Graphics2D g2d) {
+
+    return this.getAccessor().getHeight(g2d);
   }
 
   /**
@@ -1000,13 +1085,8 @@ public abstract class AAxis implements IAxis {
   }
 
   /**
-   * Get the major tick spacing for label generation.
-   * <p>
-   * 
-   * @see #setMajorTickSpacing(double)
-   * 
+   * @see info.monitorenter.gui.chart.IAxis#getMajorTickSpacing()
    */
-
   public double getMajorTickSpacing() {
     return this.m_majorTickSpacing;
   }
@@ -1059,7 +1139,7 @@ public abstract class AAxis implements IAxis {
   }
 
   /**
-   * @see java.beans.PropertyChangeSupport#getPropertyChangeListeners(java.lang.String)
+   * @see info.monitorenter.gui.chart.IAxis#getPropertyChangeListeners(java.lang.String)
    */
   public PropertyChangeListener[] getPropertyChangeListeners(final String propertyName) {
     return this.m_propertyChangeSupport.getPropertyChangeListeners(propertyName);
@@ -1122,6 +1202,20 @@ public abstract class AAxis implements IAxis {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IAxis#getTitle()
+   */
+  public final String getTitle() {
+    return this.m_title;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#getTitlePainter()
+   */
+  public final IAxisTitlePainter getTitlePainter() {
+    return this.m_titlePainter;
+  }
+
+  /**
    * Returns the value distance on the current chart that exists for the given
    * amount of pixel distance in the given direction of this <code>Axis</code>.
    * <p>
@@ -1146,6 +1240,14 @@ public abstract class AAxis implements IAxis {
    */
   protected final double getValueDistanceForPixel(final int pixel) {
     return this.m_accessor.getValueDistanceForPixel(pixel);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#getWidth(java.awt.Graphics2D)
+   */
+  public final int getWidth(final Graphics2D g2d) {
+
+    return this.getAccessor().getWidth(g2d);
   }
 
   /**
@@ -1228,7 +1330,43 @@ public abstract class AAxis implements IAxis {
   }
 
   /**
-   * @see java.beans.PropertyChangeSupport#removePropertyChangeListener(java.lang.String,
+   * Routine for painting the title of this axis.
+   * <p>
+   * <b>Intended for <code>{@link Chart2D}</code> only!!!</b>
+   * 
+   * @param g2d
+   *          needed for painting.
+   * 
+   * @return the width consumed in px for y axis, the height consumed in px for
+   *         x axis.
+   */
+  public int paintTitle(final Graphics2D g2d) {
+    int result = 0;
+    // drawing the title :
+    if (!StringUtil.isEmpty(this.getTitle())) {
+      IAxisTitlePainter titlePainter;
+      titlePainter = this.getTitlePainter();
+      titlePainter.paintTitle(this, g2d);
+
+      int dimension = this.getDimension();
+      switch (dimension) {
+        case Chart2D.X:
+          result = titlePainter.getHeight(this, g2d);
+          break;
+        case Chart2D.Y:
+          result = titlePainter.getWidth(this, g2d);
+          break;
+        default:
+          throw new IllegalArgumentException(
+              "Given axis.getDimension() is neither Chart2D.X nor Chart2D.Y!");
+
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#removePropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
   public void removePropertyChangeListener(final String property,
@@ -1241,7 +1379,6 @@ public abstract class AAxis implements IAxis {
    */
   public void replace(final IAxis axis) {
     if (axis != null) {
-      this.setAccessor(axis.getAccessor());
 
       // No go for listeners:
       // TODO: keep in track with evolving IAxis properties!
@@ -1345,7 +1482,7 @@ public abstract class AAxis implements IAxis {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IAxis#scale()
+   * @see info.monitorenter.gui.chart.IAxis#scaleTrace(info.monitorenter.gui.chart.ITrace2D)
    */
   public void scaleTrace(final ITrace2D trace) {
     Range range = this.getRange();
@@ -1365,10 +1502,20 @@ public abstract class AAxis implements IAxis {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IAxis#setChart(info.monitorenter.gui.chart.Chart2D)
+   * Allows the chart to register itself with the axix.
+   * <p>
+   * 
+   * This is intended for <code>Chart2D</code> only!.
+   * <p>
+   * 
+   * @param chart
+   *          the chart to register itself with this axis.
+   * 
+   * @param dimension
+   *          <code>{@link Chart2D#X}</code> or <code>{@link Chart2D#Y}</code>.
    */
-  public void setChart(final Chart2D chart) {
-    this.m_accessor = this.createAccessor(chart);
+  public void setChart(final Chart2D chart, final int dimension) {
+    this.m_accessor = this.createAccessor(chart, dimension);
   }
 
   /**
@@ -1378,7 +1525,7 @@ public abstract class AAxis implements IAxis {
    * @param formatter
    *          The formatter to set.
    */
-  public void setFormatter(final ILabelFormatter formatter) {
+  public void setFormatter(final IAxisLabelFormatter formatter) {
 
     if (this.getAccessor() != null) {
       // remove listener for this:
@@ -1388,13 +1535,13 @@ public abstract class AAxis implements IAxis {
       // listener to subsequent format changes:
       if (this.m_formatter != null) {
         // remove listener on old formatter:
-        this.m_formatter.removePropertyChangeListener(ILabelFormatter.PROPERTY_FORMATCHANGE, this
-            .getAccessor().getChart());
+        this.m_formatter.removePropertyChangeListener(IAxisLabelFormatter.PROPERTY_FORMATCHANGE,
+            this.getAccessor().getChart());
       }
-      formatter.addPropertyChangeListener(ILabelFormatter.PROPERTY_FORMATCHANGE, this.getAccessor()
-          .getChart());
+      formatter.addPropertyChangeListener(IAxisLabelFormatter.PROPERTY_FORMATCHANGE, this
+          .getAccessor().getChart());
     }
-    ILabelFormatter old = this.m_formatter;
+    IAxisLabelFormatter old = this.m_formatter;
 
     this.m_formatter = formatter;
 
@@ -1567,6 +1714,28 @@ public abstract class AAxis implements IAxis {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IAxis#setTitle(String)
+   */
+  public final String setTitle(final String title) {
+    String result = this.m_title;
+    this.m_title = title;
+    return result;
+  }
+
+  /**
+   * Sets the title painter of this axis which is by default
+   * <code>{@link AxisTitlePainterDefault}</code>.
+   * <p>
+   * 
+   * @see info.monitorenter.gui.chart.IAxis#setTitlePainter(info.monitorenter.gui.chart.IAxisTitlePainter)
+   */
+  public final IAxisTitlePainter setTitlePainter(final IAxisTitlePainter painter) {
+    IAxisTitlePainter result = this.m_titlePainter;
+    this.m_titlePainter = painter;
+    return result;
+  }
+
+  /**
    * Returns the translation of the mouse event coordinates of the given mouse
    * event to the value within the chart for the dimension (x,y) covered by this
    * axis.
@@ -1577,11 +1746,32 @@ public abstract class AAxis implements IAxis {
    * 
    * @param mouseEvent
    *          a mouse event that has been fired on this component.
+   * 
    * @return the translation of the mouse event coordinates of the given mouse
    *         event to the value within the chart for the dimension covered by
    *         this axis (x or y) or null if no calculations could be performed as
    *         the chart was not painted before.
+   * 
+   * @throws IllegalArgumentException
+   *           if the given mouse event is out of the current graphics context
+   *           (not a mouse event of the chart component).
    */
-  public abstract double translateMousePosition(final MouseEvent mouseEvent);
+  public double translateMousePosition(final MouseEvent mouseEvent) throws IllegalArgumentException {
+    return this.getAccessor().translateMousePosition(mouseEvent);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#translatePxToValue(int)
+   */
+  public double translatePxToValue(final int pixel) {
+    return this.m_accessor.translatePxToValue(pixel);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#translateValueToPx(double)
+   */
+  public int translateValueToPx(final double value) {
+    return this.m_accessor.translateValueToPx(value);
+  }
 
 }

@@ -1,7 +1,7 @@
 /*
  *  IAxis.java of project jchart2d, interface for an axis of the 
  *  Chart2D.
- *  Copyright 2006 (C) Achim Westermann, created on 22:25:17.
+ *  Copyright 2007 (C) Achim Westermann, created on 22:25:17.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,7 @@ package info.monitorenter.gui.chart;
 import info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor;
 import info.monitorenter.util.Range;
 
+import java.awt.Graphics2D;
 import java.beans.PropertyChangeListener;
 
 /**
@@ -34,7 +35,7 @@ import java.beans.PropertyChangeListener;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.18 $
  */
 public interface IAxis {
   /**
@@ -113,7 +114,54 @@ public interface IAxis {
    * @param chart
    *          the chart to register itself with this axis.
    */
-  public void setChart(Chart2D chart);
+  //public void setChart(Chart2D chart);
+
+  /**
+   * Sets the title of this axis will be painted by the
+   * <code>{IAxisTitlePainter}</code> of this instance.
+   * <p>
+   * 
+   * @param title
+   *          the title to set.
+   * 
+   * @return the previous Title or <code>null</code> if there was no title
+   *         configured before.
+   * 
+   * @see #setTitlePainter(IAxisTitlePainter)
+   */
+  public String setTitle(String title);
+
+  /**
+   * Returns the title or <code>null</code> if there was no title configured
+   * before.
+   * <p>
+   * 
+   * @return the title or <code>null</code> if there was no title configured
+   *         before.
+   * 
+   * @see #getTitlePainter()
+   */
+  public String getTitle();
+
+  /**
+   * Sets the title painter that will paint the title of this axis.
+   * <p>
+   * 
+   * @param painter
+   *          the instance that will paint the title of this axis.
+   * 
+   * @return the previous title painter of this axis or null if there was none
+   *         configured before.
+   */
+  public IAxisTitlePainter setTitlePainter(IAxisTitlePainter painter);
+
+  /**
+   * Returns the instance that will paint the title of this axis.
+   * <p>
+   * 
+   * @return the instance that will paint the title of this axis.
+   */
+  public IAxisTitlePainter getTitlePainter();
 
   /**
    * Add a listener for the given property.
@@ -144,9 +192,9 @@ public interface IAxis {
    * <tr>
    * <td><code>{@link info.monitorenter.gui.chart.IAxis#PROPERTY_LABELFORMATTER}</code></td>
    * <td><code>{@link IAxis}</code> that changed</td>
-   * <td><code>{@link ILabelFormatter}</code>, the old value or null if
+   * <td><code>{@link IAxisLabelFormatter}</code>, the old value or null if
    * there was no formatter before. </td>
-   * <td><code>{@link ILabelFormatter}</code>, the new value</td>
+   * <td><code>{@link IAxisLabelFormatter}</code>, the new value</td>
    * </tr>
    * </table>
    * 
@@ -181,7 +229,7 @@ public interface IAxis {
    * 
    * @return the formatter for labels.
    */
-  public abstract ILabelFormatter getFormatter();
+  public abstract IAxisLabelFormatter getFormatter();
 
   /**
    * Get the major tick spacing for label generation.
@@ -205,6 +253,44 @@ public interface IAxis {
    * 
    */
   public abstract double getMinorTickSpacing();
+
+  /**
+   * Returns the width in pixel this axis needs to paint itself.
+   * <p>
+   * 
+   * This includes the axis line, it's ticks and labels and it's title.
+   * <p>
+   * 
+   * <b>Note:</b></br/> For an x axis the width only includes the overhang it
+   * needs on the right edge for painting a complete lable, not the complete
+   * space it needs for the complete line.
+   * <p>
+   * 
+   * @param g2d
+   *          needed for font metric information.
+   * 
+   * @return the width in pixel this axis needs to paint itself.
+   */
+  public int getWidth(Graphics2D g2d);
+
+  /**
+   * Returns the height in pixel this axis needs to paint itself.
+   * <p>
+   * 
+   * This includes the axis line, it's ticks and labels and it's title.
+   * <p>
+   * 
+   * <b>Note:</b></br/> For an y axis the hight only includes the overhang it
+   * needs on the upper edge for painting a complete lable, not the complete
+   * space it needs for the complete line.
+   * <p>
+   * 
+   * @param g2d
+   *          needed for font metric information.
+   * 
+   * @return the height in pixel this axis needs to paint itself.
+   */
+  public int getHeight(Graphics2D g2d);
 
   /**
    * Returns an array of all the listeners that were added to the this instance
@@ -336,7 +422,7 @@ public interface IAxis {
    * @param formatter
    *          The formatter to set.
    */
-  public abstract void setFormatter(final ILabelFormatter formatter);
+  public abstract void setFormatter(final IAxisLabelFormatter formatter);
 
   /**
    * This method sets the major tick spacing for label generation.

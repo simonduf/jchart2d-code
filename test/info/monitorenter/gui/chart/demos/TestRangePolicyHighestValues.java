@@ -33,7 +33,7 @@ import junit.framework.TestSuite;
 
 /**
  * Junit test for class
- * <code>{@link info.monitorenter.gui.chart.RangePolicyHighestValues}</code>.
+ * <code>{@link RangePolicyHighestValues}</code>.
  * <p>
  * 
  * @author Achim Westermann

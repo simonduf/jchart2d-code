@@ -36,7 +36,7 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  * 
  */
 public class PointPainterVerticalBar implements IPointPainter {
@@ -67,7 +67,7 @@ public class PointPainterVerticalBar implements IPointPainter {
    * 
    * @param barWidth
    *          the bar width in pixel to use.
-   *          
+   * 
    * @param chart
    *          the corresponding chart for bound information.
    */
@@ -87,7 +87,7 @@ public class PointPainterVerticalBar implements IPointPainter {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int,
+   * @see info.monitorenter.gui.chart.IPointPainter#paintPoint(int, int, int,
    *      int, java.awt.Graphics2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,

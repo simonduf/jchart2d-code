@@ -37,7 +37,7 @@ import java.util.Map;
 
 /**
  * A label formatter that adds an automatic choice of the unit SI prefix to a
- * decorated {@link info.monitorenter.gui.chart.ILabelFormatter}.
+ * decorated {@link info.monitorenter.gui.chart.IAxisLabelFormatter}.
  * <p>
  * 
  * The formatted Strings will be divided by a factor according to the automatic
@@ -46,7 +46,7 @@ import java.util.Map;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.13 $
  * 
  */
 public class LabelFormatterAutoUnits
@@ -128,7 +128,7 @@ public class LabelFormatterAutoUnits
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#addPropertyChangeListener(java.lang.String,
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#addPropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
   public void addPropertyChangeListener(final String propertyName,
@@ -166,7 +166,7 @@ public class LabelFormatterAutoUnits
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#format(double)
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#format(double)
    */
   public String format(final double value) {
     double tmp = value / this.m_unit.getFactor();
@@ -256,15 +256,15 @@ public class LabelFormatterAutoUnits
 
   }
 
-  /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#getMaxAmountChars()
-   */
+/**
+ * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getMinimumValueShiftForChange()
+ */
   public double getMinimumValueShiftForChange() {
     return this.m_delegate.getMinimumValueShiftForChange() * this.m_unit.getFactor();
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#getNextEvenValue(double,
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getNextEvenValue(double,
    *      boolean)
    */
   public double getNextEvenValue(final double value, final boolean ceiling) {
@@ -272,7 +272,7 @@ public class LabelFormatterAutoUnits
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#getUnit()
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getUnit()
    */
   public AUnit getUnit() {
     return this.m_unit;
@@ -286,7 +286,7 @@ public class LabelFormatterAutoUnits
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#initPaintIteration()
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#initPaintIteration()
    */
   public void initPaintIteration() {
     this.m_delegate.initPaintIteration();
@@ -295,7 +295,7 @@ public class LabelFormatterAutoUnits
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#parse(String)
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#parse(String)
    */
   public Number parse(final String formatted) throws NumberFormatException {
     double parsed = this.m_delegate.parse(formatted).doubleValue();

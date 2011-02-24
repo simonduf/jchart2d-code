@@ -1,7 +1,7 @@
 /*
  *  ErrorBarPolicyPanel.java of project jchart2d, a panel 
  *  for selection of an error bar policy. 
- *  Copyright 2006 (C) Achim Westermann, created on 09:50:20.
+ *  Copyright (c) 2007 Achim Westermann, created on 09:50:20.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
-import javax.swing.JLabel;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 /**
@@ -38,14 +38,13 @@ import javax.swing.JPanel;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class ErrorBarPolicyPanel
     extends JPanel {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 5185411570993974756L;
-
 
   /**
    * Creates a panel that offers controls the given error bar policy.
@@ -57,7 +56,7 @@ public class ErrorBarPolicyPanel
   public ErrorBarPolicyPanel(final IErrorBarPolicy errorBarPolicy) {
 
     super();
-   
+
     // complex layout needed for ensuring that
     // both labes are displayed vertically stacked but
     // with the same distance to their text fields regardless
@@ -71,18 +70,22 @@ public class ErrorBarPolicyPanel
     gbc.gridheight = 1;
     gbc.gridy = 0;
     gbc.insets = new Insets(2, 2, 2, 2);
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+
     // TODO: add the custom config panel of the concrete
     // error bar policy here:
-    this.add(new JLabel("Custom Config..."), gbc);
+    JComponent customConfigControl = errorBarPolicy.getCustomConfigurator();
+    if (customConfigControl != null) {
+      this.add(customConfigControl, gbc);
+    }
 
     // The checkboxes for dimension / direction:
-    gbc.gridy = 2;
+    gbc.gridy++;
     gbc.gridx = 0;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
     this.add(new ErrorBarDirectionPanel(errorBarPolicy), gbc);
 
     // The available painters:
-    gbc.gridy = 3;
+    gbc.gridy++;
     this.add(new ErrorBarPaintersPanel(errorBarPolicy), gbc);
 
   }

@@ -1,7 +1,7 @@
 /*
  * AbstractLabelFormatter.java, base class for ILabelFormatter 
  * implementations.  
- * Copyright (C) 2005 Achim Westermann, Achim.Westermann@gmx.de 
+ * Copyright (c) 2007 Achim Westermann, Achim.Westermann@gmx.de 
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@
 package info.monitorenter.gui.chart.labelformatters;
 
 import info.monitorenter.gui.chart.IAxis;
-import info.monitorenter.gui.chart.ILabelFormatter;
+import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.units.AUnit;
 import info.monitorenter.util.units.UnitUnchanged;
@@ -43,9 +43,9 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.6 $
  */
-public abstract class ALabelFormatter implements ILabelFormatter {
+public abstract class ALabelFormatter implements IAxisLabelFormatter {
   /**
    * The default unit with the factor 1 that is returned as the default for
    * {@link #getUnit()}.
@@ -67,7 +67,7 @@ public abstract class ALabelFormatter implements ILabelFormatter {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#addPropertyChangeListener(java.lang.String,
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#addPropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
   public void addPropertyChangeListener(final String propertyName,
@@ -149,7 +149,7 @@ public abstract class ALabelFormatter implements ILabelFormatter {
    * 
    * @return {@link #UNIT_UNCHANGED}
    * 
-   * @see info.monitorenter.gui.chart.ILabelFormatter#getUnit()
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getUnit()
    */
   public AUnit getUnit() {
 
@@ -160,14 +160,14 @@ public abstract class ALabelFormatter implements ILabelFormatter {
    * Void adapter method implementation - optional to override.
    * <p>
    * 
-   * @see info.monitorenter.gui.chart.ILabelFormatter#initPaintIteration()
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#initPaintIteration()
    */
   public void initPaintIteration() {
     // nop adapter
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#removePropertyChangeListener(java.lang.String,
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#removePropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
   public void removePropertyChangeListener(final String property,

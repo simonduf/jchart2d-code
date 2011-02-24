@@ -1,7 +1,7 @@
 /*
  *  LabelSpacingTestChart.java of project jchart2d a Junit test 
  *  for correct label spacing when using several traces. 
- *  Copyright 2006 (C) Achim Westermann, created on 22:22:26.
+ *  Copyright (c) 2007 Achim Westermann, created on 22:22:26.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -50,7 +50,7 @@ import junit.framework.TestSuite;
  * 
  * TODO: Refactor this to allow fail and succes in Junit manners!
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public final class LabelSpacingTestChart
     extends TestCase {

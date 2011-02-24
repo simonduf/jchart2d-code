@@ -31,6 +31,8 @@ import info.monitorenter.gui.chart.ZoomableChart;
 import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.axis.AxisLog10;
 import info.monitorenter.gui.chart.axis.AxisLogE;
+import info.monitorenter.gui.chart.errorbars.ErrorBarPolicyAbsoluteSummation;
+import info.monitorenter.gui.chart.errorbars.ErrorBarPolicyRelative;
 import info.monitorenter.gui.chart.events.AxisActionSetGrid;
 import info.monitorenter.gui.chart.events.AxisActionSetRange;
 import info.monitorenter.gui.chart.events.AxisActionSetRangePolicy;
@@ -38,7 +40,7 @@ import info.monitorenter.gui.chart.events.Chart2DActionSaveImageSingleton;
 import info.monitorenter.gui.chart.events.Chart2DActionSetAxis;
 import info.monitorenter.gui.chart.events.Chart2DActionSetCustomGridColorSingleton;
 import info.monitorenter.gui.chart.events.Chart2DActionSetGridColor;
-import info.monitorenter.gui.chart.events.ErrorBarPolicyActionShowWizard;
+import info.monitorenter.gui.chart.events.ErrorBarPolicyMultiAction;
 import info.monitorenter.gui.chart.events.JComponentActionSetBackground;
 import info.monitorenter.gui.chart.events.JComponentActionSetCustomBackgroundSingleton;
 import info.monitorenter.gui.chart.events.JComponentActionSetCustomForegroundSingleton;
@@ -77,7 +79,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -100,7 +105,7 @@ import javax.swing.JRadioButtonMenuItem;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.23 $
  */
 public final class LayoutFactory {
 
@@ -220,7 +225,7 @@ public final class LayoutFactory {
      * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
      * 
      * 
-     * @version $Revision: 1.18 $
+     * @version $Revision: 1.23 $
      */
     private final class JMenuOrderingAction
         extends AbstractAction {
@@ -239,7 +244,10 @@ public final class LayoutFactory {
 
       /**
        * Creates an instance delegating to the given action and adding the
-       * ordering service described above.
+       * ordering service of enriching a wrapped {@link Action} by the service
+       * of ordering it's corresponding {@link JMenuItem} in it's {@link JMenu}
+       * according to the description of
+       * {@link LayoutFactory.OrderingCheckBoxMenuItem}.
        * <p>
        * 
        * @param delegate
@@ -272,7 +280,6 @@ public final class LayoutFactory {
           LayoutFactory.OrderingCheckBoxMenuItem.this.m_menu
               .add(LayoutFactory.OrderingCheckBoxMenuItem.this);
         }
-
       }
 
       /**
@@ -671,7 +678,7 @@ public final class LayoutFactory {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    */
-  private static class PropertyChangeMenuItem
+  public static class PropertyChangeMenuItem
       extends JMenuItem {
 
     /**
@@ -693,6 +700,26 @@ public final class LayoutFactory {
     public PropertyChangeMenuItem(final JComponent component, final Action action) {
       super(action);
       new BasicPropertyAdaptSupport(this, component);
+      this.m_component = new WeakReference(component);
+    }
+
+    /**
+     * Weak reference (suspicion of cyclic reference) to the
+     * <code>{@link JComponent}</code> that is used to adapt basic UI
+     * properties to.
+     */
+    private WeakReference m_component;
+
+    /**
+     * Returns the adaptee this menu item adapts basic UI properties to if still
+     * not garbage collected or null.
+     * <p>
+     * 
+     * @return the adaptee this menu item adapts basic UI properties to if still
+     *         not garbage collected or null.
+     */
+    public JComponent getUIAdaptee() {
+      return (JComponent) this.m_component.get();
     }
   }
 
@@ -852,7 +879,6 @@ public final class LayoutFactory {
   }
 
   /**
-   * <p>
    * Implementation for a <code>PropertyChangeListener</code> that adpapts a
    * wrapped <code>JComponent</code> to the following properties.
    * <p>
@@ -2097,7 +2123,7 @@ public final class LayoutFactory {
   public JMenu createErrorBarWizardMenu(final Chart2D chart, final ITrace2D trace,
       final boolean adaptUI2Chart) {
     JMenuItem item;
-    // trace painters
+    // the edit error bar policy menu
     JMenu errorBarMenu;
     if (adaptUI2Chart) {
       errorBarMenu = new PropertyChangeMenu(chart, "error bar policies");
@@ -2105,20 +2131,108 @@ public final class LayoutFactory {
       errorBarMenu = new JMenu("error bar policies");
     }
 
+    // the add action items (allow to add all error bar policies
+    // that are not configured at the moment):
+    JMenu errorBarAddMenu;
+
+    if (adaptUI2Chart) {
+      errorBarAddMenu = new PropertyChangeMenu(chart, "+");
+    } else {
+      errorBarAddMenu = new JMenu("+");
+    }
+    errorBarMenu.add(errorBarAddMenu);
+
+    // the remove action items (allow to remove all error bar policies
+    // that are configured at the moment):
+    JMenu errorBarRemoveMenu;
+
+    if (adaptUI2Chart) {
+      errorBarRemoveMenu = new PropertyChangeMenu(chart, "-");
+    } else {
+      errorBarRemoveMenu = new JMenu("-");
+    }
+    errorBarMenu.add(errorBarRemoveMenu);
+
+    // the edit action items (allow to edit all error bar policies 
+    // that are configured at the moment): 
+    JMenu erroBarEditMenu;
+    if (adaptUI2Chart) {
+      erroBarEditMenu = new PropertyChangeMenu(chart, "edit");
+    } else {
+      erroBarEditMenu = new JMenu("edit");
+    }
+    errorBarMenu.add(erroBarEditMenu);
+ 
+    
+    // creating groups for the special add / remove item
+    // handling:
+    List group1 = new LinkedList();
+    group1.add(erroBarEditMenu);
+    group1.add(errorBarRemoveMenu);
+    List group2 = new LinkedList();
+    group2.add(errorBarAddMenu);
+
+    // set of all error bar policies available, needed for finding
+    // addable / removable error bar policies.
+    Set allErrorBarPolicies = new TreeSet();
+    allErrorBarPolicies.add(new ErrorBarPolicyRelative(0.02, 0.02));
+    allErrorBarPolicies.add(new ErrorBarPolicyAbsoluteSummation(4, 4));
+
+    // the edit action items (show wizard for existing error bar policies):
     Set errorBarPolicies = trace.getErrorBarPolicies();
     Iterator itErrorBarPolicies = errorBarPolicies.iterator();
     IErrorBarPolicy errorBarPolicy;
     while (itErrorBarPolicies.hasNext()) {
       errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
       if (adaptUI2Chart) {
-        item = new PropertyChangeMenuItem(chart, new ErrorBarPolicyActionShowWizard(errorBarPolicy,
-            errorBarPolicy.getClass().getName()));
+        item = new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(trace,
+            errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
+            errorBarRemoveMenu, erroBarEditMenu));
       } else {
-        item = new JMenuItem(new ErrorBarPolicyActionShowWizard(errorBarPolicy, errorBarPolicy
-            .getClass().getName()));
+        item = new JMenuItem(new ErrorBarPolicyMultiAction(trace, errorBarPolicy.getClass()
+            .getName(), errorBarPolicy, errorBarAddMenu, errorBarRemoveMenu, erroBarEditMenu));
       }
-      errorBarMenu.add(item);
+      erroBarEditMenu.add(item);
     }
+
+    // find the error bar policies to add:
+    Set addableErrorBarPolicies = new TreeSet(allErrorBarPolicies);
+    itErrorBarPolicies = errorBarPolicies.iterator();
+    while (itErrorBarPolicies.hasNext()) {
+      addableErrorBarPolicies.remove(itErrorBarPolicies.next());
+    }
+    // now add them:
+    itErrorBarPolicies = addableErrorBarPolicies.iterator();
+
+    while (itErrorBarPolicies.hasNext()) {
+      errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
+      if (adaptUI2Chart) {
+        errorBarAddMenu.add(new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(trace,
+            errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
+            errorBarRemoveMenu, erroBarEditMenu)));
+
+      } else {
+        errorBarAddMenu.add(new JMenuItem(new ErrorBarPolicyMultiAction(trace, errorBarPolicy
+            .getClass().getName(), errorBarPolicy, errorBarAddMenu, errorBarRemoveMenu,
+            erroBarEditMenu)));
+      }
+    }
+
+    // the error bar policies to remove
+    itErrorBarPolicies = errorBarPolicies.iterator();
+    while (itErrorBarPolicies.hasNext()) {
+      errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
+      if (adaptUI2Chart) {
+        errorBarRemoveMenu.add(new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(
+            trace, errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
+            errorBarRemoveMenu, erroBarEditMenu)));
+      } else {
+        errorBarRemoveMenu.add(new JMenuItem(new ErrorBarPolicyMultiAction(trace, errorBarPolicy
+            .getClass().getName(), errorBarPolicy, errorBarAddMenu, errorBarRemoveMenu,
+            erroBarEditMenu)));
+      }
+    }
+
     return errorBarMenu;
   }
 
@@ -2143,7 +2257,12 @@ public final class LayoutFactory {
       final boolean adaptUI2Chart) {
     JMenuItem item;
     // strokes
-    JMenu strokesMenu = new PropertyChangeMenu(chart, "Stroke");
+    JMenu strokesMenu;
+    if (adaptUI2Chart) {
+      strokesMenu = new PropertyChangeMenu(chart, "Stroke");
+    } else {
+      strokesMenu = new JMenu("Stroke");
+    }
     for (int i = 0; i < this.m_strokes.length; i++) {
       if (adaptUI2Chart) {
         item = new PropertyChangeMenuItem(chart, new Trace2DActionSetStroke(trace,

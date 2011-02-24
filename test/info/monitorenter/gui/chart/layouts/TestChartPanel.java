@@ -1,7 +1,7 @@
 /*
  *  TestChartPanelMemoryLeak.java of project jchart2d, a 
  *  test for a memory leak detected by Pieter-Jan Busschaert.
- *  Copyright 2006 (C) Achim Westermann, created on 23:52:11.
+ *  Copyright (c) 2007 Achim Westermann, created on 23:52:11.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -54,7 +54,7 @@ import junit.framework.TestSuite;
  * @author Holger Brandl
  * 
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TestChartPanel
     extends TestCase {

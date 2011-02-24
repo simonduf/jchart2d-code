@@ -11,7 +11,7 @@
     <property name="builddir" value="${basedir}/bin" />
     <property name="sourcedir" value="${basedir}/src" />
     <property name="sourcedir.test" value="${basedir}/test" />
-    <property name="project.version" value="2.1.2" />
+    <property name="project.version" value="2.2.0" />
 
     <!-- Taskdefs -->
     <!--
@@ -270,8 +270,8 @@
               href="http://java.sun.com/j2se/1.5.0/docs/api/"
               packagelistLoc="${java.home}/docs/api/" />
         <link offline="false"
-              href="http://logging.apache.org/log4j/docs/api/"
-              packagelistLoc="http://logging.apache.org/log4j/docs/api/package-list" />
+              href="http://logging.apache.org/log4j/1.2/apidocs/"
+              packagelistLoc="http://logging.apache.org/log4j/1.2/apidocs/package-list" />
     </javadoc>
 </target>
 
@@ -284,10 +284,10 @@
          includes="**/*.html,**/*.css,package-list" />
 </target>
 
-<!-- remove all classfiles (except antlr sources) and the jar file-->
+<!-- remove all resources in builddir and the current jar file-->
 <target name="delete.classfiles">
     <delete verbose="true" failonerror="false">
-        <fileset refid="classfiles" />
+        <fileset dir="${builddir}" />
         <fileset dir="${basedir}">
             <include name="${project.name}-${project.version}.jar" />
         </fileset>

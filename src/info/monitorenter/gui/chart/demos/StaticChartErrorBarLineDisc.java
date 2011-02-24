@@ -55,7 +55,7 @@ import javax.swing.JPanel;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public final class StaticChartErrorBarLineDisc
     extends JPanel {
@@ -98,7 +98,7 @@ public final class StaticChartErrorBarLineDisc
     ITrace2D trace = new Trace2DSimple();
     trace.setColor(Color.RED);
     // create an error bar policy and configure it
-    IErrorBarPolicy errorBarPolicy = new ErrorBarPolicyRelative(0.2);
+    IErrorBarPolicy errorBarPolicy = new ErrorBarPolicyRelative(0.2, 0.2);
     errorBarPolicy.setShowNegativeYErrors(true);
     errorBarPolicy.setShowPositiveYErrors(true);
     // errorBarPolicy.setShowNegativeXErrors(true);
@@ -112,7 +112,7 @@ public final class StaticChartErrorBarLineDisc
     errorBarPainter.setConnectionColor(Color.LIGHT_GRAY);
     // add the painter to the policy
     errorBarPolicy.setErrorBarPainter(errorBarPainter);
-    
+
     // Fini: now we have configured how error bars look,
     // which parts they render (end point, start point, segment), in which
     // direction they should extend and what kind of error is calculated.

@@ -59,7 +59,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.21 $
+ * @version $Revision: 1.31 $
  */
 public abstract class ATrace2D implements ITrace2D {
 
@@ -87,6 +87,9 @@ public abstract class ATrace2D implements ITrace2D {
 
   /** The color property. */
   private Color m_color = Color.black;
+
+  /** The list of traces that compute their values from this trace. */
+  protected List m_computingTraces = new LinkedList();
 
   /** The internal set of the error bar policies to use. */
   private Set m_errorBarPolicies = new TreeSet();
@@ -201,19 +204,26 @@ public abstract class ATrace2D implements ITrace2D {
     this.m_tracePainters.add(new TracePainterPolyline());
   }
 
+  // /**
+  // * Default contstructor taking the chart to render.
+  // * <p>
+  // *
+  // * @param chart
+  // * the chart of this trace.
+  // *
+  // */
+  // public ATrace2D(final Chart2D chart) {
+  // super();
+  // ATrace2D.instanceCount++;
+  // this.m_tracePainters = new TreeSet();
+  // this.m_tracePainters.add(new TracePainterPolyline());
+  // }
+
   /**
-   * Default contstructor taking the chart to render.
-   * <p>
-   * 
-   * @param chart
-   *          the chart of this trace.
-   * 
+   * @see info.monitorenter.gui.chart.ITrace2D#addComputingTrace(info.monitorenter.gui.chart.ITrace2D)
    */
-  public ATrace2D(final Chart2D chart) {
-    super();
-    ATrace2D.instanceCount++;
-    this.m_tracePainters = new TreeSet();
-    this.m_tracePainters.add(new TracePainterPolyline());
+  public void addComputingTrace(final ITrace2D trace) {
+    this.m_computingTraces.add(trace);
   }
 
   /**
@@ -276,7 +286,7 @@ public abstract class ATrace2D implements ITrace2D {
    * <code>{@link #firePointAdded(TracePoint2D)}</code>.
    * <p>
    * 
-   * @see #firePointChanged(TracePoint2D, boolean)
+   * @see #firePointChanged(TracePoint2D, int)
    * @param p
    *          the <code>TracePoint2D</code> to add.
    * @return true if the operation was successful, false else.
@@ -300,17 +310,23 @@ public abstract class ATrace2D implements ITrace2D {
           this.m_minX = this.m_maxX;
           this.m_maxY = p.getY();
           this.m_minY = this.m_maxY;
+          // fires property changes for max/min x/y:
           this.expandErrorBarBounds();
-          this.firePropertyChange(PROPERTY_MAX_X, this, new Double(this.getMaxX()));
-          this.firePropertyChange(PROPERTY_MIN_X, this, new Double(this.getMinX()));
-          this.firePropertyChange(PROPERTY_MAX_Y, this, new Double(this.getMaxY()));
-          this.firePropertyChange(PROPERTY_MIN_Y, this, new Double(this.getMinY()));
 
           this.m_firsttime = false;
         }
         if (accepted) {
           this.firePointAdded(p);
           p.setListener(this);
+          // inform computing traces:
+          if (this.m_computingTraces.size() > 0) {
+            Iterator it = this.m_computingTraces.iterator();
+            ITrace2D trace;
+            while (it.hasNext()) {
+              trace = (ITrace2D) it.next();
+              trace.addPoint(p);
+            }
+          }
         }
         // else{
         // System.err.println("Not accepted!");
@@ -330,7 +346,7 @@ public abstract class ATrace2D implements ITrace2D {
    * returns <code>true</code> the outer logic of the calling method
    * <code>{@link #addPoint(TracePoint2D)}</code> will perform bound checks
    * for the new point and fire property changes as described in method
-   * <code>{@link #firePointChanged(TracePoint2D, boolean)}</code>.
+   * <code>{@link #firePointChanged(TracePoint2D, int)}</code>.
    * </p>
    * <p>
    * In special cases - when additional modifications to the internal set of
@@ -360,9 +376,14 @@ public abstract class ATrace2D implements ITrace2D {
    * @see info.monitorenter.gui.chart.ITrace2D#addTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
   public boolean addTracePainter(final ITracePainter painter) {
-    boolean result = this.m_tracePainters.add(painter);
-    if (result) {
-      this.firePropertyChange(PROPERTY_PAINTERS, null, painter);
+    boolean result = false;
+    synchronized (this.m_renderer) {
+      synchronized (this) {
+        result = this.m_tracePainters.add(painter);
+        if (result) {
+          this.firePropertyChange(PROPERTY_PAINTERS, null, painter);
+        }
+      }
     }
     return result;
   }
@@ -376,23 +397,58 @@ public abstract class ATrace2D implements ITrace2D {
 
   /**
    * Internally expands all bounds according to potential error bars.
-   * <p>
-   * 
    */
   private void expandErrorBarBounds() {
     boolean requiresErrorBarCalculation = !this.isEmpty();
     if (requiresErrorBarCalculation) {
-      if (this.showsPositiveXErrorBars()) {
-        this.expandMaxXErrorBarBounds();
-      }
-      if (this.showsPositiveYErrorBars()) {
-        this.expandMaxYErrorBarBounds();
-      }
-      if (this.showsNegativeXErrorBars()) {
-        this.expandMinXErrorBarBounds();
-      }
-      if (this.showsNegativeYErrorBars()) {
-        this.expandMinYErrorBarBounds();
+      boolean change;
+      synchronized (this.m_renderer) {
+        synchronized (this) {
+          if (this.showsPositiveXErrorBars()) {
+            change = this.expandMaxXErrorBarBounds();
+            if (change) {
+              this.firePropertyChange(PROPERTY_MAX_X, this, new Double(this.getMaxX()));
+            }
+          } else {
+            if (this.m_maxXErrorBar != -IErrorBarValue.ERROR_VALUE_NONE) {
+              this.m_maxXErrorBar = -IErrorBarValue.ERROR_VALUE_NONE;
+              this.firePropertyChange(PROPERTY_MAX_X, this, new Double(this.getMaxX()));
+            }
+          }
+          if (this.showsPositiveYErrorBars()) {
+            change = this.expandMaxYErrorBarBounds();
+            if (change) {
+              this.firePropertyChange(PROPERTY_MAX_Y, this, new Double(this.getMaxY()));
+            }
+          } else {
+            if (this.m_maxYErrorBar != -IErrorBarValue.ERROR_VALUE_NONE) {
+              this.m_maxYErrorBar = -IErrorBarValue.ERROR_VALUE_NONE;
+              this.firePropertyChange(PROPERTY_MAX_Y, this, new Double(this.getMaxY()));
+            }
+          }
+          if (this.showsNegativeXErrorBars()) {
+            change = this.expandMinXErrorBarBounds();
+            if (change) {
+              this.firePropertyChange(PROPERTY_MIN_X, this, new Double(this.getMinX()));
+            }
+          } else {
+            if (this.m_minXErrorBar != IErrorBarValue.ERROR_VALUE_NONE) {
+              this.m_minXErrorBar = IErrorBarValue.ERROR_VALUE_NONE;
+              this.firePropertyChange(PROPERTY_MIN_X, this, new Double(this.getMinX()));
+            }
+          }
+          if (this.showsNegativeYErrorBars()) {
+            change = this.expandMinYErrorBarBounds();
+            if (change) {
+              this.firePropertyChange(PROPERTY_MIN_Y, this, new Double(this.getMinY()));
+            }
+          } else {
+            if (this.m_minYErrorBar != IErrorBarValue.ERROR_VALUE_NONE) {
+              this.m_minYErrorBar = IErrorBarValue.ERROR_VALUE_NONE;
+              this.firePropertyChange(PROPERTY_MIN_Y, this, new Double(this.getMinY()));
+            }
+          }
+        }
       }
     }
   }
@@ -401,10 +457,15 @@ public abstract class ATrace2D implements ITrace2D {
    * Internally takes into account that in case of error bars to render the
    * maximum x value will be different.
    * <p>
+   * Returns true if a change to <code>{@link #getMaxX()}</code> was done.
+   * <p>
+   * 
+   * @return true if a change to <code>{@link #getMaxX()}</code> was done.
    */
-  private void expandMaxXErrorBarBounds() {
+  private boolean expandMaxXErrorBarBounds() {
     Chart2D chart = this.getRenderer();
     boolean change = false;
+    double errorBarMaxXCollect = -IErrorBarValue.ERROR_VALUE_NONE;
     if (chart != null) {
       Iterator itErrorBarPolicies = this.getErrorBarPolicies().iterator();
       IErrorBarPolicy erroBarPolicy;
@@ -415,26 +476,30 @@ public abstract class ATrace2D implements ITrace2D {
           // was it turned on?
           erroBarPolicy.calculateErrorBar(this.m_maxX, 0, this.m_reusedErrorBar);
           errorBarMaxX = this.m_reusedErrorBar.getPositiveXError();
-          if (errorBarMaxX > this.m_maxXErrorBar) {
-            this.m_maxXErrorBar = errorBarMaxX;
-            change = true;
+          if (errorBarMaxX > errorBarMaxXCollect) {
+            errorBarMaxXCollect = errorBarMaxX;
           }
         }
       }
     }
-    if (change) {
-      this.firePropertyChange(PROPERTY_MAX_X, new Double(this.m_maxX), new Double(this.getMaxX()));
-    }
+    change = this.m_maxXErrorBar != errorBarMaxXCollect;
+    this.m_maxXErrorBar = errorBarMaxXCollect;
+    return change;
   }
 
   /**
    * Internally takes into account that in case of error bars to render the
    * maximum y value will be different.
    * <p>
+   * Returns true if a change to <code>{@link #getMaxY()}</code> was done.
+   * <p>
+   * 
+   * @return true if a change to <code>{@link #getMaxY()}</code> was done.
    */
-  private void expandMaxYErrorBarBounds() {
+  private boolean expandMaxYErrorBarBounds() {
     Chart2D chart = this.getRenderer();
     boolean change = false;
+    double errorBarMaxYCollect = -IErrorBarValue.ERROR_VALUE_NONE;
     if (chart != null) {
       Iterator itErrorBarPolicies = this.getErrorBarPolicies().iterator();
       IErrorBarPolicy erroBarPolicy;
@@ -444,16 +509,15 @@ public abstract class ATrace2D implements ITrace2D {
         if (erroBarPolicy.isShowPositiveYErrors()) {
           erroBarPolicy.calculateErrorBar(0, this.m_maxY, this.m_reusedErrorBar);
           errorBarMaxY = this.m_reusedErrorBar.getPositiveYError();
-          if (errorBarMaxY > this.m_maxYErrorBar) {
-            this.m_maxYErrorBar = errorBarMaxY;
-            change = true;
+          if (errorBarMaxY > errorBarMaxYCollect) {
+            errorBarMaxYCollect = errorBarMaxY;
           }
         }
       }
     }
-    if (change) {
-      this.firePropertyChange(PROPERTY_MAX_Y, new Double(this.m_maxY), new Double(this.getMaxY()));
-    }
+    change = this.m_maxYErrorBar != errorBarMaxYCollect;
+    this.m_maxYErrorBar = errorBarMaxYCollect;
+    return change;
 
   }
 
@@ -461,10 +525,15 @@ public abstract class ATrace2D implements ITrace2D {
    * Internally takes into account that in case of error bars to render the
    * minimum x value will be different.
    * <p>
+   * Returns true if a change to <code>{@link #getMinX()}</code> was done.
+   * <p>
+   * 
+   * @return true if a change to <code>{@link #getMinX()}</code> was done.
    */
-  private void expandMinXErrorBarBounds() {
+  private boolean expandMinXErrorBarBounds() {
     Chart2D chart = this.getRenderer();
     boolean change = false;
+    double errorBarMinXCollect = IErrorBarValue.ERROR_VALUE_NONE;
     if (chart != null) {
       Iterator itErrorBarPolicies = this.getErrorBarPolicies().iterator();
       IErrorBarPolicy erroBarPolicy;
@@ -474,26 +543,30 @@ public abstract class ATrace2D implements ITrace2D {
         if (erroBarPolicy.isShowNegativeXErrors()) {
           erroBarPolicy.calculateErrorBar(this.m_minX, 0, this.m_reusedErrorBar);
           errorBarMinX = this.m_reusedErrorBar.getNegativeXError();
-          if (errorBarMinX < this.m_minXErrorBar) {
-            this.m_minXErrorBar = errorBarMinX;
-            change = true;
+          if (errorBarMinX < errorBarMinXCollect) {
+            errorBarMinXCollect = errorBarMinX;
           }
         }
       }
     }
-    if (change) {
-      this.firePropertyChange(PROPERTY_MIN_X, new Double(this.m_minX), new Double(this.getMinX()));
-    }
+    change = this.m_minXErrorBar != errorBarMinXCollect;
+    this.m_minXErrorBar = errorBarMinXCollect;
+    return change;
   }
 
   /**
    * Internally takes into account that in case of error bars to render the
    * minimum y value will be different.
    * <p>
+   * Returns true if a change to <code>{@link #getMinY()}</code> was done.
+   * <p>
+   * 
+   * @return true if a change to <code>{@link #getMinY()}</code> was done.
    */
-  private void expandMinYErrorBarBounds() {
+  private boolean expandMinYErrorBarBounds() {
     Chart2D chart = this.getRenderer();
     boolean change = false;
+    double errorBarMinYCollect = IErrorBarValue.ERROR_VALUE_NONE;
     if (chart != null) {
       Iterator itErrorBarPolicies = this.getErrorBarPolicies().iterator();
       IErrorBarPolicy erroBarPolicy;
@@ -504,16 +577,15 @@ public abstract class ATrace2D implements ITrace2D {
           // calculate the error
           erroBarPolicy.calculateErrorBar(0, this.m_minY, this.m_reusedErrorBar);
           errorBarMinY = this.m_reusedErrorBar.getNegativeYError();
-          if (errorBarMinY < this.m_minYErrorBar) {
-            this.m_minYErrorBar = errorBarMinY;
-            change = true;
+          if (errorBarMinY < errorBarMinYCollect) {
+            errorBarMinYCollect = errorBarMinY;
           }
         }
       }
     }
-    if (change) {
-      this.firePropertyChange(PROPERTY_MIN_Y, new Double(this.m_minY), new Double(this.getMinY()));
-    }
+    change = this.m_minYErrorBar != errorBarMinYCollect;
+    this.m_minYErrorBar = errorBarMinYCollect;
+    return change;
   }
 
   /**
@@ -538,14 +610,14 @@ public abstract class ATrace2D implements ITrace2D {
    * <p>
    * Additionally before this property change, property change events for bounds
    * are fired as described in method
-   * <code>{@link #firePointChanged(TracePoint2D, boolean)}</code>.
+   * <code>{@link #firePointChanged(TracePoint2D, int)}</code>.
    * <p>
    * 
    * @param added
    *          the point that was added.
    */
   protected void firePointAdded(final TracePoint2D added) {
-    this.firePointChanged(added, true);
+    this.firePointChanged(added, TracePoint2D.STATE_ADDED);
     this.firePropertyChange(PROPERTY_TRACEPOINT, null, added);
   }
 
@@ -563,58 +635,111 @@ public abstract class ATrace2D implements ITrace2D {
    * have changed due to the modification of the point.
    * <p>
    * 
+   * If <code>state</code> is <code>{@link TracePoint2D#STATE_CHANGED}</code>
+   * a property change event with
+   * <code>{@link ITrace2D#PROPERTY_POINT_CHANGED}</code> will be fired to all
+   * listeners.
+   * <p>
+   * 
    * @param changed
    *          the point that has been changed which may be a newly added point
    *          (from <code>{@link #addPoint(TracePoint2D)}</code>, a removed
    *          one or a modified one.
-   * @param added
-   *          if true the points values dominate old bounds, if false the bounds
-   *          are rechecked against the removed points values.
+   * @param state
+   *          one of {<code>{@link TracePoint2D#STATE_ADDED}, {@link TracePoint2D#STATE_CHANGED},
+   *   {@link TracePoint2D#STATE_REMOVED}</code>}
+   *          to inform about the type of change.
    */
-  public void firePointChanged(final TracePoint2D changed, final boolean added) {
+  public void firePointChanged(final TracePoint2D changed, final int state) {
     double tmpx = changed.getX();
     double tmpy = changed.getY();
-    if (added) {
+    // for a changed point all cases (new extremum as for added case, other
+    // point
+    // becomes extremum as the change point was one like in removed case) have
+    // to be tested. Additionally we have to fire a changd point event.
+    if (((TracePoint2D.STATE_ADDED | TracePoint2D.STATE_CHANGED) & state) != 0) {
+      // add or change
       if (tmpx > this.m_maxX) {
         this.m_maxX = tmpx;
-        this.expandMaxXErrorBarBounds();
-        this.firePropertyChange(PROPERTY_MAX_X, null, new Double(this.m_maxX));
+        synchronized (this.m_renderer) {
+          synchronized (this) {
+            this.expandMaxXErrorBarBounds();
+            this.firePropertyChange(PROPERTY_MAX_X, null, new Double(this.m_maxX));
+          }
+        }
       } else if (tmpx < this.m_minX) {
         this.m_minX = tmpx;
-        this.expandMinXErrorBarBounds();
-        this.firePropertyChange(PROPERTY_MIN_X, null, new Double(this.m_minX));
+        synchronized (this.m_renderer) {
+          synchronized (this) {
+            this.expandMinXErrorBarBounds();
+            this.firePropertyChange(PROPERTY_MIN_X, null, new Double(this.m_minX));
+          }
+        }
       }
       if (tmpy > this.m_maxY) {
         this.m_maxY = tmpy;
-        this.expandMaxYErrorBarBounds();
-        this.firePropertyChange(PROPERTY_MAX_Y, null, new Double(this.m_maxY));
+        synchronized (this.m_renderer) {
+          synchronized (this) {
+            this.expandMaxYErrorBarBounds();
+            this.firePropertyChange(PROPERTY_MAX_Y, null, new Double(this.m_maxY));
+          }
+        }
       } else if (tmpy < this.m_minY) {
         this.m_minY = tmpy;
-        this.expandMinYErrorBarBounds();
-        this.firePropertyChange(PROPERTY_MIN_Y, null, new Double(this.m_minY));
+        synchronized (this.m_renderer) {
+          synchronized (this) {
+            this.expandMinYErrorBarBounds();
+            this.firePropertyChange(PROPERTY_MIN_Y, null, new Double(this.m_minY));
+          }
+        }
       }
-    } else {
-      // removal: care for extrema (<=, >=)
+    }
+    if (((TracePoint2D.STATE_REMOVED | TracePoint2D.STATE_CHANGED) & state) != 0) {
+      // removal or change: care for extrema (<=, >=)
       if (tmpx >= this.m_maxX) {
         tmpx = this.m_maxX;
-        this.maxXSearch();
-        this.firePropertyChange(PROPERTY_MAX_X, new Double(tmpx), new Double(this.m_maxX));
+        synchronized (this.m_renderer) {
+          synchronized (this) {
+            this.maxXSearch();
+            this.firePropertyChange(PROPERTY_MAX_X, new Double(tmpx), new Double(this.m_maxX));
+          }
+        }
       } else if (tmpx <= this.m_minX) {
         tmpx = this.m_minX;
-        this.minXSearch();
-        this.firePropertyChange(PROPERTY_MIN_X, new Double(tmpx), new Double(this.m_minX));
+        synchronized (this.m_renderer) {
+          synchronized (this) {
+            this.minXSearch();
+            this.firePropertyChange(PROPERTY_MIN_X, new Double(tmpx), new Double(this.m_minX));
+          }
+        }
       }
       if (tmpy >= this.m_maxY) {
         tmpy = this.m_maxY;
-        this.maxYSearch();
-        this.firePropertyChange(PROPERTY_MAX_Y, new Double(tmpy), new Double(this.m_maxY));
+        synchronized (this.m_renderer) {
+          synchronized (this) {
+            this.maxYSearch();
+            this.firePropertyChange(PROPERTY_MAX_Y, new Double(tmpy), new Double(this.m_maxY));
+          }
+        }
       } else if (tmpy <= this.m_minY) {
         tmpy = this.m_minY;
-        this.minYSearch();
-        this.firePropertyChange(PROPERTY_MIN_Y, new Double(tmpy), new Double(this.m_minY));
+        synchronized (this.m_renderer) {
+          synchronized (this) {
+            this.minYSearch();
+            this.firePropertyChange(PROPERTY_MIN_Y, new Double(tmpy), new Double(this.m_minY));
+          }
+        }
       }
       if (this.getSize() == 0) {
         this.m_firsttime = true;
+      }
+    }
+    if (state == TracePoint2D.STATE_CHANGED) {
+      synchronized (this.m_renderer) {
+        synchronized (this) {
+
+          this.firePropertyChange(PROPERTY_POINT_CHANGED, null, changed);
+        }
       }
     }
   }
@@ -629,14 +754,14 @@ public abstract class ATrace2D implements ITrace2D {
    * <p>
    * Additionally before this property change, property change events for bounds
    * are fired as described in method
-   * <code>{@link #firePointChanged(TracePoint2D, boolean)}</code>.
+   * <code>{@link #firePointChanged(TracePoint2D, int)}</code>.
    * <p>
    * 
    * @param removed
    *          the point that was removed.
    */
   protected void firePointRemoved(final TracePoint2D removed) {
-    this.firePointChanged(removed, false);
+    this.firePointChanged(removed, TracePoint2D.STATE_REMOVED);
     this.firePropertyChange(PROPERTY_TRACEPOINT, removed, null);
   }
 
@@ -647,22 +772,29 @@ public abstract class ATrace2D implements ITrace2D {
    * @param property
    *          one of the <code>PROPERTY_XXX</code> constants defined in
    *          <code>{@link ITrace2D}</code>.
+   * 
    * @param oldvalue
    *          the old value of the property.
+   * 
    * @param newvalue
    *          the new value of the property.
    * 
    */
   protected final void firePropertyChange(final String property, final Object oldvalue,
       final Object newvalue) {
-    if (Chart2D.DEBUG_THREADING) {
-      System.out.println("trace.firePropertyChange (" + property + "), 0 locks");
-    }
     if (property.equals(PROPERTY_MAX_X) || property.equals(PROPERTY_MAX_Y)
         || property.equals(PROPERTY_MIN_X) || property.equals(PROPERTY_MIN_Y)
-        || property.equals(PROPERTY_TRACEPOINT)) {
+        || property.equals(PROPERTY_TRACEPOINT) || property.equals(PROPERTY_POINT_CHANGED)) {
       if (!Thread.holdsLock(this.m_renderer)) {
         throw new RuntimeException("Acquire a lock on the corresponding chart first!");
+      }
+      if (!Thread.holdsLock(this)) {
+        throw new RuntimeException("Acquire a lock on this trace first!");
+      }
+
+      if (Chart2D.DEBUG_THREADING) {
+        System.out.println("trace.firePropertyChange (" + property + "), 2 locks, renderer is: "
+            + this.m_renderer);
       }
     }
 
@@ -821,20 +953,14 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * Returns the physical unit string value for the x dimension.
-   * <p>
-   * 
-   * @see #setPhysicalUnits(String x,String y)
+   * @see info.monitorenter.gui.chart.ITrace2D#getPhysicalUnitsX()
    */
   public final String getPhysicalUnitsX() {
     return this.m_physicalUnitsX;
   }
 
   /**
-   * Returns the physical unit string value for the y dimension.
-   * <p>
-   * 
-   * @see #setPhysicalUnits(String x,String y)
+   * @see info.monitorenter.gui.chart.ITrace2D#getPhysicalUnitsY()
    */
   public final String getPhysicalUnitsY() {
     return this.m_physicalUnitsY;
@@ -1079,6 +1205,7 @@ public abstract class ATrace2D implements ITrace2D {
    */
   public void propertyChange(final PropertyChangeEvent evt) {
     if (IErrorBarPolicy.PROPERTY_CONFIGURATION.equals(evt.getPropertyName())) {
+      this.expandErrorBarBounds();
       this.firePropertyChange(PROPERTY_ERRORBARPOLICY_CONFIGURATION, null, evt.getSource());
     }
 
@@ -1114,6 +1241,16 @@ public abstract class ATrace2D implements ITrace2D {
         this.m_minY = 0;
         this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldValue), new Double(
             this.m_minY));
+
+        // inform computing traces:
+        if (this.m_computingTraces.size() > 0) {
+          Iterator it = this.m_computingTraces.iterator();
+          ITrace2D trace;
+          while (it.hasNext()) {
+            trace = (ITrace2D) it.next();
+            trace.removeAllPoints();
+          }
+        }
       }
     }
   }
@@ -1127,6 +1264,14 @@ public abstract class ATrace2D implements ITrace2D {
    * 
    */
   protected abstract void removeAllPointsInternal();
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#removeComputingTrace(info.monitorenter.gui.chart.ITrace2D)
+   */
+  public boolean removeComputingTrace(final ITrace2D trace) {
+    boolean result = this.m_computingTraces.remove(trace);
+    return result;
+  }
 
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#removeErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
@@ -1149,6 +1294,7 @@ public abstract class ATrace2D implements ITrace2D {
         if (result) {
           errorBarPolicy.setTrace(null);
           errorBarPolicy.removePropertyChangeListener(IErrorBarPolicy.PROPERTY_CONFIGURATION, this);
+          this.expandErrorBarBounds();
           this.firePropertyChange(PROPERTY_ERRORBARPOLICY, errorBarPolicy, null);
         }
       }
@@ -1157,19 +1303,16 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * <p>
    * Remove the given point from this <code>ITrace2D</code>.
-   * </p>
    * <p>
    * This implementation performs caching of minimum and maximum values for x
    * and y and the delegates to
    * <code>{@link #removePointInternal(TracePoint2D)}</code> that has to
    * perform the "real" add remove operation.
-   * </p>
    * <p>
    * Property change events are fired as described in method
    * <code>{@link #firePointRemoved(TracePoint2D)}</code>.
-   * </p>
+   * <p>
    * 
    * @param point
    *          the <code>TracePoint2D</code> to remove.
@@ -1177,57 +1320,93 @@ public abstract class ATrace2D implements ITrace2D {
    * @return true if the removal suceeded, false else: this could be that the
    *         given point was not contained.
    * 
-   * @see #firePointChanged(TracePoint2D, boolean)
+   * @see #firePointChanged(TracePoint2D, int)
    */
   public boolean removePoint(final TracePoint2D point) {
     synchronized (this.m_renderer) {
       if (Chart2D.DEBUG_THREADING) {
-
         System.out.println("removePoint, 0 locks");
       }
       synchronized (this) {
         if (Chart2D.DEBUG_THREADING) {
           System.out.println("removePoint, 1 lock");
         }
-        boolean success = this.removePointInternal(point);
-        if (success) {
-          this.firePointRemoved(point);
-        }
-        return success;
+        TracePoint2D removed = this.removePointInternal(point);
+        if (removed != null) {
 
+          double tmpx = removed.getX();
+          double tmpy = removed.getY();
+          // System.out.println("Trace2DLtd.addPoint() removed point!");
+          if (tmpx >= this.m_maxX) {
+            tmpx = this.m_maxX;
+            this.maxXSearch();
+            this.firePropertyChange(PROPERTY_MAX_X, new Double(tmpx), new Double(this.m_maxX));
+          } else if (tmpx <= this.m_minX) {
+            tmpx = this.m_minX;
+            this.minXSearch();
+            this.firePropertyChange(PROPERTY_MIN_X, new Double(tmpx), new Double(this.m_minX));
+          }
+          if (tmpy >= this.m_maxY) {
+            tmpy = this.m_maxY;
+            this.maxYSearch();
+            this.firePropertyChange(PROPERTY_MAX_Y, new Double(tmpy), new Double(this.m_maxY));
+          } else if (tmpy <= this.m_minY) {
+            tmpy = this.m_minY;
+            this.minYSearch();
+            this.firePropertyChange(PROPERTY_MIN_Y, new Double(tmpy), new Double(this.m_minY));
+          }
+
+          this.firePointRemoved(removed);
+          removed.setListener(null);
+          // inform computing traces:
+          if (this.m_computingTraces.size() > 0) {
+            Iterator it = this.m_computingTraces.iterator();
+            ITrace2D trace;
+            while (it.hasNext()) {
+              trace = (ITrace2D) it.next();
+              trace.removePoint(removed);
+            }
+          }
+        }
+        return removed != null;
       }
     }
   }
 
   /**
-   * <p>
    * Override this template method for the custom remove operation that depends
    * on the internal storage the implementation.
-   * </p>
    * <p>
+   * The returned point may be the same as the given. But some "computing"
+   * traces like
+   * <code>{@link info.monitorenter.gui.chart.traces.computing.Trace2DArithmeticMean}</code>
+   * will internally delete a different point and return that one.
+   * <p>
+   * 
    * No property change events have to be fired by default. If this method
-   * returns <code>true</code> the outer logic of the calling method
+   * returns <code>null</code> the outer logic of the calling method
    * <code>{@link #removePoint(TracePoint2D)}</code> will perform bound checks
-   * for the new point and fire property changes for the properties
+   * for the returned point and fire property changes for the properties
    * <code>{@link ITrace2D#PROPERTY_MAX_X}</code>,
    * <code>{@link ITrace2D#PROPERTY_MIN_X}</code>,
    * <code>{@link ITrace2D#PROPERTY_MAX_Y}</code> and
    * <code>{@link ITrace2D#PROPERTY_MIN_Y}</code>.
-   * </p>
    * <p>
    * In special cases - when additional modifications to the internal set of
    * points take place (e.g. a further point get added) this method should
    * return false (regardless wether the old point was really removed or not)
    * and perform bound checks and fire the property changes as mentioned above
    * "manually".
-   * </p>
+   * <p>
    * 
    * @param point
    *          the point to remove.
    * 
-   * @return true if the given point was removed or false if not.
+   * @return null if unsuccesful (and no events should be fired) or the point
+   *         that actually was removed (in case different than the given one it
+   *         should be somehow related to the given one).
    */
-  protected abstract boolean removePointInternal(final TracePoint2D point);
+  protected abstract TracePoint2D removePointInternal(final TracePoint2D point);
 
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#removePropertyChangeListener(java.beans.PropertyChangeListener)

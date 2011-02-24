@@ -31,7 +31,7 @@ import junit.framework.TestSuite;
  * Main test suite for the package <code>{@link info.monitorenter.gui.chart}</code>.<p>
  * 
  * @author Achim westermann
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  * 
  * @since 2.1.0
  */
@@ -54,11 +54,8 @@ public final class AllTests {
 
     TestSuite suite = new TestSuite("Tests for package " + AllTests.class.getPackage().getName());
     //$JUnit-BEGIN$
-    suite.addTest(TestTrace2D.suite());
-    suite.addTest(TestTrace2DLtd.suite());
     suite.addTest(TestMultiThreadingAndTracing.suite());
     suite.addTest(TestChart2DSetAxis.suite());
-    suite.addTest(TestTrace2DSimple.suite());
     suite.addTest(TestChart2DHeadless.suite());
     suite.addTest(TestMultithreading.suite());
     suite.addTest(TestChartOperationsVisual.suite());

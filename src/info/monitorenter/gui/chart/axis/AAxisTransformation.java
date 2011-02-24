@@ -2,7 +2,7 @@
  *  AAxisTransformation.java of project jchart2d, 
  *  base class for Axis implementations that transform the scale 
  *  for changed display.  
- *  Copyright 2006 (C) Achim Westermann, created on 20:33:13.
+ *  Copyright (c) 2007 Achim Westermann, created on 20:33:13.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@
 package info.monitorenter.gui.chart.axis;
 
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.ILabelFormatter;
+import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.TracePoint2D;
 import info.monitorenter.util.Range;
@@ -41,10 +41,9 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.16 $
  */
-public abstract class AAxisTransformation
-    extends AAxis {
+public abstract class AAxisTransformation extends AAxis {
 
   /**
    * 
@@ -55,8 +54,7 @@ public abstract class AAxisTransformation
    * 
    * @see Chart2D#getAxisX()
    */
-  public final class XDataAccessor
-      extends AAxis.XDataAccessor {
+  public final class XDataAccessor extends AAxis.XDataAccessor {
 
     /**
      * Creates an instance that accesses the given chart's x axis.
@@ -93,9 +91,9 @@ public abstract class AAxisTransformation
           } catch (IllegalArgumentException e) {
             long tstamp = System.currentTimeMillis();
             if (tstamp - AAxisTransformation.this.m_outputErrorTstamp > AAxisTransformation.OUTPUT_ERROR_THRESHHOLD) {
-              System.out.println(e.getLocalizedMessage());
+              System.out.println(e.getLocalizedMessage()); 
               AAxisTransformation.this.m_outputErrorTstamp = tstamp;
-            }
+            } 
             result = 0;
           }
           point.m_scaledX = result;
@@ -109,13 +107,12 @@ public abstract class AAxisTransformation
    * Accesses the y axis of the {@link Chart2D}.
    * <p>
    * 
-   * @see AAxis#setAccessor(AChart2DDataAccessor)
+   * @see AAxis#setAccessor(info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor)
    * 
    * @see Chart2D#getAxisY()
    */
 
-  public final class YDataAccessor
-      extends AAxis.YDataAccessor {
+  public final class YDataAccessor extends AAxis.YDataAccessor {
 
     /**
      * Creates an instance that accesses the y axis of the given chart.
@@ -194,19 +191,23 @@ public abstract class AAxisTransformation
    *          needed for formatting labels of this axis.
    * 
    */
-  public AAxisTransformation(final ILabelFormatter formatter) {
+  public AAxisTransformation(final IAxisLabelFormatter formatter) {
     super(formatter);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.axis.AAxis#createAccessor(info.monitorenter.gui.chart.Chart2D)
+   * @see info.monitorenter.gui.chart.axis.AAxis#createAccessor(info.monitorenter.gui.chart.Chart2D,
+   *      int)
    */
-  protected AAxis.AChart2DDataAccessor createAccessor(final Chart2D chart) {
-    if (this.getDimension() == Chart2D.X) {
+  protected AAxis.AChart2DDataAccessor createAccessor(final Chart2D chart, final int dimension) {
+    if (dimension == Chart2D.X) {
       return new AAxisTransformation.XDataAccessor(chart);
-    } else {
+    } else if (dimension == Chart2D.Y) {
       return new AAxisTransformation.YDataAccessor(chart);
+    } else {
+      throw new IllegalArgumentException("Dimension has to be Chart2D.X or Chart2D.Y!");
     }
+
   }
 
   /**

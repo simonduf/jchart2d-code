@@ -1,6 +1,6 @@
 /*
  *  AxisActionSetRange.java of project jchart2d
- *  Copyright 2006 (C) Achim Westermann, created on 20:30:06.
+ *  Copyright (c) 2007 Achim Westermann, created on 20:30:06.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -41,7 +41,7 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class AxisActionSetRange
     extends AAxisAction {

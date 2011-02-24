@@ -1,7 +1,7 @@
 /*
  *  ZoomableChart.java of project jchart2d, a chart enriched 
  *  by zoom functionality in x dimension. 
- *  Copyright 2006 (C) Achim Westermann, created on 23:58:31.
+ *  Copyright 2007 (C) Achim Westermann, created on 23:58:31.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -42,7 +42,7 @@ import java.awt.geom.Rectangle2D;
  * 
  * @author Alessio Sambarino (Contributor)
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.9 $
  * 
  * @author Klaus Pesendorfer (klaus.pesendorfer@fabalabs.org)
  * 
@@ -157,7 +157,7 @@ public class ZoomableChart
 
     this.m_zoomArea = new Rectangle2D.Double(startX, startY, dimX, dimY);
 
-    repaint();
+    repaint(200);
   }
 
   /**
@@ -200,55 +200,29 @@ public class ZoomableChart
     if (this.m_zoomArea == null) {
       return;
     }
+    IAxis axisX = this.getAxisX();
+    IAxis axisY = this.getAxisY();
 
     // x-coordinate
     double startPx = this.m_zoomArea.getX();
     double endPx = this.m_zoomArea.getX() + this.m_zoomArea.getWidth();
 
-    Range rangeX = getAxisX().getRangePolicy().getRange();
-
-    double maxX = rangeX.getMax();
-    double minX = rangeX.getMin();
-
-    if (maxX == Double.MAX_VALUE) {
-      rangeX = getAxisX().getRange();
-      maxX = rangeX.getMax();
-      minX = rangeX.getMin();
-    }
-
-    double xAxisDomain = maxX - minX;
-    double xAxisLength = getWidth() - 20 - this.getXChartStart();
-
-    double xAxisMin = minX + xAxisDomain / xAxisLength * (startPx - this.getXChartStart());
-    double xAxisMax = minX + xAxisDomain / xAxisLength * (endPx - this.getXChartStart());
+    double xAxisMin = axisX.translatePxToValue((int) startPx);
+    double xAxisMax = axisX.translatePxToValue((int) endPx);
 
     // modified by Fabalabs (KP) 20060914: zoom also in y-direction
     // y-coordinate
     double startPy = this.m_zoomArea.getY();
     double endPy = this.m_zoomArea.getY() + this.m_zoomArea.getHeight();
 
-    Range rangeY = getAxisY().getRangePolicy().getRange();
-
-    double maxY = rangeY.getMax();
-    double minY = rangeY.getMin();
-
-    if (maxY == Double.MAX_VALUE) {
-      rangeY = getAxisY().getRange();
-      maxY = rangeY.getMax();
-      minY = rangeY.getMin();
-    }
-
-    double yAxisDomain = maxY - minY;
-    double yAxisLength = getHeight() - 20 - this.getYChartEnd();
-
-    double yAxisMin = maxY - yAxisDomain / yAxisLength * (startPy - this.getYChartEnd());
-    double yAxisMax = maxY - yAxisDomain / yAxisLength * (endPy - this.getYChartEnd());
+    double yAxisMin = axisY.translatePxToValue((int) startPy);
+    double yAxisMax = axisY.translatePxToValue((int) endPy);
 
     // do not zoom extremly small areas (does not work properly because of
     // calculation)
     if ((endPx - startPx) < 20 || (endPy - startPy) < 20) {
       this.m_zoomArea = null;
-      repaint();
+      repaint(200);
       return;
     }
 
@@ -286,10 +260,8 @@ public class ZoomableChart
     this.m_zoomArea = null;
 
     IAxis axis = getAxisX();
-    // IRangePolicy
-    axis.setRangePolicy(new RangePolicyFixedViewport());
-    axis.setRange(new Range(xmin, xmax));
-
+    IRangePolicy zoomPolicy = new RangePolicyFixedViewport(new Range(xmin, xmax));
+    axis.setRangePolicy(zoomPolicy);
   }
 
   /**
@@ -314,14 +286,12 @@ public class ZoomableChart
     this.m_zoomArea = null;
 
     IAxis axisX = getAxisX();
-    // IRangePolicy
-    axisX.setRangePolicy(new RangePolicyFixedViewport());
-    axisX.setRange(new Range(xmin, xmax));
+    IRangePolicy zoomPolicyX = new RangePolicyFixedViewport(new Range(xmin, xmax));
+    axisX.setRangePolicy(zoomPolicyX);
 
     IAxis axisY = getAxisY();
-    // IRangePolicy
-    axisY.setRangePolicy(new RangePolicyFixedViewport());
-    axisY.setRange(new Range(ymin, ymax));
+    IRangePolicy zoomPolicyY = new RangePolicyFixedViewport(new Range(ymin, ymax));
+    axisY.setRangePolicy(zoomPolicyY);
   }
 
   /**

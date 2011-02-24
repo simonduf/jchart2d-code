@@ -55,7 +55,7 @@ import junit.framework.TestSuite;
 public class TestStaticCollectorChart
     extends TestCase {
 
-  /**
+  /** 
    * Main debug entry.
    * <p>
    * 

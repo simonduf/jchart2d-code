@@ -44,14 +44,14 @@ import java.util.Set;
  * Use it by decorating the ITrace2D you normally use:
  * 
  * <pre>
- *    // Create a chart:
- *    Chart2D chart = new Chart2D();
- *    // Create an ITrace:
- *    &lt;b&gt;ITrace2D trace = new Trace2DDebugger(new Trace2DSimple());
- *    // add data...
- *    ...
- *    //
- *    chart.addTrace(trace);
+ *      // Create a chart:
+ *      Chart2D chart = new Chart2D();
+ *      // Create an ITrace:
+ *      &lt;b&gt;ITrace2D trace = new Trace2DDebugger(new Trace2DSimple());
+ *      // add data...
+ *      ...
+ *      //
+ *      chart.addTrace(trace);
  * </pre>
  * 
  * <p>
@@ -61,7 +61,7 @@ import java.util.Set;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.13 $
  */
 public class Trace2DDebugger implements ITrace2D {
 
@@ -97,10 +97,10 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#addErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
+   * @see info.monitorenter.gui.chart.ITrace2D#addComputingTrace(info.monitorenter.gui.chart.ITrace2D)
    */
-  public boolean addErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
-    return this.m_delegate.addErrorBarPolicy(errorBarPolicy);
+  public void addComputingTrace(final ITrace2D trace) {
+    this.m_delegate.addComputingTrace(trace);
   }
 
   /**
@@ -109,15 +109,22 @@ public class Trace2DDebugger implements ITrace2D {
    */
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#addErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
+   */
+  public boolean addErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
+    return this.m_delegate.addErrorBarPolicy(errorBarPolicy);
+  }
+
+  // /////////////////////////////////
+  // Proxy methods
+
+  /**
    * @see ITrace2D#addPoint(double, double)
    */
   public boolean addPoint(final double x, final double y) {
     TracePoint2D p = new TracePoint2D(x, y);
     return this.addPoint(p);
   }
-
-  // /////////////////////////////////
-  // Proxy methods
 
   /**
    * @see ITrace2D#addPoint(TracePoint2D)
@@ -163,6 +170,15 @@ public class Trace2DDebugger implements ITrace2D {
    */
   public boolean equals(final Object obj) {
     return this.m_delegate.equals(obj);
+  }
+
+  /**
+   * 
+   * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(info.monitorenter.gui.chart.TracePoint2D,
+   *      int)
+   */
+  public void firePointChanged(final TracePoint2D changed, final int state) {
+    this.m_delegate.firePointChanged(changed, state);
   }
 
   /**
@@ -359,6 +375,13 @@ public class Trace2DDebugger implements ITrace2D {
    */
   public void removeAllPoints() {
     this.m_delegate.removeAllPoints();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#removeComputingTrace(info.monitorenter.gui.chart.ITrace2D)
+   */
+  public boolean removeComputingTrace(final ITrace2D trace) {
+    return this.m_delegate.removeComputingTrace(trace);
   }
 
   /**

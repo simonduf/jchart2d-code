@@ -1,7 +1,7 @@
 /*
  *  AllTests.java of project jchart2d, main test suite for 
  *  the package info.monitorenter.util.collections. 
- *  Copyright 2006 (C) Achim Westermann, created on 08.10.2006 11:59:12.
+ *  Copyright (c) 2007 Achim Westermann, created on 08.10.2006 11:59:12.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import junit.framework.TestSuite;
  * <p>
  * 
  * @author Achim westermann
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  * 
  * @since 2.1.0
  */

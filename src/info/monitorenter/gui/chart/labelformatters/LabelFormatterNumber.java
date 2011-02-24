@@ -23,7 +23,7 @@
  */
 package info.monitorenter.gui.chart.labelformatters;
 
-import info.monitorenter.gui.chart.ILabelFormatter;
+import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.util.Range;
 
 import java.text.DecimalFormat;
@@ -47,10 +47,10 @@ import java.text.ParseException;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.7 $
  */
 public class LabelFormatterNumber
-    extends ALabelFormatter implements ILabelFormatter {
+    extends ALabelFormatter implements IAxisLabelFormatter {
 
   /**
    * The internal cached minimum shift of value required to get to distinct
@@ -88,14 +88,14 @@ public class LabelFormatterNumber
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#format(double)
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#format(double)
    */
   public String format(final double value) {
     return this.m_numberFormat.format(value);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#getMaxAmountChars()
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getMaxAmountChars()
    */
   public int getMaxAmountChars() {
     // find the fractions by using range information:
@@ -144,7 +144,7 @@ public class LabelFormatterNumber
       }
     }
 
-    // check if the interna numberformat would cut values and cause rendering
+    // check if the internal numberformat would cut values and cause rendering
     // errors:
     if (integerDigits > this.m_numberFormat.getMaximumIntegerDigits()) {
       this.m_numberFormat.setMaximumIntegerDigits(integerDigits);
@@ -152,13 +152,27 @@ public class LabelFormatterNumber
     if (fractionDigits > this.m_numberFormat.getMaximumFractionDigits()) {
       this.m_numberFormat.setMaximumFractionDigits(fractionDigits);
     }
+
+    // check if the internal numberformat will format bigger numbers than the
+    // computed ones thus causing labels overwriting the y axis or each other
+    // for the x axis:
+
+    int minFractionDigits = this.m_numberFormat.getMinimumFractionDigits();
+    int minIntegerDigits = this.m_numberFormat.getMinimumIntegerDigits();
+    if (minFractionDigits > fractionDigits) {
+      fractionDigits = minFractionDigits;
+    }
+    if (minIntegerDigits > integerDigits) {
+      integerDigits = minFractionDigits;
+    }
+
     // <sign> integerDigits <dot> fractionDigits:
     return 1 + integerDigits + 1 + fractionDigits;
 
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#getMinimumValueShiftForChange()
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getMinimumValueShiftForChange()
    */
   public double getMinimumValueShiftForChange() {
     if (this.m_cachedMinValueShift == Double.MAX_VALUE) {
@@ -169,7 +183,7 @@ public class LabelFormatterNumber
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#getNextEvenValue(double,
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getNextEvenValue(double,
    *      boolean)
    */
   public double getNextEvenValue(final double value, final boolean ceiling) {
@@ -193,7 +207,7 @@ public class LabelFormatterNumber
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#parse(java.lang.String)
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#parse(java.lang.String)
    */
   public Number parse(final String formatted) throws NumberFormatException {
     try {
@@ -207,8 +221,8 @@ public class LabelFormatterNumber
    * Sets the number formatter to use.
    * <p>
    * 
-   * Fires a <code>{@link java.beans.PropertyChangeEvent}</code> to the listeners added
-   * via
+   * Fires a <code>{@link java.beans.PropertyChangeEvent}</code> to the
+   * listeners added via
    * <code>{@link #addPropertyChangeListener(String, java.beans.PropertyChangeListener)}</code>
    * with the property key <code>{@link #PROPERTY_FORMATCHANGE}</code>.
    * <p>

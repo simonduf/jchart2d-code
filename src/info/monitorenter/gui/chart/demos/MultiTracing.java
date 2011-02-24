@@ -1,6 +1,6 @@
 /*
  * MultiTracing, a demo testing the thread- safetiness of the Chart2D.
- * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -36,7 +36,6 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
-
 /**
  * <p>
  * An example that tests the ability of multithreaded use of a single
@@ -51,25 +50,27 @@ import javax.swing.JFrame;
  * This test may blow your CPU. I am currently working on an AMD Athlon 1200,
  * 512 MB RAM so I did not get these problems.
  * </p>
- *
- * @version $Revision: 1.2 $
- *
+ * 
+ * @version $Revision: 1.4 $
+ * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  */
 
-public final class MultiTracing extends JFrame {
+public final class MultiTracing
+    extends JFrame {
   /**
    * Thread that adds a trace to a chart, paints the points with configurable
    * sleep breaks and then removes it. It then goes to sleep and starts this
    * cycle anew.
    * <p>
-   *
+   * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   *
-   *
-   * @version $Revision: 1.2 $
+   * 
+   * 
+   * @version $Revision: 1.4 $
    */
-  static final class AddPaintRemoveThread extends Thread {
+  static final class AddPaintRemoveThread
+      extends Thread {
 
     /** The y values to paint. */
     private double[] m_data;
@@ -87,16 +88,16 @@ public final class MultiTracing extends JFrame {
      * Creates an instance that paints data to the trace that is added to the
      * chart.
      * <p>
-     *
+     * 
      * @param chart
      *          the chart to use.
-     *
+     * 
      * @param trace
      *          the trace to add points to.
-     *
+     * 
      * @param data
      *          the y values of the points to add.
-     *
+     * 
      * @param sleep
      *          the length of the sleep break between painting points in ms.
      */
@@ -115,11 +116,14 @@ public final class MultiTracing extends JFrame {
     public void run() {
 
       while (true) {
-
+        if (Chart2D.DEBUG_THREADING) {
+          System.out.println(this.getName() + "(" + currentThread().getName() + ") adding trace.");
+        }
         this.m_innnerChart.addTrace(this.m_trace);
         for (int i = 0; i < this.m_data.length; i++) {
-          if (DEBUG) {
-            System.out.println(this.getName() + " adding point to " + this.m_trace.getName());
+          if (Chart2D.DEBUG_THREADING) {
+            System.out.println(this.getName() + "(" + currentThread().getName()
+                + ") adding point to " + this.m_trace.getName());
           }
           this.m_trace.addPoint(i, this.m_data[i]);
           try {
@@ -134,8 +138,9 @@ public final class MultiTracing extends JFrame {
         } catch (InterruptedException e) {
           e.printStackTrace(System.err);
         }
-        if (DEBUG) {
-          System.out.println(this.getName() + " removing trace.");
+        if (Chart2D.DEBUG_THREADING) {
+          System.out
+              .println(this.getName() + "(" + currentThread().getName() + ") removing trace.");
         }
         this.m_innnerChart.removeTrace(this.m_trace);
         this.m_trace.removeAllPoints();
@@ -149,9 +154,6 @@ public final class MultiTracing extends JFrame {
     }
   }
 
-  /** Debugging switch. */
-  private static final boolean DEBUG = false;
-
   /**
    * Generated <code>serialVersionUID</code>.
    */
@@ -163,10 +165,10 @@ public final class MultiTracing extends JFrame {
   /**
    * Helper method that generates random data for display.
    * <p>
-   *
+   * 
    * @param data
    *          will be filled with random y and ascending x values.
-   *
+   * 
    * @return the range of the generated data.
    */
   private static Range getRange(final double[][] data) {
@@ -191,7 +193,7 @@ public final class MultiTracing extends JFrame {
   /**
    * Main entry.
    * <p>
-   *
+   * 
    * @param args
    *          ignored.
    */
@@ -304,7 +306,7 @@ public final class MultiTracing extends JFrame {
    * Enforces to display a certain visible x range that will be expanded if
    * traces in the chart have higher or lower values.
    * <p>
-   *
+   * 
    * @param forceXRange
    *          the range that at least has to be kept visible.
    */
@@ -316,7 +318,7 @@ public final class MultiTracing extends JFrame {
    * Enforces to display a certain visible x range that will be expanded if
    * traces in the chart have higher or lower values.
    * <p>
-   *
+   * 
    * @param forceYRange
    *          the range that at least has to be kept visible.
    */

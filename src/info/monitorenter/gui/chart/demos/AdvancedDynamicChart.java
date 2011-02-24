@@ -55,7 +55,7 @@ import javax.swing.JFrame;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.6 $
  *
  */
 public final class AdvancedDynamicChart {
@@ -74,6 +74,7 @@ public final class AdvancedDynamicChart {
     // We want to use a date format for the y axis.
     // Currently works only this way:
     AAxis yAxis = new AxisLinear();
+
 
     // Number formatter does not work for AxisAutoUnit.
     AAxis xAxis = new AxisLinear();
@@ -100,7 +101,7 @@ public final class AdvancedDynamicChart {
     // Create an ITrace:
     // Note that dynamic charts need limited amount of values!!!
 
-    ITrace2D trace = new Trace2DLtd(20);
+    ITrace2D trace = new Trace2DLtd(400);
     trace.setColor(Color.RED);
 
     // set a stroke (pattern to render the trace)
@@ -128,7 +129,7 @@ public final class AdvancedDynamicChart {
     // Every 500 milliseconds a new value is collected.
     // The AxisSwap changes x and y data. Just a proof of concept.
     ADataCollector collector = new RandomDataCollectorTimeStamped(
-        new Trace2DAxisSwap(trace), 500);
+        new Trace2DAxisSwap(trace), 50);
     collector.start();
   }
 

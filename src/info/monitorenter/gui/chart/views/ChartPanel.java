@@ -219,13 +219,9 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
       if (oldTrace == null && newTrace != null) {
         label = LayoutFactory.getInstance().createContextMenuLabel(this.m_chart, newTrace, true);
         this.m_labelPanel.add(label);
-        synchronized (this.m_chart) {
-          // this.doLayout();
-          // this.getLayout().layoutContainer(this);
           this.invalidate();
           this.m_labelPanel.invalidate();
           this.validateTree();
-        }
         this.m_labelPanel.doLayout();
       } else if (oldTrace != null && newTrace == null) {
         // search for label:

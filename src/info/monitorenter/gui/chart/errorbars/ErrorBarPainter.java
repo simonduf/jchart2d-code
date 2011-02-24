@@ -3,7 +3,7 @@
  *  an error bar painter that allows configuration of the way 
  *  the segment, start point and end point of an error bar is painted 
  *  by the use of info.monitorenter.gui.chart.IPointPainter.
- *  Copyright 2006 (C) Achim Westermann, created on 03.09.2006 19:55:53.
+ *  Copyright (c) 2007 Achim Westermann, created on 03.09.2006 19:55:53.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -58,7 +58,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.10 $
  */
 public class ErrorBarPainter implements IErrorBarPainter {
 
@@ -94,7 +94,7 @@ public class ErrorBarPainter implements IErrorBarPainter {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.8 $
+   * @version $Revision: 1.10 $
    */
   private abstract class ASegment implements ISegment {
 
@@ -532,7 +532,7 @@ public class ErrorBarPainter implements IErrorBarPainter {
     Color old = this.m_connectionColor;
     this.m_connectionColor = connectionColor;
     this.m_propertyChangeSupport.firePropertyChange(PROPERTY_CONNECTION_COLOR, old,
-        this.m_endPointColor);
+        this.m_connectionColor);
   }
 
   /**

@@ -1,7 +1,7 @@
 /*
  *  TestChart2DSetAxis.java of project jchart2d, Junit test to 
  *  ensure API contracts. 
- *  Copyright 2006 (C) Achim Westermann, created on 05.08.2006 17:14:47.
+ *  Copyright (c) 2007 Achim Westermann, created on 05.08.2006 17:14:47.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.6 $
  */
 public class TestChart2DSetAxis extends TestCase {
 
@@ -83,13 +83,13 @@ public class TestChart2DSetAxis extends TestCase {
    * <p>
    * 
    * Configures an {@link IAxis} sets it to a chart and verifies, if the
-   * {@link ILabelFormatter} remains the same.
+   * {@link IAxisLabelFormatter} remains the same.
    * <p>
    * 
    */
   public void testSetAxisLabelFormatters() {
     AAxis axis = new AxisLinear();
-    ILabelFormatter formatter = new LabelFormatterDate((SimpleDateFormat) DateFormat
+    IAxisLabelFormatter formatter = new LabelFormatterDate((SimpleDateFormat) DateFormat
         .getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT));
     axis.setFormatter(formatter);
     Chart2D chart = new Chart2D();

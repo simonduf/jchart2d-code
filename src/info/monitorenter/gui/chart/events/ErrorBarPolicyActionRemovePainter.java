@@ -1,7 +1,7 @@
 /*
  *  ErrorBarPolicyActionRemovePainter.java of project jchart2d, action 
  *  that removes the given IErrorBarPainter from the given IErrorBarPolicy. 
- *  Copyright 2006 (C) Achim Westermann, created on 09.12.2006 00:14:25.
+ *  Copyright (c) 2007 Achim Westermann, created on 09.12.2006 00:14:25.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,10 @@ package info.monitorenter.gui.chart.events;
 
 import info.monitorenter.gui.chart.IErrorBarPainter;
 import info.monitorenter.gui.chart.IErrorBarPolicy;
+import info.monitorenter.util.UIUtil;
 
+import java.awt.Component;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 
@@ -38,7 +41,7 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  */
 public class ErrorBarPolicyActionRemovePainter
     extends AErrorBarPolicyAction {
@@ -83,7 +86,16 @@ public class ErrorBarPolicyActionRemovePainter
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   public void actionPerformed(final ActionEvent e) {
+    // update UI, these two steps have to be performed before 
+    // the remove operation - the window will not be found afterwards:
+    Component component = (Component) e.getSource();
+    Window dialog = UIUtil.findWindow(component);
+    
+    // remove operation:
     this.m_errorBarPolicy.removeErrorBarPainter(this.m_errorBarPainter);
+   
+    // update UI, final step:
+    dialog.pack();
   }
 
 }

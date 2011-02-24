@@ -1,7 +1,7 @@
 /*
  *  ErrorBarDirectionPanel.java of project jchart2d, a panel 
  *  for selection of the directions of error bars. 
- *  Copyright 2006 (C) Achim Westermann, created on 09:50:20.
+ *  Copyright (c) 2007 Achim Westermann, created on 09:50:20.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -48,7 +48,7 @@ import javax.swing.JPanel;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ErrorBarDirectionPanel
     extends JPanel {
@@ -83,8 +83,7 @@ public class ErrorBarDirectionPanel
     // Negative x error
     JLabel label = new JLabel("Negative X");
     label.setToolTipText("Show error bars in negative x direction.");
-    gbc.gridy = 0;
-    gbc.fill = GridBagConstraints.NONE;
+   
     this.add(label, gbc);
 
     JCheckBox box = new JCheckBox();
@@ -139,17 +138,14 @@ public class ErrorBarDirectionPanel
     gbc.gridheight = 2;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     gbc.weightx = 1;
-
-    // JLabel dummy = new JLabel();
     this.add(Box.createHorizontalGlue(), gbc);
     gbc.fill = GridBagConstraints.NONE;
-
-    // Positive x error
     gbc.weightx = 0;
+    gbc.gridheight = 1;
+    // Positive x error
     label = new JLabel("Positive X");
     label.setToolTipText("Show error bars in positive x direction.");
     gbc.gridx = 0;
-    gbc.gridheight = 1;
     gbc.gridy++;
     this.add(label, gbc);
     box = new JCheckBox();

@@ -1,7 +1,7 @@
 /*
  *  ErrorBarPainterEditPanel.java of project jchart2d, a panel 
  *  for configuration of a single ErrorBarConfigurable. 
- *  Copyright 2006 (C) Achim Westermann, created on 09:50:20.
+ *  Copyright (c) 2007 Achim Westermann, created on 09:50:20.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -58,7 +58,7 @@ import javax.swing.border.TitledBorder;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class ErrorBarPainterEditPanel
     extends JPanel {
@@ -79,7 +79,7 @@ public class ErrorBarPainterEditPanel
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.6 $
+   * @version $Revision: 1.7 $
    */
   private class SegmentChooserPanel
       extends JPanel {
@@ -94,7 +94,7 @@ public class ErrorBarPainterEditPanel
      * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
      * 
      * 
-     * @version $Revision: 1.6 $
+     * @version $Revision: 1.7 $
      */
     final class ColorIconUpdater implements PropertyChangeListener {
 

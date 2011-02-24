@@ -1,6 +1,6 @@
 /*
  *  Trace2DSimple, a list- based simple implementation of a ITrace2D.
- *  Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,6 @@
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
  */
-
 package info.monitorenter.gui.chart.traces;
 
 import info.monitorenter.gui.chart.ITrace2D;
@@ -51,10 +50,9 @@ import java.util.LinkedList;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.6 $
  */
-public class Trace2DSimple
-    extends ATrace2D implements ITrace2D {
+public class Trace2DSimple extends ATrace2D implements ITrace2D {
 
   /** Internal List &lt;ITracePoint2D&gt;. */
   protected LinkedList m_points = new LinkedList();
@@ -124,8 +122,12 @@ public class Trace2DSimple
   /**
    * @see ATrace2D#removePointInternal(info.monitorenter.gui.chart.TracePoint2D)
    */
-  protected boolean removePointInternal(final TracePoint2D point) {
-    return this.m_points.remove(point);
+  protected TracePoint2D removePointInternal(final TracePoint2D point) {
+    TracePoint2D result = null;
+    if (this.m_points.remove(point)) {
+      result = point;
+    }
+    return result;
   }
 
 }

@@ -1,7 +1,7 @@
 /*
  *  TestChart2DHeadless.java of project jchart2d, junit tests for Chart2D
  *  in headless mode.
- *  Copyright 2006 (C) Achim Westermann, created on 14:32:20.
+ *  Copyright (c) 2007 Achim Westermann, created on 14:32:20.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -46,7 +46,7 @@ import junit.framework.TestSuite;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class TestChart2DHeadless extends TestCase {
 

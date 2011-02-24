@@ -23,19 +23,25 @@
 package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterDate;
+import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.traces.painters.TracePainterVerticalBar;
+import info.monitorenter.gui.chart.views.ChartPanel;
+import info.monitorenter.util.Range;
 
+import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import javax.swing.JFrame;
+import javax.swing.UIManager;
 
 /**
  * Demonstrates advanced features of static charts in jchart2d.
@@ -64,8 +70,16 @@ public final class AdvancedStaticChart {
     ITrace2D trace = new Trace2DSimple();
     trace.setTracePainter(new TracePainterVerticalBar(2, chart));
     AAxis yAxis = new AxisLinear();
+    Font titleFont = UIManager.getDefaults().getFont("Label.font").deriveFont(14f).deriveFont(
+        Font.BOLD);
+    yAxis.getTitlePainter().setTitleFont(titleFont);
+    yAxis.setTitle("hoppelhase");
     chart.setAxisY(yAxis);
     yAxis.setFormatter(new LabelFormatterDate(new SimpleDateFormat()));
+    IAxis xAxis = chart.getAxisX();
+    xAxis.setTitle("emil");
+    xAxis.getTitlePainter().setTitleFont(titleFont);
+    xAxis.setRangePolicy(new RangePolicyFixedViewport(new Range(0, 220)));
     // Add all points, as it is static:
     double high = System.currentTimeMillis();
     for (double i = 0; i < 200; i++) {
@@ -80,7 +94,7 @@ public final class AdvancedStaticChart {
     // Create a frame.
     JFrame frame = new JFrame("AdvancedStaticChart");
     // add the chart to the frame:
-    frame.getContentPane().add(chart);
+    frame.getContentPane().add(new ChartPanel(chart));
     frame.setSize(600, 600);
     // Enable the termination button [cross on the upper right edge]:
     frame.addWindowListener(new WindowAdapter() {

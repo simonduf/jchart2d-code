@@ -1,6 +1,6 @@
 /*
  *  AxisLinear.java of project jchart2d, Axis implementation with linear display.
- *  Copyright 2006 (C) Achim Westermann, created on 20:33:13.
+ *  Copyright (c) 2007 Achim Westermann, created on 20:33:13.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,19 +23,17 @@
 package info.monitorenter.gui.chart.axis;
 
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.ILabelFormatter;
+import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.util.Range;
 
-import java.awt.event.MouseEvent;
-
 /**
- * An {@link AAxis} with linear display of values.
+ * An <code>{@link AAxis}</code> with linear display of values.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.13 $
  */
 public class AxisLinear
     extends AAxis {
@@ -56,19 +54,23 @@ public class AxisLinear
    *          needed for formatting labels of this axis.
    * 
    */
-  public AxisLinear(final ILabelFormatter formatter) {
+  public AxisLinear(final IAxisLabelFormatter formatter) {
     super(formatter);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.axis.AAxis#createAccessor(info.monitorenter.gui.chart.Chart2D)
+   * @see info.monitorenter.gui.chart.axis.AAxis#createAccessor(info.monitorenter.gui.chart.Chart2D,
+   *      int)
    */
-  protected AChart2DDataAccessor createAccessor(final Chart2D chart) {
-    if (this.getDimension() == Chart2D.X) {
+  protected AChart2DDataAccessor createAccessor(final Chart2D chart, final int dimension) {
+    if (dimension == Chart2D.X) {
       return new AAxis.XDataAccessor(chart);
-    } else {
+    } else if (dimension == Chart2D.Y) {
       return new AAxis.YDataAccessor(chart);
+    } else {
+      throw new IllegalArgumentException("Dimension has to be Chart2D.X or Chart2D.Y!");
     }
+
   }
 
   /**
@@ -83,26 +85,4 @@ public class AxisLinear
     }
     return result;
   }
-
-  /**
-   * @see info.monitorenter.gui.chart.axis.AAxis#translateMousePosition(java.awt.event.MouseEvent)
-   */
-  public double translateMousePosition(final MouseEvent mouseEvent) throws IllegalArgumentException {
-    return this.getAccessor().translateMousePosition(mouseEvent);
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IAxis#translatePxToValue(int)
-   */
-  public double translatePxToValue(final int pixel) {
-    return this.m_accessor.translatePxToValue(pixel);
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IAxis#translateValueToPx(double)
-   */
-  public int translateValueToPx(final double value) {
-    return this.m_accessor.translateValueToPx(value);
-  }
-
 }

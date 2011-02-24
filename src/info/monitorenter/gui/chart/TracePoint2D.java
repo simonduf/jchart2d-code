@@ -1,6 +1,6 @@
 /*
  * TracePoint2D, a tuned Point2D.Double for use with ITrace2D- implementations.
- * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,8 +21,6 @@
  */
 
 package info.monitorenter.gui.chart;
-
-import info.monitorenter.gui.chart.traces.ATrace2D;
 
 import java.awt.geom.Point2D;
 
@@ -56,15 +54,43 @@ import java.awt.geom.Point2D;
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.9 $
  */
-public class TracePoint2D
-    extends Point2D.Double implements Comparable, java.io.Serializable, Cloneable {
+public class TracePoint2D extends Point2D.Double implements Comparable, java.io.Serializable,
+    Cloneable {
 
   /**
    * Generated <code>serialVersionUID</code>.
    */
   private static final long serialVersionUID = 3618980079204512309L;
+
+  /**
+   * The state flag used to inform the <code>{@link ITrace2D}</code> listener
+   * via <code>{@link ITrace2D#firePointChanged(TracePoint2D, int)}</code> in
+   * case a point was added.
+   * <p>
+   */
+  public static final transient int STATE_ADDED = 1;
+
+  /**
+   * The state flag used to inform the <code>{@link ITrace2D}</code> listener
+   * via <code>{@link ITrace2D#firePointChanged(TracePoint2D, int)}</code> in
+   * case a point was removed.
+   * <p>
+   */
+  public static final transient int STATE_REMOVED = 2;
+
+  /**
+   * The state flag used to inform the <code>{@link ITrace2D}</code> listener
+   * via <code>{@link ITrace2D#firePointChanged(TracePoint2D, int)}</code> in
+   * case a point was changed.
+   * <p>
+   * 
+   * Will be used by <code>{@link #setLocation(double, double)}</code> and
+   * <code>{@link #setLocation(Point2D)}</code>.
+   * <p>
+   */
+  public static final transient int STATE_CHANGED = 4;
 
   /**
    * The reference to the listening <code>ITrace</code> who owns this point.
@@ -73,7 +99,7 @@ public class TracePoint2D
    * A trace point should be contained only in one trace!
    * <p>
    */
-  private ATrace2D m_listener;
+  private ITrace2D m_listener;
 
   /**
    * Flag for the Chart2D painter that allows it to render only instances he has
@@ -168,7 +194,7 @@ public class TracePoint2D
   /**
    * Allows <code>ITrace2D</code> instances to register (or deregister)
    * themselves with this point to receive (or stop receiving) change
-   * information via {@link ATrace2D#firePointChanged(TracePoint2D, boolean)}
+   * information via {@link ITrace2D#firePointChanged(TracePoint2D, int)}
    * events.
    * <p>
    * 
@@ -176,19 +202,18 @@ public class TracePoint2D
    *          The instance that will be informed about changes or null to
    *          deregister.
    */
-  public void setListener(final ATrace2D listener) {
+  public void setListener(final ITrace2D listener) {
     this.m_listener = listener;
   }
 
   /**
-   * <p>
    * This method overloads the method of
    * <code>java.awt.geom.Point2D.Double</code> to fire a property change event
    * to listeners of the corresponding <code>{@link ITrace2D}</code> instances
    * via their method
-   * <code>{@link ATrace2D#firePointChanged(TracePoint2D, boolean)}</code>
-   * (with argument true).
-   * </p>
+   * <code>{@link ITrace2D#firePointChanged(TracePoint2D, int)}</code> (with
+   * int argument set to <code>{@link #STATE_CHANGED}</code>).
+   * <p>
    * 
    * @param xValue
    *          the new x-coordinate for this point.
@@ -199,7 +224,7 @@ public class TracePoint2D
 
     super.setLocation(xValue, yValue);
     if (this.m_listener != null) {
-      this.m_listener.firePointChanged(this, true);
+      this.m_listener.firePointChanged(this, TracePoint2D.STATE_CHANGED);
     }
   }
 }

@@ -1,7 +1,7 @@
 /*
  *  IErrorBarPolicy.java of project jchart2d, interface for a facade 
  *  towards painting error bars that adds a layer of configurability. 
- *  Copyright 2006 (C) Achim Westermann, created on 06.08.2006 13:40:03.
+ *  Copyright (c) 2007 Achim Westermann, created on 06.08.2006 13:40:03.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -26,6 +26,8 @@ import info.monitorenter.gui.chart.errorbars.ErrorBarValue;
 
 import java.beans.PropertyChangeListener;
 import java.util.Set;
+
+import javax.swing.JComponent;
 
 /**
  * Interface for a facade towards painting error bars that adds a layer of
@@ -89,7 +91,7 @@ import java.util.Set;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public interface IErrorBarPolicy extends ITracePainter {
   /**
@@ -126,7 +128,7 @@ public interface IErrorBarPolicy extends ITracePainter {
    * {@link ITrace2D#addErrorBarPolicy(IErrorBarPolicy)} for this feature
    * instead.
    * <p>
-   *  
+   * 
    * @param trace
    *          the trace error bars are rendered for.
    */
@@ -315,5 +317,20 @@ public interface IErrorBarPolicy extends ITracePainter {
    *         means of the equals operation.
    */
   public boolean removeErrorBarPainter(IErrorBarPainter painter);
+
+  /**
+   * Allows an implementation to return a <code>JComponent</code> that takes
+   * care of custom configuration properties for the UI support of error bar
+   * policies.
+   * <p>
+   * Returns a <code>JComponent</code> that - stand alone - takes care of
+   * configuring custom properties or null if nothing is required. This will be
+   * integrated in the error bar wizard UI of jchart2d.
+   * <p>
+   * 
+   * @return a <code>JComponent</code> that - stand alone - takes care of
+   *         configuring custom properties or null if nothing is required.
+   */
+  public JComponent getCustomConfigurator();
 
 }

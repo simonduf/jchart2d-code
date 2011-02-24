@@ -23,7 +23,7 @@
  */
 package info.monitorenter.gui.chart.labelformatters;
 
-import info.monitorenter.gui.chart.ILabelFormatter;
+import info.monitorenter.gui.chart.IAxisLabelFormatter;
 
 import java.text.DecimalFormat;
 
@@ -34,10 +34,10 @@ import java.text.DecimalFormat;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  *
  */
-public final class LabelFormatterSimple extends LabelFormatterNumber implements ILabelFormatter {
+public final class LabelFormatterSimple extends LabelFormatterNumber implements IAxisLabelFormatter {
   /**
    * Default constructor that limits the internal maximum fraction digits to 2
    * and the maximum integer digits to 16.

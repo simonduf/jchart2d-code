@@ -1,32 +1,24 @@
 /*
- * File   : $Source: /cvsroot/jchart2d/jchart2d/test/info/monitorenter/gui/chart/test/AllTests.java,v $
- * Date   : $Date: 2007/06/30 10:03:22 $
- * Version: $Revision: 1.2 $
+ *  AllTest.java of project JChart2d, 
+ *  mother of all test suites that incorporates all tests for JChart2d..
+ *  Copyright 2007 (C) Achim Westermann, created on 25.02.2007 18:59:08.
  *
- * This library is part of OpenCms -
- * the Open Source Content Mananagement System
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
  *
- * Copyright (c) 2005 Alkacon Software GmbH (http://www.alkacon.com)
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA*
+ *  If you modify or optimize the code in a useful way please let me know.
+ *  Achim.Westermann@gmx.de
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * For further information about Alkacon Software GmbH, please see the
- * company website: http://www.alkacon.com
- *
- * For further information about OpenCms, please see the
- * project website: http://www.opencms.org
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 package info.monitorenter.gui.chart.test;
@@ -36,12 +28,12 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
- * OpenCms main test suite, executes the individual test suites of all core
+ * JChart2D main test suite, executes the individual test suites of all core
  * packages.
  * <p>
  * 
  * @author Achim Westermann
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.5 $
  * 
  * @since 2.1.0
  */
@@ -56,16 +48,17 @@ public final class AllTests {
   }
 
   /**
-   * Creates the OpenCms JUnit test suite.
+   * Creates the JChart2D JUnit test suite.
    * <p>
    * 
-   * @return the OpenCms JUnit test suite
+   * @return the JChart2D JUnit test suite
    */
   public static Test suite() {
 
-    TestSuite suite = new TestSuite("OpenCms complete tests");
+    TestSuite suite = new TestSuite("JChart2d complete tests");
 
     suite.addTest(info.monitorenter.gui.chart.AllTests.suite());
+    suite.addTest(info.monitorenter.gui.chart.traces.AllTests.suite());
     suite.addTest(info.monitorenter.gui.chart.axis.AllTests.suite());
     suite.addTest(info.monitorenter.gui.chart.demos.AllTests.suite());
     suite.addTest(info.monitorenter.gui.chart.layouts.AllTests.suite());

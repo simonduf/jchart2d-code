@@ -33,7 +33,7 @@ import java.util.Map;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann</a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public final class TimeStampedValue implements Map.Entry, Comparable {
   /**
@@ -176,7 +176,11 @@ public final class TimeStampedValue implements Map.Entry, Comparable {
    * {@link #getTime()}.
    * <p>
    * 
-   * @see java.lang.Comparable
+   * @param obj
+   *          the object to compare this to.
+   * 
+   * 
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   public int compareTo(final java.lang.Object obj) {
     TimeStampedValue other = (TimeStampedValue) obj;

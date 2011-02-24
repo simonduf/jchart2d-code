@@ -52,7 +52,7 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.12 $
  */
 public class TestChartOperationsVisual
     extends ATestChartOperations {
@@ -68,19 +68,17 @@ public class TestChartOperationsVisual
     TestSuite suite = new TestSuite();
     suite.setName(TestChartOperationsVisual.class.getName());
 
-    // suite.addTest(new TestChartOperationsVisual("testRemoveAllPoints"));
-    // suite.addTest(new TestChartOperationsVisual("testAddPoint"));
-    // suite.addTest(new TestChartOperationsVisual("testSetStroke"));
-    // suite.addTest(new TestChartOperationsVisual("testSetName"));
-    // suite.addTest(new TestChartOperationsVisual("testSetRangePolicyX"));
-    // suite
-    // .addTest(new
-    // TestChartOperationsVisual("testAxisLabelFormatterNumberFormatSetNumberFormat"));
-    // suite.addTest(new
-    // TestChartOperationsVisual("testAxisSetLabelFormatter"));
-    // suite.addTest(new
-    // TestChartOperationsVisual("testTraceSetErrorBarPolicy"));
+    suite.addTest(new TestChartOperationsVisual("testRemoveAllPoints"));
+    suite.addTest(new TestChartOperationsVisual("testAddPoint"));
+    suite.addTest(new TestChartOperationsVisual("testSetStroke"));
+    suite.addTest(new TestChartOperationsVisual("testSetName"));
+    suite.addTest(new TestChartOperationsVisual("testSetRangePolicyX"));
+    suite
+        .addTest(new TestChartOperationsVisual("testAxisLabelFormatterNumberFormatSetNumberFormat"));
+    suite.addTest(new TestChartOperationsVisual("testAxisSetLabelFormatter"));
+    suite.addTest(new TestChartOperationsVisual("testTraceSetErrorBarPolicy"));
     suite.addTest(new TestChartOperationsVisual("testIErrorBarPainterSetStartPointPainter"));
+    suite.addTest(new TestChartOperationsVisual("testZoom"));
 
     return suite;
   }
@@ -175,8 +173,8 @@ public class TestChartOperationsVisual
   }
 
   /**
-   * Invokes <code>{@link IAxis#setFormatter(ILabelFormatter)}</code> on axis
-   * x with a <code>{@link LabelFormatterDate}</code>.
+   * Invokes <code>{@link IAxis#setFormatter(IAxisLabelFormatter)}</code> on
+   * axis x with a <code>{@link LabelFormatterDate}</code>.
    */
   public void testAxisSetLabelFormatter() {
     ATestChartOperations.AChartOperation operation = new AChartOperation(
@@ -216,7 +214,7 @@ public class TestChartOperationsVisual
         super.preCondition(chart);
         ITrace2D trace = (ITrace2D) chart.getTraces().iterator().next();
         // create an error bar policy and configure it
-        IErrorBarPolicy errorBarPolicy = new ErrorBarPolicyRelative(0.2);
+        IErrorBarPolicy errorBarPolicy = new ErrorBarPolicyRelative(0.2, 0.2);
         errorBarPolicy.setShowNegativeYErrors(true);
         errorBarPolicy.setShowPositiveYErrors(true);
         // errorBarPolicy.setShowNegativeXErrors(true);
@@ -247,6 +245,9 @@ public class TestChartOperationsVisual
     ATestChartOperations.AChartOperation operation = new AChartOperation("trace.removeAllPoints()") {
       public Object action(final Chart2D chart) {
         TestChartOperationsVisual.this.m_trace.removeAllPoints();
+        if (Chart2D.DEBUG_THREADING) {
+          System.out.println(this.getClass().getName() + " removed all points. ");
+        }
         return null;
       }
     };
@@ -276,10 +277,10 @@ public class TestChartOperationsVisual
   public void testSetRangePolicyX() {
     ATestChartOperations.AChartOperation operation = new AChartOperation(
         "chart.getAxisX().setRangePolicy( "
-            + "new RangePolicyFixedViewport(new Range(System.currentTimeMillis(), System.currentTimeMillis()+100)))") {
+            + "new RangePolicyFixedViewport(new Range(System.currentTimeMillis()-8000, System.currentTimeMillis())))") {
       public Object action(final Chart2D chart) {
         IRangePolicy rangePolicy = new RangePolicyFixedViewport(new Range(System
-            .currentTimeMillis(), System.currentTimeMillis() + 100));
+            .currentTimeMillis() - 8000, System.currentTimeMillis()));
         chart.getAxisX().setRangePolicy(rangePolicy);
         return null;
       }
@@ -313,7 +314,7 @@ public class TestChartOperationsVisual
       public Object action(final Chart2D chart) {
         ITrace2D trace = (ITrace2D) chart.getTraces().iterator().next();
         // create an error bar policy and configure it
-        IErrorBarPolicy errorBarPolicy = new ErrorBarPolicyRelative(0.2);
+        IErrorBarPolicy errorBarPolicy = new ErrorBarPolicyRelative(0.2, 0.2);
         errorBarPolicy.setShowNegativeYErrors(true);
         errorBarPolicy.setShowPositiveYErrors(true);
         // errorBarPolicy.setShowNegativeXErrors(true);
@@ -333,4 +334,41 @@ public class TestChartOperationsVisual
     };
     this.setTestOperation(operation);
   }
+
+  /**
+   * Sets a bold stroke to the trace and prompts for visual judgement.
+   * <p>
+   */
+  public void testZoom() {
+    ATestChartOperations.AChartOperation operation = new AChartOperation(
+
+    "zoomableChart.zoom()") {
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#createChartInstance()
+       */
+      public Chart2D createChartInstance() {
+
+        return new ZoomableChart();
+      }
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#createTrace()
+       */
+      public ITrace2D createTrace() {
+        ITrace2D trace = new Trace2DSimple();
+        for (int i = 0; i < 100; i++) {
+          trace.addPoint(i, (1.0 + Math.random()) * i);
+        }
+        return trace;
+      }
+
+      public Object action(final Chart2D chart) {
+        ZoomableChart zoomChart = (ZoomableChart) chart;
+        zoomChart.zoom(0.01, 20, 0, 20);
+        return null;
+      }
+    };
+    this.setTestOperation(operation);
+  }
+
 }

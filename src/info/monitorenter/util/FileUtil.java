@@ -46,7 +46,7 @@ import java.util.StringTokenizer;
  * <code>{@link #getInstance()}</code>.
  * <p>
  * 
- * @author Achim Westermann
+ * @author Achim Westermann 
  * 
  * @version 1.1
  */
@@ -525,8 +525,7 @@ public final class FileUtil
    *          in bytes
    * 
    * @param locale
-   *          the locale of the current OpenCms user or the System's default
-   *          locale if the first choice is not at hand.
+   *          the locale to translate the result to (e.g. in France they us 
    * 
    * @return the formatted filesize to Bytes, KB, MB or GB depending on the
    *         given value.

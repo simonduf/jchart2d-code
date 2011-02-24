@@ -31,12 +31,12 @@ import junit.framework.TestSuite;
 
 /**
  * A simple implementation that does not configure the chart to test and uses a
- * {@link info.monitorenter.gui.chart.Trace2DSimple}.
+ * {@link Trace2DSimple}.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  * 
  */
 public class DefaultDisplayTest

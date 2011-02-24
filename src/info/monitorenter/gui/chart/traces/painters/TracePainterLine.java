@@ -1,6 +1,6 @@
 /*
  *  LinePainter.java,  <enter purpose here>.
- *  Copyright (C) 2005  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -33,7 +33,7 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  * 
  */
 public class TracePainterLine

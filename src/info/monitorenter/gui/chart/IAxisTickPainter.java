@@ -24,38 +24,56 @@ package info.monitorenter.gui.chart;
 import java.awt.Graphics2D;
 
 /**
+ * Interface to paint ticks for a trace.
  * <p>
- * Interface to paint labels for a trace.
- * </p>
- * <b>Caution </b>
+ * <b>Caution </b><br/> There is no guarantee that further manipulation on the
+ * given <code>{@link java.awt.Graphics2D}</code> instance than painting just
+ * the label or tick will not produce layout problems. E.g. changing the color
+ * or font is not recommended as these should be assigned to the
+ * {@link info.monitorenter.gui.chart.ITrace2D}/
+ * <code>{@link info.monitorenter.gui.chart.Chart2D}</code>.
  * <p>
- * There is no guarantee that further manipulation on the given
- * {@link java.awt.Graphics2D} instance than painting just the label or tick
- * will not produce layout problems. E.g. changing the color or font is not
- * recommended as these should be assigned to the {@link info.monitorenter.gui.chart.ITrace2D}/
- * {@link info.monitorenter.gui.chart.Chart2D}.
- * </p>
- *
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
- * @version $Revision: 1.2 $
- *
+ * 
+ * @version $Revision: 1.1 $
+ * 
  */
-public interface ILabelPainter {
+public interface IAxisTickPainter {
+
+  /**
+   * Returns the major tick length in pixel.
+   * <p>
+   * Implementations should access a static variable for performance boost.
+   * <p>
+   * 
+   * @return the major tick length in pixel.
+   */
+  public int getMajorTickLength();
+
+  /**
+   * Returns the minor tick length in pixel.
+   * <p>
+   * Implementations should access a static variable for performance boost.
+   * <p>
+   * 
+   * @return the minor tick length in pixel.
+   */
+  public int getMinorTickLength();
 
   /**
    * Paint the given label for the x axis.
    * <p>
-   *
+   * 
    * @param x
    *          the x coordinate of the baseline for the label.
-   *
+   * 
    * @param y
    *          the y coordinate of the baseline for the label.
-   *
+   * 
    * @param label
    *          the formatted label String.
-   *
+   * 
    * @param g
    *          the graphic context to draw on.
    */
@@ -64,16 +82,16 @@ public interface ILabelPainter {
   /**
    * Paint the little marker for a label of the x axis.
    * <p>
-   *
+   * 
    * @param x
    *          the x coordinate of the baseline for the label.
-   *
+   * 
    * @param y
    *          the y coordinate of the baseline for the label.
-   *
+   * 
    * @param isMajorTick
    *          if true, this is a major tick.
-   *
+   * 
    * @param g
    *          the graphic context to draw on.
    */
@@ -82,16 +100,16 @@ public interface ILabelPainter {
   /**
    * Paint the given label for the y axis.
    * <p>
-   *
+   * 
    * @param x
    *          the x coordinate of the baseline for the label.
-   *
+   * 
    * @param y
    *          the y coordinate of the baseline for the label.
-   *
+   * 
    * @param label
    *          the formatted label String.
-   *
+   * 
    * @param g
    *          the graphic context to draw on.
    */
@@ -100,16 +118,16 @@ public interface ILabelPainter {
   /**
    * Paint the little marker for a label of the y axis.
    * <p>
-   *
+   * 
    * @param x
    *          the x coordinate of the baseline for the label.
-   *
+   * 
    * @param y
    *          the y coordinate of the baseline for the label.
-   *
+   * 
    * @param isMajorTick
    *          if true, this is a major tick.
-   *
+   * 
    * @param g
    *          the graphic context to draw on.
    */

@@ -1,7 +1,7 @@
 /*
  *  IErrorBarPainter.java of project jchart2d, interface for a 
  *  renderer of error bars. 
- *  Copyright 2006 (C) Achim Westermann, created on 06.08.2006 18:26:38.
+ *  Copyright (c) 2007 Achim Westermann, created on 06.08.2006 18:26:38.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -56,7 +56,7 @@ import java.beans.PropertyChangeListener;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.13 $
  */
 public interface IErrorBarPainter {
 
@@ -72,9 +72,9 @@ public interface IErrorBarPainter {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.11 $
+   * @version $Revision: 1.13 $
    */
-  interface ISegment {
+  public interface ISegment {
     /**
      * Registers the given property change listener to receive
      * <code>{@link java.beans.PropertyChangeEvent}</code> instances upon a
@@ -84,7 +84,7 @@ public interface IErrorBarPainter {
      * Note that implementations should delegate this call to
      * <code>{@link IErrorBarPainter#addPropertyChangeListener(String, PropertyChangeListener)}</code>
      * (the instance that belongs to this inner non-static class) for integrity
-     * with the fact that an <code>{@link ISegment}</code> is just a facade to
+     * with the fact that an <code>{@link IErrorBarPainter.ISegment}</code> is just a facade to
      * the outer class.
      * <p>
      * 

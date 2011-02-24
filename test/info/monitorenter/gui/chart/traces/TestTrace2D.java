@@ -10,7 +10,7 @@
  * 
  *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  *  Lesser General Public License for more details.
  * 
  *  You should have received a copy of the GNU Lesser General Public
@@ -21,10 +21,11 @@
  *  Achim.Westermann@gmx.de
  *
  */
-package info.monitorenter.gui.chart;
+package info.monitorenter.gui.chart.traces;
 
-import info.monitorenter.gui.chart.traces.Trace2DLtd;
-import info.monitorenter.gui.chart.traces.Trace2DSimple;
+import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.TracePoint2D;
 
 import java.awt.Color;
 import java.awt.GraphicsEnvironment;
@@ -38,7 +39,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Junit test case for <code>{@link Trace2D}</code>.
+ * Junit test case for <code>{@link Trace2DSimple}</code>.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
@@ -260,7 +261,7 @@ public class TestTrace2D
      * 
      * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
      * 
-     * @version $Revision: 1.5 $
+     * @version $Revision: 1.1 $
      */
     class PropertyChangeDetector implements PropertyChangeListener {
 
@@ -342,4 +343,5 @@ public class TestTrace2D
         "removeTrace(ITrace2D) on Chart2D did trigger a PropertyChangeEvent with a non-null newValue. ",
         event.getNewValue());
   }
+  
 }

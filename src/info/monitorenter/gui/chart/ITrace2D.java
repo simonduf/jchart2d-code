@@ -1,6 +1,6 @@
 /*
  * ITrace2D, the interface for all traces used by the Chart2D.
- * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -26,6 +26,7 @@ import info.monitorenter.util.collections.IComparableProperty;
 import java.awt.Color;
 import java.awt.Stroke;
 import java.beans.PropertyChangeListener;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -151,18 +152,26 @@ import java.util.Set;
  * </tr>
  * <tr>
  * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_ERRORBARPOLICY_CONFIGURATION}</code></td>
- * <td><code>{@link ITrace2D}</code> that notifies the change of the change
+ * <td><code>{@link ITrace2D}</code> that notifies the change 
  * of the configured error bar policy.</td>
  * <td>null</td>
  * <td><code>{@link info.monitorenter.gui.chart.IErrorBarPolicy}</code>, the
  * instance with the configuration change.</td>
+ * </tr>
+ * <tr>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_POINT_CHANGED}</code></td>
+ * <td><code>{@link ITrace2D}</code> that notifies the change 
+ * of the contained trace point.</td>
+ * <td><code>null</code> because it would be too much overhead to store the old point in a additional instance as the 
+ * original is modified in <code>{@link TracePoint2D#setLocation(java.awt.geom.Point2D)}</code>.</td>
+ * <td><code>{@link TracePoint2D}</code> the point whose location was modified.</td>
  * </tr>
  * </table>
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.16 $
  */
 public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
 
@@ -172,6 +181,20 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
   public static final String PROPERTY_COLOR = "trace.color";
+
+  /**
+   * The property key defining any change of a localtion of a contained
+   * <code>{@link TracePoint2D} </code>.
+   * <p>
+   * Use in combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   * 
+   * Property change event with this property will be fired if method
+   * <code>{@link TracePoint2D#setLocation(java.awt.geom.Point2D)}</code> or
+   * <code>{@link TracePoint2D#setLocation(double, double)}</code> of any
+   * contained point is invoked.<p>
+   */
+  public static final String PROPERTY_POINT_CHANGED = "trace.point.changed";
 
   /**
    * The property key defining a change of <code>{@link IErrorBarPolicy}</code>
@@ -301,6 +324,20 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
   public static final int ZINDEX_MAX = 100;
 
   /**
+   * Adds a trace that "should" compute values from the points added via
+   * <code>{@link #addPoint(TracePoint2D)}</code>.
+   * <p>
+   * 
+   * The given trace will be informed in case an add operation on this trace
+   * succeeds via <code>{@link #addPoint(TracePoint2D)}</code>.
+   * 
+   * @param trace
+   *          the trace that will calculate it's points from the added points of
+   *          this trace.
+   */
+  public void addComputingTrace(ITrace2D trace);
+
+  /**
    * Adds the given error bar policy to the internal set of error bar policies.
    * <p>
    * 
@@ -316,42 +353,64 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
   public boolean addErrorBarPolicy(IErrorBarPolicy errorBarPolicy);
 
   /**
-   * <p>
    * Adds a tracepoint to the internal data.
-   * </p>
+   * <p>
    * 
    * @see #addPoint(TracePoint2D p)
+   * 
    * @param x
    *          the x-value of the point to add.
    * @param y
    *          the y-value of the point to add.
    * @return true if the operation was successful, false else.
    */
-  boolean addPoint(double x, double y);
+  public boolean addPoint(double x, double y);
 
   /**
-   * <p>
    * Adds the given <code>TracePoint2D </code> to the internal data.
-   * </p>
    * <p>
    * Try to pass instances of <code>TracePoint2D</code> to this instance
    * instead of invoking <code>{@link #addPoint(double, double)}</code> to
    * increase performace. Else the given point has to be copied into such an
    * instance from the other method and delegated to this method.
-   * </p>
    * <p>
    * Implementations decide wether the point will be accepted or not. So they
    * have to update the internal properties <code>minX</code>,
    * <code>maxX</code>,<code>maxY</code> and <code>minY</code> and also
    * care about firing property change events for those properties by method
    * <code>{@link java.beans.PropertyChangeSupport#firePropertyChange(java.beans.PropertyChangeEvent)}</code>.
-   * </p>
+   * <p>
    * 
    * @param p
    *          the point to add.
    * @return true if the operation was successful, false else.
    */
-  boolean addPoint(TracePoint2D p);
+  public boolean addPoint(TracePoint2D p);
+
+  /**
+   * Method to trigger by
+   * <code>{@link TracePoint2D#setLocation(double, double)}</code>,
+   * <code>{@link #addPoint(TracePoint2D)}</code> or
+   * <code>{@link #removePoint(TracePoint2D)}</code>.
+   * <p>
+   * Bound checks are performed and property change events for the properties
+   * <code>{@link ITrace2D#PROPERTY_MAX_X}</code>,
+   * <code>{@link ITrace2D#PROPERTY_MIN_X}</code>,
+   * <code>{@link ITrace2D#PROPERTY_MAX_Y}</code> and
+   * <code>{@link ITrace2D#PROPERTY_MIN_Y}</code> are fired if the add bounds
+   * have changed due to the modification of the point.
+   * <p>
+   * 
+   * @param changed
+   *          the point that has been changed which may be a newly added point
+   *          (from <code>{@link #addPoint(TracePoint2D)}</code>, a removed
+   *          one or a modified one.
+   * @param state
+   *          one of {<code>{@link TracePoint2D#STATE_ADDED}, {@link TracePoint2D#STATE_CHANGED},
+   *   {@link TracePoint2D#STATE_REMOVED}</code>}
+   *          to inform about the type of change.
+   */
+  public void firePointChanged(final TracePoint2D changed, final int state);
 
   /**
    * Registers a property change listener that will be informed about changes of
@@ -397,7 +456,8 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
 
   /**
    * Because the color is data common to a trace of a <code>Chart2D</code> it
-   * is stored here. <br>
+   * is stored here.
+   * <p>
    * On the other hand only the corresponding <code>Chart2D </code> may detect
    * the same color chosen for different <code>IChart2D</code> instances to be
    * displayed. Therefore it is allowed to return null. This is a message to the
@@ -410,7 +470,7 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
    * value in implementation and only check on modifications of
    * <code>TracePoint</code> instances or on <code>add</code>- invocations
    * for changes.
-   * </p>
+   * <p>
    * 
    * @return The chosen java.awt.Color or null if the decision for the color
    *         should be made by the corresponding <code>Chart2D</code>.
@@ -440,7 +500,7 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
    * @return a String describing the Axis being accessed.
    * 
    */
-  String getLabel();
+  public String getLabel();
 
   /**
    * <p>
@@ -467,33 +527,37 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
    * value in implementation and only check on modifications of
    * <code>TracePoint</code> instances or on <code>add</code>- invocations
    * for changes.
-   * </p>
+   * <p>
    * 
    * @return the maximum value of the internal data for the x- dimension.
    */
-  double getMaxX();
+  public double getMaxX();
 
   /**
    * Returns the maximum value to be displayed on the y- axis of the Chart2D.
    * Implementations should be synchronized for multithreaded use. No exception
    * is thrown. In case of empty data (no tracepoints) 0 should be returned.
    * (watch division with zero).
+   * <p>
    * 
    * @return the maximum value of the internal data for the y- dimension.
    */
-  double getMaxY();
+  public double getMaxY();
 
   /**
    * Returns the minimum value to be displayed on the x- axis of the Chart2D.
+   * <p>
+   * 
    * Implementations should be synchronized for multithreaded use. No exception
    * is thrown. In case of empty data (no tracepoints) 0 should be returned.
    * (watch division with zero).
    * <p>
+   * 
    * The <code>Chart2D </code> will often call this method. So try to cache the
    * value in implementation and only check on modifications of
    * <code>TracePoint</code> instances or on <code>add</code>- invocations
    * for changes.
-   * </p>
+   * <p>
    * 
    * @return the minimum value of the internal data for the x- dimension.
    */
@@ -502,6 +566,7 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
 
   /**
    * Returns the minimum value to be displayed on the y- axis of the Chart2D.
+   * <p>
    * Implementations should be synchronized for multithreaded use. No exception
    * is thrown. In case of empty data (no tracepoints) 0 should be returned.
    * (watch division with zero).
@@ -576,16 +641,24 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
   public Chart2D getRenderer();
 
   /**
-   * @return The amount of {@link TracePoint2D} instances currently contained.
+   * Returns the amount of {@link TracePoint2D} instances currently contained.
+   * <p>
+   * 
+   * @return The amount of <code>{@link TracePoint2D}</code> instances
+   *         currently contained.
    */
   public int getSize();
 
   /**
+   * Returns the Stroke that is used to render this instance.
+   * <p>
+   * 
    * @return the Stroke that is used to render this instance.
+   * 
    * @see #setStroke(Stroke)
    * 
    */
-  Stroke getStroke();
+  public Stroke getStroke();
 
   /**
    * Returns the <code>Set&lt;{@link ITracePainter}&gt;</code> that will be
@@ -598,10 +671,10 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
   public Set getTracePainters();
 
   /**
+   * The z-index defines the order in which this instance will be painted.
    * <p>
-   * The z-index defines the order in which this instance will be painted. A
-   * lower value will bring it more "to the front".
-   * </p>
+   * A lower value will bring it more "to the front".
+   * <p>
    * 
    * @return the z-index that will define the order in which this instance will
    *         be painted.
@@ -610,51 +683,65 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
   public Integer getZIndex();
 
   /**
-   * <p>
    * Returns false if internal <code>{@link TracePoint2D}</code> instances are
    * contained or true if not.
-   * </p>
+   * <p>
    * 
    * @return <tt>false</tt> if internal <code>{@link TracePoint2D}</code>
    *         instances are contained or <tt>true</tt> if not.
    * 
    */
-  boolean isEmpty();
+  public boolean isEmpty();
 
   /**
+   * Returns true if this instance should be rendered.
+   * <p>
+   * 
    * @return true if this instance should be rendered.
    * 
    */
   public boolean isVisible();
 
   /**
-   * <p>
    * Returns an <code>Iterator</code> over the internal
    * <code>{@link TracePoint2D}</code> instances.
-   * </p>
    * <p>
    * Implementations should be synchronized. This method is meant to allow
    * modifications of the intenal <code>TracePoint2D</code> instances, so the
    * original points should be returned.
-   * </p>
    * <p>
    * There is no guarantee that changes made to the contained tracepoints will
    * be reflected in the display immediately. The order the iterator returns the
    * <code>TracePoint2D</code> instances decides how the <code>Chart2D</code>
    * will paint the trace.
-   * </p>
+   * <p>
    * 
    * @return an <code>Iterator</code> over the internal
    *         <code>{@link TracePoint2D}</code> instances.
    */
-  java.util.Iterator iterator();
+  public Iterator iterator();
 
   /**
    * Removes all internal <code>TracePoint2D</code>.{@link #isEmpty()} will
    * return true afterwards.
+   * <p>
    * 
    */
   public void removeAllPoints();
+
+  /**
+   * Remove a trace that "should" compute values from the points added via
+   * <code>{@link #addPoint(TracePoint2D)}</code>.
+   * <p>
+   * 
+   * @param trace
+   *          the trace that will calculate it's points from the added points of
+   *          this trace.
+   * 
+   * @return true if the given trace was removed (recognized by the means of
+   *         <code>{@link Object#equals(Object)}</code>).
+   */
+  public boolean removeComputingTrace(ITrace2D trace);
 
   /**
    * Removes the given error bar policy from the internal set of error bar
@@ -669,9 +756,8 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
   public boolean removeErrorBarPolicy(IErrorBarPolicy errorBarPolicy);
 
   /**
-   * <p>
    * Removes the given point from this trace.
-   * </p>
+   * <p>
    * 
    * @param point
    *          the point to remove.
@@ -721,9 +807,8 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
   public boolean removeTracePainter(final ITracePainter painter);
 
   /**
-   * <p>
    * Set a <code>java.awt.Color</code> for this trace.
-   * </p>
+   * <p>
    * 
    * @param color
    *          the <tt>Color</tt> to set.
@@ -769,8 +854,11 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
 
   /**
    * This is a callback from {@link Chart2D#addTrace(ITrace2D)} and must not be
-   * invoked from elswhere (needed for synchronization). Not the best design to
-   * put this to an interface, but Char2D should handle this interface only.
+   * invoked from elswhere (needed for synchronization).
+   * <p>
+   * Not the best design to put this to an interface, but Char2D should handle
+   * this interface only.
+   * <p>
    * 
    * @param renderer
    *          The renderer to set.
@@ -787,7 +875,7 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
    *          the stroke to use for painting this trace.
    * 
    */
-  void setStroke(Stroke stroke);
+  public void setStroke(Stroke stroke);
 
   /**
    * Replaces all internal trace painters by the new one.
@@ -815,8 +903,10 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
   /**
    * Sets the internal z-index property. This decides the order in which
    * different traces within the same <code>{@link Chart2D}</code> are
-   * painted. The lower the given value is the more this trace will be brought
-   * to front.
+   * painted.
+   * <p>
+   * 
+   * The lower the given value is the more this trace will be brought to front.
    * <p>
    * The value must not be lower than {@link #Z_INDEX_MIN}(0) and higher than
    * {@link #ZINDEX_MAX}(100).

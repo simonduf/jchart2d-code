@@ -1,6 +1,6 @@
 /*
  *  AxisActionSetRangePolicy.java of project jchart2d
- *  Copyright 2006 (C) Achim Westermann, created on 00:13:29.
+ *  Copyright (c) 2007 Achim Westermann, created on 00:13:29.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -48,7 +48,7 @@ import javax.swing.JCheckBoxMenuItem;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.9 $
  */
 public class AxisActionSetGrid
     extends AAxisAction {
@@ -94,6 +94,12 @@ public class AxisActionSetGrid
    */
   public AxisActionSetGrid(final Chart2D chart, final String description, final int axis) {
     super(chart, description, axis);
+
+    if (axis == Chart2D.X) {
+      chart.getAxisX().addPropertyChangeListener(IAxis.PROPERTY_PAINTGRID, this);
+    } else if (axis == Chart2D.Y) {
+      chart.getAxisY().addPropertyChangeListener(IAxis.PROPERTY_PAINTGRID, this);
+    }
   }
 
   /**

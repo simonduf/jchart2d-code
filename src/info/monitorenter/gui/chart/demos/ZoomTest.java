@@ -1,7 +1,7 @@
 /*
  *  ZoomTest.java of project jchart2d, demonstration of a zoom-enabled 
  *  chart. 
- *  Copyright 2006 (C) Achim Westermann, created on 23:59:21.
+ *  Copyright 2007 (C) Achim Westermann, created on 23:59:21.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -46,7 +46,7 @@ import javax.swing.JFrame;
  * 
  * @author Alessio Sambarino (Contributor)
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class ZoomTest extends JFrame {
 

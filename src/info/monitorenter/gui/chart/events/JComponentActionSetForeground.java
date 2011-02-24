@@ -32,15 +32,14 @@ import java.beans.PropertyChangeEvent;
 import javax.swing.JComponent;
 
 /**
- * <p>
  * Performs the action of setting the foreground color (
  * {@link javax.swing.JComponent#setForeground(java.awt.Color)}} of a
  * <code>JComponent</code>.
- * </p>
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public final class JComponentActionSetForeground extends AJComponentAction {
 
@@ -74,7 +73,7 @@ public final class JComponentActionSetForeground extends AJComponentAction {
       final Color color) {
     super(component, colorName);
     this.m_color = color;
-    component.addPropertyChangeListener(Chart2D.PROPERTY_BACKGROUND_COLOR, this);
+    component.addPropertyChangeListener(Chart2D.PROPERTY_FOREGROUND_COLOR, this);
   }
 
   /**

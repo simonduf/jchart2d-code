@@ -2,8 +2,7 @@
  *  AErrorBarPolicyConfigurable.java of project jchart2d, a basic 
  *  error bar policy implementation that allows configuration of 
  *  the dimension and direction error bars will be visible in. 
- *  
- *  Copyright 2006 (C) Achim Westermann, created on 08.08.2006 08:05:54.
+ *  Copyright (c) 2007 Achim Westermann, created on 08.08.2006 08:05:54.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -36,6 +35,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.swing.JComponent;
 import javax.swing.event.SwingPropertyChangeSupport;
 
 /**
@@ -58,7 +58,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.15 $
  */
 public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
     PropertyChangeListener {
@@ -232,6 +232,13 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
   protected final void firePropertyChange(final String property, final Object oldvalue,
       final Object newvalue) {
     this.m_propertyChangeSupport.firePropertyChange(property, oldvalue, newvalue);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IErrorBarPolicy#getCustomConfigurator()
+   */
+  public JComponent getCustomConfigurator() {
+    return null;
   }
 
   /**
@@ -421,7 +428,7 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
   public void propertyChange(final PropertyChangeEvent evt) {
-    this.firePropertyChange(PROPERTY_CONFIGURATION, evt.getOldValue(), evt.getNewValue());
+     this.firePropertyChange(PROPERTY_CONFIGURATION, evt.getOldValue(), evt.getNewValue());
   }
 
   /**
@@ -444,14 +451,14 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
   }
 
   /**
-   * @see java.beans.PropertyChangeSupport#removePropertyChangeListener(java.beans.PropertyChangeListener)
+   * @see info.monitorenter.gui.chart.IErrorBarPolicy#removePropertyChangeListener(java.beans.PropertyChangeListener)
    */
   public void removePropertyChangeListener(final PropertyChangeListener listener) {
     this.m_propertyChangeSupport.removePropertyChangeListener(listener);
   }
 
   /**
-   * @see java.beans.PropertyChangeSupport#removePropertyChangeListener(java.lang.String,
+   * @see info.monitorenter.gui.chart.IErrorBarPolicy#removePropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
   public void removePropertyChangeListener(final String property,

@@ -1,7 +1,7 @@
 /*
  *  Trace2DSorted, a TreeSet- based implementation of a ITrace2D that performs
  *  insertion- sort of TracePoint2D - instances by their x- value.
- *  Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -39,15 +39,15 @@ import java.util.TreeSet;
  * that the tracepoints will be sorted in ascending order of x- values at any
  * time.</li>
  * </UL>
- *
+ * 
  * Because sorted insertion of a List causes n! index- operations (
  * <code>get(int i)</code>) additional to the comparisons this class does not
  * extend <code>Trace2DSimple</code> which uses a List. Instead a
  * <code>TreeSet </code> is used.
- *
+ * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
- *
- * @version $Revision: 1.2 $
+ * 
+ * @version $Revision: 1.4 $
  */
 public class Trace2DSorted extends ATrace2D implements ITrace2D {
   /** The sorted set of points. */
@@ -67,10 +67,10 @@ public class Trace2DSorted extends ATrace2D implements ITrace2D {
    * added at an index in order to keep the ascending order of tracepoints with
    * a higher x- value are contained.
    * <p>
-   *
+   * 
    * @param p
    *          the point to add.
-   *
+   * 
    * @return true if the given point was successfully added.
    */
   protected boolean addPointInternal(final TracePoint2D p) {
@@ -117,7 +117,11 @@ public class Trace2DSorted extends ATrace2D implements ITrace2D {
   /**
    * @see ATrace2D#removePointInternal(info.monitorenter.gui.chart.TracePoint2D)
    */
-  protected boolean removePointInternal(final TracePoint2D point) {
-    return this.m_points.remove(point);
+  protected TracePoint2D removePointInternal(final TracePoint2D point) {
+    TracePoint2D result = null;
+    if (this.m_points.remove(point)) {
+      result = point;
+    }
+    return result;
   }
 }

@@ -63,7 +63,8 @@ import javax.swing.filechooser.FileSystemView;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de>Achim Westermann </a>
  */
-public final class FileFilterExtensions extends FileFilter implements INameFilter {
+public final class FileFilterExtensions
+    extends FileFilter implements INameFilter {
   /** Filename extensions to filter for. */
   private String[] m_extensions;
 
@@ -87,7 +88,7 @@ public final class FileFilterExtensions extends FileFilter implements INameFilte
   }
 
   /**
-   * @see java.io.FileFilter#accept(java.io.File)
+   * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
    */
   public boolean accept(final File pathname) {
     if (pathname.isDirectory()) {

@@ -1,6 +1,6 @@
 /*
  *  ErrorBarPainterLine.java of project jchart2d, <purpose>
- *  Copyright 2006 (C) Achim Westermann, created on 03.09.2006 21:55:43.
+ *  Copyright (c) 2007 Achim Westermann, created on 03.09.2006 21:55:43.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import info.monitorenter.gui.chart.pointpainters.PointPainterLine;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ErrorBarPainterLine
     extends ErrorBarPainter {

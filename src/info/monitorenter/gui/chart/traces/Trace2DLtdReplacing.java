@@ -1,7 +1,7 @@
 /*
  * Trace2DLtdReplcacing, an array- based fast implementation of an ITrace2D
  * that only allows a single tracepoint with a certain x- value.
- * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -40,7 +40,7 @@ import java.util.Iterator;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westerman </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class Trace2DLtdReplacing extends Trace2DLtd {
   /**

@@ -1,7 +1,6 @@
 /*
- /*
  *  ZoomableChartZoomOutAction, action for zooming out a ZoomableChart.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -30,52 +29,54 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 
 /**
- * <code>Action</code> for setting an axis implementation of the chart.
+ * <code>Action</code> for zooming a <code>{@link  ZoomableChart}</code> 
+ * to the original size (zoom out).
  * <p>
  * 
  * @author <a href="mailto:vpappas@gmail.com">Vasilis Pappas </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
-public final class ZoomableChartZoomOutAction extends AZoomableChartAction {
+public final class ZoomableChartZoomOutAction
+    extends AZoomableChartAction {
 
-    /**
-     * Generated <code>serial version UID</code>.
-     * <p>
-     */
-    private static final long serialVersionUID = 1663463025252405898L;
+  /**
+   * Generated <code>serial version UID</code>.
+   * <p>
+   */
+  private static final long serialVersionUID = 1663463025252405898L;
 
-    /**
-     * Create an <code>Action</code> that zooms out a zoomable chart.
-     * <p>
-     * 
-     * @param chart
-     *          the target the action will work on.
-     * 
-     * @param description
-     *          the description of this action to show in the UI.
-     * 
-     */
-    public ZoomableChartZoomOutAction(final ZoomableChart chart, final String description) {
+  /**
+   * Create an <code>Action</code> that zooms out a zoomable chart.
+   * <p>
+   * 
+   * @param chart
+   *          the target the action will work on.
+   * 
+   * @param description
+   *          the description of this action to show in the UI.
+   * 
+   */
+  public ZoomableChartZoomOutAction(final ZoomableChart chart, final String description) {
 
-        super(chart, description);
-    }
+    super(chart, description);
+  }
 
-    /**
-     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-     */
-    public void actionPerformed(final ActionEvent e) {
+  /**
+   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+   */
+  public void actionPerformed(final ActionEvent e) {
 
-        this.m_chart.zoomAll();
-    }
+    this.m_chart.zoomAll();
+  }
 
-    /**
-     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-     */
-    public void propertyChange(final PropertyChangeEvent evt) {
+  /**
+   * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+   */
+  public void propertyChange(final PropertyChangeEvent evt) {
 
-        // nop as this action will not be used
-        // by checkbox or radio button menu items that have a state.
-    }
+    // nop as this action will not be used
+    // by checkbox or radio button menu items that have a state.
+  }
 
 }

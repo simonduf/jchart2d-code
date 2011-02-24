@@ -1,6 +1,6 @@
 /*
  *  Trace2DLtd, a RingBuffer- based fast implementation of a ITrace2D.
- *  Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -29,7 +29,6 @@ import info.monitorenter.util.collections.RingBufferArrayFast;
 
 import java.util.Iterator;
 
-
 /**
  * Additional to the Trace2DSimple the Trace2DLimited adds the following
  * functionality:
@@ -48,7 +47,7 @@ import java.util.Iterator;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.7 $
  */
 public class Trace2DLtd extends ATrace2D implements ITrace2D {
 
@@ -162,6 +161,7 @@ public class Trace2DLtd extends ATrace2D implements ITrace2D {
   public boolean addPointInternal(final TracePoint2D p) {
 
     TracePoint2D removed = (TracePoint2D) this.m_buffer.add(p);
+
     double tmpx;
     double tmpy;
     if (removed != null) {
@@ -188,12 +188,17 @@ public class Trace2DLtd extends ATrace2D implements ITrace2D {
       }
       // scale the new point, check for new bounds!
       this.firePointAdded(p);
-      return false;
-    } else {
-      // no point was removed
-      // use bound checks of calling addPoint
-      return true;
+      // inform computing traces of removal:
+      if (this.m_computingTraces.size() > 0) {
+        Iterator it = this.m_computingTraces.iterator();
+        ITrace2D trace;
+        while (it.hasNext()) {
+          trace = (ITrace2D) it.next();
+          trace.removePoint(removed);
+        }
+      }
     }
+    return true;
   }
 
   /**
@@ -251,22 +256,21 @@ public class Trace2DLtd extends ATrace2D implements ITrace2D {
   }
 
   /**
-   * <p>
-   * Returns false always because internally a ringbuffer is used which does not
+   * Returns null always because internally a ringbuffer is used which does not
    * allow removing of values because that would break the contract of a
    * ringbuffer.
-   * </p>
+   * <p>
    * 
    * @param point
    *          the point to remove.
    * 
-   * @return false always because internally a ringbuffer is used which does not
+   * @return null always because internally a ringbuffer is used which does not
    *         allow removing of values because that would break the contract of a
    *         ringbuffer.
    * 
    */
-  protected boolean removePointInternal(final TracePoint2D point) {
-    return false;
+  protected TracePoint2D removePointInternal(final TracePoint2D point) {
+    return null;
   }
 
   /**

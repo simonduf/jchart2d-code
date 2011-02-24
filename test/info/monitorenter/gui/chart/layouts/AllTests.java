@@ -1,6 +1,6 @@
 /*
  *  AllTests.java of project jchart2d, <purpose>
- *  Copyright 2006 (C) Achim Westermann, created on 08.10.2006 11:58:09.
+ *  Copyright (c) 2007 Achim Westermann, created on 08.10.2006 11:58:09.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@ import junit.framework.TestSuite;
  * Main test suite for the package <code>{@link info.monitorenter.gui.chart.layouts}</code>.<p>
  * 
  * @author Achim westermann
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  * 
  * @since 2.1.0
  */

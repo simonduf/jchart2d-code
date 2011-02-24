@@ -1,7 +1,7 @@
 /*
  *  ErrorBarWizard.java of project jchart2d, a wizard for 
  *  configuring error bars for a trace. 
- *  Copyright 2006 (C) Achim Westermann, created on 09:50:20.
+ *  Copyright (c) 2007 Achim Westermann, created on 09:50:20.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -52,7 +52,7 @@ import javax.swing.JTabbedPane;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  */
 public class ErrorBarWizard
     extends JPanel {
@@ -112,7 +112,7 @@ public class ErrorBarWizard
     ITrace2D trace = new Trace2DSimple();
     trace.setColor(Color.RED);
     // create an error bar policy and configure it
-    IErrorBarPolicy errorBarPolicy = new ErrorBarPolicyRelative(0.2);
+    IErrorBarPolicy errorBarPolicy = new ErrorBarPolicyRelative(0.2, 0.2);
     errorBarPolicy.setShowNegativeYErrors(true);
     errorBarPolicy.setShowPositiveYErrors(true);
     // errorBarPolicy.setShowNegativeXErrors(true);
@@ -147,7 +147,7 @@ public class ErrorBarWizard
         System.exit(0);
       }
     });
-    //frame.setSize(600, 600);
+    // frame.setSize(600, 600);
     frame.pack();
     frame.setVisible(true);
 

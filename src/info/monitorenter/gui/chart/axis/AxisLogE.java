@@ -1,6 +1,6 @@
 /*
  *  AxisLogE.java of project jchart2d, Axis implementation with log display.
- *  Copyright 2006 (C) Achim Westermann, created on 20:33:13.
+ *  Copyright (c) 2007 Achim Westermann, created on 20:33:13.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,7 @@
  */
 package info.monitorenter.gui.chart.axis;
 
-import info.monitorenter.gui.chart.ILabelFormatter;
+import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 
@@ -47,7 +47,7 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.6 $
  */
 public class AxisLogE
     extends AAxisTransformation {
@@ -71,7 +71,7 @@ public class AxisLogE
    *          needed for formatting labels of this axis.
    * 
    */
-  public AxisLogE(final ILabelFormatter formatter) {
+  public AxisLogE(final IAxisLabelFormatter formatter) {
     super(formatter);
   }
 

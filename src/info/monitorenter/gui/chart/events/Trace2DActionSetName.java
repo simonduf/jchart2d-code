@@ -32,14 +32,13 @@ import javax.swing.JOptionPane;
 
 
 /**
- * <p>
  * <code>Action</code> that sets a custom name of the corresponding trace by
  * showing a modal String chooser.
- * </p>
+ * <p>
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public final class Trace2DActionSetName extends ATrace2DAction {
 

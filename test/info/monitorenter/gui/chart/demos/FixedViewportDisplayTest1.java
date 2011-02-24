@@ -35,12 +35,12 @@ import junit.framework.TestSuite;
 /**
  * Test implementation that uses a chart with a {@link RangePolicyFixedViewport}
  * with a range from 2 to 5 for both axis and a
- * {@link info.monitorenter.gui.chart.Trace2DSimple}.
+ * {@link Trace2DSimple}.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  * 
  */
 public class FixedViewportDisplayTest1

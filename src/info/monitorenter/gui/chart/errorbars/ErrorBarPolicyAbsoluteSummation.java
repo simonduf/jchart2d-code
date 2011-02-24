@@ -2,7 +2,7 @@
  *  ErrorBarPolicyRelative.java of project jchart2d, configurable 
  *  info.monitorenter.gui.chart.IErrorBarPolicy that adds an 
  *  absolute error to the points to render.
- *  Copyright 2006 (C) Achim Westermann, created on 10.08.2006 19:37:54.
+ *  Copyright (c) 2007 Achim Westermann, created on 10.08.2006 19:37:54.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,21 @@
  */
 package info.monitorenter.gui.chart.errorbars;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 /**
  * Configurable <code>{@link info.monitorenter.gui.chart.IErrorBarPolicy}</code>
  * that adds an absolute error (relative to the absolute values) to the points
@@ -32,7 +47,7 @@ package info.monitorenter.gui.chart.errorbars;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.4 $
  */
 public class ErrorBarPolicyAbsoluteSummation
     extends AErrorBarPolicyConfigurable {
@@ -41,7 +56,7 @@ public class ErrorBarPolicyAbsoluteSummation
   private double m_xError = 4;
 
   /** The absolute y error to add. */
-  private double m_yError = 8;
+  private double m_yError = 4;
 
   /**
    * Creates an instance with the given absolute errors to add in x and y
@@ -66,6 +81,85 @@ public class ErrorBarPolicyAbsoluteSummation
   public ErrorBarPolicyAbsoluteSummation(final double xError, final double yError)
       throws IllegalArgumentException {
     this.setXError(xError);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#getCustomConfigurator()
+   */
+  public JComponent getCustomConfigurator() {
+    JPanel panel = new JPanel();
+    panel.setBorder(BorderFactory.createEtchedBorder());
+
+    panel.setLayout(new GridBagLayout());
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.anchor = GridBagConstraints.WEST;
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.gridwidth = 1;
+    gbc.gridheight = 1;
+    gbc.weightx = 0;
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.insets = new Insets(2, 2, 2, 2);
+
+    JLabel xErrorLable = new JLabel("Absolute X error ");
+
+    panel.add(xErrorLable, gbc);
+
+    SpinnerModel numberXModel = new SpinnerNumberModel(ErrorBarPolicyAbsoluteSummation.this
+        .getXError(), 0, 10000, 10);
+    JSpinner xErrorSelector = new JSpinner(numberXModel);
+
+    gbc.gridx = 1;
+    gbc.weightx = 0.5;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    panel.add(xErrorSelector, gbc);
+
+    // fill a dummy component that may be resized:
+    gbc.gridx = 2;
+    gbc.gridheight = 2;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.weightx = 0.5;
+    panel.add(Box.createHorizontalGlue(), gbc);
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.weightx = 0;
+
+    JLabel yErrorLable = new JLabel("Absolute Y error ");
+
+    gbc.gridx = 0;
+    gbc.gridy = 1;
+    gbc.gridheight = 1;
+    
+    panel.add(yErrorLable, gbc);
+
+    SpinnerModel numberYModel = new SpinnerNumberModel(ErrorBarPolicyAbsoluteSummation.this
+        .getYError(), 0, 10000, 10);
+    JSpinner yErrorSelector = new JSpinner(numberYModel);
+
+    gbc.gridx = 1;
+    gbc.weightx = 0.5;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    panel.add(yErrorSelector, gbc);
+
+    // actions:
+    xErrorSelector.addChangeListener(new ChangeListener() {
+      public void stateChanged(final ChangeEvent e) {
+        JSpinner spinner = (JSpinner) e.getSource();
+        SpinnerNumberModel model = (SpinnerNumberModel) spinner.getModel();
+        Number number = model.getNumber();
+        ErrorBarPolicyAbsoluteSummation.this.setXError(number.doubleValue());
+      }
+    });
+
+    yErrorSelector.addChangeListener(new ChangeListener() {
+      public void stateChanged(final ChangeEvent e) {
+        JSpinner spinner = (JSpinner) e.getSource();
+        SpinnerNumberModel model = (SpinnerNumberModel) spinner.getModel();
+        Number number = model.getNumber();
+        ErrorBarPolicyAbsoluteSummation.this.setYError(number.doubleValue());
+      }
+    });
+
+    return panel;
   }
 
   /**

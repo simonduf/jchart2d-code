@@ -36,22 +36,20 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * <p>
  * A delegator / proxy that delegates all calls to an internal constructor-given
  * ITrace2d and swaps the data of the added Point2D instances.
- * </p>
  * <p>
  * x values become y values and vice versa. Performance is bad, as unnecessary
  * instances are created (each TracePoint2D is instantiated twice) so this
  * instance is for debugging / testing purposes only.
- * 
- * </p>
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.12 $
  */
 public class Trace2DAxisSwap implements ITrace2D {
+
   /** The delagate instance to decorate with axis swapping. */
   private ITrace2D m_delegate;
 
@@ -71,6 +69,13 @@ public class Trace2DAxisSwap implements ITrace2D {
           + " is unnecessary and may be harmful.");
     }
     this.m_delegate = trace;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#addComputingTrace(info.monitorenter.gui.chart.ITrace2D)
+   */
+  public void addComputingTrace(final ITrace2D trace) {
+    this.m_delegate.addComputingTrace(trace);
   }
 
   /**
@@ -122,6 +127,13 @@ public class Trace2DAxisSwap implements ITrace2D {
    */
   public boolean equals(final Object obj) {
     return this.m_delegate.equals(obj);
+  }
+
+ /**
+  * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(info.monitorenter.gui.chart.TracePoint2D, int)
+  */
+  public void firePointChanged(final TracePoint2D changed, final int state) {
+    this.m_delegate.firePointChanged(changed, state);
   }
 
   /**
@@ -298,6 +310,13 @@ public class Trace2DAxisSwap implements ITrace2D {
    */
   public void removeAllPoints() {
     this.m_delegate.removeAllPoints();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#removeComputingTrace(info.monitorenter.gui.chart.ITrace2D)
+   */
+  public boolean removeComputingTrace(final ITrace2D trace) {
+    return this.m_delegate.removeComputingTrace(trace);
   }
 
   /**

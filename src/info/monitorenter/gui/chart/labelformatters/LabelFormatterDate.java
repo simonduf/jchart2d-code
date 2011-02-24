@@ -23,7 +23,7 @@
  */
 package info.monitorenter.gui.chart.labelformatters;
 
-import info.monitorenter.gui.chart.ILabelFormatter;
+import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.SimpleDateFormatAnalyzer;
 
@@ -65,12 +65,12 @@ import java.util.Date;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  * 
  * @see java.util.Date
  */
 public class LabelFormatterDate
-    extends ALabelFormatter implements ILabelFormatter {
+    extends ALabelFormatter implements IAxisLabelFormatter {
   /** The cached maximum amount of characters that will be used. */
   private int m_cachedMaxAmountChars = Integer.MAX_VALUE;
 
@@ -103,7 +103,7 @@ public class LabelFormatterDate
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#format(double)
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#format(double)
    */
   public String format(final double value) {
     this.m_lastFormatted = value;
@@ -121,7 +121,7 @@ public class LabelFormatterDate
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#getMaxAmountChars()
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getMaxAmountChars()
    */
   public int getMaxAmountChars() {
     Range range = this.getAxis().getRange();
@@ -133,7 +133,7 @@ public class LabelFormatterDate
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#getMinimumValueShiftForChange()
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getMinimumValueShiftForChange()
    */
   public double getMinimumValueShiftForChange() {
     double ret = 0;
@@ -156,7 +156,7 @@ public class LabelFormatterDate
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#getNextEvenValue(double,
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getNextEvenValue(double,
    *      boolean)
    */
   public double getNextEvenValue(final double value, final boolean ceiling) {
@@ -212,7 +212,7 @@ public class LabelFormatterDate
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#parse(java.lang.String)
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#parse(java.lang.String)
    */
   public Number parse(final String formatted) throws NumberFormatException {
     return new Double(this.m_lastFormatted);

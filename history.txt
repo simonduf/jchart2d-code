@@ -1,7 +1,7 @@
 /*
  * File   : $Source: /cvsroot/jchart2d/jchart2d/history.txt,v $
- * Date   : $Date: 2007/07/25 05:10:37 $
- * Version: $Revision: 1.96 $
+ * Date   : $Date: 2007/09/16 08:25:09 $
+ * Version: $Revision: 1.113 $
  *
  * This file is part of jchart2d -
  * the Open Source real time charting library.
@@ -21,6 +21,58 @@ Legend:
 o API change that requires refactoring. 
   Note that refactoring of protected code intended for library 
   internal details will not be listed.
+
+jchart2d-2.2.0 - September, 16th, 2007
+
+! Added method in ITrace2D: public void addComputingTrace(ITrace2D trace) 
+  for support of traces that compute their values based upon other 
+  traces (e.g. average).
+! Added info.monitorenter.gui.chart.traces.computing.Trace2DArithmeticMean 
+  that displays the arithemtic mean of the last n (contrcutor - given) 
+  added data points. See 
+  info.monitorenter.gui.chart.demosDynamicChartWithArithmeticMeanTrace 
+  for a demo. 
+- Changed internal API of traces for supporting chains of computational traces.
+! Support for stacking charts vertically with same x coordinate start 
+  via Chart2D.setSynchronizedXStartChart(Chart2D) 
+  (contribution by Karl Piteira). 
+o Renamed net.monitorenter.gui.chart.ILabelFormatter to 
+  net.monitorenter.gui.chart.IAxisLabelFormatter.
+o Renamed net.monitorenter.gui.chart.ILabelPainter to 
+  net.monitorenter.gui.chart.IAxisTickPainter. 
+- Moved logic for finding chart bounds to axis classes. 
+! Support for axis titles via IAxis.setTitlePainer(IAxisTitlePainter) 
+  and IAxis.setTitle(String). 
+! New AxisInverse allows to display values in descending order (10, 9, 8, ...0). 
+  Contribution by Andrea Plotegher while working on IR spectroscopy. 
+* Fixed issue  #1769652: zoom all menu item doesn't repaint the chart when selected. 
+o Renamed net.monitorenter.gui.chart.ILabelPainter to 
+  net.monitorenter.gui.chart.IAxisTickPainter. 
+o Renamed package info.monitorenter.gui.chart.labelpainters 
+  to info.monitorenter.gui.chart.axistickpainters.
+o Renamed info.monitorenter.gui.chart.labelpainters.LabelPainterDefault 
+  to info.monitorenter.gui.chart.axistickpainters.AxisTickPainterDefault.
+o Renamed info.monitorenter.gui.chart.Chart2D.getLabelPainter() 
+  to info.monitorenter.gui.chart.Chart2D.getAxisTickPainter()
+o Renamed info.monitorenter.gui.chart.Chart2D.setLabelPainter(IAxisTickPainter) 
+  to info.monitorenter.gui.chart.Chart2D.setAxisTickPainter(IAxisTickPainter)
+* Fixed unreported deadlock when using ChartPanel with multiple traces. 
+* Fixed unreleased issue that painted a connection from the last point of 
+  a trace to the first point of the next trace (multiple traces), reported 
+  by Andrea Plotegher. 
+! Extended info.monitorenter.gui.chart.errorbars.ErrorBarPolicyRelative by 
+  allowing to configure relative x and y errors (vs. only one relative error 
+  for alll dimensions). 
+! Finished integration of error bar wizard into GUI controls of ChartPanel. 
+* Fixed bug with chart bounds upon decreasing error bar expansion. 
+* Fixed bug with non - UI property adapting strokes menu in LayoutFactory 
+  (fixed by Andrea Plotegher).
+* Fixed bug #1790622: using trace.setLocation(..) fails. Now changed points will 
+  be reflected in the UI without exception and correct display. 
+* Fixed unreported issue with incorrect repaint if partial repaint is triggered by another 
+  Thread than the painter (e.g. if a modal dialog is closed). 
+* Fixed unreported display issue with LabelFormatterNumber using a format that 
+  enforces digits (e.g.:  new DecimalFormat("000.000");) and overwrites the y axis. 
 
 
 jchart2d-2.1.2 - July, 25th, 2007
@@ -51,7 +103,8 @@ jchart2d-2.1.2 - July, 25th, 2007
   runtime before, now takes ~ 16 %.
 ! New info.monitorenter.gui.chart.labelformatters.LabelFormatterUnit allows to specify 
   a fixed unit for an axis. 
-  
+
+   
 jchart2d-2.1.1 - March, 30st, 2007
 
 * Fixed issue: When adding a trace that does not exceed bounds it 

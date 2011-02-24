@@ -1,5 +1,5 @@
 /*  FlowLayoutCorrectMinimumSize.java of project jchart2d, <purpose>
- *  Copyright 2006 (C) Achim Westermann, created on 08.10.2006 14:44:18.
+ *  Copyright (c) 2007 Achim Westermann, created on 08.10.2006 14:44:18.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -42,7 +42,7 @@ import java.awt.Insets;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class FlowLayoutCorrectMinimumSize
     extends FlowLayout {

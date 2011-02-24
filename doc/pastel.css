@@ -9,6 +9,7 @@ html, body {
    color: #000;
    background-color: #fff;
    font: 11px/17px Verdana, sans-serif;
+   border: none;
 }
 
 html>body{ background:none; }
@@ -100,6 +101,10 @@ h3 {
    color: #666;
    background-color: transparent;
    font: bold 11px/17px Verdana, sans-serif;
+}
+
+img {
+  border: none;
 }
 
 td {

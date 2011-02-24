@@ -40,9 +40,9 @@ import java.beans.PropertyChangeListener;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.1 $
  */
-public interface ILabelFormatter {
+public interface IAxisLabelFormatter {
   /**
    * Constant for <code>{@link java.beans.PropertyChangeEvent}</code> fired
    * when the configuration changes.

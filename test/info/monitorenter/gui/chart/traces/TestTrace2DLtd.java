@@ -20,9 +20,10 @@
  *  Achim.Westermann@gmx.de
  *
  */
-package info.monitorenter.gui.chart;
+package info.monitorenter.gui.chart.traces;
 
-import info.monitorenter.gui.chart.traces.Trace2DLtd;
+import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.TracePoint2D;
 
 import java.util.Iterator;
 import java.util.Map;

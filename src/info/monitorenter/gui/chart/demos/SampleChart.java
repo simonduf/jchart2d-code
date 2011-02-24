@@ -1,6 +1,6 @@
 /*
  * SampleChart, a test for memory leak contributed by Martin Rojo.
- * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -55,7 +55,7 @@ import javax.swing.JPanel;
  *
  * @author Achim Westermann (modified)
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class SampleChart extends JPanel {
   /**

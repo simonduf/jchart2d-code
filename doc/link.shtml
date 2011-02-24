@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <!--#include virtual="./head.shtml" -->
 <script language="javascript">
-  var update="04/03/2007";
+  var update="03/08/2007";
  </script>
 <body id="link">
 <div id="wrapper">
@@ -14,7 +14,7 @@
 <table border="0">
 	<tr>
 		<td id="box"><a href="http://sourceforge.net/projects/jchart2d/"
-			target="_blank">Sourceforge project page</a></td>
+			rel="_blank">Sourceforge project page</a></td>
 		<td>This project is hosted at sourceforge. Visit the page in order to
 		submit bugs, request features, download the project, view the download
 		statistics,... .</td>
@@ -22,14 +22,14 @@
 
 	<tr>
 		<td id="box"><a href="http://freshmeat.net/projects/jchart2d/"
-			target="_blank">Freshmeat project page</a></td>
+			rel="_blank">Freshmeat project page</a></td>
 		<td>New releases will be posted there. Users can subscribe to the
 		project record and will be informed by mail. The author of JChart2D is
 		not able to view the subscribers, they remain anonymous.</td>
 	</tr>
 	<tr>
 		<td id="box"><a href="http://jchart2d.cvs.sourceforge.net/jchart2d/"
-			target="_blank">CVS Web-access</a></td>
+			rel="_blank">CVS Web-access</a></td>
 		<td><!-- description --> Programmers that want to take a quick glance
 		at certain sources are faster by watching the file through cvs
 		Web-access instead of downloading the latest source release. Hint:
@@ -48,13 +48,13 @@
 <table border="0">
 	<tr>
 		<td id="box"><a href="http://cpdetector.sourceforge.net"
-			target="_blank">cpdetector</a></td>
+			rel="_blank">cpdetector</a></td>
 		<td>An open source framework for codepage detection. Ships with a
 		command line tool that allwos to sort large collection of documents by
 		codepage or transform then into other codepages.</td>
 	</tr>
 	<tr>
-		<td id="box"><a href="http://jbuzzer.sourceforge.net" target="_blank">jbuzzer</a>
+		<td id="box"><a href="http://jbuzzer.sourceforge.net" rel="_blank">jbuzzer</a>
 		</td>
 		<td><!-- description --> A free end user desktop application that
 		allows to trigger audio samples with the computer keyboard.</td>
@@ -69,8 +69,8 @@
 
 <table border="0">
 	<tr>
-		<td id="box"><a href="http://www.jfree.org/jfreechart/index.php"
-			target="_blank">JFreeChart</a></td>
+		<td id="box"><a href="http://www.jfree.org/jfreechart/index.html"
+			rel="_blank">JFreeChart</a></td>
 		<td>A free Java chart library. JFreeChart supports pie charts (2D and
 		3D), bar charts (horizontal and vertical, regular and stacked), line
 		charts, scatter plots, time series charts, high-low-open-close charts,
@@ -87,7 +87,7 @@
 
 <table border="0">
 	<tr>
-		<td id="box"><a href="http://www.cafeaulait.org/" target="_blank">Cafe
+		<td id="box"><a href="http://www.cafeaulait.org/" rel="_blank">Cafe
 		au Lait</a></td>
 		<td>Daily handpicked Java News and Resources.</td>
 	</tr>

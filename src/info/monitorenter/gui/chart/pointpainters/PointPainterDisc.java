@@ -1,7 +1,7 @@
 /*
  *  PointPainterDisc.java of project jchart2d, base class for painting 
  *  points. 
- *  Copyright 2006 (C) Achim Westermann, created on 03.09.2006 20:27:06.
+ *  Copyright (c) 2007 Achim Westermann, created on 03.09.2006 20:27:06.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -25,14 +25,15 @@ package info.monitorenter.gui.chart.pointpainters;
 import java.awt.Graphics2D;
 
 import info.monitorenter.gui.chart.IPointPainter;
+
 /**
- * Renders points in form of a disc with configurable diameter. 
+ * Renders points in form of a disc with configurable diameter.
  * <p>
- *
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- *  @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  */
 public class PointPainterDisc implements IPointPainter {
 
@@ -41,7 +42,7 @@ public class PointPainterDisc implements IPointPainter {
 
   /** Cached m_discSize divided by two to save division for each point to render. */
   private int m_halfDiscSize;
-  
+
   /**
    * Creates an instance with a default disc size of 4.
    * <p>
@@ -52,18 +53,18 @@ public class PointPainterDisc implements IPointPainter {
 
   /**
    * Creates an instance with the given disc diameter.
-   *
+   * 
    * @param diameter
    *          the disc size in pixel to use.
    */
   public PointPainterDisc(final int diameter) {
     this.setDiscSize(diameter);
   }
-  
+
   /**
    * Returns the diameter of the discs to paint in pixel.
    * <p>
-   *
+   * 
    * @return the diameter of the discs to paint in pixel.
    */
   public int getDiscSize() {
@@ -73,7 +74,7 @@ public class PointPainterDisc implements IPointPainter {
   /**
    * Sets the diameter of the discs to paint in pixel.
    * <p>
-   *
+   * 
    * @param discSize
    *          the diameter of the discs to paint in pixel.
    */
@@ -81,9 +82,10 @@ public class PointPainterDisc implements IPointPainter {
     this.m_discSize = discSize;
     this.m_halfDiscSize = this.m_discSize / 2;
   }
+
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int, int,
-   *      java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.IPointPainter#paintPoint(int, int, int,
+   *      int, java.awt.Graphics2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
       final int nextY, final Graphics2D g) {
