@@ -1,5 +1,4 @@
 /*
- *
  *  MinimalStaticChart.java  jchart2d
  *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
  *
@@ -56,7 +55,7 @@ import javax.swing.JFrame;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  *
  */
 public final class AdvancedDynamicChart {

@@ -26,19 +26,19 @@ package info.monitorenter.gui.chart.io;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.TracePoint2D;
 
-
 /**
+ * A proof of concept dummy implementation for the supertype.
  * <p>
- * A proof of concept dummy implementation for the supertype. Only collects
- * random values with timestamp on the x axis. The timestamp is related to the
- * time when this instance is instantiated to make it a lower value (offset to
- * start). implementation for exact timestamps that may be formatted with
- * java.text.DateFormat instances.
- * </p>
- *
+ * 
+ * Only collects random values with timestamp on the x axis. The timestamp is
+ * related to the time when this instance is instantiated to make it a lower
+ * value (offset to start). implementation for exact timestamps that may be
+ * formatted with java.text.DateFormat instances.
+ * <p>
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
- * @version $Revision: 1.2 $
+ * 
+ * @version $Revision: 1.3 $
  */
 public class RandomDataCollectorOffset extends ADataCollector {
 
@@ -52,10 +52,10 @@ public class RandomDataCollectorOffset extends ADataCollector {
    * Creates a collector that collectes every latency ms a point and adds it to
    * the trace.
    * <p>
-   *
+   * 
    * @param trace
    *          the trace to add points to.
-   *
+   * 
    * @param latency
    *          the interval for collection of points.
    */

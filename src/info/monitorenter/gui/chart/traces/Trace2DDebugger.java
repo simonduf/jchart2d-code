@@ -31,23 +31,19 @@ import info.monitorenter.util.Range;
 
 import java.awt.Color;
 import java.awt.Stroke;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
 import java.util.Set;
 
 /**
- * <p>
  * A decorator for any ITrace2D implementation. Useful if your chart looks
  * unexpected and the problem may be related to the data that is added. It
  * prints every point added to the console.
- * </p>
- * <p>
  * <p>
  * Use it by decorating the ITrace2D you normally use:
  * 
  * <pre>
- * 
- * 
  *    // Create a chart:
  *    Chart2D chart = new Chart2D();
  *    // Create an ITrace:
@@ -56,19 +52,16 @@ import java.util.Set;
  *    ...
  *    //
  *    chart.addTrace(trace);
- * 
- * 
  * </pre>
  * 
- * </p>
  * <p>
  * One can use {@link #setXRange(Range)},{@link #setYRange(Range)} to let this
  * instance throw an Exception if bounds for legal data are exceeded.
- * </p>
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.11 $
  */
 public class Trace2DDebugger implements ITrace2D {
 
@@ -104,19 +97,16 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @param debug
-   *          The ITrace to debug.
-   */
-
-  /**
    * @see info.monitorenter.gui.chart.ITrace2D#addErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
    */
   public boolean addErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
     return this.m_delegate.addErrorBarPolicy(errorBarPolicy);
   }
 
-  // /////////////////////////////////
-  // Proxy methods
+  /**
+   * @param debug
+   *          The ITrace to debug.
+   */
 
   /**
    * @see ITrace2D#addPoint(double, double)
@@ -125,6 +115,9 @@ public class Trace2DDebugger implements ITrace2D {
     TracePoint2D p = new TracePoint2D(x, y);
     return this.addPoint(p);
   }
+
+  // /////////////////////////////////
+  // Proxy methods
 
   /**
    * @see ITrace2D#addPoint(TracePoint2D)
@@ -194,13 +187,6 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @see ITrace2D#isVisible()
-   */
-  public boolean getisible() {
-    return this.m_delegate.isVisible();
-  }
-
-  /**
    * @see info.monitorenter.gui.chart.ITrace2D#getLabel()
    */
   public String getLabel() {
@@ -255,6 +241,20 @@ public class Trace2DDebugger implements ITrace2D {
    */
   public String getPhysicalUnits() {
     return this.m_delegate.getPhysicalUnits();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getPhysicalUnitsX()
+   */
+  public String getPhysicalUnitsX() {
+    return this.m_delegate.getPhysicalUnitsX();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getPhysicalUnitsY()
+   */
+  public String getPhysicalUnitsY() {
+    return this.m_delegate.getPhysicalUnitsY();
   }
 
   /**
@@ -348,10 +348,24 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
+   * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+   */
+  public void propertyChange(final PropertyChangeEvent evt) {
+    this.m_delegate.propertyChange(evt);
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#removeAllPoints()
    */
   public void removeAllPoints() {
     this.m_delegate.removeAllPoints();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#removeErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
+   */
+  public boolean removeErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
+    return this.m_delegate.removeErrorBarPolicy(errorBarPolicy);
   }
 
   /**

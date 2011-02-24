@@ -29,6 +29,7 @@ import info.monitorenter.gui.chart.IErrorBarPolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 
 import java.awt.Graphics2D;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Iterator;
@@ -57,9 +58,10 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.12 $
  */
-public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy {
+public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
+    PropertyChangeListener {
 
   /** The internal set of error bar painters delegated to. */
   private Set m_errorBarPainters = new LinkedHashSet();
@@ -71,9 +73,9 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy {
    * The last x coordinate that was sent to
    * {@link #paintPoint(int, int, int, int, Graphics2D)}.
    * <p>
-   * It will be needed at {@link #endPaintIteration(Graphics2D)} as the former method only
-   * uses the first set of coordinates to store in the internal list to avoid
-   * duplicates.
+   * It will be needed at {@link #endPaintIteration(Graphics2D)} as the former
+   * method only uses the first set of coordinates to store in the internal list
+   * to avoid duplicates.
    * <p>
    */
   protected int m_lastX;
@@ -82,9 +84,9 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy {
    * The last � coordinate that was sent to
    * {@link #paintPoint(int, int, int, int, Graphics2D)}.
    * <p>
-   * It will be needed at {@link #endPaintIteration(Graphics2D)} as the former method only
-   * uses the first set of coordinates to store in the internal list to avoid
-   * duplicates.
+   * It will be needed at {@link #endPaintIteration(Graphics2D)} as the former
+   * method only uses the first set of coordinates to store in the internal list
+   * to avoid duplicates.
    * <p>
    */
   protected int m_lastY;
@@ -96,11 +98,11 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy {
    */
   protected PropertyChangeSupport m_propertyChangeSupport = new SwingPropertyChangeSupport(this);
 
-  /** Internal shared error bar value instance to save Object allocation. */
-  private ErrorBarValue m_reusedErrorBarValue;
-
   /** Internal shared error bar pixel instance to save Object allocation. */
   private ErrorBarPixel m_reusedErrorBarPixel = new ErrorBarPixel(null);
+
+  /** Internal shared error bar value instance to save Object allocation. */
+  private ErrorBarValue m_reusedErrorBarValue;
 
   /** Flag that controls display of negative errors in x dimension. */
   private boolean m_showNegativeXErrors;
@@ -131,6 +133,15 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy {
    */
   public void addErrorBarPainter(final IErrorBarPainter painter) {
     this.m_errorBarPainters.add(painter);
+    painter.addPropertyChangeListener(IErrorBarPainter.PROPERTY_CONNECTION, this);
+    painter.addPropertyChangeListener(IErrorBarPainter.PROPERTY_CONNECTION_COLOR, this);
+    painter.addPropertyChangeListener(IErrorBarPainter.PROPERTY_ENDPOINT, this);
+    painter.addPropertyChangeListener(IErrorBarPainter.PROPERTY_ENDPOINT_COLOR, this);
+    painter.addPropertyChangeListener(IErrorBarPainter.PROPERTY_STARTPOINT, this);
+    painter.addPropertyChangeListener(IErrorBarPainter.PROPERTY_STARTPOINT_COLOR, this);
+
+    this.firePropertyChange(IErrorBarPolicy.PROPERTY_ERRORBARPAINTER, null, painter);
+    this.firePropertyChange(IErrorBarPolicy.PROPERTY_CONFIGURATION, null, null);
   }
 
   /**
@@ -147,6 +158,28 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy {
   public final void addPropertyChangeListener(final String propertyName,
       final PropertyChangeListener listener) {
     this.m_propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IErrorBarPolicy#calculateErrorBar(double,
+   *      double, info.monitorenter.gui.chart.errorbars.ErrorBarValue)
+   */
+  public final void calculateErrorBar(final double absoluteX, final double absoluteY,
+      final ErrorBarValue errorBar) {
+    errorBar.clear();
+
+    if (this.m_showNegativeXErrors) {
+      errorBar.setNegativeXError(this.internalGetNegativeXError(absoluteX, absoluteY));
+    }
+    if (this.m_showNegativeYErrors) {
+      errorBar.setNegativeYError(this.internalGetNegativeYError(absoluteX, absoluteY));
+    }
+    if (this.m_showPositiveXErrors) {
+      errorBar.setPositiveXError(this.internalGetPositiveXError(absoluteX, absoluteY));
+    }
+    if (this.m_showPositiveYErrors) {
+      errorBar.setPositiveYError(this.internalGetPositiveYError(absoluteX, absoluteY));
+    }
   }
 
   /**
@@ -253,13 +286,6 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy {
       }
     }
     return result;
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.ITrace2D#getPropertyChangeListeners(String)
-   */
-  public PropertyChangeListener[] getPropertyChangeListeners(final String property) {
-    return this.m_propertyChangeSupport.getPropertyChangeListeners(property);
   }
 
   /**
@@ -385,25 +411,36 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IErrorBarPolicy#calculateErrorBar(double,
-   *      double, info.monitorenter.gui.chart.errorbars.ErrorBarValue)
+   * Just turns the property change event of subsequent configuration (like
+   * <code>{@link IErrorBarPainter#PROPERTY_CONNECTION}</code> to
+   * <code>{@link IErrorBarPolicy#PROPERTY_CONFIGURATION}</code> and informs
+   * outer <code>{@link PropertyChangeListener}</code> addes with
+   * <code>{@link #addPropertyChangeListener(String, PropertyChangeListener)}</code>.
+   * <p>
+   * 
+   * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
-  public final void calculateErrorBar(final double absoluteX, final double absoluteY,
-      final ErrorBarValue errorBar) {
-    errorBar.clear();
+  public void propertyChange(final PropertyChangeEvent evt) {
+    this.firePropertyChange(PROPERTY_CONFIGURATION, evt.getOldValue(), evt.getNewValue());
+  }
 
-    if (this.m_showNegativeXErrors) {
-      errorBar.setNegativeXError(this.internalGetNegativeXError(absoluteX, absoluteY));
+  /**
+   * @see info.monitorenter.gui.chart.IErrorBarPolicy#removeErrorBarPainter(info.monitorenter.gui.chart.IErrorBarPainter)
+   */
+  public boolean removeErrorBarPainter(final IErrorBarPainter painter) {
+    boolean result = this.m_errorBarPainters.remove(painter);
+    painter.removePropertyChangeListener(IErrorBarPainter.PROPERTY_CONNECTION, this);
+    painter.removePropertyChangeListener(IErrorBarPainter.PROPERTY_CONNECTION_COLOR, this);
+    painter.removePropertyChangeListener(IErrorBarPainter.PROPERTY_ENDPOINT, this);
+    painter.removePropertyChangeListener(IErrorBarPainter.PROPERTY_ENDPOINT_COLOR, this);
+    painter.removePropertyChangeListener(IErrorBarPainter.PROPERTY_STARTPOINT, this);
+    painter.removePropertyChangeListener(IErrorBarPainter.PROPERTY_STARTPOINT_COLOR, this);
+
+    if (result) {
+      this.firePropertyChange(IErrorBarPolicy.PROPERTY_ERRORBARPAINTER, painter, null);
+      this.firePropertyChange(IErrorBarPolicy.PROPERTY_CONFIGURATION, null, null);
     }
-    if (this.m_showNegativeYErrors) {
-      errorBar.setNegativeYError(this.internalGetNegativeYError(absoluteX, absoluteY));
-    }
-    if (this.m_showPositiveXErrors) {
-      errorBar.setPositiveXError(this.internalGetPositiveXError(absoluteX, absoluteY));
-    }
-    if (this.m_showPositiveYErrors) {
-      errorBar.setPositiveYError(this.internalGetPositiveYError(absoluteX, absoluteY));
-    }
+    return result;
   }
 
   /**
@@ -426,8 +463,31 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy {
    * @see info.monitorenter.gui.chart.IErrorBarPolicy#setErrorBarPainter(info.monitorenter.gui.chart.IErrorBarPainter)
    */
   public void setErrorBarPainter(final IErrorBarPainter painter) {
-    this.m_errorBarPainters.clear();
+    Iterator it = this.m_errorBarPainters.iterator();
+    IErrorBarPainter removePainter;
+    while (it.hasNext()) {
+      removePainter = (IErrorBarPainter) it.next();
+      it.remove();
+      removePainter.removePropertyChangeListener(IErrorBarPainter.PROPERTY_CONNECTION, this);
+      removePainter.removePropertyChangeListener(IErrorBarPainter.PROPERTY_CONNECTION_COLOR, this);
+      removePainter.removePropertyChangeListener(IErrorBarPainter.PROPERTY_ENDPOINT, this);
+      removePainter.removePropertyChangeListener(IErrorBarPainter.PROPERTY_ENDPOINT_COLOR, this);
+      removePainter.removePropertyChangeListener(IErrorBarPainter.PROPERTY_STARTPOINT, this);
+      removePainter.removePropertyChangeListener(IErrorBarPainter.PROPERTY_STARTPOINT_COLOR, this);
+
+      this.firePropertyChange(IErrorBarPolicy.PROPERTY_ERRORBARPAINTER, removePainter, null);
+
+    }
     this.m_errorBarPainters.add(painter);
+    painter.addPropertyChangeListener(IErrorBarPainter.PROPERTY_CONNECTION, this);
+    painter.addPropertyChangeListener(IErrorBarPainter.PROPERTY_CONNECTION_COLOR, this);
+    painter.addPropertyChangeListener(IErrorBarPainter.PROPERTY_ENDPOINT, this);
+    painter.addPropertyChangeListener(IErrorBarPainter.PROPERTY_ENDPOINT_COLOR, this);
+    painter.addPropertyChangeListener(IErrorBarPainter.PROPERTY_STARTPOINT, this);
+    painter.addPropertyChangeListener(IErrorBarPainter.PROPERTY_STARTPOINT_COLOR, this);
+
+    this.firePropertyChange(IErrorBarPolicy.PROPERTY_ERRORBARPAINTER, null, painter);
+    this.firePropertyChange(IErrorBarPolicy.PROPERTY_CONFIGURATION, null, null);
   }
 
   /**

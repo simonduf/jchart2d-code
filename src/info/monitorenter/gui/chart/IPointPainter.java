@@ -33,14 +33,14 @@ import java.awt.Graphics2D;
  * <ul>
  * <li> painting traces ({@link info.monitorenter.gui.chart.ITracePainter}) </li>
  * <li> painting endpoints, startpoints and the segments of errorbars 
- * ({@link info.monitorenter.gui.chart.errorbars.ErrorBarPainterConfigureable}). </li>
+ * ({@link info.monitorenter.gui.chart.errorbars.ErrorBarPainter}). </li>
  * </ul>
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public interface IPointPainter {
   /**

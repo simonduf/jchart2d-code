@@ -1,6 +1,5 @@
 /*
- *
- *  TestTrace2DLtd.java  jchart2d
+ *  TestTrace2DLtd.java, a Junit test case for Trace2DLtd.
  *  Copyright (C) Achim Westermann, created on 23.04.2005, 08:21:12
  *
  *  This library is free software; you can redistribute it and/or
@@ -23,7 +22,6 @@
  */
 package info.monitorenter.gui.chart;
 
-import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 
 import java.util.Iterator;
@@ -35,6 +33,9 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
+ * A Junit test case for <code>{@link Trace2DLtd}</code>.
+ * <p>
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  */
@@ -44,7 +45,7 @@ public class TestTrace2DLtd
    * Test suite for this test class.
    * <p>
    * 
-   * @return the test suite
+   * @return the test suite.
    */
   public static Test suite() {
 
@@ -57,13 +58,23 @@ public class TestTrace2DLtd
   }
 
   /**
-   * @param arg0
+   * Creates a test case with the given name.
+   * <p>
+   * 
+   * @param testName
+   *          the name of the test case.
    */
-  public TestTrace2DLtd(String arg0) {
-    super(arg0);
-    // TODO Auto-generated constructor stub
+  public TestTrace2DLtd(final String testName) {
+    super(testName);
   }
 
+  /**
+   * Adds 1000000 <code>{@link TracePoint2D}</code> instances to a
+   * <code>{@link Trace2DLtd}</code> and asserts that not more points than
+   * <code>{@link Trace2DLtd#getMaxSize()} </code> are remaining in memory.
+   * <p>
+   * 
+   */
   public void testMemoryLeak() {
     int traceSize = 10;
     ITrace2D trace = new Trace2DLtd(traceSize);

@@ -25,7 +25,7 @@ package info.monitorenter.gui.chart.events;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.controls.RangeChooserPanel;
-import info.monitorenter.gui.chart.dialogs.DialogRange;
+import info.monitorenter.gui.chart.dialogs.ModalDialog;
 
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -41,7 +41,7 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class AxisActionSetRange
     extends AAxisAction {
@@ -80,7 +80,7 @@ public class AxisActionSetRange
 
     IAxis axis = this.getAxis();
     RangeChooserPanel rangePanel = new RangeChooserPanel(axis.getRangePolicy().getRange());
-    DialogRange dialog = new DialogRange(axis.getAccessor().getChart(), "Choose a range",
+    ModalDialog dialog = new ModalDialog(axis.getAccessor().getChart(), "Choose a range",
         rangePanel);
     dialog.showDialog();
     axis.setRange(rangePanel.getRange());

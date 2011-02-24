@@ -31,13 +31,13 @@ import java.beans.PropertyChangeListener;
  * The base class that connects triggered actions with an
  * {@link info.monitorenter.gui.chart.axis.AAxis} instance.
  * <p>
- * Every subclass may delegate it's constructor-given <code>Axis</code>
+ * Every subclass may acess it's constructor-given <code>Axis</code>
  * instance as protected member <code>m_axis</code>.
- * </p>
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  * 
  */
 public abstract class AAxisAction

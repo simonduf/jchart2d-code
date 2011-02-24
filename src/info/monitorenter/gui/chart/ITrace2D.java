@@ -52,7 +52,6 @@ import java.util.Set;
  * property zIndex (see {@link #getZIndex()}, {@link #setZIndex(Integer)}).
  * <p>
  * <h3>Property Change events</h3>
- * <p>
  * <table border="0">
  * <tr>
  * <th><code>getPropertyName()</code></th>
@@ -137,27 +136,35 @@ import java.util.Set;
  * <td><code>{@link java.awt.Color}</code>, the new color.</td>
  * </tr>
  * <tr>
- * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_ERRORBARPOLICIES}</code></td>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_ERRORBARPOLICY}</code></td>
  * <td><code>{@link ITrace2D}</code> that changed</td>
  * <td><code>null</code>, indicating that an error bar policy was added.</td>
  * <td><code>{@link info.monitorenter.gui.chart.IErrorBarPolicy}</code>, the
  * new error bar policy.</td>
  * </tr>
  * <tr>
- * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_ERRORBARPOLICIES}</code></td>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_ERRORBARPOLICY}</code></td>
  * <td><code>{@link ITrace2D}</code> that changed</td>
  * <td><code>{@link info.monitorenter.gui.chart.IErrorBarPolicy}</code>, the
  * old error bar policy.</td>
  * <td><code>null</code>, indicating that an error bar policy was removed.</td>
+ * </tr>
+ * <tr>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_ERRORBARPOLICY_CONFIGURATION}</code></td>
+ * <td><code>{@link ITrace2D}</code> that notifies the change of the change
+ * of the configured error bar policy.</td>
+ * <td>null</td>
+ * <td><code>{@link info.monitorenter.gui.chart.IErrorBarPolicy}</code>, the
+ * instance with the configuration change.</td>
  * </tr>
  * </table>
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.12 $
  */
-public interface ITrace2D extends IComparableProperty {
+public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
 
   /**
    * The property key defining the <code>color</code> property. Use in
@@ -167,11 +174,32 @@ public interface ITrace2D extends IComparableProperty {
   public static final String PROPERTY_COLOR = "trace.color";
 
   /**
-   * The property key defining a change in the set of
-   * <code>{@link IErrorBarPolicy}</code> instances. Use in combination with
+   * The property key defining a change of <code>{@link IErrorBarPolicy}</code>
+   * instances contained.
+   * <p>
+   * This is fired from <code>{@link #addErrorBarPolicy(IErrorBarPolicy)}</code>,
+   * <code>{@link #removeErrorBarPolicy(IErrorBarPolicy)}</code> and
+   * <code>{@link #setErrorBarPolicy(IErrorBarPolicy)}</code>.
+   * <p>
+   * 
+   * Use in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   * <p>
    */
-  public static final String PROPERTY_ERRORBARPOLICIES = "trace.errorbarpolicies";
+  public static final String PROPERTY_ERRORBARPOLICY = "trace.errorbarspolicy";
+
+  /**
+   * The property key defining a change of the configuration of a contained<code>{@link IErrorBarPolicy}</code>.
+   * <p>
+   * This is fired whenever an <code>IErrorBarPolicy</code> notifies this
+   * instance of a configuration change via an event for
+   * <code>{@link IErrorBarPolicy#PROPERTY_CONFIGURATION}</code>.
+   * <p>
+   * Use in combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   * <p>
+   */
+  public static final String PROPERTY_ERRORBARPOLICY_CONFIGURATION = "trace.errorbarspolicy";
 
   /**
    * The property key defining the <code>maxX</code> property. Use in
@@ -245,11 +273,11 @@ public interface ITrace2D extends IComparableProperty {
   public static final String PROPERTY_VISIBLE = "trace.visible";
 
   /**
+   * The property key defining the <code>zIndex</code> property.
    * <p>
-   * The property key defining the <code>zIndex</code> property. Use in
-   * combination with
+   * Use in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
-   * </p>
+   * <p>
    */
   public static final String PROPERTY_ZINDEX = "trace.zIndex";
 
@@ -282,7 +310,7 @@ public interface ITrace2D extends IComparableProperty {
    * @param errorBarPolicy
    *          the error bar policy to add for rendering this trace's error bars.
    * 
-   * @return true if the painter was added (class of instance not contained
+   * @return true if the painter was added (same instance was not contained
    *         before).
    */
   public boolean addErrorBarPolicy(IErrorBarPolicy errorBarPolicy);
@@ -388,6 +416,7 @@ public interface ITrace2D extends IComparableProperty {
    *         should be made by the corresponding <code>Chart2D</code>.
    */
   Color getColor();
+
   /**
    * Returns the <code>Set&lt;{@link IErrorBarPolicy}&gt;</code> that will
    * be used to render error bars for this trace.
@@ -489,15 +518,45 @@ public interface ITrace2D extends IComparableProperty {
   double getMinY();
 
   /**
+   * Returns the name of this trace.
+   * <p>
+   * 
+   * @return the name of this trace.
+   * 
    * @see #setName(String s)
    */
   public String getName();
 
   /**
+   * Returns the concatenation
+   * <code>[x: "{@link #getPhysicalUnitsX()}", y: "{@link #getPhysicalUnitsY()}"]</code>.
+   * <p>
    * 
+   * @return the concatenation
+   *         <code>[x: "{@link #getPhysicalUnitsX()}", y: "{@link #getPhysicalUnitsY()}"]</code>.
    * @see #setPhysicalUnits(String x,String y)
    */
   public String getPhysicalUnits();
+
+  /**
+   * Returns the physical unit string value for the x dimension.
+   * <p>
+   * 
+   * @return the physical unit string value for the x dimension.
+   * 
+   * @see #setPhysicalUnits(String x,String y)
+   */
+  public String getPhysicalUnitsX();
+
+  /**
+   * Returns the physical unit string value for the y dimension.
+   * <p>
+   * 
+   * @return the physical unit string value for the y dimension.
+   * 
+   * @see #setPhysicalUnits(String x,String y)
+   */
+  public String getPhysicalUnitsY();
 
   /**
    * Returns all property change listeners for the given property.
@@ -596,6 +655,18 @@ public interface ITrace2D extends IComparableProperty {
    * 
    */
   public void removeAllPoints();
+
+  /**
+   * Removes the given error bar policy from the internal set of error bar
+   * policies.
+   * <p>
+   * 
+   * @param errorBarPolicy
+   *          the error bar policy to remove.
+   * 
+   * @return true if the painter was removed (same instance contained before).
+   */
+  public boolean removeErrorBarPolicy(IErrorBarPolicy errorBarPolicy);
 
   /**
    * <p>
@@ -742,7 +813,6 @@ public interface ITrace2D extends IComparableProperty {
   public void setVisible(boolean visible);
 
   /**
-   * <p>
    * Sets the internal z-index property. This decides the order in which
    * different traces within the same <code>{@link Chart2D}</code> are
    * painted. The lower the given value is the more this trace will be brought
@@ -750,11 +820,14 @@ public interface ITrace2D extends IComparableProperty {
    * <p>
    * The value must not be lower than {@link #Z_INDEX_MIN}(0) and higher than
    * {@link #ZINDEX_MAX}(100).
-   * </p>
    * <p>
    * This might not be tested for increased performance but ignoring these
    * bounds may result in wrong ordering of display.
-   * </p>
+   * <p>
+   * 
+   * @param zIndex
+   *          the z index of this trace - the lower the value the more in front
+   *          the trace will appear amongst other traces in the same chart.
    * 
    * @see #getZIndex()
    * 

@@ -1,5 +1,6 @@
 /*
- *  TestRingBufferArrayFast.java of project jchart2d, <purpose>
+ *  TestRingBufferArrayFast.java of project jchart2d, Junit 
+ *  test for class RingBufferArrayFast. 
  *  Copyright 2006 (C) Achim Westermann, created on 06:29:12.
  *
  *  This library is free software; you can redistribute it and/or
@@ -21,8 +22,6 @@
  */
 package info.monitorenter.util.collections;
 
-import info.monitorenter.gui.chart.layout.TestChartPanelMemoryLeak;
-
 import java.util.Iterator;
 
 import junit.framework.Test;
@@ -37,12 +36,14 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  */
-public class TestRingBufferArrayFast extends TestCase {
+public class TestRingBufferArrayFast
+    extends TestCase {
 
   /**
-   * Test method for {@link info.monitorenter.util.collections.RingBufferArrayFast.add(Object)}.
+   * Test method for
+   * {@link info.monitorenter.util.collections.RingBufferArrayFast#add(Object)}.
    * <p>
    */
   public void testAdd() {
@@ -54,7 +55,8 @@ public class TestRingBufferArrayFast extends TestCase {
   }
 
   /**
-   * Test method for {@link info.monitorenter.util.collections.RingBufferArrayFast#size()}.
+   * Test method for
+   * {@link info.monitorenter.util.collections.RingBufferArrayFast#size()}.
    * <p>
    */
   public void testSize() {
@@ -288,7 +290,7 @@ public class TestRingBufferArrayFast extends TestCase {
     assertEquals(2, ((Integer) it.next()).intValue());
     assertFalse(it.hasNext());
   }
-  
+
   /**
    * Test suite for this test class.
    * <p>
@@ -310,10 +312,14 @@ public class TestRingBufferArrayFast extends TestCase {
   }
 
   /**
-   * @param arg0
+   * Creates a test case with the given name.
+   * <p>
+   * 
+   * @param testName
+   *          the name of the test case.
    */
-  public TestRingBufferArrayFast(String arg0) {
-    super(arg0);
+  public TestRingBufferArrayFast(final String testName) {
+    super(testName);
   }
 
 }

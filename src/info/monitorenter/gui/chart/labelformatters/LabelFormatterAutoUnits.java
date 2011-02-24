@@ -1,6 +1,8 @@
 /*
- * LabelFormatterAutoUnits.java,  <enter purpose here>.
- * Copyright (C) 2006  Achim Westermann, Achim.Westermann@gmx.de
+ * LabelFormatterAutoUnits.java, a label formatter that adds 
+ * an automatic choice of the unit SI prefix to a decorated 
+ * label formatter. 
+ * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -27,14 +29,15 @@ import info.monitorenter.util.units.AUnit;
 import info.monitorenter.util.units.UnitFactory;
 import info.monitorenter.util.units.UnitSystemSI;
 
+import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 /**
- * A formatter that adds a "unit-functionality" to a given
- * {@link info.monitorenter.gui.chart.ILabelFormatter}.
+ * A label formatter that adds an automatic choice of the unit SI prefix to a
+ * decorated {@link info.monitorenter.gui.chart.ILabelFormatter}.
  * <p>
  * 
  * The formatted Strings will be divided by a factor according to the automatic
@@ -43,10 +46,11 @@ import java.util.Map;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.11 $
  * 
  */
-public class LabelFormatterAutoUnits extends ALabelFormatter {
+public class LabelFormatterAutoUnits
+    extends ALabelFormatter {
 
   /**
    * Performance improvement: Maps the units to use to the powers of 10 of their
@@ -97,11 +101,18 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
    * In this implementation it is only used for finding labels that match the
    * ticks.
    * <p>
-   * 
-   * @see #setMajorTickSpacing(double)
-   * @see #setMinorTickSpacing(double)
    */
   private AUnit m_unit = UNIT_UNCHANGED;
+
+  /**
+   * Default constructor that uses a <code>{@link LabelFormatterSimple}</code>
+   * to add the auto unit feature to.
+   * <p>
+   * 
+   */
+  public LabelFormatterAutoUnits() {
+    this.m_delegate = new LabelFormatterSimple();
+  }
 
   /**
    * Creates an instance that will add "unit-functionality" to the given
@@ -117,7 +128,16 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
   }
 
   /**
-   * Internally sets the correct <code>{@link Unit}</code> corresponding to
+   * @see info.monitorenter.gui.chart.ILabelFormatter#addPropertyChangeListener(java.lang.String,
+   *      java.beans.PropertyChangeListener)
+   */
+  public void addPropertyChangeListener(final String propertyName,
+      final PropertyChangeListener listener) {
+    this.m_delegate.addPropertyChangeListener(propertyName, listener);
+  }
+
+  /**
+   * Internally sets the correct <code>{@link AUnit}</code> corresponding to
    * the range of this axis.
    * <p>
    * 
@@ -129,9 +149,6 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
    * @param max
    *          the maximum value of the axis.
    * 
-   * @see #getScaleValues()
-   * @see #setMajorTickSpacing(double)
-   * @see #setMinorTickSpacing(double)
    */
   private final void chooseUnit(final double min, final double max) {
     double range = this.getAxis().getRange().getExtent();
@@ -139,9 +156,6 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
       range = 1;
     }
     this.m_unit = UnitFactory.getInstance().getUnit(range, UnitSystemSI.getInstance());
-    if (range / this.m_unit.getFactor() < 3) {
-      this.m_unit = this.m_unit.getNexLowerUnit();
-    }
   }
 
   /**
@@ -164,6 +178,16 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
    */
   public IAxis getAxis() {
     return this.m_delegate.getAxis();
+  }
+
+  /**
+   * Returns the decoroated label formatter.
+   * <p>
+   * 
+   * @return the the decoroated label formatter.
+   */
+  final ALabelFormatter getDelegate() {
+    return this.m_delegate;
   }
 
   /**
@@ -265,6 +289,7 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
    * @see info.monitorenter.gui.chart.ILabelFormatter#initPaintIteration()
    */
   public void initPaintIteration() {
+    this.m_delegate.initPaintIteration();
     Range domain = this.m_delegate.getAxis().getRange();
     this.chooseUnit(domain.getMin(), domain.getMax());
   }
@@ -279,11 +304,33 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.labelformatters.ALabelFormatter#removePropertyChangeListener(java.lang.String,
+   *      java.beans.PropertyChangeListener)
+   */
+  public void removePropertyChangeListener(final String property,
+      final PropertyChangeListener listener) {
+    this.m_delegate.removePropertyChangeListener(property, listener);
+  }
+
+  /**
    * @see ALabelFormatter#setAxis(IAxis)
    */
   public void setAxis(final IAxis axis) {
 
     this.m_delegate.setAxis(axis);
+  }
+
+  /**
+   * Sets the label formatter to decorate by the feature of automatic unit
+   * choice.
+   * <p>
+   * 
+   * @param delegate
+   *          the label formatter to decorate by the feature of automatic unit
+   *          choice.
+   */
+  final void setDelegate(final ALabelFormatter delegate) {
+    this.m_delegate = delegate;
   }
 
   /**

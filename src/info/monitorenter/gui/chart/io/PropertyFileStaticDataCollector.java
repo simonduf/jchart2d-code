@@ -87,7 +87,7 @@ public class PropertyFileStaticDataCollector extends AStaticDataCollector {
     Collections.sort(sortList);
     it = sortList.iterator();
     while (it.hasNext()) {
-      m_trace.addPoint((TracePoint2D) it.next());
+      this.m_trace.addPoint((TracePoint2D) it.next());
     }
   }
 }

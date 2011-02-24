@@ -2,22 +2,22 @@
  * TracePoint2D, a tuned Point2D.Double for use with ITrace2D- implementations.
  * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
  *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  * 
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  * 
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- *  If you modify or optimize the code in a useful way please let me know.
- *  Achim.Westermann@gmx.de
+ * If you modify or optimize the code in a useful way please let me know.
+ * Achim.Westermann@gmx.de
  */
 
 package info.monitorenter.gui.chart;
@@ -56,7 +56,7 @@ import java.awt.geom.Point2D;
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.7 $
  */
 public class TracePoint2D
     extends Point2D.Double implements Comparable, java.io.Serializable, Cloneable {
@@ -82,28 +82,28 @@ public class TracePoint2D
   protected boolean m_scaledOnce = false;
 
   /**
-   * Accessible at package-level for the <code>Chart2D</code>.
+   * Public level for the access of <code>AAxis</code>.
    */
-  protected double m_scaledX;
+  public double m_scaledX;
 
   /**
-   * Accessible at package-level for the <code>Chart2D</code>.
+   * Public level for the access of <code>AAxis</code>.
    */
-  protected double m_scaledY;
+  public double m_scaledY;
 
   /**
    * Construct a TracePoint2D whose coords are initalized to (x,y).
    * <p>
    * 
-   * @param x
+   * @param xValue
    *          the x value to use.
    * 
-   * @param y
+   * @param yValue
    *          the y value to use.
    */
-  public TracePoint2D(final double x, final double y) {
+  public TracePoint2D(final double xValue, final double yValue) {
 
-    super(x, y);
+    super(xValue, yValue);
   }
 
   /**
@@ -190,14 +190,14 @@ public class TracePoint2D
    * (with argument true).
    * </p>
    * 
-   * @param x
+   * @param xValue
    *          the new x-coordinate for this point.
-   * @param y
+   * @param yValue
    *          the new y-coordinate for this point.
    */
-  public void setLocation(final double x, final double y) {
+  public void setLocation(final double xValue, final double yValue) {
 
-    super.setLocation(x, y);
+    super.setLocation(xValue, yValue);
     if (this.m_listener != null) {
       this.m_listener.firePointChanged(this, true);
     }

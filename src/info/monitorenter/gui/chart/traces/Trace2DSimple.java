@@ -30,9 +30,10 @@ import java.util.LinkedList;
 
 /**
  * <p>
- * A basic <code>{@link info.monitorenter.gui.chart.ITrace2D}</code> implementation that
- * stores the internal <code>{@link info.monitorenter.gui.chart.TracePoint2D}</code>
- * instances in a <code>{@link java.util.List}</code>.
+ * A basic <code>{@link info.monitorenter.gui.chart.ITrace2D}</code>
+ * implementation that stores the internal
+ * <code>{@link info.monitorenter.gui.chart.TracePoint2D}</code> instances in
+ * a <code>{@link java.util.List}</code>.
  * </p>
  * <p>
  * </p>
@@ -50,9 +51,10 @@ import java.util.LinkedList;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class Trace2DSimple extends ATrace2D implements ITrace2D {
+public class Trace2DSimple
+    extends ATrace2D implements ITrace2D {
 
   /** Internal List &lt;ITracePoint2D&gt;. */
   protected LinkedList m_points = new LinkedList();

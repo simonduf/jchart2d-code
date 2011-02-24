@@ -1,6 +1,6 @@
 /*
- *
- *  MockFontMetrics.java  jchart2d
+ *  MockFontMetrics.java  of project jchart2d - a mock object for 
+ *  java.awt.FontMetrics.
  *  Copyright (C) Achim Westermann, created on 23.04.2005, 15:24:13
  *
  *  This library is free software; you can redistribute it and/or
@@ -27,45 +27,58 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 
 /**
+ * A mock ojbect for <code>{@link FontMetrics}</code>.
+ * <p>
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- *
+ * 
  */
-public class MockFontMetrics extends FontMetrics {
+public class MockFontMetrics
+    extends FontMetrics {
+
+  /** Comment for <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 3905236827622486832L;
 
   /**
-   * Comment for <code>serialVersionUID</code>
+   * Default constructor with a font.
+   * <p>
+   * 
+   * @param myFont
+   *          the font to use.
    */
-  private static final long serialVersionUID = 3905236827622486832L;
-  /**
-   */
-  public MockFontMetrics(final Font font) {
-    super(font);
+  public MockFontMetrics(final Font myFont) {
+    super(myFont);
   }
-  /* (non-Javadoc)
+
+  /**
    * @see java.awt.FontMetrics#charsWidth(char[], int, int)
    */
-  public int charsWidth(char[] data, int off, int len) {
-    return len*this.getFont().getSize()/2;
+  public int charsWidth(final char[] data, final int off, final int len) {
+    return len * this.getFont().getSize() / 2;
   }
+
   /**
    * @see java.awt.FontMetrics#charWidth(char)
    */
   public int charWidth(final char ch) {
     return this.getFont().getSize();
   }
-  /** 
+
+  /**
    * @see java.awt.FontMetrics#getAscent()
    */
   public int getAscent() {
-   return this.getFont().getSize();
+    return this.getFont().getSize();
   }
-  /** 
+
+  /**
    * @see java.awt.FontMetrics#getLeading()
    */
   public int getLeading() {
     return 2;
   }
-  /* (non-Javadoc)
+
+  /**
    * @see java.awt.FontMetrics#getMaxAdvance()
    */
   public int getMaxAdvance() {

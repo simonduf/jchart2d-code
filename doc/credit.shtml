@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-  var update="06/12/2004";
+  var update="07/23/2007";
  </script>
  <body id="credit">
   <div id="wrapper">
@@ -42,7 +42,7 @@
       
       <tr>
        <td >
-        <h3>Shipment &amp; Build</h3>
+        <h3>Development, Shipment &amp; Build</h3>
        </td>
        <td>&nbsp;</td>
       </tr>
@@ -83,7 +83,19 @@
          (frame)work. Erich Gamma was involved. An example that base motives (to black out <em>the</em> sun), 
          can have a positive side effect (competition on the royalty free market).
        </td>
-      </tr>      
+      </tr>     
+      
+      <tr>
+       <td id="box">
+         <A href="http://www.ej-technologies.com/products/jprofiler/overview.html" rel="_blank" ><IMG src="./img/jprofiler-logo.png" width="100" height="26" border="0" alt="JProfiler logo" title="JProfiler"/></A>
+       </td>
+       <td>
+        <a href="http://www.ej-technologies.com/products/jprofiler/overview.html" rel="_blank">http://www.ej-technologies.com/products/jprofiler/overview.html</a><br>
+        ej-technologies sponsored their tool for optimizing the performance 
+        of jchart2d. For the upcoming 2.1.2 release a major bottleneck has 
+        been detected and fixed. 
+       </td>
+      </tr>     
 
       <tr><td colspan="2">&nbsp;</td></tr>
       

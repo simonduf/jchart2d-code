@@ -1,6 +1,5 @@
 /*
- *
- *  MockGraphics2D.java  jchart2d
+ *  MockGraphics2D.java, a mock for java.awt.Graphics2D.
  *  Copyright (C) Achim Westermann, created on 23.04.2005, 15:17:47
  *
  *  This library is free software; you can redistribute it and/or
@@ -49,6 +48,9 @@ import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
 /**
+ * A mock Object for <code>{@link Graphics2D}</code>.
+ * <p>
+ * 
  * 
  * A quick-hack mock object to fool Chart2D's paint method. Used for debugging /
  * testing.
@@ -57,7 +59,8 @@ import java.util.Map;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  */
-public class MockGraphics2D extends Graphics2D {
+public class MockGraphics2D
+    extends Graphics2D {
 
   /**
    * defcon.
@@ -104,7 +107,7 @@ public class MockGraphics2D extends Graphics2D {
    * @see java.awt.Graphics2D#drawImage(java.awt.image.BufferedImage,
    *      java.awt.image.BufferedImageOp, int, int)
    */
-  public void drawImage(BufferedImage img, BufferedImageOp op, int x, int y) {
+  public void drawImage(final BufferedImage img, final BufferedImageOp op, final int x, final int y) {
     // TODO Auto-generated method stub
 
   }
@@ -113,7 +116,7 @@ public class MockGraphics2D extends Graphics2D {
    * @see java.awt.Graphics2D#drawImage(java.awt.Image,
    *      java.awt.geom.AffineTransform, java.awt.image.ImageObserver)
    */
-  public boolean drawImage(final Image img,final AffineTransform xform, final ImageObserver obs) {
+  public boolean drawImage(final Image img, final AffineTransform xform, final ImageObserver obs) {
     // TODO Auto-generated method stub
     return false;
   }
@@ -122,7 +125,7 @@ public class MockGraphics2D extends Graphics2D {
    * @see java.awt.Graphics2D#drawRenderableImage(java.awt.image.renderable.RenderableImage,
    *      java.awt.geom.AffineTransform)
    */
-  public void drawRenderableImage(final RenderableImage img,final AffineTransform xform) {
+  public void drawRenderableImage(final RenderableImage img, final AffineTransform xform) {
     // TODO Auto-generated method stub
 
   }
@@ -157,7 +160,7 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics2D#drawString(java.lang.String, float, float)
    */
-  public void drawString(final String s,final float x,final float y) {
+  public void drawString(final String s, final float x, final float y) {
     // TODO Auto-generated method stub
 
   }
@@ -165,7 +168,7 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics#drawString(java.lang.String, int, int)
    */
-  public void drawString(final String str,final int x,final int y) {
+  public void drawString(final String str, final int x, final int y) {
     // TODO Auto-generated method stub
 
   }
@@ -269,14 +272,14 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics2D#rotate(double)
    */
-  public void rotate(final  double theta) {
+  public void rotate(final double theta) {
     // nop
   }
 
   /**
    * @see java.awt.Graphics2D#scale(double, double)
    */
-  public void scale(final double sx,final double sy) {
+  public void scale(final double sx, final double sy) {
     // nop
 
   }
@@ -333,7 +336,7 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics2D#setTransform(java.awt.geom.AffineTransform)
    */
-  public void setTransform(final AffineTransform Tx) {
+  public void setTransform(final AffineTransform tx) {
     // TODO Auto-generated method stub
 
   }
@@ -341,25 +344,23 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics2D#shear(double, double)
    */
-  public void shear(final double shx,final double shy) {
-    // TODO Auto-generated method stub
-
+  public void shear(final double shx, final double shy) {
+    // nop
   }
 
-  /*
+  /**
+   * 
    * @see java.awt.Graphics2D#transform(java.awt.geom.AffineTransform)
    */
-  public void transform(final AffineTransform Tx) {
-    // TODO Auto-generated method stub
-
+  public void transform(final AffineTransform tx) {
+    // nop
   }
 
   /**
    * @see java.awt.Graphics2D#translate(double, double)
    */
-  public void translate(final double tx,final double ty) {
-    // TODO Auto-generated method stub
-
+  public void translate(final double tx, final double ty) {
+    // nop
   }
 
   /**
@@ -373,7 +374,7 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics#clearRect(int, int, int, int)
    */
-  public void clearRect(final int x, final int y, final int width,final  int height) {
+  public void clearRect(final int x, final int y, final int width, final int height) {
     // TODO Auto-generated method stub
 
   }
@@ -389,7 +390,8 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics#copyArea(int, int, int, int, int, int)
    */
-  public void copyArea(final int x,final  int y, final  int width,final  int height,final  int dx, final int dy) {
+  public void copyArea(final int x, final int y, final int width, final int height, final int dx,
+      final int dy) {
     // TODO Auto-generated method stub
 
   }
@@ -413,7 +415,8 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics#drawArc(int, int, int, int, int, int)
    */
-  public void drawArc(final int x, final int y, final int width,final  int height,final int startAngle, final  int arcAngle) {
+  public void drawArc(final int x, final int y, final int width, final int height,
+      final int startAngle, final int arcAngle) {
     // TODO Auto-generated method stub
 
   }
@@ -422,7 +425,8 @@ public class MockGraphics2D extends Graphics2D {
    * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, java.awt.Color,
    *      java.awt.image.ImageObserver)
    */
-  public boolean drawImage(final Image img,final int x, final  int y, final Color bgcolor,final ImageObserver observer) {
+  public boolean drawImage(final Image img, final int x, final int y, final Color bgcolor,
+      final ImageObserver observer) {
     // TODO Auto-generated method stub
     return false;
   }
@@ -431,7 +435,7 @@ public class MockGraphics2D extends Graphics2D {
    * @see java.awt.Graphics#drawImage(java.awt.Image, int, int,
    *      java.awt.image.ImageObserver)
    */
-  public boolean drawImage(final Image img,final int x,final int y,final ImageObserver observer) {
+  public boolean drawImage(final Image img, final int x, final int y, final ImageObserver observer) {
     // TODO Auto-generated method stub
     return false;
   }
@@ -440,8 +444,8 @@ public class MockGraphics2D extends Graphics2D {
    * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int,
    *      java.awt.Color, java.awt.image.ImageObserver)
    */
-  public boolean drawImage(final Image img,final int x, final int y,final  int width,final int height,final Color bgcolor,
-      final ImageObserver observer) {
+  public boolean drawImage(final Image img, final int x, final int y, final int width,
+      final int height, final Color bgcolor, final ImageObserver observer) {
     // TODO Auto-generated method stub
     return false;
   }
@@ -450,7 +454,8 @@ public class MockGraphics2D extends Graphics2D {
    * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int,
    *      java.awt.image.ImageObserver)
    */
-  public boolean drawImage(final Image img, final int x, final int y, final int width,final int height,final ImageObserver observer) {
+  public boolean drawImage(final Image img, final int x, final int y, final int width,
+      final int height, final ImageObserver observer) {
     // TODO Auto-generated method stub
     return false;
   }
@@ -459,8 +464,9 @@ public class MockGraphics2D extends Graphics2D {
    * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int, int,
    *      int, int, int, java.awt.Color, java.awt.image.ImageObserver)
    */
-  public boolean drawImage(final Image img,final int dx1, final int dy1,final int dx2,final int dy2, final int sx1,final int sy1,
-      int sx2, int sy2, Color bgcolor, ImageObserver observer) {
+  public boolean drawImage(final Image img, final int dx1, final int dy1, final int dx2,
+      final int dy2, final int sx1, final int sy1, final int sx2, final int sy2,
+      final Color bgcolor, final ImageObserver observer) {
     // TODO Auto-generated method stub
     return false;
   }
@@ -469,8 +475,9 @@ public class MockGraphics2D extends Graphics2D {
    * @see java.awt.Graphics#drawImage(java.awt.Image, int, int, int, int, int,
    *      int, int, int, java.awt.image.ImageObserver)
    */
-  public boolean drawImage(final Image img,final int dx1, final int dy1,final  int dx2, final int dy2,final int sx1, final int sy1,
-      final int sx2, int sy2,final ImageObserver observer) {
+  public boolean drawImage(final Image img, final int dx1, final int dy1, final int dx2,
+      final int dy2, final int sx1, final int sy1, final int sx2, final int sy2,
+      final ImageObserver observer) {
     // TODO Auto-generated method stub
     return false;
   }
@@ -478,7 +485,7 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics#drawLine(int, int, int, int)
    */
-  public void drawLine(final int x1,final int y1,final int x2,final int y2) {
+  public void drawLine(final int x1, final int y1, final int x2, final int y2) {
     // TODO Auto-generated method stub
 
   }
@@ -486,7 +493,7 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics#drawOval(int, int, int, int)
    */
-  public void drawOval(final int x, final int y, final int width,final int height) {
+  public void drawOval(final int x, final int y, final int width, final int height) {
     // TODO Auto-generated method stub
 
   }
@@ -502,7 +509,7 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics#drawPolyline(int[], int[], int)
    */
-  public void drawPolyline(final int[] xPoints,final  int[] yPoints, final int nPoints) {
+  public void drawPolyline(final int[] xPoints, final int[] yPoints, final int nPoints) {
     // TODO Auto-generated method stub
 
   }
@@ -510,7 +517,8 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics#drawRoundRect(int, int, int, int, int, int)
    */
-  public void drawRoundRect(final int x,final  int y,final  int width,final  int height, final int arcWidth,final  int arcHeight) {
+  public void drawRoundRect(final int x, final int y, final int width, final int height,
+      final int arcWidth, final int arcHeight) {
     // TODO Auto-generated method stub
 
   }
@@ -518,7 +526,8 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics#fillArc(int, int, int, int, int, int)
    */
-  public void fillArc(final int x, final int y,final int width,final int height,final int startAngle,final int arcAngle) {
+  public void fillArc(final int x, final int y, final int width, final int height,
+      final int startAngle, final int arcAngle) {
     // TODO Auto-generated method stub
 
   }
@@ -526,7 +535,7 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics#fillOval(int, int, int, int)
    */
-  public void fillOval(final int x,final int y,final int width,final int height) {
+  public void fillOval(final int x, final int y, final int width, final int height) {
     // TODO Auto-generated method stub
 
   }
@@ -534,7 +543,7 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics#fillPolygon(int[], int[], int)
    */
-  public void fillPolygon(final int[] xPoints,final int[] yPoints,final int nPoints) {
+  public void fillPolygon(final int[] xPoints, final int[] yPoints, final int nPoints) {
     // TODO Auto-generated method stub
 
   }
@@ -542,7 +551,7 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics#fillRect(int, int, int, int)
    */
-  public void fillRect(final int x,final int y,final int width,final int height) {
+  public void fillRect(final int x, final int y, final int width, final int height) {
     // TODO Auto-generated method stub
 
   }
@@ -550,7 +559,8 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics#fillRoundRect(int, int, int, int, int, int)
    */
-  public void fillRoundRect(final int x,final int y,final int width,final int height,final int arcWidth,final int arcHeight) {
+  public void fillRoundRect(final int x, final int y, final int width, final int height,
+      final int arcWidth, final int arcHeight) {
     // TODO Auto-generated method stub
 
   }
@@ -598,7 +608,7 @@ public class MockGraphics2D extends Graphics2D {
   /**
    * @see java.awt.Graphics#setClip(int, int, int, int)
    */
-  public void setClip(final int x,final int y,final int width,final int height) {
+  public void setClip(final int x, final int y, final int width, final int height) {
     // TODO Auto-generated method stub
 
   }

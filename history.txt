@@ -1,12 +1,12 @@
 /*
  * File   : $Source: /cvsroot/jchart2d/jchart2d/history.txt,v $
- * Date   : $Date: 2006/10/13 09:23:07 $
- * Version: $Revision: 1.65 $
+ * Date   : $Date: 2007/07/25 05:10:37 $
+ * Version: $Revision: 1.96 $
  *
  * This file is part of jchart2d -
  * the Open Source real time charting library.
  *
- * Copyright (c) 2006 Achim Westermann
+ * Copyright (c) 2007 Achim Westermann
  */
 
 History of changes for the jchart2d project.
@@ -16,9 +16,69 @@ to bottom (least recent).
 
 Legend:
 ! New Feature
-* Bug fixed
+* Bug fixed, (unreleased) points out that this bug was never released. 
 - General comment
-o API change that requires refactoring.
+o API change that requires refactoring. 
+  Note that refactoring of protected code intended for library 
+  internal details will not be listed.
+
+
+jchart2d-2.1.2 - July, 25th, 2007
+
+* Fixed issue #1711148: LayoutFactory does not provide documented methods. 
+! Configurable context menu entry for zooming out for ChartPanel when wrapping 
+  a ZoomableChart. Contribution by Vasilis Pappas. 
+! Only use lower unit in LabelFormatterAutoUnits when data range is 
+  smaller 1.5 of a whole unit. 
+! New error bar policy for summation of absolute values. 
+! Added default constructors and additional setters for bean compliance 
+  of label formatters.   
+* Fixed issue with UI not reacting upon changed label formatter of Axis at runtime.
+* Fixed issue with UI not reacting upon changed number format of 
+  LabelFormatterNumber at runtime.
+* Fixed issue with concurrent painting / potential deadlock in addErrorBarPolicy 
+  and setErrorBarPolicy of traces. 
+* Fixes issue with traces not updating in case the error bar policies / their 
+  configuration changes at runtime. 
+* Fixed issue with color icon of error bar painter edit panel not updating when 
+  corresponding error bar segment is changed at runtime.
+* Fixed minor rounding bug in value to pixel transformation of AAxis.
+* Fixed issue with axis scale values that appear out of the chart area (too low).
+* Fixed issue with traces being rescaled in both dimensions even if only one 
+  dimension changed (Performance improvement). 
+! Updated profiling support to Java Interactive Profiler (JIP) Version 1.1(final).
+! Major performance improvement for updateScaling: JProfiler measured ~42 % total of paint 
+  runtime before, now takes ~ 16 %.
+! New info.monitorenter.gui.chart.labelformatters.LabelFormatterUnit allows to specify 
+  a fixed unit for an axis. 
+  
+jchart2d-2.1.1 - March, 30st, 2007
+
+* Fixed issue: When adding a trace that does not exceed bounds it 
+  is not scaled in the corresponding dimension (x=0 or y=0 lines appeared).
+* Fixed issue #1584637: Trace back when displaying Chart2D on Java 6.
+* Fixed issue with zooming all in ZoomableChart that contains several traces. 
+* Show range policy selection on x axis for chart panels by default (was hidden).
+* Fixed issue with NullPointerException in custom layout manager 
+  of chart panel in case the component count of the target layout container is 0.
+* Fixed issue #1578136: Trace2DLtdSorted(int) has private access. 
+* Fixed issue #1586616: Removing trace from chart dos not delete label in ChartPanel.
+! New UI action for setting physical units for traces in ChartPanel. 
+! New UI action for removing trace in ChartPanel (disabled by default, enable by 
+  LayoutFactory.getInstance().setShowRemoveTraceMenu(true)). 
+* Fixed issue #1601947: image export with snaphot() when chart is not visible (not sized).
+! New method IErrorBarPolicy.removeErrorBarPainter(IErrorBarPainter). 
+! Improved property change handling for IErrorBarPolicy implementations 
+  along with reusable Action implementations. 
+* Fixed issue #1644055: Bounds check in ATrace2D doesn't catch removed extremum.
+! Added constructors for all AAxis types that take an info.monitorenter.gui.chart.ILabelFormatter. 
+! Decreased calls to repaint by using the axis range as the repaint criterium vs. the chart data bounds. 
+! Improved property change event handling in the Chart2D. 
+* Fixed issue #1652154: ATRace2D.setName has conditional/delayed visibility. 
+! Added visual human-judged operation tests. 
+* Fixed issue #1657003: javadoc error in IAxis (setMinorTickSpacing(double)).
+* Fixed issue #1684854 (unreleased):  Phantom line appears while adding trace point.
+* Fixed issue #1663833 Bug in legend print: Contribution by Horea Haitonic.
 
 jchart2d-2.1.0 - October, 12th, 2006
 

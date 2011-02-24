@@ -40,13 +40,60 @@ import java.util.Set;
  * <code>{@link info.monitorenter.gui.chart.IErrorBarValue}</code> instances.
  * <p>
  * 
+ * <h3>Property Change events</h3>
+ * The following table describes the contract of this interface of
+ * <code>{@link java.beans.PropertyChangeEvent}</code> instances that are
+ * thrown by methods. <table border="0">
+ * <tr>
+ * <th>thrown by method</th>
+ * <th><code>getPropertyName()</code></th>
+ * <th><code>getSource()</code></th>
+ * <th><code>getOldValue()</code></th>
+ * <th><code>getNewValue()</code></th>
+ * </tr>
+ * <tr>
+ * <th>All mutator methods that would cause different rendering.</th>
+ * <td><code>{@link #PROPERTY_CONFIGURATION}</code></td>
+ * <td><code>{@link IErrorBarPolicy}</code> that changed</td>
+ * <td><code>null</code>, as this event marks a general change</td>
+ * <td><code>null</code>, as this event marks a general change</td>
+ * </tr>
+ * <tr>
+ * <th>{@link #addErrorBarPainter(IErrorBarPainter)}</th>
+ * <td><code>{@link #PROPERTY_ERRORBARPAINTER}</code></td>
+ * <td><code>{@link IErrorBarPolicy}</code> that changed</td>
+ * <td><code>null</code>, which marks that a new painter was added.</td>
+ * <td><code>{@link info.monitorenter.gui.chart.IErrorBarPainter}</code>,
+ * the added painter.</td>
+ * </tr>
+ * <tr>
+ * <th>{@link #removeErrorBarPainter(IErrorBarPainter)}</th>
+ * <td><code>{@link #PROPERTY_ERRORBARPAINTER}</code></td>
+ * <td><code>{@link IErrorBarPolicy}</code> that changed</td>
+ * <td><code>{@link info.monitorenter.gui.chart.IErrorBarPainter}</code>,
+ * the removed painter.</td>
+ * <td><code>null</code>, which marks that a painter was removed.</td>
+ * </tr>
+ * <tr>
+ * <th>all mutator methods of
+ * {@link info.monitorenter.gui.chart.IErrorBarPainter}</th>
+ * <td><code>{@link #PROPERTY_ERRORBARPAINTER}</code></td>
+ * <td><code>{@link IErrorBarPolicy}</code> that changed</td>
+ * <td><code>{@link info.monitorenter.gui.chart.IErrorBarPainter}</code>,
+ * the changed painter.</td>
+ * <td><code>{@link info.monitorenter.gui.chart.IErrorBarPainter}</code>,
+ * the changed painter (same as old value).</td>
+ * </tr>
+ * <tr> </table>
+ * <p>
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public interface IErrorBarPolicy extends ITracePainter {
   /**
-   * The property key defining the <code>color</code> property.
+   * The property key defining a general change of an instance.
    * <p>
    * This is fired whenever the internal configuration of the error bar policy
    * changes. This internal configuration should be of no interest for clients
@@ -55,7 +102,7 @@ public interface IErrorBarPolicy extends ITracePainter {
    * to tell exactly this: "Rendering has changed. Please repaint."
    * <p>
    * As it is of no interest and knowledge which configuration has changed the
-   * {@link javax.swing.event.PropertyChangeEvent#getNewValue()} and the
+   * {@link java.beans.PropertyChangeEvent#getNewValue()} and the
    * {@link java.beans.PropertyChangeEvent#getOldValue()} of the
    * {@link java.beans.PropertyChangeEvent} given to
    * {@link PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)}
@@ -79,7 +126,7 @@ public interface IErrorBarPolicy extends ITracePainter {
    * {@link ITrace2D#addErrorBarPolicy(IErrorBarPolicy)} for this feature
    * instead.
    * <p>
-   * 
+   *  
    * @param trace
    *          the trace error bars are rendered for.
    */
@@ -100,17 +147,21 @@ public interface IErrorBarPolicy extends ITracePainter {
    *          an error bar to use: This is for design reasons as internally this
    *          method is used too with a reused instance.
    */
-  public void calculateErrorBar(final double absoluteX, final double absoluteY, final ErrorBarValue errorBar);
+  public void calculateErrorBar(final double absoluteX, final double absoluteY,
+      final ErrorBarValue errorBar);
 
   /**
-   * The property key defining the <code>color</code> property.
-   * <p>
    * This is fired whenever the internal set of error bar painters changes.
+   * <p>
+   * 
    * Namely from <code>{@link  #addErrorBarPainter(IErrorBarPainter)}</code>
-   * and <code>{@link #setErrorBarPainter(IErrorBarPainter)}</code>.
+   * <code>{@link #setErrorBarPainter(IErrorBarPainter)}</code>
+   * and <code>{@link #removeErrorBarPainter(IErrorBarPainter)}</code>.
    * <p>
    * Use in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   * <p>
+   * 
    * 
    */
   public static final String PROPERTY_ERRORBARPAINTER = "errorbarpolicy.painter";
@@ -252,5 +303,17 @@ public interface IErrorBarPolicy extends ITracePainter {
    *          if true positive errors in y dimension will be shown.
    */
   public void setShowPositiveYErrors(final boolean showPositiveYErrors);
+
+  /**
+   * Removes the given error bar painter.
+   * <p>
+   * 
+   * @param painter
+   *          the error bar painter to remove.
+   * 
+   * @return true if the given error bar painter was removed, comparison by the
+   *         means of the equals operation.
+   */
+  public boolean removeErrorBarPainter(IErrorBarPainter painter);
 
 }

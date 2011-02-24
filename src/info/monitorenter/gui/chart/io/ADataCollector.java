@@ -53,7 +53,7 @@ import info.monitorenter.gui.chart.TracePoint2D;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public abstract class ADataCollector implements Runnable {
 
@@ -216,9 +216,7 @@ public abstract class ADataCollector implements Runnable {
   }
 
   /**
-   * <p>
    * Stops this Thread. Data collection will end when finished the current loop.
-   * </p>
    * <p>
    * Note that your application may
    * <ol>
@@ -229,7 +227,7 @@ public abstract class ADataCollector implements Runnable {
    * 1) a limited buffer or a 2) unlimited buffer. This behaviour will of course
    * not appear if the data is not read from a queue where it has to be removed
    * from.
-   * </p>
+   * <p>
    */
   public void stop() {
     this.m_stop = true;

@@ -1,7 +1,7 @@
 /*
  *  PointPainterVerticalBar.java, a point painter that renders a bar 
  *  for each point.
- *  Copyright (C) 2006 Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2007 Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -28,8 +28,7 @@ import info.monitorenter.gui.chart.IPointPainter;
 import java.awt.Graphics2D;
 
 /**
- * Renders points by painting a bar with choosable width for each
- * point to show.
+ * Renders points by painting a bar with choosable width for each point to show.
  * <p>
  * Bars are placed around the x value to render: the middle of the bar in x
  * dimension is the exact x value.
@@ -37,11 +36,10 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.3 $
  * 
  */
-public class PointPainterVerticalBar
-    implements IPointPainter {
+public class PointPainterVerticalBar implements IPointPainter {
 
   /**
    * Stores the corresponding chart to know the coordinate roots for closing the
@@ -56,6 +54,9 @@ public class PointPainterVerticalBar
   /**
    * Creates an instance with a default bar width size of 4.
    * <p>
+   * 
+   * @param chart
+   *          the corresponding chart for bound information.
    */
   public PointPainterVerticalBar(final Chart2D chart) {
     this(4, chart);
@@ -66,13 +67,15 @@ public class PointPainterVerticalBar
    * 
    * @param barWidth
    *          the bar width in pixel to use.
+   *          
+   * @param chart
+   *          the corresponding chart for bound information.
    */
   public PointPainterVerticalBar(final int barWidth, final Chart2D chart) {
     this.setBarWidth(barWidth);
     this.m_chart = chart;
   }
 
-  
   /**
    * Returns the diameter of the discs to paint in pixel.
    * <p>

@@ -37,7 +37,7 @@ import java.util.Iterator;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  * 
  * @see info.monitorenter.util.units.IUnitSystem
  * 
@@ -53,7 +53,7 @@ public final class UnitFactory extends Object {
    */
   public static final AUnit UNCHANGED = new UnitUnchanged();
 
-  /** Cache for {@link UnitSystem} instances. */
+  /** Cache for {@link IUnitSystem} instances. */
   private static final Map UNITSYSTEMS = new HashMap();
 
   /**
@@ -147,7 +147,7 @@ public final class UnitFactory extends Object {
    * @param units
    *          the unit system to initialize.
    * 
-   * @return the list of {@link Unit} instances of the given unit system.
+   * @return the list of {@link AUnit} instances of the given unit system.
    */
   private List initUnitSystem(final IUnitSystem units) {
     List choice = new LinkedList();
@@ -178,7 +178,6 @@ public final class UnitFactory extends Object {
         }
       }
     }
-    unit.m_nextHigherUnit = unit;
     // hardcoded minsearch sort:
     double tmpfactori;
     double tmpfactorj;

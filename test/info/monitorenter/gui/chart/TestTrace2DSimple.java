@@ -1,6 +1,6 @@
 /*
- *
- *  TestTrace2DSimple.java  jchart2d
+ *  TestTrace2DSimple.java of project jchart2d - a Junit test case 
+ *  for class Trace2DSimple. 
  *  Copyright (C) Achim Westermann, created on 08.06.2005, 22:58:51
  *
  *  This library is free software; you can redistribute it and/or
@@ -26,24 +26,30 @@ package info.monitorenter.gui.chart;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 
 import java.beans.PropertyChangeListener;
-import java.util.List;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
+ * A Junit test case for class <code>{@link Trace2DSimple}</code>.
+ * <p>
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- *
  */
-public class TestTrace2DSimple extends TestCase {
+public class TestTrace2DSimple
+    extends TestCase {
   /**
-   * @param arg0
+   * Creates a test case with the given name.
+   * <p>
+   * 
+   * @param testName
+   *          the name of the test.
    */
-  public TestTrace2DSimple(String arg0) {
-    super(arg0);
-    // TODO Auto-generated constructor stub
+  public TestTrace2DSimple(final String testName) {
+    super(testName);
   }
+
   /**
    * Test suite for this test class.
    * <p>
@@ -60,18 +66,17 @@ public class TestTrace2DSimple extends TestCase {
 
     return suite;
   }
+
   /**
+   * Adds and removes a trace to a chart and asserts that only one and
+   * afterwards zero listeners are contained in the chart.
    * <p>
-   *  Adds and removes a trace to a chart and asserts that only one and
-   *  afterwards zero listeners are contained in the chart.
-   * </p>
-   *
    */
-  public void testMemoryLeakTrace2DListeners(){
+  public void testMemoryLeakTrace2DListeners() {
     Chart2D chart = new Chart2D();
     ITrace2D trace = new Trace2DSimple();
     PropertyChangeListener[] listeners;
-    for(int i=0;i<100;i++){
+    for (int i = 0; i < 100; i++) {
       chart.addTrace(trace);
       listeners = trace.getPropertyChangeListeners(ITrace2D.PROPERTY_MAX_X);
       assertEquals("Only one listener should be registered!", 1, listeners.length);
@@ -84,16 +89,16 @@ public class TestTrace2DSimple extends TestCase {
 
   /**
    * <p>
-   *  Adds and removes a trace to a chart 100 times and asserts that only
-   *  zero listeners are contained in the chart afterwards.
+   * Adds and removes a trace to a chart 100 times and asserts that only zero
+   * listeners are contained in the chart afterwards.
    * </p>
-   *
+   * 
    */
-  public void testMemoryLeakTrace2DListenersSeverity(){
+  public void testMemoryLeakTrace2DListenersSeverity() {
     Chart2D chart = new Chart2D();
     ITrace2D trace = new Trace2DSimple();
     int listeners = 0;
-    for(int i=0;i<100;i++){
+    for (int i = 0; i < 100; i++) {
       chart.addTrace(trace);
       chart.removeTrace(trace);
     }

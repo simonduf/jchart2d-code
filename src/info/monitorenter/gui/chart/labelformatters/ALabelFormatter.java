@@ -1,23 +1,24 @@
 /*
- * AbstractLabelFormatter.java, <enter purpose here>. Copyright (C) 2005 Achim
- * Westermann, Achim.Westermann@gmx.de 
+ * AbstractLabelFormatter.java, base class for ILabelFormatter 
+ * implementations.  
+ * Copyright (C) 2005 Achim Westermann, Achim.Westermann@gmx.de 
  * 
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  * 
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  * 
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- *  If you modify or optimize the code in a useful way please let me know.
- *  Achim.Westermann@gmx.de
+ * If you modify or optimize the code in a useful way please let me know.
+ * Achim.Westermann@gmx.de
  */
 package info.monitorenter.gui.chart.labelformatters;
 
@@ -26,6 +27,11 @@ import info.monitorenter.gui.chart.ILabelFormatter;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.units.AUnit;
 import info.monitorenter.util.units.UnitUnchanged;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+
+import javax.swing.event.SwingPropertyChangeSupport;
 
 /**
  * A label formatter that is aware of the
@@ -37,10 +43,9 @@ import info.monitorenter.util.units.UnitUnchanged;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  */
 public abstract class ALabelFormatter implements ILabelFormatter {
-
   /**
    * The default unit with the factor 1 that is returned as the default for
    * {@link #getUnit()}.
@@ -50,12 +55,24 @@ public abstract class ALabelFormatter implements ILabelFormatter {
   /** The corresponding axis to format for. */
   private IAxis m_axis;
 
+  /** Support for acting as a property change event producer for listeners. */
+  protected PropertyChangeSupport m_propertyChangeSupport;
+
   /**
    * Default constructor.
    * <p>
    */
   protected ALabelFormatter() {
-    // nop
+    this.m_propertyChangeSupport = new SwingPropertyChangeSupport(this);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ILabelFormatter#addPropertyChangeListener(java.lang.String,
+   *      java.beans.PropertyChangeListener)
+   */
+  public void addPropertyChangeListener(final String propertyName,
+      final PropertyChangeListener listener) {
+    this.m_propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
   }
 
   /**
@@ -147,6 +164,15 @@ public abstract class ALabelFormatter implements ILabelFormatter {
    */
   public void initPaintIteration() {
     // nop adapter
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ILabelFormatter#removePropertyChangeListener(java.lang.String,
+   *      java.beans.PropertyChangeListener)
+   */
+  public void removePropertyChangeListener(final String property,
+      final PropertyChangeListener listener) {
+    this.m_propertyChangeSupport.removePropertyChangeListener(listener);
   }
 
   /**

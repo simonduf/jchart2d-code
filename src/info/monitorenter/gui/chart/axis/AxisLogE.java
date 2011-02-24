@@ -22,6 +22,7 @@
  */
 package info.monitorenter.gui.chart.axis;
 
+import info.monitorenter.gui.chart.ILabelFormatter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 
@@ -46,7 +47,7 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class AxisLogE
     extends AAxisTransformation {
@@ -59,6 +60,19 @@ public class AxisLogE
    */
   public AxisLogE() {
     super(new LabelFormatterSimple());
+  }
+  
+  /**
+   * Creates an instance that will the given label formatter for formatting
+   * labels.
+   * <p>
+   * 
+   * @param formatter
+   *          needed for formatting labels of this axis.
+   * 
+   */
+  public AxisLogE(final ILabelFormatter formatter) {
+    super(formatter);
   }
 
   /**

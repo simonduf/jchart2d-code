@@ -44,7 +44,7 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class AxisActionSetRangePolicy
     extends AAxisAction {
@@ -73,6 +73,9 @@ public class AxisActionSetRangePolicy
    * @param axis
    *          needed to identify the axis of the chart: one of {@link Chart2D#X},
    *          {@link Chart2D#Y}.
+   * 
+   * @param rangePolicy
+   *          the range policy to set oon the axis.
    * 
    * @param description
    *          the descriptive <code>String</code> that will be displayed by

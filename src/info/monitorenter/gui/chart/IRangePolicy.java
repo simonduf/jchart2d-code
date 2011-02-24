@@ -72,7 +72,7 @@ import java.beans.PropertyChangeListener;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  * 
  * @see info.monitorenter.gui.chart.axis.AAxis
  */
@@ -106,10 +106,9 @@ public interface IRangePolicy {
   public static final String PROPERTY_RANGE_MIN = "rangepolicy.rangemin";
 
   /**
-   * <p>
    * Registers a property change listener that will be informed about changes of
    * the property identified by the given <code>propertyName</code>.
-   * </p>
+   * <p>
    * 
    * @param propertyName
    *          the name of the property the listener is interested in
@@ -178,18 +177,18 @@ public interface IRangePolicy {
   public Range getRange();
 
   /**
-   * <p>
    * Deregisters a property change listener that has been registerd for
-   * listening on all properties.
-   * </p>
+   * listening on the given property.
+   * <p>
    * 
    * @param listener
    *          a listener that will only be informed if the property identified
    *          by the argument <code>propertyName</code> changes
    * 
-   * 
+   * @param property
+   *          the property the listener was registered to.
    */
-  public void removePropertyChangeListener(PropertyChangeListener listener);
+  public void removePropertyChangeListener(PropertyChangeListener listener, final String property);
 
   /**
    * <p>

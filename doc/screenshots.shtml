@@ -5,7 +5,7 @@
   by the generic footer via a "document.write(update);" - script.
  -->
 <script language="javascript">
-  var update="05/06/2006";
+  var update="13/10/2006";
  </script>
 <body id="screenshot">
 <div id="wrapper">
@@ -31,11 +31,10 @@
 
 	<tr>
 		<td>&nbsp;</td>
-		<td><img src="./img/showcase.png" width="341px" height="335px"
-			alt="Showcase demo application." /><br>
+		<td><img src="./img/errorbars-relative.png" width="598px" height="600px"
+			alt="Relative error bars in positive and negative y direction." /><br>
 		<br>
-		<font size="2">The showcase demo application: Interact with data
-		collectors, traces and save images.</font></td>
+		<font size="2">Relative errorbars (0.2) configured for positive and negative y direction.</font></td>
 		<td>&nbsp;</td>
 	</tr>
 

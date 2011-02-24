@@ -28,7 +28,7 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IErrorBarPainter;
 import info.monitorenter.gui.chart.IErrorBarPolicy;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.errorbars.ErrorBarPainterConfigureable;
+import info.monitorenter.gui.chart.errorbars.ErrorBarPainter;
 import info.monitorenter.gui.chart.errorbars.ErrorBarPolicyRelative;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.pointpainters.PointPainterLine;
@@ -55,7 +55,7 @@ import javax.swing.JPanel;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  */
 public final class StaticChartErrorBarLineDisc
     extends JPanel {
@@ -105,13 +105,14 @@ public final class StaticChartErrorBarLineDisc
     // errorBarPolicy.setShowPositiveXErrors(true);
     trace.setErrorBarPolicy(errorBarPolicy);
     // configure how error bars are rendered with an error bar painter:
-    IErrorBarPainter errorBarPainter = new ErrorBarPainterConfigureable();
+    IErrorBarPainter errorBarPainter = new ErrorBarPainter();
     errorBarPainter.setEndPointPainter(new PointPainterDisc());
     errorBarPainter.setEndPointColor(Color.GRAY);
-    errorBarPainter.setSegmentPainter(new PointPainterLine());
-    errorBarPainter.setSegmentColor(Color.LIGHT_GRAY);
+    errorBarPainter.setConnectionPainter(new PointPainterLine());
+    errorBarPainter.setConnectionColor(Color.LIGHT_GRAY);
     // add the painter to the policy
     errorBarPolicy.setErrorBarPainter(errorBarPainter);
+    
     // Fini: now we have configured how error bars look,
     // which parts they render (end point, start point, segment), in which
     // direction they should extend and what kind of error is calculated.

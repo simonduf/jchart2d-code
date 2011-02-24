@@ -1,5 +1,6 @@
 /*
- * ObjectRecorder, a class that takes records of an objects state using reflection.
+ * ObjectRecorder, a class that takes records of an objects state using 
+ * reflection.
  * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de.
  *
  *  This library is free software; you can redistribute it and/or
@@ -41,7 +42,7 @@ import javax.swing.event.EventListenerList;
  * state using reflection and accessibility- framework.
  * <p>
  * 
- * It's strategy is to: <br>
+ * It's strategy is to: <br/>
  * 
  * <pre>
  *  - try to set any field accessible.
@@ -58,7 +59,7 @@ import javax.swing.event.EventListenerList;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.3 $
  */
 public class ObjectRecorder extends Thread {
 
@@ -69,7 +70,7 @@ public class ObjectRecorder extends Thread {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.1 $
+   * @version $Revision: 1.3 $
    */
   public final class ObjectInspection {
     /** Timestamp of the inspection. */
@@ -194,6 +195,7 @@ public class ObjectRecorder extends Thread {
   public ObjectRecorder(final Object toinspect, final long interval) {
     this.m_interval = interval;
     this.m_toinspect = toinspect;
+    this.setDaemon(true);
     // getting the fieldnames.
     this.m_fields = toinspect.getClass().getDeclaredFields();
     this.start();

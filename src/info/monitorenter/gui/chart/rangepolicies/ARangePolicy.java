@@ -40,7 +40,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public abstract class ARangePolicy implements IRangePolicy {
 
@@ -139,9 +139,11 @@ public abstract class ARangePolicy implements IRangePolicy {
   }
 
   /**
-   * @see java.beans.PropertyChangeSupport#removePropertyChangeListener(java.beans.PropertyChangeListener)
+   * @see info.monitorenter.gui.chart.IRangePolicy#removePropertyChangeListener(java.beans.PropertyChangeListener,
+   *      java.lang.String)
    */
-  public void removePropertyChangeListener(final PropertyChangeListener listener) {
+  public void removePropertyChangeListener(final PropertyChangeListener listener,
+      final String property) {
     this.m_propertyChangeSupport.removePropertyChangeListener(listener);
   }
 

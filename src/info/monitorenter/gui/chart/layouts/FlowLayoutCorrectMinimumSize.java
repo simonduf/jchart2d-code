@@ -1,5 +1,4 @@
-/*
- *  FlowLayoutCorrectMinimumSize.java of project jchart2d, <purpose>
+/*  FlowLayoutCorrectMinimumSize.java of project jchart2d, <purpose>
  *  Copyright 2006 (C) Achim Westermann, created on 08.10.2006 14:44:18.
  *
  *  This library is free software; you can redistribute it and/or
@@ -37,13 +36,13 @@ import java.awt.Insets;
  * 
  * This clas is inspired by the sun class
  * <code>{@link java.awt.FlowLayout}</code> with modifications to the methods
- * <code>{@link #preferredLayoutSize(Container)}</code>
- * and <code>{@link #minimumLayoutSize(Container)}</code>.
+ * <code>{@link #preferredLayoutSize(Container)}</code> and
+ * <code>{@link #minimumLayoutSize(Container)}</code>.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.6 $
  */
 public class FlowLayoutCorrectMinimumSize
     extends FlowLayout {
@@ -106,26 +105,32 @@ public class FlowLayoutCorrectMinimumSize
       Insets insets = target.getInsets();
       int maxwidth = target.getWidth() - (insets.left + insets.right + hgap * 2);
 
-      Dimension dim = null;
       int nmembers = target.getComponentCount();
       boolean firstVisibleComponent = true;
 
+      int rowWidth = 0;
+      int maxRowWidth = 0;
+      int height = 0;
       for (int i = 0; i < nmembers; i++) {
         Component m = target.getComponent(i);
         if (m.isVisible()) {
           Dimension d = m.getPreferredSize();
           if (firstVisibleComponent) {
+            height = d.height;
             firstVisibleComponent = false;
-            dim = d;
+          }
+          if (rowWidth + hgap + d.width > maxwidth) {
+            maxRowWidth = Math.max(rowWidth, maxRowWidth);
+            height += (vgap + d.height);
+            rowWidth = d.width;
           } else {
-            if (dim.width + hgap + d.width > maxwidth) {
-              dim.height += (d.height + vgap);
-            } else {
-              dim.width += (hgap + d.width);
-            }
+            rowWidth += (hgap + d.width);
           }
         }
       }
+
+      Dimension dim = new Dimension(maxRowWidth, height);
+
       dim.width += insets.left + insets.right + hgap * 2;
       dim.height += insets.top + insets.bottom + vgap * 2;
       return dim;
@@ -151,26 +156,32 @@ public class FlowLayoutCorrectMinimumSize
       Insets insets = target.getInsets();
       int maxwidth = target.getWidth() - (insets.left + insets.right + hgap * 2);
 
-      Dimension dim = null;
       int nmembers = target.getComponentCount();
       boolean firstVisibleComponent = true;
 
+      int rowWidth = 0;
+      int maxRowWidth = 0;
+      int height = 0;
       for (int i = 0; i < nmembers; i++) {
         Component m = target.getComponent(i);
         if (m.isVisible()) {
           Dimension d = m.getMinimumSize();
           if (firstVisibleComponent) {
+            height = d.height;
             firstVisibleComponent = false;
-            dim = d;
+          }
+          if (rowWidth + hgap + d.width > maxwidth) {
+            maxRowWidth = Math.max(rowWidth, maxRowWidth);
+            height += (vgap + d.height);
+            rowWidth = d.width;
           } else {
-            if (dim.width + hgap + d.width > maxwidth) {
-              dim.height += (d.height + vgap);
-            } else {
-              dim.width += (hgap + d.width);
-            }
+            rowWidth += (hgap + d.width);
           }
         }
       }
+
+      Dimension dim = new Dimension(maxRowWidth, height);
+
       dim.width += insets.left + insets.right + hgap * 2;
       dim.height += insets.top + insets.bottom + vgap * 2;
       return dim;

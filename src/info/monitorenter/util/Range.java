@@ -25,29 +25,28 @@ package info.monitorenter.util;
 import java.io.Serializable;
 
 /**
- * <p>
  * A simple data structure that defines a minimum and a maximum and knows, what
  * lies within it and what not.
- * </p>
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  */
 public class Range implements Serializable {
 
+  /** The unbounded range. */
+  public static final Range RANGE_UNBOUNDED = new Range(-Double.MAX_VALUE, +Double.MAX_VALUE);
+
   /**
    * Generated for <code>serialVersionUID</code>.
    */
   private static final long serialVersionUID = 3760565278089754419L;
 
-  /** The unbounded range. */
-  public static final Range RANGE_UNBOUNDED = new Range(-Double.MAX_VALUE, +Double.MAX_VALUE);
+  /** The upper bound of this range. */
+  protected double m_max;
 
   /** The lower bound of this range. */
   protected double m_min;
-
-  /** The upper bound of this range. */
-  protected double m_max;
 
   /**
    * Constructs a new Range that covers the given bounds.
@@ -75,36 +74,6 @@ public class Range implements Serializable {
   }
 
   /**
-   * Returns the lower bound of this range.
-   * <p>
-   * 
-   * @return the lower bound of this range.
-   */
-  public double getMin() {
-    return this.m_min;
-  }
-
-  /**
-   * Returns the upper bound of this range.
-   * <p>
-   * 
-   * @return the upper bound of this range.
-   */
-  public double getMax() {
-    return this.m_max;
-  }
-
-  /**
-   * Returns the extent of this range.
-   * <p>
-   * 
-   * @return the extent of this range.
-   */
-  public double getExtent() {
-    return this.m_max - this.m_min;
-  }
-
-  /**
    * Force this Range to cover the given value.
    * <p>
    * 
@@ -128,6 +97,57 @@ public class Range implements Serializable {
   }
 
   /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  public boolean equals(final Object obj) {
+    boolean result = true;
+    if (obj instanceof Range) {
+      Range other = (Range) obj;
+      result = (this.m_max == other.m_max) && (this.m_min == other.m_min);
+    } else {
+      result = false;
+    }
+    return result;
+  }
+
+  /**
+   * Returns the extent of this range.
+   * <p>
+   * 
+   * @return the extent of this range.
+   */
+  public double getExtent() {
+    return this.m_max - this.m_min;
+  }
+
+  /**
+   * Returns the upper bound of this range.
+   * <p>
+   * 
+   * @return the upper bound of this range.
+   */
+  public double getMax() {
+    return this.m_max;
+  }
+
+  /**
+   * Returns the lower bound of this range.
+   * <p>
+   * 
+   * @return the lower bound of this range.
+   */
+  public double getMin() {
+    return this.m_min;
+  }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  public int hashCode() {
+    return this.toString().hashCode();
+  }
+
+  /**
    * Returns true if the given value is covered by this range.
    * <p>
    * 
@@ -141,6 +161,44 @@ public class Range implements Serializable {
   }
 
   /**
+   * Mutator that shifts this range to the given one.
+   * <p>
+   * 
+   * This is support for "clone" without allocations in case range instances are
+   * reused.
+   * <p>
+   * 
+   * @param r
+   *          the range to copy from.
+   */
+  public void mimic(final Range r) {
+    this.m_max = r.m_max;
+    this.m_min = r.m_min;
+  }
+
+  /**
+   * Sets the max value of this range.
+   * <p>
+   * 
+   * @param max
+   *          the max to set.
+   */
+  public final void setMax(final double max) {
+    this.m_max = max;
+  }
+
+  /**
+   * Sets the min value of this range.
+   * <p>
+   * 
+   * @param min
+   *          the min to set
+   */
+  public final void setMin(final double min) {
+    this.m_min = min;
+  }
+
+  /**
    * @see java.lang.Object#toString()
    */
   public String toString() {
@@ -149,4 +207,5 @@ public class Range implements Serializable {
     ret.append(this.m_max).append(']');
     return ret.toString();
   }
+
 }

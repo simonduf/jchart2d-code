@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-
 /**
  * A RingBuffer can be used to store a limited number of entries of any type
  * within a buffer.
@@ -52,39 +51,10 @@ import java.util.NoSuchElementException;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.3 $
  */
-public class RingBufferArray extends RingBufferArrayFast {
-
-  /**
-   * Generated <code>serialVersionUID</code>.
-   */
-  private static final long serialVersionUID = 3977861774055585593L;
-
-  /**
-   * Elements that stores elements that have to be removed due to an invocation
-   * to {@link #setBufferSize(int)} with a smaller argument than the amount of
-   * elements stored.
-   */
-  protected List m_pendingremove = new LinkedList();
-
-  /**
-   * Constructs a RingBuffer with the given size.
-   * <p>
-   * 
-   * @param aSize
-   *          the size of the buffer.
-   */
-  public RingBufferArray(final int aSize) {
-    super(aSize);
-  }
-
-  /**
-   * @see info.monitorenter.util.collections.IRingBuffer#isEmpty()
-   */
-  public boolean isEmpty() {
-    return super.isEmpty() && (this.m_pendingremove.size() == 0);
-  }
+public class RingBufferArray
+    extends RingBufferArrayFast {
 
   /**
    * Base class for ringbuffer iterators with pending removals (those who do not
@@ -94,9 +64,10 @@ public class RingBufferArray extends RingBufferArrayFast {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.1 $
+   * @version $Revision: 1.3 $
    */
-  abstract class ARingBufferIterator extends RingBufferArrayFast.ARingBufferIterator {
+  abstract class ARingBufferIterator
+      extends RingBufferArrayFast.ARingBufferIterator {
 
     /**
      * The position of the next instance of the pending removed elements to
@@ -105,14 +76,14 @@ public class RingBufferArray extends RingBufferArrayFast {
     protected int m_pendpos;
 
     /**
-     * @see info.monitorenter.util.collections.RingBufferArrayFast.RingBufferIterator#hasNext()
+     * @see java.util.Iterator#hasNext()
      */
     public boolean hasNext() {
       return super.hasNext() || this.m_pendpos >= 0;
     }
 
     /**
-     * @see info.monitorenter.util.collections.RingBufferArrayFast.RingBufferIterator#incPos()
+     * @see info.monitorenter.util.collections.RingBufferArrayFast.ARingBufferIterator#incPos()
      */
     protected void incPos() {
       // TODO Auto-generated method stub
@@ -148,18 +119,48 @@ public class RingBufferArray extends RingBufferArrayFast {
   }
 
   /**
+   * Generated <code>serialVersionUID</code>.
+   */
+  private static final long serialVersionUID = 3977861774055585593L;
+
+  /**
+   * Elements that stores elements that have to be removed due to an invocation
+   * to {@link #setBufferSize(int)} with a smaller argument than the amount of
+   * elements stored.
+   */
+  protected List m_pendingremove = new LinkedList();
+
+  /**
+   * Constructs a RingBuffer with the given size.
+   * <p>
+   * 
+   * @param aSize
+   *          the size of the buffer.
+   */
+  public RingBufferArray(final int aSize) {
+    super(aSize);
+  }
+
+  /**
+   * @see info.monitorenter.util.collections.IRingBuffer#isEmpty()
+   */
+  public boolean isEmpty() {
+    return super.isEmpty() && (this.m_pendingremove.size() == 0);
+  }
+
+  /**
    * @see info.monitorenter.util.collections.IRingBuffer#iteratorF2L()
    */
   public java.util.Iterator iteratorF2L() {
     return new ARingBufferIterator() {
       {
-        this.m_pos = (m_headpointer == 0) ? m_size : m_headpointer - 1;
+        this.m_pos = (RingBufferArray.this.m_headpointer == 0) ? RingBufferArray.this.m_size : RingBufferArray.this.m_headpointer - 1;
         this.m_pendpos = RingBufferArray.this.m_pendingremove.size() - 1;
       }
 
       protected void incPos() {
         if (this.m_pos == 0) {
-          this.m_pos = m_size;
+          this.m_pos = RingBufferArray.this.m_size;
         } else {
           this.m_pos--;
         }
@@ -174,11 +175,10 @@ public class RingBufferArray extends RingBufferArrayFast {
   public java.util.Iterator iteratorL2F() {
     return new ARingBufferIterator() {
       {
-        this.m_pos = m_tailpointer;
+        this.m_pos = RingBufferArray.this.m_tailpointer;
         this.m_pendpos = 0;
       }
 
-     
       protected void incPos() {
         if (this.m_pos == RingBufferArray.this.m_size) {
           this.m_pos = 0;

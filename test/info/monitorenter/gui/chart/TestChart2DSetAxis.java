@@ -1,5 +1,6 @@
 /*
- *  TestChart2DSetAxis.java of project jchart2d, <purpose>
+ *  TestChart2DSetAxis.java of project jchart2d, Junit test to 
+ *  ensure API contracts. 
  *  Copyright 2006 (C) Achim Westermann, created on 05.08.2006 17:14:47.
  *
  *  This library is free software; you can redistribute it and/or
@@ -33,16 +34,16 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Tests the policy of adding axis to charts.
+ * Junit test for ensuring some contracts of the API.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
-public class TestChart2DSetAxis
-    extends TestCase {
+public class TestChart2DSetAxis extends TestCase {
+
   /**
    * Defcon.
    * <p>
@@ -50,6 +51,7 @@ public class TestChart2DSetAxis
   public TestChart2DSetAxis() {
     // nop
   }
+
   /**
    * Test suite for this test class.
    * <p>
@@ -66,13 +68,20 @@ public class TestChart2DSetAxis
   }
 
   /**
-   * @param arg0
+   * Constructor with test name.
+   * <p>
+   * 
+   * @param testName
+   *          the name of the test to create.
    */
-  public TestChart2DSetAxis(String arg0) {
-    super(arg0);
-    // TODO Auto-generated constructor stub
+  public TestChart2DSetAxis(final String testName) {
+    super(testName);
   }
+
   /**
+   * Tests the policy of adding axis to charts.
+   * <p>
+   * 
    * Configures an {@link IAxis} sets it to a chart and verifies, if the
    * {@link ILabelFormatter} remains the same.
    * <p>

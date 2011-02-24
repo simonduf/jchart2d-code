@@ -63,7 +63,7 @@ import javax.swing.event.ChangeListener;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.7 $
  * 
  */
 public final class Showcase
@@ -76,7 +76,7 @@ public final class Showcase
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.5 $
+   * @version $Revision: 1.7 $
    */
   final class ControlPanel
       extends JPanel {
@@ -207,7 +207,7 @@ public final class Showcase
        * <p>
        * 
        * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-       * @version $Revision: 1.5 $
+       * @version $Revision: 1.7 $
        */
       final class ColorItem
           extends Color {
@@ -514,5 +514,4 @@ public final class Showcase
       this.getCollector().stop();
     }
   }
-
 }

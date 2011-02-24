@@ -11,7 +11,7 @@
     <property name="builddir" value="${basedir}/bin" />
     <property name="sourcedir" value="${basedir}/src" />
     <property name="sourcedir.test" value="${basedir}/test" />
-    <property name="project.version" value="2.1.0" />
+    <property name="project.version" value="2.1.2" />
 
     <!-- Taskdefs -->
     <!--
@@ -119,6 +119,7 @@
     <target name="makejarFat" depends="delete.classfiles,build">
         <jar destfile="${project.name}-${project.version}.jar"
              basedir="${builddir}"
+             update="false"
              manifest="manifest.mf">
             <include name="**/*.class" />
         </jar>
@@ -140,7 +141,8 @@
                   warn="true"
                   verbose="true"
                   ignorewarnings="true"
-                  printmapping="true">
+                  printmapping="true"
+                  allowaccessmodification="false">
             <libraryjar>
                 <pathelement path="${java.home}/lib/rt.jar" />
                 <fileset refid="allJars" />
@@ -154,13 +156,30 @@
             <!-- Filter -->
             <keep access="public" name="info.monitorenter.gui.chart.demos.*">
                 <method access="public static" name="main" />
+                <constructor />
             </keep>
             <keep access="public" name="info.monitorenter.gui.chart.*">
                 <method access="public" name="*" />
+                <constructor />
             </keep>
-            <keep access="public" name="info.monitorenter.gui.chart.errorbars.A*">
+            <keep access="public"
+                  name="info.monitorenter.gui.chart.errorbars.A*">
                 <method access="protected" name="*" />
+                <constructor />
             </keep>
+            <keep access="public"
+                  name="info.monitorenter.gui.chart.labelformatters.**">
+            </keep>
+            <!-- keep all constructors for traces -->
+            <keep name="info.monitorenter.gui.chart.traces.*">
+                <constructor />
+            </keep>
+            <!-- keep all getters and setters of classes that are preserved -->
+            <keepclassmembers>
+                <method name="get*" />
+                <method name="set*" />
+                <method name="is*" />
+            </keepclassmembers>
         </proguard>
         <!-- Delete big jar and rename shrinked to that name. -->
         <delete file="${basedir}/${project.name}-${project.version}.jar" />
@@ -216,7 +235,7 @@
             <include name="${project.name}/checkstyle.xml" />
             <include name="${project.name}/formatting.xml" />
             <include name="${project.name}/history.txt" />
-            <include name="${project.name}/doc/jchart2d.css" />
+            <include name="${project.name}/doc/docs/javadoc/jchart2d.css" />
             <!-- Works when  defaultexcludes="no" is set -->
             <include name="${project.name}/.cvsignore" />
             <!-- The eclipse builders -->
@@ -270,7 +289,7 @@
     <delete verbose="true" failonerror="false">
         <fileset refid="classfiles" />
         <fileset dir="${basedir}">
-            <include name="${project.name}.jar" />
+            <include name="${project.name}-${project.version}.jar" />
         </fileset>
     </delete>
 </target>
@@ -301,17 +320,28 @@
     -->
 <target name="rebuild" depends="delete.classfiles,build" />
 
-<target name="profile.chartpanel">
+<target name="profile.runningchart">
     <description>
-    	Runs info.monitorenter.gui.chart.layout.TestChartPanelMemoryLeak with 
+    	Runs info.monitorenter.gui.chart.demos.RunningChart with 
     	the JIP (java interactive profiler). Change project to java 1.5 
         as it requires the new -javaagent: argument. 
     </description>
+    <!-- 
+    <exec dir="${basedir}"
+            executable="java"
+            os="Windows 2000"
+            output="profiler-output.txt">
+          <arg line="-version" />
+      </exec>
+-->
     <exec dir="${basedir}"
           executable="java"
           os="Windows 2000"
           output="profiler-output.txt">
-        <arg line="-javaagent:${basedir}/ext/build/profile.jar -Xmx100M -Dprofile.properties=${basedir}/ext/build/profiler.properties -classpath ${basedir}/bin/;${basedir}/ext/build/junit.jar info.monitorenter.gui.chart.layout.TestChartPanelMemoryLeak" />
+        <arg line="-javaagent:${basedir}/ext/build/profile.jar -Xmx100M -Dprofile.properties=${basedir}/ext/build/profiler.properties -classpath ${basedir}/bin/;${basedir}/ext/build/junit.jar info.monitorenter.gui.chart.demos.RunningChart" />
+    </exec>
+    <exec dir="${basedir}" executable="java" os="Windows 2000">
+        <arg line="-classpath ${basedir}/ext/build/jipViewer.jar com.tivo.jipviewer.JipViewer profiler.xml" />
     </exec>
 </target>
 

@@ -1,6 +1,6 @@
 /*
- *
- *  LabelFormatterNumber.java  jchart2d
+ *  LabelFormatterNumber.java of jchart2d, a label formatter that 
+ *  formats the labels with a number format. 
  *  Copyright (C) Achim Westermann, created on 20.04.2005, 22:34:16
  *
  *  This library is free software; you can redistribute it and/or
@@ -26,32 +26,31 @@ package info.monitorenter.gui.chart.labelformatters;
 import info.monitorenter.gui.chart.ILabelFormatter;
 import info.monitorenter.util.Range;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
-
 /**
- * <p>
  * An ILabelFormatter that is based on a {@link java.text.NumberFormat}
- * </p>
  * <p>
  * To avoid loss of precision please choose a sufficient resolution for your
  * constructor given NumberFormat. Example: If you add new
  * {@link info.monitorenter.gui.chart.TracePoint2D} instances to the
- * {@link info.monitorenter.gui.chart.Chart2D} every second, prefer using a NumberFormat that
- * at least formats the seconds like (e.g.):
- *
+ * {@link info.monitorenter.gui.chart.Chart2D} every second, prefer using a
+ * NumberFormat that at least formats the seconds like (e.g.):
+ * 
  * <pre>
  * NumberFormat format = new java.text.SimpleDateFormat(&quot;HH:mm:ss&quot;);
  * </pre>
- *
- * </p>
- *
+ * 
+ * <p>
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
- * @version $Revision: 1.1 $
+ * 
+ * @version $Revision: 1.5 $
  */
-public class LabelFormatterNumber extends ALabelFormatter implements ILabelFormatter {
+public class LabelFormatterNumber
+    extends ALabelFormatter implements ILabelFormatter {
 
   /**
    * The internal cached minimum shift of value required to get to distinct
@@ -61,12 +60,22 @@ public class LabelFormatterNumber extends ALabelFormatter implements ILabelForma
   private double m_cachedMinValueShift = Double.MAX_VALUE;
 
   /** The number format to use. */
-  protected NumberFormat m_nf;
+  protected NumberFormat m_numberFormat;
+
+  /**
+   * Default constructor that uses the defalut constructor of
+   * <code>{@link DecimalFormat}</code>.
+   * <p>
+   * 
+   */
+  public LabelFormatterNumber() {
+    this.m_numberFormat = new DecimalFormat();
+  }
 
   /**
    * Creates a label formatter that uses the given number format.
    * <p>
-   *
+   * 
    * @param numberFormat
    *          the number format to use.
    */
@@ -75,14 +84,14 @@ public class LabelFormatterNumber extends ALabelFormatter implements ILabelForma
     if (numberFormat == null) {
       throw new IllegalArgumentException("Argument numberFormat must not be null.");
     }
-    this.m_nf = numberFormat;
+    this.setNumberFormat(numberFormat);
   }
 
   /**
    * @see info.monitorenter.gui.chart.ILabelFormatter#format(double)
    */
   public String format(final double value) {
-    return this.m_nf.format(value);
+    return this.m_numberFormat.format(value);
   }
 
   /**
@@ -137,11 +146,11 @@ public class LabelFormatterNumber extends ALabelFormatter implements ILabelForma
 
     // check if the interna numberformat would cut values and cause rendering
     // errors:
-    if (integerDigits > this.m_nf.getMaximumIntegerDigits()) {
-      this.m_nf.setMaximumIntegerDigits(integerDigits);
+    if (integerDigits > this.m_numberFormat.getMaximumIntegerDigits()) {
+      this.m_numberFormat.setMaximumIntegerDigits(integerDigits);
     }
-    if (fractionDigits > this.m_nf.getMaximumFractionDigits()) {
-      this.m_nf.setMaximumFractionDigits(fractionDigits);
+    if (fractionDigits > this.m_numberFormat.getMaximumFractionDigits()) {
+      this.m_numberFormat.setMaximumFractionDigits(fractionDigits);
     }
     // <sign> integerDigits <dot> fractionDigits:
     return 1 + integerDigits + 1 + fractionDigits;
@@ -153,17 +162,18 @@ public class LabelFormatterNumber extends ALabelFormatter implements ILabelForma
    */
   public double getMinimumValueShiftForChange() {
     if (this.m_cachedMinValueShift == Double.MAX_VALUE) {
-      int fractionDigits = this.m_nf.getMaximumFractionDigits();
+      int fractionDigits = this.m_numberFormat.getMaximumFractionDigits();
       this.m_cachedMinValueShift = 1 / Math.pow(10, fractionDigits);
     }
     return this.m_cachedMinValueShift;
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelFormatter#getNextEvenValue(double, boolean)
+   * @see info.monitorenter.gui.chart.ILabelFormatter#getNextEvenValue(double,
+   *      boolean)
    */
   public double getNextEvenValue(final double value, final boolean ceiling) {
-    double divisor = Math.pow(10, this.m_nf.getMaximumFractionDigits());
+    double divisor = Math.pow(10, this.m_numberFormat.getMaximumFractionDigits());
     if (ceiling) {
       return Math.ceil(value * divisor) / divisor;
     } else {
@@ -174,12 +184,12 @@ public class LabelFormatterNumber extends ALabelFormatter implements ILabelForma
   /**
    * Returns the interal <code>NumberFormat</code>.
    * <p>
-   *
+   * 
    * @return the interal <code>NumberFormat</code>.
-   *
+   * 
    */
   NumberFormat getNumberFormat() {
-    return this.m_nf;
+    return this.m_numberFormat;
   }
 
   /**
@@ -187,9 +197,29 @@ public class LabelFormatterNumber extends ALabelFormatter implements ILabelForma
    */
   public Number parse(final String formatted) throws NumberFormatException {
     try {
-      return this.m_nf.parse(formatted);
+      return this.m_numberFormat.parse(formatted);
     } catch (ParseException pe) {
       throw new NumberFormatException(pe.getMessage());
     }
+  }
+
+  /**
+   * Sets the number formatter to use.
+   * <p>
+   * 
+   * Fires a <code>{@link java.beans.PropertyChangeEvent}</code> to the listeners added
+   * via
+   * <code>{@link #addPropertyChangeListener(String, java.beans.PropertyChangeListener)}</code>
+   * with the property key <code>{@link #PROPERTY_FORMATCHANGE}</code>.
+   * <p>
+   * 
+   * @param numberFormat
+   *          the number formatter to use.
+   */
+  public final void setNumberFormat(final NumberFormat numberFormat) {
+    NumberFormat old = this.m_numberFormat;
+    this.m_numberFormat = numberFormat;
+    this.m_propertyChangeSupport
+        .firePropertyChange(PROPERTY_FORMATCHANGE, old, this.m_numberFormat);
   }
 }

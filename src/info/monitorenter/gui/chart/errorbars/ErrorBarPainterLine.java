@@ -31,17 +31,19 @@ import info.monitorenter.gui.chart.pointpainters.PointPainterLine;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  */
 public class ErrorBarPainterLine
-    extends ErrorBarPainterConfigureable {
+    extends ErrorBarPainter {
 
   /**
-   * 
+   * Defcon.
+   * <p>
    */
   public ErrorBarPainterLine() {
     super();
-    this.setSegmentPainter(new PointPainterLine());
+    this.setConnectionPainter(new PointPainterLine());
+    this.setStartPointPainter(null);
+    this.setEndPointPainter(null);
   }
-
 }

@@ -45,7 +45,7 @@ import javax.swing.JPanel;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public final class MinimalStaticChart
     extends JPanel {
@@ -91,8 +91,8 @@ public final class MinimalStaticChart
 
     // Add all points, as it is static:
     double time = System.currentTimeMillis();
-    for (int i = 0; i < 100; i++) {
-      trace.addPoint(time + i, i * 1000);
+    for (int i = 0; i < 120; i++) {
+      trace.addPoint(time + i, i);
     }
     // Add the trace to the chart:
     chart.addTrace(trace);

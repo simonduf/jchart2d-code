@@ -38,29 +38,30 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
-
 /**
  * A test for the <code>Chart2D</code> that constantly adds new tracepoints to
  * a <code> Trace2DLtd</code>. Mainly the runtime- scaling is interesting.
  * <p>
  * Furthermore this is an example on how to connect other components to the
- * <code>Chart2D</code> using an adaptor- class. If interested have a look 
- * on {@link info.monitorenter.reflection.ObjRecorder2Trace2DAdapter}.
+ * <code>Chart2D</code> using an adaptor- class. If interested have a look on
+ * {@link info.monitorenter.reflection.ObjRecorder2Trace2DAdapter}.
  * <p>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'> Achim Westermann </a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
-public class RunningChart extends JFrame {
+public class RunningChart
+    extends JFrame {
   /**
    * Helper class that holds an internal number that is randomly modified by a
    * Thread.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * @version $Revision: 1.3 $
+   * @version $Revision: 1.4 $
    */
-  static class RandomBumper extends Thread {
+  static class RandomBumper
+      extends Thread {
     /** Streches or compresses the grade of jumping of the internal number. */
     protected double m_factor;
 
@@ -91,6 +92,7 @@ public class RunningChart extends JFrame {
         this.m_plusminus = plusminus;
       }
       this.m_factor = factor;
+      this.setDaemon(true);
       this.start();
     }
 
@@ -175,7 +177,8 @@ public class RunningChart extends JFrame {
 
       public void windowClosing(final WindowEvent e) {
 
-        System.exit(0);
+        RunningChart.this.setVisible(false);
+        RunningChart.this.dispose();
       }
     });
     Container contentPane = getContentPane();

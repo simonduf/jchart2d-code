@@ -1,6 +1,6 @@
 /*
- *
- *  TestTrace2DLtd.java  jchart2d
+ *  TestTrace2D.java of project jchart2d - 
+ *  a test case for class TestTrace2D. 
  *  Copyright (C) Achim Westermann, created on 23.04.2005, 08:21:12
  *
  *  This library is free software; you can redistribute it and/or
@@ -23,8 +23,6 @@
  */
 package info.monitorenter.gui.chart;
 
-import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 
@@ -40,6 +38,9 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
+ * Junit test case for <code>{@link Trace2D}</code>.
+ * <p>
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  */
@@ -65,96 +66,90 @@ public class TestTrace2D
   }
 
   /**
-   * @param arg0
+   * Creates a test case with the given name.
+   * <p>
+   * 
+   * @param testName
+   *          the name of the test case.
    */
-  public TestTrace2D(String arg0) {
-    super(arg0);
-    // TODO Auto-generated constructor stub
+  public TestTrace2D(final String testName) {
+    super(testName);
   }
 
   /**
    * <p>
-   * Adds and removes a tracepoint to a trace and asserts that zero listeners
-   * are in the tracepoint afterwards.
+   * Add several <code>Trace2DLtd</code> instances and remove them (procedure
+   * two times) and check for zero traces remaining within the chart.
    * </p>
    * 
    */
-  public void testMemoryLeakTrace2PointDListeners() {
-    ITrace2D trace = new Trace2DSimple();
-    TracePoint2D point = new TracePoint2D(1, 1);
-
-  }
-
-  /**
-   * <p>
-   * Register <code>PropertyChangeListener</code> instances on a for different
-   * properties on a <code>Char2D</code>, fire property changes a check for
-   * <code>PropertyChangeEvent</code> instances being fired or not if they
-   * should not be fired.
-   * </p>
-   * 
-   */
-  public void testPropertyChange() {
+  public void testAddRemoveManyTrace2DLtd() {
     Chart2D chart = new Chart2D();
-    class PropertyChangeDetector implements PropertyChangeListener {
-      private PropertyChangeEvent event = null;
+    ArrayList traces = new ArrayList(5);
 
-      public void propertyChange(PropertyChangeEvent evt) {
-        event = evt;
-      }
-
-      public PropertyChangeEvent consumeEvent() {
-        PropertyChangeEvent ret = this.event;
-        this.event = null;
-        return ret;
-      }
+    for (int i = 0; i < 5; i++) {
+      traces.add(new Trace2DLtd("Trace " + i));
     }
 
-    // test
-    // font
-    // trigger a "font" change
-    PropertyChangeDetector fontListener = new PropertyChangeDetector();
-    chart.addPropertyChangeListener("font", fontListener);
-    chart.setFont(GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts()[0]);
-    assertNotNull(
-        "setFont(Font) on Chart2D did not trigger a PropertyChange for property \"font\". ",
-        fontListener.consumeEvent());
-    // trigger a different change:
-    chart.setBackground(Color.GREEN);
-    assertNull("setColor(Color) on Chart2D did trigger a PropertyChange for property \"font\".",
-        fontListener.consumeEvent());
+    for (int i = 0; i < 5; i++) {
+      chart.addTrace((ITrace2D) traces.get(i));
+    }
 
-    // addTrace
-    PropertyChangeDetector traceListener = new PropertyChangeDetector();
-    chart.addPropertyChangeListener(Chart2D.PROPERTY_ADD_REMOVE_TRACE, traceListener);
-    ITrace2D trace = new Trace2DSimple();
-    chart.addTrace(trace);
-    PropertyChangeEvent event = traceListener.consumeEvent();
-    assertNotNull("addTrace(ITrace2D) on Chart2D did not trigger a PropertyChange for property \""
-        + Chart2D.PROPERTY_ADD_REMOVE_TRACE + "\". ", event);
-    assertNull(
-        "addTrace(ITrace2D) on Chart2D did trigger a PropertyChangeEvent with a not-null oldValue. ",
-        event.getOldValue());
-    assertNotNull(
-        "addTrace(ITrace2D) on Chart2D did trigger a PropertyChangeEvent with a null newValue. ",
-        event.getNewValue());
-    // trigger a different change:
-    chart.setBackground(Color.GREEN);
-    assertNull("addTrace(ITrace2D) on Chart2D did trigger a PropertyChange for property \""
-        + Chart2D.PROPERTY_ADD_REMOVE_TRACE + "\". ", traceListener.consumeEvent());
+    Iterator tracesIt = chart.getTraces().iterator();
+    StringBuffer msg = new StringBuffer("[");
+    while (tracesIt.hasNext()) {
+      msg.append(((ITrace2D) tracesIt.next()).getName());
+      if (tracesIt.hasNext()) {
+        msg.append(',');
+      }
+    }
+    msg.append(']');
+    assertEquals("Wrong number of traces contained: " + msg.toString(), 5, chart.getTraces().size());
+    for (int i = 0; i < 5; i++) {
+      chart.removeTrace((ITrace2D) traces.get(i));
+    }
 
-    // removeTrace
-    chart.removeTrace(trace);
-    event = traceListener.consumeEvent();
-    assertNotNull(
-        "removeTrace(ITrace2D) on Chart2D did not trigger a PropertyChange for property \""
-            + Chart2D.PROPERTY_ADD_REMOVE_TRACE + "\". ", event);
-    assertNotNull(
-        "removeTrace(ITrace2D) on Chart2D did trigger a PropertyChangeEvent with a null oldValue. ",
-        event.getOldValue());
-    assertNull(
-        "removeTrace(ITrace2D) on Chart2D did trigger a PropertyChangeEvent with a non-null newValue. ",
-        event.getNewValue());
+    tracesIt = chart.getTraces().iterator();
+    msg = new StringBuffer("[");
+    while (tracesIt.hasNext()) {
+      msg.append(((ITrace2D) tracesIt.next()).getName());
+      if (tracesIt.hasNext()) {
+        msg.append(',');
+      }
+    }
+    msg.append(']');
+    assertEquals("Wrong number of traces contained: " + msg.toString(), 0, chart.getTraces().size());
+
+    for (int i = 0; i < 5; i++) {
+      chart.addTrace((ITrace2D) traces.get(i));
+    }
+
+    tracesIt = chart.getTraces().iterator();
+    msg = new StringBuffer("[");
+    while (tracesIt.hasNext()) {
+      msg.append(((ITrace2D) tracesIt.next()).getName());
+      if (tracesIt.hasNext()) {
+        msg.append(',');
+      }
+    }
+    msg.append(']');
+    assertEquals("Wrong number of traces contained: " + msg.toString(), 5, chart.getTraces().size());
+    for (int i = 0; i < 5; i++) {
+      chart.removeTrace((ITrace2D) traces.get(i));
+    }
+
+    tracesIt = chart.getTraces().iterator();
+    msg = new StringBuffer("[");
+    while (tracesIt.hasNext()) {
+      msg.append(((ITrace2D) tracesIt.next()).getName());
+      if (tracesIt.hasNext()) {
+        msg.append(',');
+      }
+    }
+    msg.append(']');
+
+    assertEquals("Wrong number of traces contained: " + msg.toString(), 0, chart.getTraces().size());
+
   }
 
   /**
@@ -234,78 +229,117 @@ public class TestTrace2D
   }
 
   /**
+   * Adds and removes a tracepoint to a trace and asserts that zero listeners
+   * are in the tracepoint afterwards.
    * <p>
-   * Add several <code>Trace2DLtd</code> instances and remove them (procedure
-   * two times) and check for zero traces remaining within the chart.
+   */
+  public void testMemoryLeakTrace2PointDListeners() {
+    ITrace2D trace = new Trace2DSimple();
+    TracePoint2D point = new TracePoint2D(1, 1);
+    trace.addPoint(point);
+    assertEquals(1, trace.getSize());
+    trace.removePoint(point);
+    assertEquals(0, trace.getSize());
+  }
+
+  /**
+   * <p>
+   * Register <code>PropertyChangeListener</code> instances on a for different
+   * properties on a <code>Char2D</code>, fire property changes a check for
+   * <code>PropertyChangeEvent</code> instances being fired or not if they
+   * should not be fired.
    * </p>
    * 
    */
-  public void testAddRemoveManyTrace2DLtd() {
+  public void testPropertyChange() {
     Chart2D chart = new Chart2D();
-    ArrayList traces = new ArrayList(5);
+    /**
+     * Helper class to detect if <code>{@link PropertyChangeEvent}</code> are
+     * received as expected.
+     * <p>
+     * 
+     * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
+     * 
+     * @version $Revision: 1.5 $
+     */
+    class PropertyChangeDetector implements PropertyChangeListener {
 
-    for (int i = 0; i < 5; i++) {
-      traces.add(new Trace2DLtd("Trace " + i));
-    }
+      /** The caught property change event. */
+      private PropertyChangeEvent m_event = null;
 
-    for (int i = 0; i < 5; i++) {
-      chart.addTrace((ITrace2D) traces.get(i));
-    }
+      /**
+       * Defcon.
+       * <p>
+       */
+      public PropertyChangeDetector() {
+        super();
+      }
 
-    Iterator tracesIt = chart.getTraces().iterator();
-    StringBuffer msg = new StringBuffer("[");
-    while (tracesIt.hasNext()) {
-      msg.append(((ITrace2D) tracesIt.next()).getName());
-      if (tracesIt.hasNext()) {
-        msg.append(',');
+      /**
+       * Returns the last <code>{@link PropertyChangeEvent}</code> received
+       * and clears it internally.
+       * <p>
+       * 
+       * @return the last <code>{@link PropertyChangeEvent}</code> received
+       */
+      public PropertyChangeEvent consumeEvent() {
+        PropertyChangeEvent ret = this.m_event;
+        this.m_event = null;
+        return ret;
+      }
+
+      /**
+       * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+       */
+      public void propertyChange(final PropertyChangeEvent evt) {
+        this.m_event = evt;
       }
     }
-    msg.append(']');
-    assertEquals("Wrong number of traces contained: " + msg.toString(), 5, chart.getTraces().size());
-    for (int i = 0; i < 5; i++) {
-      chart.removeTrace((ITrace2D) traces.get(i));
-    }
 
-    tracesIt = chart.getTraces().iterator();
-    msg = new StringBuffer("[");
-    while (tracesIt.hasNext()) {
-      msg.append(((ITrace2D) tracesIt.next()).getName());
-      if (tracesIt.hasNext()) {
-        msg.append(',');
-      }
-    }
-    msg.append(']');
-    assertEquals("Wrong number of traces contained: " + msg.toString(), 0, chart.getTraces().size());
+    // test
+    // font
+    // trigger a "font" change
+    PropertyChangeDetector fontListener = new PropertyChangeDetector();
+    chart.addPropertyChangeListener("font", fontListener);
+    chart.setFont(GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts()[0]);
+    assertNotNull(
+        "setFont(Font) on Chart2D did not trigger a PropertyChange for property \"font\". ",
+        fontListener.consumeEvent());
+    // trigger a different change:
+    chart.setBackground(Color.GREEN);
+    assertNull("setColor(Color) on Chart2D did trigger a PropertyChange for property \"font\".",
+        fontListener.consumeEvent());
 
-    for (int i = 0; i < 5; i++) {
-      chart.addTrace((ITrace2D) traces.get(i));
-    }
+    // addTrace
+    PropertyChangeDetector traceListener = new PropertyChangeDetector();
+    chart.addPropertyChangeListener(Chart2D.PROPERTY_ADD_REMOVE_TRACE, traceListener);
+    ITrace2D trace = new Trace2DSimple();
+    chart.addTrace(trace);
+    PropertyChangeEvent event = traceListener.consumeEvent();
+    assertNotNull("addTrace(ITrace2D) on Chart2D did not trigger a PropertyChange for property \""
+        + Chart2D.PROPERTY_ADD_REMOVE_TRACE + "\". ", event);
+    assertNull(
+        "addTrace(ITrace2D) on Chart2D did trigger a PropertyChangeEvent with a not-null oldValue. ",
+        event.getOldValue());
+    assertNotNull(
+        "addTrace(ITrace2D) on Chart2D did trigger a PropertyChangeEvent with a null newValue. ",
+        event.getNewValue());
+    // trigger a different change:
+    chart.setBackground(Color.GREEN);
+    assertNull("addTrace(ITrace2D) on Chart2D did trigger a PropertyChange for property \""
+        + Chart2D.PROPERTY_ADD_REMOVE_TRACE + "\". ", traceListener.consumeEvent());
 
-    tracesIt = chart.getTraces().iterator();
-    msg = new StringBuffer("[");
-    while (tracesIt.hasNext()) {
-      msg.append(((ITrace2D) tracesIt.next()).getName());
-      if (tracesIt.hasNext()) {
-        msg.append(',');
-      }
-    }
-    msg.append(']');
-    assertEquals("Wrong number of traces contained: " + msg.toString(), 5, chart.getTraces().size());
-    for (int i = 0; i < 5; i++) {
-      chart.removeTrace((ITrace2D) traces.get(i));
-    }
-
-    tracesIt = chart.getTraces().iterator();
-    msg = new StringBuffer("[");
-    while (tracesIt.hasNext()) {
-      msg.append(((ITrace2D) tracesIt.next()).getName());
-      if (tracesIt.hasNext()) {
-        msg.append(',');
-      }
-    }
-    msg.append(']');
-
-    assertEquals("Wrong number of traces contained: " + msg.toString(), 0, chart.getTraces().size());
-
+    // removeTrace
+    chart.removeTrace(trace);
+    event = traceListener.consumeEvent();
+    assertNotNull(
+        "removeTrace(ITrace2D) on Chart2D did not trigger a PropertyChange for property \""
+            + Chart2D.PROPERTY_ADD_REMOVE_TRACE + "\". ", event);
+    assertNotNull(
+        "removeTrace(ITrace2D) on Chart2D did trigger a PropertyChangeEvent with a null oldValue. ",
+        event.getOldValue());
+    assertNull(
+        "removeTrace(ITrace2D) on Chart2D did trigger a PropertyChangeEvent with a non-null newValue. ",
+        event.getNewValue());
   }
 }

@@ -39,7 +39,7 @@ import javax.swing.JOptionPane;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final class Trace2DActionSetName extends ATrace2DAction {
 
@@ -72,7 +72,7 @@ public final class Trace2DActionSetName extends ATrace2DAction {
    *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    *
    * @param trigger
-   *          the <code>Component</code> the modal color chooser dialog will
+   *          the <code>Component</code> the modal dialog will
    *          be related to.
    */
   public Trace2DActionSetName(final ITrace2D trace, final String description,

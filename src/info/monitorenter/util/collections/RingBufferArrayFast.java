@@ -26,7 +26,6 @@ import info.monitorenter.util.StringUtil;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-
 /**
  * Fast ringbuffer implementation.
  * <p>
@@ -57,7 +56,7 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.2 $
+   * @version $Revision: 1.4 $
    */
   protected abstract class ARingBufferIterator implements Iterator {
     /**
@@ -75,6 +74,7 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
      * 
      */
     ARingBufferIterator() {
+      // nop
     }
 
     /**
@@ -210,7 +210,7 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
       ret = this.m_buffer[this.m_tailpointer];
       this.incTail();
     }
-    if (RingBufferArray.DEBUG) {
+    if (RingBufferArrayFast.DEBUG) {
       System.out.println("add: tailpointer: " + this.m_tailpointer + " headpointer: "
           + this.m_headpointer + " size: " + this.size());
     }
@@ -300,7 +300,7 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
    * @see info.monitorenter.util.collections.IRingBuffer#isEmpty()
    */
   public boolean isEmpty() {
-    if (RingBufferArray.DEBUG) {
+    if (RingBufferArrayFast.DEBUG) {
       System.out.println("isEmpty: " + this.m_empty + " head: " + this.m_headpointer + " tail: "
           + this.m_tailpointer);
     }
@@ -312,7 +312,7 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
    */
   public boolean isFull() {
     boolean ret = (this.m_headpointer == this.m_tailpointer) && !this.m_empty;
-    if (RingBufferArray.DEBUG) {
+    if (RingBufferArrayFast.DEBUG) {
       System.out.println("isFull: " + ret + " head: " + this.m_headpointer + " tail: "
           + this.m_tailpointer);
     }
@@ -368,7 +368,7 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
       }
 
       /**
-       * @see info.monitorenter.util.collections.RingBufferArrayFast.RingBufferIterator#incPos()
+       * @see info.monitorenter.util.collections.RingBufferArrayFast.ARingBufferIterator#incPos()
        */
       protected void incPos() {
         if (this.m_pos == RingBufferArrayFast.this.m_size) {
@@ -390,7 +390,7 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
     Object ret = null;
     ret = this.m_buffer[this.m_tailpointer];
     this.incTail();
-    if (RingBufferArray.DEBUG) {
+    if (RingBufferArrayFast.DEBUG) {
       System.out.println("Removing element: " + ret + " head: " + this.m_headpointer + " tail: "
           + this.m_tailpointer + " size: " + this.size());
     }
@@ -402,7 +402,7 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
    */
   public Object[] removeAll() {
     Object[] ret = new Object[this.size()];
-    if (RingBufferArray.DEBUG) {
+    if (RingBufferArrayFast.DEBUG) {
       System.out.println("removeAll()");
     }
     for (int i = 0; i < ret.length; i++) {
@@ -430,7 +430,7 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
     boolean emptyStore = this.m_empty;
     int i = 0;
     int j = 0;
-    if (RingBufferArray.DEBUG) {
+    if (RingBufferArrayFast.DEBUG) {
       System.out.println("setBufferSize(" + newSize + "): isEmpty(): " + this.isEmpty() + " tail: "
           + this.m_tailpointer + " head: " + this.m_headpointer);
     }
@@ -480,7 +480,7 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
    */
   public String toString() {
     if (this.isEmpty()) {
-      if (RingBufferArray.DEBUG) {
+      if (RingBufferArrayFast.DEBUG) {
         System.out.println("toString(): isEmpty: true");
       }
       return "[]";

@@ -1,5 +1,4 @@
 /*
- *
  *  AdvancedStaticChart  jchart2d
  *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
  *

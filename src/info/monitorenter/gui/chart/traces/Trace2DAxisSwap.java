@@ -30,6 +30,7 @@ import info.monitorenter.gui.chart.TracePoint2D;
 
 import java.awt.Color;
 import java.awt.Stroke;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
 import java.util.Set;
@@ -48,7 +49,7 @@ import java.util.Set;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.10 $
  */
 public class Trace2DAxisSwap implements ITrace2D {
   /** The delagate instance to decorate with axis swapping. */
@@ -201,6 +202,20 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getPhysicalUnitsX()
+   */
+  public String getPhysicalUnitsX() {
+    return this.m_delegate.getPhysicalUnitsX();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getPhysicalUnitsY()
+   */
+  public String getPhysicalUnitsY() {
+    return this.m_delegate.getPhysicalUnitsY();
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#getPropertyChangeListeners(java.lang.String)
    */
   public PropertyChangeListener[] getPropertyChangeListeners(final String property) {
@@ -272,10 +287,24 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
+   * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+   */
+  public void propertyChange(final PropertyChangeEvent evt) {
+    this.m_delegate.propertyChange(evt);
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#removeAllPoints()
    */
   public void removeAllPoints() {
     this.m_delegate.removeAllPoints();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#removeErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
+   */
+  public boolean removeErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
+    return this.m_delegate.removeErrorBarPolicy(errorBarPolicy);
   }
 
   /**

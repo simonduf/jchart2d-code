@@ -27,8 +27,9 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ILabelFormatter;
 import info.monitorenter.gui.chart.IRangePolicy;
+import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.LabeledValue;
-import info.monitorenter.gui.chart.labelformatters.ALabelFormatter;
+import info.monitorenter.gui.chart.TracePoint2D;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterAutoUnits;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyUnbounded;
@@ -36,10 +37,12 @@ import info.monitorenter.util.Range;
 
 import java.awt.Dimension;
 import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
@@ -55,7 +58,7 @@ import java.util.LinkedList;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.16 $
  */
 public abstract class AAxis implements IAxis {
 
@@ -94,6 +97,7 @@ public abstract class AAxis implements IAxis {
       AAxis.this.setAccessor(this);
       this.m_chart = chart;
       this.m_rangePolicy.addPropertyChangeListener(IRangePolicy.PROPERTY_RANGE, chart);
+      AAxis.this.addPropertyChangeListener(IAxis.PROPERTY_LABELFORMATTER, chart);
     }
 
     /**
@@ -136,9 +140,13 @@ public abstract class AAxis implements IAxis {
      * Returns the maximum pixels that will be needed to paint a label.
      * <p>
      * 
+     * @param g2d
+     *          provides information about the graphics context to paint on
+     *          (e.g. font size).
+     * 
      * @return the maximum pixels that will be needed to paint a label.
      */
-    protected abstract double getMaximumPixelForLabel();
+    protected abstract double getMaximumPixelForLabel(final Graphics g2d);
 
     /**
      * @return the minimum value from the Chart2D's "axis" (X or Y) this
@@ -162,15 +170,19 @@ public abstract class AAxis implements IAxis {
      * 
      * This procedure needs the amount of pixels needed by the largest possible
      * label and relies on the implementation of
-     * {@link #getMaximumPixelForLabel()}, whose result is multiplied with the
-     * "value per pixel" quantifier.
+     * {@link #getMaximumPixelForLabel(Graphics)}, whose result is multiplied
+     * with the "value per pixel" quantifier.
      * <p>
+     * 
+     * @param g2d
+     *          the current graphic context to use in case further information
+     *          is required.
      * 
      * @return the minimum amount of increase in the value that will be needed
      *         to display all labels without overwriting each others.
      * 
      */
-    protected abstract double getMinimumValueDistanceForLabels();
+    protected abstract double getMinimumValueDistanceForLabels(final Graphics g2d);
 
     /**
      * Returns the amount of pixel avalable for displaying the values on the
@@ -223,6 +235,31 @@ public abstract class AAxis implements IAxis {
     protected abstract double getValueDistanceForPixel(int pixel);
 
     /**
+     * Scales all <code>{@link ITrace2D}</code> instances in the dimension
+     * represented by this axis.
+     * <p>
+     * This method is not deadlock - safe and should be called by the
+     * <code>{@link Chart2D}</code> only!
+     * <p>
+     */
+    protected abstract void scale();
+
+    /**
+     * Scales the given trace in the dimension represented by this axis.
+     * <p>
+     * This method is not deadlock - safe and should be called by the
+     * <code>{@link Chart2D}</code> only!
+     * <p>
+     * 
+     * @param trace
+     *          the trace to scale.
+     * 
+     * @param range
+     *          the range to use as scaler.
+     */
+    protected abstract void scaleTrace(ITrace2D trace, Range range);
+
+    /**
      * Sets the RangePolicy.
      * <p>
      * A new Range with minimum and maxium of the chart is set to it to ensure
@@ -234,7 +271,12 @@ public abstract class AAxis implements IAxis {
      */
     public void setRangePolicy(final IRangePolicy rangePolicy) {
 
-      this.m_rangePolicy.removePropertyChangeListener(this.m_chart);
+      this.m_rangePolicy.removePropertyChangeListener(this.m_chart, IRangePolicy.PROPERTY_RANGE);
+      this.m_rangePolicy
+          .removePropertyChangeListener(this.m_chart, IRangePolicy.PROPERTY_RANGE_MAX);
+      this.m_rangePolicy
+          .removePropertyChangeListener(this.m_chart, IRangePolicy.PROPERTY_RANGE_MIN);
+
       this.m_rangePolicy = rangePolicy;
       this.m_rangePolicy.addPropertyChangeListener(IRangePolicy.PROPERTY_RANGE, this.m_chart);
       this.m_rangePolicy.addPropertyChangeListener(IRangePolicy.PROPERTY_RANGE_MAX, this.m_chart);
@@ -307,7 +349,7 @@ public abstract class AAxis implements IAxis {
    * 
    * @see Chart2D#getAxisX()
    */
-  public final class XDataAccessor
+  public class XDataAccessor
       extends AAxis.AChart2DDataAccessor {
 
     /**
@@ -341,15 +383,15 @@ public abstract class AAxis implements IAxis {
      */
     public final double getMaxFromAxis() {
 
-      return m_chart.getMaxX();
+      return this.m_chart.getMaxX();
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMaximumPixelForLabel()
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMaximumPixelForLabel(Graphics)
      */
-    protected double getMaximumPixelForLabel() {
+    protected double getMaximumPixelForLabel(final Graphics g2d) {
 
-      FontMetrics fontdim = m_chart.getGraphics().getFontMetrics();
+      FontMetrics fontdim = g2d.getFontMetrics();
       int fontwidth = fontdim.charWidth('0');
       // multiply with longest possible number.
       // longest possible number is the non-fraction part of
@@ -372,13 +414,13 @@ public abstract class AAxis implements IAxis {
      */
     public final double getMinFromAxis() {
 
-      return m_chart.getMinX();
+      return this.m_chart.getMinX();
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMinimumValueDistanceForLabels()
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMinimumValueDistanceForLabels(java.awt.Graphics)
      */
-    protected final double getMinimumValueDistanceForLabels() {
+    protected final double getMinimumValueDistanceForLabels(final Graphics g2d) {
 
       Dimension d = this.m_chart.getSize();
       int pxrange = (int) d.getWidth() - 60;
@@ -390,7 +432,7 @@ public abstract class AAxis implements IAxis {
         valuerange = 10;
       }
       double pxToValue = valuerange / pxrange;
-      double ret = pxToValue * this.getMaximumPixelForLabel();
+      double ret = pxToValue * this.getMaximumPixelForLabel(g2d);
       return ret;
     }
 
@@ -414,6 +456,41 @@ public abstract class AAxis implements IAxis {
       double pxToValue = valuerangex / pxrangex;
       double ret = pxToValue * pixel;
       return ret;
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#scale()
+     */
+    protected final void scale() {
+      Iterator itTraces = this.getChart().getTraces().iterator();
+      ITrace2D trace;
+      Range range = AAxis.this.getRange();
+      while (itTraces.hasNext()) {
+        trace = (ITrace2D) itTraces.next();
+        this.scaleTrace(trace, range);
+      }
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#scaleTrace(info.monitorenter.gui.chart.ITrace2D,
+     *      info.monitorenter.util.Range)
+     */
+    protected void scaleTrace(final ITrace2D trace, final Range range) {
+      Iterator itPoints;
+      final double scaler = range.getExtent();
+      if (trace.isVisible()) {
+        itPoints = trace.iterator();
+        TracePoint2D point;
+        while (itPoints.hasNext()) {
+          point = (TracePoint2D) itPoints.next();
+          double absolute = point.getX();
+          double result = (absolute - range.getMin()) / scaler;
+          if (result == Double.NaN || Double.isInfinite(result)) {
+            result = 0;
+          }
+          point.m_scaledX = result;
+        }
+      }
     }
 
     /**
@@ -483,7 +560,8 @@ public abstract class AAxis implements IAxis {
       if (rangeX == 0) {
         // return null
       } else {
-        result = (int) (valueNormalized * rangeX + this.m_chart.getXChartStart());
+        double tmpResult = (valueNormalized * rangeX + this.m_chart.getXChartStart());
+        result = (int) Math.round(tmpResult);
       }
       return result;
     }
@@ -498,8 +576,9 @@ public abstract class AAxis implements IAxis {
    * @see Chart2D#getAxisY()
    */
 
-  public final class YDataAccessor
+  public class YDataAccessor
       extends AAxis.AChart2DDataAccessor {
+
     /**
      * Creates an instance that accesses the y axis of the given chart.
      * <p>
@@ -531,15 +610,19 @@ public abstract class AAxis implements IAxis {
      */
     public final double getMaxFromAxis() {
 
-      return m_chart.getMaxY();
+      return this.m_chart.getMaxY();
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMaximumPixelForLabel()
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMaximumPixelForLabel(Graphics) *
+     * @param g2d
+     *          the current graphic context to use in case further information
+     *          is required.
+     * 
      */
-    protected double getMaximumPixelForLabel() {
+    protected double getMaximumPixelForLabel(final Graphics g2d) {
 
-      FontMetrics fontdim = m_chart.getGraphics().getFontMetrics();
+      FontMetrics fontdim = g2d.getFontMetrics();
       int fontheight = fontdim.getHeight();
       return fontheight + 10;
     }
@@ -556,13 +639,13 @@ public abstract class AAxis implements IAxis {
      */
     public final double getMinFromAxis() {
 
-      return m_chart.getMinY();
+      return this.m_chart.getMinY();
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMinimumValueDistanceForLabels()
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMinimumValueDistanceForLabels(Graphics)
      */
-    protected final double getMinimumValueDistanceForLabels() {
+    protected final double getMinimumValueDistanceForLabels(final Graphics g2d) {
 
       Dimension d = this.m_chart.getSize();
       int pxrange = (int) d.getHeight() - 40;
@@ -574,7 +657,7 @@ public abstract class AAxis implements IAxis {
         valuerange = 10;
       }
       double pxToValue = valuerange / pxrange;
-      double ret = pxToValue * this.getMaximumPixelForLabel();
+      double ret = pxToValue * this.getMaximumPixelForLabel(g2d);
       return ret;
     }
 
@@ -598,6 +681,42 @@ public abstract class AAxis implements IAxis {
       double pxToValue = valuerangey / pxrangey;
       double ret = pxToValue * pixel;
       return ret;
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#scale()
+     */
+    protected final void scale() {
+      Iterator itTraces = this.getChart().getTraces().iterator();
+      ITrace2D trace;
+      Range range = AAxis.this.getRange();
+      while (itTraces.hasNext()) {
+        trace = (ITrace2D) itTraces.next();
+        this.scaleTrace(trace, range);
+
+      }
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#scaleTrace(info.monitorenter.gui.chart.ITrace2D,
+     *      info.monitorenter.util.Range)
+     */
+    protected void scaleTrace(final ITrace2D trace, final Range range) {
+      if (trace.isVisible()) {
+        double scaler = range.getExtent();
+        Iterator itPoints = trace.iterator();
+        TracePoint2D point;
+        while (itPoints.hasNext()) {
+          point = (TracePoint2D) itPoints.next();
+          double absolute = point.getY();
+          double result = (absolute - range.getMin()) / scaler;
+          if (result == Double.NaN || Double.isInfinite(result)) {
+            result = 0;
+          }
+          point.m_scaledY = result;
+        }
+      }
+
     }
 
     /**
@@ -718,6 +837,9 @@ public abstract class AAxis implements IAxis {
   /** Support for acting as a property change event producer for listeners. */
   private PropertyChangeSupport m_propertyChangeSupport;
 
+  /** Reused range for <code>{@link #getRange()}</code>. */
+  private Range m_reusedRange = new Range(0, 0);
+
   /**
    * Controls wether scale values are started from major ticks.
    * <p>
@@ -741,10 +863,14 @@ public abstract class AAxis implements IAxis {
    * Constructor that uses the given label formatter for formatting labels.
    * <p>
    * 
+   * @param formatter
+   *          needed for formatting labels of this axis.
+   * 
    */
-  public AAxis(final ALabelFormatter formatter) {
-    this.setFormatter(formatter);
+  public AAxis(final ILabelFormatter formatter) {
     this.m_propertyChangeSupport = new PropertyChangeSupport(this);
+    this.setFormatter(formatter);
+
   }
 
   /**
@@ -755,6 +881,19 @@ public abstract class AAxis implements IAxis {
       final PropertyChangeListener listener) {
     this.m_propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
   }
+
+  /**
+   * Template method to create the proper
+   * <code>{@link AAxis.AChart2DDataAccessor}</code> implementation.
+   * <p>
+   * 
+   * @param chart
+   *          the chart to access.
+   * 
+   * @return the proper <code>{@link AAxis.AChart2DDataAccessor}</code>
+   *         implementation.
+   */
+  protected abstract AChart2DDataAccessor createAccessor(Chart2D chart);
 
   /**
    * Returns the accessor to the chart.
@@ -786,7 +925,17 @@ public abstract class AAxis implements IAxis {
   }
 
   /**
-   * @see AAxis#getLabels(double)
+   * Returns the labels for this axis.
+   * <p>
+   * The labels will have at least the given argument <code>resolution</code>
+   * as distance in the value domain of the chart.
+   * <p>
+   * 
+   * @param resolution
+   *          the distance in the value domain of the chart that has to be at
+   *          least between to labels.
+   * 
+   * @return the labels for this axis.
    */
   protected LabeledValue[] getLabels(final double resolution) {
     if (resolution <= 0) {
@@ -813,7 +962,7 @@ public abstract class AAxis implements IAxis {
       }
       if (oldLabelName.equals(labelName)) {
         if (AAxis.DEBUG) {
-          System.out.println("constant Label");
+          System.out.println("constant Label " + labelName);
         }
       }
       label = this.roundToTicks(value, false, !firstMajorFound && this.m_startMajorTick);
@@ -825,11 +974,16 @@ public abstract class AAxis implements IAxis {
       loopStop++;
       if (firstMajorFound || !this.m_startMajorTick || label.isMajorTick()) {
         firstMajorFound = true;
-        if (value <= max) {
+        if (value <= max && value >= min) {
           collect.add(label);
-        } else {
-          // System.out.println("Dropping label (too high) : (" + label + ")
-          // [max: " + max + "]");
+        } else if (value > max) {
+          if (AAxis.DEBUG) {
+            System.out.println("Dropping label (too high) : (" + label + ")[max: " + max + "]");
+          }
+        } else if (value < min) {
+          if (AAxis.DEBUG) {
+            System.out.println("Dropping label (too low) : (" + label + ")[min: " + min + "]");
+          }
         }
       }
       value += resolution;
@@ -905,13 +1059,6 @@ public abstract class AAxis implements IAxis {
   }
 
   /**
-   * @see java.beans.PropertyChangeSupport#getPropertyChangeListeners()
-   */
-  public PropertyChangeListener[] getPropertyChangeListeners() {
-    return this.m_propertyChangeSupport.getPropertyChangeListeners();
-  }
-
-  /**
    * @see java.beans.PropertyChangeSupport#getPropertyChangeListeners(java.lang.String)
    */
   public PropertyChangeListener[] getPropertyChangeListeners(final String propertyName) {
@@ -930,25 +1077,24 @@ public abstract class AAxis implements IAxis {
    *         that will be displayable on this Axis of the Chart2D.
    * 
    * @see #setRangePolicy(IRangePolicy)
-   * @see Chart2DDataAccessor#getRange()
    * 
    */
   public final Range getRange() {
-    Range result;
     double min = this.getMin();
     double max = this.getMax();
     if (min == max) {
       max += 10;
     }
-    result = new Range(min, max);
-    return result;
+    this.m_reusedRange.setMax(max);
+    this.m_reusedRange.setMin(min);
+    return this.m_reusedRange;
   }
 
   /**
-   * See!
+   * Returns the range policy of this axis.
    * <p>
    * 
-   * @see Chart2DDataAccessor#getRangePolicy()
+   * @return the range policy of this axis.
    * 
    */
   public IRangePolicy getRangePolicy() {
@@ -961,11 +1107,15 @@ public abstract class AAxis implements IAxis {
    * {@link Chart2D} to paint labels.
    * <p>
    * 
+   * @param g2d
+   *          Provides information about the graphic context (e.g. font
+   *          metrics).
+   * 
    * @return the array of labeled values that will be used by the
    *         {@link Chart2D} to paint labels.
    */
-  public LabeledValue[] getScaleValues() {
-    double labelspacepx = this.m_accessor.getMinimumValueDistanceForLabels();
+  public LabeledValue[] getScaleValues(final Graphics g2d) {
+    double labelspacepx = this.m_accessor.getMinimumValueDistanceForLabels(g2d);
     double formattingspace = this.m_formatter.getMinimumValueShiftForChange();
     double max = Math.max(labelspacepx, formattingspace);
     return this.getLabels(max);
@@ -1078,10 +1228,12 @@ public abstract class AAxis implements IAxis {
   }
 
   /**
-   * @see java.beans.PropertyChangeSupport#removePropertyChangeListener(java.beans.PropertyChangeListener)
+   * @see java.beans.PropertyChangeSupport#removePropertyChangeListener(java.lang.String,
+   *      java.beans.PropertyChangeListener)
    */
-  public void removePropertyChangeListener(final PropertyChangeListener listener) {
-    this.m_propertyChangeSupport.removePropertyChangeListener(listener);
+  public void removePropertyChangeListener(final String property,
+      final PropertyChangeListener listener) {
+    this.m_propertyChangeSupport.removePropertyChangeListener(property, listener);
   }
 
   /**
@@ -1096,12 +1248,12 @@ public abstract class AAxis implements IAxis {
       PropertyChangeListener[] propertyChangeListeners = axis
           .getPropertyChangeListeners(IAxis.PROPERTY_PAINTGRID);
       for (int i = propertyChangeListeners.length - 1; i >= 0; i--) {
-        axis.removePropertyChangeListener(propertyChangeListeners[i]);
+        axis.removePropertyChangeListener(IAxis.PROPERTY_PAINTGRID, propertyChangeListeners[i]);
         this.addPropertyChangeListener(IAxis.PROPERTY_PAINTGRID, propertyChangeListeners[i]);
       }
       propertyChangeListeners = axis.getPropertyChangeListeners(IAxis.PROPERTY_RANGEPOLICY);
       for (int i = propertyChangeListeners.length - 1; i >= 0; i--) {
-        axis.removePropertyChangeListener(propertyChangeListeners[i]);
+        axis.removePropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, propertyChangeListeners[i]);
         this.addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, propertyChangeListeners[i]);
       }
     }
@@ -1180,10 +1332,24 @@ public abstract class AAxis implements IAxis {
     // format label string.
     ret.setLabel(this.getFormatter().format(ret.getValue()));
     // as formatting rounds too, reparse value so that it is exactly at the
-    // point the
-    // label string describes.
+    // point the label string describes.
     ret.setValue(this.getFormatter().parse(ret.getLabel()).doubleValue());
     return ret;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#scale()
+   */
+  public void scale() {
+    this.m_accessor.scale();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#scale()
+   */
+  public void scaleTrace(final ITrace2D trace) {
+    Range range = this.getRange();
+    this.m_accessor.scaleTrace(trace, range);
   }
 
   /**
@@ -1199,6 +1365,13 @@ public abstract class AAxis implements IAxis {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IAxis#setChart(info.monitorenter.gui.chart.Chart2D)
+   */
+  public void setChart(final Chart2D chart) {
+    this.m_accessor = this.createAccessor(chart);
+  }
+
+  /**
    * Sets the formatter to use for labels.
    * <p>
    * 
@@ -1207,8 +1380,26 @@ public abstract class AAxis implements IAxis {
    */
   public void setFormatter(final ILabelFormatter formatter) {
 
+    if (this.getAccessor() != null) {
+      // remove listener for this:
+      this.removePropertyChangeListener(PROPERTY_LABELFORMATTER, this.getAccessor().getChart());
+      // add listener for this:
+      this.addPropertyChangeListener(PROPERTY_LABELFORMATTER, this.getAccessor().getChart());
+      // listener to subsequent format changes:
+      if (this.m_formatter != null) {
+        // remove listener on old formatter:
+        this.m_formatter.removePropertyChangeListener(ILabelFormatter.PROPERTY_FORMATCHANGE, this
+            .getAccessor().getChart());
+      }
+      formatter.addPropertyChangeListener(ILabelFormatter.PROPERTY_FORMATCHANGE, this.getAccessor()
+          .getChart());
+    }
+    ILabelFormatter old = this.m_formatter;
+
     this.m_formatter = formatter;
+
     this.m_formatter.setAxis(this);
+    this.m_propertyChangeSupport.firePropertyChange(PROPERTY_LABELFORMATTER, old, this.m_formatter);
   }
 
   /**

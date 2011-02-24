@@ -24,10 +24,14 @@
  */
 package info.monitorenter.gui.chart.axis;
 
-import info.monitorenter.gui.chart.labelformatters.ALabelFormatter;
+import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.ILabelFormatter;
+import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.TracePoint2D;
 import info.monitorenter.util.Range;
 
 import java.awt.event.MouseEvent;
+import java.util.Iterator;
 
 /**
  * Base class for Axis implementations that transform the scale for changed
@@ -37,10 +41,125 @@ import java.awt.event.MouseEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.11 $
  */
 public abstract class AAxisTransformation
     extends AAxis {
+
+  /**
+   * 
+   * An accessor for the x axis of a chart.
+   * <p>
+   * 
+   * @author <a href="mailto:Achim.Westermann@gmx.de>Achim Westermann </a>
+   * 
+   * @see Chart2D#getAxisX()
+   */
+  public final class XDataAccessor
+      extends AAxis.XDataAccessor {
+
+    /**
+     * Creates an instance that accesses the given chart's x axis.
+     * <p>
+     * 
+     * @param chart
+     *          the chart to access.
+     */
+    public XDataAccessor(final Chart2D chart) {
+
+      super(chart);
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.XDataAccessor#scaleTrace(info.monitorenter.gui.chart.ITrace2D,
+     *      info.monitorenter.util.Range)
+     */
+    protected void scaleTrace(final ITrace2D trace, final Range range) {
+      if (trace.isVisible()) {
+        Iterator itPoints = trace.iterator();
+        TracePoint2D point;
+        double result;
+        double scaler = range.getExtent();
+        itPoints = trace.iterator();
+        while (itPoints.hasNext()) {
+          point = (TracePoint2D) itPoints.next();
+          double absolute = point.getX();
+          try {
+            result = (transform(absolute) - range.getMin());
+            result = result / scaler;
+            if (result == Double.NaN || Double.isInfinite(result)) {
+              result = 0;
+            }
+          } catch (IllegalArgumentException e) {
+            long tstamp = System.currentTimeMillis();
+            if (tstamp - AAxisTransformation.this.m_outputErrorTstamp > AAxisTransformation.OUTPUT_ERROR_THRESHHOLD) {
+              System.out.println(e.getLocalizedMessage());
+              AAxisTransformation.this.m_outputErrorTstamp = tstamp;
+            }
+            result = 0;
+          }
+          point.m_scaledX = result;
+        }
+      }
+    }
+
+  }
+
+  /**
+   * Accesses the y axis of the {@link Chart2D}.
+   * <p>
+   * 
+   * @see AAxis#setAccessor(AChart2DDataAccessor)
+   * 
+   * @see Chart2D#getAxisY()
+   */
+
+  public final class YDataAccessor
+      extends AAxis.YDataAccessor {
+
+    /**
+     * Creates an instance that accesses the y axis of the given chart.
+     * <p>
+     * 
+     * @param chart
+     *          the chart to access.
+     */
+    public YDataAccessor(final Chart2D chart) {
+      super(chart);
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.YDataAccessor#scaleTrace(info.monitorenter.gui.chart.ITrace2D,
+     *      info.monitorenter.util.Range)
+     */
+    protected void scaleTrace(final ITrace2D trace, final Range range) {
+      if (trace.isVisible()) {
+        TracePoint2D point;
+        double scaler = range.getExtent();
+        double result;
+        Iterator itPoints = trace.iterator();
+        while (itPoints.hasNext()) {
+          point = (TracePoint2D) itPoints.next();
+          double absolute = point.getY();
+          try {
+            result = (transform(absolute) - range.getMin());
+            result = result / scaler;
+            if (result == Double.NaN || Double.isInfinite(result)) {
+              result = 0;
+            }
+          } catch (IllegalArgumentException e) {
+            long tstamp = System.currentTimeMillis();
+            if (tstamp - AAxisTransformation.this.m_outputErrorTstamp > AAxisTransformation.OUTPUT_ERROR_THRESHHOLD) {
+              System.out.println(e.getLocalizedMessage());
+              AAxisTransformation.this.m_outputErrorTstamp = tstamp;
+            }
+            result = 0;
+          }
+          point.m_scaledY = result;
+        }
+      }
+    }
+  }
 
   /**
    * Internal flag that defines that only every n milliseconds a transformation
@@ -71,9 +190,23 @@ public abstract class AAxisTransformation
    * labels.
    * <p>
    * 
+   * @param formatter
+   *          needed for formatting labels of this axis.
+   * 
    */
-  public AAxisTransformation(final ALabelFormatter formatter) {
+  public AAxisTransformation(final ILabelFormatter formatter) {
     super(formatter);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.axis.AAxis#createAccessor(info.monitorenter.gui.chart.Chart2D)
+   */
+  protected AAxis.AChart2DDataAccessor createAccessor(final Chart2D chart) {
+    if (this.getDimension() == Chart2D.X) {
+      return new AAxisTransformation.XDataAccessor(chart);
+    } else {
+      return new AAxisTransformation.YDataAccessor(chart);
+    }
   }
 
   /**
@@ -103,6 +236,8 @@ public abstract class AAxisTransformation
   }
 
   /**
+   * @deprecated replaced by {@link #scaleTrace(ITrace2D)}
+   * 
    * @see info.monitorenter.gui.chart.IAxis#getScaledValue(double)
    */
   public final double getScaledValue(final double absolute) {

@@ -53,7 +53,7 @@ import java.util.Iterator;
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class Trace2DBijective
     extends Trace2DSimple {
@@ -62,6 +62,7 @@ public class Trace2DBijective
    * Defcon of this stateless instance.
    */
   public Trace2DBijective() {
+    // nop
   }
 
   /**

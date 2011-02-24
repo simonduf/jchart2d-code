@@ -23,6 +23,7 @@
 package info.monitorenter.gui.chart;
 
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
+import info.monitorenter.gui.chart.rangepolicies.RangePolicyUnbounded;
 import info.monitorenter.util.Range;
 
 import java.awt.Color;
@@ -35,65 +36,46 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 /**
- * {@link info.monitorenter.gui.chart.Chart2D} enriched by a zoom-functionality
- * in the x dimension.
+ * <code>{@link info.monitorenter.gui.chart.Chart2D}</code> enriched by a
+ * zoom-functionality in the x and y dimension.
  * <p>
  * 
  * @author Alessio Sambarino (Contributor)
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.7 $
  * 
  * @author Klaus Pesendorfer (klaus.pesendorfer@fabalabs.org)
+ * 
  * @version 1.3.2 zoom in both directions
  */
 public class ZoomableChart
     extends Chart2D implements MouseListener, MouseMotionListener {
 
   /**
-   * Generated <code>serial version UID</code>.<p>
+   * Generated <code>serial version UID</code>.
+   * <p>
    */
   private static final long serialVersionUID = 8799808716942023907L;
 
-  /** Needed to set the initial zooming area to the data bounds. */
-  private boolean m_firstTime = true;
+  // modified by Fabalabs (KP) 20060802: only zoom graph with left mouse-button
+  /**
+   * Store the last mouse click and test in the mouseDragged-method which
+   * mouse-button was clicked.
+   */
+  private int m_lastPressedButton;
 
   /** The starting point of the mouse drag operation (click, then move). */
   private Point2D m_startPoint;
 
+  /**
+   * Range policy used to zoom out to the minimum bounds that show every data
+   * point.
+   */
+  private IRangePolicy m_zoomAllRangePolicy = new RangePolicyUnbounded();
+
   /** The area to zoom. */
   private Rectangle2D m_zoomArea;
 
-  // modified by Fabalabs (KP) 20060914: zoom in both directions
-  /**
-   * The maximum value of the data bounds of this chart in x dimension that is
-   * needed to reset the zooming.
-   */
-  private double m_zoomMaxX;
-
-  /**
-   * The minimum value of the data bounds of this chart in x dimension that is
-   * needed to reset the zooming.
-   */
-  private double m_zoomMinX;
-  
-  /**
-   * The maximum value of the data bounds of this chart in y dimension that is
-   * needed to reset the zooming.
-   */
-  private double m_zoomMaxY;
-
-  /**
-   * The minimum value of the data bounds of this chart in y dimension that is
-   * needed to reset the zooming.
-   */
-  private double m_zoomMinY;
-
-  // modified by Fabalabs (KP) 20060802: only zoom graph with left mouse-button
-  /**
-   * Store the last mouse click and test in the mouseDragged-method which mouse-button was clicked.
-   */
-  private int m_lastPressedButton;
-  
   /**
    * Defcon.
    * <p>
@@ -111,71 +93,71 @@ public class ZoomableChart
    */
   public void mouseClicked(final MouseEvent e) {
     // nop.
-      
+
   }
 
   /**
    * @see java.awt.event.MouseMotionListener#mouseDragged(java.awt.event.MouseEvent)
    */
   public void mouseDragged(final MouseEvent e) {
-      // modified by Fabalabs (KP) 20060802: only zoom graph with left mouse-button
-      if (this.m_lastPressedButton != MouseEvent.BUTTON1) {
-          return;
-      }
+    // modified by Fabalabs (KP) 20060802: only zoom graph with left
+    // mouse-button
+    if (this.m_lastPressedButton != MouseEvent.BUTTON1) {
+      return;
+    }
 
-      // modified by Fabalabs (KP) 20060914: set exact reactangle for 2D-zoom
-      if ((e.getY() < 20) || (e.getY() > this.getYChartStart()) 
-              || (e.getX() < 20) || (e.getX() > this.getXChartEnd())) {
-          return;
-      }
-      double startX;
-      double endX;
-      double dimX;
-      double dimY;
-      double startY;
-      double endY;
+    // modified by Fabalabs (KP) 20060914: set exact reactangle for 2D-zoom
+    if ((e.getY() < 20) || (e.getY() > this.getYChartStart()) || (e.getX() < 20)
+        || (e.getX() > this.getXChartEnd())) {
+      return;
+    }
+    double startX;
+    double endX;
+    double dimX;
+    double dimY;
+    double startY;
+    double endY;
 
-      // x-coordinate
-      if (e.getX() > this.m_startPoint.getX()) {
-          startX = this.m_startPoint.getX();
-          endX = e.getX();
-      } else {
-          startX = e.getX();
-          endX = this.m_startPoint.getX();
-      }
+    // x-coordinate
+    if (e.getX() > this.m_startPoint.getX()) {
+      startX = this.m_startPoint.getX();
+      endX = e.getX();
+    } else {
+      startX = e.getX();
+      endX = this.m_startPoint.getX();
+    }
 
-      if (startX < this.getXChartStart()) {
-          startX = this.getXChartStart();
-      }
+    if (startX < this.getXChartStart()) {
+      startX = this.getXChartStart();
+    }
 
-      if (endX > (this.getWidth() - 20)) {
-          endX = this.getWidth() - 20;
-      }
+    if (endX > (this.getWidth() - 20)) {
+      endX = this.getWidth() - 20;
+    }
 
-      // y-coordinate
-      if (e.getY() > this.m_startPoint.getY()) {
-          startY = this.m_startPoint.getY();
-          endY = e.getY();
-      } else {
-          startY = e.getY();
-          endY = this.m_startPoint.getY();
-      }
+    // y-coordinate
+    if (e.getY() > this.m_startPoint.getY()) {
+      startY = this.m_startPoint.getY();
+      endY = e.getY();
+    } else {
+      startY = e.getY();
+      endY = this.m_startPoint.getY();
+    }
 
-      if (startY > this.getYChartStart()) {
-          startY = this.getYChartStart();
-      }
+    if (startY > this.getYChartStart()) {
+      startY = this.getYChartStart();
+    }
 
-      if (endY > (this.getHeight() - 20)) {
-          endY = this.getHeight() - 20;
-      }
+    if (endY > (this.getHeight() - 20)) {
+      endY = this.getHeight() - 20;
+    }
 
+    dimX = endX - startX;
+    dimY = endY - startY;
 
-      dimX = endX - startX;
-      dimY = endY - startY;
+    this.m_zoomArea = new Rectangle2D.Double(startX, startY, dimX, dimY);
 
-      this.m_zoomArea = new Rectangle2D.Double(startX, startY, dimX, dimY);
-
-      repaint();
+    repaint();
   }
 
   /**
@@ -205,7 +187,8 @@ public class ZoomableChart
   public void mousePressed(final MouseEvent e) {
     // modified by Fabalabs (KP) 20060914: use exact start-point for 2D-zoom
     this.m_startPoint = new Point2D.Double(e.getX(), e.getY());
-    // modified by Fabalabs (KP) 20060802: only zoom graph with left mouse-button
+    // modified by Fabalabs (KP) 20060802: only zoom graph with left
+    // mouse-button
     this.m_lastPressedButton = e.getButton();
   }
 
@@ -214,61 +197,62 @@ public class ZoomableChart
    */
   public void mouseReleased(final MouseEvent e) {
 
-      if (this.m_zoomArea == null) {
-          return;
-      }
+    if (this.m_zoomArea == null) {
+      return;
+    }
 
-      // x-coordinate
-      double startPx = this.m_zoomArea.getX();
-      double endPx = this.m_zoomArea.getX() + this.m_zoomArea.getWidth();
+    // x-coordinate
+    double startPx = this.m_zoomArea.getX();
+    double endPx = this.m_zoomArea.getX() + this.m_zoomArea.getWidth();
 
-      Range rangeX = getAxisX().getRangePolicy().getRange();
+    Range rangeX = getAxisX().getRangePolicy().getRange();
 
-      double maxX = rangeX.getMax();
-      double minX = rangeX.getMin();
+    double maxX = rangeX.getMax();
+    double minX = rangeX.getMin();
 
-      if (maxX == Double.MAX_VALUE) {
-          rangeX = getAxisX().getRange();
-          maxX = rangeX.getMax();
-          minX = rangeX.getMin();
-      }
+    if (maxX == Double.MAX_VALUE) {
+      rangeX = getAxisX().getRange();
+      maxX = rangeX.getMax();
+      minX = rangeX.getMin();
+    }
 
-      double xAxisDomain = maxX - minX;
-      double xAxisLength = getWidth() - 20 - this.getXChartStart();
+    double xAxisDomain = maxX - minX;
+    double xAxisLength = getWidth() - 20 - this.getXChartStart();
 
-      double xAxisMin = minX + xAxisDomain / xAxisLength * (startPx - this.getXChartStart());
-      double xAxisMax = minX + xAxisDomain / xAxisLength * (endPx - this.getXChartStart());
+    double xAxisMin = minX + xAxisDomain / xAxisLength * (startPx - this.getXChartStart());
+    double xAxisMax = minX + xAxisDomain / xAxisLength * (endPx - this.getXChartStart());
 
-      // modified by Fabalabs (KP) 20060914: zoom also in y-direction
-      // y-coordinate
-      double startPy = this.m_zoomArea.getY();
-      double endPy = this.m_zoomArea.getY() + this.m_zoomArea.getHeight();
+    // modified by Fabalabs (KP) 20060914: zoom also in y-direction
+    // y-coordinate
+    double startPy = this.m_zoomArea.getY();
+    double endPy = this.m_zoomArea.getY() + this.m_zoomArea.getHeight();
 
-      Range rangeY = getAxisY().getRangePolicy().getRange();
+    Range rangeY = getAxisY().getRangePolicy().getRange();
 
-      double maxY = rangeY.getMax();
-      double minY = rangeY.getMin();
+    double maxY = rangeY.getMax();
+    double minY = rangeY.getMin();
 
-      if (maxY == Double.MAX_VALUE) {
-          rangeY = getAxisY().getRange();
-          maxY = rangeY.getMax();
-          minY = rangeY.getMin();
-      }
+    if (maxY == Double.MAX_VALUE) {
+      rangeY = getAxisY().getRange();
+      maxY = rangeY.getMax();
+      minY = rangeY.getMin();
+    }
 
-      double yAxisDomain = maxY - minY;
-      double yAxisLength = getHeight() - 20 - this.getYChartEnd();
+    double yAxisDomain = maxY - minY;
+    double yAxisLength = getHeight() - 20 - this.getYChartEnd();
 
-      double yAxisMin = maxY - yAxisDomain / yAxisLength * (startPy - this.getYChartEnd());
-      double yAxisMax = maxY - yAxisDomain / yAxisLength * (endPy - this.getYChartEnd());
+    double yAxisMin = maxY - yAxisDomain / yAxisLength * (startPy - this.getYChartEnd());
+    double yAxisMax = maxY - yAxisDomain / yAxisLength * (endPy - this.getYChartEnd());
 
-      // do not zoom extremly small areas (does not work properly because of calculation)
-      if ((endPx - startPx) < 20 || (endPy - startPy) < 20) {
-          this.m_zoomArea = null;
-          repaint();
-          return;
-      }
+    // do not zoom extremly small areas (does not work properly because of
+    // calculation)
+    if ((endPx - startPx) < 20 || (endPy - startPy) < 20) {
+      this.m_zoomArea = null;
+      repaint();
+      return;
+    }
 
-      zoom(xAxisMin, xAxisMax, yAxisMin, yAxisMax);
+    zoom(xAxisMin, xAxisMax, yAxisMin, yAxisMax);
   }
 
   /**
@@ -276,60 +260,17 @@ public class ZoomableChart
    */
   public void paintComponent(final Graphics g) {
 
-      super.paintComponent(g);
+    super.paintComponent(g);
 
-      Graphics2D g2 = (Graphics2D) g;
+    Graphics2D g2 = (Graphics2D) g;
 
-      if (this.m_firstTime) {
-          Range rangeX = getAxisX().getRange();
-          this.m_zoomMinX = rangeX.getMin();
-          this.m_zoomMaxX = rangeX.getMax();
-          // modified by Fabalabs (KP) 20060914: zoom also in y-direction
-          Range rangeY = getAxisY().getRange();
-          this.m_zoomMinY = rangeY.getMin();
-          this.m_zoomMaxY = rangeY.getMax();
-          this.m_firstTime = false;
-      }
-
-      if (this.m_zoomArea != null) {
-          g2.draw(this.m_zoomArea);
-          g2.setPaint(new Color(255, 255, 0, 100));
-          g2.fill(this.m_zoomArea);
-      }
+    if (this.m_zoomArea != null) {
+      g2.draw(this.m_zoomArea);
+      g2.setPaint(new Color(255, 255, 0, 100));
+      g2.fill(this.m_zoomArea);
+    }
   }
 
-  /**
-   * Zooms to the selected bounds in both directions.
-   * modified by Fabalabs (KP) 20060914: zoom also in y-direction
-   * <p>
-   * 
-   * @param xmin
-   *          the lower x bound.
-   * 
-   * @param xmax
-   *          the upper x bound.
-   *          
-   * @param ymin
-   *          the lower y bound.
-   * 
-   * @param ymax
-   *          the upper y bound.
-   */
-  public void zoom(final double xmin, final double xmax, final double ymin, final double ymax) {
-
-    this.m_zoomArea = null;
-
-    IAxis axisX = getAxisX();
-    // IRangePolicy
-    axisX.setRangePolicy(new RangePolicyFixedViewport());
-    axisX.setRange(new Range(xmin, xmax));
-
-    IAxis axisY = getAxisY();
-    // IRangePolicy
-    axisY.setRangePolicy(new RangePolicyFixedViewport());
-    axisY.setRange(new Range(ymin, ymax));
-  }
-  
   /**
    * Zooms to the selected bounds in x-axis.
    * <p>
@@ -352,13 +293,45 @@ public class ZoomableChart
   }
 
   /**
+   * Zooms to the selected bounds in both directions. modified by Fabalabs (KP)
+   * 20060914: zoom also in y-direction
+   * <p>
+   * 
+   * @param xmin
+   *          the lower x bound.
+   * 
+   * @param xmax
+   *          the upper x bound.
+   * 
+   * @param ymin
+   *          the lower y bound.
+   * 
+   * @param ymax
+   *          the upper y bound.
+   */
+  public void zoom(final double xmin, final double xmax, final double ymin, final double ymax) {
+
+    this.m_zoomArea = null;
+
+    IAxis axisX = getAxisX();
+    // IRangePolicy
+    axisX.setRangePolicy(new RangePolicyFixedViewport());
+    axisX.setRange(new Range(xmin, xmax));
+
+    IAxis axisY = getAxisY();
+    // IRangePolicy
+    axisY.setRangePolicy(new RangePolicyFixedViewport());
+    axisY.setRange(new Range(ymin, ymax));
+  }
+
+  /**
    * Resets the zooming area to a range that displays all data.
    * <p>
    */
   public void zoomAll() {
 
-    this.getAxisX().setRangePolicy(new RangePolicyFixedViewport(new Range(this.m_zoomMinX, this.m_zoomMaxX)));
+    this.getAxisX().setRangePolicy(this.m_zoomAllRangePolicy);
     // modified by Fabalabs (KP) 20060914: zoom also in y-direction
-    this.getAxisY().setRangePolicy(new RangePolicyFixedViewport(new Range(this.m_zoomMinY, this.m_zoomMaxY)));
+    this.getAxisY().setRangePolicy(this.m_zoomAllRangePolicy);
   }
 }

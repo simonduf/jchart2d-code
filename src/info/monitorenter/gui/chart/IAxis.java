@@ -34,7 +34,7 @@ import java.beans.PropertyChangeListener;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.16 $
  */
 public interface IAxis {
   /**
@@ -45,6 +45,13 @@ public interface IAxis {
 
   /** Constant for a {@link java.beans.PropertyChangeEvent} of the range policy. */
   public static final String PROPERTY_RANGEPOLICY = "axis.rangepolicy";
+
+  /**
+   * Constant for a {@link java.beans.PropertyChangeEvent} of the label
+   * formatter.
+   */
+  public static final String PROPERTY_LABELFORMATTER = "axis.labelformatter";
+
   /**
    * Transforms the given pixel value (which has to be a awt value like
    * {@link java.awt.event.MouseEvent#getY()} into the chart value.
@@ -72,6 +79,42 @@ public interface IAxis {
    * @return the awt pixel value corresponding to the chart data value.
    */
   public int translateValueToPx(final double value);
+
+  /**
+   * Scales all <code>{@link ITrace2D}</code> instances in the dimension
+   * represented by this axis.
+   * <p>
+   * This method is not deadlock - safe and should be called by the
+   * <code>{@link Chart2D}</code> only!
+   * <p>
+   */
+  public void scale();
+
+  /**
+   * Scales the given <code>{@link ITrace2D}</code> in the dimension
+   * represented by this axis.
+   * <p>
+   * This method is not deadlock - safe and should be called by the
+   * <code>{@link Chart2D}</code> only!
+   * <p>
+   * 
+   * @param trace
+   *          the trace to scale.
+   */
+  public void scaleTrace(final ITrace2D trace);
+
+  /**
+   * Allows the chart to register itself with the axix.
+   * <p>
+   * 
+   * This is intended for <code>Chart2D</code> only!.
+   * <p>
+   * 
+   * @param chart
+   *          the chart to register itself with this axis.
+   */
+  public void setChart(Chart2D chart);
+
   /**
    * Add a listener for the given property.
    * <p>
@@ -97,6 +140,13 @@ public interface IAxis {
    * <td><code>{@link IAxis}</code> that changed</td>
    * <td><code>{@link Boolean}</code>, the old value</td>
    * <td><code>{@link Boolean}</code>, the new value</td>
+   * </tr>
+   * <tr>
+   * <td><code>{@link info.monitorenter.gui.chart.IAxis#PROPERTY_LABELFORMATTER}</code></td>
+   * <td><code>{@link IAxis}</code> that changed</td>
+   * <td><code>{@link ILabelFormatter}</code>, the old value or null if
+   * there was no formatter before. </td>
+   * <td><code>{@link ILabelFormatter}</code>, the new value</td>
    * </tr>
    * </table>
    * 
@@ -137,6 +187,8 @@ public interface IAxis {
    * Get the major tick spacing for label generation.
    * <p>
    * 
+   * @return the major tick spacing for label generation.
+   * 
    * @see #setMajorTickSpacing(double)
    * 
    */
@@ -147,7 +199,7 @@ public interface IAxis {
    * Get the minor tick spacing for label generation.
    * <p>
    * 
-   * @return he minor tick spacing for label generation.
+   * @return the minor tick spacing for label generation.
    * 
    * @see #setMinorTickSpacing(double)
    * 
@@ -155,11 +207,17 @@ public interface IAxis {
   public abstract double getMinorTickSpacing();
 
   /**
-   * @see java.beans.PropertyChangeSupport#getPropertyChangeListeners()
-   */
-  public PropertyChangeListener[] getPropertyChangeListeners();
-
-  /**
+   * Returns an array of all the listeners that were added to the this instance
+   * with {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   * <p>
+   * 
+   * @return an array of all the listeners that were added to the this instance
+   *         with
+   *         {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   * 
+   * @param propertyName
+   *          The name of the property being listened to.
+   * 
    * @see java.beans.PropertyChangeSupport#getPropertyChangeListeners(java.lang.String)
    */
   public PropertyChangeListener[] getPropertyChangeListeners(String propertyName);
@@ -181,8 +239,10 @@ public interface IAxis {
   public abstract Range getRange();
 
   /**
-   * See!
+   * Returns the range policy used by this axis.
    * <p>
+   * 
+   * @return the range policy used by this axis
    * 
    * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getRangePolicy()
    * 
@@ -234,9 +294,23 @@ public interface IAxis {
   public abstract boolean isStartMajorTick();
 
   /**
-   * @see java.beans.PropertyChangeSupport#removePropertyChangeListener(java.beans.PropertyChangeListener)
+   * Remove a PropertyChangeListener for a specific property. If
+   * <code>listener</code> was added more than once to the same event source
+   * for the specified property, it will be notified one less time after being
+   * removed. If <code>propertyName</code> is null, no exception is thrown and
+   * no action is taken. If <code>listener</code> is null, or was never added
+   * for the specified property, no exception is thrown and no action is taken.
+   * 
+   * @param property
+   *          The name of the property that was listened on.
+   * 
+   * @param listener
+   *          The PropertyChangeListener to be removed.
+   * 
+   * @see java.beans.PropertyChangeSupport#removePropertyChangeListener(java.lang.String,
+   *      java.beans.PropertyChangeListener)
    */
-  public void removePropertyChangeListener(PropertyChangeListener listener);
+  public void removePropertyChangeListener(String property, PropertyChangeListener listener);
 
   /**
    * Copies the complete state (flat, references are overtaken) of the given
@@ -246,9 +320,9 @@ public interface IAxis {
    * This is used when a new axis is set to a chart.
    * <p>
    * 
-   * @see Chart2D#setAxisX(AAxis)
+   * @see Chart2D#setAxisX(info.monitorenter.gui.chart.axis.AAxis)
    * 
-   * @see Chart2D#setAxisY(AAxis)
+   * @see Chart2D#setAxisY(info.monitorenter.gui.chart.axis.AAxis)
    * 
    * @param axis
    *          the axis to replace by this instance.
@@ -271,7 +345,7 @@ public interface IAxis {
    * Only values between 0.0 and 100.0 are allowed.
    * <p>
    * 
-   * The number that is passed-in represents the distance, measured in values,
+   * The number that is passed in represents the distance, measured in values,
    * between each major tick mark. If you have a trace with a range from 0 to 50
    * and the major tick spacing is set to 10, you will get major ticks next to
    * the following values: 0, 10, 20, 30, 40, 50.
@@ -300,9 +374,11 @@ public interface IAxis {
    * <p>
    * 
    * The number that is passed-in represents the distance, measured in values,
-   * between each major tick mark. If you have a trace with a range from 0 to 50
-   * and the major tick spacing is set to 10, you will get major ticks next to
-   * the following values: 0, 10, 20, 30, 40, 50.
+   * between each minor tick mark. If you have a trace with a range from 0 to 10
+   * and the minor tick spacing is set to 2, you will get major ticks next to
+   * the following values: 0, 2, 4, 6, 8, 10. If a major tick hits the same
+   * values the tick will be a major ticks. For this example: if a major tick
+   * spacing is set to 5 you will only get minor ticks for: 2, 4, 6, 8.
    * <p>
    * 
    * <b>Note: </b> <br>

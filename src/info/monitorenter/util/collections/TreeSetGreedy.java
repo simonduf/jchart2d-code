@@ -65,22 +65,6 @@ public class TreeSetGreedy
    * instances by their {@link IComparableProperty#getComparableProperty()}
    * number.
    * <p>
-   * Note that the given <code>Set</code> has to be the instance this
-   * <code>Comparator</code> has to be set to later. This is necessary to
-   * fulfill the contract declared for method {@link #compare(Object, Object)}.
-   * Therefore direct after creation the internal member {@link #m_delegate} has
-   * to be set from outside.
-   * <p>
-   * A {@link java.util.Set} that is sorted by this <code>Comparator</code>
-   * has to be obtained by the call: <br>
-   * 
-   * <pre>
-   * NumberPropertyComparator comparator = new NumberPropertyComparator();
-   * Set set = new TreeSet(comparator);
-   * NumberPropertyComparator.delegate = set;
-   * </pre>
-   * 
-   * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 

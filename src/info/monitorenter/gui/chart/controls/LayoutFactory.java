@@ -7,7 +7,6 @@
  *  modify it under the terms of the GNU Lesser General Public
  *  License as published by the Free Software Foundation; either
  *  version 2.1 of the License, or (at your option) any later version.
- * 
  *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -25,8 +24,10 @@ package info.monitorenter.gui.chart.controls;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
+import info.monitorenter.gui.chart.IErrorBarPolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
+import info.monitorenter.gui.chart.ZoomableChart;
 import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.axis.AxisLog10;
 import info.monitorenter.gui.chart.axis.AxisLogE;
@@ -37,20 +38,24 @@ import info.monitorenter.gui.chart.events.Chart2DActionSaveImageSingleton;
 import info.monitorenter.gui.chart.events.Chart2DActionSetAxis;
 import info.monitorenter.gui.chart.events.Chart2DActionSetCustomGridColorSingleton;
 import info.monitorenter.gui.chart.events.Chart2DActionSetGridColor;
+import info.monitorenter.gui.chart.events.ErrorBarPolicyActionShowWizard;
 import info.monitorenter.gui.chart.events.JComponentActionSetBackground;
 import info.monitorenter.gui.chart.events.JComponentActionSetCustomBackgroundSingleton;
 import info.monitorenter.gui.chart.events.JComponentActionSetCustomForegroundSingleton;
 import info.monitorenter.gui.chart.events.JComponentActionSetForeground;
 import info.monitorenter.gui.chart.events.PopupListener;
 import info.monitorenter.gui.chart.events.Trace2DActionAddRemoveTracePainter;
+import info.monitorenter.gui.chart.events.Trace2DActionRemove;
 import info.monitorenter.gui.chart.events.Trace2DActionSetColor;
 import info.monitorenter.gui.chart.events.Trace2DActionSetCustomColor;
 import info.monitorenter.gui.chart.events.Trace2DActionSetName;
+import info.monitorenter.gui.chart.events.Trace2DActionSetPhysicalUnits;
 import info.monitorenter.gui.chart.events.Trace2DActionSetStroke;
 import info.monitorenter.gui.chart.events.Trace2DActionSetVisible;
 import info.monitorenter.gui.chart.events.Trace2DActionSetZindex;
 import info.monitorenter.gui.chart.events.Trace2DActionZindexDecrease;
 import info.monitorenter.gui.chart.events.Trace2DActionZindexIncrease;
+import info.monitorenter.gui.chart.events.ZoomableChartZoomOutAction;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyForcedPoint;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyHighestValues;
@@ -71,6 +76,8 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.WeakReference;
+import java.util.Iterator;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -93,7 +100,7 @@ import javax.swing.JRadioButtonMenuItem;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.18 $
  */
 public final class LayoutFactory {
 
@@ -213,7 +220,7 @@ public final class LayoutFactory {
      * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
      * 
      * 
-     * @version $Revision: 1.11 $
+     * @version $Revision: 1.18 $
      */
     private final class JMenuOrderingAction
         extends AbstractAction {
@@ -353,6 +360,9 @@ public final class LayoutFactory {
      * @param container
      *          the instance this menu item is contained in.
      * 
+     * @param checked
+     *          the initial state of the checkbox.
+     * 
      * @see LayoutFactory.PropertyChangeCheckBoxMenuItem
      */
     public OrderingCheckBoxMenuItem(final Action action, final JMenu container,
@@ -399,6 +409,9 @@ public final class LayoutFactory {
      * 
      * @param container
      *          the instance this menu item is contained in.
+     * 
+     * @param checked
+     *          the initial state of the checkbox.
      * 
      * @see LayoutFactory.PropertyChangeCheckBoxMenuItem
      */
@@ -537,9 +550,10 @@ public final class LayoutFactory {
    * be changed from outside (unlike only changing it from the UI): Sth. that
    * seems to have been forgotten in the java implementation. It's state ({@link JCheckBoxMenuItem#setState(boolean)},
    * {@link javax.swing.AbstractButton#setSelected(boolean)}) listens on
-   * property {@link #PROPERTY_SELECTED} for changes of the state. These events
-   * are normally fired by the custom {@link Action} implementations like
-   * {@link Chart2DActionSetAxis}.
+   * property
+   * {@link LayoutFactory.PropertyChangeCheckBoxMenuItem#PROPERTY_SELECTED} for
+   * changes of the state. These events are normally fired by the custom
+   * {@link Action} implementations like {@link Chart2DActionSetAxis}.
    * <p>
    * Instances register themselves to receive events from the action given to
    * their constructor.
@@ -718,9 +732,10 @@ public final class LayoutFactory {
    * outside (unlike only changing it from the UI): Sth. that seems to have been
    * forgotten in the java implementation. It's state ({@link JCheckBoxMenuItem#setState(boolean)},
    * {@link javax.swing.AbstractButton#setSelected(boolean)}) listens on
-   * property {@link #PROPERTY_SELECTED} for changes of the state. These events
-   * are normally fired by the custom {@link Action} implementations like
-   * {@link Chart2DActionSetAxis}.
+   * property
+   * {@link LayoutFactory.PropertyChangeCheckBoxMenuItem#PROPERTY_SELECTED} for
+   * changes of the state. These events are normally fired by the custom
+   * {@link Action} implementations like {@link Chart2DActionSetAxis}.
    * <p>
    * Instances register themselves to receive events from the action given to
    * their constructor.
@@ -783,9 +798,10 @@ public final class LayoutFactory {
    * outside (unlike only changing it from the UI): Sth. that seems to have been
    * forgotten in the java implementation. It's state ({@link JCheckBoxMenuItem#setState(boolean)},
    * {@link javax.swing.AbstractButton#setSelected(boolean)}) listens on
-   * property {@link #PROPERTY_SELECTED} for changes of the state. These events
-   * are normally fired by the custom {@link Action} implementations like
-   * {@link Chart2DActionSetAxis}.
+   * property
+   * {@link LayoutFactory.PropertyChangeCheckBoxMenuItem#PROPERTY_SELECTED} for
+   * changes of the state. These events are normally fired by the custom
+   * {@link Action} implementations like {@link Chart2DActionSetAxis}.
    * <p>
    * Instances register themselves to receive events from the action given to
    * their constructor.
@@ -884,11 +900,10 @@ public final class LayoutFactory {
   }
 
   /**
-   * <p>
    * A <code>JLabel</code> that implements <code>ActionListener</code> in
    * order to change it's text color whenever the color of a corresponding
    * {@link ITrace2D} is changed.
-   * </p>
+   * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
@@ -935,8 +950,11 @@ public final class LayoutFactory {
         Font font = (Font) evt.getNewValue();
         this.setFont(font);
       } else if (propertyName.equals(ITrace2D.PROPERTY_NAME)) {
-        String name = (String) evt.getNewValue();
-        this.setText(name);
+        ITrace2D source = (ITrace2D) evt.getSource();
+        this.setText(source.getLabel());
+      } else if (propertyName.equals(ITrace2D.PROPERTY_PHYSICALUNITS)) {
+        ITrace2D source = (ITrace2D) evt.getSource();
+        this.setText(source.getLabel());
       }
     }
   }
@@ -969,7 +987,7 @@ public final class LayoutFactory {
    * Boolean flag that controls showing the range policy submenu and range menu
    * item on the x axis.
    */
-  private boolean m_showAxisXRangePolicyMenu;
+  private boolean m_showAxisXRangePolicyMenu = true;
 
   /** Boolean flag that turns on showing the x axis type menu. */
   private boolean m_showAxisXTypeMenu = true;
@@ -1000,6 +1018,15 @@ public final class LayoutFactory {
   /** Boolean flag that turns on showing the grid color menu. */
   private boolean m_showGridColorMenu = true;
 
+  /** Boolean flag that controls showing the set physical units item for traces. */
+  private boolean m_showPhysicalUnitsMenu = true;
+
+  /** Boolean flag that controls showing the remove trace menu for traces. */
+  private boolean m_showRemoveTraceMenu = false;
+
+  /** Boolean flag that controls showing the error bar wizard menu for traces. */
+  private boolean m_showErrorBarWizardMenu = true;
+
   /** Boolean flag that controls showing the save to image menu item. */
   private boolean m_showSaveImageMenu = true;
 
@@ -1020,6 +1047,9 @@ public final class LayoutFactory {
 
   /** Boolean flag that controls showing the z-index menu for traces. */
   private boolean m_showTraceZindexMenu = true;
+
+  /** Boolean flag that controls showing the zoom out menu for zoomable charts. */
+  private boolean m_showZoomOutMenu = true;
 
   /**
    * Stroke names, quick hack - no "NamedStroke" subtype.
@@ -1136,6 +1166,10 @@ public final class LayoutFactory {
    *          if true the menu will adapt it's basic UI properies (font,
    *          foreground and background color) to the given chart.
    * 
+   * @param chart
+   *          the component to adapt the UI of this menu if adaption is
+   *          requested.
+   * 
    * @return a radio button menu for choose one the available
    *         {@link info.monitorenter.gui.chart.IRangePolicy} implementations to
    *         set to it's axis identified by argument <code>axis</code>.
@@ -1247,6 +1281,10 @@ public final class LayoutFactory {
    * @param adaptUI2Chart
    *          if true the menu will adapt it's basic UI properies (font,
    *          foreground and background color) to the given chart.
+   * 
+   * @param chart
+   *          the component to adapt the UI of this menu if adaption is
+   *          requested.
    * 
    * @return a radio button menu for choose one the available axis types of the
    *         given chart that will be set to it's axis identified by argument
@@ -1434,16 +1472,37 @@ public final class LayoutFactory {
 
     // item for setVisible
     if (this.m_showTraceVisibleMenu) {
-      item = new PropertyChangeCheckBoxMenuItem(chart,
-          new Trace2DActionSetVisible(trace, "Visible"), trace.isVisible());
+      if (adaptUI2Chart) {
+        item = new PropertyChangeCheckBoxMenuItem(chart, new Trace2DActionSetVisible(trace,
+            "Visible"), trace.isVisible());
+      } else {
+        item = new SelectionAdaptJCheckBoxMenuItem(new Trace2DActionSetVisible(trace, "Visible"),
+            trace.isVisible());
+      }
       popup.add(item);
     }
 
     // item for setName
     if (this.m_showTraceNameMenu) {
-      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetName(trace, "Name", chart));
+      if (adaptUI2Chart) {
+        item = new PropertyChangeMenuItem(chart, new Trace2DActionSetName(trace, "Name", chart));
+      } else {
+        item = new JMenuItem(new Trace2DActionSetName(trace, "Name", chart));
+      }
       popup.add(item);
     }
+    // item for setPhysicalUnits
+    if (this.m_showPhysicalUnitsMenu) {
+      if (adaptUI2Chart) {
+        item = new PropertyChangeMenuItem(chart, new Trace2DActionSetPhysicalUnits(trace,
+            "Physical Units", chart));
+      } else {
+        item = new JMenuItem(new Trace2DActionSetPhysicalUnits(trace, "Physical Units", chart));
+
+      }
+      popup.add(item);
+    }
+
     // add the submenus
     if (this.m_showTraceColorMenu) {
       popup.add(this.createTraceColorMenu(chart, trace, ret, adaptUI2Chart));
@@ -1457,9 +1516,24 @@ public final class LayoutFactory {
     if (this.m_showTracePainterMenu) {
       popup.add(this.createTracePainterMenu(chart, trace, adaptUI2Chart));
     }
+    if (this.m_showRemoveTraceMenu) {
+      if (adaptUI2Chart) {
+        item = new PropertyChangeMenuItem(chart, new Trace2DActionRemove(trace, "Remove"));
+      } else {
+        item = new JMenuItem(new Trace2DActionRemove(trace, "Remove"));
+      }
+      popup.add(item);
+    }
+
+    if (this.m_showErrorBarWizardMenu) {
+      popup.add(this.createErrorBarWizardMenu(chart, trace, adaptUI2Chart));
+    }
     ret.addMouseListener(new PopupListener(popup));
+    // The label itself should always look like the trace
+    // foreground and contain the propert name.
     trace.addPropertyChangeListener(ITrace2D.PROPERTY_COLOR, ret);
     trace.addPropertyChangeListener(ITrace2D.PROPERTY_NAME, ret);
+    trace.addPropertyChangeListener(ITrace2D.PROPERTY_PHYSICALUNITS, ret);
     chart.addPropertyChangeListener(Chart2D.PROPERTY_FONT, ret);
     return ret;
   }
@@ -1657,6 +1731,8 @@ public final class LayoutFactory {
    * @param adaptUI2Chart
    *          if true the menu will adapt it's basic UI properies (font,
    *          foreground and background color) to the given chart.
+   * 
+   * @return a menu that offers various controls over the given chart.
    */
   public JMenu createMenu(final Chart2D chart, final boolean adaptUI2Chart) {
 
@@ -1725,6 +1801,8 @@ public final class LayoutFactory {
    * @param adaptUI2Chart
    *          if true the menu will adapt it's basic UI properies (font,
    *          foreground and background color) to the given chart.
+   * 
+   * @return a menu bar that offers various controls over the given chart.
    */
   public JMenuBar createMenuBar(final Chart2D chart, final boolean adaptUI2Chart) {
 
@@ -1802,6 +1880,17 @@ public final class LayoutFactory {
       }
       popup.add(item);
     }
+
+    if (chart instanceof ZoomableChart && this.m_showZoomOutMenu) {
+      if (adaptUI2Chart) {
+        item = new PropertyChangeMenuItem(chart, new ZoomableChartZoomOutAction(
+            (ZoomableChart) chart, "Zoom Out"));
+      } else {
+        item = new JMenuItem(new ZoomableChartZoomOutAction((ZoomableChart) chart, "Zoom Out"));
+      }
+      popup.add(item);
+    }
+
     chart.addMouseListener(new PopupListener(popup));
   }
 
@@ -1983,6 +2072,54 @@ public final class LayoutFactory {
     }
 
     return painterMenu;
+  }
+
+  /**
+   * Creates a menu for showing the wizard for the
+   * <code>{@link IErrorBarPolicy}</code> instances of the given trace.
+   * <p>
+   * 
+   * @param chart
+   *          needed to adapt the basic ui properties to (font, foreground
+   *          color, background color).
+   * 
+   * @param trace
+   *          the trace to show the error bar wizards of.
+   * 
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * 
+   * @return a menu that offers to show the
+   *         {@link info.monitorenter.gui.chart.controls.errorbarwizard.ErrorBarWizard}
+   *         dialogs for the given trace.
+   */
+  public JMenu createErrorBarWizardMenu(final Chart2D chart, final ITrace2D trace,
+      final boolean adaptUI2Chart) {
+    JMenuItem item;
+    // trace painters
+    JMenu errorBarMenu;
+    if (adaptUI2Chart) {
+      errorBarMenu = new PropertyChangeMenu(chart, "error bar policies");
+    } else {
+      errorBarMenu = new JMenu("error bar policies");
+    }
+
+    Set errorBarPolicies = trace.getErrorBarPolicies();
+    Iterator itErrorBarPolicies = errorBarPolicies.iterator();
+    IErrorBarPolicy errorBarPolicy;
+    while (itErrorBarPolicies.hasNext()) {
+      errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
+      if (adaptUI2Chart) {
+        item = new PropertyChangeMenuItem(chart, new ErrorBarPolicyActionShowWizard(errorBarPolicy,
+            errorBarPolicy.getClass().getName()));
+      } else {
+        item = new JMenuItem(new ErrorBarPolicyActionShowWizard(errorBarPolicy, errorBarPolicy
+            .getClass().getName()));
+      }
+      errorBarMenu.add(item);
+    }
+    return errorBarMenu;
   }
 
   /**
@@ -2192,6 +2329,20 @@ public final class LayoutFactory {
   }
 
   /**
+   * @return the showPhysicalUnitsMenu.
+   */
+  protected final boolean isShowPhysicalUnitsMenu() {
+    return this.m_showPhysicalUnitsMenu;
+  }
+
+  /**
+   * @return the showRemoveTraceMenu.
+   */
+  protected final boolean isShowRemoveTraceMenu() {
+    return this.m_showRemoveTraceMenu;
+  }
+
+  /**
    * Returns whether the save image menu is shown.
    * <p>
    * 
@@ -2241,6 +2392,13 @@ public final class LayoutFactory {
    */
   public final boolean isShowTraceZindexMenu() {
     return this.m_showTraceZindexMenu;
+  }
+
+  /**
+   * @return the showZoomOutMenu.
+   */
+  public final boolean isZoomOutMenu() {
+    return this.m_showZoomOutMenu;
   }
 
   /**
@@ -2398,6 +2556,22 @@ public final class LayoutFactory {
   }
 
   /**
+   * @param showPhysicalUnitsMenu
+   *          The showPhysicalUnitsMenu to set.
+   */
+  protected final void setShowPhysicalUnitsMenu(final boolean showPhysicalUnitsMenu) {
+    this.m_showPhysicalUnitsMenu = showPhysicalUnitsMenu;
+  }
+
+  /**
+   * @param showRemoveTraceMenu
+   *          The showRemoveTraceMenu to set.
+   */
+  protected final void setShowRemoveTraceMenu(final boolean showRemoveTraceMenu) {
+    this.m_showRemoveTraceMenu = showRemoveTraceMenu;
+  }
+
+  /**
    * Set wether the save to image menu should be created.
    * <p>
    * Configure this before using any instance of
@@ -2457,5 +2631,13 @@ public final class LayoutFactory {
    */
   public final void setShowTraceZindexMenu(final boolean showTraceZindexMenu) {
     this.m_showTraceZindexMenu = showTraceZindexMenu;
+  }
+
+  /**
+   * @param showZoomOutMenu
+   *          The showZoomOutMenu to set.
+   */
+  public final void setZoomOutMenu(final boolean showZoomOutMenu) {
+    this.m_showZoomOutMenu = showZoomOutMenu;
   }
 }

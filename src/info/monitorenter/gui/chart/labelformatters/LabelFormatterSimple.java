@@ -34,7 +34,7 @@ import java.text.DecimalFormat;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  *
  */
 public final class LabelFormatterSimple extends LabelFormatterNumber implements ILabelFormatter {
@@ -46,8 +46,8 @@ public final class LabelFormatterSimple extends LabelFormatterNumber implements 
    */
   public LabelFormatterSimple() {
     super(new DecimalFormat("#"));
-    this.m_nf.setMaximumFractionDigits(2);
-    this.m_nf.setMaximumIntegerDigits(16);
+    this.m_numberFormat.setMaximumFractionDigits(2);
+    this.m_numberFormat.setMaximumIntegerDigits(16);
   }
 
 }

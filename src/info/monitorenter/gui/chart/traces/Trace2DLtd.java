@@ -48,7 +48,7 @@ import java.util.Iterator;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class Trace2DLtd extends ATrace2D implements ITrace2D {
 
@@ -172,7 +172,7 @@ public class Trace2DLtd extends ATrace2D implements ITrace2D {
         tmpx = this.m_maxX;
         this.maxXSearch();
         this.firePropertyChange(PROPERTY_MAX_X, new Double(tmpx), new Double(this.m_maxX));
-      } else if (tmpx <= m_minX) {
+      } else if (tmpx <= this.m_minX) {
         tmpx = this.m_minX;
         this.minXSearch();
         this.firePropertyChange(PROPERTY_MIN_X, new Double(tmpx), new Double(this.m_minX));

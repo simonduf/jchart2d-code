@@ -38,20 +38,19 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
-
 /**
  * A testclass that steps through all <code>ITrace2D</code> implementations
  * and adds random or "half- random" <code>TracePoint2D</code> -instances.
  * <p>
- *
+ * 
  * You may see, that not all <code>ITrace2D</code> implementations work as
  * proposed (Trace2DLimitedReplacing). This will be fixed.
  * <p>
- *
+ * 
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
- *
- * @version $Revision: 1.1 $
+ * 
+ * @version $Revision: 1.2 $
  */
 public final class TraceTester {
 
@@ -61,19 +60,21 @@ public final class TraceTester {
    * Unlike random points half random points are not totally random samples
    * within the given bounds but repeat the same x value 10 times.
    * <p>
-   *
+   * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   *
-   *
-   * @version $Revision: 1.1 $
+   * 
+   * 
+   * @version $Revision: 1.2 $
    */
-  static class HalfRandomPoints extends TraceTester.RandomPoints {
+  static class HalfRandomPoints
+      extends TraceTester.RandomPoints {
 
     /** The old x value. */
     private double m_oldx = 0;
+
     /**
      * Defines how often the same x value is returned from subsequent calls to
-     * {@link #nextPoint(ITrace2D)}.
+     * {@link #nextPoint()}.
      */
     private double m_samexcount = 0;
 
@@ -81,19 +82,19 @@ public final class TraceTester {
      * Creates a half random point generator that will create random points
      * within ([minx..minx+maxx], [miny..miny+maxy]).
      * <p>
-     *
+     * 
      * @param minx
      *          the lower x bound for points to generate.
-     *
+     * 
      * @param maxx
      *          the x range for points to generate.
-     *
+     * 
      * @param miny
      *          the lower y bound for points to generate.
-     *
+     * 
      * @param maxy
      *          the y range for points to generate.
-     *
+     * 
      */
     HalfRandomPoints(final int minx, final int maxx, final int miny, final int maxy) {
       super(minx, maxx, miny, maxy);
@@ -101,7 +102,7 @@ public final class TraceTester {
     }
 
     /**
-     * @see info.monitorenter.gui.chart.demo.TraceTester.RandomPoints#nextPoint()
+     * @see info.monitorenter.gui.chart.demos.TraceTester.RandomPoints#nextPoint()
      */
     public TracePoint2D nextPoint() {
       if (this.m_samexcount == 10) {
@@ -116,10 +117,10 @@ public final class TraceTester {
   /**
    * Helper that creates random points.
    * <p>
-   *
+   * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   *
-   * @version $Revision: 1.1 $
+   * 
+   * @version $Revision: 1.2 $
    */
   private static class RandomPoints {
     /** Used for randomization. */
@@ -141,19 +142,19 @@ public final class TraceTester {
      * Creates a random point generator that will create random points within
      * ([minx..minx+maxx], [miny..miny+maxy]).
      * <p>
-     *
+     * 
      * @param minx
      *          the lower x bound for points to generate.
-     *
+     * 
      * @param maxx
      *          the x range for points to generate.
-     *
+     * 
      * @param miny
      *          the lower y bound for points to generate.
-     *
+     * 
      * @param maxy
      *          the y range for points to generate.
-     *
+     * 
      */
     RandomPoints(final int minx, final int maxx, final int miny, final int maxy) {
       if (minx >= maxx) {
@@ -171,7 +172,7 @@ public final class TraceTester {
     /**
      * Returns the next random point.
      * <p>
-     *
+     * 
      * @return the next random point.
      */
     public TracePoint2D nextPoint() {
@@ -185,7 +186,7 @@ public final class TraceTester {
   /**
    * Main entry.
    * <p>
-   *
+   * 
    * @param args
    *          ignored.
    */

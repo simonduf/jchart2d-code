@@ -58,7 +58,7 @@ import javax.swing.filechooser.FileFilter;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public final class Chart2DActionSaveImageSingleton
     extends AChart2DAction {
@@ -97,7 +97,7 @@ public final class Chart2DActionSaveImageSingleton
    * 
    * @param chart
    *          the target the action will work on
-   * @param colorName
+   * @param actionName
    *          the descriptive <code>String</code> that will be displayed by
    *          {@link javax.swing.AbstractButton} subclasses that get this
    *          <code>Action</code> assigned (
@@ -106,11 +106,11 @@ public final class Chart2DActionSaveImageSingleton
    * @return the single instance for the given component.
    */
   public static Chart2DActionSaveImageSingleton getInstance(final Chart2D chart,
-      final String colorName) {
+      final String actionName) {
     Chart2DActionSaveImageSingleton result = (Chart2DActionSaveImageSingleton) Chart2DActionSaveImageSingleton.instances
         .get(key(chart));
     if (result == null) {
-      result = new Chart2DActionSaveImageSingleton(chart, colorName);
+      result = new Chart2DActionSaveImageSingleton(chart, actionName);
       Chart2DActionSaveImageSingleton.instances.put(key(chart), result);
     }
     return result;

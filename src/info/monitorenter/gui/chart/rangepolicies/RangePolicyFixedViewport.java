@@ -1,6 +1,6 @@
 /*
  * RangePolicyFixedViewport.java,  <enter purpose here>.
- * Copyright (C) 2006  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,7 @@ import info.monitorenter.util.Range;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  * 
  */
 public final class RangePolicyFixedViewport extends ARangePolicy {

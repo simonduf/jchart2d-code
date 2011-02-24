@@ -29,21 +29,20 @@ import info.monitorenter.gui.chart.ITrace2D;
 import javax.swing.AbstractAction;
 
 /**
- * <p>
  * The base class that connects triggered actions with an {@link ITrace2D}
  * instance.
- * </p>
  * <p>
- * Every subclass may delegate it's constructor-given <code>ITrace2D</code>
- * instance as protected member <code>trace</code>.
- * </p>
+ * Every subclass may access it's constructor-given <code>ITrace2D</code>
+ * instance as protected member <code>m_trace</code>.
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  * 
  */
 public abstract class ATrace2DAction extends AbstractAction implements PropertyChangeListener {
+  
   /** The trace to trigger the action upon. */
   protected ITrace2D m_trace;
 

@@ -1,6 +1,6 @@
 /*
  * RangePolicyHighestValues.java,  <enter purpose here>.
- * Copyright (C) 2006  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -33,10 +33,11 @@ import info.monitorenter.util.Range;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  * 
  */
-public final class RangePolicyHighestValues extends ARangePolicy {
+public final class RangePolicyHighestValues
+    extends ARangePolicy {
 
   /** The value range for the highest values to show. */
   private double m_highestValueRangeToShow;
@@ -54,6 +55,9 @@ public final class RangePolicyHighestValues extends ARangePolicy {
    * Creates a range policy with an unconfigured range ({@link Range#RANGE_UNBOUNDED})
    * that will show the given amount of highest values.
    * <p>
+   * 
+   * @param amountHighestValues
+   *          the amount of highest values to show.
    */
   public RangePolicyHighestValues(final int amountHighestValues) {
     super();

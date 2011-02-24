@@ -1,7 +1,7 @@
 /*
  * File   : $Source: /cvsroot/jchart2d/jchart2d/test/info/monitorenter/gui/chart/test/AllTests.java,v $
- * Date   : $Date: 2006/10/08 11:55:33 $
- * Version: $Revision: 1.1 $
+ * Date   : $Date: 2007/06/30 10:03:22 $
+ * Version: $Revision: 1.2 $
  *
  * This library is part of OpenCms -
  * the Open Source Content Mananagement System
@@ -41,7 +41,7 @@ import junit.framework.TestSuite;
  * <p>
  * 
  * @author Achim Westermann
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  * 
  * @since 2.1.0
  */
@@ -67,8 +67,8 @@ public final class AllTests {
 
     suite.addTest(info.monitorenter.gui.chart.AllTests.suite());
     suite.addTest(info.monitorenter.gui.chart.axis.AllTests.suite());
-    suite.addTest(info.monitorenter.gui.chart.demo.AllTests.suite());
-    suite.addTest(info.monitorenter.gui.chart.layout.AllTests.suite());
+    suite.addTest(info.monitorenter.gui.chart.demos.AllTests.suite());
+    suite.addTest(info.monitorenter.gui.chart.layouts.AllTests.suite());
     suite.addTest(info.monitorenter.util.collections.AllTests.suite());
 
     TestSetup wrapper = new TestSetup(suite) {

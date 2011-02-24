@@ -38,7 +38,7 @@ import java.util.List;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  * 
  */
 public class TracePainterPolyline
@@ -56,6 +56,7 @@ public class TracePainterPolyline
    * 
    */
   public TracePainterPolyline() {
+    // nop
   }
 
   /**

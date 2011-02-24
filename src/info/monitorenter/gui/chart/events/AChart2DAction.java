@@ -30,18 +30,16 @@ import javax.swing.AbstractAction;
 
 
 /**
- * <p>
  * The base class that connects triggered actions with an
  * {@link info.monitorenter.gui.chart.Chart2D} instance.
- * </p>
  * <p>
  * Every subclass may delegate it's constructor-given <code>Chart2D</code>
  * instance as protected member <code>m_chart</code>.
- * </p>
+ * <p>
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  *
  */
 public abstract class AChart2DAction extends AbstractAction implements PropertyChangeListener {

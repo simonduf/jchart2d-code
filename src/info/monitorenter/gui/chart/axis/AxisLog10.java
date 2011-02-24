@@ -23,6 +23,7 @@
  */
 package info.monitorenter.gui.chart.axis;
 
+import info.monitorenter.gui.chart.ILabelFormatter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 
@@ -46,7 +47,7 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class AxisLog10
     extends AAxisTransformation {
@@ -60,6 +61,18 @@ public class AxisLog10
   public AxisLog10() {
     super(new LabelFormatterSimple());
   }
+
+  /**
+   * Constructor that uses the given label formatter for formatting labels.
+   * <p>
+   * 
+   * @param formatter
+   *          needed for formatting labels of this axis.
+   * 
+   */
+  public AxisLog10(final ILabelFormatter formatter) {
+      super(formatter);
+    }
 
   /**
    * Performs {@link Math#log10(double)} with a check for reaching infinity.

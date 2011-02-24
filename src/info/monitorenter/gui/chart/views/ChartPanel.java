@@ -229,7 +229,7 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
         this.m_labelPanel.doLayout();
       } else if (oldTrace != null && newTrace == null) {
         // search for label:
-        String labelName = oldTrace.getName();
+        String labelName = oldTrace.getLabel();
         Component[] labels = (this.m_labelPanel.getComponents());
         for (int i = 0; i < labels.length; i++) {
           if (((JLabel) labels[i]).getText().equals(labelName)) {

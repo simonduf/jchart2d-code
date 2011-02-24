@@ -1,6 +1,6 @@
 /*
- *
- *  TestAxisAutoUnit.java  jchart2d
+ *  TestAxis.java of project jchart2d, Junit test case for 
+ *  IAxis implementations.
  *  Copyright (C) Achim Westermann, created on 16.07.2005, 10:52:43
  *
  *  This library is free software; you can redistribute it and/or
@@ -23,25 +23,24 @@
  */
 package info.monitorenter.gui.chart.axis;
 
+import info.monitorenter.gui.chart.IRangePolicy;
+import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
+import info.monitorenter.gui.chart.test.ATestJChart2D;
+import info.monitorenter.gui.chart.traces.Trace2DSimple;
+import info.monitorenter.util.Range;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.TestChart2D;
-import info.monitorenter.gui.chart.TestTrace2D;
-import info.monitorenter.gui.chart.traces.Trace2DSimple;
 
 /**
+ * Junit test for <code>{@link info.monitorenter.gui.chart.IAxis}</code> implementations.
+ * <p>
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- *
+ * 
  */
-public class TestAxis extends ATestAxis {
-  /**
-   * @param arg0
-   */
-  public TestAxis(String arg0) {
-    super(arg0);
-    // TODO Auto-generated constructor stub
-  }
+public class TestAxis
+    extends ATestJChart2D {
   /**
    * Test suite for this test class.
    * <p>
@@ -59,26 +58,143 @@ public class TestAxis extends ATestAxis {
 
     return suite;
   }
-  /* (non-Javadoc)
-   * @see info.monitorenter.gui.chart.TestAxis#createAxisY()
+
+  /**
+   * Constructor with the test name.
+   * <p>
+   * 
+   * @param testname
+   *          the test name.
    */
-  protected AAxis createAxisY() {
-    // TODO Auto-generated method stub
-    return this.createAxisX();
+  public TestAxis(final String testname) {
+    super(testname);
   }
 
-  /* (non-Javadoc)
-   * @see info.monitorenter.gui.chart.TestAxis#createAxisX()
+  /**
+   * @see info.monitorenter.gui.chart.test.ATestJChart2D#createAxisX()
    */
   protected AAxis createAxisX() {
     return new AxisLinear();
   }
 
-  /* (non-Javadoc)
-   * @see info.monitorenter.gui.chart.TestAxis#createTrace()
+  /**
+   * @see info.monitorenter.gui.chart.test.ATestJChart2D#createAxisY()
+   */
+  protected AAxis createAxisY() {
+    return this.createAxisX();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.test.ATestJChart2D#createTrace()
    */
   protected ITrace2D createTrace() {
     return new Trace2DSimple();
   }
 
+  /**
+   * @see info.monitorenter.gui.chart.test.ATestJChart2D#fillTrace(info.monitorenter.gui.chart.ITrace2D)
+   */
+  protected void fillTrace(final ITrace2D trace2D) {
+    for (int i = 0; i < 101; i++) {
+      this.m_trace.addPoint(i, i);
+    }
+  }
+
+  /**
+   * Tests <code>{@link AAxis#setRangePolicy(IRangePolicy)}</code> with a
+   * <code>{@link RangePolicyFixedViewport}</code>.
+   * <p>
+   * 
+   * @see info.monitorenter.gui.chart.test.ATestJChart2D#testSetRangePolicyFixedViewPort()
+   */
+  public void testSetRangePolicyFixedViewPort() {
+    Range range = new Range(1, 2);
+    IRangePolicy rangePolicy = new RangePolicyFixedViewport(range);
+    this.m_axisX.setRangePolicy(rangePolicy);
+    Range axisRange = this.m_axisX.getRangePolicy().getRange();
+    assertEquals(range.getMin(), axisRange.getMin(), 0);
+    assertSame(range, axisRange);
+    this.m_axisY.setRangePolicy(rangePolicy);
+    axisRange = this.m_axisY.getRangePolicy().getRange();
+    assertEquals(range.getMin(), axisRange.getMin(), 0);
+    assertSame(range, axisRange);
+  }
+
+  /**
+   * Tests the method {@link AAxis.AChart2DDataAccessor#translatePxToValue(int)}.
+   * <p>
+   */
+  public void testTransformPxToValue() {
+    // X-axis
+    int pixel = 100;
+    double value = this.m_axisX.translatePxToValue(pixel);
+    int retransform = this.m_axisX.m_accessor.translateValueToPx(value);
+    assertEquals(pixel, retransform);
+
+    pixel = 222;
+    value = this.m_axisX.m_accessor.translatePxToValue(pixel);
+    retransform = this.m_axisX.m_accessor.translateValueToPx(value);
+    assertEquals(pixel, retransform);
+
+
+    pixel = 399;
+    value = this.m_axisX.m_accessor.translatePxToValue(pixel);
+    retransform = this.m_axisX.m_accessor.translateValueToPx(value);
+    assertEquals(pixel, retransform);
+
+    // direction test: higher x px have to be transformed to lower px:
+    pixel = 400;
+    double higherValue = this.m_axisX.m_accessor.translatePxToValue(pixel);
+    assertTrue(higherValue > value);
+
+    // Y-axis
+    pixel = 100;
+    value = this.m_axisY.m_accessor.translatePxToValue(pixel);
+    retransform = this.m_axisY.m_accessor.translateValueToPx(value);
+    assertEquals(pixel, retransform);
+
+    pixel = 222;
+    value = this.m_axisY.m_accessor.translatePxToValue(pixel);
+    retransform = this.m_axisY.m_accessor.translateValueToPx(value);
+    assertEquals(pixel, retransform);
+
+    // Direction test: higher y px have to be transformed to lower values,
+    // as y starts from top in awt:
+    pixel = 300;
+    higherValue = this.m_axisY.m_accessor.translatePxToValue(pixel);
+    assertTrue(higherValue < value);
+
+  }
+
+  /**
+   * Tests the method {@link AAxis.AChart2DDataAccessor#translatePxToValue(int)}.
+   * <p>
+   * 
+   */
+  public void testTransformValueToPx() {
+    double value = 50;
+    int pixel = this.m_axisX.m_accessor.translateValueToPx(value);
+    double retransform = this.m_axisX.m_accessor.translatePxToValue(pixel);
+    assertEquals(value, retransform, 3);
+
+    // the first transformation value to px will cause a change (int rounding)
+    // the 2nd try should be exact as the value matches an exact px:
+    value = retransform;
+    pixel = this.m_axisX.m_accessor.translateValueToPx(value);
+    retransform = this.m_axisX.m_accessor.translatePxToValue(pixel);
+    assertEquals(value, retransform, 0);
+
+    // y Axis
+    value = 50;
+    pixel = this.m_axisY.m_accessor.translateValueToPx(value);
+    retransform = this.m_axisY.m_accessor.translatePxToValue(pixel);
+    assertEquals(value, retransform, 3);
+
+    // the first transformation value to px will cause a change (int rounding)
+    // the 2nd try should be exact as the value matches an exact px:
+    value = retransform;
+    pixel = this.m_axisY.m_accessor.translateValueToPx(value);
+    retransform = this.m_axisY.m_accessor.translatePxToValue(pixel);
+    assertEquals(value, retransform, 0);
+  }
 }

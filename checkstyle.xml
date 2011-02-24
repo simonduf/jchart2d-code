@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	This configuration file was written by the eclipse-cs plugin configuration editor
+    This configuration file was written by the eclipse-cs plugin configuration editor
 -->
 <!--
-Checkstyle-Configuration: checkstyle-monitorenter.info
-Description:
+    Checkstyle-Configuration: checkstyle-monitorenter.info
+    Description: 
 Checkstyle-Configuration: cs-jchart2d
 Description:
 Derived from the sun checks standard. 
@@ -12,7 +12,7 @@ Derived from the sun checks standard.
 Softer:
 - No force to define numeric literals in constants. 
 - Allow catch blocks without statements.
-- Maximum line length of 120.
+- Maximum line length of 140.
 - Allow redundant modifier public in interfaces: It is no mistake to put an emphasis on sth. 
   that is implicitly set (default) in special cases (here: interface scope).
 - Allow throws declaration of unchecked Exceptions. Some higher level layer 
@@ -54,7 +54,6 @@ Harder:
             <property name="max" value="3000"/>
         </module>
         <module name="MethodLength"/>
-        <module name="ParameterNumber"/>
         <module name="EmptyForIteratorPad"/>
         <module name="MethodParamPad"/>
         <module name="NoWhitespaceAfter">
@@ -128,6 +127,11 @@ Harder:
         </module>
         <module name="DefaultComesLast">
             <metadata name="com.atlassw.tools.eclipse.checkstyle.comment" value="Force default to be last in switch."/>
+        </module>
+        <module name="ParameterNumber">
+            <metadata name="com.atlassw.tools.eclipse.checkstyle.comment" value="Allows 10 parameters just for the case that we have to overload these uncool methods (e.g. in the java sdk API)"/>
+            <property name="max" value="11"/>
+            <property name="tokens" value="CTOR_DEF,METHOD_DEF"/>
         </module>
     </module>
     <module name="PackageHtml"/>

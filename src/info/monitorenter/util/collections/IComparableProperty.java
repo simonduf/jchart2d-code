@@ -30,7 +30,7 @@ package info.monitorenter.util.collections;
  * take every new element by shifting the order of the contained operations with
  * an operation that modifies their comparable <code>Number</code>.
  * <p>
- * Note that the methods {@link #getComparableProperty()()} and
+ * Note that the methods {@link #getComparableProperty()} and
  * {@link #setComparableProperty(Number)} have to be linked to the same member
  * or source of data (if more advanced) in a way that:
  * <p>
@@ -47,7 +47,7 @@ package info.monitorenter.util.collections;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
  */
 

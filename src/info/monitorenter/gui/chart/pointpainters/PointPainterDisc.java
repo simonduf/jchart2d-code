@@ -32,7 +32,7 @@ import info.monitorenter.gui.chart.IPointPainter;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- *  @version $Revision: 1.1 $
+ *  @version $Revision: 1.2 $
  */
 public class PointPainterDisc implements IPointPainter {
 
@@ -51,13 +51,13 @@ public class PointPainterDisc implements IPointPainter {
   }
 
   /**
-   * Creates an instance with the given disc size.
+   * Creates an instance with the given disc diameter.
    *
-   * @param discSize
+   * @param diameter
    *          the disc size in pixel to use.
    */
-  public PointPainterDisc(final int discSize) {
-    this.setDiscSize(discSize);
+  public PointPainterDisc(final int diameter) {
+    this.setDiscSize(diameter);
   }
   
   /**

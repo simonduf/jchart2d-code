@@ -22,6 +22,8 @@
  */
 package info.monitorenter.gui.chart.axis;
 
+import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.ILabelFormatter;
 import info.monitorenter.util.Range;
 
 import java.awt.event.MouseEvent;
@@ -33,7 +35,7 @@ import java.awt.event.MouseEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.9 $
  */
 public class AxisLinear
     extends AAxis {
@@ -44,6 +46,29 @@ public class AxisLinear
    */
   public AxisLinear() {
     // nop
+  }
+
+  /**
+   * Constructor that uses the given label formatter for formatting labels.
+   * <p>
+   * 
+   * @param formatter
+   *          needed for formatting labels of this axis.
+   * 
+   */
+  public AxisLinear(final ILabelFormatter formatter) {
+    super(formatter);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.axis.AAxis#createAccessor(info.monitorenter.gui.chart.Chart2D)
+   */
+  protected AChart2DDataAccessor createAccessor(final Chart2D chart) {
+    if (this.getDimension() == Chart2D.X) {
+      return new AAxis.XDataAccessor(chart);
+    } else {
+      return new AAxis.YDataAccessor(chart);
+    }
   }
 
   /**
