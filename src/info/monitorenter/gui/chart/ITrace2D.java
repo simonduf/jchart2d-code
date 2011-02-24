@@ -175,7 +175,7 @@ import java.util.Set;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.20 $
  */
 public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
 
@@ -184,7 +184,7 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_COLOR = "trace.color";
+  public static final String PROPERTY_COLOR = "ITrace2D.PROPERTY_COLOR";
 
   /**
    * The property key defining any change of a localtion of a contained
@@ -198,7 +198,7 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
    * <code>{@link TracePoint2D#setLocation(double, double)}</code> of any
    * contained point is invoked.<p>
    */
-  public static final String PROPERTY_POINT_CHANGED = "trace.point.changed";
+  public static final String PROPERTY_POINT_CHANGED = "ITrace2D.PROPERTY_POINT_CHANGED";
 
   /**
    * The property key defining a change of <code>{@link IErrorBarPolicy}</code>
@@ -213,7 +213,7 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    * <p>
    */
-  public static final String PROPERTY_ERRORBARPOLICY = "trace.errorbarspolicy";
+  public static final String PROPERTY_ERRORBARPOLICY = "ITrace2D.PROPERTY_ERRORBARPOLICY";
 
   /**
    * The property key defining a change of the configuration of a contained<code>{@link IErrorBarPolicy}</code>.
@@ -226,63 +226,63 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    * <p>
    */
-  public static final String PROPERTY_ERRORBARPOLICY_CONFIGURATION = "trace.errorbarspolicy";
+  public static final String PROPERTY_ERRORBARPOLICY_CONFIGURATION = "ITrace2D.PROPERTY_ERRORBARPOLICY_CONFIGURATION";
 
   /**
    * The property key defining the <code>maxX</code> property. Use in
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_MAX_X = "trace.maxX";
+  public static final String PROPERTY_MAX_X = "ITrace2D.PROPERTY_MAX_X";
 
   /**
    * The property key defining the <code>maxY</code> property. Use in
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_MAX_Y = "trace.maxY";
+  public static final String PROPERTY_MAX_Y = "ITrace2D.PROPERTY_MAX_Y";
 
   /**
    * The property key defining the <code>minX</code> property. Use in
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_MIN_X = "trace.minX";
+  public static final String PROPERTY_MIN_X = "ITrace2D.PROPERTY_MIN_X";
 
   /**
    * The property key defining the <code>minY</code> property. Use in
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_MIN_Y = "trace.minY";
+  public static final String PROPERTY_MIN_Y = "ITrace2D.PROPERTY_MIN_Y";
 
   /**
    * The property key defining the <code>name</code> property. Use in
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_NAME = "trace.name";
+  public static final String PROPERTY_NAME = "ITrace2D.PROPERTY_NAME";
 
   /**
    * The property key defining a change in the set of
    * <code>{@link ITracePainter}</code> instances. Use in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_PAINTERS = "trace.painters";
+  public static final String PROPERTY_PAINTERS = "ITrace2D.PROPERTY_PAINTERS";
 
   /**
    * The property key defining the <code>physicalUnits</code> property. Use in
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_PHYSICALUNITS = "trace.physicalUnits";
+  public static final String PROPERTY_PHYSICALUNITS = "ITrace2D.PROPERTY_PHYSICALUNITS";
 
   /**
    * The property key defining the <code>stroke</code> property. Use in
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_STROKE = "trace.stroke";
+  public static final String PROPERTY_STROKE = "ITrace2D.PROPERTY_STROKE";
 
   /**
    * The property key defining a change in the collection of
@@ -290,14 +290,14 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_TRACEPOINT = "trace.tracepoint";
+  public static final String PROPERTY_TRACEPOINT = "ITrace2D.PROPERTY_TRACEPOINT";
 
   /**
    * The property key defining the <code>visible</code> property. Use in
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_VISIBLE = "trace.visible";
+  public static final String PROPERTY_VISIBLE = "ITrace2D.PROPERTY_VISIBLE";
 
   /**
    * The property key defining the <code>zIndex</code> property.
@@ -306,7 +306,7 @@ public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    * <p>
    */
-  public static final String PROPERTY_ZINDEX = "trace.zIndex";
+  public static final String PROPERTY_ZINDEX = "ITrace2D.PROPERTY_ZINDEX";
 
   /**
    * The minimum value for property zIndex: 0.

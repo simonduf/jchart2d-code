@@ -1,7 +1,7 @@
 /*
  * File   : $Source: /cvsroot/jchart2d/jchart2d/history.txt,v $
- * Date   : $Date: 2007/10/23 06:16:48 $
- * Version: $Revision: 1.125 $
+ * Date   : $Date: 2007/12/15 20:14:38 $
+ * Version: $Revision: 1.131 $
  *
  * This file is part of jchart2d -
  * the Open Source real time charting library.
@@ -22,6 +22,24 @@ o API change that requires refactoring.
   Note that refactoring of protected code intended for library 
   internal details will not be listed.
 
+
+jchart2d-2.2.2 - December, 13th, 2007
+
+o Extended method 
+  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
+      final int nextY, final Graphics2D g);
+  in class 
+  info.monitorenter.gui.chart.IPointPainter 
+  to 
+  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
+      final int nextY, final Graphics2D g, final TracePoint2D original);
+  to provide more information to the point painters. 
+* Fixed serious error reported by Robin Weisberg: Maximum Y value change was 
+  not detected causing an inifinte loop (100 % cpu usage) or an invalid scaling. 
+* Don't incorporate empty traces in extremum search.
+* Fixed bug #1821361: Output of ATrace2D.setName() subject to race condition?
+! A minimum repaint latency may be configured that allows to collapse many 
+  repaint requests into one (required for high performance in real time applications).
 
 jchart2d-2.2.1 - October, 22nd, 2007
 

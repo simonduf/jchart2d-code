@@ -1,4 +1,4 @@
-/*
+ /*
  *  AErrorBarPolicyConfigurable.java of project jchart2d, a basic 
  *  error bar policy implementation that allows configuration of 
  *  the dimension and direction error bars will be visible in. 
@@ -26,6 +26,7 @@ package info.monitorenter.gui.chart.errorbars;
 import info.monitorenter.gui.chart.IErrorBarPainter;
 import info.monitorenter.gui.chart.IErrorBarPolicy;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.TracePoint2D;
 
 import java.awt.Graphics2D;
 import java.beans.PropertyChangeEvent;
@@ -58,7 +59,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.18 $
  */
 public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
     PropertyChangeListener {
@@ -71,7 +72,7 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
 
   /**
    * The last x coordinate that was sent to
-   * {@link #paintPoint(int, int, int, int, Graphics2D)}.
+   * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
    * <p>
    * It will be needed at {@link #endPaintIteration(Graphics2D)} as the former
    * method only uses the first set of coordinates to store in the internal list
@@ -81,8 +82,8 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
   protected int m_lastX;
 
   /**
-   * The last � coordinate that was sent to
-   * {@link #paintPoint(int, int, int, int, Graphics2D)}.
+   * The last y coordinate that was sent to
+   * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
    * <p>
    * It will be needed at {@link #endPaintIteration(Graphics2D)} as the former
    * method only uses the first set of coordinates to store in the internal list
@@ -247,7 +248,7 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
 
   /**
    * Returns the previous X value that had to be painted by
-   * {@link #paintPoint(int, int, int, int, Graphics2D)}.
+   * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
    * <p>
    * 
    * This value will be {@link Integer#MIN_VALUE} if no previous point had to be
@@ -255,7 +256,7 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    * <p>
    * 
    * @return the previous X value that had to be painted by
-   *         {@link #paintPoint(int, int, int, int, Graphics2D)}.
+   *         {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
    */
   private int getPreviousX() {
     int result = this.m_lastX;
@@ -271,7 +272,7 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
 
   /**
    * Returns the previous Y value that had to be painted by
-   * {@link #paintPoint(int, int, int, int, Graphics2D)}.
+   * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
    * <p>
    * 
    * This value will be {@link Integer#MIN_VALUE} if no previous point had to be
@@ -279,7 +280,7 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    * <p>
    * 
    * @return the previous Y value that had to be painted by
-   *         {@link #paintPoint(int, int, int, int, Graphics2D)}.
+   *         {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
    */
   private int getPreviousY() {
     int result = this.m_lastY;
@@ -395,11 +396,10 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int,
-   *      int, java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int, int, java.awt.Graphics2D, info.monitorenter.gui.chart.TracePoint2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g) {
+      final int nextY, final Graphics2D g, final TracePoint2D original) {
 
     this.calculateErrorBar(absoluteX, absoluteY, this.m_reusedErrorBarPixel);
     Iterator it = this.m_errorBarPainters.iterator();

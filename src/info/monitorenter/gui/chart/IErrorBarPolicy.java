@@ -91,7 +91,7 @@ import javax.swing.JComponent;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public interface IErrorBarPolicy extends ITracePainter {
   /**
@@ -115,7 +115,7 @@ public interface IErrorBarPolicy extends ITracePainter {
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    * 
    */
-  public static final String PROPERTY_CONFIGURATION = "errorbarpolicy.config";
+  public static final String PROPERTY_CONFIGURATION = "IErrorBarPolicy.PROPERTY_CONFIGURATION";
 
   /**
    * Intended for {@link info.monitorenter.gui.chart.traces.ATrace2D} only that
@@ -165,7 +165,7 @@ public interface IErrorBarPolicy extends ITracePainter {
    * 
    * 
    */
-  public static final String PROPERTY_ERRORBARPAINTER = "errorbarpolicy.painter";
+  public static final String PROPERTY_ERRORBARPAINTER = "IErrorBarPolicy.PROPERTY_ERRORBARPAINTER";
 
   /**
    * Adds the given error bar painter to the list of painters of this instance.

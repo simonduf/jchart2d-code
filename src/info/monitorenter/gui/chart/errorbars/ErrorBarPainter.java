@@ -61,7 +61,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class ErrorBarPainter implements IErrorBarPainter {
 
@@ -100,7 +100,7 @@ public class ErrorBarPainter implements IErrorBarPainter {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.12 $
+   * @version $Revision: 1.13 $
    */
   private abstract class ASegment implements ISegment {
 
@@ -110,10 +110,10 @@ public class ErrorBarPainter implements IErrorBarPainter {
      * <p>
      * 
      * Note that adding property change listeners to the nested access facades
-     * of type <code>{@link ISegment}</code> accessible via
+     * of type <code>{@link IErrorBarPainter.ISegment}</code> accessible via
      * <code>getXXXSegment()</code> methods will fire the corresponding events
      * for listeners of this instance (as they delegate the calls) while they
-     * fire events for properties defined in <code>{@link ISegment}</code>
+     * fire events for properties defined in <code>{@link IErrorBarPainter.ISegment}</code>
      * too. If you register for events of this instance and for the retrieved
      * segments you will receive two
      * <code>{@link PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)}</code>
@@ -577,7 +577,8 @@ public class ErrorBarPainter implements IErrorBarPainter {
         colorChange = true;
         g2d.setColor(color);
       }
-      pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g2d);
+      // FIXME Null argument for trace point used for error bar painter!!!
+      pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g2d, null);
       if (colorChange) {
         g2d.setColor(backupColor);
       }

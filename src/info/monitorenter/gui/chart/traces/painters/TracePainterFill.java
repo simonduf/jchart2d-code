@@ -22,6 +22,7 @@
 package info.monitorenter.gui.chart.traces.painters;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.TracePoint2D;
 
 import java.awt.Graphics2D;
 import java.util.Iterator;
@@ -34,7 +35,7 @@ import java.util.List;
  * <p>
  * 
  * Additionally it increases performance by summing up all points to render for
- * a paint iteration (submitted by {@link #paintPoint(int, int, int, int, Graphics2D)} 
+ * a paint iteration (submitted by {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)} 
  * between {@link #startPaintIteration(Graphics2D)} and 
  * {@link #endPaintIteration(Graphics2D)}) and only invoking only one polygon paint for a
  * paint call of the corresponding {@link info.monitorenter.gui.chart.Chart2D}.
@@ -44,11 +45,10 @@ import java.util.List;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  * 
  */
-public class TracePainterFill
-    extends ATracePainter {
+public class TracePainterFill extends ATracePainter {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -7194158082574997539L;
@@ -98,9 +98,9 @@ public class TracePainterFill
         x[count] = ((Integer) it.next()).intValue();
         count++;
       }
-      x[count] = this.m_lastX;
+      x[count] = this.getPreviousX();
       // step down (or up) to the y=0 for the last value (in y)
-      x[count + 1] = this.m_lastX;
+      x[count + 1] = x[count];
       // step back to startx,starty (root)
       x[count + 2] = this.m_chart.getXChartStart();
 
@@ -112,7 +112,7 @@ public class TracePainterFill
         y[count] = ((Integer) it.next()).intValue();
         count++;
       }
-      y[count] = this.m_lastY;
+      y[count] = this.getPreviousY();
       // step down (or up) to the y=0 for the last value (in y)
       y[count + 1] = this.m_chart.getYChartStart();
       // step back to startx,starty (root)
@@ -123,17 +123,14 @@ public class TracePainterFill
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int,
-   *      int, java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int, int, java.awt.Graphics2D, info.monitorenter.gui.chart.TracePoint2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g) {
+      final int nextY, final Graphics2D g, final TracePoint2D original) {
 
     this.m_xPoints.add(new Integer(absoluteX));
     this.m_yPoints.add(new Integer(absoluteY));
-    // don't loose the last point:
-    this.m_lastX = nextX;
-    this.m_lastY = nextY;
+    super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
   }
 
   /**

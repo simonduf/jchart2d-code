@@ -31,7 +31,7 @@ import java.awt.geom.Point2D;
  * the scaled values (between 0.0 and 1.0) without having to keep a copy of the
  * aggregators (<code>ITrace2D</code>) complete tracepoints.
  * <p>
- * This avoids the necessarity to care for the correct order of a set of scaled
+ * This avoids the necessity to care for the correct order of a set of scaled
  * tracepoints copied for caching purposes. Especially in the case of new
  * <code>TracePoint2D</code> instances added to a <code>ITrace2D</code>
  * instance managed by a <code>Chart2D</code> there remains no responsibility
@@ -54,7 +54,7 @@ import java.awt.geom.Point2D;
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class TracePoint2D extends Point2D.Double implements Comparable, java.io.Serializable,
     Cloneable {

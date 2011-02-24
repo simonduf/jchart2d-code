@@ -32,18 +32,20 @@ import java.io.Serializable;
  * 
  * This low level interface is used wherever points have to painted:
  * <ul>
- * <li> painting traces ({@link info.monitorenter.gui.chart.ITracePainter}) </li>
- * <li> painting endpoints, startpoints and the segments of errorbars 
- * ({@link info.monitorenter.gui.chart.errorbars.ErrorBarPainter}). </li>
+ * <li> painting traces ({@link info.monitorenter.gui.chart.ITracePainter})
+ * </li>
+ * <li> painting endpoints, startpoints and the segments of errorbars ({@link info.monitorenter.gui.chart.errorbars.ErrorBarPainter}).
+ * </li>
  * </ul>
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.8 $
  */
 public interface IPointPainter extends Serializable {
+
   /**
    * Paint the point given by absolute coordinates on the given graphic context.
    * <p>
@@ -52,22 +54,35 @@ public interface IPointPainter extends Serializable {
    * is available for the graphic representation of the current point.
    * <p>
    * 
+   * Note that by contract the <code>{@link TracePoint2D}</code> argument is
+   * only guaranteed to be non-null in case the instance is used as a painter
+   * for <code>{@link ITracePainter}</code> subtypes. If you plan to use your
+   * implementation also for a subcomponent of an
+   * <code>{@link IErrorBarPainter}</code> (e.g.
+   * <code>{@link IErrorBarPainter#setConnectionPainter(IPointPainter)}</code>)
+   * then you have to implement "null - safe" for that argument.
+   * <p>
+   * 
    * @param absoluteX
-   *          the ready to use x value for the point to paint.
+   *            the ready to use x value for the point to paint.
    * 
    * @param absoluteY
-   *          the ready to use y value for the point to paint.
+   *            the ready to use y value for the point to paint.
    * 
    * @param nextX
-   *          the ready to use next x value for the point to paint.
+   *            the ready to use next x value for the point to paint.
    * 
    * @param nextY
-   *          the ready to use next y value for the point to paint.
+   *            the ready to use next y value for the point to paint.
    * 
    * @param g
-   *          the graphic context to paint on.
+   *            the graphic context to paint on.
+   * 
+   * @param original
+   *            just for information, for painting this should be irrelevant and
+   *            it should not be changed too!
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g);
+      final int nextY, final Graphics2D g, final TracePoint2D original);
 
 }

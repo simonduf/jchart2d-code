@@ -47,7 +47,7 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  * 
  */
 public interface ITracePainter extends Comparable, IPointPainter {
@@ -57,7 +57,7 @@ public interface ITracePainter extends Comparable, IPointPainter {
    * has occured.
    * <p>
    * This only has to be implemented by painters that collect several points of
-   * {@link #paintPoint(int, int, int, int, Graphics2D)} to draw them as
+   * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)} to draw them as
    * polygons (e.g.: {@link java.awt.Graphics#drawPolyline(int[], int[], int)}).
    * <p>
    * 
@@ -76,32 +76,6 @@ public interface ITracePainter extends Comparable, IPointPainter {
    *          provided in case pending paint operations have to be performed.
    */
   public void endPaintIteration(Graphics2D g2d);
-
-  /**
-   * Paint the point given by absolute coordinates on the given graphic context.
-   * <p>
-   * 
-   * The next coordinates are also provided to allow to check how much distance
-   * is available for the graphic representation of the current point.
-   * <p>
-   * 
-   * @param absoluteX
-   *          the ready to use x value for the point to paint.
-   * 
-   * @param absoluteY
-   *          the ready to use y value for the point to paint.
-   * 
-   * @param nextX
-   *          the ready to use next x value for the point to paint.
-   * 
-   * @param nextY
-   *          the ready to use next y value for the point to paint.
-   * 
-   * @param g
-   *          the graphic context to paint on.
-   */
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g);
 
   /**
    * Invoked to inform implementations that a paint iteration starts for the

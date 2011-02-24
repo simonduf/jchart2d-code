@@ -33,7 +33,7 @@ import java.util.TreeSet;
 /**
  * A <code>Set</code> that will always successfully add new instances and
  * guarantee that all the "<em>Comparable properties</em>" of the contained
- * {@link info.monitorenter.util.collections.IComparableProperty} instances will
+ * <code>{@link info.monitorenter.util.collections.IComparableProperty}</code> instances will
  * build a set (no duplicates).
  * <p>
  * Although the interface of {@link java.util.Set} is preserved and allows

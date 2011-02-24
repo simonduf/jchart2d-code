@@ -23,6 +23,7 @@
 package info.monitorenter.gui.chart.traces.painters;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.TracePoint2D;
 import info.monitorenter.gui.chart.pointpainters.PointPainterVerticalBar;
 
 import java.awt.Graphics2D;
@@ -37,15 +38,14 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  * 
  */
-public class TracePainterVerticalBar
-    extends ATracePainter {
+public class TracePainterVerticalBar extends ATracePainter {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 6151930248938945671L;
-  
+
   /** The implementation for rendering the point as a vertical bar. */
   private PointPainterVerticalBar m_pointPainter;
 
@@ -78,7 +78,7 @@ public class TracePainterVerticalBar
    */
   public void endPaintIteration(final Graphics2D g2d) {
     if (g2d != null) {
-      this.m_pointPainter.paintPoint(this.getPreviousX(), this.getPreviousY(), 0, 0, g2d);
+      this.m_pointPainter.paintPoint(this.getPreviousX(), this.getPreviousY(), 0, 0, g2d, this.getPreviousPoint());
     }
   }
 
@@ -93,13 +93,12 @@ public class TracePainterVerticalBar
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int,
-   *      int, java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int, int, java.awt.Graphics2D, info.monitorenter.gui.chart.TracePoint2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g) {
-    super.paintPoint(absoluteX, absoluteY, nextX, nextY, g);
-    this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g);
+      final int nextY, final Graphics2D g, final TracePoint2D original) {
+    super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
+    this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
   }
 
   /**

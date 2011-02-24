@@ -31,7 +31,7 @@ import java.io.Serializable;
  * Interface for a renderer of error bars.
  * <p>
  * It contains a similar method to
- * {@link info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int, int, Graphics2D)}
+ * {@link info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}
  * with an additional {@link info.monitorenter.gui.chart.IErrorBarPixel} for
  * getting information about the error to render.
  * <p>
@@ -57,7 +57,7 @@ import java.io.Serializable;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.17 $
  */
 public interface IErrorBarPainter extends Serializable {
 
@@ -73,7 +73,7 @@ public interface IErrorBarPainter extends Serializable {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.15 $
+   * @version $Revision: 1.17 $
    */
   public interface ISegment extends Serializable {
     /**
@@ -195,42 +195,42 @@ public interface IErrorBarPainter extends Serializable {
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_CONNECTION = "errorbar.connection";
+  public static final String PROPERTY_CONNECTION = "IErrorBarPainter.PROPERTY_CONNECTION";
 
   /**
    * The property key defining the <code>connectionColor</code> property. Use
    * in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_CONNECTION_COLOR = "errorbar.connection.color";
+  public static final String PROPERTY_CONNECTION_COLOR = "IErrorBarPainter.PROPERTY_CONNECTION_COLOR";
 
   /**
    * The property key defining the <code>endPointPainter</code> property. Use
    * in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_ENDPOINT = "errorbar.endpoint";
+  public static final String PROPERTY_ENDPOINT = "IErrorBarPainter.PROPERTY_CONNECTION_COLOR";
 
   /**
    * The property key defining the <code>endPointColor</code> property. Use in
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_ENDPOINT_COLOR = "errorbar.endpoint.color";
+  public static final String PROPERTY_ENDPOINT_COLOR = "IErrorBarPainter.PROPERTY_ENDPOINT_COLOR";
 
   /**
    * The property key defining the <code>startPointPaint</code> property. Use
    * in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_STARTPOINT = "errorbar.startpoint";
+  public static final String PROPERTY_STARTPOINT = "IErrorBarPainter.PROPERTY_STARTPOINT";
 
   /**
    * The property key defining the <code>startPointColor</code> property. Use
    * in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_STARTPOINT_COLOR = "errorbar.startpoint.color";
+  public static final String PROPERTY_STARTPOINT_COLOR = "IErrorBarPainter.PROPERTY_STARTPOINT_COLOR";
 
   /**
    * Registers a property change listener that will be informed about changes of
@@ -484,7 +484,7 @@ public interface IErrorBarPainter extends Serializable {
    * Note that the choice for the right point painter has to be taken with care:
    * It is senseless to use an implementation that does not interconnect both
    * coordinates given to
-   * {@link IPointPainter#paintPoint(int, int, int, int, Graphics2D)}.
+   * {@link IPointPainter#paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
    * <p>
    * Choosing a
    * {@link info.monitorenter.gui.chart.pointpainters.PointPainterLine} will
@@ -523,7 +523,7 @@ public interface IErrorBarPainter extends Serializable {
    * Note that the choice for the right point painter has to be taken with care:
    * It is senseless to use an implementation that interconnects both
    * coordinates given to
-   * {@link IPointPainter#paintPoint(int, int, int, int, Graphics2D)}.
+   * {@link IPointPainter#paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
    * <p>
    * Choosing a
    * {@link info.monitorenter.gui.chart.pointpainters.PointPainterLine} will
@@ -552,7 +552,7 @@ public interface IErrorBarPainter extends Serializable {
    * Note that the choice for the right point painter has to be taken with care:
    * It is senseless to use an implementation that interconnects both
    * coordinates given to
-   * {@link IPointPainter#paintPoint(int, int, int, int, Graphics2D)}.
+   * {@link IPointPainter#paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
    * <p>
    * Choosing a
    * {@link info.monitorenter.gui.chart.pointpainters.PointPainterLine} will

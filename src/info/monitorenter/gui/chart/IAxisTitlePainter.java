@@ -32,9 +32,9 @@ import java.beans.PropertyChangeListener;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  * 
- * @since 7.0.0
+ * @since 2.2.1
  * 
  */
 public interface IAxisTitlePainter {

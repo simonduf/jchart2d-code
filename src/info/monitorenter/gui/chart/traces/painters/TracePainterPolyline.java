@@ -21,16 +21,18 @@
  */
 package info.monitorenter.gui.chart.traces.painters;
 
+import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.util.collections.IRingBuffer;
+import info.monitorenter.util.collections.RingBufferArrayFast;
+
 import java.awt.Graphics2D;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * A trace painter that increases performance by summing up all points to render
  * for a paint iteration (submitted by
- * {@link #paintPoint(int, int, int, int, Graphics2D)} invocations between
- * {@link #startPaintIteration(Graphics2D)} and
+ * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)} invocations
+ * between {@link #startPaintIteration(Graphics2D)} and
  * {@link #endPaintIteration(Graphics2D)}) and only invoking only one polyline
  * paint for a paint call of the corresponding
  * {@link info.monitorenter.gui.chart.Chart2D}.
@@ -38,7 +40,7 @@ import java.util.List;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.8 $
  * 
  */
 public class TracePainterPolyline
@@ -47,11 +49,25 @@ public class TracePainterPolyline
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 142122979535173974L;
 
-  /** The list of x coordinates collected in one paint iteration. */
-  private List m_xPoints;
+  /**
+   * The list of x coordinates collected in one paint iteration.
+   * <p>
+   * 
+   * Ring buffer is used as it may happend that the chart is minimized and no
+   * paint operation is triggered for a long time and this list grows.
+   * <p>
+   */
+  private IRingBuffer m_xPoints;
 
-  /** The list of y coordinates collected in one paint iteration. */
-  private List m_yPoints;
+  /**
+   * The list of y coordinates collected in one paint iteration.
+   * <p>
+   * 
+   * Ring buffer is used as it may happend that the chart is minimized and no
+   * paint operation is triggered for a long time and this list grows.
+   * <p>
+   */
+  private IRingBuffer m_yPoints;
 
   /**
    * Default Constructor.
@@ -69,7 +85,7 @@ public class TracePainterPolyline
     if (g2d != null) {
 
       int[] x = new int[this.m_xPoints.size() + 1];
-      Iterator it = this.m_xPoints.iterator();
+      Iterator it = this.m_xPoints.iteratorL2F();
       int count = 0;
       while (it.hasNext()) {
         x[count] = ((Integer) it.next()).intValue();
@@ -78,7 +94,7 @@ public class TracePainterPolyline
       x[count] = this.getPreviousX();
 
       int[] y = new int[this.m_yPoints.size() + 1];
-      it = this.m_yPoints.iterator();
+      it = this.m_yPoints.iteratorL2F();
       count = 0;
       while (it.hasNext()) {
         y[count] = ((Integer) it.next()).intValue();
@@ -91,12 +107,14 @@ public class TracePainterPolyline
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int,
-   *      int, java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int,
+   *      int, int, int, java.awt.Graphics2D,
+   *      info.monitorenter.gui.chart.TracePoint2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g) {
-    super.paintPoint(absoluteX, absoluteY, nextX, nextY, g);
+      final int nextY, final Graphics2D g, final TracePoint2D original) {
+    super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
+    // just store the points here: 
     this.m_xPoints.add(new Integer(absoluteX));
     this.m_yPoints.add(new Integer(absoluteY));
 
@@ -107,8 +125,8 @@ public class TracePainterPolyline
    */
   public void startPaintIteration(final Graphics2D g2d) {
     super.startPaintIteration(g2d);
-    this.m_xPoints = new LinkedList();
-    this.m_yPoints = new LinkedList();
+    this.m_xPoints = new RingBufferArrayFast(1000);
+    this.m_yPoints = new RingBufferArrayFast(1000);
   }
 
 }

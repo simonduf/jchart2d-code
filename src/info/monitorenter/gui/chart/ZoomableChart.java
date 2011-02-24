@@ -42,7 +42,7 @@ import java.awt.geom.Rectangle2D;
  * 
  * @author Alessio Sambarino (Contributor)
  * 
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  * 
  * @author Klaus Pesendorfer (klaus.pesendorfer@fabalabs.org)
  * 
@@ -157,7 +157,7 @@ public class ZoomableChart
 
     this.m_zoomArea = new Rectangle2D.Double(startX, startY, dimX, dimY);
 
-    this.repaint(Chart2D.REPAINT_LATENCY);
+    this.setRequestedRepaint(true);
   }
 
   /**
@@ -222,7 +222,7 @@ public class ZoomableChart
     // calculation)
     if ((endPx - startPx) < 20 || (endPy - startPy) < 20) {
       this.m_zoomArea = null;
-      this.repaint(Chart2D.REPAINT_LATENCY);
+      this.setRequestedRepaint(true);
       return;
     }
 

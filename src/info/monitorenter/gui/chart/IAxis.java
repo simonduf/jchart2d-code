@@ -36,26 +36,38 @@ import java.io.Serializable;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.23 $
+ * @version $Revision: 1.25 $
  */
 public interface IAxis extends Serializable {
 
   /**
-   * Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the paint grid
-   * flag.
+   * Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the
+   * paint grid flag.
    */
   public static final String PROPERTY_PAINTGRID = "IAxis.PROPERTY_PAINTGRID";
 
-  /** Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the range policy. */
+  /**
+   * Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the
+   * range policy.
+   */
   public static final String PROPERTY_RANGEPOLICY = "IAxis.PROPERTY_RANGEPOLICY";
 
-  /** Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the title String. */
+  /**
+   * Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the
+   * title String.
+   */
   public static final String PROPERTY_TITLE = "IAxis.PROPERTY_TITLE";
 
-  /** Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the <code>{@link IAxisTitlePainter}</code>. */
+  /**
+   * Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the
+   * <code>{@link IAxisTitlePainter}</code>.
+   */
   public static final String PROPERTY_TITLEPAINTER = "IAxis.PROPERTY_TITLEPAINTER";
 
-  /** Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the title font. */
+  /**
+   * Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the
+   * title font.
+   */
   public static final String PROPERTY_TITLEFONT = "IAxis.PROPERTY_TITLEFONT";
 
   /**
@@ -63,6 +75,31 @@ public interface IAxis extends Serializable {
    * formatter.
    */
   public static final String PROPERTY_LABELFORMATTER = "IAxis.PROPERTY_LABELFORMATTER";
+
+  /**
+   * Adds a trace that belongs to this axis.
+   * <p>
+   * 
+   * @param trace
+   *          the trace to add.
+   * 
+   * @return true if the trace was added, false else.
+   */
+  public boolean addTrace(ITrace2D trace);
+
+  /**
+   * Removes the given trace from this axis.
+   * <p>
+   * 
+   * @param trace
+   *          the trace to remove from this axis.
+   * 
+   * @return true if the given trace could be removed from this axis, false
+   *         else.
+   */
+  public boolean removeTrace(ITrace2D trace);
+
+  
 
   /**
    * Transforms the given pixel value (which has to be a awt value like
@@ -107,7 +144,8 @@ public interface IAxis extends Serializable {
    * @param distance
    *          a chart data distance.
    * 
-   * @return the awt pixel value distance corresponding to the chart data value distance.
+   * @return the awt pixel value distance corresponding to the chart data value
+   *         distance.
    */
   public int translateRelativeValueToPx(final double distance);
 
@@ -217,22 +255,22 @@ public interface IAxis extends Serializable {
    * <tr>
    * <td><code>{@link info.monitorenter.gui.chart.IAxis#PROPERTY_TITLE}</code></td>
    * <td><code>{@link IAxis}</code> that changed</td>
-   * <td><code>{@link String}</code>, the old value or null if
-   * there was no title before. </td>
+   * <td><code>{@link String}</code>, the old value or null if there was no
+   * title before. </td>
    * <td><code>{@link String}</code>, the new value.</td>
    * </tr>
    * <tr>
    * <td><code>{@link info.monitorenter.gui.chart.IAxis#PROPERTY_TITLEPAINTER}</code></td>
    * <td><code>{@link IAxis}</code> that changed</td>
    * <td><code>{@link IAxisTitlePainter}</code>, the old value or null if
-   * there was no title painter  before. </td>
+   * there was no title painter before. </td>
    * <td><code>{@link IAxisTitlePainter}</code>, the new value.</td>
    * </tr>
    * <tr>
    * <td><code>{@link info.monitorenter.gui.chart.IAxis#PROPERTY_TITLEFONT}</code></td>
    * <td><code>{@link IAxis}</code> that changed</td>
-   * <td><code>{@link java.awt.Font}</code>, the old value or null if
-   * there was no title font before. </td>
+   * <td><code>{@link java.awt.Font}</code>, the old value or null if there
+   * was no title font before. </td>
    * <td><code>{@link java.awt.Font}</code>, the new value.</td>
    * </tr>
    * 

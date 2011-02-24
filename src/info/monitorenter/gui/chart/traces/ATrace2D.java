@@ -57,7 +57,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.41 $
+ * @version $Revision: 1.43 $
  */
 public abstract class ATrace2D implements ITrace2D {
 
@@ -199,21 +199,6 @@ public abstract class ATrace2D implements ITrace2D {
     this.m_tracePainters.add(new TracePainterPolyline());
   }
 
-  // /**
-  // * Default contstructor taking the chart to render.
-  // * <p>
-  // *
-  // * @param chart
-  // * the chart of this trace.
-  // *
-  // */
-  // public ATrace2D(final Chart2D chart) {
-  // super();
-  // ATrace2D.instanceCount++;
-  // this.m_tracePainters = new TreeSet();
-  // this.m_tracePainters.add(new TracePainterPolyline());
-  // }
-
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#addComputingTrace(info.monitorenter.gui.chart.ITrace2D)
    */
@@ -304,19 +289,6 @@ public abstract class ATrace2D implements ITrace2D {
           System.out.println("addPoint, 2 locks");
         }
         boolean accepted = this.addPointInternal(p);
-        if (this.m_firsttime) {
-          // MAX events / members are done already from the
-          // firePointAdded()->firePointChanged() method,
-          // this is only the special case that a new point also marks the
-          // minimum.
-          this.m_minX = p.getX();
-          this.m_minY = p.getY();
-          Double zero = new Double(0);
-          this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, zero, new Double(this.m_minX));
-          this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, zero, new Double(this.m_minY));
-
-          this.m_firsttime = false;
-        }
         if (accepted) {
           // fires property changes for max/min x/y:
           this.expandErrorBarBounds();
@@ -333,33 +305,45 @@ public abstract class ATrace2D implements ITrace2D {
             }
           }
         }
-        // else{
-        // System.err.println("Not accepted!");
-        // }
+        if (this.m_firsttime) {
+          // MAX events / members are done already from the
+          // firePointAdded()->firePointChanged() method,
+          // this is only the special case that a new point also marks the
+          // minimum.
+          // Don't move this code block before the firePointAdded or 
+          // the minimum of the chart will be higher than the maximum 
+          // which causes an infinite loop in AxisAutoUnit!
+          this.m_minX = p.getX();
+          this.m_minY = p.getY();
+          this.m_maxX = p.getX();
+          this.m_maxY = p.getY();
+          Double zero = new Double(0);
+          this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, zero, new Double(this.m_minX));
+          this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, zero, new Double(this.m_minY));
+
+          this.m_firsttime = false;
+        }
         return accepted;
       }
     }
   }
 
   /**
-   * <p>
    * Override this template method for the custom add operation that depends on
    * the policies of the implementation.
-   * </p>
    * <p>
    * No property change events have to be fired by default. If this method
    * returns <code>true</code> the outer logic of the calling method
    * <code>{@link #addPoint(TracePoint2D)}</code> will perform bound checks
    * for the new point and fire property changes as described in method
    * <code>{@link #firePointChanged(TracePoint2D, int)}</code>.
-   * </p>
    * <p>
    * In special cases - when additional modifications to the internal set of
    * points take place (e.g. a further point gets removed) this method should
    * return false (regardless wether the new point was accepted or not) and
    * perform bound checks and fire the property changes as mentioned above
    * "manually".
-   * </p>
+   * <p>
    * 
    * @param p
    *          the point to add.

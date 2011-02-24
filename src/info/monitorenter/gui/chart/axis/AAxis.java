@@ -36,6 +36,7 @@ import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyUnbounded;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.StringUtil;
+import info.monitorenter.util.collections.TreeSetGreedy;
 
 import java.awt.Dimension;
 import java.awt.FontMetrics;
@@ -47,6 +48,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Set;
 
 /**
  * The base class for an axis of the <code>{@link Chart2D}</code>.
@@ -61,10 +63,29 @@ import java.util.LinkedList;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.27 $
+ * @version $Revision: 1.29 $
  */
 public abstract class AAxis implements IAxis, PropertyChangeListener {
-
+  
+  /**
+   * The internal <code>TreeSetGreedy</code> use to store the different
+   * <code>ITrace2d</code> instanes to paint with z-index ordering based 
+   * on <code>{@link ITrace2D#getZIndex()}</code>.
+   */
+  private TreeSetGreedy m_traces = new TreeSetGreedy();
+  
+  /**
+   * Returns a <code>List&lt;ITrace2D&gt;</code> with all the
+   * <code>{@link ITrace2D}</code> that are assigned to this trace.
+   * <p>
+   * 
+   * @return a <code>List&lt;ITrace2D&gt;</code> with all the
+   *         <code>{@link ITrace2D}</code> that are assigned to this trace.
+   */
+  Set getTraces() {
+    return this.m_traces;
+  }
+  
   /**
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
@@ -73,6 +94,25 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
       this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this,
           IAxis.PROPERTY_TITLEFONT, evt.getOldValue(), evt.getNewValue()));
     }
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#addTrace(info.monitorenter.gui.chart.ITrace2D)
+   */
+  public boolean addTrace(final ITrace2D trace) {
+    // TODO property change events! 
+    boolean result = this.m_traces.add(trace);
+    return result;
+  }
+
+  
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#removeTrace(info.monitorenter.gui.chart.ITrace2D)
+   */
+  public boolean removeTrace(final ITrace2D trace) {
+    // TODO propety change events!
+    boolean result = this.m_traces.remove(trace);
+    return result;
   }
 
   /**

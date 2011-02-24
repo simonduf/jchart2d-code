@@ -21,6 +21,7 @@
  */
 package info.monitorenter.gui.chart.traces.painters;
 
+import info.monitorenter.gui.chart.TracePoint2D;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 
 import java.awt.Graphics2D;
@@ -32,15 +33,14 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  * 
  */
-public class TracePainterDisc
-    extends ATracePainter {
+public class TracePainterDisc extends ATracePainter {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 8919406018882664083L;
-  
+
   /** The implementation for rendering the point as a disc. */
   private PointPainterDisc m_pointPainter;
 
@@ -67,7 +67,8 @@ public class TracePainterDisc
    */
   public void endPaintIteration(final Graphics2D g2d) {
     if (g2d != null) {
-      this.m_pointPainter.paintPoint(this.getPreviousX(), this.getPreviousY(), 0, 0, g2d);
+      this.m_pointPainter.paintPoint(this.getPreviousX(), this.getPreviousY(), 0, 0, g2d, this
+          .getPreviousPoint());
     }
   }
 
@@ -82,13 +83,12 @@ public class TracePainterDisc
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int,
-   *      int, java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int, int, java.awt.Graphics2D, info.monitorenter.gui.chart.TracePoint2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g) {
-    super.paintPoint(absoluteX, absoluteY, nextX, nextY, g);
-    this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g);
+      final int nextY, final Graphics2D g, final TracePoint2D original) {
+    super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
+    this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
   }
 
   /**

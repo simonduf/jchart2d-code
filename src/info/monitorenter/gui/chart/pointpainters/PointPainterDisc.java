@@ -22,9 +22,10 @@
  */
 package info.monitorenter.gui.chart.pointpainters;
 
-import java.awt.Graphics2D;
-
 import info.monitorenter.gui.chart.IPointPainter;
+import info.monitorenter.gui.chart.TracePoint2D;
+
+import java.awt.Graphics2D;
 
 /**
  * Renders points in form of a disc with configurable diameter.
@@ -33,7 +34,7 @@ import info.monitorenter.gui.chart.IPointPainter;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.7 $
  */
 public class PointPainterDisc implements IPointPainter {
 
@@ -88,10 +89,10 @@ public class PointPainterDisc implements IPointPainter {
 
   /**
    * @see info.monitorenter.gui.chart.IPointPainter#paintPoint(int, int, int,
-   *      int, java.awt.Graphics2D)
+   *      int, java.awt.Graphics2D, info.monitorenter.gui.chart.TracePoint2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g) {
+      final int nextY, final Graphics2D g, final TracePoint2D original) {
     g.drawOval(absoluteX - this.m_halfDiscSize, absoluteY - this.m_halfDiscSize, this.m_discSize,
         this.m_discSize);
   }

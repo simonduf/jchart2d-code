@@ -48,7 +48,7 @@ import javax.swing.JFrame;
  * <p>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'> Achim Westermann </a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.7 $
  */
 public class RunningChart
     extends JFrame {
@@ -58,7 +58,7 @@ public class RunningChart
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * @version $Revision: 1.5 $
+   * @version $Revision: 1.7 $
    */
   static class RandomBumper
       extends Thread {
@@ -134,6 +134,7 @@ public class RunningChart
   public static void main(final String[] args) {
 
     Chart2D chart = new Chart2D();
+    chart.setMinPaintLatency(100);
     ITrace2D data = new Trace2DLtd(300);
     data.setColor(Color.RED);
     data.setName("random");
@@ -153,7 +154,7 @@ public class RunningChart
     wnd.setSize(700, 210);
     wnd.setResizable(true);
     wnd.setVisible(true);
-    new ObjRecorder2Trace2DAdapter(data, new RandomBumper(0.5, 1000), "m_number", 100);
+    new ObjRecorder2Trace2DAdapter(data, new RandomBumper(0.5, 1000), "m_number", 50);
   }
 
   /** The chart to use. */

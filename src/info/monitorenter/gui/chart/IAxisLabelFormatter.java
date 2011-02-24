@@ -40,14 +40,14 @@ import java.beans.PropertyChangeListener;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public interface IAxisLabelFormatter {
   /**
    * Constant for <code>{@link java.beans.PropertyChangeEvent}</code> fired
    * when the configuration changes.
    */
-  public static final String PROPERTY_FORMATCHANGE = "labelformatter.formatchange";
+  public static final String PROPERTY_FORMATCHANGE = "IAxisLabelFormatter.PROPERTY_FORMATCHANGE";
 
   /**
    * Registers a property change listener that will be informed about changes of

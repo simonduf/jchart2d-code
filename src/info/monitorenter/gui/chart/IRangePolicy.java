@@ -73,7 +73,7 @@ import java.io.Serializable;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  * 
  * @see info.monitorenter.gui.chart.axis.AAxis
  */
@@ -86,7 +86,7 @@ public interface IRangePolicy extends Serializable {
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    * <p>
    */
-  public static final String PROPERTY_RANGE = "rangepolicy.range";
+  public static final String PROPERTY_RANGE = "IRangePolicy.PROPERTY_RANGE";
 
   /**
    * The property key defining the <code>max</code> property.
@@ -95,7 +95,7 @@ public interface IRangePolicy extends Serializable {
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    * <p>
    */
-  public static final String PROPERTY_RANGE_MAX = "rangepolicy.rangemax";
+  public static final String PROPERTY_RANGE_MAX = "IRangePolicy.PROPERTY_RANGE";
 
   /**
    * The property key defining the <code>min</code> property.
@@ -104,7 +104,7 @@ public interface IRangePolicy extends Serializable {
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    * <p>
    */
-  public static final String PROPERTY_RANGE_MIN = "rangepolicy.rangemin";
+  public static final String PROPERTY_RANGE_MIN = "IRangePolicy.PROPERTY_RANGE";
 
   /**
    * Registers a property change listener that will be informed about changes of
