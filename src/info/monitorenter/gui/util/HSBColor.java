@@ -30,7 +30,7 @@ package info.monitorenter.gui.util;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class HSBColor implements java.io.Serializable, Cloneable {
 
@@ -170,7 +170,16 @@ public class HSBColor implements java.io.Serializable, Cloneable {
    * @return an intance copied from this one.
    */
   public Object clone() {
-    return new HSBColor(this.m_hue, this.m_sat, this.m_lum);
+    HSBColor result = null;
+    try {
+      result = (HSBColor) super.clone();
+      result.m_hue = this.m_hue;
+      result.m_lum = this.m_lum;
+      result.m_sat = this.m_sat;
+    } catch (CloneNotSupportedException e) {
+      result = new HSBColor(this.m_hue, this.m_sat, this.m_lum);
+    }
+    return result;
   }
 
   /**

@@ -32,7 +32,7 @@ import java.util.NoSuchElementException;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ColorIterator implements Iterator {
 
@@ -131,7 +131,7 @@ public class ColorIterator implements Iterator {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.1 $
+   * @version $Revision: 1.2 $
    */
   public static interface ISteppingModel extends Cloneable {
     /**
@@ -158,7 +158,7 @@ public class ColorIterator implements Iterator {
    * 
    * 
    */
-  public abstract static class DefaultStepping implements ColorIterator.ISteppingModel {
+  public abstract static class ADefaultStepping implements ColorIterator.ISteppingModel {
     /** The amount of stepping. */
     protected float m_stepping;
 
@@ -166,7 +166,7 @@ public class ColorIterator implements Iterator {
      * Creates a stepper with 100 steps in the color space.
      * <p>
      */
-    public DefaultStepping() {
+    public ADefaultStepping() {
       this(1.0f / 100.0f);
     }
 
@@ -180,7 +180,7 @@ public class ColorIterator implements Iterator {
      * @throws IllegalArgumentException
      *           if the stepping is <= 0.0 or >=1.0.
      */
-    public DefaultStepping(final float stepping) throws IllegalArgumentException {
+    public ADefaultStepping(final float stepping) throws IllegalArgumentException {
       if (stepping > 1.0f || stepping <= 0.0f) {
         throw new IllegalArgumentException("Illegal stepping param: choose within 0.0 and 1.0.");
       }
@@ -195,15 +195,15 @@ public class ColorIterator implements Iterator {
      * @return a clone of the stepper.
      */
     public Object clone() {
+      ADefaultStepping result;
       try {
-        DefaultStepping ret = (DefaultStepping) (this.getClass().newInstance());
-        ret.m_stepping = this.m_stepping;
-        return ret;
+        result = (ADefaultStepping) super.clone();
       } catch (Throwable f) {
-        // this will never happen
         f.printStackTrace();
         return null;
       }
+      result.m_stepping = this.m_stepping;
+      return result;
     }
   }
 
@@ -213,9 +213,10 @@ public class ColorIterator implements Iterator {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.1 $
+   * @version $Revision: 1.2 $
    */
-  public static class HueStepper extends ColorIterator.DefaultStepping {
+  public static class HueStepper
+      extends ColorIterator.ADefaultStepping {
     /**
      * Creates an instance with 100 steps left.
      * <p>
@@ -287,9 +288,10 @@ public class ColorIterator implements Iterator {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.1 $
+   * @version $Revision: 1.2 $
    */
-  public static class LuminanceStepper extends ColorIterator.DefaultStepping {
+  public static class LuminanceStepper
+      extends ColorIterator.ADefaultStepping {
     /**
      * Defcon.
      * <p>
@@ -361,9 +363,10 @@ public class ColorIterator implements Iterator {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.1 $
+   * @version $Revision: 1.2 $
    */
-  public static class SaturationStepper extends ColorIterator.DefaultStepping {
+  public static class SaturationStepper
+      extends ColorIterator.ADefaultStepping {
     /**
      * Defcon.
      * <p>
@@ -436,9 +439,10 @@ public class ColorIterator implements Iterator {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.1 $
+   * @version $Revision: 1.2 $
    */
-  public abstract static class PiggyBackStepper extends ColorIterator.DefaultStepping {
+  public abstract static class APiggyBackStepper
+      extends ColorIterator.ADefaultStepping {
     /** The hue stepper to use. */
     protected HueStepper m_huestep;
 
@@ -452,7 +456,7 @@ public class ColorIterator implements Iterator {
      * Defcon.
      * <p>
      */
-    public PiggyBackStepper() {
+    public APiggyBackStepper() {
       this(0.002f, 0.2f, 0.2f);
     }
 
@@ -473,7 +477,7 @@ public class ColorIterator implements Iterator {
      * @throws IllegalArgumentException
      *           if any of the arguments is <= 0.0 or >= 1.0.
      */
-    public PiggyBackStepper(final float hueStepping, final float satStepping,
+    public APiggyBackStepper(final float hueStepping, final float satStepping,
         final float lumStepping) throws IllegalArgumentException {
       this.m_huestep = new HueStepper(hueStepping);
       this.m_satstep = new SaturationStepper(satStepping);
@@ -484,7 +488,7 @@ public class ColorIterator implements Iterator {
      * @see java.lang.Object#clone()
      */
     public Object clone() {
-      PiggyBackStepper ret = (PiggyBackStepper) super.clone();
+      APiggyBackStepper ret = (APiggyBackStepper) super.clone();
       ret.m_huestep = (HueStepper) this.m_huestep.clone();
       ret.m_satstep = (SaturationStepper) this.m_satstep.clone();
       ret.m_lumstep = (LuminanceStepper) this.m_lumstep.clone();
@@ -501,9 +505,10 @@ public class ColorIterator implements Iterator {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.1 $
+   * @version $Revision: 1.2 $
    */
-  public static class HSBStepper extends ColorIterator.PiggyBackStepper {
+  public static class HSBStepper
+      extends ColorIterator.APiggyBackStepper {
     /**
      * Defcon.
      * <p>
@@ -536,9 +541,10 @@ public class ColorIterator implements Iterator {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.1 $
+   * @version $Revision: 1.2 $
    */
-  public static class HSStepper extends ColorIterator.PiggyBackStepper {
+  public static class HSStepper
+      extends ColorIterator.APiggyBackStepper {
     /**
      * Defcon.
      * <p>

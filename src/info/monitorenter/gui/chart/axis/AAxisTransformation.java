@@ -38,9 +38,23 @@ import java.awt.event.MouseEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  */
-public abstract class AAxisTransformation extends AAxis {
+public abstract class AAxisTransformation
+    extends AAxis {
+
+  /**
+   * Internal flag that defines that only every n milliseconds a transformation
+   * error (untransformable value was used in chart: this axis implementation of
+   * axis is not recommended for the data used) should be reported on system
+   * output.
+   */
+  private static final int OUTPUT_ERROR_THRESHHOLD = 30000;
+
+  /**
+   * Internal timestamp of the last transformation error reporting.
+   */
+  private long m_outputErrorTstamp = 0;
 
   /**
    * Creates a default instance that will use a
@@ -66,14 +80,22 @@ public abstract class AAxisTransformation extends AAxis {
   /**
    * @see info.monitorenter.gui.chart.AAxis#getScaledValue(double)
    */
-  protected final double getScaledValue(final double absolute) {
+  public final double getScaledValue(final double absolute) {
     double result;
     Range range = this.getRange();
-    double scaler = range.getExtent();
-
-    result = (transform(absolute) - range.getMin());
-    result = result / scaler;
-    if (result == Double.NaN || Double.isInfinite(result)) {
+    try {
+      result = (transform(absolute) - range.getMin());
+      double scaler = range.getExtent();
+      result = result / scaler;
+      if (result == Double.NaN || Double.isInfinite(result)) {
+        result = 0;
+      }
+    } catch (IllegalArgumentException e) {
+      long tstamp = System.currentTimeMillis();
+      if (tstamp - this.m_outputErrorTstamp > AAxisTransformation.OUTPUT_ERROR_THRESHHOLD) {
+        System.out.println(e.getLocalizedMessage());
+        this.m_outputErrorTstamp = tstamp;
+      }
       result = 0;
     }
     return result;
@@ -92,8 +114,13 @@ public abstract class AAxisTransformation extends AAxis {
    *          the value to transform.
    * 
    * @return the transformed value.
+   * 
+   * @throws IllegalArgumentException
+   *           if scaling is impossible (due to some mathematical transformation
+   *           in implementations like
+   *           {@link info.monitorenter.gui.chart.axis.AxisLog10}
    */
-  protected abstract double transform(final double in);
+  protected abstract double transform(final double in) throws IllegalArgumentException;
 
   /**
    * Template method for performing the reverse axis transformation.
@@ -121,13 +148,25 @@ public abstract class AAxisTransformation extends AAxis {
    * @see info.monitorenter.gui.chart.AAxis#getMax()
    */
   public double getMax() {
-    return this.transform(super.getMax());
+    double result = 1.0;
+    try {
+      result = this.transform(super.getMax());
+    } catch (IllegalArgumentException e) {
+      // nop
+    }
+    return result;
   }
 
   /**
    * @see info.monitorenter.gui.chart.AAxis#getMin()
    */
   public double getMin() {
-    return this.transform(super.getMin());
+    double result = 0.0;
+    try {
+      result = this.transform(super.getMin());
+    } catch (IllegalArgumentException e) {
+        // nop
+    }
+    return result;
   }
 }

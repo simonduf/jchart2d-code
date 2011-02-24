@@ -47,9 +47,16 @@ import javax.swing.JCheckBoxMenuItem;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  */
-public class AxisActionSetGrid extends AAxisAction {
+public class AxisActionSetGrid
+    extends AAxisAction {
+
+  /**
+   * Generated <code>serial version UID</code>.
+   * <p>
+   */
+  private static final long serialVersionUID = -5816028313134616682L;
 
   /**
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
@@ -89,6 +96,6 @@ public class AxisActionSetGrid extends AAxisAction {
   public void actionPerformed(final ActionEvent e) {
     JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
     boolean state = item.getState();
-    this.m_axis.setPaintGrid(state);
+    this.getAxis().setPaintGrid(state);
   }
 }

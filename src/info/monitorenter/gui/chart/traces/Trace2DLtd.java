@@ -48,7 +48,7 @@ import java.util.Iterator;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class Trace2DLtd extends ATrace2D implements ITrace2D {
 
@@ -162,7 +162,8 @@ public class Trace2DLtd extends ATrace2D implements ITrace2D {
   public boolean addPointInternal(final TracePoint2D p) {
 
     TracePoint2D removed = (TracePoint2D) this.m_buffer.add(p);
-    double tmpx, tmpy;
+    double tmpx;
+    double tmpy;
     if (removed != null) {
       tmpx = removed.getX();
       tmpy = removed.getY();

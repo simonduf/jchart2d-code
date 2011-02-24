@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-  var update="12/09/2004";
+  var update="06/02/2006";
  </script>
  <body id="feature">
   <div id="wrapper">
@@ -25,19 +25,43 @@
         Multiple traces with different behaviour may be added to a single 
         chart.
        <li>
-        Efficient event - handling. The event chain starts from the single 
-        tracepoint traverses the trace and stops at the chart. All changed or 
-        newly added tracepoints will be reflected in the view. If the range 
-        of an axis is not changed, no rescaling has to be done. Else it is still 
-        distinguished between rescaling the x - axis or y - axis.
-       <li>
-        Caching of scaled values at tracepoint - level. 
+        Performance. JChart2D is designed for dynamic rendering. Rescaling 
+        is done per axis only and only if bounds are exceeded. New points 
+        within bounds are scaled without affecting old scalings. Minimum 
+        and maximum bounds of traces are cached and updated upon events.
+        Invisible traces are not scaled and don't affect bounds. 
+        <br/>
+        AWT is the bottleneck:
+        Non-visible calculations (scaling, rounding, event-handling, 
+        label calculation) do not impose high load even if a point is 
+        added with bounds changes every 2ms. 
+        But enlarging the window does. So scaling is bound to painting and 
+        the adapting painting frequency is limited to 20 frames / second minimum. 
+        For rendering traces polylines are drawn by default 
+        (instead of many calls to drawline for connecting points). 
+        No comparisons to other libraries available. 
        <li>
         Automatic choice of the unit - prefix (multiplier) according to the 
         scientific unit system (nano , milli, tera, ..). 
+       <li>
+        Label formatter for scale labels via java.text.NumberFormat or java.text.DateFormat. 
        <li> 
         Choosable display of grids, labels, labeled scalepoints, decimals 
         of labeled scalepoints. 
+       <li>
+        Toolbox of UI controls for chart and traces via popup menus and 
+        menu bar. See the applet demo. Tip: right-click on the label of the 
+        trace to get controls for it. 
+        <li>
+        Traces may be rendered via lines, discs, dots (is a disc with radius 1) 
+        or filled polygons. Additionally strokes may be specified (only useful 
+        for lines I think). An open interface for further graphical representations 
+        of traces exists. 
+       <li>
+        Different axis implementations (settable from UI): linear, log e and log 10.
+       <li>
+        Different viewport implementations: Zooming (ZoomableChart), enforcing 
+        visible bounds even if data does not fill them,... . 
        <li>
         Exact visualisation of labeled scalepoints. No label of a scalepoint 
         is ever rounded to the next current chosen decimal, instead the scalepoint 

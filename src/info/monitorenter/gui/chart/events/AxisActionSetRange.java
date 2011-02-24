@@ -39,7 +39,7 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class AxisActionSetRange extends AAxisAction {
 
@@ -70,11 +70,12 @@ public class AxisActionSetRange extends AAxisAction {
    */
   public void actionPerformed(final ActionEvent e) {
 
-    RangeChooserPanel rangePanel = new RangeChooserPanel(this.m_axis.getRangePolicy().getRange());
-    DialogRange dialog = new DialogRange(this.m_axis.getAccessor().getChart(), "Choose a range",
+    IAxis axis = this.getAxis();
+    RangeChooserPanel rangePanel = new RangeChooserPanel(axis.getRangePolicy().getRange());
+    DialogRange dialog = new DialogRange(axis.getAccessor().getChart(), "Choose a range",
         true, rangePanel);
     dialog.showDialog();
-    this.m_axis.setRange(rangePanel.getRange());
+    axis.setRange(rangePanel.getRange());
   }
 
   /**

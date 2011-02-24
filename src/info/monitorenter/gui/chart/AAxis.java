@@ -51,100 +51,9 @@ import java.util.LinkedList;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.12 $
  */
 public abstract class AAxis implements IAxis {
-
-  /** Support for acting as a property change event producer for listeners. */
-  private PropertyChangeSupport m_propertyChangeSupport;
-
-  /** Boolean switch for painting x gridlines. * */
-  private boolean m_paintGrid = false;
-
-  /**
-   * Returns wether the x grid is painted or not.
-   * <p>
-   * 
-   * @return wether the x grid is painted or not.
-   */
-  public final boolean isPaintGrid() {
-    return this.m_paintGrid;
-  }
-
-  /**
-   * Set wether the grid in this dimension should be painted or not.
-   * <p>
-   * A repaint operation for the chart is triggered.
-   * <p>
-   * 
-   * @param grid
-   *          true if the grid should be painted or false if not.
-   */
-  public final void setPaintGrid(final boolean grid) {
-    boolean oldValue = this.m_paintGrid;
-    this.m_paintGrid = grid;
-    if (oldValue != grid) {
-
-      Chart2D chart2D = this.getAccessor().getChart();
-      if (grid) {
-        // TODO: this is hardcoded behaviour that is not explained!
-        this.setPaintScale(true);
-      }
-      this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this,
-          IAxis.PROPERTY_PAINTGRID, new Boolean(oldValue), new Boolean(this.m_paintGrid)));
-      chart2D.repaint(200);
-    }
-  }
-
-  /** Boolean switch for painting the scale in this dimension. */
-  private boolean m_paintScale = true;
-
-  /**
-   * Set if the scale for this axis should be shown.
-   * <p>
-   * 
-   * @param show
-   *          true if the scale on this axis should be shown, false else.
-   */
-  public final void setPaintScale(final boolean show) {
-    this.m_paintScale = show;
-  }
-
-  /**
-   * Returns the translation of the mouse event coordinates of the given mouse
-   * event to the value within the chart for the dimension (x,y) covered by this
-   * axis.
-   * <p>
-   * Note that the mouse event has to be an event fired on the correspondinig
-   * chart component!
-   * <p>
-   * 
-   * @param mouseEvent
-   *          a mouse event that has been fired on this component.
-   * @return the translation of the mouse event coordinates of the given mouse
-   *         event to the value within the chart for the dimension covered by
-   *         this axis (x or y) or null if no calculations could be performed as
-   *         the chart was not painted before.
-   */
-  protected abstract double translateMousePosition(final MouseEvent mouseEvent);
-
-  /**
-   * Scales the given absolute value into a value between 0 and 1.0 (if it is in
-   * the range of the data).
-   * <p>
-   * If the given absolute value is not in the display- range of the
-   * <code>Chart2D</code>, negative values or values greater than 1.0 may
-   * result.
-   * <p>
-   * 
-   * @param absolute
-   *          a value in the real value range of the corresponding chart.
-   * 
-   * @return a value between 0.0 and 1.0 that is mapped to a position within the
-   *         chart.
-   */
-  protected abstract double getScaledValue(final double absolute);
-
   /**
    * An internal connector class that will connect the axis to the a Chart2D.
    * <p>
@@ -158,40 +67,10 @@ public abstract class AAxis implements IAxis {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    */
-  public abstract class Chart2DDataAccessor {
-
-    /**
-     * Returns the translation of the mouse event coordinates of the given mouse
-     * event to the value within the chart for the dimension (x,y) covered by
-     * this axis.
-     * <p>
-     * Note that the mouse event has to be an event fired on this component!
-     * <p>
-     * 
-     * @param mouseEvent
-     *          a mouse event that has been fired on this component.
-     * @return the translation of the mouse event coordinates of the given mouse
-     *         event to the value within the chart for the dimension covered by
-     *         this axis (x or y) or null if no calculations could be performed
-     *         as the chart was not painted before.
-     */
-    public abstract double translateMousePosition(final MouseEvent mouseEvent);
+  public abstract class AChart2DDataAccessor {
 
     /** The chart that is acessed. */
     protected Chart2D m_chart;
-
-    /**
-     * Returns the amount of pixel avalable for displaying the values on the
-     * chart in the dimension this accessor stands for.
-     * <p>
-     * This method must not be called within the first lines of a paint cycle
-     * (neccessary underlying values then are computed new).
-     * <p>
-     * 
-     * @return the amount of pixel avalable for displaying the values on the
-     *         chart in the dimension this accessor stands for.
-     */
-    protected abstract int getPixelRange();
 
     /**
      * A pluggable range policy.
@@ -205,7 +84,7 @@ public abstract class AAxis implements IAxis {
      * @param chart
      *          the chart that is acessed.
      */
-    protected Chart2DDataAccessor(final Chart2D chart) {
+    protected AChart2DDataAccessor(final Chart2D chart) {
 
       AAxis.this.setAccessor(this);
       this.m_chart = chart;
@@ -221,6 +100,15 @@ public abstract class AAxis implements IAxis {
     public final Chart2D getChart() {
       return this.m_chart;
     }
+
+    /**
+     * Returns the constant for the dimension that is accessed on the chart.
+     * <p>
+     * 
+     * @return {@link Chart2D#X}, {@link Chart2D#Y} or -1 if this axis is not
+     *         assigned to a chart.
+     */
+    public abstract int getDimension();
 
     /**
      * Returns the maximum value from the Chart2D's axis (X or Y) this instance
@@ -280,6 +168,19 @@ public abstract class AAxis implements IAxis {
     protected abstract double getMinimumValueDistanceForLables();
 
     /**
+     * Returns the amount of pixel avalable for displaying the values on the
+     * chart in the dimension this accessor stands for.
+     * <p>
+     * This method must not be called within the first lines of a paint cycle
+     * (neccessary underlying values then are computed new).
+     * <p>
+     * 
+     * @return the amount of pixel avalable for displaying the values on the
+     *         chart in the dimension this accessor stands for.
+     */
+    protected abstract int getPixelRange();
+
+    /**
      * @return Returns the rangePolicy.
      */
     public final IRangePolicy getRangePolicy() {
@@ -334,6 +235,23 @@ public abstract class AAxis implements IAxis {
       this.m_rangePolicy.addPropertyChangeListener(ARangePolicy.PROPERTY_RANGE_MAX, this.m_chart);
       this.m_rangePolicy.addPropertyChangeListener(ARangePolicy.PROPERTY_RANGE_MIN, this.m_chart);
     }
+
+    /**
+     * Returns the translation of the mouse event coordinates of the given mouse
+     * event to the value within the chart for the dimension (x,y) covered by
+     * this axis.
+     * <p>
+     * Note that the mouse event has to be an event fired on this component!
+     * <p>
+     * 
+     * @param mouseEvent
+     *          a mouse event that has been fired on this component.
+     * @return the translation of the mouse event coordinates of the given mouse
+     *         event to the value within the chart for the dimension covered by
+     *         this axis (x or y) or null if no calculations could be performed
+     *         as the chart was not painted before.
+     */
+    public abstract double translateMousePosition(final MouseEvent mouseEvent);
   }
 
   /**
@@ -345,33 +263,8 @@ public abstract class AAxis implements IAxis {
    * 
    * @see Chart2D#getAxisX()
    */
-  public final class XDataAccessor extends AAxis.Chart2DDataAccessor {
-
-    /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#translateMousePosition(java.awt.event.MouseEvent)
-     */
-    public double translateMousePosition(final MouseEvent mouseEvent) {
-      double result = 0;
-      // relate to the offset:
-      double mouseX = mouseEvent.getX() - this.m_chart.getXChartStart();
-
-      int rangeX = this.m_chart.getXChartEnd() - this.m_chart.getXChartStart();
-      if (rangeX == 0) {
-        // return null
-      } else {
-        double scaledX = mouseX / (double) rangeX;
-        Range valueRangeX = AAxis.this.getRange();
-        result = scaledX * valueRangeX.getExtent() + valueRangeX.getMin();
-      }
-      return result;
-    }
-
-    /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getPixelRange()
-     */
-    protected int getPixelRange() {
-      return this.m_chart.getXChartEnd() - this.m_chart.getXChartStart();
-    }
+  public final class XDataAccessor
+      extends AAxis.AChart2DDataAccessor {
 
     /**
      * Creates an instance that accesses the given chart's x axis.
@@ -386,14 +279,21 @@ public abstract class AAxis implements IAxis {
     }
 
     /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getMax()
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getDimension()
+     */
+    public int getDimension() {
+      return Chart2D.X;
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getMax()
      */
     protected double getMax() {
       return this.m_rangePolicy.getMax(this.m_chart.getMinX(), this.m_chart.getMaxX());
     }
 
     /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getMaxFromAxis()
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getMaxFromAxis()
      */
     protected final double getMaxFromAxis() {
 
@@ -401,7 +301,7 @@ public abstract class AAxis implements IAxis {
     }
 
     /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getMaximumPixelForLable()
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getMaximumPixelForLable()
      */
     protected double getMaximumPixelForLable() {
 
@@ -417,14 +317,14 @@ public abstract class AAxis implements IAxis {
     }
 
     /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getMin()
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getMin()
      */
     protected final double getMin() {
       return this.m_rangePolicy.getMin(this.m_chart.getMinX(), this.m_chart.getMaxX());
     }
 
     /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getMinFromAxis()
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getMinFromAxis()
      */
     protected final double getMinFromAxis() {
 
@@ -432,7 +332,7 @@ public abstract class AAxis implements IAxis {
     }
 
     /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getMinimumValueDistanceForLables()
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getMinimumValueDistanceForLables()
      */
     protected final double getMinimumValueDistanceForLables() {
 
@@ -451,7 +351,14 @@ public abstract class AAxis implements IAxis {
     }
 
     /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getValueDistanceForPixel(int)
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getPixelRange()
+     */
+    protected int getPixelRange() {
+      return this.m_chart.getXChartEnd() - this.m_chart.getXChartStart();
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getValueDistanceForPixel(int)
      */
     protected double getValueDistanceForPixel(final int pixel) {
       Dimension d = this.m_chart.getSize();
@@ -466,7 +373,7 @@ public abstract class AAxis implements IAxis {
     }
 
     /**
-     * @see AAxis.Chart2DDataAccessor#setRangePolicy(IRangePolicy)
+     * @see AAxis.AChart2DDataAccessor#setRangePolicy(info.monitorenter.gui.chart.IRangePolicy)
      */
     public void setRangePolicy(final IRangePolicy rangePolicy) {
 
@@ -489,19 +396,38 @@ public abstract class AAxis implements IAxis {
     public String toString() {
       return "X";
     }
+
+    /**
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#translateMousePosition(java.awt.event.MouseEvent)
+     */
+    public double translateMousePosition(final MouseEvent mouseEvent) {
+      double result = 0;
+      // relate to the offset:
+      double mouseX = mouseEvent.getX() - this.m_chart.getXChartStart();
+
+      int rangeX = this.m_chart.getXChartEnd() - this.m_chart.getXChartStart();
+      if (rangeX == 0) {
+        // return null
+      } else {
+        double scaledX = mouseX / (double) rangeX;
+        Range valueRangeX = AAxis.this.getRange();
+        result = scaledX * valueRangeX.getExtent() + valueRangeX.getMin();
+      }
+      return result;
+    }
   }
 
   /**
    * Accesses the y axis of the {@link Chart2D}.
    * <p>
    * 
-   * @see AAxis#setAccessor(AAxis.Chart2DDataAccessor)
+   * @see AAxis#setAccessor(AChart2DDataAccessor)
    * 
    * @see Chart2D#getAxisY()
    */
 
-  public final class YDataAccessor extends AAxis.Chart2DDataAccessor {
-
+  public final class YDataAccessor
+      extends AAxis.AChart2DDataAccessor {
     /**
      * Creates an instance that accesses the y axis of the given chart.
      * <p>
@@ -515,21 +441,21 @@ public abstract class AAxis implements IAxis {
     }
 
     /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getPixelRange()
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getDimension()
      */
-    protected int getPixelRange() {
-      return this.m_chart.getYChartStart() - this.m_chart.getYChartEnd();
+    public int getDimension() {
+      return Chart2D.Y;
     }
 
     /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getMax()
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getMax()
      */
     protected final double getMax() {
       return this.m_rangePolicy.getMax(this.m_chart.getMinY(), this.m_chart.getMaxY());
     }
 
     /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getMaxFromAxis()
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getMaxFromAxis()
      */
     protected final double getMaxFromAxis() {
 
@@ -537,7 +463,7 @@ public abstract class AAxis implements IAxis {
     }
 
     /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getMaximumPixelForLable()
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getMaximumPixelForLable()
      */
     protected double getMaximumPixelForLable() {
 
@@ -547,14 +473,14 @@ public abstract class AAxis implements IAxis {
     }
 
     /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getMin()
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getMin()
      */
     protected final double getMin() {
       return this.m_rangePolicy.getMin(this.m_chart.getMinY(), this.m_chart.getMaxY());
     }
 
     /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getMinFromAxis()
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getMinFromAxis()
      */
     protected final double getMinFromAxis() {
 
@@ -562,7 +488,7 @@ public abstract class AAxis implements IAxis {
     }
 
     /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getMinimumValueDistanceForLables()
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getMinimumValueDistanceForLables()
      */
     protected final double getMinimumValueDistanceForLables() {
 
@@ -581,7 +507,14 @@ public abstract class AAxis implements IAxis {
     }
 
     /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getValueDistanceForPixel(int)
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getPixelRange()
+     */
+    protected int getPixelRange() {
+      return this.m_chart.getYChartStart() - this.m_chart.getYChartEnd();
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#getValueDistanceForPixel(int)
      */
     protected double getValueDistanceForPixel(final int pixel) {
       Dimension d = this.m_chart.getSize();
@@ -596,7 +529,7 @@ public abstract class AAxis implements IAxis {
     }
 
     /**
-     * @see AAxis.Chart2DDataAccessor#setRangePolicy(IRangePolicy)
+     * @see AAxis.AChart2DDataAccessor#setRangePolicy(IRangePolicy)
      */
     public void setRangePolicy(final IRangePolicy rangePolicy) {
       double ymax = this.getMax();
@@ -620,7 +553,7 @@ public abstract class AAxis implements IAxis {
     }
 
     /**
-     * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#translateMousePosition(java.awt.event.MouseEvent)
+     * @see info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor#translateMousePosition(java.awt.event.MouseEvent)
      */
     public double translateMousePosition(final MouseEvent mouseEvent) {
       double result = 0;
@@ -649,7 +582,7 @@ public abstract class AAxis implements IAxis {
    * It determines, which axis (x or y) this instance is representing.
    * <p>
    */
-  protected Chart2DDataAccessor m_accessor;
+  protected AChart2DDataAccessor m_accessor;
 
   /**
    * Formatting of the labels.
@@ -673,8 +606,17 @@ public abstract class AAxis implements IAxis {
    */
   protected double m_minorTickSpacing = 1;
 
+  /** Boolean switch for painting x gridlines. * */
+  private boolean m_paintGrid = false;
+
+  /** Boolean switch for painting the scale in this dimension. */
+  private boolean m_paintScale = true;
+
   /** Internally used for rouding to ticks, calculated once per paint iteration. */
   protected double m_power;
+
+  /** Support for acting as a property change event producer for listeners. */
+  private PropertyChangeSupport m_propertyChangeSupport;
 
   /**
    * Controls wether scale values are started from major ticks.
@@ -720,8 +662,19 @@ public abstract class AAxis implements IAxis {
    * 
    * @return the accessor to the chart.
    */
-  public Chart2DDataAccessor getAccessor() {
+  public AChart2DDataAccessor getAccessor() {
     return this.m_accessor;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#getDimension()
+   */
+  public int getDimension() {
+    int result = -1;
+    if (this.m_accessor != null) {
+      result = this.m_accessor.getDimension();
+    }
+    return result;
   }
 
   /**
@@ -849,6 +802,20 @@ public abstract class AAxis implements IAxis {
    */
   public double getMinorTickSpacing() {
     return this.m_minorTickSpacing;
+  }
+
+  /**
+   * @see java.beans.PropertyChangeSupport#getPropertyChangeListeners()
+   */
+  public PropertyChangeListener[] getPropertyChangeListeners() {
+    return this.m_propertyChangeSupport.getPropertyChangeListeners();
+  }
+
+  /**
+   * @see java.beans.PropertyChangeSupport#getPropertyChangeListeners(java.lang.String)
+   */
+  public PropertyChangeListener[] getPropertyChangeListeners(final String propertyName) {
+    return this.m_propertyChangeSupport.getPropertyChangeListeners(propertyName);
   }
 
   /**
@@ -980,6 +947,26 @@ public abstract class AAxis implements IAxis {
   }
 
   /**
+   * Returns wether the x grid is painted or not.
+   * <p>
+   * 
+   * @return wether the x grid is painted or not.
+   */
+  public final boolean isPaintGrid() {
+    return this.m_paintGrid;
+  }
+
+  /**
+   * Returns whether the scale for this axis should be painted or not.
+   * <p>
+   * 
+   * @return whether the scale for this axis should be painted or not.
+   */
+  public final boolean isPaintScale() {
+    return this.m_paintScale;
+  }
+
+  /**
    * Check wether scale values are started from major ticks.
    * <p>
    * 
@@ -989,6 +976,46 @@ public abstract class AAxis implements IAxis {
    */
   public boolean isStartMajorTick() {
     return this.m_startMajorTick;
+  }
+
+  /**
+   * @see java.beans.PropertyChangeSupport#removePropertyChangeListener(java.beans.PropertyChangeListener)
+   */
+  public void removePropertyChangeListener(final PropertyChangeListener listener) {
+    this.m_propertyChangeSupport.removePropertyChangeListener(listener);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#replace(info.monitorenter.gui.chart.IAxis)
+   */
+  public void replace(final IAxis axis) {
+    if (axis != null) {
+      this.setAccessor(axis.getAccessor());
+      this.setFormatter(axis.getFormatter());
+      this.setMajorTickSpacing(axis.getMajorTickSpacing());
+      this.setMinorTickSpacing(axis.getMinorTickSpacing());
+      this.setPaintGrid(axis.isPaintGrid());
+      this.setPaintScale(axis.isPaintScale());
+      // This must not be done! See javadoc: it delegates to the accessor which
+      // already has been moved.
+      // axisX.setRange(old.getRange());
+      // axisX.setRangePolicy(old.getRangePolicy());
+      this.setStartMajorTick(axis.isStartMajorTick());
+
+      // No go for listeners:
+      // TODO: keep in track with evolving IAxis properties!
+      PropertyChangeListener[] propertyChangeListeners = axis
+          .getPropertyChangeListeners(IAxis.PROPERTY_PAINTGRID);
+      for (int i = propertyChangeListeners.length - 1; i >= 0; i--) {
+        axis.removePropertyChangeListener(propertyChangeListeners[i]);
+        this.addPropertyChangeListener(IAxis.PROPERTY_PAINTGRID, propertyChangeListeners[i]);
+      }
+      propertyChangeListeners = axis.getPropertyChangeListeners(IAxis.PROPERTY_RANGEPOLICY);
+      for (int i = propertyChangeListeners.length - 1; i >= 0; i--) {
+        axis.removePropertyChangeListener(propertyChangeListeners[i]);
+        this.addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, propertyChangeListeners[i]);
+      }
+    }
   }
 
   /**
@@ -1077,7 +1104,7 @@ public abstract class AAxis implements IAxis {
    * @param accessor
    *          the accessor to the axis of the chart.
    */
-  protected final void setAccessor(final Chart2DDataAccessor accessor) {
+  protected final void setAccessor(final AChart2DDataAccessor accessor) {
 
     this.m_accessor = accessor;
   }
@@ -1089,7 +1116,7 @@ public abstract class AAxis implements IAxis {
    * @param formatter
    *          The formatter to set.
    */
-  public void setFormatter(final ALabelFormatter formatter) {
+  public void setFormatter(final ILabelFormatter formatter) {
 
     this.m_formatter = formatter;
     this.m_formatter.setAxis(this);
@@ -1162,6 +1189,42 @@ public abstract class AAxis implements IAxis {
   }
 
   /**
+   * Set wether the grid in this dimension should be painted or not.
+   * <p>
+   * A repaint operation for the chart is triggered.
+   * <p>
+   * 
+   * @param grid
+   *          true if the grid should be painted or false if not.
+   */
+  public final void setPaintGrid(final boolean grid) {
+    boolean oldValue = this.m_paintGrid;
+    this.m_paintGrid = grid;
+    if (oldValue != grid) {
+
+      Chart2D chart2D = this.getAccessor().getChart();
+      if (grid) {
+        // TODO: this is hardcoded behaviour that is not explained!
+        this.setPaintScale(true);
+      }
+      this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this,
+          IAxis.PROPERTY_PAINTGRID, new Boolean(oldValue), new Boolean(this.m_paintGrid)));
+      chart2D.repaint(200);
+    }
+  }
+
+  /**
+   * Set if the scale for this axis should be shown.
+   * <p>
+   * 
+   * @param show
+   *          true if the scale on this axis should be shown, false else.
+   */
+  public final void setPaintScale(final boolean show) {
+    this.m_paintScale = show;
+  }
+
+  /**
    * <p>
    * Sets a Range to use for filtering the view to the the connected Axis. Note
    * that it's effect will be affected by the internal {@link IRangePolicy}.
@@ -1222,12 +1285,20 @@ public abstract class AAxis implements IAxis {
   }
 
   /**
-   * Returns whether the scale for this axis should be painted or not.
+   * Returns the translation of the mouse event coordinates of the given mouse
+   * event to the value within the chart for the dimension (x,y) covered by this
+   * axis.
+   * <p>
+   * Note that the mouse event has to be an event fired on the correspondinig
+   * chart component!
    * <p>
    * 
-   * @return whether the scale for this axis should be painted or not.
+   * @param mouseEvent
+   *          a mouse event that has been fired on this component.
+   * @return the translation of the mouse event coordinates of the given mouse
+   *         event to the value within the chart for the dimension covered by
+   *         this axis (x or y) or null if no calculations could be performed as
+   *         the chart was not painted before.
    */
-  public final boolean isPaintScale() {
-    return this.m_paintScale;
-  }
+  protected abstract double translateMousePosition(final MouseEvent mouseEvent);
 }

@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-  var update="05/21/2006";
+  var update="06/01/2006";
  </script>
  <body id="applet">
   <div id="wrapper">
@@ -16,7 +16,8 @@
      
        <h2>Demo Applet</h2>
       <p>
-       This is a simple applet that shows a dynamic chart. It prints summations of 
+       This is a demo applet that shows a dynamic chart along with all recent 
+       UI controls available. It prints summations of 
        random values [positive or negative] on the y axis and a timestamp on the x axis. 
        The y-axis has been forced to always show the range between -20 and +20. 
       </p>

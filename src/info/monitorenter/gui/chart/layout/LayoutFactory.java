@@ -33,6 +33,7 @@ import info.monitorenter.gui.chart.axis.AxisLogE;
 import info.monitorenter.gui.chart.events.AxisActionSetGrid;
 import info.monitorenter.gui.chart.events.AxisActionSetRange;
 import info.monitorenter.gui.chart.events.AxisActionSetRangePolicy;
+import info.monitorenter.gui.chart.events.Chart2DActionSaveImageSingleton;
 import info.monitorenter.gui.chart.events.Chart2DActionSetAxis;
 import info.monitorenter.gui.chart.events.Chart2DActionSetCustomGridColorSingleton;
 import info.monitorenter.gui.chart.events.Chart2DActionSetGridColor;
@@ -82,15 +83,16 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
+
 /**
- * Factory that provides creational methods for adding UI controls to 
- * {@link info.monitorenter.gui.chart.Chart2D} instances and 
- * {@link info.monitorenter.gui.chart.ITrace2D} instances. 
+ * Factory that provides creational methods for adding UI controls to
+ * {@link info.monitorenter.gui.chart.Chart2D} instances and
+ * {@link info.monitorenter.gui.chart.ITrace2D} instances.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.17 $
  */
 public final class LayoutFactory {
 
@@ -210,7 +212,7 @@ public final class LayoutFactory {
      * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
      * 
      * 
-     * @version $Revision: 1.14 $
+     * @version $Revision: 1.17 $
      */
     private final class JMenuOrderingAction
         extends AbstractAction {
@@ -467,6 +469,12 @@ public final class LayoutFactory {
       extends JMenuBar {
 
     /**
+     * Generated <code>serial version UID</code>.
+     * <p>
+     */
+    private static final long serialVersionUID = -332246962640911539L;
+
+    /**
      * @param component
      *          The component to whose background color this item will adapt.
      */
@@ -498,6 +506,12 @@ public final class LayoutFactory {
    */
   private static class PropertyChangeJRadioButtonMenuItem
       extends JRadioButtonMenuItem {
+
+    /**
+     * Generated <code>serial version UID</code>.
+     * <p>
+     */
+    private static final long serialVersionUID = 3933408706693522564L;
 
     /**
      * Internal constructor that should not be used unless
@@ -578,6 +592,13 @@ public final class LayoutFactory {
      */
     public PropertyChangeMenu(final JComponent component, final String name) {
       super(name);
+      /*
+       * For java 1.5 menus that are submenus don't use background color in
+       * ocean theme: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5097866
+       * 
+       * workaround:
+       */
+      this.setOpaque(true);
       new BasicPropertyAdaptSupport(this, component);
 
     }
@@ -668,6 +689,12 @@ public final class LayoutFactory {
       extends JCheckBoxMenuItem {
 
     /**
+     * Generated <code>serial version UID</code>.
+     * <p>
+     */
+    private static final long serialVersionUID = 5737559379056167605L;
+
+    /**
      * Creates an instance with the given name that listens to the components
      * background color, foreground color and font.
      * <p>
@@ -725,6 +752,12 @@ public final class LayoutFactory {
    */
   private static class SelectionAdaptJRadioButtonMenuItem
       extends JRadioButtonMenuItem {
+
+    /**
+     * Generated <code>serial version UID</code>.
+     * <p>
+     */
+    private static final long serialVersionUID = 6949450166704804365L;
 
     /**
      * Creates an instance with the given name that listens to the components
@@ -1358,7 +1391,9 @@ public final class LayoutFactory {
     popup.add(painterMenu);
 
     ret.addMouseListener(new PopupListener(popup));
-    new BasicPropertyAdaptSupport(ret, chart);
+    trace.addPropertyChangeListener(ITrace2D.PROPERTY_COLOR, ret);
+    trace.addPropertyChangeListener(ITrace2D.PROPERTY_NAME, ret);
+    chart.addPropertyChangeListener(Chart2D.PROPERTY_FONT, ret);
     return ret;
   }
 
@@ -1572,7 +1607,6 @@ public final class LayoutFactory {
     } else {
       axisMenu = new JMenu("Axis");
     }
-    // axisMenu.setBackground(background);
 
     // X axis submenu
     JMenuItem xAxisMenuItem = this.createAxisMenuItem(chart.getAxisX(), Chart2D.X, adaptUI2Chart);
@@ -1585,7 +1619,16 @@ public final class LayoutFactory {
     chartMenu.add(createBackgroundColorMenu(chart, adaptUI2Chart));
     chartMenu.add(createForegroundColorMenu(chart, adaptUI2Chart));
     chartMenu.add(createGridColorMenu(chart, adaptUI2Chart));
+    JMenuItem item;
     chartMenu.add(axisMenu);
+
+    if (adaptUI2Chart) {
+      item = new PropertyChangeMenuItem(chart, Chart2DActionSaveImageSingleton.getInstance(chart,
+          "Save image"));
+    } else {
+      item = new JMenuItem(Chart2DActionSaveImageSingleton.getInstance(chart, "Save image"));
+    }
+    chartMenu.add(item);
 
     return chartMenu;
   }
@@ -1656,6 +1699,15 @@ public final class LayoutFactory {
     popup.add(createForegroundColorMenu(chart, adaptUI2Chart));
     popup.add(createGridColorMenu(chart, adaptUI2Chart));
     popup.add(axisMenu);
+    JMenuItem item;
+    if (adaptUI2Chart) {
+      item = new PropertyChangeMenuItem(chart, Chart2DActionSaveImageSingleton.getInstance(chart,
+          "Save image"));
+    } else {
+      item = new JMenuItem(Chart2DActionSaveImageSingleton.getInstance(chart, "Save image"));
+    }
+    popup.add(item);
+
     chart.addMouseListener(new PopupListener(popup));
   }
 }

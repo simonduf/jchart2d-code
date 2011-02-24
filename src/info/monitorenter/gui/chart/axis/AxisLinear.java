@@ -27,7 +27,6 @@ import info.monitorenter.util.Range;
 
 import java.awt.event.MouseEvent;
 
-
 /**
  * An {@link AAxis} with linear display of values.
  * <p>
@@ -35,21 +34,23 @@ import java.awt.event.MouseEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.4 $
  */
-public class AxisLinear extends AAxis {
+public class AxisLinear
+    extends AAxis {
 
   /**
-   * @see info.monitorenter.gui.chart.AAxis#translateMousePosition(java.awt.event.MouseEvent)
+   * Defcon.
+   * <p>
    */
-  protected double translateMousePosition(final MouseEvent mouseEvent) throws IllegalArgumentException {
-    return this.getAccessor().translateMousePosition(mouseEvent);
+  public AxisLinear() {
+    // nop
   }
 
   /**
    * @see info.monitorenter.gui.chart.AAxis#getScaledValue(double)
    */
-  protected double getScaledValue(final double absolute) {
+  public double getScaledValue(final double absolute) {
     Range range = this.getRange();
     double scalerX = range.getExtent();
     double result = (absolute - range.getMin()) / scalerX;
@@ -57,5 +58,13 @@ public class AxisLinear extends AAxis {
       result = 0;
     }
     return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.AAxis#translateMousePosition(java.awt.event.MouseEvent)
+   */
+  protected double translateMousePosition(final MouseEvent mouseEvent)
+      throws IllegalArgumentException {
+    return this.getAccessor().translateMousePosition(mouseEvent);
   }
 }

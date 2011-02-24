@@ -52,9 +52,15 @@ import javax.swing.JCheckBoxMenuItem;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class Chart2DActionSetPaintLabels extends AChart2DAction {
+
+  /**
+   * Generated <code>serial version UID</code>.
+   * <p>
+   */
+  private static final long serialVersionUID = 2032168563789294815L;
 
   /**
    * Create an <code>Action</code> that accesses the axis, identifies itself

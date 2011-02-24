@@ -1,7 +1,7 @@
 *
  * File   : $Source: /cvsroot/jchart2d/jchart2d/history.txt,v $
- * Date   : $Date: 2006/06/01 07:37:37 $
- * Version: $Revision: 1.36 $
+ * Date   : $Date: 2006/06/05 11:58:09 $
+ * Version: $Revision: 1.47 $
  *
  * This file is part of jchart2d -
  * the Open Source real time charting library.
@@ -11,7 +11,8 @@
 
 History of changes for the jchart2d project.
 
-Changes are chronologically ordered from top (most recent) to bottom (least recent).
+Changes are chronologically ordered from top (most recent) 
+to bottom (least recent).
 
 Legend:
 ! New Feature
@@ -19,10 +20,33 @@ Legend:
 - General comment
 o API change that requires refactoring.
 
+jchart2d-2.0.1 - June, 5th, 2006
+
+- Binaries are now compiled with 1.4 option against java 1.5.0_07-b03.
+* Catch exceptions caused by illegal data for axis implementations 
+  that transform values - Return 0 and only output a warning 
+  (innapropriate axis implementation for this data) every 30 seconds.
+! Menu item for saving chart image to file. 
+* JMenus that are submenus did not use background color. 
+  (http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5097866).
+* Trace labels in ChartPanel did not adapt text and color of corresponding 
+  trace.
+* All menu items linked to axis would not function any more after setting 
+  a new axis to the chart. 
+* Don't loose state information and overtake listeners when setting 
+  a new axis to a chart. This bug showed strange behaviour in UI 
+  after a new axis type had been set: E.g. grid was not painted 
+  any more. 
+* Scale value to 0 and print a warning on the console if 
+  a logarithmic axis is used and a value is < 1. 
+  (Instead of letting an exception go to the awt paint thread).
+  
 jchart2d-2.0.0 - May, 31th, 2006
 
-* Started to use a new package for each new version on sourceforge 
-  (bugreport by Ken Webb).
+! Added profiling support in build.xml with Java Interactive 
+  Profiler (JIP).
+* Started to use a new sourceforge package for each new version 
+  on sourceforge (bugreport by Ken Webb).
 ! Optional use of standard UI menu items for menubar and popup menu 
   (instead of thos that adapt their UI to the chart). 
 ! New menu bar available in LayoutFactory 
@@ -208,5 +232,5 @@ jchart2d-1.1.0 - February 12, 2006
    that caused a scaling error.
  * Weird "line from last point to (0,0)" - bug.
  ! Complete new synchronization design:
-   Client Threads (your code) is now not involved in
+   Client Threads (your code) are now not involved in
    scaling operations any more.

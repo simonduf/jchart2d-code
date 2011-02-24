@@ -28,18 +28,27 @@ import java.util.Comparator;
  * A <code>Comparator</code> that compares the given Objects by their
  * {@link java.lang.Object#toString()} value.
  * <p>
- *
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
- * @version $Revision: 1.1 $
+ * 
+ * @version $Revision: 1.2 $
  */
 public final class ComparatorToString implements Comparator {
 
   /**
-   * Compares both Objects by their {@link Object#toString()} presentation.
-   * <p> * @version $Revision: 1.1 $
+   * Defcon.
+   * <p>
+   */
+  public ComparatorToString() {
+    // nop
+  }
 
-   *
+  /**
+   * Compares both Objects by their {@link Object#toString()} presentation.
+   * <p>
+   * 
+   * @version $Revision: 1.2 $
+   * 
    * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
    */
   public int compare(final Object o1, final Object o2) throws IllegalArgumentException {

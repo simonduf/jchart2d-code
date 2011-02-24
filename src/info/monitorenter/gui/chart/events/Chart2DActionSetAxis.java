@@ -35,9 +35,16 @@ import java.beans.PropertyChangeEvent;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public final class Chart2DActionSetAxis extends AChart2DAction {
+public final class Chart2DActionSetAxis
+    extends AChart2DAction {
+
+  /**
+   * Generated <code>serial version UID</code>.
+   * <p>
+   */
+  private static final long serialVersionUID = 2385589123139195036L;
 
   /**
    * Identifies where to set the axis on the chart. Either {@link Chart2D#X} or

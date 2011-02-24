@@ -24,10 +24,10 @@ package info.monitorenter.gui.chart.events;
 
 import java.beans.PropertyChangeListener;
 
+import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 
 import javax.swing.AbstractAction;
-
 
 /**
  * The base class that connects triggered actions with an
@@ -36,24 +36,25 @@ import javax.swing.AbstractAction;
  * Every subclass may delegate it's constructor-given <code>Axis</code>
  * instance as protected member <code>m_axis</code>.
  * </p>
- *
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
- * @version $Revision: 1.2 $
- *
+ * 
+ * @version $Revision: 1.3 $
+ * 
  */
-public abstract class AAxisAction extends AbstractAction implements PropertyChangeListener {
+public abstract class AAxisAction
+    extends AbstractAction implements PropertyChangeListener {
 
   /** The target of this action. */
-  protected IAxis m_axis;
+  private IAxis m_axis;
 
   /**
    * Create an <code>Action</code> that accesses the axis and identifies
    * itself with the given action String.
-   *
+   * 
    * @param axis
    *          the target the action will work on.
-   *
+   * 
    * @param description
    *          the descriptive <code>String</code> that will be displayed by
    *          {@link javax.swing.AbstractButton} subclasses that get this
@@ -63,5 +64,35 @@ public abstract class AAxisAction extends AbstractAction implements PropertyChan
   public AAxisAction(final IAxis axis, final String description) {
     super(description);
     this.m_axis = axis;
+  }
+
+  /**
+   * Returns the axis that is controlled.
+   * <p>
+   * Note that several calls may return different instances (<code>a.getAxis() == a.getAxis()</code>
+   * may be false) in case the corresponding chart of the former axis gets a new
+   * axis assigned.
+   * <p>
+   * 
+   * @return the axis that is controlled.
+   */
+  protected IAxis getAxis() {
+    // update in case the corresponding chart has a new axis:
+    IAxis axis = null;
+    switch (this.m_axis.getDimension()) {
+      case Chart2D.X:
+        axis = this.m_axis.getAccessor().getChart().getAxisX();
+        break;
+      case Chart2D.Y:
+        axis = this.m_axis.getAccessor().getChart().getAxisY();
+        break;
+      default:
+        break;
+    }
+    if (axis != this.m_axis) {
+      // transport of listeners is already done in AAxis.replace(IAxis)!
+    }
+    this.m_axis = axis;
+    return this.m_axis;
   }
 }

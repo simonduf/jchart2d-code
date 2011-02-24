@@ -46,9 +46,10 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class AxisLog10 extends AAxisTransformation {
+public class AxisLog10
+    extends AAxisTransformation {
 
   /**
    * Creates an instance that uses a {@link LabelFormatterSimple} for formatting
@@ -59,6 +60,8 @@ public class AxisLog10 extends AAxisTransformation {
   public AxisLog10() {
     super(new LabelFormatterSimple());
   }
+
+
 
   /**
    * Performs {@link Math#log10(double)} with a check for reaching infinity.

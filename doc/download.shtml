@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-  var update="12/09/2004";
+  var update="06/01/2006";
  </script>
  <body id="download">
   <div id="wrapper">
@@ -23,7 +23,7 @@
        JChart2D may be downloaded from the following page:
        <br>
        <font size="big">
-        <a href="http://sourceforge.net/project/showfiles.php?group_id=50440" target="_blank">Download JChart2D</a>
+        <a href="http://prdownloads.sourceforge.net/jchart2d/jchart2d-2.0.0.jar?download" target="_blank">Download JChart2D</a>
        </font>
        <br>
       </p>

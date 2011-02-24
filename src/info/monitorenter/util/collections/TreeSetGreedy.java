@@ -32,13 +32,13 @@ import java.util.TreeSet;
 /**
  * A <code>Set</code> that will always successfully add new instances and
  * guarantee that all the "<em>Comparable properties</em>" of the contained
- * {@link info.monitorenter.util.collections.IComparableProperty} instances will build a set
- * (no duplicates).
+ * {@link info.monitorenter.util.collections.IComparableProperty} instances will
+ * build a set (no duplicates).
  * <p>
  * Although the interface of {@link java.util.Set} is preserved and allows
  * adding any <code>Object</code> <b>only
- * {@link info.monitorenter.util.collections.IComparableProperty} instances may be added to
- * <code>TreeSetGreedy</code> </b> because it uses a proprietary
+ * {@link info.monitorenter.util.collections.IComparableProperty} instances may
+ * be added to <code>TreeSetGreedy</code> </b> because it uses a proprietary
  * {@link java.util.Comparator}.
  * <p>
  * The added <code>IComparableProperty</code> instances with the lowest
@@ -57,7 +57,8 @@ import java.util.TreeSet;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  */
-public class TreeSetGreedy extends TreeSet implements Set {
+public class TreeSetGreedy
+    extends TreeSet implements Set {
 
   /**
    * A <code>Comparator</code> that will compare {@link IComparableProperty}
@@ -85,6 +86,14 @@ public class TreeSetGreedy extends TreeSet implements Set {
    * 
    */
   private static final class NumberPropertyComparator implements Comparator {
+
+    /**
+     * Defcon.
+     * <p>
+     */
+    public NumberPropertyComparator() {
+      // nop
+    }
 
     /**
      * Reference to an instance that has to be ordered in the
@@ -257,10 +266,10 @@ public class TreeSetGreedy extends TreeSet implements Set {
    * <p>
    * This method allows to avoid exceeding bounds (e.g. between {
    * {@link info.monitorenter.gui.chart.ITrace2D#Z_INDEX_MIN} and
-   * {@link info.monitorenter.gui.chart.ITrace2D#ZINDEX_MAX}) and allows that changes of the
-   * comparable properties always have an effect. If in the example above the
-   * 2nd instance would increase it's property by one from 10 to 11 nothing
-   * would happen to the order.
+   * {@link info.monitorenter.gui.chart.ITrace2D#ZINDEX_MAX}) and allows that
+   * changes of the comparable properties always have an effect. If in the
+   * example above the 2nd instance would increase it's property by one from 10
+   * to 11 nothing would happen to the order.
    * <p>
    * 
    */

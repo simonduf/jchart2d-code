@@ -40,7 +40,7 @@ import java.util.Iterator;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westerman </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class Trace2DLtdReplacing extends Trace2DLtd {
   /**
@@ -67,7 +67,8 @@ public class Trace2DLtdReplacing extends Trace2DLtd {
    */
   public boolean addPointInternal(final TracePoint2D p) {
     TracePoint2D tmp;
-    double tmpx, tmpy;
+    double tmpx;
+    double tmpy;
     Iterator it = this.m_buffer.iteratorF2L();
     while (it.hasNext()) {
       tmp = (TracePoint2D) it.next();

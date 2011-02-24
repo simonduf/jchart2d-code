@@ -41,9 +41,15 @@ import java.awt.geom.Rectangle2D;
  * 
  * @author Alessio Sambarino (Contributor)
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.3 $
  */
-public class ZoomableChart extends Chart2D implements MouseListener, MouseMotionListener {
+public class ZoomableChart
+    extends Chart2D implements MouseListener, MouseMotionListener {
+
+  /**
+   * Generated <code>serial version UID</code>.<p>
+   */
+  private static final long serialVersionUID = 8799808716942023907L;
 
   /** Needed to set the initial zooming area to the data bounds. */
   private boolean m_firstTime = true;
@@ -210,20 +216,20 @@ public class ZoomableChart extends Chart2D implements MouseListener, MouseMotion
    * Zooms to the selected bounds.
    * <p>
    * 
-   * @param min
-   *          the lower bound.
+   * @param xmin
+   *          the lower x bound.
    * 
-   * @param max
-   *          the upper bound.
+   * @param xmax
+   *          the upper x bound.
    */
-  public void zoom(final double min, final double max) {
+  public void zoom(final double xmin, final double xmax) {
 
     this.m_zoomArea = null;
 
     IAxis axis = getAxisX();
     // IRangePolicy
     axis.setRangePolicy(new RangePolicyFixedViewport());
-    axis.setRange(new Range(min, max));
+    axis.setRange(new Range(xmin, xmax));
 
   }
 

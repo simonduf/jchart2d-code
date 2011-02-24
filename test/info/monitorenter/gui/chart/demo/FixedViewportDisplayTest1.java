@@ -39,7 +39,7 @@ import java.awt.Color;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  * 
  */
 public class FixedViewportDisplayTest1 extends AbstractDisplayTest {
@@ -69,9 +69,11 @@ public class FixedViewportDisplayTest1 extends AbstractDisplayTest {
    */
   protected void configure(final StaticCollectorChart chart) {
     IAxis axis = chart.getChart().getAxisX();
-    axis.setRangePolicy(new RangePolicyFixedViewport(new Range(2, 5)));
+    axis.setRangePolicy(new RangePolicyFixedViewport());
+    axis.setRange(new Range(2, 5));
     axis = chart.getChart().getAxisY();
-    axis.setRangePolicy(new RangePolicyFixedViewport(new Range(2, 5)));
+    axis.setRangePolicy(new RangePolicyFixedViewport());
+    axis.setRange(new Range(2, 5));
   }
 
 }

@@ -56,10 +56,10 @@ import java.awt.geom.Point2D;
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
-public class TracePoint2D extends Point2D.Double implements Comparable, java.io.Serializable,
-    Cloneable {
+public class TracePoint2D
+    extends Point2D.Double implements Comparable, java.io.Serializable, Cloneable {
 
   /**
    * Generated <code>serialVersionUID</code>.
@@ -110,7 +110,9 @@ public class TracePoint2D extends Point2D.Double implements Comparable, java.io.
    * @see java.lang.Object#clone()
    */
   public Object clone() {
-    TracePoint2D result = new TracePoint2D(this.x, this.y);
+    TracePoint2D result = (TracePoint2D) super.clone();
+    result.x = this.x;
+    result.y = this.y;
     result.m_scaledOnce = this.m_scaledOnce;
     result.m_scaledX = this.m_scaledX;
     result.m_scaledY = this.m_scaledY;

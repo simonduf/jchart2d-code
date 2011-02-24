@@ -46,9 +46,15 @@ import javax.swing.JFrame;
  * 
  * @author Alessio Sambarino (Contributor)
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ZoomTest extends JFrame {
+
+  /**
+   * Generated <code>serial version UID</code>.
+   * <p>
+   */
+  private static final long serialVersionUID = -2249660781499017221L;
 
   /**
    * Action adapter for zoomAllButton.

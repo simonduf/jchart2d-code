@@ -45,7 +45,6 @@ import java.util.Set;
 
 import javax.swing.JPanel;
 import javax.swing.JToolTip;
-import javax.swing.SwingUtilities;
 
 /**
  * <code> Chart2D</code> is a component for diplaying the data contained in a
@@ -180,7 +179,7 @@ import javax.swing.SwingUtilities;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.19 $
  */
 
 public class Chart2D
@@ -203,13 +202,19 @@ public class Chart2D
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    */
-  class Painter
+  final class Painter
       extends Thread {
+
+    /** Hide constructor. */
+    private Painter() {
+      // nop
+    }
+
     /** The maximum sleep time between to paint invocations. */
     static final long MAX_SLEEP = 10000;
 
     /** The minimum sleep time between to paint invocations. */
-    static final long MIN_SLEEP = 100;
+    static final long MIN_SLEEP = 50;
 
     /**
      * Dynamically adapts to the update speed of data. Calculated in run().
@@ -614,11 +619,7 @@ public class Chart2D
     }
     // A deadlock occurs if a listener triggers paint.
     // This was the case with ChartPanel.
-    SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-        Chart2D.this.firePropertyChange(Chart2D.PROPERTY_ADD_REMOVE_TRACE, null, points);
-      }
-    });
+    this.firePropertyChange(Chart2D.PROPERTY_ADD_REMOVE_TRACE, null, points);
   }
 
   /**
@@ -693,7 +694,8 @@ public class Chart2D
    * @return the maximum x value of all traces.
    */
   protected final double findMaxX() {
-    double max = -Double.MAX_VALUE, tmp;
+    double max = -Double.MAX_VALUE;
+    double tmp;
     Iterator it = this.m_traces.iterator();
     ITrace2D trace;
     while (it.hasNext()) {
@@ -727,7 +729,8 @@ public class Chart2D
    * @return the maximum y value of all traces.
    */
   protected final double findMaxY() {
-    double max = -Double.MAX_VALUE, tmp;
+    double max = -Double.MAX_VALUE;
+    double tmp;
     Iterator it = this.m_traces.iterator();
     ITrace2D trace;
     while (it.hasNext()) {
@@ -762,7 +765,8 @@ public class Chart2D
    */
 
   protected final double findMinX() {
-    double min = Double.MAX_VALUE, tmp;
+    double min = Double.MAX_VALUE;
+    double tmp;
     Iterator it = this.m_traces.iterator();
     ITrace2D trace;
     while (it.hasNext()) {
@@ -797,7 +801,8 @@ public class Chart2D
    */
 
   protected final double findMinY() {
-    double min = Double.MAX_VALUE, tmp;
+    double min = Double.MAX_VALUE;
+    double tmp;
     Iterator it = this.m_traces.iterator();
     ITrace2D trace;
     while (it.hasNext()) {
@@ -1203,8 +1208,13 @@ public class Chart2D
     this.paintCoordinateSystem(g2d);
 
     // paint Traces.
-    int tmpx, oldtmpx, tmpy, oldtmpy;
-    TracePoint2D oldpoint = null, newpoint = null, tmppt = null;
+    int tmpx;
+    int oldtmpx;
+    int tmpy;
+    int oldtmpy;
+    TracePoint2D oldpoint = null;
+    TracePoint2D newpoint = null;
+    TracePoint2D tmppt = null;
     traceIt = this.m_traces.iterator();
     Stroke backupStroke = g2d.getStroke();
     int count = 0;
@@ -1225,7 +1235,8 @@ public class Chart2D
             tracePainter = (ITracePainter) itTracePainters.next();
             tracePainter.startPaintIteration();
             Iterator pointIt = tmpdata.iterator();
-            boolean newpointVisible, oldpointVisible;
+            boolean newpointVisible;
+            boolean oldpointVisible;
             // searching the first valid point, done as a wrapping loop to cope
             // with zero points.
             while (pointIt.hasNext()) {
@@ -1693,6 +1704,8 @@ public class Chart2D
    */
   public void setAxisX(final AAxis axisX) {
     IAxis old = this.m_axisX;
+    // copy the complete state and steal the listeners:
+    axisX.replace(old);
     this.m_axisX = axisX;
     // constructor will register the accessor to the axis:
     axisX.new XDataAccessor(this);
@@ -1712,6 +1725,7 @@ public class Chart2D
    */
   public void setAxisY(final AAxis axisY) {
     IAxis old = this.m_axisY;
+    axisY.replace(old);
     this.m_axisY = axisY;
     // constructor will register the accessor to the axis:
     axisY.new YDataAccessor(this);

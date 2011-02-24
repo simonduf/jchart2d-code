@@ -38,7 +38,7 @@ import javax.swing.event.ChangeListener;
  *
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ObjRecorder2Trace2DAdapter implements ChangeListener {
 
@@ -105,7 +105,8 @@ public class ObjRecorder2Trace2DAdapter implements ChangeListener {
       return;
     }
     if (last != null) {
-      double tmpx, tmpy;
+      double tmpx;
+      double tmpy;
       tmpx = last.getTime() - this.m_start;
       tmpy = Double.parseDouble(last.getValue().toString());
       this.m_view.addPoint(tmpx, tmpy);

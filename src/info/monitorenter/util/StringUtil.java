@@ -34,7 +34,7 @@ import java.util.List;
  * 
  * @author Achim.Westermann@gmx.de
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public final class StringUtil {
   /** Singleton instance. */
@@ -237,7 +237,8 @@ public final class StringUtil {
     if (objects == null) {
       return 0;
     }
-    int maxsize = 0, tint = 0;
+    int maxsize = 0;
+    int tint = 0;
     String tmp;
     int stop = objects.size();
     for (int i = 0; i < stop; i++) {
@@ -321,7 +322,8 @@ public final class StringUtil {
     if (objects == null) {
       return;
     }
-    int maxsize = 0, tint = 0;
+    int maxsize = 0;
+    int tint = 0;
     String tmp;
     int stop = objects.size();
     for (int i = 0; i < stop; i++) {

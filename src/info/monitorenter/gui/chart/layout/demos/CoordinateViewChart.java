@@ -40,16 +40,23 @@ import java.io.IOException;
 
 import javax.swing.JFrame;
 
-
 /**
- * A demo that uses a {@link info.monitorenter.gui.chart.layout.views.ChartCoordinateView} to
+ * A demo that uses a
+ * {@link info.monitorenter.gui.chart.layout.views.ChartCoordinateView} to
  * display the position of the mouse over the chart.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class CoordinateViewChart extends JFrame {
+public class CoordinateViewChart
+    extends JFrame {
+
+  /**
+   * Generated <code>serial version UID</code>.
+   * <p>
+   */
+  private static final long serialVersionUID = 1195707820931595997L;
 
   /** The chart to display and query for coordinates. */
   private Chart2D m_chart;

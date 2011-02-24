@@ -57,7 +57,7 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.1 $
+   * @version $Revision: 1.2 $
    */
   protected abstract class ARingBufferIterator implements Iterator {
     /**
@@ -428,7 +428,8 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
   public void setBufferSize(final int newSize) {
     Object[] newbuffer = new Object[newSize];
     boolean emptyStore = this.m_empty;
-    int i = 0, j = 0;
+    int i = 0;
+    int j = 0;
     if (RingBufferArray.DEBUG) {
       System.out.println("setBufferSize(" + newSize + "): isEmpty(): " + this.isEmpty() + " tail: "
           + this.m_tailpointer + " head: " + this.m_headpointer);

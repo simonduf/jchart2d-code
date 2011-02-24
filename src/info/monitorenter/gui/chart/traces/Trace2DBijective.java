@@ -23,7 +23,6 @@
 
 package info.monitorenter.gui.chart.traces;
 
-
 import info.monitorenter.gui.chart.TracePoint2D;
 
 import java.util.Iterator;
@@ -54,9 +53,10 @@ import java.util.Iterator;
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class Trace2DBijective extends Trace2DSimple {
+public class Trace2DBijective
+    extends Trace2DSimple {
 
   /**
    * Defcon of this stateless instance.
@@ -71,7 +71,8 @@ public class Trace2DBijective extends Trace2DSimple {
     double px = p.getX();
     synchronized (this) {
       Iterator it = this.m_points.iterator();
-      TracePoint2D tmp = null, removed = null;
+      TracePoint2D tmp = null;
+      TracePoint2D removed = null;
       while (it.hasNext()) {
         tmp = (TracePoint2D) it.next();
         if (tmp.getX() == px) {

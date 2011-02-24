@@ -11,7 +11,7 @@
     <property name="builddir" value="${basedir}/bin" />
     <property name="sourcedir" value="${basedir}/src" />
     <property name="sourcedir.test" value="${basedir}/test" />
-    <property name="project.version" value="2.0.0" />
+    <property name="project.version" value="2.0.1" />
 
     <!-- Taskdefs -->
     <!--
@@ -162,7 +162,7 @@
     </target>
 
 
-    <target name="makejarApplet">
+    <target name="makejarApplet" depends="makejarFat">
         <description>
      Create a jar file that is shrinked by proguard for
      faster download. Only the codepath for the applet

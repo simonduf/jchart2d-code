@@ -41,7 +41,7 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  */
 public class AxisActionSetRangePolicy extends AAxisAction {
 
@@ -87,7 +87,7 @@ public class AxisActionSetRangePolicy extends AAxisAction {
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   public void actionPerformed(final ActionEvent e) {
-    this.m_axis.setRangePolicy(this.m_rangePolicy);
+    this.getAxis().setRangePolicy(this.m_rangePolicy);
   }
 
   /**
@@ -97,7 +97,8 @@ public class AxisActionSetRangePolicy extends AAxisAction {
     String property = evt.getPropertyName();
     if (property.equals(IAxis.PROPERTY_RANGEPOLICY)) {
       Class rangepolicyClass = evt.getNewValue().getClass();
-      Boolean oldValue, newValue;
+      Boolean oldValue;
+      Boolean newValue;
       if (rangepolicyClass == this.m_rangePolicy.getClass()) {
         oldValue = new Boolean(false);
         newValue = new Boolean(true);

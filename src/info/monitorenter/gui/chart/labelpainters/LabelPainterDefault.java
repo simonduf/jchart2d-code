@@ -30,25 +30,33 @@ import java.awt.Graphics2D;
  * Default implementation for a label painter that uses all given arguments (no
  * proprietary behaviour).
  * </p>
- *
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
- * @version $Revision: 1.1 $
- *
+ * 
+ * @version $Revision: 1.2 $
+ * 
  */
 public class LabelPainterDefault implements ILabelPainter {
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelPainter#paintXLabel(int, int, java.lang.String,
-   *      java.awt.Graphics2D)
+   * Defcon.
+   * <p>
+   */
+  public LabelPainterDefault() {
+    // nop
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ILabelPainter#paintXLabel(int, int,
+   *      java.lang.String, java.awt.Graphics2D)
    */
   public void paintXLabel(final int x, final int y, final String label, final Graphics2D g) {
     g.drawString(label, x, y);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelPainter#paintXTick(int, int, boolean,
-   *      java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ILabelPainter#paintXTick(int, int,
+   *      boolean, java.awt.Graphics2D)
    */
   public void paintXTick(final int x, final int y, final boolean isMajorTick, final Graphics2D g) {
     if (isMajorTick) {
@@ -59,16 +67,16 @@ public class LabelPainterDefault implements ILabelPainter {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelPainter#paintYLabel(int, int, java.lang.String,
-   *      java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ILabelPainter#paintYLabel(int, int,
+   *      java.lang.String, java.awt.Graphics2D)
    */
   public void paintYLabel(final int x, final int y, final String label, final Graphics2D g) {
     g.drawString(label, x, y);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ILabelPainter#paintYTick(int, int, boolean,
-   *      java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ILabelPainter#paintYTick(int, int,
+   *      boolean, java.awt.Graphics2D)
    */
   public void paintYTick(final int x, final int y, final boolean isMajorTick, final Graphics2D g) {
     if (isMajorTick) {

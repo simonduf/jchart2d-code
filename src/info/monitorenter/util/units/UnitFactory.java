@@ -1,5 +1,6 @@
 /*
- *  Unit.java, singleton for caching and accessing UnitSystems.
+ *  UnitFactory.java, Singleton that caches instances of whole unit- systems 
+ *  and provides you with the matching unit for a maximum value.
  *  Copyright (C) Achim Westermann, created on 12.05.2005, 20:11:17
  *
  *  This library is free software; you can redistribute it and/or
@@ -36,7 +37,7 @@ import java.util.Iterator;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  * 
  * @see info.monitorenter.util.units.IUnitSystem
  * 
@@ -100,7 +101,8 @@ public final class UnitFactory extends Object {
     }
     // Now to find the right unit.
     Iterator it = choice.iterator();
-    AUnit ret = null, old = null;
+    AUnit ret = null;
+    AUnit old = null;
     if (it.hasNext()) {
       old = (AUnit) it.next();
       while (it.hasNext()) {
@@ -150,7 +152,8 @@ public final class UnitFactory extends Object {
   private List initUnitSystem(final IUnitSystem units) {
     List choice = new LinkedList();
     Class[] clazzs = units.getUnits();
-    AUnit unit = null, previous = null;
+    AUnit unit = null;
+    AUnit previous = null;
     for (int i = 0; i < clazzs.length; i++) {
       if (!AUnit.class.isAssignableFrom(clazzs[i])) {
         System.err.println("UnitFactory: wrong class " + clazzs[i].getName() + " delivered by "
@@ -177,7 +180,8 @@ public final class UnitFactory extends Object {
     }
     unit.m_nextHigherUnit = unit;
     // hardcoded minsearch sort:
-    double tmpfactori, tmpfactorj;
+    double tmpfactori;
+    double tmpfactorj;
     int min;
     int stop = choice.size();
     for (int i = 0; i < stop - 1; i++) {

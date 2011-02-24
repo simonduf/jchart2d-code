@@ -21,26 +21,35 @@
  */
 package info.monitorenter.gui.chart.traces.painters;
 
-
 import java.awt.Graphics2D;
 
 /**
  * <p>
  * A trace painter that renders a trace by lines.
  * </p>
- *
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
- * @version $Revision: 1.1 $
- *
+ * 
+ * @version $Revision: 1.2 $
+ * 
  */
-public class TracePainterLine extends ATracePainter {
+public class TracePainterLine
+    extends ATracePainter {
+
+  /**
+   * Defcon.
+   * <p>
+   */
+  public TracePainterLine() {
+    // nop
+  }
 
   /**
    * Paints a line from current to next point.
    * <p>
-   *
-   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int, int, Graphics2D)
+   * 
+   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int,
+   *      int, Graphics2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
       final int nextY, final Graphics2D g) {

@@ -1,5 +1,5 @@
 /*
- *  UnitSystem.java, base for unit systems.
+ *  IUnitSystem.java, interface for unit systems.
  *  Copyright (C) Achim Westermann, created on 12.05.2005, 20:11:17
  *
  *  This library is free software; you can redistribute it and/or
@@ -34,7 +34,7 @@ package info.monitorenter.util.units;
  *
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public interface IUnitSystem {
   /**

@@ -33,7 +33,6 @@ import info.monitorenter.util.Range;
 import java.awt.Color;
 import java.io.IOException;
 
-
 /**
  * Test implementation that uses a chart with a {@link RangePolicyFixedViewport}
  * with a range from 0 to 100 for the x axis and a range from -40 to 40 for the
@@ -45,10 +44,11 @@ import java.io.IOException;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  * 
  */
-public class FixedViewportDisplayTest2 extends AbstractDisplayTest {
+public class FixedViewportDisplayTest2
+    extends AbstractDisplayTest {
 
   /**
    * Returns a {@link Trace2DSimple} that has a painter for discs and a painter
@@ -77,9 +77,11 @@ public class FixedViewportDisplayTest2 extends AbstractDisplayTest {
    */
   protected void configure(final StaticCollectorChart chart) {
     IAxis axis = chart.getChart().getAxisX();
-    axis.setRangePolicy(new RangePolicyFixedViewport(new Range(0, 100)));
+    axis.setRangePolicy(new RangePolicyFixedViewport());
+    axis.setRange(new Range(0, 100));
     axis = chart.getChart().getAxisY();
-    axis.setRangePolicy(new RangePolicyFixedViewport(new Range(-40, 40)));
+    axis.setRangePolicy(new RangePolicyFixedViewport());
+    axis.setRange(new Range(-40, 40));
   }
 
   /**

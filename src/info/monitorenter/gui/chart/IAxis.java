@@ -22,8 +22,7 @@
  */
 package info.monitorenter.gui.chart;
 
-import info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor;
-import info.monitorenter.gui.chart.labelformatters.ALabelFormatter;
+import info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor;
 import info.monitorenter.util.Range;
 
 import java.beans.PropertyChangeListener;
@@ -35,9 +34,17 @@ import java.beans.PropertyChangeListener;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.8 $
  */
 public interface IAxis {
+  /**
+   * Constant for a {@link java.beans.PropertyChangeEvent} of the paint grid
+   * flag.
+   */
+  public static final String PROPERTY_PAINTGRID = "axis.paintgrid";
+
+  /** Constant for a {@link java.beans.PropertyChangeEvent} of the range policy. */
+  public static final String PROPERTY_RANGEPOLICY = "axis.rangepolicy";
 
   /**
    * Add a listener for the given property.
@@ -75,19 +82,22 @@ public interface IAxis {
    */
   public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
 
-  /** Constant for a {@link java.beans.PropertyChangeEvent} of the range policy. */
-  public static final String PROPERTY_RANGEPOLICY = "axis.rangepolicy";
-
-  /** Constant for a {@link java.beans.PropertyChangeEvent} of the paint grid flag. */
-  public static final String PROPERTY_PAINTGRID = "axis.paintgrid";
-
   /**
    * Returns the accessor to the chart.
    * <p>
    * 
    * @return the accessor to the chart.
    */
-  public abstract Chart2DDataAccessor getAccessor();
+  public abstract AChart2DDataAccessor getAccessor();
+
+  /**
+   * Returns the constant for the dimension this axis stands for in the chart.
+   * <p>
+   * 
+   * @return {@link Chart2D#X}, {@link Chart2D#Y} or -1 if this axis is not
+   *         assigned to a chart.
+   */
+  public int getDimension();
 
   /**
    * Returns the formatter for labels.
@@ -119,6 +129,16 @@ public interface IAxis {
   public abstract double getMinorTickSpacing();
 
   /**
+   * @see java.beans.PropertyChangeSupport#getPropertyChangeListeners()
+   */
+  public PropertyChangeListener[] getPropertyChangeListeners();
+
+  /**
+   * @see java.beans.PropertyChangeSupport#getPropertyChangeListeners(java.lang.String)
+   */
+  public PropertyChangeListener[] getPropertyChangeListeners(String propertyName);
+
+  /**
    * This method is used by the Chart2D to scale it's values during painting.
    * <p>
    * Caution: This method does not necessarily return the Range configured with
@@ -143,6 +163,24 @@ public interface IAxis {
    * 
    */
   public abstract IRangePolicy getRangePolicy();
+
+  /**
+   * Scales the given absolute value into a value between 0 and 1.0 (if it is in
+   * the range of the data).
+   * <p>
+   * If the given absolute value is not in the display- range of the
+   * <code>Chart2D</code>, negative values or values greater than 1.0 may
+   * result.
+   * <p>
+   * 
+   * @param absolute
+   *          a value in the real value range of the corresponding chart.
+   * 
+   * @return a value between 0.0 and 1.0 that is mapped to a position within the
+   *         chart.
+   * 
+   */
+  public abstract double getScaledValue(final double absolute);
 
   /**
    * Returns wether the x grid is painted or not.
@@ -171,13 +209,35 @@ public interface IAxis {
   public abstract boolean isStartMajorTick();
 
   /**
+   * @see java.beans.PropertyChangeSupport#removePropertyChangeListener(java.beans.PropertyChangeListener)
+   */
+  public void removePropertyChangeListener(PropertyChangeListener listener);
+
+  /**
+   * Copies the complete state (flat, references are overtaken) of the given
+   * axis to this instance and overtakes any property change listeners.
+   * <p>
+   * 
+   * This is used when a new axis is set to a chart.
+   * <p>
+   * 
+   * @see Chart2D#setAxisX(AAxis)
+   * 
+   * @see Chart2D#setAxisY(AAxis)
+   * 
+   * @param axis
+   *          the axis to replace by this instance.
+   */
+  public abstract void replace(final IAxis axis);
+
+  /**
    * Sets the formatter to use for labels.
    * <p>
    * 
    * @param formatter
    *          The formatter to set.
    */
-  public abstract void setFormatter(final ALabelFormatter formatter);
+  public abstract void setFormatter(final ILabelFormatter formatter);
 
   /**
    * This method sets the major tick spacing for label generation.
