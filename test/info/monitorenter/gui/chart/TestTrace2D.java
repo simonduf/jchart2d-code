@@ -35,7 +35,9 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /**
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
@@ -43,6 +45,32 @@ import junit.framework.TestCase;
  */
 public class TestTrace2D
     extends TestCase {
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
+
+    TestSuite suite = new TestSuite();
+    suite.setName(TestTrace2D.class.getName());
+
+    suite.addTest(new TestTrace2D("testAddRemoveManyTrace2DLtd"));
+    suite.addTest(new TestTrace2D("testAddRemoveManyTrace2DSimple"));
+    suite.addTest(new TestTrace2D("testMemoryLeakTrace2PointDListeners"));
+    suite.addTest(new TestTrace2D("testPropertyChange"));
+
+    return suite;
+  }
+
+  /**
+   * @param arg0
+   */
+  public TestTrace2D(String arg0) {
+    super(arg0);
+    // TODO Auto-generated constructor stub
+  }
 
   /**
    * <p>

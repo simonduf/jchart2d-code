@@ -31,88 +31,24 @@ import java.beans.PropertyChangeSupport;
 import javax.swing.event.SwingPropertyChangeSupport;
 
 /**
- * <p>
  * A default superclass for IRangePolicy implementations that adds support for
  * setting and getting ranges.
- * </p>
  * <p>
  * Should be used by any implementation that really works on the data of ranges
  * (not unbounded ranges). Subclasses should access the internal member range or
  * use {@link #getRange()}.
- * </p>
- * <h3>Property Change events</h3>
- * <p>
- * <table border="0">
- * <tr>
- * <th><code>property</code></th>
- * <th><code>oldValue</code></th>
- * <th><code>newValue</code></th>
- * <th>occurance</th>
- * </tr>
- * <tr>
- * <td><code>{@link #PROPERTY_RANGE}</code></td>
- * <td><code>{@link info.monitorenter.util.Range}</code> that changed</td>
- * <td><code>{@link info.monitorenter.util.Range}</code>, the new value</td>
- * <td>Fired if any bound of the range changed (min or max).</td>
- * </tr>
- * <tr>
- * <tr>
- * <td><code>{@link #PROPERTY_RANGE_MAX}</code></td>
- * <td><code>{@link java.lang.Double}</code>, the old max value of the
- * range. </td>
- * <td><code>{@link info.monitorenter.util.Range}</code>, the new max value
- * of the range. </td>
- * <td></td>
- * </tr>
- * <tr>
- * <td><code>{@link #PROPERTY_RANGE_MIN}</code></td>
- * <td><code>{@link java.lang.Double}</code>, the old min value of the
- * range. </td>
- * <td><code>{@link info.monitorenter.util.Range}</code>, the new min value
- * of the range. </td>
- * <td></td>
- * </tr>
- * </table>
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public abstract class ARangePolicy implements IRangePolicy {
-  /**
-   * The property key defining the <code>max</code> property.
-   * <p>
-   * Use in combination with
-   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
-   * <p>
-   */
-  public static final String PROPERTY_RANGE_MAX = "rangepolicy.rangemax";
-
-  /**
-   * The property key defining a change of the <code>min</code> or the
-   * <code>max</code> property.
-   * <p>
-   * Use in combination with
-   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
-   * <p>
-   */
-  public static final String PROPERTY_RANGE = "rangepolicy.range";
-
-  /**
-   * The property key defining the <code>min</code> property.
-   * <p>
-   * Use in combination with
-   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
-   * <p>
-   */
-  public static final String PROPERTY_RANGE_MIN = "rangepolicy.rangemin";
 
   /**
    * The instance that add support for firing <code>PropertyChangeEvents</code>
    * and maintaining <code>PropertyChangeListeners</code>.
    * {@link PropertyChangeListener} instances.
    */
-
   protected PropertyChangeSupport m_propertyChangeSupport = new SwingPropertyChangeSupport(this);
 
   /**
@@ -161,9 +97,8 @@ public abstract class ARangePolicy implements IRangePolicy {
   }
 
   /**
-   * <p>
    * Fires a property change event to the registered listeners.
-   * </p>
+   * <p>
    * 
    * @param property
    *          one of the <code>PROPERTY_XXX</code> constants defined in
@@ -237,12 +172,12 @@ public abstract class ARangePolicy implements IRangePolicy {
     boolean maxchanged = range.getMax() != oldMax;
     this.m_range = range;
     if (minchanged && maxchanged) {
-      this.firePropertyChange(ARangePolicy.PROPERTY_RANGE, oldRange, this.m_range);
+      this.firePropertyChange(IRangePolicy.PROPERTY_RANGE, oldRange, this.m_range);
     } else if (minchanged) {
-      this.firePropertyChange(ARangePolicy.PROPERTY_RANGE_MIN, new Double(oldMin), new Double(range
+      this.firePropertyChange(IRangePolicy.PROPERTY_RANGE_MIN, new Double(oldMin), new Double(range
           .getMin()));
     } else if (maxchanged) {
-      this.firePropertyChange(ARangePolicy.PROPERTY_RANGE_MAX, new Double(oldMax), new Double(range
+      this.firePropertyChange(IRangePolicy.PROPERTY_RANGE_MAX, new Double(oldMax), new Double(range
           .getMax()));
     }
 

@@ -24,7 +24,9 @@ package info.monitorenter.gui.chart.layout;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.demo.TestStaticCollectorChart;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
+import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.Color;
 import java.beans.PropertyChangeListener;
@@ -33,7 +35,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /**
  * 
@@ -44,16 +48,16 @@ import junit.framework.TestCase;
  * @author Pieter-Jan Busschaert
  * 
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  */
-public class TestChartPanelMemoryLeak extends TestCase {
+public class TestChartPanelMemoryLeak
+    extends TestCase {
   /**
    * Tests a memory leak that was found in jchart2d-1.1.0 and was related to
    * adding and removing traces with charts wrapped in a {@link ChartPanel}.
    * <p>
    * 
    */
-
   public void testMemoryLeak() {
     Chart2D chart = new Chart2D();
     ChartPanel chartPanel = new ChartPanel(chart);
@@ -74,24 +78,28 @@ public class TestChartPanelMemoryLeak extends TestCase {
       }
       chart.removeTrace(trace);
     }
-    
 
     PropertyChangeListener[] propertyChangeListeners = chart.getPropertyChangeListeners();
+    int before = propertyChangeListeners.length;
     System.out.println("Before chart.setBackground(Color):");
-    System.out.println("chart.propertyChangeListeners().length: " + propertyChangeListeners.length);
+    System.out.println("chart.propertyChangeListeners().length: " + before);
     System.runFinalization();
     System.gc();
     chart.setBackground(Color.LIGHT_GRAY);
     propertyChangeListeners = chart.getPropertyChangeListeners();
+    int after = propertyChangeListeners.length;
     System.out.println("After chart.setBackground(Color):");
     System.out.println("chart.propertyChangeListeners().length: " + propertyChangeListeners.length);
+    assertTrue(after < before);
 
+    // reporting / analysis
     Map classes2count = new HashMap();
     Map props2count = new HashMap();
     Integer count;
     Class clazz;
     String property;
     for (int i = propertyChangeListeners.length - 1; i >= 0; i--) {
+      System.out.println(propertyChangeListeners[i].getClass().getName());
       clazz = propertyChangeListeners[i].getClass();
       // count the properties:
       if (clazz == PropertyChangeListenerProxy.class) {
@@ -139,9 +147,35 @@ public class TestChartPanelMemoryLeak extends TestCase {
    *           if sth. goes wrong.
    */
   public static void main(final String[] args) throws Exception {
-    TestChartPanelMemoryLeak test = new TestChartPanelMemoryLeak();
+    TestChartPanelMemoryLeak test = new TestChartPanelMemoryLeak(TestChartPanelMemoryLeak.class
+        .getName());
     test.setUp();
     test.testMemoryLeak();
     test.tearDown();
   }
+
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
+
+    TestSuite suite = new TestSuite();
+    suite.setName(TestChartPanelMemoryLeak.class.getName());
+
+    suite.addTest(new TestChartPanelMemoryLeak("testMemoryLeak"));
+
+    return suite;
+  }
+
+  /**
+   * @param arg0
+   */
+  public TestChartPanelMemoryLeak(String arg0) {
+    super(arg0);
+    // TODO Auto-generated constructor stub
+  }
+
 }

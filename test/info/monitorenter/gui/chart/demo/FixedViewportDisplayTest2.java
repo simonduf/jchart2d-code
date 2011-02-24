@@ -33,6 +33,9 @@ import info.monitorenter.util.Range;
 import java.awt.Color;
 import java.io.IOException;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 /**
  * Test implementation that uses a chart with a {@link RangePolicyFixedViewport}
  * with a range from 0 to 100 for the x axis and a range from -40 to 40 for the
@@ -44,11 +47,19 @@ import java.io.IOException;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  * 
  */
 public class FixedViewportDisplayTest2
-    extends AbstractDisplayTest {
+    extends ADisplayTestPropertyDataBased {
+
+  /**
+   * @param arg0
+   */
+  public FixedViewportDisplayTest2(String arg0) {
+    super(arg0);
+    // TODO Auto-generated constructor stub
+  }
 
   /**
    * Returns a {@link Trace2DSimple} that has a painter for discs and a painter
@@ -58,7 +69,7 @@ public class FixedViewportDisplayTest2
    * @return a {@link Trace2DSimple} that has a painter for discs and a painter
    *         for lines (in that order).
    * 
-   * @see info.monitorenter.gui.chart.demo.AbstractDisplayTest#createTrace()
+   * @see info.monitorenter.gui.chart.demo.ADisplayTest#createTrace()
    */
   protected ITrace2D createTrace() {
     ITrace2D result = new Trace2DSimple();
@@ -73,7 +84,7 @@ public class FixedViewportDisplayTest2
    * the x axis and a range from -40 to 40 for the y axis.
    * <p>
    * 
-   * @see info.monitorenter.gui.chart.demo.AbstractDisplayTest#configure(info.monitorenter.gui.chart.demo.StaticCollectorChart)
+   * @see info.monitorenter.gui.chart.demo.ADisplayTest#configure(info.monitorenter.gui.chart.demo.StaticCollectorChart)
    */
   protected void configure(final StaticCollectorChart chart) {
     IAxis axis = chart.getChart().getAxisX();
@@ -98,11 +109,29 @@ public class FixedViewportDisplayTest2
    *           if sleeping fails.
    */
   public static void main(final String[] args) throws IOException, InterruptedException {
-    FixedViewportDisplayTest2 test = new FixedViewportDisplayTest2();
+    FixedViewportDisplayTest2 test = new FixedViewportDisplayTest2(FixedViewportDisplayTest2.class
+        .getName());
     try {
       test.testDisplay();
     } catch (Throwable f) {
       f.printStackTrace(System.err);
     }
   }
+
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
+
+    TestSuite suite = new TestSuite();
+    suite.setName(FixedViewportDisplayTest2.class.getName());
+
+    suite.addTest(new FixedViewportDisplayTest2("testDisplay"));
+
+    return suite;
+  }
+
 }

@@ -1,5 +1,5 @@
 /*
- * AbstractDisplayTest.java,  <enter purpose here>.
+ * ADisplayTest.java,  <enter purpose here>.
  * Copyright (C) 2006  Achim Westermann, Achim.Westermann@gmx.de
  *
  * This library is free software; you can redistribute it and/or
@@ -67,10 +67,11 @@ import junit.framework.TestCase;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.2 $
  * 
  */
-public abstract class AbstractDisplayTest extends TestCase {
+public abstract class ADisplayTest
+    extends TestCase {
 
   /** The frame currently visible. */
   private JFrame m_frame;
@@ -102,19 +103,23 @@ public abstract class AbstractDisplayTest extends TestCase {
     boolean foundData = false;
     int count = 1;
     do {
-      in = AbstractDisplayTest.class.getResourceAsStream("test" + count + ".properties");
-      if (in == null) {
-        foundData = false;
-      } else {
-        foundData = true;
-        trace = createTrace();
-        chart = new StaticCollectorChart(new PropertyFileStaticDataCollector(trace, in));
-        this.configure(chart);
-        this.show(chart);
-      }
-      count++;
+      chart = this.getNextChart();
+      this.configure(chart);
+      this.show(chart);
     } while (foundData);
   }
+
+  /**
+   * Template method that returns the next chart to test or null if no further
+   * chart is available.
+   * <p>
+   * 
+   * @return the next chart to test or null if no further chart is available.
+   * 
+   * @throws IOException
+   *           if sth. goes wrong.
+   */
+  protected abstract StaticCollectorChart getNextChart() throws IOException;
 
   /**
    * Marks this test as failure.
@@ -127,6 +132,14 @@ public abstract class AbstractDisplayTest extends TestCase {
   public final void fail(final Chart2D wrong) {
     this.m_failure = wrong;
 
+  }
+
+  /**
+   * @param arg0
+   */
+  public ADisplayTest(String arg0) {
+    super(arg0);
+    // TODO Auto-generated constructor stub
   }
 
   /**
@@ -152,7 +165,7 @@ public abstract class AbstractDisplayTest extends TestCase {
    * 
    * @param chart
    *          the chart to display.
-   *          
+   * 
    * @throws InterruptedException
    *           if sleeping fails.
    */
@@ -182,8 +195,8 @@ public abstract class AbstractDisplayTest extends TestCase {
     JButton ok = new JButton("Ok");
     ok.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent ae) {
-        AbstractDisplayTest.this.m_frame.setVisible(false);
-        AbstractDisplayTest.this.m_frame.dispose();
+        ADisplayTest.this.m_frame.setVisible(false);
+        ADisplayTest.this.m_frame.dispose();
       }
     });
     JPanel controls = new JPanel();
@@ -197,8 +210,8 @@ public abstract class AbstractDisplayTest extends TestCase {
 
     this.m_frame.addWindowListener(new WindowAdapter() {
       public void windowClosing(final WindowEvent e) {
-        AbstractDisplayTest.this.m_frame.setVisible(false);
-        AbstractDisplayTest.this.m_frame.dispose();
+        ADisplayTest.this.m_frame.setVisible(false);
+        ADisplayTest.this.m_frame.dispose();
       }
     });
     this.m_frame.setSize(600, 600);
@@ -293,12 +306,13 @@ public abstract class AbstractDisplayTest extends TestCase {
     while (itTraces.hasNext()) {
       trace = (ITrace2D) itTraces.next();
       result.append("    ").append(trace.getClass().getName()).append(":\n");
+      result.append("      amount of poijnts : ").append(trace.getSize()).append("\n");
       result.append("      x-range: [").append(trace.getMinX()).append(",").append(trace.getMaxX())
           .append("]\n");
       result.append("      y-range: [").append(trace.getMinY()).append(",").append(trace.getMaxY())
           .append("]\n");
       result.append("      Color: ").append(trace.getColor()).append("\n");
-      result.append("      Label: ").append(trace.getLable()).append("\n");
+      result.append("      Label: ").append(trace.getLabel()).append("\n");
       result.append("      Visible: ").append(trace.isVisible()).append("\n");
       result.append("      Z-index: ").append(trace.getZIndex()).append("\n");
       result.append("      TracePainters: \n");

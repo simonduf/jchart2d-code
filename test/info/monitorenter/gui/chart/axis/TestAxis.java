@@ -21,10 +21,13 @@
  *  Achim.Westermann@gmx.de
  *
  */
-package info.monitorenter.gui.chart;
+package info.monitorenter.gui.chart.axis;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.axis.AxisLinear;
+import info.monitorenter.gui.chart.TestChart2D;
+import info.monitorenter.gui.chart.TestTrace2D;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 
 /**
@@ -32,7 +35,30 @@ import info.monitorenter.gui.chart.traces.Trace2DSimple;
  *
  */
 public class TestAxis extends ATestAxis {
+  /**
+   * @param arg0
+   */
+  public TestAxis(String arg0) {
+    super(arg0);
+    // TODO Auto-generated constructor stub
+  }
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
 
+    TestSuite suite = new TestSuite();
+    suite.setName(TestAxis.class.getName());
+
+    suite.addTest(new TestAxis("testSetRangePolicyFixedViewPort"));
+    suite.addTest(new TestAxis("testTransformPxToValue"));
+    suite.addTest(new TestAxis("testTransformValueToPx"));
+
+    return suite;
+  }
   /* (non-Javadoc)
    * @see info.monitorenter.gui.chart.TestAxis#createAxisY()
    */

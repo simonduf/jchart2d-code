@@ -22,7 +22,7 @@
  */
 package info.monitorenter.gui.chart;
 
-import info.monitorenter.gui.chart.AAxis.AChart2DDataAccessor;
+import info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor;
 import info.monitorenter.util.Range;
 
 import java.beans.PropertyChangeListener;
@@ -34,7 +34,7 @@ import java.beans.PropertyChangeListener;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.11 $
  */
 public interface IAxis {
   /**
@@ -45,7 +45,33 @@ public interface IAxis {
 
   /** Constant for a {@link java.beans.PropertyChangeEvent} of the range policy. */
   public static final String PROPERTY_RANGEPOLICY = "axis.rangepolicy";
+  /**
+   * Transforms the given pixel value (which has to be a awt value like
+   * {@link java.awt.event.MouseEvent#getY()} into the chart value.
+   * <p>
+   * 
+   * Internal use only, the interface does not guarantee that the pixel
+   * corresponds to any valid awt pixel value within the chart component.
+   * <p>
+   * 
+   * @param pixel
+   *          a pixel value of the chart component as used by awt.
+   * 
+   * @return the awt pixel value transformed to the chart value.
+   */
+  public double translatePxToValue(final int pixel);
 
+  /**
+   * Transforms the given chart data value into the corresponding awt pixel
+   * value for the chart.
+   * <p>
+   * 
+   * @param value
+   *          a chart data value.
+   * 
+   * @return the awt pixel value corresponding to the chart data value.
+   */
+  public int translateValueToPx(final double value);
   /**
    * Add a listener for the given property.
    * <p>
@@ -150,7 +176,6 @@ public interface IAxis {
    *         that will be displayable on this Axis of the Chart2D.
    * 
    * @see #setRangePolicy(IRangePolicy)
-   * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getRange()
    * 
    */
   public abstract Range getRange();
@@ -159,7 +184,7 @@ public interface IAxis {
    * See!
    * <p>
    * 
-   * @see info.monitorenter.gui.chart.AAxis.Chart2DDataAccessor#getRangePolicy()
+   * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getRangePolicy()
    * 
    */
   public abstract IRangePolicy getRangePolicy();
@@ -204,7 +229,7 @@ public interface IAxis {
    * 
    * @return true if scale values start from major ticks.
    * 
-   * @see AAxis#setMajorTickSpacing(double)
+   * @see info.monitorenter.gui.chart.axis.AAxis#setMajorTickSpacing(double)
    */
   public abstract boolean isStartMajorTick();
 
@@ -323,14 +348,12 @@ public interface IAxis {
   public abstract void setPaintScale(final boolean show);
 
   /**
-   * <p>
    * Sets a Range to use for filtering the view to the the connected Axis. Note
    * that it's effect will be affected by the internal {@link IRangePolicy}.
-   * </p>
    * <p>
    * To get full control use: <br>
    * <code> setRangePolicy(new &lt;AnARangePolicy&gt;(range);</code>
-   * </p>
+   * <p>
    * 
    * @param range
    *          Range to use for filtering the view to the the connected Axis.
@@ -342,16 +365,14 @@ public interface IAxis {
   public abstract void setRange(final Range range);
 
   /**
-   * <p>
    * Sets the RangePolicy.
-   * </p>
    * <p>
    * If the given RangePolicy has an unconfigured internal Range (
    * {@link Range#RANGE_UNBOUNDED}) the old internal RangePolicy is taken into
    * account: <br>
    * If the old RangePolicy has a configured Range this is transferred to the
    * new RangePolicy.
-   * </p>
+   * <p>
    * 
    * @param rangePolicy
    *          The rangePolicy to set.
@@ -365,7 +386,7 @@ public interface IAxis {
    * @param majorTick
    *          true if scale values shall start with a major tick.
    * 
-   * @see AAxis#setMajorTickSpacing(double)
+   * @see info.monitorenter.gui.chart.axis.AAxis#setMajorTickSpacing(double)
    */
   public abstract void setStartMajorTick(final boolean majorTick);
 

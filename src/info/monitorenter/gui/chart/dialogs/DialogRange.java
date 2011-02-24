@@ -22,11 +22,10 @@
  */
 package info.monitorenter.gui.chart.dialogs;
 
-import info.monitorenter.gui.chart.layout.controls.RangeChooserPanel;
+import info.monitorenter.gui.chart.controls.RangeChooserPanel;
 import info.monitorenter.util.Range;
 
 import java.awt.Component;
-
 
 /**
  * A dialog for choosing a range.
@@ -35,9 +34,10 @@ import java.awt.Component;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class DialogRange extends ADialog {
+public class DialogRange
+    extends AModalDialog {
 
   /**
    * Generated <code>serialVersionUID</code>.
@@ -62,10 +62,6 @@ public class DialogRange extends ADialog {
    * @param title
    *          the title for the dialog.
    * 
-   * @param modal
-   *          if true, the remainder of the program is inactive until the dialog
-   *          is closed.
-   * 
    * @param range
    *          the bounds for the displayed range chooser: values within these
    *          bounds will be selectable.
@@ -77,9 +73,9 @@ public class DialogRange extends ADialog {
    * @return the dialog for selection of the range (undisplayed yet).
    */
   public static DialogRange createRangeDialog(final Component c, final Range range,
-      final String title, final boolean modal, final RangeChooserPanel chooserPane) {
+      final String title, final RangeChooserPanel chooserPane) {
 
-    DialogRange dialog = new DialogRange(c, title, modal, chooserPane);
+    DialogRange dialog = new DialogRange(c, title, chooserPane);
     return dialog;
   }
 
@@ -93,16 +89,12 @@ public class DialogRange extends ADialog {
    * @param title
    *          the String containing the dialog's title.
    * 
-   * @param modal
-   *          if true this will be a modal dialog (blocking actions on component
-   *          until closed.
-   * 
    * @param chooserPane
    *          the UI control for choosing the range.
    */
-  public DialogRange(final Component component, final String title, final boolean modal,
+  public DialogRange(final Component component, final String title,
       final RangeChooserPanel chooserPane) {
-    super(component, title, modal, chooserPane);
+    super(component, title, chooserPane);
 
   }
 }

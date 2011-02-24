@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-  var update="12/09/2004";
+  var update="06/12/2004";
  </script>
  <body id="credit">
   <div id="wrapper">
@@ -18,7 +18,6 @@
      <h2>Credits</h2>
      <p>
      <table border="0">
-
   
       <tr>
        <td >
@@ -39,11 +38,11 @@
        </td>
       </tr>
       
-      <tr><td colspan="2">&nbsp;</td><tr>
+      <tr><td colspan="2">&nbsp;</td></tr>
       
       <tr>
        <td >
-        <h3>Shipment & Build</h3>
+        <h3>Shipment &amp; Build</h3>
        </td>
        <td>&nbsp;</td>
       </tr>
@@ -80,13 +79,13 @@
        </td>
        <td>
         <a href="http://www.eclipse.org" target="_blank">http://www.eclipse.org</a><br>
-         The free development tool plugin integratration platform. Amazing piece of 
+         The free development tool plugin integration platform. Amazing piece of 
          (frame)work. Erich Gamma was involved. An example that base motives (to black out <em>the</em> sun), 
          can have a positive side effect (competition on the royalty free market).
        </td>
       </tr>      
 
-      <tr><td colspan="2">&nbsp;</td><tr>
+      <tr><td colspan="2">&nbsp;</td></tr>
       
       <tr>
        <td >
@@ -104,7 +103,7 @@
        </td>
       </tr>
 
-      <tr><td colspan="2">&nbsp;</td><tr>
+      <tr><td colspan="2">&nbsp;</td></tr>
       
       <tr>
        <td>
@@ -122,8 +121,7 @@
        </td>
       </tr>
 
-      <tr><td colspan="2">&nbsp;</td><tr>
-
+      <tr><td colspan="2">&nbsp;</td></tr>
      
      </table>
      </p>

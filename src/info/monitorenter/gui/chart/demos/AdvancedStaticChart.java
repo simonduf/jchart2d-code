@@ -23,52 +23,52 @@
  */
 package info.monitorenter.gui.chart.demos;
 
-import info.monitorenter.gui.chart.AAxis;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterDate;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
+import info.monitorenter.gui.chart.traces.painters.TracePainterVerticalBar;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import javax.swing.JFrame;
 
-
 /**
  * Demonstrates advanced features of static charts in jchart2d.
  * <p>
- *
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
+ * 
  */
 public final class AdvancedStaticChart {
 
   /**
    * Application startup hook.
    * <p>
-   *
+   * 
    * @param args
    *          ignored
-   *
+   * 
    * @throws ParseException
    *           if sth. goes wrong.
-   *
+   * 
    */
   public static void main(final String[] args) throws ParseException {
     // Create a chart:
     Chart2D chart = new Chart2D();
     // Create an ITrace:
     ITrace2D trace = new Trace2DSimple();
+    trace.setTracePainter(new TracePainterVerticalBar(2, chart));
     AAxis yAxis = new AxisLinear();
-    yAxis.setFormatter(new LabelFormatterDate(new SimpleDateFormat()));
     chart.setAxisY(yAxis);
+    yAxis.setFormatter(new LabelFormatterDate(new SimpleDateFormat()));
     // Add all points, as it is static:
-    double high = DateFormat.getInstance().parse("01.08.05 18:00").getTime();
+    double high = System.currentTimeMillis();
     for (double i = 0; i < 200; i++) {
       trace.addPoint(i, high);
       high += 1000 * 50;

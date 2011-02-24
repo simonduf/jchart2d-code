@@ -23,6 +23,7 @@
 package info.monitorenter.gui.chart.traces;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IErrorBarPolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.TracePoint2D;
@@ -67,7 +68,7 @@ import java.util.Set;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.8 $
  */
 public class Trace2DDebugger implements ITrace2D {
 
@@ -108,15 +109,22 @@ public class Trace2DDebugger implements ITrace2D {
    */
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#addErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
+   */
+  public boolean addErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
+    return this.m_delegate.addErrorBarPolicy(errorBarPolicy);
+  }
+
+  // /////////////////////////////////
+  // Proxy methods
+
+  /**
    * @see ITrace2D#addPoint(double, double)
    */
   public boolean addPoint(final double x, final double y) {
     TracePoint2D p = new TracePoint2D(x, y);
     return this.addPoint(p);
   }
-
-  // /////////////////////////////////
-  // Proxy methods
 
   /**
    * @see ITrace2D#addPoint(TracePoint2D)
@@ -179,6 +187,13 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getErrorBarPolicies()
+   */
+  public Set getErrorBarPolicies() {
+    return this.m_delegate.getErrorBarPolicies();
+  }
+
+  /**
    * @see ITrace2D#isVisible()
    */
   public boolean getisible() {
@@ -186,10 +201,10 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#getLable()
+   * @see info.monitorenter.gui.chart.ITrace2D#getLabel()
    */
-  public String getLable() {
-    return this.m_delegate.getLable();
+  public String getLabel() {
+    return this.m_delegate.getLabel();
   }
 
   /**
@@ -278,13 +293,6 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#isVisible()
-   */
-  public boolean isVisible() {
-    return this.m_delegate.isVisible();
-  }
-
-  /**
    * Returns the range of valid points of the x axis.
    * <p>
    * 
@@ -323,6 +331,13 @@ public class Trace2DDebugger implements ITrace2D {
    */
   public boolean isEmpty() {
     return this.m_delegate.isEmpty();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#isVisible()
+   */
+  public boolean isVisible() {
+    return this.m_delegate.isVisible();
   }
 
   /**
@@ -381,6 +396,13 @@ public class Trace2DDebugger implements ITrace2D {
    */
   public void setComparableProperty(final Number n) {
     this.m_delegate.setComparableProperty(n);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#setErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
+   */
+  public Set setErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
+    return this.m_delegate.setErrorBarPolicy(errorBarPolicy);
   }
 
   /**
@@ -462,6 +484,41 @@ public class Trace2DDebugger implements ITrace2D {
    */
   public void setZIndex(final Integer zIndex) {
     this.m_delegate.setZIndex(zIndex);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsErrorBars()
+   */
+  public boolean showsErrorBars() {
+    return this.m_delegate.showsErrorBars();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsNegativeXErrorBars()
+   */
+  public boolean showsNegativeXErrorBars() {
+    return this.m_delegate.showsNegativeXErrorBars();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsNegativeYErrorBars()
+   */
+  public boolean showsNegativeYErrorBars() {
+    return this.m_delegate.showsNegativeYErrorBars();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsPositiveXErrorBars()
+   */
+  public boolean showsPositiveXErrorBars() {
+    return this.m_delegate.showsPositiveXErrorBars();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsPositiveYErrorBars()
+   */
+  public boolean showsPositiveYErrorBars() {
+    return this.m_delegate.showsPositiveYErrorBars();
   }
 
   /**

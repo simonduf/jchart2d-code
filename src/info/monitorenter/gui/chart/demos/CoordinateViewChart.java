@@ -19,16 +19,16 @@
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
  */
-package info.monitorenter.gui.chart.layout.demos;
+package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.controls.LayoutFactory;
 import info.monitorenter.gui.chart.io.AStaticDataCollector;
 import info.monitorenter.gui.chart.io.PropertyFileStaticDataCollector;
-import info.monitorenter.gui.chart.layout.ChartPanel;
-import info.monitorenter.gui.chart.layout.LayoutFactory;
-import info.monitorenter.gui.chart.layout.views.ChartCoordinateView;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
+import info.monitorenter.gui.chart.views.ChartCoordinateView;
+import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.Container;
 import java.awt.Dimension;
@@ -42,12 +42,12 @@ import javax.swing.JFrame;
 
 /**
  * A demo that uses a
- * {@link info.monitorenter.gui.chart.layout.views.ChartCoordinateView} to
+ * {@link info.monitorenter.gui.chart.views.ChartCoordinateView} to
  * display the position of the mouse over the chart.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.2 $
  */
 public class CoordinateViewChart
     extends JFrame {

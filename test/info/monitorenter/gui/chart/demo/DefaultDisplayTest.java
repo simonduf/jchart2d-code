@@ -22,11 +22,14 @@
 package info.monitorenter.gui.chart.demo;
 
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.TestChart2D;
 import info.monitorenter.gui.chart.demos.StaticCollectorChart;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 
 import java.awt.Color;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 /**
  * A simple implementation that does not configure the chart to test and uses a
@@ -35,10 +38,11 @@ import java.awt.Color;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  * 
  */
-public class DefaultDisplayTest extends AbstractDisplayTest {
+public class DefaultDisplayTest
+    extends ADisplayTestPropertyDataBased {
 
   /**
    * Returns a {@link Trace2DSimple} that is configured with a custom
@@ -48,7 +52,7 @@ public class DefaultDisplayTest extends AbstractDisplayTest {
    * @return a {@link Trace2DSimple} that is configured with a custom
    *         {@link ITrace2D#setColor(Color)}.
    * 
-   * @see info.monitorenter.gui.chart.demo.AbstractDisplayTest#createTrace()
+   * @see info.monitorenter.gui.chart.demo.ADisplayTest#createTrace()
    */
   protected ITrace2D createTrace() {
     ITrace2D result = new Trace2DSimple();
@@ -57,10 +61,35 @@ public class DefaultDisplayTest extends AbstractDisplayTest {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.demo.AbstractDisplayTest#configure(info.monitorenter.gui.chart.demo.StaticCollectorChart)
+   * @see info.monitorenter.gui.chart.demo.ADisplayTest#configure(info.monitorenter.gui.chart.demo.StaticCollectorChart)
    */
   protected void configure(final StaticCollectorChart chart) {
     // nop
   }
+
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
+
+    TestSuite suite = new TestSuite();
+    suite.setName(DefaultDisplayTest.class.getName());
+
+    suite.addTest(new DefaultDisplayTest("testDisplay"));
+
+    return suite;
+  }
+
+  /**
+   * @param arg0
+   */
+  public DefaultDisplayTest(String arg0) {
+    super(arg0);
+    // TODO Auto-generated constructor stub
+  }
+
 
 }

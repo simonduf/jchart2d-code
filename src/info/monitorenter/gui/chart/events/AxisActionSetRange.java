@@ -22,26 +22,29 @@
  */
 package info.monitorenter.gui.chart.events;
 
+import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
+import info.monitorenter.gui.chart.controls.RangeChooserPanel;
 import info.monitorenter.gui.chart.dialogs.DialogRange;
-import info.monitorenter.gui.chart.layout.controls.RangeChooserPanel;
 
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 
 /**
  * <code>Action</code> that sets the range of an
- * {@link info.monitorenter.gui.chart.AAxis} of a chart ({@link info.monitorenter.gui.chart.Chart2D})
+ * {@link info.monitorenter.gui.chart.axis.AAxis} of a chart ({@link info.monitorenter.gui.chart.Chart2D})
  * that will be used by it's viewport (
- * {@link info.monitorenter.gui.chart.AAxis#setRangePolicy(info.monitorenter.gui.chart.IRangePolicy)})
+ * {@link info.monitorenter.gui.chart.axis.AAxis#setRangePolicy(info.monitorenter.gui.chart.IRangePolicy)})
  * by showing a modal range chooser.
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.6 $
  */
-public class AxisActionSetRange extends AAxisAction {
+public class AxisActionSetRange
+    extends AAxisAction {
 
   /**
    * Generated <code>serialVersionUID</code>.
@@ -49,11 +52,16 @@ public class AxisActionSetRange extends AAxisAction {
   private static final long serialVersionUID = 3258694286479406393L;
 
   /**
-   * Create an <code>Action</code> that sets the range of the given axis.
+   * Create an <code>Action</code> that accesses the chart's axis by argument
+   * <code>axis</code> and identifies itself with the given action String.
    * <p>
    * 
+   * @param chart
+   *          the owner of the axis to trigger actions upon.
+   * 
    * @param axis
-   *          the target the action will work on.
+   *          needed to identify the axis of the chart: one of {@link Chart2D#X},
+   *          {@link Chart2D#Y}.
    * 
    * @param description
    *          the descriptive <code>String</code> that will be displayed by
@@ -61,8 +69,8 @@ public class AxisActionSetRange extends AAxisAction {
    *          <code>Action</code> assigned (
    *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    */
-  public AxisActionSetRange(final IAxis axis, final String description) {
-    super(axis, description);
+  public AxisActionSetRange(final Chart2D chart, final String description, final int axis) {
+    super(chart, description, axis);
   }
 
   /**
@@ -73,7 +81,7 @@ public class AxisActionSetRange extends AAxisAction {
     IAxis axis = this.getAxis();
     RangeChooserPanel rangePanel = new RangeChooserPanel(axis.getRangePolicy().getRange());
     DialogRange dialog = new DialogRange(axis.getAccessor().getChart(), "Choose a range",
-        true, rangePanel);
+        rangePanel);
     dialog.showDialog();
     axis.setRange(rangePanel.getRange());
   }

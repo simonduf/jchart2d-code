@@ -24,7 +24,6 @@
  */
 package info.monitorenter.gui.chart.axis;
 
-import info.monitorenter.gui.chart.AAxis;
 import info.monitorenter.gui.chart.labelformatters.ALabelFormatter;
 import info.monitorenter.util.Range;
 
@@ -38,7 +37,7 @@ import java.awt.event.MouseEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.7 $
  */
 public abstract class AAxisTransformation
     extends AAxis {
@@ -78,7 +77,33 @@ public abstract class AAxisTransformation
   }
 
   /**
-   * @see info.monitorenter.gui.chart.AAxis#getScaledValue(double)
+   * @see info.monitorenter.gui.chart.axis.AAxis#getMax()
+   */
+  public double getMax() {
+    double result = 1.0;
+    try {
+      result = this.transform(super.getMax());
+    } catch (IllegalArgumentException e) {
+      // nop
+    }
+    return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.axis.AAxis#getMin()
+   */
+  public double getMin() {
+    double result = 0.0;
+    try {
+      result = this.transform(super.getMin());
+    } catch (IllegalArgumentException e) {
+      // nop
+    }
+    return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#getScaledValue(double)
    */
   public final double getScaledValue(final double absolute) {
     double result;
@@ -123,6 +148,28 @@ public abstract class AAxisTransformation
   protected abstract double transform(final double in) throws IllegalArgumentException;
 
   /**
+   * @see info.monitorenter.gui.chart.axis.AAxis#translateMousePosition(java.awt.event.MouseEvent)
+   */
+  public final double translateMousePosition(final MouseEvent mouseEvent)
+      throws IllegalArgumentException {
+    return this.untransform(this.getAccessor().translateMousePosition(mouseEvent));
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.axis.AAxis#translatePxToValue(int)
+   */
+  public double translatePxToValue(final int pixel) {
+    return this.transform(this.m_accessor.translatePxToValue(pixel));
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.axis.AAxis#translateValueToPx(double)
+   */
+  public int translateValueToPx(final double value) {
+    return (int) this.untransform(this.m_accessor.translateValueToPx(value));
+  }
+
+  /**
    * Template method for performing the reverse axis transformation.
    * <p>
    * This is the counterpart to {@link #transform(double)}.
@@ -135,38 +182,4 @@ public abstract class AAxisTransformation
    * @return the normal value;
    */
   protected abstract double untransform(final double in);
-
-  /**
-   * @see info.monitorenter.gui.chart.AAxis#translateMousePosition(java.awt.event.MouseEvent)
-   */
-  protected final double translateMousePosition(final MouseEvent mouseEvent)
-      throws IllegalArgumentException {
-    return this.untransform(this.getAccessor().translateMousePosition(mouseEvent));
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.AAxis#getMax()
-   */
-  public double getMax() {
-    double result = 1.0;
-    try {
-      result = this.transform(super.getMax());
-    } catch (IllegalArgumentException e) {
-      // nop
-    }
-    return result;
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.AAxis#getMin()
-   */
-  public double getMin() {
-    double result = 0.0;
-    try {
-      result = this.transform(super.getMin());
-    } catch (IllegalArgumentException e) {
-        // nop
-    }
-    return result;
-  }
 }

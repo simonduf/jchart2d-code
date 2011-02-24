@@ -30,18 +30,10 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  * 
  */
 public abstract class ATracePainter implements info.monitorenter.gui.chart.ITracePainter {
-
-  /**
-   * Stores the last grapcics sent to
-   * {@link #paintPoint(int, int, int, int, Graphics2D)} to allow painting
-   * polygon at the end of the paint iteration.
-   */
-
-  protected Graphics2D m_graphics;
 
   /** Flag to remember if a paint iteration has ended. */
   private boolean m_isEnded = false;
@@ -50,9 +42,9 @@ public abstract class ATracePainter implements info.monitorenter.gui.chart.ITrac
    * The last x coordinate that was sent to
    * {@link #paintPoint(int, int, int, int, Graphics2D)}.
    * <p>
-   * It will be needed at {@link #endPaintIteration()} as the former method only
-   * uses the first set of coordinates to store in the internal list to avoid
-   * duplicates.
+   * It will be needed at {@link #endPaintIteration(Graphics2D)} as the former
+   * method only uses the first set of coordinates to store in the internal list
+   * to avoid duplicates.
    * <p>
    */
 
@@ -62,9 +54,9 @@ public abstract class ATracePainter implements info.monitorenter.gui.chart.ITrac
    * The last � coordinate that was sent to
    * {@link #paintPoint(int, int, int, int, Graphics2D)}.
    * <p>
-   * It will be needed at {@link #endPaintIteration()} as the former method only
-   * uses the first set of coordinates to store in the internal list to avoid
-   * duplicates.
+   * It will be needed at {@link #endPaintIteration(Graphics2D)} as the former
+   * method only uses the first set of coordinates to store in the internal list
+   * to avoid duplicates.
    * <p>
    */
 
@@ -79,17 +71,17 @@ public abstract class ATracePainter implements info.monitorenter.gui.chart.ITrac
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#discontinue()
+   * @see info.monitorenter.gui.chart.ITracePainter#discontinue(java.awt.Graphics2D)
    */
-  public void discontinue() {
-    this.endPaintIteration();
-    this.startPaintIteration();
+  public void discontinue(final Graphics2D g2d) {
+    this.endPaintIteration(g2d);
+    this.startPaintIteration(g2d);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration()
+   * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics2D)
    */
-  public void endPaintIteration() {
+  public void endPaintIteration(final Graphics2D g2d) {
     // nop
   }
 
@@ -106,13 +98,6 @@ public abstract class ATracePainter implements info.monitorenter.gui.chart.ITrac
    */
   public boolean equals(final Object obj) {
     return this.getClass() == obj.getClass();
-  }
-
-  /**
-   * @return Returns the m_graphics.
-   */
-  protected final Graphics2D getGraphics() {
-    return this.m_graphics;
   }
 
   /**
@@ -177,13 +162,12 @@ public abstract class ATracePainter implements info.monitorenter.gui.chart.ITrac
       final int nextY, final Graphics2D g) {
     this.m_lastX = nextX;
     this.m_lastY = nextY;
-    this.m_graphics = g;
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#startPaintIteration()
+   * @see info.monitorenter.gui.chart.ITracePainter#startPaintIteration(java.awt.Graphics2D)
    */
-  public void startPaintIteration() {
+  public void startPaintIteration(final Graphics2D g2d) {
     // nop
   }
 }

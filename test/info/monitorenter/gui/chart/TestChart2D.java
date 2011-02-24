@@ -21,13 +21,14 @@
  */
 package info.monitorenter.gui.chart;
 
-import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 
 import java.util.WeakHashMap;
 
+import junit.extensions.TestSetup;
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /**
  * Junit testcase for {@link info.monitorenter.gui.chart.Chart2D}.
@@ -36,9 +37,32 @@ import junit.framework.TestCase;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class TestChart2D extends TestCase {
+public class TestChart2D
+    extends TestCase {
+
+  /**
+   * @param arg0
+   */
+  public TestChart2D(String arg0) {
+    super(arg0);
+  }
+
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
+
+    TestSuite suite = new TestSuite();
+    suite.setName(TestChart2D.class.getName());
+
+    suite.addTest(new TestChart2D("testMemoryLeak"));
+    return suite;
+  }
 
   /**
    * Creates several charts, adds a trace to each of them, destroys the chart

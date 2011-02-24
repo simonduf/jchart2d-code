@@ -31,7 +31,7 @@ import java.util.Comparator;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final class ComparatorToString implements Comparator {
 
@@ -46,8 +46,6 @@ public final class ComparatorToString implements Comparator {
   /**
    * Compares both Objects by their {@link Object#toString()} presentation.
    * <p>
-   * 
-   * @version $Revision: 1.2 $
    * 
    * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
    */

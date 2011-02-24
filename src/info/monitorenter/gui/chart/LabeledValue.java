@@ -1,6 +1,5 @@
 /*
- *
- *  LabeledValue.java  jchart2d
+ *  LabeledValue.java, a c struct for sth.. 
  *  Copyright (C) Achim Westermann, created on 12.07.2005, 22:15:11
  *
  *  This library is free software; you can redistribute it and/or
@@ -26,13 +25,13 @@ package info.monitorenter.gui.chart;
 /**
  * A double value along with it's label.
  * <p>
- *
+ * 
  * Very primitive class comparable to a c struct.
  * <p>
- *
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
- * @version $Revision: 1.2 $
+ * 
+ * @version $Revision: 1.4 $
  */
 public class LabeledValue {
 
@@ -49,17 +48,17 @@ public class LabeledValue {
    * Internal defcon.
    * <p>
    */
-  protected LabeledValue() {
+  public LabeledValue() {
     // nop
   }
 
   /**
    * Creates an instance with the given valu and the label for it.
    * <p>
-   *
+   * 
    * @param value
    *          the value of this label.
-   *
+   * 
    * @param label
    *          the String representation of this label.
    */
@@ -71,73 +70,82 @@ public class LabeledValue {
   /**
    * Returns the label String.
    * <p>
-   *
+   * 
    * @return the label String.
    */
-  String getLabel() {
+  public String getLabel() {
     return this.m_label;
   }
 
   /**
-   * Returns the value of this label which is 
-   * scaled to lie between 0.0 and 1.0.
+   * Returns the value of this label which is scaled to lie between 0.0 and 1.0.
    * <p>
-   *
-   * @return the value of this label which is 
-   * scaled to lie between 0.0 and 1.0.
+   * 
+   * @return the value of this label which is scaled to lie between 0.0 and 1.0.
    */
-  double getValue() {
+  public double getValue() {
     return this.m_value;
   }
 
   /**
    * Returns true if this label is a major tick, false else.
    * <p>
-   *
+   * 
    * @return true if this label is a major tick, false else.
-   *
-   * @see AAxis#setMajorTickSpacing(double)
-   *
-   * @see AAxis#setMinorTickSpacing(double)
+   * 
+   * @see info.monitorenter.gui.chart.axis.AAxis#setMajorTickSpacing(double)
+   * 
+   * @see info.monitorenter.gui.chart.axis.AAxis#setMinorTickSpacing(double)
    */
-  boolean isMajorTick() {
+  public boolean isMajorTick() {
     return this.m_isMajorTick;
   }
 
   /**
    * Sets the label String.
    * <p>
-   *
+   * 
    * @param label
    *          the label String.
    */
-  void setLabel(final String label) {
+  public void setLabel(final String label) {
     this.m_label = label;
   }
 
   /**
    * Set this label as a major tick.
    * <p>
-   *
+   * 
    * @param isMajorTick
    *          the major tick state to set.
-   *
-   * @see AAxis#setMajorTickSpacing(double)
-   *
-   * @see AAxis#setMinorTickSpacing(double)
+   * 
+   * @see info.monitorenter.gui.chart.axis.AAxis#setMajorTickSpacing(double)
+   * 
+   * @see info.monitorenter.gui.chart.axis.AAxis#setMinorTickSpacing(double)
    */
-  void setMajorTick(final boolean isMajorTick) {
+  public void setMajorTick(final boolean isMajorTick) {
     this.m_isMajorTick = isMajorTick;
+  }
+
+  /**
+   * Sets the value.
+   * <p>
+   * 
+   * @param value
+   *          The value to set.
+   */
+  public final void setValue(final double value) {
+    this.m_value = value;
   }
 
   /**
    * Returns the concatenation of the label string, ':' and the value's String
    * representation.
    * <p>
-   *
+   * 
    * @return the concatenation of the label string, ':' and the value's String
    *         representation.
-   *
+   * 
    * @see java.lang.Object#toString()
    */
   public String toString() {

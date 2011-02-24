@@ -47,15 +47,115 @@ import java.util.Set;
  * Therefore there are various <code>ITrace2D</code>- implementations. Read
  * their description to find the one you need. Some may not have been written
  * yet.
- * </p>
  * <p>
  * {@link java.lang.Comparable} should be implemented by using the internal
  * property zIndex (see {@link #getZIndex()}, {@link #setZIndex(Integer)}).
- * </p>
+ * <p>
+ * <h3>Property Change events</h3>
+ * <p>
+ * <table border="0">
+ * <tr>
+ * <th><code>getPropertyName()</code></th>
+ * <th><code>getSource()</code></th>
+ * <th><code>getOldValue()</code></th>
+ * <th><code>getNewValue()</code></th>
+ * </tr>
+ * <tr>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_ZINDEX}</code></td>
+ * <td><code>{@link ITrace2D}</code> that changed</td>
+ * <td><code>{@link java.lang.Number}</code>, the old value</td>
+ * <td><code>{@link java.lang.Number}</code>, the new value</td>
+ * </tr>
+ * <tr>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_MAX_X}</code></td>
+ * <td><code>{@link ITrace2D}</code> that changed</td>
+ * <td><code>{@link java.lang.Double}</code>, the old value</td>
+ * <td><code>{@link java.lang.Double}</code>, the new value</td>
+ * </tr>
+ * <tr>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_MIN_X}</code></td>
+ * <td><code>{@link ITrace2D}</code> that changed</td>
+ * <td><code>{@link java.lang.Double}</code>, the old value</td>
+ * <td><code>{@link java.lang.Double}</code>, the new value</td>
+ * </tr>
+ * <tr>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_MAX_Y}</code></td>
+ * <td><code>{@link ITrace2D}</code> that changed</td>
+ * <td><code>{@link java.lang.Double}</code>, the old value</td>
+ * <td><code>{@link java.lang.Double}</code>, the new value</td>
+ * </tr>
+ * <tr>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_MIN_Y}</code></td>
+ * <td><code>{@link ITrace2D}</code> that changed</td>
+ * <td><code>{@link java.lang.Double}</code>, the old value</td>
+ * <td><code>{@link java.lang.Double}</code>, the new value</td>
+ * </tr>
+ * <tr>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_TRACEPOINT}</code></td>
+ * <td><code>{@link ITrace2D}</code> that changed</td>
+ * <td><code>{@link info.monitorenter.gui.chart.TracePoint2D}</code>, the
+ * instance that was removed</td>
+ * <td><code>null</code>, indication that an instance was removed</td>
+ * </tr>
+ * <tr>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_TRACEPOINT}</code></td>
+ * <td><code>{@link ITrace2D}</code> that changed</td>
+ * <td><code>null</code>, indication that a value was added</td>
+ * <td><code>{@link info.monitorenter.gui.chart.TracePoint2D}</code>, the
+ * new instance that was added, identifying that an instance was removed</td>
+ * </tr>
+ * <tr>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_VISIBLE}</code></td>
+ * <td><code>{@link ITrace2D}</code> that changed</td>
+ * <td><code>{@link java.lang.Boolean}</code>, the old state.</td>
+ * <td><code>{@link java.lang.Boolean}</code>, the new state.</td>
+ * </tr>
+ * <tr>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_PAINTERS}</code></td>
+ * <td><code>{@link ITrace2D}</code> that changed</td>
+ * <td><code>null</code>, indicating that a painter was added.</td>
+ * <td><code>{@link info.monitorenter.gui.chart.ITracePainter}</code>, the
+ * new painter.</td>
+ * </tr>
+ * <tr>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_PAINTERS}</code></td>
+ * <td><code>{@link ITrace2D}</code> that changed</td>
+ * <td><code>{@link info.monitorenter.gui.chart.ITracePainter}</code>, the
+ * old painter.</td>
+ * <td><code>null</code>, indicating that a painter was removed.</td>
+ * </tr>
+ * <tr>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_STROKE}</code></td>
+ * <td><code>{@link ITrace2D}</code> that changed</td>
+ * <td><code>{@link java.awt.Stroke}</code>, the old stroke.</td>
+ * <td><code>{@link java.awt.Stroke}</code>, the new stroke.</td>
+ * </tr>
+ * <tr>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_COLOR}</code></td>
+ * <td><code>{@link ITrace2D}</code> that changed</td>
+ * <td><code>{@link java.awt.Color}</code>, the new color.</td>
+ * <td><code>{@link java.awt.Color}</code>, the new color.</td>
+ * </tr>
+ * <tr>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_ERRORBARPOLICIES}</code></td>
+ * <td><code>{@link ITrace2D}</code> that changed</td>
+ * <td><code>null</code>, indicating that an error bar policy was added.</td>
+ * <td><code>{@link info.monitorenter.gui.chart.IErrorBarPolicy}</code>, the
+ * new error bar policy.</td>
+ * </tr>
+ * <tr>
+ * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_ERRORBARPOLICIES}</code></td>
+ * <td><code>{@link ITrace2D}</code> that changed</td>
+ * <td><code>{@link info.monitorenter.gui.chart.IErrorBarPolicy}</code>, the
+ * old error bar policy.</td>
+ * <td><code>null</code>, indicating that an error bar policy was removed.</td>
+ * </tr>
+ * </table>
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.9 $
  */
 public interface ITrace2D extends IComparableProperty {
 
@@ -65,6 +165,13 @@ public interface ITrace2D extends IComparableProperty {
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
   public static final String PROPERTY_COLOR = "trace.color";
+
+  /**
+   * The property key defining a change in the set of
+   * <code>{@link IErrorBarPolicy}</code> instances. Use in combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   */
+  public static final String PROPERTY_ERRORBARPOLICIES = "trace.errorbarpolicies";
 
   /**
    * The property key defining the <code>maxX</code> property. Use in
@@ -102,6 +209,13 @@ public interface ITrace2D extends IComparableProperty {
   public static final String PROPERTY_NAME = "trace.name";
 
   /**
+   * The property key defining a change in the set of
+   * <code>{@link ITracePainter}</code> instances. Use in combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   */
+  public static final String PROPERTY_PAINTERS = "trace.painters";
+
+  /**
    * The property key defining the <code>physicalUnits</code> property. Use in
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
@@ -131,13 +245,6 @@ public interface ITrace2D extends IComparableProperty {
   public static final String PROPERTY_VISIBLE = "trace.visible";
 
   /**
-   * The property key defining a change in the set of
-   * <code>{@link ITracePainter}</code> instances. Use in combination with
-   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
-   */
-  public static final String PROPERTY_PAINTERS = "trace.painters";
-
-  /**
    * <p>
    * The property key defining the <code>zIndex</code> property. Use in
    * combination with
@@ -164,6 +271,21 @@ public interface ITrace2D extends IComparableProperty {
    * @see #setZIndex(Integer)
    */
   public static final int ZINDEX_MAX = 100;
+
+  /**
+   * Adds the given error bar policy to the internal set of error bar policies.
+   * <p>
+   * 
+   * It will be the last error bar policy to render (most forward on screen).
+   * <p>
+   * 
+   * @param errorBarPolicy
+   *          the error bar policy to add for rendering this trace's error bars.
+   * 
+   * @return true if the painter was added (class of instance not contained
+   *         before).
+   */
+  public boolean addErrorBarPolicy(IErrorBarPolicy errorBarPolicy);
 
   /**
    * <p>
@@ -204,10 +326,9 @@ public interface ITrace2D extends IComparableProperty {
   boolean addPoint(TracePoint2D p);
 
   /**
-   * <p>
    * Registers a property change listener that will be informed about changes of
    * the property identified by the given <code>propertyName</code>.
-   * </p>
+   * <p>
    * 
    * @param propertyName
    *          the name of the property the listener is interested in
@@ -267,23 +388,30 @@ public interface ITrace2D extends IComparableProperty {
    *         should be made by the corresponding <code>Chart2D</code>.
    */
   Color getColor();
+  /**
+   * Returns the <code>Set&lt;{@link IErrorBarPolicy}&gt;</code> that will
+   * be used to render error bars for this trace.
+   * <p>
+   * 
+   * @return the <code>Set&lt;{@link IErrorBarPolicy}&gt;</code> that will
+   *         be used to render error bars for this trace.
+   */
+  public Set getErrorBarPolicies();
 
   /**
-   * <p>
    * Callback method for the <code>Chart2D</code> that returns a
    * <code>String</code> describing the label of the <code>ITrace2D</code>
    * that will be displayed below the drawing area of the <code>Chart2D</code>.
-   * </p>
    * <p>
    * This method should be implemented and finalized ASAP in the inheritance
    * tree and rely on the property <code>name</code> and
    * <code>physicalUnits</code>.
-   * </p>
+   * <p>
    * 
    * @return a String describing the Axis being accessed.
    * 
    */
-  String getLable();
+  String getLabel();
 
   /**
    * <p>
@@ -372,12 +500,11 @@ public interface ITrace2D extends IComparableProperty {
   public String getPhysicalUnits();
 
   /**
-   * <p>
    * Returns all property change listeners for the given property.
-   * </p>
+   * <p>
    * 
    * @param property
-   *          one of the constants with teh <code>PROPERTY_</code> prefix
+   *          one of the constants with the <code>PROPERTY_</code> prefix
    *          defined in this class or subclasses.
    * 
    * @return the property change listeners for the given property.
@@ -412,12 +539,6 @@ public interface ITrace2D extends IComparableProperty {
   public Set getTracePainters();
 
   /**
-   * @return true if this instance should be rendered.
-   * 
-   */
-  public boolean isVisible();
-
-  /**
    * <p>
    * The z-index defines the order in which this instance will be painted. A
    * lower value will bring it more "to the front".
@@ -440,6 +561,12 @@ public interface ITrace2D extends IComparableProperty {
    * 
    */
   boolean isEmpty();
+
+  /**
+   * @return true if this instance should be rendered.
+   * 
+   */
+  public boolean isVisible();
 
   /**
    * <p>
@@ -484,10 +611,9 @@ public interface ITrace2D extends IComparableProperty {
   public boolean removePoint(TracePoint2D point);
 
   /**
-   * <p>
    * Deregisters a property change listener that has been registerd for
    * listening on all properties.
-   * </p>
+   * <p>
    * 
    * @param listener
    *          a listener that will only be informed if the property identified
@@ -498,9 +624,8 @@ public interface ITrace2D extends IComparableProperty {
   public void removePropertyChangeListener(PropertyChangeListener listener);
 
   /**
-   * <p>
    * Removes a property change listener for listening on the given property.
-   * </p>
+   * <p>
    * 
    * @param property
    *          one of the constants with teh <code>PROPERTY_</code> prefix
@@ -533,6 +658,18 @@ public interface ITrace2D extends IComparableProperty {
    *          the <tt>Color</tt> to set.
    */
   void setColor(Color color);
+
+  /**
+   * Replaces all internal error bar policies by the new one.
+   * <p>
+   * 
+   * @param errorBarPolicy
+   *          the new sole painter to use.
+   * 
+   * @return the <code>Set&lt;{@link IErrorBarPolicy}&gt;</code> that was
+   *         used before.
+   */
+  public Set setErrorBarPolicy(IErrorBarPolicy errorBarPolicy);
 
   /**
    * Assingns a specific name to the <code>ITrace2D</code> which will be
@@ -623,5 +760,89 @@ public interface ITrace2D extends IComparableProperty {
    * 
    */
   public void setZIndex(Integer zIndex);
+
+  /**
+   * Tests whether error bars are painted by this trace.
+   * <p>
+   * 
+   * Returns true if
+   * <ul>
+   * <li>this trace contains {@link IErrorBarPolicy} instances. </li>
+   * <li>and at least one of these instances contains at least one
+   * {@link IErrorBarPainter} instance.</li>
+   * </ul>
+   * <p>
+   * 
+   * @return true if this trace renders error bars.
+   */
+  public boolean showsErrorBars();
+
+  /**
+   * Tests whether error bars in negative x direction are painted by this trace.
+   * <p>
+   * 
+   * Returns true if
+   * <ul>
+   * <li> this trace contains at leaste one {@link IErrorBarPolicy} instance
+   * that {@link IErrorBarPolicy#isShowNegativeXErrors()}. </li>
+   * <li> and at least one of these instances contains at least one
+   * {@link IErrorBarPainter} instance. </li>
+   * </ul>
+   * <p>
+   * 
+   * @return true if this trace renders error bars in negative x direction.
+   */
+  public boolean showsNegativeXErrorBars();
+
+  /**
+   * Tests whether error bars in negative y direction are painted by this trace.
+   * <p>
+   * 
+   * Returns true if
+   * <ul>
+   * <li> this trace contains at leaste one {@link IErrorBarPolicy} instance
+   * that {@link IErrorBarPolicy#isShowNegativeYErrors()}. </li>
+   * <li> and at least one of these instances contains at least one
+   * {@link IErrorBarPainter} instance. </li>
+   * </ul>
+   * <p>
+   * 
+   * @return true if this trace renders error bars in negative y direction.
+   */
+  public boolean showsNegativeYErrorBars();
+
+  /**
+   * Tests whether error bars in positive x direction are painted by this trace.
+   * <p>
+   * 
+   * Returns true if
+   * <ul>
+   * <li> this trace contains at leaste one {@link IErrorBarPolicy} instance
+   * that {@link IErrorBarPolicy#isShowPositiveXErrors()}. </li>
+   * <li> and at least one of these instances contains at least one
+   * {@link IErrorBarPainter} instance. </li>
+   * </ul>
+   * <p>
+   * 
+   * @return true if this trace renders error bars in positive x direction.
+   */
+  public boolean showsPositiveXErrorBars();
+
+  /**
+   * Tests whether error bars in positive y direction are painted by this trace.
+   * <p>
+   * 
+   * Returns true if
+   * <ul>
+   * <li> this trace contains at leaste one {@link IErrorBarPolicy} instance
+   * that {@link IErrorBarPolicy#isShowPositiveYErrors()}. </li>
+   * <li> and at least one of these instances contains at least one
+   * {@link IErrorBarPainter} instance. </li>
+   * </ul>
+   * <p>
+   * 
+   * @return true if this trace renders error bars in positive y direction.
+   */
+  public boolean showsPositiveYErrorBars();
 
 }

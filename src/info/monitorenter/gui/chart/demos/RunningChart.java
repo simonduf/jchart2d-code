@@ -24,9 +24,9 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.layout.ChartPanel;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyMinimumViewport;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
+import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.reflection.ObjRecorder2Trace2DAdapter;
 import info.monitorenter.util.Range;
 
@@ -49,7 +49,7 @@ import javax.swing.JFrame;
  * <p>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'> Achim Westermann </a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class RunningChart extends JFrame {
   /**
@@ -58,7 +58,7 @@ public class RunningChart extends JFrame {
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * @version $Revision: 1.2 $
+   * @version $Revision: 1.3 $
    */
   static class RandomBumper extends Thread {
     /** Streches or compresses the grade of jumping of the internal number. */

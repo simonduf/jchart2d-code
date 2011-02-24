@@ -20,7 +20,7 @@
  *  Achim.Westermann@gmx.de
  *
  */
-package info.monitorenter.gui.chart.layout.controls;
+package info.monitorenter.gui.chart.controls;
 
 import info.monitorenter.util.Range;
 import infovis.panel.DoubleBoundedRangeModel;

@@ -1,5 +1,6 @@
 /*
- *  DialogRange.java of project jchart2d
+ *  ADialog.java, base for dialogs with ok and cancel buttons and 
+ *  support for modality within jchart2d.
  *  Copyright 2006 (C) Achim Westermann, created on 09:31:15.
  *
  *  This library is free software; you can redistribute it and/or
@@ -22,8 +23,6 @@
  */
 package info.monitorenter.gui.chart.dialogs;
 
-import info.monitorenter.gui.chart.layout.controls.RangeChooserPanel;
-
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -44,9 +43,18 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-
 /**
- * A dialog for choosing a range.
+ * Base for modal dialogs with ok and cancel buttons.
+ * <p>
+ * This is a try for a better design approach to modal dialogs than offered in
+ * the java development kit: <br>
+ * The service of a modal dialog that offers cancel and ok is separated from the
+ * retrieval of data of such a dialog. The component that queries the data from
+ * this service is freely choosable. It may be passed to the contstructor and
+ * will be returned from {@link #showDialog()}. The client code then is sure
+ * that the modal dialog has been confirmed by the human interactor and may
+ * query this component for input: it knows about the component that was used to
+ * query inputs.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
@@ -54,13 +62,14 @@ import javax.swing.JPanel;
  * 
  * @version $Revision: 1.2 $
  */
-public abstract class ADialog extends JDialog {
+public abstract class AModalDialog
+    extends JDialog {
 
   /** The ui controls and model to interact with. */
   private JComponent m_chooserPanel;
 
   /**
-   * Creates a range-chooser dialog.
+   * Creates a modal dialog.
    * <p>
    * 
    * @param component
@@ -69,21 +78,18 @@ public abstract class ADialog extends JDialog {
    * @param title
    *          the String containing the dialog's title.
    * 
-   * @param modal
-   *          if true this will be a modal dialog (blocking actions on component
-   *          until closed.
-   * 
-   * @param chooserPane
-   *          the UI control for choosing the range.
+   * @param controlComponent
+   *          the UI component that is additionally shown and returned from
+   *          {@link #showDialog()}.
    */
-  public ADialog(final Component component, final String title, final boolean modal,
-      final RangeChooserPanel chooserPane) {
-    super(JOptionPane.getFrameForComponent(component), title, modal);
-    this.m_chooserPanel = chooserPane;
+  public AModalDialog(final Component component, final String title,
+      final JComponent controlComponent) {
+    super(JOptionPane.getFrameForComponent(component), title, true);
+    this.m_chooserPanel = controlComponent;
 
     Container contentPane = this.getContentPane();
     contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-    contentPane.add(this.m_chooserPanel);
+    contentPane.add(this.m_chooserPanel); 
 
     // Window listeners:
     this.addWindowListener(new WindowAdapter() {
@@ -99,44 +105,48 @@ public abstract class ADialog extends JDialog {
       }
     });
 
-    // Chancel / OK Buttons.
-    JPanel okChancelPanel = new JPanel();
-    okChancelPanel.setLayout(new BoxLayout(okChancelPanel, BoxLayout.X_AXIS));
-    okChancelPanel.add(Box.createHorizontalGlue());
+    // Cancel / OK Buttons.
+    JPanel okCancelPanel = new JPanel();
+    okCancelPanel.setLayout(new BoxLayout(okCancelPanel, BoxLayout.X_AXIS));
+    okCancelPanel.add(Box.createHorizontalGlue());
     JButton ok = new JButton("OK");
     ok.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         setVisible(false);
       }
     });
-    okChancelPanel.add(ok);
-    okChancelPanel.add(Box.createHorizontalGlue());
-    JButton chancel = new JButton("Chancel");
-    chancel.addActionListener(new ActionListener() {
+    okCancelPanel.add(ok);
+    okCancelPanel.add(Box.createHorizontalGlue());
+    JButton cancel = new JButton("Cancel");
+    cancel.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         setVisible(false);
       }
     });
-    okChancelPanel.add(chancel);
-    okChancelPanel.add(Box.createHorizontalGlue());
-    // add ok / chancel to ui:
-    contentPane.add(okChancelPanel);
+    okCancelPanel.add(cancel);
+    okCancelPanel.add(Box.createHorizontalGlue());
+    // add ok / cancel to ui:
+    contentPane.add(okCancelPanel);
     this.setSize(new Dimension(300, 200));
   }
 
   /**
-   * Shows a modal dialog and blocks until the dialog is hidden. If the user
-   * presses the "OK" button, then this method hides/disposes the dialog and
-   * returns the selected color. If the user presses the "Cancel" button or
-   * closes the dialog without pressing "OK", then this method hides/disposes
-   * the dialog and returns <code>null</code>.
+   * Shows a modal dialog and blocks until the dialog is hidden.
+   * <p>
+   * If the user presses the "OK" button, then this method hides/disposes the
+   * dialog and returns the custom component that queries for user input. If the
+   * user presses the "Cancel" button or closes the dialog without pressing
+   * "OK", then this method hides/disposes the dialog and returns
+   * <code>null</code>.
    * <p>
    * 
    * 
-   * @return the selected range or <code>null</code> if the user opted out.
+   * @return the custom component given to the constructor with it's new
+   *         settings or <code>null</code> if the user opted out.
    * 
    * @exception HeadlessException
    *              if GraphicsEnvironment.isHeadless() returns true.
+   * 
    * @see java.awt.GraphicsEnvironment#isHeadless
    */
   public JComponent showDialog() throws HeadlessException {

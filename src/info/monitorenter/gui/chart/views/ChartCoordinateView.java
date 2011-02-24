@@ -19,7 +19,7 @@
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
  */
-package info.monitorenter.gui.chart.layout.views;
+package info.monitorenter.gui.chart.views;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.TracePoint2D;

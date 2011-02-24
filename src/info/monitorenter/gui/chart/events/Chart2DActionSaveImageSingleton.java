@@ -24,8 +24,8 @@
 package info.monitorenter.gui.chart.events;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem;
 import info.monitorenter.gui.chart.io.FileFilterExtensions;
-import info.monitorenter.gui.chart.layout.LayoutFactory.PropertyChangeCheckBoxMenuItem;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -41,6 +41,9 @@ import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.FileImageOutputStream;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
@@ -55,7 +58,7 @@ import javax.swing.filechooser.FileFilter;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.3 $
  */
 public final class Chart2DActionSaveImageSingleton
     extends AChart2DAction {
@@ -165,19 +168,30 @@ public final class Chart2DActionSaveImageSingleton
     }
     // add the file filters:
     itWriters = writers.iterator();
-    String encoding;
+    String extension;
     while (itWriters.hasNext()) {
-      encoding = (String) itWriters.next();
-      this.m_filechooser.addChoosableFileFilter(new FileFilterExtensions(new String[] {encoding }));
+      extension = (String) itWriters.next();
+      this.m_filechooser
+          .addChoosableFileFilter(new FileFilterExtensions(new String[] {extension }));
     }
 
     int ret = this.m_filechooser.showSaveDialog(this.m_chart);
     if (ret == JFileChooser.APPROVE_OPTION) {
       File file = this.m_filechooser.getSelectedFile();
       // get the encoding
-      encoding = this.m_filechooser.getFileFilter().getDescription().substring(2);
+      extension = this.m_filechooser.getFileFilter().getDescription().substring(2);
+      ImageWriter imgWriter = (ImageWriter) ImageIO.getImageWritersBySuffix(extension).next();
+      // parameters for the writer:
+      ImageWriteParam params = imgWriter.getDefaultWriteParam();
+      if (params.canWriteCompressed()) {
+        params.setCompressionMode(ImageWriteParam.MODE_DISABLED);
+        // params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+        // params.setCompressionQuality(1.0f);
+      }
       try {
-        ImageIO.write(img, encoding, new File(file.getAbsolutePath() + "." + encoding));
+        imgWriter.setOutput(new FileImageOutputStream(new File(file.getAbsolutePath() + "."
+            + extension)));
+        imgWriter.write(img);
       } catch (IOException e1) {
         e1.printStackTrace();
       }

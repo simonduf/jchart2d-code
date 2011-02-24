@@ -22,9 +22,9 @@
  */
 package info.monitorenter.gui.chart.events;
 
-import info.monitorenter.gui.chart.AAxis;
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.layout.LayoutFactory.PropertyChangeCheckBoxMenuItem;
+import info.monitorenter.gui.chart.axis.AAxis;
+import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem;
 
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -35,7 +35,7 @@ import java.beans.PropertyChangeEvent;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  */
 public final class Chart2DActionSetAxis
     extends AChart2DAction {

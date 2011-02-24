@@ -28,7 +28,7 @@ import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 import java.util.Iterator;
 
 /**
- * An {@link info.monitorenter.gui.chart.AAxis} with log scaled display of
+ * An {@link info.monitorenter.gui.chart.axis.AAxis} with log scaled display of
  * values.
  * <p>
  * 
@@ -46,9 +46,10 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class AxisLogE extends AAxisTransformation {
+public class AxisLogE
+    extends AAxisTransformation {
 
   /**
    * Creates an instance that uses a {@link LabelFormatterSimple} for formatting

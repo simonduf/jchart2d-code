@@ -96,7 +96,7 @@ Harder:
         <module name="FinalParameters"/>
         <module name="UpperEll"/>
         <module name="LineLength">
-            <property name="max" value="120"/>
+            <property name="max" value="140"/>
         </module>
         <module name="RequireThis">
             <metadata name="com.atlassw.tools.eclipse.checkstyle.comment" value="Enforce this for internal member access to avoid ambiguity with arguments."/>

@@ -24,8 +24,8 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ZoomableChart;
-import info.monitorenter.gui.chart.layout.ChartPanel;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
+import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -46,7 +46,7 @@ import javax.swing.JFrame;
  * 
  * @author Alessio Sambarino (Contributor)
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ZoomTest extends JFrame {
 

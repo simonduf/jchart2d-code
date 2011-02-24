@@ -20,18 +20,19 @@
  *  Achim.Westermann@gmx.de
  *
  */
-package info.monitorenter.gui.chart.layout;
+package info.monitorenter.gui.chart.views;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.controls.LayoutFactory;
+import info.monitorenter.gui.chart.layouts.FlowLayoutCorrectMinimumSize;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -52,8 +53,8 @@ import javax.swing.JPanel;
  * <h2>Performance note</h2>
  * The context menu items register themselves with the chart to adapt their
  * basic UI properties (font, foreground color, background color) via
- * unreferenced instances of
- * {@link info.monitorenter.gui.chart.layout.LayoutFactory.BasicPropertyAdaptSupport}.
+ * weak referenced instances of
+ * {@link info.monitorenter.gui.chart.controls.LayoutFactory.BasicPropertyAdaptSupport}.
  * This ensures that dropping a complete menu tree from the UI makes them
  * garbage collectable without introduction of highly unstable and
  * unmaintainable active memory management code. A side effect is that these
@@ -74,8 +75,7 @@ import javax.swing.JPanel;
  * (ouch, this should be changed).
  * <p>
  * 
- * Profiling a day with
- * {@link info.monitorenter.gui.chart.layout.TestChartPanelMemoryLeak} showed
+ * Profiling a day with showed
  * that up to 2000 dead listeners remained in the list. The cpu load increased
  * after about 200 add / remove trace operations. Good news is that no memory
  * leak could be detected.
@@ -170,36 +170,29 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
     this.setBackground(chart.getBackground());
     // we paint our own labels
     chart.setPaintLabels(false);
-    LayoutFactory.getInstance().createPopupMenu(chart, true);
+    // get the layout factory for popup menues: 
+    LayoutFactory factory = LayoutFactory.getInstance();
+    
+    factory.createPopupMenu(chart, true);
 
     // layouting
-    GridBagLayout gridbag = new GridBagLayout();
-    GridBagConstraints c = new GridBagConstraints();
-    this.setLayout(gridbag);
-    c.fill = GridBagConstraints.BOTH;
-    c.gridwidth = GridBagConstraints.REMAINDER;
-    c.weightx = 1.0;
-    c.weighty = 0.99;
-
-    gridbag.setConstraints(chart, c);
-    this.add(chart);
+    this.setLayout(new BorderLayout());
+    this.add(chart, BorderLayout.CENTER);
     Iterator itTraces = chart.iterator();
     ITrace2D trace;
     // initial Labels
     // put to a flow layout panel
     this.m_labelPanel = new JPanel();
     this.m_labelPanel.setFont(chart.getFont());
-    this.m_labelPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+    this.m_labelPanel.setLayout(new FlowLayoutCorrectMinimumSize(FlowLayout.LEFT));
     this.m_labelPanel.setBackground(chart.getBackground());
     JLabel label;
     while (itTraces.hasNext()) {
       trace = (ITrace2D) itTraces.next();
-      label = LayoutFactory.getInstance().createContextMenuLable(chart, trace);
+      label = factory.createContextMenuLabel(chart, trace, true);
       this.m_labelPanel.add(label);
     }
-    c.weighty = 0.01;
-    gridbag.setConstraints(this.m_labelPanel, c);
-    this.add(this.m_labelPanel);
+    this.add(this.m_labelPanel, BorderLayout.SOUTH);
     chart.addPropertyChangeListener(Chart2D.PROPERTY_BACKGROUND_COLOR, this);
     // listen to new Charts and deleted ones.
     chart.addPropertyChangeListener(Chart2D.PROPERTY_ADD_REMOVE_TRACE, this);
@@ -224,7 +217,7 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
       ITrace2D newTrace = (ITrace2D) evt.getNewValue();
       JLabel label;
       if (oldTrace == null && newTrace != null) {
-        label = LayoutFactory.getInstance().createContextMenuLable(this.m_chart, newTrace);
+        label = LayoutFactory.getInstance().createContextMenuLabel(this.m_chart, newTrace, true);
         this.m_labelPanel.add(label);
         synchronized (this.m_chart) {
           // this.doLayout();

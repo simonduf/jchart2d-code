@@ -27,24 +27,84 @@ import info.monitorenter.util.Range;
 
 import java.beans.PropertyChangeListener;
 
-
 /**
- * <p>
  * An interface that allows an axis to be plugged with a range policy.
- * </p>
  * <p>
  * Implementations may limit the range of the underlying Chart2D's data
  * (clipping / zooming), increase it (void space offset), guarantee a minimum
  * viewport... .
- * </p>
+ * <p>
+ * 
+ * <h3>Property Change events</h3>
+ * <p>
+ * <table border="0">
+ * <tr>
+ * <th><code>property</code></th>
+ * <th><code>oldValue</code></th>
+ * <th><code>newValue</code></th>
+ * <th>occurance</th>
+ * </tr>
+ * <tr>
+ * <td><code>{@link #PROPERTY_RANGE}</code></td>
+ * <td><code>{@link info.monitorenter.util.Range}</code> that changed</td>
+ * <td><code>{@link info.monitorenter.util.Range}</code>, the new value</td>
+ * <td>Fired if any bound of the range changed (min or max).</td>
+ * </tr>
+ * <tr>
+ * <tr>
+ * <td><code>{@link #PROPERTY_RANGE_MAX}</code></td>
+ * <td><code>{@link java.lang.Double}</code>, the old max value of the
+ * range. </td>
+ * <td><code>{@link info.monitorenter.util.Range}</code>, the new max value
+ * of the range. </td>
+ * <td></td>
+ * </tr>
+ * <tr>
+ * <td><code>{@link #PROPERTY_RANGE_MIN}</code></td>
+ * <td><code>{@link java.lang.Double}</code>, the old min value of the
+ * range. </td>
+ * <td><code>{@link info.monitorenter.util.Range}</code>, the new min value
+ * of the range. </td>
+ * <td></td>
+ * </tr>
+ * </table>
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.3 $
  * 
- * @see info.monitorenter.gui.chart.AAxis
+ * @see info.monitorenter.gui.chart.axis.AAxis
  */
 public interface IRangePolicy {
+  /**
+   * The property key defining a change of the <code>min</code> or the
+   * <code>max</code> property.
+   * <p>
+   * Use in combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   * <p>
+   */
+  public static final String PROPERTY_RANGE = "rangepolicy.range";
+
+  /**
+   * The property key defining the <code>max</code> property.
+   * <p>
+   * Use in combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   * <p>
+   */
+  public static final String PROPERTY_RANGE_MAX = "rangepolicy.rangemax";
+
+  /**
+   * The property key defining the <code>min</code> property.
+   * <p>
+   * Use in combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   * <p>
+   */
+  public static final String PROPERTY_RANGE_MIN = "rangepolicy.rangemin";
+
   /**
    * <p>
    * Registers a property change listener that will be informed about changes of
@@ -64,7 +124,7 @@ public interface IRangePolicy {
 
   /**
    * Define the upper bound of the Chart2D's value range. Depends on the
-   * {@link AAxis} this instance is bound to.
+   * {@link info.monitorenter.gui.chart.axis.AAxis} this instance is bound to.
    * 
    * @param chartMin
    *          the minimum value of the connected Chart2D that may / should be
@@ -81,7 +141,7 @@ public interface IRangePolicy {
 
   /**
    * Define the lower bound of the Chart2D's value range. Depends on the
-   * {@link AAxis} this instance is bound to.
+   * {@link info.monitorenter.gui.chart.axis.AAxis} this instance is bound to.
    * 
    * @param chartMin
    *          the minimum value of the connected Chart2D that may / should be

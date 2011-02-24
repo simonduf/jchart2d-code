@@ -23,6 +23,7 @@
 package info.monitorenter.gui.chart.traces;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IErrorBarPolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.TracePoint2D;
@@ -47,7 +48,7 @@ import java.util.Set;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.8 $
  */
 public class Trace2DAxisSwap implements ITrace2D {
   /** The delagate instance to decorate with axis swapping. */
@@ -69,6 +70,13 @@ public class Trace2DAxisSwap implements ITrace2D {
           + " is unnecessary and may be harmful.");
     }
     this.m_delegate = trace;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#addErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
+   */
+  public boolean addErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
+    return this.m_delegate.addErrorBarPolicy(errorBarPolicy);
   }
 
   /**
@@ -130,10 +138,17 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#getLable()
+   * @see info.monitorenter.gui.chart.ITrace2D#getErrorBarPolicies()
    */
-  public String getLable() {
-    return this.m_delegate.getLable();
+  public Set getErrorBarPolicies() {
+    return this.m_delegate.getErrorBarPolicies();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getLabel()
+   */
+  public String getLabel() {
+    return this.m_delegate.getLabel();
   }
 
   /**
@@ -222,13 +237,6 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#isVisible()
-   */
-  public boolean isVisible() {
-    return this.m_delegate.isVisible();
-  }
-
-  /**
    * @see info.monitorenter.gui.chart.ITrace2D#getZIndex()
    */
   public Integer getZIndex() {
@@ -247,6 +255,13 @@ public class Trace2DAxisSwap implements ITrace2D {
    */
   public boolean isEmpty() {
     return this.m_delegate.isEmpty();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#isVisible()
+   */
+  public boolean isVisible() {
+    return this.m_delegate.isVisible();
   }
 
   /**
@@ -308,6 +323,13 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#setErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
+   */
+  public Set setErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
+    return this.m_delegate.setErrorBarPolicy(errorBarPolicy);
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#setName(java.lang.String)
    */
   public void setName(final String name) {
@@ -356,6 +378,41 @@ public class Trace2DAxisSwap implements ITrace2D {
    */
   public void setZIndex(final Integer zIndex) {
     this.m_delegate.setZIndex(zIndex);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsErrorBars()
+   */
+  public boolean showsErrorBars() {
+    return this.m_delegate.showsErrorBars();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsNegativeXErrorBars()
+   */
+  public boolean showsNegativeXErrorBars() {
+    return this.m_delegate.showsNegativeXErrorBars();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsNegativeYErrorBars()
+   */
+  public boolean showsNegativeYErrorBars() {
+    return this.m_delegate.showsNegativeYErrorBars();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsPositiveXErrorBars()
+   */
+  public boolean showsPositiveXErrorBars() {
+    return this.m_delegate.showsPositiveXErrorBars();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsPositiveYErrorBars()
+   */
+  public boolean showsPositiveYErrorBars() {
+    return this.m_delegate.showsPositiveYErrorBars();
   }
 
   /**

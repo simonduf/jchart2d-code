@@ -32,7 +32,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.WeakHashMap;
 
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /**
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
@@ -47,6 +49,20 @@ public class TestMultithreading extends TestCase {
   protected WeakHashMap weakMap;
 
   protected List producers;
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
+
+    TestSuite suite = new TestSuite();
+    suite.setName(TestMultithreading.class.getName());
+
+    suite.addTest(new TestMultithreading("testTrace2DLtd"));
+    return suite;
+  }
 
   // test configuration
   protected final static int PRODUCER_AMOUNT = 10;

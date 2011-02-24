@@ -32,7 +32,7 @@ import javax.swing.JPopupMenu;
  * <p>
  * It is used to connect <code>JPopupMenu</code> instances with the components
  * retrieved from the factory methods (e.g.
- * {@link info.monitorenter.gui.chart.layout.LayoutFactory#createContextMenuLable
+ * {@link info.monitorenter.gui.chart.controls.LayoutFactory#createContextMenuLabel
  * (info.monitorenter.gui.chart.Chart2D)}).
  * <p>
  * 
@@ -43,9 +43,10 @@ import javax.swing.JPopupMenu;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.3 $
  */
-public final class PopupListener extends MouseAdapter {
+public final class PopupListener
+    extends MouseAdapter {
   /** The popup to open. */
   private JPopupMenu m_popup;
 

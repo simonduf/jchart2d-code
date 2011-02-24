@@ -29,7 +29,7 @@ import info.monitorenter.util.units.UnitUnchanged;
 
 /**
  * A label formatter that is aware of the
- * {@link info.monitorenter.gui.chart.AAxis} it formats label for.
+ * {@link info.monitorenter.gui.chart.axis.AAxis} it formats label for.
  * <p>
  * This allows to compute the amount of fraction digits needed from the range to
  * display.
@@ -37,7 +37,7 @@ import info.monitorenter.util.units.UnitUnchanged;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public abstract class ALabelFormatter implements ILabelFormatter {
 
@@ -59,7 +59,7 @@ public abstract class ALabelFormatter implements ILabelFormatter {
   }
 
   /**
-   * Intended for {@link info.monitorenter.gui.chart.AAxis} only.
+   * Intended for {@link info.monitorenter.gui.chart.axis.AAxis} only.
    * <p>
    * 
    * @return Returns the axis.
@@ -150,7 +150,7 @@ public abstract class ALabelFormatter implements ILabelFormatter {
   }
 
   /**
-   * Intended for {@link info.monitorenter.gui.chart.AAxis} only.
+   * Intended for {@link info.monitorenter.gui.chart.axis.AAxis} only.
    * <p>
    * 
    * Do never invoke this! This is only public for package sorting reasons.

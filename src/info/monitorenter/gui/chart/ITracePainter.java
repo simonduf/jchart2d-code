@@ -27,7 +27,7 @@ import java.awt.Graphics2D;
  * An interface that works at trace level and defines how it's points are
  * rendered.
  * <p>
- *
+ * 
  * A contract for implementation is that
  * {@link java.lang.Object#equals(java.lang.Object)} has to be implemented to
  * return true if two instances are of the same class and
@@ -35,21 +35,22 @@ import java.awt.Graphics2D;
  * according to that. This is OK as trace painters are mostly to characterize by
  * their different implementation of rendering a trace.
  * <p>
- *
+ * 
  * <h3>Caution</h3>
  * There is no guarantee that further manipulation on the given
  * {@link java.awt.Graphics2D} instance than painting just the label or tick
  * will not produce layout problems. E.g. changing the color or font is not
- * recommended as these should be assigned to the {@link info.monitorenter.gui.chart.ITrace2D}/
+ * recommended as these should be assigned to the
+ * {@link info.monitorenter.gui.chart.ITrace2D}/
  * {@link info.monitorenter.gui.chart.Chart2D}.
  * <p>
- *
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
- * @version $Revision: 1.2 $
- *
+ * 
+ * @version $Revision: 1.4 $
+ * 
  */
-public interface ITracePainter extends Comparable {
+public interface ITracePainter extends Comparable, IPointPainter {
 
   /**
    * Invoked to inform the painter that a discontinue in the trace to # paint
@@ -59,38 +60,43 @@ public interface ITracePainter extends Comparable {
    * {@link #paintPoint(int, int, int, int, Graphics2D)} to draw them as
    * polygons (e.g.: {@link java.awt.Graphics#drawPolyline(int[], int[], int)}).
    * <p>
-   *
+   * 
+   * @param g2d
+   *          provided in case pending paint operations have to be performed.
+   * 
    */
-  public void discontinue();
-  
+  public void discontinue(Graphics2D g2d);
+
   /**
    * Invoked to inform implementations that a paint iteration ends for the
    * corresponding {@link info.monitorenter.gui.chart.ITrace2D}.
    * <p>
-   *
+   * 
+   * @param g2d
+   *          provided in case pending paint operations have to be performed.
    */
-  public void endPaintIteration();
+  public void endPaintIteration(Graphics2D g2d);
 
   /**
    * Paint the point given by absolute coordinates on the given graphic context.
    * <p>
-   *
+   * 
    * The next coordinates are also provided to allow to check how much distance
    * is available for the graphic representation of the current point.
    * <p>
-   *
+   * 
    * @param absoluteX
    *          the ready to use x value for the point to paint.
-   *
+   * 
    * @param absoluteY
    *          the ready to use y value for the point to paint.
-   *
+   * 
    * @param nextX
    *          the ready to use next x value for the point to paint.
-   *
+   * 
    * @param nextY
-   *          the ready to use next < value for the point to paint.
-   *
+   *          the ready to use next y value for the point to paint.
+   * 
    * @param g
    *          the graphic context to paint on.
    */
@@ -101,8 +107,10 @@ public interface ITracePainter extends Comparable {
    * Invoked to inform implementations that a paint iteration starts for the
    * corresponding {@link info.monitorenter.gui.chart.ITrace2D}.
    * <p>
-   *
+   * 
+   * @param g2d
+   *          provided in case pending paint operations have to be performed.
    */
-  public void startPaintIteration();
+  public void startPaintIteration(Graphics2D g2d);
 
 }

@@ -22,8 +22,15 @@
  */
 package info.monitorenter.gui.chart.demo;
 
+import javax.swing.JFrame;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.TestChart2D;
+import info.monitorenter.gui.chart.axis.TestAxis;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 
 /**
@@ -31,12 +38,13 @@ import info.monitorenter.gui.chart.traces.Trace2DLtd;
  * "http://sourceforge.net/tracker/?func=detail&atid=459734&aid=1426461&group_id=50440"
  * target="_blank">#1426461 </a>.
  * <p>
- *
+ * 
  * @author zoola
- *
- * @version $Revision: 1.2 $
+ * 
+ * @version $Revision: 1.3 $
  */
-public final class AddRemoveTrace extends javax.swing.JFrame {
+public final class AddRemoveTrace
+    extends TestCase {
 
   /**
    * Generated <code>serialVersionUID</code>.
@@ -46,30 +54,54 @@ public final class AddRemoveTrace extends javax.swing.JFrame {
   /**
    * Creates an empty chart and displays it.
    * <p>
-   *
+   * 
    */
-  public AddRemoveTrace() {
+  public AddRemoveTrace(String testname) {
+    super(testname);
+    this.m_frame = new JFrame(this.getClass().getName());
     Chart2D chart = new Chart2D();
     ITrace2D trace = new Trace2DLtd();
     chart.addTrace(trace);
     chart.removeTrace(trace);
-    getContentPane().add(chart);
-    setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-    pack();
+    this.m_frame.getContentPane().add(chart);
+    this.m_frame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+    this.m_frame.pack();
+    this.m_frame.setVisible(true);
   }
+
+  /** The display frame. */
+  private JFrame m_frame;
 
   /**
    * Main entry.
    * <p>
-   *
-   * @param args
-   *          ignored.
    */
-  public static void main(final String[] args) {
-    java.awt.EventQueue.invokeLater(new Runnable() {
-      public void run() {
-        new AddRemoveTrace().setVisible(true);
-      }
-    });
+  public void testAddRemoveTrace() throws InterruptedException {
+    while (this.isVisible()) {
+      Thread.sleep(1000);
+    }
+  }
+
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
+
+    TestSuite suite = new TestSuite();
+    suite.setName(AddRemoveTrace.class.getName());
+
+    suite.addTest(new AddRemoveTrace("testAddRemoveTrace"));
+
+    return suite;
+  }
+
+  /**
+   * @see java.awt.Component#isVisible()
+   */
+  public boolean isVisible() {
+    return this.m_frame.isVisible();
   }
 }

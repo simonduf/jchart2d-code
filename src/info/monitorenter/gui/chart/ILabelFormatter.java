@@ -36,11 +36,11 @@ import info.monitorenter.util.units.AUnit;
  * {@link #getMaxAmountChars()}.
  * </p>
  * 
- * @see info.monitorenter.gui.chart.AAxis
+ * @see info.monitorenter.gui.chart.axis.AAxis
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public interface ILabelFormatter {
 
@@ -121,8 +121,9 @@ public interface ILabelFormatter {
   public AUnit getUnit();
 
   /**
-   * Callback method invoked by the corresponding {@link AAxis} upon start of a
-   * paint iteration of the {@link Chart2D}.
+   * Callback method invoked by the corresponding
+   * {@link info.monitorenter.gui.chart.axis.AAxis} upon start of a paint
+   * iteration of the {@link Chart2D}.
    * <p>
    * 
    */
@@ -152,12 +153,13 @@ public interface ILabelFormatter {
   public Number parse(String formatted) throws NumberFormatException;
 
   /**
-   * Allows the {@link AAxis} to register itself with the given formatter so
+   * Allows the {@link info.monitorenter.gui.chart.axis.AAxis} to register itself with the given formatter so
    * that it may get information about the data (e.g. range) it has to format.
    * <p>
    * 
-   * This method should only be invoked by {@link AAxis}, all other invocations
-   * will cause trouble.
+   * This method should only be invoked by
+   * {@link info.monitorenter.gui.chart.axis.AAxis}, all other invocations will
+   * cause trouble.
    * <p>
    * 
    * @param axis

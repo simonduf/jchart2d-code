@@ -30,6 +30,9 @@ import info.monitorenter.util.Range;
 
 import java.awt.Color;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 
 /**
  * Test implementation that uses a chart with a {@link RangePolicyFixedViewport}
@@ -39,10 +42,10 @@ import java.awt.Color;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  * 
  */
-public class FixedViewportDisplayTest1 extends AbstractDisplayTest {
+public class FixedViewportDisplayTest1 extends ADisplayTestPropertyDataBased {
 
   /**
    * Returns a {@link Trace2DSimple} that is configured with a custom
@@ -52,7 +55,7 @@ public class FixedViewportDisplayTest1 extends AbstractDisplayTest {
    * @return a {@link Trace2DSimple} that is configured with a custom
    *         {@link ITrace2D#setColor(Color)}.
    * 
-   * @see info.monitorenter.gui.chart.demo.AbstractDisplayTest#createTrace()
+   * @see info.monitorenter.gui.chart.demo.ADisplayTest#createTrace()
    */
   protected ITrace2D createTrace() {
     ITrace2D result = new Trace2DSimple();
@@ -65,7 +68,7 @@ public class FixedViewportDisplayTest1 extends AbstractDisplayTest {
    * both axis.
    * <p>
    * 
-   * @see info.monitorenter.gui.chart.demo.AbstractDisplayTest#configure(info.monitorenter.gui.chart.demo.StaticCollectorChart)
+   * @see info.monitorenter.gui.chart.demo.ADisplayTest#configure(info.monitorenter.gui.chart.demo.StaticCollectorChart)
    */
   protected void configure(final StaticCollectorChart chart) {
     IAxis axis = chart.getChart().getAxisX();
@@ -75,5 +78,31 @@ public class FixedViewportDisplayTest1 extends AbstractDisplayTest {
     axis.setRangePolicy(new RangePolicyFixedViewport());
     axis.setRange(new Range(2, 5));
   }
+  
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
+
+    TestSuite suite = new TestSuite();
+    suite.setName(FixedViewportDisplayTest1.class.getName());
+
+    suite.addTest(new FixedViewportDisplayTest1("testDisplay"));
+
+    return suite;
+  }
+
+  /**
+   * @param arg0
+   */
+  public FixedViewportDisplayTest1(String arg0) {
+    super(arg0);
+    // TODO Auto-generated constructor stub
+  }
+  
+
 
 }

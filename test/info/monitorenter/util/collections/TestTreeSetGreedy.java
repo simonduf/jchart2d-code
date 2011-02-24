@@ -28,7 +28,9 @@ import info.monitorenter.gui.chart.ITrace2D;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /**
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
@@ -68,7 +70,7 @@ public class TestTreeSetGreedy extends TestCase {
    * Add an element and ensure size is 1.
    * 
    */
-  public void estAdd() {
+  public void testAdd() {
     assertNotNull(this.test);
 
     this.test.add(new Element());
@@ -195,7 +197,7 @@ public class TestTreeSetGreedy extends TestCase {
    * Add 1,1,1, remove then and ensure that zero elements remain.
    * 
    */
-  public void estAddRemoveEqual3() {
+  public void testAddRemoveEqual3() {
     assertNotNull(this.test);
     IComparableProperty e1 = new Element();
     IComparableProperty e2 = new Element();
@@ -495,5 +497,31 @@ public class TestTreeSetGreedy extends TestCase {
       StringBuffer ret = new StringBuffer(this.compare.toString());
       return ret.toString();
     }
+  }
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
+
+    TestSuite suite = new TestSuite();
+    suite.setName(TestTreeSetGreedy.class.getName());
+
+    suite.addTest(new TestTreeSetGreedy("testAdd"));
+    suite.addTest(new TestTreeSetGreedy("testAdd10RemoveCenter"));
+    suite.addTest(new TestTreeSetGreedy("testAddEqual10"));
+    suite.addTest(new TestTreeSetGreedy("testAddEqual2"));
+    suite.addTest(new TestTreeSetGreedy("testAddEqual3"));
+    suite.addTest(new TestTreeSetGreedy("testAddEqual5"));
+    suite.addTest(new TestTreeSetGreedy("testAddIdentical2"));
+    suite.addTest(new TestTreeSetGreedy("testAddRemoveEqual10"));
+    suite.addTest(new TestTreeSetGreedy("testAddRemoveEqual2"));
+    suite.addTest(new TestTreeSetGreedy("testAddRemoveEqual3"));
+    suite.addTest(new TestTreeSetGreedy("testAddRemoveEqual5"));
+    suite.addTest(new TestTreeSetGreedy("testMultiThreadingAddRemove"));
+  
+    return suite;
   }
 }

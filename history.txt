@@ -1,7 +1,7 @@
-*
+/*
  * File   : $Source: /cvsroot/jchart2d/jchart2d/history.txt,v $
- * Date   : $Date: 2006/06/05 11:58:09 $
- * Version: $Revision: 1.47 $
+ * Date   : $Date: 2006/10/13 09:23:07 $
+ * Version: $Revision: 1.65 $
  *
  * This file is part of jchart2d -
  * the Open Source real time charting library.
@@ -19,6 +19,80 @@ Legend:
 * Bug fixed
 - General comment
 o API change that requires refactoring.
+
+jchart2d-2.1.0 - October, 12th, 2006
+
+o Renamed 
+  info.monitorenter.gui.chart.controls.LayoutFactory.createContextMenuLable(Chart2D, ITrace2D, boolean) 
+  to 
+  info.monitorenter.gui.chart.controls.LayoutFactory.createContextMenuLabel(Chart2D, ITrace2D, boolean) 
+o Renamed 
+  info.monitorenter.chart.ITrace2D.getLable() 
+  to 
+  info.monitorenter.chart.ITrace2D.getLabel() 
+o Renamed 
+  info.monitorenter.chart.axis.AAxis.getMinimumValueDistanceForLables() 
+  to 
+  info.monitorenter.chart.axis.AAxis.getMinimumValueDistanceForLabels()
+o Renamed 
+  info.monitorenter.chart.axis.AAxis.getMaximumPixelForLable() 
+  to 
+  info.monitorenter.chart.axis.AAxis.getMaximumPixelForLabel()
+* Chartpanel does not claim the correct height for an amount 
+  of trace labels (below chart) that exceeds available width.
+* Bugfix #1573885:  Range dialog has misspelled "Chancel" button.
+* Fixed obfuscated method names in ILabelFormatter of previous binary release.
+* Recalculate bound in case a trace gets visible or invisible 
+  at runtime to zoom to the optimal bounds upon visibility changes. 
+- Redesigned re- / transformation from px values to chart data 
+  values.
+o Moved AAxis from package info.monitorenter.gui.chart to 
+  package info.monitorenter.gui.chart.axis.
+* Repaint chart in static mode if trace is set visible / invible 
+  to reflect that change (discovered by Anton Kratz).
+! ZoomableChart supports zooming in both directions 
+  (contribution by Klaus Pesendorfer, Fabalabs). 
+! First error bar policy implementation: 
+  info.monitorenter.gui.chart.errorbars.ErrorBarPolicyRelative. 
+  See info.monitorenter.gui.chart.demos.StaticChartErrorBarLineDisc 
+  for a demonstration of the error bar API. 
+! Highly configurable error bar API supported in core (vs.: UI): 
+  Choose the direction (x/y,positive/negative), 
+  kind of error bar policy and the way of rendering 
+  (end point -, start point - and segment - painter). 
+- Separated code for painting a point from code to manage painting a whole trace 
+  and reused this for error bar rendering: 
+  Factored out duplications, increased modularization and maintainability. 
+o Refactored 
+  info.monitorenter.gui.chart.ITracePainter.discontinue()
+  to
+  info.monitorenter.gui.chart.ITracePainter.discontinue(java.awt.Graphics2D)
+o Refactored 
+  info.monitorenter.gui.chart.ITracePainter.startPaintIteration()
+  to
+  info.monitorenter.gui.chart.ITracePainter.startPaintIteration(java.awt.Graphics2D)
+o Refactored 
+  info.monitorenter.gui.chart.ITracePainter.endPaintIteration()
+  to
+  info.monitorenter.gui.chart.ITracePainter.endPaintIteration(java.awt.Graphics2D)
+* Bugfix #1550773: Don't overwrite the range of a range policy in AAxis.setRangePolicy(IRangePolicy)
+* Only zoom graph with left mouse-button (Contribution by Klaus Pesendorfer, Fabalabs).
+! New trace painter for vertical filled bars: info.monitorenter.gui.chart.traces.painters.TracePainterVerticalBar
+* Bugfix #1523799: LabelFormatter property overwritten for new AAxis.
+- Refactored axis actions to always be based on the current chart (stability, consistancy). 
+! LayoutFactory supports the option for standard menus 
+  (vs. UI-property adapting menus [foreground color, background color,...].
+- Modularized the creation of trace menus in LayoutFactory. 
+! Configurable visibility of menu entries for Popup and Menubar menus. 
+o Moved info.monitorenter.gui.chart.layout.LayoutFactory to 
+  info.monitorenter.gui.chart.controls.LayoutFactory.
+o Moved info.monitorenter.gui.chart.layout.ChartPanel to 
+  info.monitorenter.gui.chart.views.ChartPanel.
+o Moved info.monitorenter.gui.chart.layout.demos.CoordinateViewChart to 
+  info.monitorenter.gui.chart.demos.CoordinateViewChart.
+o Renamed package info.monitorenter.gui.chart.layout.controls to 
+  info.monitorenter.gui.chart.controls. 
+! Improved quality of saved images significantly by use of anti-aliasing. 
 
 jchart2d-2.0.1 - June, 5th, 2006
 

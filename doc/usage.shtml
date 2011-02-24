@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-  var update="06/01/2006";
+  var update="08/08/2006";
  </script>
  <body id="usage">
   <div id="wrapper">
@@ -255,10 +255,10 @@ import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
-import info.monitorenter.gui.chart.io.AbstractDataCollector;
+import info.monitorenter.gui.chart.io.ADataCollector;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.io.RandomDataCollector;
+import info.monitorenter.gui.chart.io.RandomDataCollectorOffset;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 
 public class MinimalDynamicChart {

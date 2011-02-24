@@ -22,9 +22,12 @@
  */
 package info.monitorenter.gui.chart.events;
 
+import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.IRangePolicy;
-import info.monitorenter.gui.chart.layout.LayoutFactory.PropertyChangeCheckBoxMenuItem;
+import info.monitorenter.gui.chart.axis.AAxis;
+import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem;
+import info.monitorenter.util.Range;
 
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -32,7 +35,7 @@ import java.beans.PropertyChangeEvent;
 /**
  * Action that sets a constructor given
  * {@link info.monitorenter.gui.chart.IRangePolicy} to a constructor given
- * {@link info.monitorenter.gui.chart.AAxis}.
+ * {@link info.monitorenter.gui.chart.axis.AAxis}.
  * <p>
  * 
  * <h2>Warning</h2>
@@ -41,9 +44,10 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.9 $
  */
-public class AxisActionSetRangePolicy extends AAxisAction {
+public class AxisActionSetRangePolicy
+    extends AAxisAction {
 
   /**
    * Generated <code>serial version UID</code>.
@@ -61,9 +65,14 @@ public class AxisActionSetRangePolicy extends AAxisAction {
    * with the given action String and sets the given
    * {@link info.monitorenter.gui.chart.IRangePolicy} to the axis upon
    * selection.
+   * <p>
+   * 
+   * @param chart
+   *          the owner of the axis to trigger actions upon.
    * 
    * @param axis
-   *          the target the action will work on.
+   *          needed to identify the axis of the chart: one of {@link Chart2D#X},
+   *          {@link Chart2D#Y}.
    * 
    * @param description
    *          the descriptive <code>String</code> that will be displayed by
@@ -71,15 +80,12 @@ public class AxisActionSetRangePolicy extends AAxisAction {
    *          <code>Action</code> assigned (
    *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    * 
-   * @param rangePolicy
-   *          The range policy to set to the axis upon invocation of
-   *          {@link #actionPerformed(ActionEvent)}.
    */
-  public AxisActionSetRangePolicy(final IAxis axis, final String description,
+  public AxisActionSetRangePolicy(final Chart2D chart, final String description, final int axis,
       final IRangePolicy rangePolicy) {
-    super(axis, description);
+    super(chart, description, axis);
     this.m_rangePolicy = rangePolicy;
-    axis.addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, this);
+    this.getAxis().addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, this);
 
   }
 
@@ -87,6 +93,12 @@ public class AxisActionSetRangePolicy extends AAxisAction {
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   public void actionPerformed(final ActionEvent e) {
+    // initially configure the range to show all data (in case a fixed
+    // viewport rp is used):
+    AAxis.AChart2DDataAccessor accessor = this.getAxis().getAccessor();
+    Range actualRange = new Range(accessor.getMinFromAxis(), accessor.getMaxFromAxis());
+    this.m_rangePolicy.setRange(actualRange);
+    this.m_rangePolicy.setRange(actualRange);
     this.getAxis().setRangePolicy(this.m_rangePolicy);
   }
 

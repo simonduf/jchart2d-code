@@ -25,8 +25,8 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.io.ADataCollector;
 import info.monitorenter.gui.chart.io.RandomDataCollectorOffset;
-import info.monitorenter.gui.chart.layout.ChartPanel;
 import info.monitorenter.gui.chart.traces.Trace2DLtdReplacing;
+import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -55,7 +55,7 @@ import javax.swing.JPanel;
  *
  * @author Achim Westermann (modified)
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class SampleChart extends JPanel {
   /**

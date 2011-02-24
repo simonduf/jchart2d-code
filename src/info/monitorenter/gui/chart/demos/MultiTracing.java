@@ -23,9 +23,9 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.layout.ChartPanel;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyMinimumViewport;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
+import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.util.Range;
 
 import java.awt.BorderLayout;
@@ -52,7 +52,7 @@ import javax.swing.JFrame;
  * 512 MB RAM so I did not get these problems.
  * </p>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  */
@@ -67,7 +67,7 @@ public final class MultiTracing extends JFrame {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    *
    *
-   * @version $Revision: 1.1 $
+   * @version $Revision: 1.2 $
    */
   static final class AddPaintRemoveThread extends Thread {
 

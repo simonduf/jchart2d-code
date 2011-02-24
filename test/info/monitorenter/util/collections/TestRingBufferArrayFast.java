@@ -21,9 +21,13 @@
  */
 package info.monitorenter.util.collections;
 
+import info.monitorenter.gui.chart.layout.TestChartPanelMemoryLeak;
+
 import java.util.Iterator;
 
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /**
  * 
@@ -33,7 +37,7 @@ import junit.framework.TestCase;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class TestRingBufferArrayFast extends TestCase {
 
@@ -283,7 +287,33 @@ public class TestRingBufferArrayFast extends TestCase {
     assertEquals(1, ((Integer) it.next()).intValue());
     assertEquals(2, ((Integer) it.next()).intValue());
     assertFalse(it.hasNext());
+  }
+  
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
 
+    TestSuite suite = new TestSuite();
+    suite.setName(TestRingBufferArrayFast.class.getName());
+
+    suite.addTest(new TestRingBufferArrayFast("testAdd"));
+    suite.addTest(new TestRingBufferArrayFast("testIteratorF2L"));
+    suite.addTest(new TestRingBufferArrayFast("testIteratorL2F"));
+    suite.addTest(new TestRingBufferArrayFast("testSetBufferSize"));
+    suite.addTest(new TestRingBufferArrayFast("testSize"));
+
+    return suite;
+  }
+
+  /**
+   * @param arg0
+   */
+  public TestRingBufferArrayFast(String arg0) {
+    super(arg0);
   }
 
 }

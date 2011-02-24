@@ -25,8 +25,8 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.layout.ChartPanel;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
+import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -37,27 +37,18 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
- * Title: AdvancedStaticChart
+ * Title: MinimalStaticChart
  * <p>
  * 
- * Description: A chart to test labels. This chart uses a
- * <code>{@link info.monitorenter.gui.chart.labelformatters.LabelFormatterNumber}</code>
- * that formats to whole integer numbers. No same labels should appear.
+ * Description: A minimal example for rendering a static chart.
  * <p>
  * 
- * Copyright: sample code taken from http://jchart2d.sourceforge.net/usage.shtml
- * <p>
+ * @author Achim Westermann
  * 
- * Company: Infotility
- * <p>
- * 
- * @author Achim Westermann (original)
- * 
- * @author Martin Rojo (modified)
- * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.3 $
  */
-public final class MinimalStaticChart extends JPanel {
+public final class MinimalStaticChart
+    extends JPanel {
   /**
    * Generated for <code>serialVersionUID</code>.
    */
@@ -95,7 +86,6 @@ public final class MinimalStaticChart extends JPanel {
     // Create an ITrace:
     // Note that dynamic charts need limited amount of values!!!
     // ITrace2D trace = new Trace2DLtd(200);
-    // 3/11/-5 , let's try something else too:
     ITrace2D trace = new Trace2DSimple();
     trace.setColor(Color.RED);
 

@@ -39,7 +39,9 @@ import java.io.InputStream;
 
 import javax.swing.JFrame;
 
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /**
  * Tests {@link StaticCollectorChart} with data from test1.properties.
@@ -47,7 +49,8 @@ import junit.framework.TestCase;
  * 
  * @author Achim Westermann
  */
-public class TestStaticCollectorChart extends TestCase {
+public class TestStaticCollectorChart
+    extends TestCase {
 
   /**
    * Tests {@link StaticCollectorChart} with data from test1.properties.
@@ -146,14 +149,44 @@ public class TestStaticCollectorChart extends TestCase {
   }
 
   /**
-   * Main debug entry. <p>
+   * Main debug entry.
+   * <p>
    * 
-   * @param args ignored. 
+   * @param args
+   *          ignored.
    * 
-   * @throws IOException if sth. goes wrong reading data. 
+   * @throws IOException
+   *           if sth. goes wrong reading data.
    */
   public static void main(final String[] args) throws IOException {
-    TestStaticCollectorChart test = new TestStaticCollectorChart();
+    TestStaticCollectorChart test = new TestStaticCollectorChart(TestStaticCollectorChart.class
+        .getName());
     test.testStaticCollectorChart2();
+  }
+
+  /**
+   * @param arg0
+   */
+  public TestStaticCollectorChart(String arg0) {
+    super(arg0);
+  }
+
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
+
+    TestSuite suite = new TestSuite();
+    suite.setName(TestStaticCollectorChart.class.getName());
+
+    suite.addTest(new TestStaticCollectorChart("testStaticCollectorChart1"));
+    suite.addTest(new TestStaticCollectorChart("testStaticCollectorChart2"));
+    suite.addTest(new TestStaticCollectorChart("testStaticCollectorChart3"));
+    suite.addTest(new TestStaticCollectorChart("testStaticCollectorChart7"));
+
+    return suite;
   }
 }

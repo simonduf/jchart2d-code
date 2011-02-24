@@ -11,7 +11,7 @@
     <property name="builddir" value="${basedir}/bin" />
     <property name="sourcedir" value="${basedir}/src" />
     <property name="sourcedir.test" value="${basedir}/test" />
-    <property name="project.version" value="2.0.1" />
+    <property name="project.version" value="2.1.0" />
 
     <!-- Taskdefs -->
     <!--
@@ -136,10 +136,11 @@
         -->
         <proguard obfuscate="false"
                   shrink="true"
-                  overloadaggressively="true"
+                  overloadaggressively="false"
                   warn="true"
                   verbose="true"
-                  ignorewarnings="true">
+                  ignorewarnings="true"
+                  printmapping="true">
             <libraryjar>
                 <pathelement path="${java.home}/lib/rt.jar" />
                 <fileset refid="allJars" />
@@ -153,6 +154,12 @@
             <!-- Filter -->
             <keep access="public" name="info.monitorenter.gui.chart.demos.*">
                 <method access="public static" name="main" />
+            </keep>
+            <keep access="public" name="info.monitorenter.gui.chart.*">
+                <method access="public" name="*" />
+            </keep>
+            <keep access="public" name="info.monitorenter.gui.chart.errorbars.A*">
+                <method access="protected" name="*" />
             </keep>
         </proguard>
         <!-- Delete big jar and rename shrinked to that name. -->
@@ -169,12 +176,13 @@
      init will be kept.
     </description>
 
-        <proguard obfuscate="false"
+        <proguard obfuscate="true"
                   shrink="true"
                   overloadaggressively="true"
                   warn="true"
                   verbose="true"
-                  ignorewarnings="true">
+                  ignorewarnings="true"
+                  printmapping="true">
             <libraryjar name="${java.home}/lib/rt.jar" />
             <!--
              caution: The name attribut value has to be the same expression
@@ -240,9 +248,9 @@
                 <![CDATA[<i>Copyright &#169; 2001 - 2006 <a href="http://www.opensource.org/licenses/lgpl-license.php" target="_blank">LGPL</a>, All Rights Footloose.</i>]]></bottom>
         <fileset refid="sourcefiles" />
         <link offline="false"
-              href="http://java.sun.com/j2se/1.4.2/docs/api/"
+              href="http://java.sun.com/j2se/1.5.0/docs/api/"
               packagelistLoc="${java.home}/docs/api/" />
-        <link offline="true"
+        <link offline="false"
               href="http://logging.apache.org/log4j/docs/api/"
               packagelistLoc="http://logging.apache.org/log4j/docs/api/package-list" />
     </javadoc>

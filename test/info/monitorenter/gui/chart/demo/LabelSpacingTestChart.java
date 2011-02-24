@@ -29,6 +29,12 @@ import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import java.awt.Color;
 import java.awt.Dimension;
 
+import javax.swing.JFrame;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 
 /**
  * Contributed by zoola for bug report <a href=
@@ -40,21 +46,26 @@ import java.awt.Dimension;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public final class LabelSpacingTestChart extends javax.swing.JFrame {
+public final class LabelSpacingTestChart extends TestCase {
 
   /**
    * Generated <code>serialVersionUID</code>.
    */
  private static final long serialVersionUID = 3689069560279873588L;
 
+ /** The display frame. */
+ private JFrame m_frame;
+ 
   /**
    * Creates a chart with three traces and different labels and displays it.
    * <p>
    *
    */
-  public LabelSpacingTestChart() {
+  public LabelSpacingTestChart(String testName) {
+    super(testName);
+    this.m_frame = new JFrame(testName);
     Chart2D chart = new Chart2D();
     ITrace2D trace1 = new Trace2DLtd();
     trace1.setName("lottolotto");
@@ -70,24 +81,37 @@ public final class LabelSpacingTestChart extends javax.swing.JFrame {
     trace3.setColor(Color.BLACK);
     trace3.setName("ffollejolle");
     chart.addTrace(trace3);
-    getContentPane().add(chart);
-    setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-    this.setSize(new Dimension(400, 300));
+    this.m_frame.getContentPane().add(chart);
+    this.m_frame.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+    this.m_frame.setSize(new Dimension(400, 300));
+    this.m_frame.setVisible(true);
+  }
 
+  public void testLabelSpacing() throws InterruptedException {
+    while(this.isVisible()) {
+      Thread.sleep(1000);
+    }
+  }
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
+
+    TestSuite suite = new TestSuite();
+    suite.setName(LabelSpacingTestChart.class.getName());
+
+    suite.addTest(new LabelSpacingTestChart("testLabelSpacing"));
+
+    return suite;
   }
 
   /**
-   * Main entry.
-   * <p>
-   *
-   * @param args
-   *          ignored.
+   * @see java.awt.Component#isVisible()
    */
-  public static void main(final String [] args) {
-    java.awt.EventQueue.invokeLater(new Runnable() {
-      public void run() {
-        new LabelSpacingTestChart().setVisible(true);
-      }
-    });
+  public boolean isVisible() {
+    return this.m_frame.isVisible();
   }
 }

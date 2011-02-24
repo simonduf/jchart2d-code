@@ -23,17 +23,43 @@
  */
 package info.monitorenter.gui.chart;
 
-import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
+
+import java.beans.PropertyChangeListener;
+import java.util.List;
+
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /**
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  *
  */
 public class TestTrace2DSimple extends TestCase {
+  /**
+   * @param arg0
+   */
+  public TestTrace2DSimple(String arg0) {
+    super(arg0);
+    // TODO Auto-generated constructor stub
+  }
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
 
+    TestSuite suite = new TestSuite();
+    suite.setName(TestTrace2DSimple.class.getName());
+
+    suite.addTest(new TestTrace2DSimple("testMemoryLeakTrace2DListeners"));
+    suite.addTest(new TestTrace2DSimple("testMemoryLeakTrace2DListenersSeverity"));
+
+    return suite;
+  }
   /**
    * <p>
    *  Adds and removes a trace to a chart and asserts that only one and
@@ -44,14 +70,14 @@ public class TestTrace2DSimple extends TestCase {
   public void testMemoryLeakTrace2DListeners(){
     Chart2D chart = new Chart2D();
     ITrace2D trace = new Trace2DSimple();
-    int listeners = 0;
+    PropertyChangeListener[] listeners;
     for(int i=0;i<100;i++){
       chart.addTrace(trace);
-      listeners = trace.getPropertyChangeListeners(ITrace2D.PROPERTY_MAX_X).length;
-      assertEquals("Only one listener should be registered!", 1, listeners);
+      listeners = trace.getPropertyChangeListeners(ITrace2D.PROPERTY_MAX_X);
+      assertEquals("Only one listener should be registered!", 1, listeners.length);
       chart.removeTrace(trace);
-      listeners = trace.getPropertyChangeListeners(ITrace2D.PROPERTY_MAX_X).length;
-      assertEquals("All listeners have to be deregistered!", 0, listeners);
+      listeners = trace.getPropertyChangeListeners(ITrace2D.PROPERTY_MAX_X);
+      assertEquals("All listeners have to be deregistered!", 0, listeners.length);
     }
 
   }

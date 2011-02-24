@@ -34,8 +34,9 @@ import java.util.List;
  * <p>
  * 
  * Additionally it increases performance by summing up all points to render for
- * a paint iteration ({@link #startPaintIteration()},
- * {@link #endPaintIteration()}) and only invoking only one polygon paint for a
+ * a paint iteration (submitted by {@link #paintPoint(int, int, int, int, Graphics2D)} 
+ * between {@link #startPaintIteration(Graphics2D)} and 
+ * {@link #endPaintIteration(Graphics2D)}) and only invoking only one polygon paint for a
  * paint call of the corresponding {@link info.monitorenter.gui.chart.Chart2D}.
  * <p>
  * 
@@ -43,10 +44,11 @@ import java.util.List;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.3 $
  * 
  */
-public class TracePainterFill extends ATracePainter {
+public class TracePainterFill
+    extends ATracePainter {
 
   /**
    * Stores the corresponding chart to know the coordinate roots for closing the
@@ -72,18 +74,18 @@ public class TracePainterFill extends ATracePainter {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#discontinue()
+   * @see info.monitorenter.gui.chart.ITracePainter#discontinue(java.awt.Graphics2D)
    */
-  public void discontinue() {
-    this.endPaintIteration();
-    this.startPaintIteration();
+  public void discontinue(final Graphics2D g2d) {
+    this.endPaintIteration(g2d);
+    this.startPaintIteration(g2d);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration()
+   * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics2D)
    */
-  public void endPaintIteration() {
-    if (this.m_graphics != null) {
+  public void endPaintIteration(final Graphics2D g2d) {
+    if (g2d != null) {
 
       int[] x = new int[this.m_xPoints.size() + 4];
       x[0] = this.m_chart.getXChartStart();
@@ -113,13 +115,13 @@ public class TracePainterFill extends ATracePainter {
       // step back to startx,starty (root)
       y[count + 2] = this.m_chart.getYChartStart();
 
-      this.m_graphics.fillPolygon(x, y, x.length);
+      g2d.fillPolygon(x, y, x.length);
     }
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int, int,
-   *      java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int,
+   *      int, java.awt.Graphics2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
       final int nextY, final Graphics2D g) {
@@ -129,17 +131,13 @@ public class TracePainterFill extends ATracePainter {
     // don't loose the last point:
     this.m_lastX = nextX;
     this.m_lastY = nextY;
-    if (this.m_graphics == null) {
-      this.m_graphics = g;
-    }
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#startPaintIteration()
+   * @see info.monitorenter.gui.chart.ITracePainter#startPaintIteration(java.awt.Graphics2D)
    */
-  public void startPaintIteration() {
+  public void startPaintIteration(final Graphics2D g2d) {
     this.m_xPoints = new LinkedList();
     this.m_yPoints = new LinkedList();
-    this.m_graphics = null;
   }
 }

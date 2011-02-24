@@ -22,16 +22,14 @@
  */
 package info.monitorenter.gui.chart.events;
 
-import java.beans.PropertyChangeListener;
-
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 
-import javax.swing.AbstractAction;
+import java.beans.PropertyChangeListener;
 
 /**
  * The base class that connects triggered actions with an
- * {@link info.monitorenter.gui.chart.AAxis} instance.
+ * {@link info.monitorenter.gui.chart.axis.AAxis} instance.
  * <p>
  * Every subclass may delegate it's constructor-given <code>Axis</code>
  * instance as protected member <code>m_axis</code>.
@@ -39,30 +37,36 @@ import javax.swing.AbstractAction;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  * 
  */
 public abstract class AAxisAction
-    extends AbstractAction implements PropertyChangeListener {
+    extends AChart2DAction implements PropertyChangeListener {
 
   /** The target of this action. */
-  private IAxis m_axis;
+  private int m_axis;
 
   /**
-   * Create an <code>Action</code> that accesses the axis and identifies
-   * itself with the given action String.
+   * Create an <code>Action</code> that accesses the chart's axis by argument
+   * <code>axis</code> and identifies itself with the given action String.
+   * <p>
+   * 
+   * @param chart
+   *          the owner of the axis to trigger actions upon.
    * 
    * @param axis
-   *          the target the action will work on.
+   *          needed to identify the axis of the chart: one of {@link Chart2D#X},
+   *          {@link Chart2D#Y}.
    * 
    * @param description
    *          the descriptive <code>String</code> that will be displayed by
    *          {@link javax.swing.AbstractButton} subclasses that get this
    *          <code>Action</code> assigned (
    *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   * 
    */
-  public AAxisAction(final IAxis axis, final String description) {
-    super(description);
+  public AAxisAction(final Chart2D chart, final String description, final int axis) {
+    super(chart, description);
     this.m_axis = axis;
   }
 
@@ -79,20 +83,16 @@ public abstract class AAxisAction
   protected IAxis getAxis() {
     // update in case the corresponding chart has a new axis:
     IAxis axis = null;
-    switch (this.m_axis.getDimension()) {
+    switch (this.m_axis) {
       case Chart2D.X:
-        axis = this.m_axis.getAccessor().getChart().getAxisX();
+        axis = this.m_chart.getAxisX();
         break;
       case Chart2D.Y:
-        axis = this.m_axis.getAccessor().getChart().getAxisY();
+        axis = this.m_chart.getAxisY();
         break;
       default:
         break;
     }
-    if (axis != this.m_axis) {
-      // transport of listeners is already done in AAxis.replace(IAxis)!
-    }
-    this.m_axis = axis;
-    return this.m_axis;
+    return axis;
   }
 }

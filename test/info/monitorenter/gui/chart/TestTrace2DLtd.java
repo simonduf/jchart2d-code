@@ -30,46 +30,73 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /**
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- *
+ * 
  */
-public class TestTrace2DLtd extends TestCase {
+public class TestTrace2DLtd
+    extends TestCase {
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
 
-  public void testMemoryLeak(){
+    TestSuite suite = new TestSuite();
+    suite.setName(TestTrace2DLtd.class.getName());
+
+    suite.addTest(new TestTrace2DLtd("testMemoryLeak"));
+
+    return suite;
+  }
+
+  /**
+   * @param arg0
+   */
+  public TestTrace2DLtd(String arg0) {
+    super(arg0);
+    // TODO Auto-generated constructor stub
+  }
+
+  public void testMemoryLeak() {
     int traceSize = 10;
     ITrace2D trace = new Trace2DLtd(traceSize);
     long max = 1000000;
-    long percentModulo = max/20;
-    System.out.println("Adding "+max+" points to a Trace2DLtd and a WeakHashMap...");
+    long percentModulo = max / 20;
+    System.out.println("Adding " + max + " points to a Trace2DLtd and a WeakHashMap...");
     TracePoint2D point;
     Map weakMap = new WeakHashMap();
-    for(long i=0;i<max;i++){
-      point = new TracePoint2D(i,i);
+    for (long i = 0; i < max; i++) {
+      point = new TracePoint2D(i, i);
       trace.addPoint(point);
-      weakMap.put(point,point.toString());
-      if(i%percentModulo == 0){
-        System.out.println((i*100/max) +" %");
+      weakMap.put(point, point.toString());
+      if (i % percentModulo == 0) {
+        System.out.println((i * 100 / max) + " %");
       }
     }
     System.out.println("Dropping point reference (but holding trace)...");
     point = null;
-    //trace=null;
+    // trace=null;
     long keys = weakMap.size();
-    System.out.println("Points remaining in the weakMap: "+keys);
+    System.out.println("Points remaining in the weakMap: " + keys);
     System.out.println("System.runFinalization()... ");
     System.runFinalization();
     System.out.println("System.gc()... ");
     System.gc();
     keys = 0;
     Iterator it = weakMap.keySet().iterator();
-    while(it.hasNext()){
+    while (it.hasNext()) {
       keys++;
-      System.out.println("Point "+it.next().toString()+" was not dropped.");
+      System.out.println("Point " + it.next().toString() + " was not dropped.");
     }
-    System.out.println("Points remaining in the weakMap: "+keys);
-    assertFalse("There are "+keys+ " TracePoint2D instances not deleted from the WeakHashMap.",keys > traceSize);
+    System.out.println("Points remaining in the weakMap: " + keys);
+    assertFalse("There are " + keys + " TracePoint2D instances not deleted from the WeakHashMap.",
+        keys > traceSize);
   }
 }

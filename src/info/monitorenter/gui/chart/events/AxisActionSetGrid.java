@@ -22,8 +22,9 @@
  */
 package info.monitorenter.gui.chart.events;
 
+import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
-import info.monitorenter.gui.chart.layout.LayoutFactory.PropertyChangeCheckBoxMenuItem;
+import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem;
 
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -32,8 +33,8 @@ import javax.swing.JCheckBoxMenuItem;
 
 /**
  * <code>Action</code> that invokes
- * {@link info.monitorenter.gui.chart.AAxis#setPaintGrid(boolean)} on a
- * constructor given {@link info.monitorenter.gui.chart.AAxis}.
+ * {@link info.monitorenter.gui.chart.axis.AAxis#setPaintGrid(boolean)} on a
+ * constructor given {@link info.monitorenter.gui.chart.axis.AAxis}.
  * <p>
  * 
  * <h2>Caution</h2>
@@ -47,7 +48,7 @@ import javax.swing.JCheckBoxMenuItem;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.7 $
  */
 public class AxisActionSetGrid
     extends AAxisAction {
@@ -70,13 +71,19 @@ public class AxisActionSetGrid
   }
 
   /**
-   * Create an <code>Action</code> that accesses the axis, identifies itself
-   * with the given action String and invokes
-   * {@link info.monitorenter.gui.chart.AAxis#setPaintGrid(boolean)} on the axis
-   * upon selection.
+   * Create an <code>Action</code> that accesses the chart's axis by argument
+   * <code>axis</code> and identifies itself with the given action String and
+   * invokes
+   * {@link info.monitorenter.gui.chart.axis.AAxis#setPaintGrid(boolean)} on the
+   * axis upon selection.
+   * <p>
+   * 
+   * @param chart
+   *          the owner of the axis to trigger actions upon.
    * 
    * @param axis
-   *          the target the action will work on.
+   *          needed to identify the axis of the chart: one of {@link Chart2D#X},
+   *          {@link Chart2D#Y}.
    * 
    * @param description
    *          the descriptive <code>String</code> that will be displayed by
@@ -85,9 +92,8 @@ public class AxisActionSetGrid
    *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    * 
    */
-  public AxisActionSetGrid(final IAxis axis, final String description) {
-    super(axis, description);
-    axis.addPropertyChangeListener(IAxis.PROPERTY_PAINTGRID, this);
+  public AxisActionSetGrid(final Chart2D chart, final String description, final int axis) {
+    super(chart, description, axis);
   }
 
   /**

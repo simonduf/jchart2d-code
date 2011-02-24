@@ -33,10 +33,11 @@ import info.monitorenter.util.Range;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public final class RangePolicyUnbounded extends ARangePolicy {
- 
+public final class RangePolicyUnbounded
+    extends ARangePolicy {
+
   /**
    * Creates a range policy with an unconfigured range ({@link Range#RANGE_UNBOUNDED}).
    * <p>
@@ -55,7 +56,7 @@ public final class RangePolicyUnbounded extends ARangePolicy {
    *          the range that may be used to decide about the policy of
    *          displaying the range.
    * 
-   * @see info.monitorenter.gui.chart.AAxis#setRangePolicy(IRangePolicy)
+   * @see info.monitorenter.gui.chart.axis.AAxis#setRangePolicy(IRangePolicy)
    */
   public RangePolicyUnbounded(final Range range) {
     super(range);

@@ -1,6 +1,6 @@
 /*
  *
- *  LableFormatterSimple.java  jchart2d
+ *  LabelFormatterSimple.java  jchart2d
  *  Copyright (C) Achim Westermann, created on 20.04.2005, 09:54:15
  *
  *  This library is free software; you can redistribute it and/or
@@ -28,14 +28,13 @@ import info.monitorenter.gui.chart.ILabelFormatter;
 import java.text.DecimalFormat;
 
 /**
- * <p>
  * An IlabelFormatter implementation that just returns
  * <code>String.valueOf(value)</code>.
- * </p>
+ * <p>
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  *
  */
 public final class LabelFormatterSimple extends LabelFormatterNumber implements ILabelFormatter {

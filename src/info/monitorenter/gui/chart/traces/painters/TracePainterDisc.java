@@ -21,7 +21,7 @@
  */
 package info.monitorenter.gui.chart.traces.painters;
 
-
+import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 
 import java.awt.Graphics2D;
 
@@ -29,79 +29,73 @@ import java.awt.Graphics2D;
  * Renders traces by painting a disc (hollow circle) with choosable diameter for
  * each {@link info.monitorenter.gui.chart.TracePoint2D} to show.
  * <p>
- *
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
- * @version $Revision: 1.1 $
- *
+ * 
+ * @version $Revision: 1.3 $
+ * 
  */
-public class TracePainterDisc extends ATracePainter {
+public class TracePainterDisc
+    extends ATracePainter {
 
-  /** The diameter of the discs to paint. */
-  private int m_discSize;
-
-  /** Cached m_discSize divided by two to save division for each point to render. */
-  private int m_halfDiscSize;
+  /** The implementation for rendering the point as a disc. */
+  private PointPainterDisc m_pointPainter;
 
   /**
    * Creates an instance with a default disc size of 4.
    * <p>
    */
   public TracePainterDisc() {
-    this.setDiscSize(4);
+    this.m_pointPainter = new PointPainterDisc(4);
   }
 
   /**
    * Creates an instance with the given disc size.
-   *
+   * 
    * @param discSize
    *          the disc size in pixel to use.
    */
   public TracePainterDisc(final int discSize) {
-    this.setDiscSize(discSize);
+    this.m_pointPainter = new PointPainterDisc(discSize);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#startPaintIteration()
+   * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics2D)
    */
-  public void endPaintIteration() {
-    Graphics2D g2d = this.getGraphics();
+  public void endPaintIteration(final Graphics2D g2d) {
     if (g2d != null) {
-      this.getGraphics().drawOval(this.getPreviousX() - this.m_halfDiscSize,
-          this.getPreviousY() - this.m_halfDiscSize, this.m_discSize, this.m_discSize);
+      this.m_pointPainter.paintPoint(this.getPreviousX(), this.getPreviousY(), 0, 0, g2d);
     }
   }
 
   /**
    * Returns the diameter of the discs to paint in pixel.
    * <p>
-   *
+   * 
    * @return the diameter of the discs to paint in pixel.
    */
   public int getDiscSize() {
-    return this.m_discSize;
+    return this.m_pointPainter.getDiscSize();
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int, int,
-   *      java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int,
+   *      int, java.awt.Graphics2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
       final int nextY, final Graphics2D g) {
     super.paintPoint(absoluteX, absoluteY, nextX, nextY, g);
-    g.drawOval(absoluteX - this.m_halfDiscSize, absoluteY - this.m_halfDiscSize, this.m_discSize,
-        this.m_discSize);
+    this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g);
   }
 
   /**
    * Sets the diameter of the discs to paint in pixel.
    * <p>
-   *
+   * 
    * @param discSize
    *          the diameter of the discs to paint in pixel.
    */
   public void setDiscSize(final int discSize) {
-    this.m_discSize = discSize;
-    this.m_halfDiscSize = this.m_discSize / 2;
+    this.m_pointPainter.setDiscSize(discSize);
   }
 }

@@ -23,8 +23,6 @@
  */
 package info.monitorenter.gui.chart;
 
-import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 
 import java.util.Iterator;
@@ -32,22 +30,40 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.WeakHashMap;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 /**
- * <p>
  * Multiple <code>Producers</code> concurrently add points to an amount of
  * randomly shared <code>ITrace2D</code> instances.
- * </p>
  * <p>
  * One <code>Consumer</code> invokes paint on the <code>Chart2D</code> thus
  * allowing to drop pending changes stored in it.
- * </p>
- *
+ * <p>
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
+ * 
  */
-public class TestMultiThreadingAndTracing extends TestMultithreading {
+public class TestMultiThreadingAndTracing
+    extends TestMultithreading {
 
   protected List traces;
+
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
+
+    TestSuite suite = new TestSuite();
+    suite.setName(TestMultiThreadingAndTracing.class.getName());
+
+    suite.addTest(new TestMultiThreadingAndTracing("testTrace2DLtd"));
+   
+    return suite;
+  }
 
   // configuration
   protected static final int TRACES_AMOUNT = 10;
@@ -56,7 +72,7 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
 
   /*
    * (non-Javadoc)
-   *
+   * 
    * @see junit.framework.TestCase#setUp()
    */
   public void setUp() throws Exception {
@@ -87,7 +103,7 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
 
   /*
    * (non-Javadoc)
-   *
+   * 
    * @see junit.framework.TestCase#tearDown()
    */
   protected void tearDown() throws Exception {
@@ -128,7 +144,8 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
   // Worker classes
   // ////////////////////////////
 
-  class Producer extends TestMultithreading.Producer {
+  class Producer
+      extends TestMultithreading.Producer {
     /** The amount to add. */
     private long m_toAdd;
 
@@ -143,7 +160,7 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
      * Constructs a producer that will add <code>toAdd</code> points with
      * random breaks of milliseconds between <code>maxSleep</code> and zero.
      * </p>
-     *
+     * 
      * @param toAdd
      *          the amount of points to add
      * @param sleepRange
@@ -177,7 +194,8 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
     }
   }
 
-  class Consumer extends TestMultithreading.Consumer {
+  class Consumer
+      extends TestMultithreading.Consumer {
     /** The maximum of milliseconds between two add operations. */
     private long m_sleepRange;
 
@@ -185,7 +203,7 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
      * Creates an instance that will take a random break between 0 and
      * <code>sleepRange</code> milliseconds between two add operations.
      * <p>
-     *
+     * 
      * @param sleepRange
      *          the maximum of milliseconds between two add operations.
      */
@@ -209,6 +227,13 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
       }
     }
 
+  }
+
+  /**
+   * @param arg0
+   */
+  public TestMultiThreadingAndTracing(String arg0) {
+    super(arg0);
   }
 
 }

@@ -21,7 +21,7 @@
  *  Achim.Westermann@gmx.de
  *
  */
-package info.monitorenter.gui.chart.layout;
+package info.monitorenter.gui.chart.controls;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
@@ -59,6 +59,7 @@ import info.monitorenter.gui.chart.rangepolicies.RangePolicyUnbounded;
 import info.monitorenter.gui.chart.traces.painters.TracePainterDisc;
 import info.monitorenter.gui.chart.traces.painters.TracePainterFill;
 import info.monitorenter.gui.chart.traces.painters.TracePainterPolyline;
+import info.monitorenter.gui.chart.traces.painters.TracePainterVerticalBar;
 import info.monitorenter.util.Range;
 
 import java.awt.BasicStroke;
@@ -92,7 +93,7 @@ import javax.swing.JRadioButtonMenuItem;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.11 $
  */
 public final class LayoutFactory {
 
@@ -201,7 +202,7 @@ public final class LayoutFactory {
    * <p>
    */
   private static class OrderingCheckBoxMenuItem
-      extends LayoutFactory.PropertyChangeCheckBoxMenuItem {
+      extends JCheckBoxMenuItem {
 
     /**
      * Enriches a wrapped {@link Action} by the service of ordering it's
@@ -212,7 +213,7 @@ public final class LayoutFactory {
      * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
      * 
      * 
-     * @version $Revision: 1.17 $
+     * @version $Revision: 1.11 $
      */
     private final class JMenuOrderingAction
         extends AbstractAction {
@@ -341,6 +342,49 @@ public final class LayoutFactory {
     private JMenu m_menu;
 
     /**
+     * Creates an instance that will trigger the given action upon checkbox
+     * selection / deselection and order itself in the given menu as described
+     * in the class comment.
+     * <p>
+     * 
+     * @param action
+     *          the action to trigger.
+     * 
+     * @param container
+     *          the instance this menu item is contained in.
+     * 
+     * @see LayoutFactory.PropertyChangeCheckBoxMenuItem
+     */
+    public OrderingCheckBoxMenuItem(final Action action, final JMenu container,
+        final boolean checked) {
+      super();
+      this.setSelected(checked);
+      this.m_menu = container;
+      if (action != null) {
+        action.addPropertyChangeListener(new SelectionPropertyAdaptSupport(this));
+      }
+      super.setAction(new JMenuOrderingAction(action));
+    }
+  }
+
+  /**
+   * A checkbox menu item that will change it's order in the known {@link JMenu}
+   * it is contained in whenever it's state changes (see superclass) and
+   * additionally adapt basic UI propierties font, foreground color, background
+   * color to the constructor given component.
+   * <p>
+   * 
+   * Whenever it is deselected it is put to the end, whenever it is selected it
+   * will put itself to the top. Not very perfomant but close to minimal code.
+   * <p>
+   */
+  private static class OrderingCheckBoxPropertyChangeMenuItem
+      extends LayoutFactory.OrderingCheckBoxMenuItem {
+
+    /** Generated <code>serial version UID</code>. */
+    private static final long serialVersionUID = 3889088574130596540L;
+
+    /**
      * Creates an instance that will adapt it's own basic UI properties to the
      * given component, trigger the given action upon checkbox selection /
      * deselection and order itself in the given menu as described in the class
@@ -358,12 +402,12 @@ public final class LayoutFactory {
      * 
      * @see LayoutFactory.PropertyChangeCheckBoxMenuItem
      */
-    public OrderingCheckBoxMenuItem(final JComponent component, final Action action,
+    public OrderingCheckBoxPropertyChangeMenuItem(final JComponent component, final Action action,
         final JMenu container, final boolean checked) {
-      super(component, checked);
-      this.m_menu = container;
-      super.setAction(new JMenuOrderingAction(action));
+      super(action, container, checked);
+      new BasicPropertyAdaptSupport(this, component);
     }
+
   }
 
   /**
@@ -914,6 +958,70 @@ public final class LayoutFactory {
   }
 
   /**
+   * Boolean flag that controls showing the show grid menu item for the x axis.
+   */
+  private boolean m_showAxisXGridMenu = true;
+
+  /** Boolean flag that turns on showing the x axis menu. */
+  private boolean m_showAxisXMenu = true;
+
+  /**
+   * Boolean flag that controls showing the range policy submenu and range menu
+   * item on the x axis.
+   */
+  private boolean m_showAxisXRangePolicyMenu;
+
+  /** Boolean flag that turns on showing the x axis type menu. */
+  private boolean m_showAxisXTypeMenu = true;
+
+  /**
+   * Boolean flag that controls showing the show grid menu item for the y axis.
+   */
+  private boolean m_showAxisYGridMenu = true;
+
+  /** Boolean flag that turns on showing the x axis menu. */
+  private boolean m_showAxisYMenu = true;
+
+  /**
+   * Boolean flag that controls showing the range policy submenu and range menu
+   * item on the y axis.
+   */
+  private boolean m_showAxisYRangePolicyMenu = true;
+
+  /** Boolean flag that turns on showing the y axis type menu. */
+  private boolean m_showAxisYTypeMenu = true;
+
+  /** Boolean flag that turns on showing the chart background color menu. */
+  private boolean m_showChartBackgroundMenu = true;
+
+  /** Boolean flag that turns on showing the chart foreground color menu. */
+  private boolean m_showChartForegroundMenu = true;
+
+  /** Boolean flag that turns on showing the grid color menu. */
+  private boolean m_showGridColorMenu = true;
+
+  /** Boolean flag that controls showing the save to image menu item. */
+  private boolean m_showSaveImageMenu = true;
+
+  /** Boolean flag that controls showing the color menu for traces. */
+  private boolean m_showTraceColorMenu = true;
+
+  /** Boolean flag that controls showing the set name menu item for traces. */
+  private boolean m_showTraceNameMenu = true;
+
+  /** Boolean flag that controls showing the trace painter menu for traces. */
+  private boolean m_showTracePainterMenu = true;
+
+  /** Boolean flag that controls showing the stroke menu for traces. */
+  private boolean m_showTraceStrokeMenu = true;
+
+  /** Boolean flag that controls showing the set visible menu item for traces. */
+  private boolean m_showTraceVisibleMenu = true;
+
+  /** Boolean flag that controls showing the z-index menu for traces. */
+  private boolean m_showTraceZindexMenu = true;
+
+  /**
    * Stroke names, quick hack - no "NamedStroke" subtype.
    */
   private String[] m_strokeNames;
@@ -945,13 +1053,13 @@ public final class LayoutFactory {
         new float[] {0, 10f }, 0f);
     this.m_strokeNames[4] = "square caps";
     this.m_strokes[5] = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 1.5f,
-        new float[] {2f, 2f }, 1f);
+        new float[] {10f, 2f }, 1f);
     this.m_strokeNames[5] = "dashed thick";
   }
 
   /**
    * Creates a {@link JMenuItem} that allows to trigger the features related to
-   * {@link info.monitorenter.gui.chart.AAxis} features.
+   * {@link info.monitorenter.gui.chart.axis.AAxis} features.
    * <p>
    * 
    * @param axis
@@ -967,7 +1075,7 @@ public final class LayoutFactory {
    * 
    * 
    * @return a {@link JMenuItem} that allows to trigger the features related to
-   *         {@link info.monitorenter.gui.chart.AAxis} features.
+   *         {@link info.monitorenter.gui.chart.axis.AAxis} features.
    */
   protected JMenuItem createAxisMenuItem(final IAxis axis, final int axisDimension,
       final boolean adaptUI2Chart) {
@@ -982,27 +1090,36 @@ public final class LayoutFactory {
       axisMenuItem = new JMenu("Axis" + axis.getAccessor().toString());
     }
 
-    axisMenuItem.add(createAxisTypeMenu(chart, axis, axisDimension, adaptUI2Chart));
-
-    axisMenuItem.add(createAxisRangePolicyMenu(chart, axis, adaptUI2Chart));
-
-    // Axis -> Range menu
-    if (adaptUI2Chart) {
-      item = new PropertyChangeMenuItem(chart, new AxisActionSetRange(axis, "Range"));
-    } else {
-      item = new JMenuItem(new AxisActionSetRange(axis, "Range"));
+    if ((this.m_showAxisXTypeMenu && axisDimension == Chart2D.X)
+        || (this.m_showAxisYTypeMenu && axisDimension == Chart2D.Y)) {
+      axisMenuItem.add(createAxisTypeMenu(chart, axis, axisDimension, adaptUI2Chart));
     }
-    axisMenuItem.add(item);
+    if ((this.m_showAxisXRangePolicyMenu && axisDimension == Chart2D.X)
+        || this.m_showAxisYRangePolicyMenu && axisDimension == Chart2D.Y) {
+      axisMenuItem.add(createAxisRangePolicyMenu(chart, axis, adaptUI2Chart));
 
-    // Axis -> show grid submenu
-    if (adaptUI2Chart) {
-      item = new PropertyChangeCheckBoxMenuItem(chart, new AxisActionSetGrid(axis, "Grid"), axis
-          .isPaintGrid());
-    } else {
-      item = new SelectionAdaptJCheckBoxMenuItem(new AxisActionSetGrid(axis, "Grid"), axis
-          .isPaintGrid());
+      // Axis -> Range menu
+      if (adaptUI2Chart) {
+        item = new PropertyChangeMenuItem(chart, new AxisActionSetRange(chart, "Range",
+            axisDimension));
+      } else {
+        item = new JMenuItem(new AxisActionSetRange(chart, "Range", axisDimension));
+      }
+      axisMenuItem.add(item);
     }
-    axisMenuItem.add(item);
+
+    if ((this.m_showAxisXGridMenu && axisDimension == Chart2D.X) || this.m_showAxisYGridMenu
+        && axisDimension == Chart2D.Y) {
+      // Axis -> show grid submenu
+      if (adaptUI2Chart) {
+        item = new PropertyChangeCheckBoxMenuItem(chart, new AxisActionSetGrid(chart, "Grid",
+            axisDimension), axis.isPaintGrid());
+      } else {
+        item = new SelectionAdaptJCheckBoxMenuItem(new AxisActionSetGrid(chart, "Grid",
+            axisDimension), axis.isPaintGrid());
+      }
+      axisMenuItem.add(item);
+    }
     return axisMenuItem;
   }
 
@@ -1038,11 +1155,11 @@ public final class LayoutFactory {
     // check the default selected item:
     Class rangePolicyClass = axis.getRangePolicy().getClass();
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(axis,
-          "Fixed viewport", new RangePolicyFixedViewport()));
+      item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(chart,
+          "Fixed viewport", axis.getDimension(), new RangePolicyFixedViewport()));
     } else {
-      item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(axis,
-          "Fixed viewport", new RangePolicyFixedViewport()));
+      item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(chart,
+          "Fixed viewport", axis.getDimension(), new RangePolicyFixedViewport()));
     }
     item
         .setToolTipText("Zooms or expands to the configured range without respect to the data to display. ");
@@ -1053,11 +1170,11 @@ public final class LayoutFactory {
     }
 
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(axis,
-          "Minimum viewport", new RangePolicyUnbounded()));
+      item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(chart,
+          "Minimum viewport", axis.getDimension(), new RangePolicyUnbounded()));
     } else {
-      item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(axis,
-          "Minimum viewport", new RangePolicyUnbounded()));
+      item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(chart,
+          "Minimum viewport", axis.getDimension(), new RangePolicyUnbounded()));
     }
     axisRangePolicy.add(item);
     item.setToolTipText("Ensures all data is shown with minimal bounds.");
@@ -1067,11 +1184,13 @@ public final class LayoutFactory {
     }
 
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(axis,
-          "Minimum viewport with range", new RangePolicyMinimumViewport(new Range(10, 10))));
+      item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(chart,
+          "Minimum viewport with range", axis.getDimension(), new RangePolicyMinimumViewport(
+              new Range(10, 10))));
     } else {
-      item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(axis,
-          "Minimum viewport with range", new RangePolicyMinimumViewport(new Range(10, 10))));
+      item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(chart,
+          "Minimum viewport with range", axis.getDimension(), new RangePolicyMinimumViewport(
+              new Range(10, 10))));
     }
     item.setToolTipText("Ensures that all data is shown and expands if range is higher. ");
     axisRangePolicy.add(item);
@@ -1081,11 +1200,11 @@ public final class LayoutFactory {
     }
 
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(axis,
-          "Ensure visible point", new RangePolicyForcedPoint(0)));
+      item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(chart,
+          "Ensure visible point", axis.getDimension(), new RangePolicyForcedPoint(0)));
     } else {
-      item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(axis,
-          "Ensure visible point", new RangePolicyForcedPoint(0)));
+      item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(chart,
+          "Ensure visible point", axis.getDimension(), new RangePolicyForcedPoint(0)));
     }
     item.setToolTipText("Only the minimum value of the axis' range will be ensured to be visible.");
     axisRangePolicy.add(item);
@@ -1095,11 +1214,13 @@ public final class LayoutFactory {
     }
 
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(axis,
-          "Highest points within max-50 to max.", new RangePolicyHighestValues(50)));
+      item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(chart,
+          "Highest points within max-50 to max.", axis.getDimension(),
+          new RangePolicyHighestValues(50)));
     } else {
-      item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(axis,
-          "Highest points within max-50 to max.", new RangePolicyHighestValues(50)));
+      item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(chart,
+          "Highest points within max-50 to max.", axis.getDimension(),
+          new RangePolicyHighestValues(50)));
     }
     item.setToolTipText("Shows the highest values from max-50 to max.");
     axisRangePolicy.add(item);
@@ -1279,11 +1400,10 @@ public final class LayoutFactory {
   }
 
   /**
-   * <p>
    * Creates a <code>JLabel</code> that is capable of triggering a
    * <code>JPopupMenu</code> for the settings available for the
    * <code>ITrace2D</code>.
-   * </p>
+   * <p>
    * 
    * @param chart
    *          The chart the given trace is a member of. This will be used for
@@ -1294,12 +1414,17 @@ public final class LayoutFactory {
    *          The trace on which the <code>JPopupMenu</code> of the
    *          <code>JLabel</code> will act.
    * 
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * 
    * @return a label that offers a popup menue with controls for the given
    *         trace.
    */
-  public JLabel createContextMenuLable(final Chart2D chart, final ITrace2D trace) {
-    TraceJLabel ret = new TraceJLabel(trace.getLable());
-
+  public JLabel createContextMenuLabel(final Chart2D chart, final ITrace2D trace,
+      final boolean adaptUI2Chart) {
+    TraceJLabel ret = new TraceJLabel(trace.getLabel());
+    JMenuItem item;
     // ret.setSize(new Dimension(20, 100));
     JPopupMenu popup = new PropertyChangePopupMenu(chart);
     // set the initial background color:
@@ -1307,89 +1432,31 @@ public final class LayoutFactory {
     ret.setBackground(background);
     ret.setForeground(trace.getColor());
 
-    // submenu for trace color
-    JMenu colorMenu = new PropertyChangeMenu(chart, "Color");
-    JMenuItem item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Red",
-        Color.RED));
-    colorMenu.add(item);
-    item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Green", Color.GREEN));
-    colorMenu.add(item);
-    item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Blue", Color.BLUE));
-    colorMenu.add(item);
-    item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Gray", Color.GRAY));
-    colorMenu.add(item);
-    item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Magenta",
-        Color.MAGENTA));
-    colorMenu.add(item);
-    item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Pink", Color.PINK));
-    colorMenu.add(item);
-    item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Black", Color.BLACK));
-    colorMenu.add(item);
-    item = new PropertyChangeMenuItem(chart, new Trace2DActionSetCustomColor(trace, "Custom", ret));
-    colorMenu.add(item);
-
-    // submenu for zIndex
-    JMenu zIndexMenu = new PropertyChangeMenu(chart, "layer");
-    zIndexMenu.setBackground(background);
-    item = new PropertyChangeMenuItem(chart, new Trace2DActionSetZindex(trace, "bring to front", 0));
-    zIndexMenu.add(item);
-    item = new PropertyChangeMenuItem(chart, new Trace2DActionSetZindex(trace, "send to back",
-        ITrace2D.ZINDEX_MAX));
-    zIndexMenu.add(item);
-    item = new PropertyChangeMenuItem(chart, new Trace2DActionZindexDecrease(trace, "forward", 2));
-    zIndexMenu.add(item);
-    item = new PropertyChangeMenuItem(chart, new Trace2DActionZindexIncrease(trace, "backwards", 2));
-    zIndexMenu.add(item);
-
     // item for setVisible
-    item = new PropertyChangeCheckBoxMenuItem(chart, new Trace2DActionSetVisible(trace, "Visible"),
-        trace.isVisible());
-    popup.add(item);
+    if (this.m_showTraceVisibleMenu) {
+      item = new PropertyChangeCheckBoxMenuItem(chart,
+          new Trace2DActionSetVisible(trace, "Visible"), trace.isVisible());
+      popup.add(item);
+    }
 
     // item for setName
-    item = new PropertyChangeMenuItem(chart, new Trace2DActionSetName(trace, "Name", chart));
-    popup.add(item);
-
-    // strokes
-    JMenu strokesMenu = new PropertyChangeMenu(chart, "Stroke");
-    for (int i = 0; i < this.m_strokes.length; i++) {
-      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetStroke(trace,
-          this.m_strokeNames[i], this.m_strokes[i]));
-      strokesMenu.add(item);
+    if (this.m_showTraceNameMenu) {
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetName(trace, "Name", chart));
+      popup.add(item);
     }
-
-    // trace painters
-    JMenu painterMenu = new PropertyChangeMenu(chart, "renderer");
-    ITracePainter painter = new TracePainterDisc(4);
-    item = new OrderingCheckBoxMenuItem(chart, new Trace2DActionAddRemoveTracePainter(trace,
-        "discs", painter), painterMenu, trace.containsTracePainter(painter));
-    if (trace.getTracePainters().contains(painter)) {
-      item.setSelected(true);
-    }
-    painterMenu.add(item);
-
-    painter = new TracePainterPolyline();
-    item = new OrderingCheckBoxMenuItem(chart, new Trace2DActionAddRemoveTracePainter(trace,
-        "line", painter), painterMenu, trace.containsTracePainter(painter));
-    painterMenu.add(item);
-    if (trace.getTracePainters().contains(painter)) {
-      item.setSelected(true);
-    }
-
-    painter = new TracePainterFill(chart);
-    item = new OrderingCheckBoxMenuItem(chart, new Trace2DActionAddRemoveTracePainter(trace,
-        "fill", painter), painterMenu, trace.containsTracePainter(painter));
-    painterMenu.add(item);
-    if (trace.getTracePainters().contains(painter)) {
-      item.setSelected(true);
-    }
-
     // add the submenus
-    popup.add(colorMenu);
-    popup.add(zIndexMenu);
-    popup.add(strokesMenu);
-    popup.add(painterMenu);
-
+    if (this.m_showTraceColorMenu) {
+      popup.add(this.createTraceColorMenu(chart, trace, ret, adaptUI2Chart));
+    }
+    if (this.m_showTraceZindexMenu) {
+      popup.add(this.createTraceZindexMenu(chart, trace, adaptUI2Chart));
+    }
+    if (this.m_showTraceStrokeMenu) {
+      popup.add(this.createTraceStrokesMenu(chart, trace, adaptUI2Chart));
+    }
+    if (this.m_showTracePainterMenu) {
+      popup.add(this.createTracePainterMenu(chart, trace, adaptUI2Chart));
+    }
     ret.addMouseListener(new PopupListener(popup));
     trace.addPropertyChangeListener(ITrace2D.PROPERTY_COLOR, ret);
     trace.addPropertyChangeListener(ITrace2D.PROPERTY_NAME, ret);
@@ -1600,35 +1667,50 @@ public final class LayoutFactory {
       chartMenu = new JMenu("Chart");
     }
 
-    // Axis submenu:
-    JMenu axisMenu;
-    if (adaptUI2Chart) {
-      axisMenu = new PropertyChangeMenu(chart, "Axis");
-    } else {
-      axisMenu = new JMenu("Axis");
-    }
-
-    // X axis submenu
-    JMenuItem xAxisMenuItem = this.createAxisMenuItem(chart.getAxisX(), Chart2D.X, adaptUI2Chart);
-    axisMenu.add(xAxisMenuItem);
-    // Y axis submenu
-    JMenuItem yAxisMenuItem = this.createAxisMenuItem(chart.getAxisY(), Chart2D.Y, adaptUI2Chart);
-    axisMenu.add(yAxisMenuItem);
-
     // fill top-level popup menu
-    chartMenu.add(createBackgroundColorMenu(chart, adaptUI2Chart));
-    chartMenu.add(createForegroundColorMenu(chart, adaptUI2Chart));
-    chartMenu.add(createGridColorMenu(chart, adaptUI2Chart));
-    JMenuItem item;
-    chartMenu.add(axisMenu);
-
-    if (adaptUI2Chart) {
-      item = new PropertyChangeMenuItem(chart, Chart2DActionSaveImageSingleton.getInstance(chart,
-          "Save image"));
-    } else {
-      item = new JMenuItem(Chart2DActionSaveImageSingleton.getInstance(chart, "Save image"));
+    if (this.m_showChartBackgroundMenu) {
+      chartMenu.add(createBackgroundColorMenu(chart, adaptUI2Chart));
     }
-    chartMenu.add(item);
+    if (this.m_showChartForegroundMenu) {
+      chartMenu.add(createForegroundColorMenu(chart, adaptUI2Chart));
+    }
+    if (this.m_showGridColorMenu) {
+      chartMenu.add(createGridColorMenu(chart, adaptUI2Chart));
+    }
+    JMenuItem item;
+    if (this.m_showAxisXMenu || this.m_showAxisYMenu) {
+      // Axis submenu:
+      JMenu axisMenu;
+      if (adaptUI2Chart) {
+        axisMenu = new PropertyChangeMenu(chart, "Axis");
+      } else {
+        axisMenu = new JMenu("Axis");
+      }
+
+      // X axis submenu
+      if (this.m_showAxisXMenu) {
+        JMenuItem xAxisMenuItem = this.createAxisMenuItem(chart.getAxisX(), Chart2D.X,
+            adaptUI2Chart);
+        axisMenu.add(xAxisMenuItem);
+      }
+      // Y axis submenu
+      if (this.m_showAxisYMenu) {
+        JMenuItem yAxisMenuItem = this.createAxisMenuItem(chart.getAxisY(), Chart2D.Y,
+            adaptUI2Chart);
+        axisMenu.add(yAxisMenuItem);
+      }
+      chartMenu.add(axisMenu);
+    }
+
+    if (this.m_showSaveImageMenu) {
+      if (adaptUI2Chart) {
+        item = new PropertyChangeMenuItem(chart, Chart2DActionSaveImageSingleton.getInstance(chart,
+            "Save image"));
+      } else {
+        item = new JMenuItem(Chart2DActionSaveImageSingleton.getInstance(chart, "Save image"));
+      }
+      chartMenu.add(item);
+    }
 
     return chartMenu;
   }
@@ -1670,24 +1752,6 @@ public final class LayoutFactory {
    */
   public void createPopupMenu(final Chart2D chart, final boolean adaptUI2Chart) {
 
-    // Color background = chart.getBackground();
-
-    // Axis submenu:
-    JMenu axisMenu;
-    if (adaptUI2Chart) {
-      axisMenu = new PropertyChangeMenu(chart, "Axis");
-    } else {
-      axisMenu = new JMenu("Axis");
-    }
-    // axisMenu.setBackground(background);
-
-    // X axis submenu
-    JMenuItem xAxisMenuItem = this.createAxisMenuItem(chart.getAxisX(), Chart2D.X, adaptUI2Chart);
-    axisMenu.add(xAxisMenuItem);
-    // Y axis submenu
-    JMenuItem yAxisMenuItem = this.createAxisMenuItem(chart.getAxisY(), Chart2D.Y, adaptUI2Chart);
-    axisMenu.add(yAxisMenuItem);
-
     // fill top-level popup menu
     JPopupMenu popup;
     if (adaptUI2Chart) {
@@ -1695,19 +1759,703 @@ public final class LayoutFactory {
     } else {
       popup = new JPopupMenu();
     }
-    popup.add(createBackgroundColorMenu(chart, adaptUI2Chart));
-    popup.add(createForegroundColorMenu(chart, adaptUI2Chart));
-    popup.add(createGridColorMenu(chart, adaptUI2Chart));
-    popup.add(axisMenu);
+    if (this.m_showChartBackgroundMenu) {
+      popup.add(createBackgroundColorMenu(chart, adaptUI2Chart));
+    }
+    if (this.m_showChartForegroundMenu) {
+      popup.add(createForegroundColorMenu(chart, adaptUI2Chart));
+    }
+    if (this.m_showGridColorMenu) {
+      popup.add(createGridColorMenu(chart, adaptUI2Chart));
+    }
+    if (this.m_showAxisXMenu || this.m_showAxisYMenu) {
+      // Axis submenu:
+      JMenu axisMenu;
+      if (adaptUI2Chart) {
+        axisMenu = new PropertyChangeMenu(chart, "Axis");
+      } else {
+        axisMenu = new JMenu("Axis");
+      }
+
+      if (this.m_showAxisXMenu) {
+        // X axis submenu
+        JMenuItem xAxisMenuItem = this.createAxisMenuItem(chart.getAxisX(), Chart2D.X,
+            adaptUI2Chart);
+        axisMenu.add(xAxisMenuItem);
+      }
+      if (this.m_showAxisYMenu) {
+        // Y axis submenu
+        JMenuItem yAxisMenuItem = this.createAxisMenuItem(chart.getAxisY(), Chart2D.Y,
+            adaptUI2Chart);
+        axisMenu.add(yAxisMenuItem);
+      }
+      popup.add(axisMenu);
+    }
+
+    JMenuItem item;
+    if (this.m_showSaveImageMenu) {
+      if (adaptUI2Chart) {
+        item = new PropertyChangeMenuItem(chart, Chart2DActionSaveImageSingleton.getInstance(chart,
+            "Save image"));
+      } else {
+        item = new JMenuItem(Chart2DActionSaveImageSingleton.getInstance(chart, "Save image"));
+      }
+      popup.add(item);
+    }
+    chart.addMouseListener(new PopupListener(popup));
+  }
+
+  /**
+   * Creates a menu for choosing the color of the given trace.
+   * <p>
+   * 
+   * @param chart
+   *          needed to adapt the basic ui properties to (font, foreground
+   *          color, background color).
+   * 
+   * @param trace
+   *          the trace to set the color of.
+   * 
+   * @param parent
+   *          needed for a modal dialog for custom color as parent component.
+   * 
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * 
+   * @return a menu for choosing the color of the given trace.
+   */
+  public JMenu createTraceColorMenu(final Chart2D chart, final ITrace2D trace,
+      final JComponent parent, final boolean adaptUI2Chart) {
+    // submenu for trace color
+    JMenu colorMenu;
+    if (adaptUI2Chart) {
+      colorMenu = new PropertyChangeMenu(chart, "Color");
+    } else {
+      colorMenu = new JMenu("Color");
+    }
     JMenuItem item;
     if (adaptUI2Chart) {
-      item = new PropertyChangeMenuItem(chart, Chart2DActionSaveImageSingleton.getInstance(chart,
-          "Save image"));
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Red", Color.RED));
     } else {
-      item = new JMenuItem(Chart2DActionSaveImageSingleton.getInstance(chart, "Save image"));
+      item = new JMenuItem(new Trace2DActionSetColor(trace, "Red", Color.RED));
     }
-    popup.add(item);
+    colorMenu.add(item);
 
-    chart.addMouseListener(new PopupListener(popup));
+    if (adaptUI2Chart) {
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Green",
+          Color.GREEN));
+    } else {
+      item = new JMenuItem(new Trace2DActionSetColor(trace, "Green", Color.GREEN));
+
+    }
+    colorMenu.add(item);
+
+    if (adaptUI2Chart) {
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Blue", Color.BLUE));
+    } else {
+      item = new JMenuItem(new Trace2DActionSetColor(trace, "Blue", Color.BLUE));
+    }
+    colorMenu.add(item);
+
+    if (adaptUI2Chart) {
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Gray", Color.GRAY));
+    } else {
+      item = new JMenuItem(new Trace2DActionSetColor(trace, "Gray", Color.GRAY));
+    }
+    colorMenu.add(item);
+
+    if (adaptUI2Chart) {
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Magenta",
+          Color.MAGENTA));
+    } else {
+      item = new JMenuItem(new Trace2DActionSetColor(trace, "Magenta", Color.MAGENTA));
+    }
+    colorMenu.add(item);
+
+    if (adaptUI2Chart) {
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Pink", Color.PINK));
+    } else {
+      item = new JMenuItem(new Trace2DActionSetColor(trace, "Pink", Color.PINK));
+    }
+    colorMenu.add(item);
+
+    if (adaptUI2Chart) {
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Black",
+          Color.BLACK));
+    } else {
+      item = new JMenuItem(new Trace2DActionSetColor(trace, "Black", Color.BLACK));
+    }
+    colorMenu.add(item);
+
+    if (adaptUI2Chart) {
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetCustomColor(trace, "Custom",
+          parent));
+    } else {
+      item = new JMenuItem(new Trace2DActionSetCustomColor(trace, "Custom", parent));
+    }
+    colorMenu.add(item);
+    return colorMenu;
+  }
+
+  /**
+   * Creates a menu for choosing the {@link ITracePainter} of the given trace.
+   * <p>
+   * 
+   * @param chart
+   *          needed to adapt the basic ui properties to (font, foreground
+   *          color, background color).
+   * 
+   * @param trace
+   *          the trace to set the painter of.
+   * 
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * 
+   * @return a menu for choosing the {@link ITracePainter} of the given trace.
+   */
+  public JMenu createTracePainterMenu(final Chart2D chart, final ITrace2D trace,
+      final boolean adaptUI2Chart) {
+    JMenuItem item;
+    // trace painters
+    JMenu painterMenu;
+    if (adaptUI2Chart) {
+      painterMenu = new PropertyChangeMenu(chart, "renderer");
+    } else {
+      painterMenu = new JMenu("renderer");
+    }
+
+    ITracePainter painter = new TracePainterDisc(4);
+    if (adaptUI2Chart) {
+      item = new OrderingCheckBoxPropertyChangeMenuItem(chart,
+          new Trace2DActionAddRemoveTracePainter(trace, "discs", painter), painterMenu, trace
+              .containsTracePainter(painter));
+    } else {
+      item = new OrderingCheckBoxMenuItem(new Trace2DActionAddRemoveTracePainter(trace, "discs",
+          painter), painterMenu, trace.containsTracePainter(painter));
+    }
+    if (trace.getTracePainters().contains(painter)) {
+      item.setSelected(true);
+    }
+    painterMenu.add(item);
+
+    painter = new TracePainterPolyline();
+    if (adaptUI2Chart) {
+      item = new OrderingCheckBoxPropertyChangeMenuItem(chart,
+          new Trace2DActionAddRemoveTracePainter(trace, "line", painter), painterMenu, trace
+              .containsTracePainter(painter));
+    } else {
+      item = new OrderingCheckBoxMenuItem(new Trace2DActionAddRemoveTracePainter(trace, "line",
+          painter), painterMenu, trace.containsTracePainter(painter));
+    }
+    painterMenu.add(item);
+    if (trace.getTracePainters().contains(painter)) {
+      item.setSelected(true);
+    }
+
+    painter = new TracePainterFill(chart);
+    if (adaptUI2Chart) {
+      item = new OrderingCheckBoxPropertyChangeMenuItem(chart,
+          new Trace2DActionAddRemoveTracePainter(trace, "fill", painter), painterMenu, trace
+              .containsTracePainter(painter));
+    } else {
+      item = new OrderingCheckBoxMenuItem(new Trace2DActionAddRemoveTracePainter(trace, "fill",
+          painter), painterMenu, trace.containsTracePainter(painter));
+
+    }
+    painterMenu.add(item);
+    if (trace.getTracePainters().contains(painter)) {
+      item.setSelected(true);
+    }
+    painter = new TracePainterVerticalBar(chart);
+    if (adaptUI2Chart) {
+      item = new OrderingCheckBoxPropertyChangeMenuItem(chart,
+          new Trace2DActionAddRemoveTracePainter(trace, "bar", painter), painterMenu, trace
+              .containsTracePainter(painter));
+    } else {
+      item = new OrderingCheckBoxMenuItem(new Trace2DActionAddRemoveTracePainter(trace, "bar",
+          painter), painterMenu, trace.containsTracePainter(painter));
+    }
+    painterMenu.add(item);
+    if (trace.getTracePainters().contains(painter)) {
+      item.setSelected(true);
+    }
+
+    return painterMenu;
+  }
+
+  /**
+   * Creates a menu for choosing the {@link Stroke} of the given trace.
+   * <p>
+   * 
+   * @param chart
+   *          needed to adapt the basic ui properties to (font, foreground
+   *          color, background color).
+   * 
+   * @param trace
+   *          the trace to set the stroke of.
+   * 
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * 
+   * @return a menu for choosing the stroke of the given trace.
+   */
+  public JMenu createTraceStrokesMenu(final Chart2D chart, final ITrace2D trace,
+      final boolean adaptUI2Chart) {
+    JMenuItem item;
+    // strokes
+    JMenu strokesMenu = new PropertyChangeMenu(chart, "Stroke");
+    for (int i = 0; i < this.m_strokes.length; i++) {
+      if (adaptUI2Chart) {
+        item = new PropertyChangeMenuItem(chart, new Trace2DActionSetStroke(trace,
+            this.m_strokeNames[i], this.m_strokes[i]));
+      } else {
+        item = new JMenuItem(new Trace2DActionSetStroke(trace, this.m_strokeNames[i],
+            this.m_strokes[i]));
+      }
+      strokesMenu.add(item);
+    }
+    return strokesMenu;
+  }
+
+  /**
+   * Creates a menu for choosing the z-index of the given trace.
+   * <p>
+   * 
+   * @param chart
+   *          needed to adapt the basic ui properties to (font, foreground
+   *          color, background color).
+   * 
+   * @param trace
+   *          the trace to set the z-index of.
+   * 
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * 
+   * @return a menu for choosing the z-index of the given trace.
+   */
+  public JMenu createTraceZindexMenu(final Chart2D chart, final ITrace2D trace,
+      final boolean adaptUI2Chart) {
+    JMenuItem item;
+    // submenu for zIndex
+    JMenu zIndexMenu;
+    if (adaptUI2Chart) {
+      zIndexMenu = new PropertyChangeMenu(chart, "layer");
+    } else {
+      zIndexMenu = new JMenu("layer");
+    }
+
+    if (adaptUI2Chart) {
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetZindex(trace, "bring to front",
+          0));
+    } else {
+      item = new JMenuItem(new Trace2DActionSetZindex(trace, "bring to front", 0));
+    }
+    zIndexMenu.add(item);
+
+    if (adaptUI2Chart) {
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetZindex(trace, "send to back",
+          ITrace2D.ZINDEX_MAX));
+    } else {
+      item = new JMenuItem(new Trace2DActionSetZindex(trace, "send to back", ITrace2D.ZINDEX_MAX));
+    }
+    zIndexMenu.add(item);
+
+    if (adaptUI2Chart) {
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionZindexDecrease(trace, "forward", 2));
+    } else {
+      item = new JMenuItem(new Trace2DActionZindexDecrease(trace, "forward", 2));
+    }
+    zIndexMenu.add(item);
+
+    if (adaptUI2Chart) {
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionZindexIncrease(trace, "backwards",
+          2));
+    } else {
+      item = new JMenuItem(new Trace2DActionZindexIncrease(trace, "backwards", 2));
+    }
+    zIndexMenu.add(item);
+    return zIndexMenu;
+  }
+
+  /**
+   * Returns wether the chart show x grid menu should be created.
+   * <p>
+   * 
+   * @return the showAxisXGridMenu.
+   */
+  public final boolean isShowAxisXGridMenu() {
+    return this.m_showAxisXGridMenu;
+  }
+
+  /**
+   * Returns whether the axis x menu is shown.
+   * <p>
+   * 
+   * @return the showAxisXMenu.
+   */
+  public final boolean isShowAxisXMenu() {
+    return this.m_showAxisXMenu;
+  }
+
+  /**
+   * Returns whether the axis x range policy menu is shown.
+   * <p>
+   * 
+   * @return the showAxisXRangePolicyMenu.
+   */
+  public final boolean isShowAxisXRangePolicyMenu() {
+    return this.m_showAxisXRangePolicyMenu;
+  }
+
+  /**
+   * Returns whether the axis x type menu is shown.
+   * <p>
+   * 
+   * @return the showAxisXTypeMenu.
+   */
+  public final boolean isShowAxisXTypeMenu() {
+    return this.m_showAxisXTypeMenu;
+  }
+
+  /**
+   * Returns whether the axis y show grid menu is shown.
+   * <p>
+   * 
+   * @return the showAxisYGridMenu.
+   */
+  public final boolean isShowAxisYGridMenu() {
+    return this.m_showAxisYGridMenu;
+  }
+
+  /**
+   * Returns whether the axis y menu is shown.
+   * <p>
+   * 
+   * @return the showAxisYMenu.
+   */
+  public final boolean isShowAxisYMenu() {
+    return this.m_showAxisYMenu;
+  }
+
+  /**
+   * Returns whether the axis y range policy menu is shown.
+   * <p>
+   * 
+   * @return the showAxisYRangePolicyMenu.
+   */
+  public final boolean isShowAxisYRangePolicyMenu() {
+    return this.m_showAxisYRangePolicyMenu;
+  }
+
+  /**
+   * Returns whether the axis y type menu is shown.
+   * <p>
+   * 
+   * @return the showAxisYTypeMenu.
+   */
+  public final boolean isShowAxisYTypeMenu() {
+    return this.m_showAxisYTypeMenu;
+  }
+
+  /**
+   * Returns whether the chart set background color menu is shown.
+   * <p>
+   * 
+   * @return the showChartBackgroundMenu.
+   */
+  public final boolean isShowChartBackgroundMenu() {
+    return this.m_showChartBackgroundMenu;
+  }
+
+  /**
+   * Returns whether the chart set foreground color menu is shown.
+   * <p>
+   * 
+   * @return the showChartForegroundMenu.
+   */
+  public final boolean isShowChartForegroundMenu() {
+    return this.m_showChartForegroundMenu;
+  }
+
+  /**
+   * Returns whether the chart grid color menu is shown.
+   * <p>
+   * 
+   * @return the showGridColorMenu.
+   */
+  public final boolean isShowGridColorMenu() {
+    return this.m_showGridColorMenu;
+  }
+
+  /**
+   * Returns whether the save image menu is shown.
+   * <p>
+   * 
+   * @return the showSaveImageMenu.
+   */
+  public final boolean isShowSaveImageMenu() {
+    return this.m_showSaveImageMenu;
+  }
+
+  /**
+   * @return the showTraceColorMenu.
+   */
+  public final boolean isShowTraceColorMenu() {
+    return this.m_showTraceColorMenu;
+  }
+
+  /**
+   * @return the showTraceNameMenu.
+   */
+  public final boolean isShowTraceNameMenu() {
+    return this.m_showTraceNameMenu;
+  }
+
+  /**
+   * @return the showTracePainterMenu.
+   */
+  public final boolean isShowTracePainterMenu() {
+    return this.m_showTracePainterMenu;
+  }
+
+  /**
+   * @return the showTraceStrokeMenu.
+   */
+  public final boolean isShowTraceStrokeMenu() {
+    return this.m_showTraceStrokeMenu;
+  }
+
+  /**
+   * @return the showTraceVisibleMenu.
+   */
+  public final boolean isShowTraceVisibleMenu() {
+    return this.m_showTraceVisibleMenu;
+  }
+
+  /**
+   * @return the showTraceZindexMenu.
+   */
+  public final boolean isShowTraceZindexMenu() {
+    return this.m_showTraceZindexMenu;
+  }
+
+  /**
+   * Set wether the axis x show grid menu should be created.
+   * <p>
+   * Configure this before using any instance of
+   * {@link info.monitorenter.gui.chart.views.ChartPanel} or it will be useless.
+   * <p>
+   * 
+   * @param showAxisXGridMenu
+   *          The showAxisXGridMenu to set.
+   */
+  public final void setShowAxisXGridMenu(final boolean showAxisXGridMenu) {
+    this.m_showAxisXGridMenu = showAxisXGridMenu;
+  }
+
+  /**
+   * Set wether the axis x menu should be created.
+   * <p>
+   * Configure this before using any instance of
+   * {@link info.monitorenter.gui.chart.views.ChartPanel} or it will be useless.
+   * <p>
+   * 
+   * @param showAxisXMenu
+   *          The showAxisXMenu to set.
+   */
+  public final void setShowAxisXMenu(final boolean showAxisXMenu) {
+    this.m_showAxisXMenu = showAxisXMenu;
+  }
+
+  /**
+   * Set wether the axis x range policy menu should be created.
+   * <p>
+   * Configure this before using any instance of
+   * {@link info.monitorenter.gui.chart.views.ChartPanel} or it will be useless.
+   * <p>
+   * 
+   * @param showAxisXRangePolicyMenu
+   *          The showAxisXRangePolicyMenu to set.
+   */
+  public final void setShowAxisXRangePolicyMenu(final boolean showAxisXRangePolicyMenu) {
+    this.m_showAxisXRangePolicyMenu = showAxisXRangePolicyMenu;
+  }
+
+  /**
+   * Set wether the axis x type menu should be created.
+   * <p>
+   * Configure this before using any instance of
+   * {@link info.monitorenter.gui.chart.views.ChartPanel} or it will be useless.
+   * <p>
+   * 
+   * @param showAxisXTypeMenu
+   *          The showAxisXTypeMenu to set.
+   */
+  public final void setShowAxisXTypeMenu(final boolean showAxisXTypeMenu) {
+    this.m_showAxisXTypeMenu = showAxisXTypeMenu;
+  }
+
+  /**
+   * Set wether the axis y show grid menu should be created.
+   * <p>
+   * Configure this before using any instance of
+   * {@link info.monitorenter.gui.chart.views.ChartPanel} or it will be useless.
+   * <p>
+   * 
+   * @param showAxisYGridMenu
+   *          The showAxisYGridMenu to set.
+   */
+  public final void setShowAxisYGridMenu(final boolean showAxisYGridMenu) {
+    this.m_showAxisYGridMenu = showAxisYGridMenu;
+  }
+
+  /**
+   * Set wether the axis y menu should be created.
+   * <p>
+   * Configure this before using any instance of
+   * {@link info.monitorenter.gui.chart.views.ChartPanel} or it will be useless.
+   * <p>
+   * 
+   * @param showAxisYMenu
+   *          The showAxisYMenu to set.
+   */
+  public final void setShowAxisYMenu(final boolean showAxisYMenu) {
+    this.m_showAxisYMenu = showAxisYMenu;
+  }
+
+  /**
+   * Set wether the axis y range policy menu should be created.
+   * <p>
+   * Configure this before using any instance of
+   * {@link info.monitorenter.gui.chart.views.ChartPanel} or it will be useless.
+   * <p>
+   * 
+   * @param showAxisYRangePolicyMenu
+   *          The showAxisYRangePolicyMenu to set.
+   */
+  public final void setShowAxisYRangePolicyMenu(final boolean showAxisYRangePolicyMenu) {
+    this.m_showAxisYRangePolicyMenu = showAxisYRangePolicyMenu;
+  }
+
+  /**
+   * Set wether the axis y type menu should be created.
+   * <p>
+   * Configure this before using any instance of
+   * {@link info.monitorenter.gui.chart.views.ChartPanel} or it will be useless.
+   * <p>
+   * 
+   * @param showAxisYTypeMenu
+   *          The showAxisYTypeMenu to set.
+   */
+  public final void setShowAxisYTypeMenu(final boolean showAxisYTypeMenu) {
+    this.m_showAxisYTypeMenu = showAxisYTypeMenu;
+  }
+
+  /**
+   * Set wether the chart set background menu should be created.
+   * <p>
+   * Configure this before using any instance of
+   * {@link info.monitorenter.gui.chart.views.ChartPanel} or it will be useless.
+   * <p>
+   * 
+   * @param showChartBackgroundMenu
+   *          The showChartBackgroundMenu to set.
+   */
+  public final void setShowChartBackgroundMenu(final boolean showChartBackgroundMenu) {
+    this.m_showChartBackgroundMenu = showChartBackgroundMenu;
+  }
+
+  /**
+   * Set wether the chart set foreground menu should be created.
+   * <p>
+   * Configure this before using any instance of
+   * {@link info.monitorenter.gui.chart.views.ChartPanel} or it will be useless.
+   * <p>
+   * 
+   * @param showChartForegroundMenu
+   *          The showChartForegroundMenu to set.
+   */
+  public final void setShowChartForegroundMenu(final boolean showChartForegroundMenu) {
+    this.m_showChartForegroundMenu = showChartForegroundMenu;
+  }
+
+  /**
+   * Set wether the chart grid color menu should be created.
+   * <p>
+   * Configure this before using any instance of
+   * {@link info.monitorenter.gui.chart.views.ChartPanel} or it will be useless.
+   * <p>
+   * 
+   * @param showGridColorMenu
+   *          The showGridColorMenu to set.
+   */
+  public final void setShowGridColorMenu(final boolean showGridColorMenu) {
+    this.m_showGridColorMenu = showGridColorMenu;
+  }
+
+  /**
+   * Set wether the save to image menu should be created.
+   * <p>
+   * Configure this before using any instance of
+   * {@link info.monitorenter.gui.chart.views.ChartPanel} or it will be useless.
+   * <p>
+   * 
+   * @param showSaveImageMenu
+   *          The showSaveImageMenu to set.
+   */
+  public final void setShowSaveImageMenu(final boolean showSaveImageMenu) {
+    this.m_showSaveImageMenu = showSaveImageMenu;
+  }
+
+  /**
+   * @param showTraceColorMenu
+   *          The showTraceColorMenu to set.
+   */
+  public final void setShowTraceColorMenu(final boolean showTraceColorMenu) {
+    this.m_showTraceColorMenu = showTraceColorMenu;
+  }
+
+  /**
+   * @param showTraceNameMenu
+   *          The showTraceNameMenu to set.
+   */
+  public final void setShowTraceNameMenu(final boolean showTraceNameMenu) {
+    this.m_showTraceNameMenu = showTraceNameMenu;
+  }
+
+  /**
+   * @param showTracePainterMenu
+   *          The showTracePainterMenu to set.
+   */
+  public final void setShowTracePainterMenu(final boolean showTracePainterMenu) {
+    this.m_showTracePainterMenu = showTracePainterMenu;
+  }
+
+  /**
+   * @param showTraceStrokeMenu
+   *          The showTraceStrokeMenu to set.
+   */
+  public final void setShowTraceStrokeMenu(final boolean showTraceStrokeMenu) {
+    this.m_showTraceStrokeMenu = showTraceStrokeMenu;
+  }
+
+  /**
+   * @param showTraceVisibleMenu
+   *          The showTraceVisibleMenu to set.
+   */
+  public final void setShowTraceVisibleMenu(final boolean showTraceVisibleMenu) {
+    this.m_showTraceVisibleMenu = showTraceVisibleMenu;
+  }
+
+  /**
+   * @param showTraceZindexMenu
+   *          The showTraceZindexMenu to set.
+   */
+  public final void setShowTraceZindexMenu(final boolean showTraceZindexMenu) {
+    this.m_showTraceZindexMenu = showTraceZindexMenu;
   }
 }

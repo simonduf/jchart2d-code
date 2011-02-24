@@ -22,7 +22,6 @@
  */
 package info.monitorenter.gui.chart.axis;
 
-import info.monitorenter.gui.chart.AAxis;
 import info.monitorenter.util.Range;
 
 import java.awt.event.MouseEvent;
@@ -34,7 +33,7 @@ import java.awt.event.MouseEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.7 $
  */
 public class AxisLinear
     extends AAxis {
@@ -48,7 +47,7 @@ public class AxisLinear
   }
 
   /**
-   * @see info.monitorenter.gui.chart.AAxis#getScaledValue(double)
+   * @see info.monitorenter.gui.chart.IAxis#getScaledValue(double)
    */
   public double getScaledValue(final double absolute) {
     Range range = this.getRange();
@@ -61,10 +60,24 @@ public class AxisLinear
   }
 
   /**
-   * @see info.monitorenter.gui.chart.AAxis#translateMousePosition(java.awt.event.MouseEvent)
+   * @see info.monitorenter.gui.chart.axis.AAxis#translateMousePosition(java.awt.event.MouseEvent)
    */
-  protected double translateMousePosition(final MouseEvent mouseEvent)
-      throws IllegalArgumentException {
+  public double translateMousePosition(final MouseEvent mouseEvent) throws IllegalArgumentException {
     return this.getAccessor().translateMousePosition(mouseEvent);
   }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#translatePxToValue(int)
+   */
+  public double translatePxToValue(final int pixel) {
+    return this.m_accessor.translatePxToValue(pixel);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#translateValueToPx(double)
+   */
+  public int translateValueToPx(final double value) {
+    return this.m_accessor.translateValueToPx(value);
+  }
+
 }

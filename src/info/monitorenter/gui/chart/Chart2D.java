@@ -21,9 +21,9 @@
  */
 package info.monitorenter.gui.chart;
 
+import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.labelpainters.LabelPainterDefault;
-import info.monitorenter.gui.chart.rangepolicies.ARangePolicy;
 import info.monitorenter.util.collections.TreeSetGreedy;
 
 import java.awt.Color;
@@ -33,6 +33,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -179,7 +180,7 @@ import javax.swing.JToolTip;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.19 $
+ * @version $Revision: 1.35 $
  */
 
 public class Chart2D
@@ -205,11 +206,6 @@ public class Chart2D
   final class Painter
       extends Thread {
 
-    /** Hide constructor. */
-    private Painter() {
-      // nop
-    }
-
     /** The maximum sleep time between to paint invocations. */
     static final long MAX_SLEEP = 10000;
 
@@ -220,6 +216,11 @@ public class Chart2D
      * Dynamically adapts to the update speed of data. Calculated in run().
      */
     private long m_sleepTime = Chart2D.Painter.MIN_SLEEP;
+
+    /** Hide constructor. */
+    private Painter() {
+      // nop
+    }
 
     /**
      * @see java.lang.Runnable#run()
@@ -376,9 +377,7 @@ public class Chart2D
    */
   public static final String PROPERTY_PAINTLABELS = "chart.paintLabels";
 
-  /**
-   * Generated serial version UID.
-   */
+  /** Generated <code>serial version UID</code>. */
   private static final long serialVersionUID = 3978425840633852978L;
 
   /** Constant describing the x axis (needed for scaling). * */
@@ -390,10 +389,10 @@ public class Chart2D
   /** Constant describing the y axis (needed for scaling). * */
   public static final int Y = 2;
 
-  /** The x axis insance. * */
+  /** The x axis instance. * */
   private AAxis m_axisX;
 
-  /** The y axis insance. * */
+  /** The y axis instance. * */
   private AAxis m_axisY;
 
   /** The grid color. * */
@@ -422,17 +421,14 @@ public class Chart2D
   private TreeSetGreedy m_traces = new TreeSetGreedy();
 
   /**
-   * <p>
    * An internal counter that is increased for every bound property change event
    * received from traces.
-   * </p>
    * <p>
    * It is reset whenever the painting Thread triggers a repaint and used to
    * calculate the new time it will sleep until starting the next paint
    * operation.
-   * </p>
+   * <p>
    */
-  // private boolean m_updateScaling = true;
   private List m_unscaledPoints = new LinkedList();
 
   /**
@@ -551,8 +547,6 @@ public class Chart2D
         if (Chart2D.DEBUG_THREADING) {
           System.out.println("trace.addTrace, 2 locks");
         }
-
-        points.setRenderer(this);
         this.m_traces.add(points);
         // listen to bound changes and more
         points.addPropertyChangeListener(ITrace2D.PROPERTY_MAX_X, this);
@@ -565,6 +559,7 @@ public class Chart2D
         points.addPropertyChangeListener(ITrace2D.PROPERTY_VISIBLE, this);
         points.addPropertyChangeListener(ITrace2D.PROPERTY_ZINDEX, this);
         points.addPropertyChangeListener(ITrace2D.PROPERTY_PAINTERS, this);
+        points.addPropertyChangeListener(ITrace2D.PROPERTY_ERRORBARPOLICIES, this);
         // listen to newly added points
         // this is needed for scaling at point level.
         // else every bound change would force to rescale all traces!
@@ -593,20 +588,21 @@ public class Chart2D
           this.m_ymin = minY;
           change = true;
         }
-
-        // initial scaling:
-        // if a change in bounds was recorded here, scaling
-        // will be done by the paint method. If not, new traces
-        // (that could contain points already) have to be scaled here.
-        if (!change) {
-          this.scaleTrace(points, Chart2D.X_Y);
-        }
         // special case: first trace added:
         if (this.m_traces.size() == 1) {
           this.m_ymin = minY;
           this.m_ymax = maxY;
           this.m_xmin = minX;
           this.m_xmax = maxX;
+        }
+
+        points.setRenderer(this);
+        // initial scaling:
+        // if a change in bounds was recorded here, scaling
+        // will be done by the paint method. If not, new traces
+        // (that could contain points already) have to be scaled here.
+        if (!change) {
+          this.scaleTrace(points, Chart2D.X_Y);
         }
 
       }
@@ -688,7 +684,7 @@ public class Chart2D
    * Note that the <code>Chart2D</code> itself does not use this value for
    * painting. It uses {@link AAxis#getRange()} which itself accesses this value
    * by accessors and additionally filters the value by it's assigned internal
-   * {@link ARangePolicy}.
+   * {@link info.monitorenter.gui.chart.rangepolicies.ARangePolicy}.
    * <p>
    * 
    * @return the maximum x value of all traces.
@@ -723,7 +719,7 @@ public class Chart2D
    * Note that the <code>Chart2D</code> itself does not use this value for
    * painting. It uses {@link AAxis#getRange()} which itself accesses this value
    * by accessors and additionally filters the value by it's assigned internal
-   * {@link ARangePolicy}.
+   * {@link info.monitorenter.gui.chart.rangepolicies.ARangePolicy}.
    * <p>
    * 
    * @return the maximum y value of all traces.
@@ -758,7 +754,7 @@ public class Chart2D
    * Note that the <code>Chart2D</code> itself does not use this value for
    * painting. It uses {@link AAxis#getRange()} which itself accesses this value
    * by accessors and additionally filters the value by it's assigned internal
-   * {@link ARangePolicy}.
+   * {@link info.monitorenter.gui.chart.rangepolicies.ARangePolicy}.
    * <p>
    * 
    * @return the minimum x value of all traces.
@@ -794,7 +790,7 @@ public class Chart2D
    * Note that the <code>Chart2D</code> itself does not use this value for
    * painting. It uses {@link AAxis#getRange()} which itself accesses this value
    * by accessors and additionally filters the value by it's assigned internal
-   * {@link ARangePolicy}.
+   * {@link info.monitorenter.gui.chart.rangepolicies.ARangePolicy}.
    * <p>
    * 
    * @return the minimum y value of all traces.
@@ -961,7 +957,7 @@ public class Chart2D
    * 
    * @return the x coordinate of the chart's right edge in px.
    */
-  protected final int getXChartEnd() {
+  public final int getXChartEnd() {
     return this.m_xChartEnd;
   }
 
@@ -986,12 +982,12 @@ public class Chart2D
    * @return The y coordinate of the upper edge of the chart's display area in
    *         px.
    */
-  protected final int getYChartEnd() {
+  public final int getYChartEnd() {
     return this.m_yChartEnd;
   }
 
   /**
-   * Returns the x coordinate of the chart's lower edge in px.
+   * Returns the y coordinate of the chart's lower edge in px.
    * <p>
    * 
    * Pixel coordinates in awt / swing start from top and increase towards the
@@ -1180,8 +1176,6 @@ public class Chart2D
     // will be used in several iterations.
     ITrace2D tmpdata;
     Iterator traceIt;
-    ITracePainter tracePainter;
-
     // update the scaling
     this.updateScaling(false);
     Dimension d = this.getSize();
@@ -1194,19 +1188,15 @@ public class Chart2D
     int yLabelMax = (this.m_axisY.getFormatter().getMaxAmountChars()) * fontwidth;
     this.m_xChartStart = yLabelMax;
     // painting trace labels
-    int labelheight = this.paintTraceLables(g2d);
-
+    int labelheight = this.paintTraceLabels(g2d);
     // finding startpoint of coordinate System.
     // -4 is for showing colons of x - labels that are below the baseline
     this.m_yChartStart = height - fontheight - labelheight - 4;
-
     int xLabelMax = (this.m_axisX.getFormatter().getMaxAmountChars()) * fontwidth;
     this.m_xChartEnd = width - xLabelMax;
     int rangex = this.m_xChartEnd - this.m_xChartStart;
     int rangey = this.m_yChartStart - this.m_yChartEnd;
-
     this.paintCoordinateSystem(g2d);
-
     // paint Traces.
     int tmpx;
     int oldtmpx;
@@ -1219,86 +1209,100 @@ public class Chart2D
     Stroke backupStroke = g2d.getStroke();
     int count = 0;
     Iterator itTracePainters;
+    Iterator itTraceErrorBarPolicies;
+    ITracePainter tracePainter;
+    IErrorBarPolicy errorBarPolicy;
+
     while (traceIt.hasNext()) {
       count++;
       tmpdata = (ITrace2D) traceIt.next();
       if (tmpdata.isVisible()) {
-
         g2d.setStroke(tmpdata.getStroke());
         g2d.setColor(tmpdata.getColor());
-        itTracePainters = tmpdata.getTracePainters().iterator();
         synchronized (tmpdata) {
           if (Chart2D.DEBUG_THREADING) {
             System.out.println("paint, 2 locks");
           }
+          itTracePainters = tmpdata.getTracePainters().iterator();
+          tracePainter = null;
           while (itTracePainters.hasNext()) {
             tracePainter = (ITracePainter) itTracePainters.next();
-            tracePainter.startPaintIteration();
-            Iterator pointIt = tmpdata.iterator();
-            boolean newpointVisible;
-            boolean oldpointVisible;
-            // searching the first valid point, done as a wrapping loop to cope
-            // with zero points.
-            while (pointIt.hasNext()) {
-              oldpoint = newpoint;
-              newpoint = (TracePoint2D) pointIt.next();
-
-              newpointVisible = isVisible(newpoint);
-              oldpointVisible = isVisible(oldpoint);
-              if (newpointVisible || oldpointVisible) {
-                tmpx = this.m_xChartStart + (int) (newpoint.m_scaledX * rangex);
-                tmpy = this.m_yChartStart - (int) (newpoint.m_scaledY * rangey);
-                while (pointIt.hasNext()) {
-                  oldpoint = newpoint;
-                  oldtmpx = tmpx;
-                  oldtmpy = tmpy;
-                  newpoint = (TracePoint2D) pointIt.next();
-                  newpointVisible = isVisible(newpoint);
-                  oldpointVisible = isVisible(oldpoint);
-                  if (!newpointVisible && !oldpointVisible) {
-                    // nothing to paint...
-                    continue;
-                  } else if (newpointVisible && !oldpointVisible) {
-                    // entering the visible bounds: interpolate from old point
-                    // to
-                    // new point
-                    oldpoint = interpolateVisible(oldpoint, newpoint);
-                    tmpx = this.m_xChartStart + (int) (newpoint.m_scaledX * rangex);
-                    tmpy = this.m_yChartStart - (int) (newpoint.m_scaledY * rangey);
-                    oldtmpx = this.m_xChartStart + (int) (oldpoint.m_scaledX * rangex);
-                    oldtmpy = this.m_yChartStart - (int) (oldpoint.m_scaledY * rangey);
-                    tracePainter.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, g2d);
-
-                  } else if (!newpointVisible && oldpointVisible) {
-                    // leaving the visible bounds:
-                    tmppt = (TracePoint2D) newpoint.clone();
-                    newpoint = interpolateVisible(newpoint, oldpoint);
-                    tmpx = this.m_xChartStart + (int) (newpoint.m_scaledX * rangex);
-                    tmpy = this.m_yChartStart - (int) (newpoint.m_scaledY * rangey);
-
-                    tracePainter.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, g2d);
-                    tracePainter.discontinue();
-                    // restore for next loop start:
-                    newpoint = tmppt;
-
-                  } else {
-                    // staying in the visible bounds: just paint
-                    tmpx = this.m_xChartStart + (int) (newpoint.m_scaledX * rangex);
-                    tmpy = this.m_yChartStart - (int) (newpoint.m_scaledY * rangey);
-
-                    tracePainter.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, g2d);
-                  }
+            tracePainter.startPaintIteration(g2d);
+          }
+          errorBarPolicy = null;
+          itTraceErrorBarPolicies = tmpdata.getErrorBarPolicies().iterator();
+          while (itTraceErrorBarPolicies.hasNext()) {
+            errorBarPolicy = (IErrorBarPolicy) itTraceErrorBarPolicies.next();
+            errorBarPolicy.startPaintIteration(g2d);
+          }
+          Iterator pointIt = tmpdata.iterator();
+          boolean newpointVisible;
+          boolean oldpointVisible;
+          // searching the first valid point, done as a wrapping loop to cope
+          // with zero points.
+          while (pointIt.hasNext()) {
+            oldpoint = newpoint;
+            newpoint = (TracePoint2D) pointIt.next();
+            newpointVisible = isVisible(newpoint);
+            oldpointVisible = isVisible(oldpoint);
+            if (newpointVisible || oldpointVisible) {
+              tmpx = this.m_xChartStart + (int) (newpoint.m_scaledX * rangex);
+              tmpy = this.m_yChartStart - (int) (newpoint.m_scaledY * rangey);
+              while (pointIt.hasNext()) {
+                oldpoint = newpoint;
+                oldtmpx = tmpx;
+                oldtmpy = tmpy;
+                newpoint = (TracePoint2D) pointIt.next();
+                newpointVisible = isVisible(newpoint);
+                oldpointVisible = isVisible(oldpoint);
+                if (!newpointVisible && !oldpointVisible) {
+                  // nothing to paint...
+                  continue;
+                } else if (newpointVisible && !oldpointVisible) {
+                  // entering the visible bounds: interpolate from old point
+                  // to new point
+                  oldpoint = interpolateVisible(oldpoint, newpoint);
+                  tmpx = this.m_xChartStart + (int) (newpoint.m_scaledX * rangex);
+                  tmpy = this.m_yChartStart - (int) (newpoint.m_scaledY * rangey);
+                  oldtmpx = this.m_xChartStart + (int) (oldpoint.m_scaledX * rangex);
+                  oldtmpy = this.m_yChartStart - (int) (oldpoint.m_scaledY * rangey);
+                  this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, false, tmpdata, g2d);
+                  this.paintErrorBars(tmpdata, oldtmpx, oldtmpy, tmpx, tmpy, g2d);
+                } else if (!newpointVisible && oldpointVisible) {
+                  // leaving the visible bounds:
+                  tmppt = (TracePoint2D) newpoint.clone();
+                  newpoint = interpolateVisible(newpoint, oldpoint);
+                  tmpx = this.m_xChartStart + (int) (newpoint.m_scaledX * rangex);
+                  tmpy = this.m_yChartStart - (int) (newpoint.m_scaledY * rangey);
+                  itTracePainters = tmpdata.getTracePainters().iterator();
+                  this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, tmpdata, g2d);
+                  this.paintErrorBars(tmpdata, oldtmpx, oldtmpy, tmpx, tmpy, g2d);
+                  // restore for next loop start:
+                  newpoint = tmppt;
+                } else {
+                  // staying in the visible bounds: just paint
+                  tmpx = this.m_xChartStart + (int) (newpoint.m_scaledX * rangex);
+                  tmpy = this.m_yChartStart - (int) (newpoint.m_scaledY * rangey);
+                  this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, false, tmpdata, g2d);
+                  this.paintErrorBars(tmpdata, oldtmpx, oldtmpy, tmpx, tmpy, g2d);
                 }
               }
             }
-            tracePainter.endPaintIteration();
           }
-
+          itTracePainters = tmpdata.getTracePainters().iterator();
+          while (itTracePainters.hasNext()) {
+            tracePainter = (ITracePainter) itTracePainters.next();
+            tracePainter.endPaintIteration(g2d);
+          }
+          itTraceErrorBarPolicies = tmpdata.getErrorBarPolicies().iterator();
+          while (itTraceErrorBarPolicies.hasNext()) {
+            errorBarPolicy = (IErrorBarPolicy) itTraceErrorBarPolicies.next();
+            errorBarPolicy.endPaintIteration(g2d);
+          }
         }
-        if (Chart2D.DEBUG_THREADING) {
-
-          System.out.println("paint, left lock");
-        }
+      }
+      if (Chart2D.DEBUG_THREADING) {
+        System.out.println("paint, left lock");
       }
     }
     g2d.setStroke(backupStroke);
@@ -1374,6 +1378,110 @@ public class Chart2D
   }
 
   /**
+   * Internally renders the error bars for the given point for the given trace.
+   * <p>
+   * 
+   * The current point to render in px is defined by the first two arguments,
+   * the next point to render in px is defined by the 2nd two arguments.
+   * <p>
+   * 
+   * @param trace
+   *          needed to get the {@link IErrorBarPolicy} instances to use.
+   * 
+   * @param oldtmpx
+   *          the x coordinate of the original point to render an error bar for.
+   * 
+   * @param oldtmpy
+   *          the y coordinate of the original point to render an error bar for.
+   * 
+   * @param tmpx
+   *          the x coordinate of the original next point to render an error bar
+   *          for.
+   * 
+   * @param tmpy
+   *          the y coordinate of the original next point to render an error bar
+   *          for.
+   * 
+   * @param g2d
+   *          the graphics context to use.
+   */
+  private void paintErrorBars(final ITrace2D trace, final int oldtmpx, final int oldtmpy,
+      final int tmpx, final int tmpy, final Graphics2D g2d) {
+    IErrorBarPolicy errorBarPolicy;
+    Iterator itTraceErrorBarPolicies = trace.getErrorBarPolicies().iterator();
+    while (itTraceErrorBarPolicies.hasNext()) {
+      errorBarPolicy = (IErrorBarPolicy) itTraceErrorBarPolicies.next();
+      errorBarPolicy.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, g2d);
+    }
+
+  }
+
+  /**
+   * Internally paints the point with respect to trace painters ({@link ITracePainter})
+   * and error bar painter ({@link IErrorBarPolicy}) of the trace.
+   * <p>
+   * 
+   * This method must not be called directly as it does not support
+   * interpolation of visibility bounds (discontinuations).
+   * <p>
+   * 
+   * @param xPxOld
+   *          the x coordinate of the previous point to render in px
+   *          (potentially an interpolation of it if the old point was not
+   *          visible and the new point is).
+   * 
+   * @param yPxOld
+   *          the y coordinate of the previous point to render in px
+   *          (potentially an interpolation of it if the old point was not
+   *          visible and the new point is).
+   * 
+   * @param xPxNew
+   *          the x coordinate of the point to render in px (potentially an
+   *          interpolation of it if the old point was visible and the new point
+   *          is not).
+   * 
+   * @param yPxNew
+   *          the y coordinate of the point to render in px (potentially an
+   *          interpolation of it if the old point was visible and the new point
+   *          is not).
+   * @param trace
+   *          needed for obtaining trace painters and error bar painters.
+   * 
+   * @param g2d
+   *          the graphics context to use.
+   * 
+   * @param discontinue
+   *          if a discontinuation has been taken place and all potential cached
+   *          points by an {@link ITracePainter} (done for polyline performance
+   *          boost) have to be drawn immediately before starting a new point
+   *          caching.
+   */
+  private final void paintPoint(final int xPxOld, final int yPxOld, final int xPxNew,
+      final int yPxNew, final boolean discontinue, final ITrace2D trace, final Graphics2D g2d) {
+    Iterator itTracePainters;
+    Iterator itTraceErrorBarPolicies;
+    ITracePainter tracePainter;
+    IErrorBarPolicy errorBarPolicy;
+    itTracePainters = trace.getTracePainters().iterator();
+    while (itTracePainters.hasNext()) {
+      tracePainter = (ITracePainter) itTracePainters.next();
+      tracePainter.paintPoint(xPxOld, yPxOld, xPxNew, yPxNew, g2d);
+      if (discontinue) {
+        tracePainter.discontinue(g2d);
+      }
+    }
+    itTraceErrorBarPolicies = trace.getErrorBarPolicies().iterator();
+    while (itTraceErrorBarPolicies.hasNext()) {
+      errorBarPolicy = (IErrorBarPolicy) itTraceErrorBarPolicies.next();
+      errorBarPolicy.paintPoint(xPxOld, yPxOld, xPxNew, yPxNew, g2d);
+      if (discontinue) {
+        errorBarPolicy.discontinue(g2d);
+      }
+    }
+
+  }
+
+  /**
    * Internally paints the labels for the traces below the chart.
    * <p>
    * 
@@ -1382,7 +1490,7 @@ public class Chart2D
    * @return the amount of vertical (y) px used for the labels.
    */
 
-  private int paintTraceLables(final Graphics2D g2d) {
+  private int paintTraceLabels(final Graphics2D g2d) {
     int labelheight = 0;
     Dimension d = this.getSize();
     if (this.m_paintLabels) {
@@ -1406,7 +1514,7 @@ public class Chart2D
       while (traceIt.hasNext()) {
         trace = (ITrace2D) traceIt.next();
         if (trace.isVisible()) {
-          tmplabel = trace.getLable();
+          tmplabel = trace.getLabel();
           lblwidth = fontdim.stringWidth(tmplabel) + 10;
           // conditional linebreak.
           // crlfdone avoids never doing linebreak if all
@@ -1517,19 +1625,17 @@ public class Chart2D
         } else if (value > this.m_ymin) {
           this.m_ymin = this.findMinY();
         }
-      } else if (property.equals(ARangePolicy.PROPERTY_RANGE)) {
+      } else if (property.equals(IRangePolicy.PROPERTY_RANGE)) {
         this.updateScaling(true);
         this.repaint(200);
-      } else if (property.equals(ARangePolicy.PROPERTY_RANGE_MAX)) {
-        // TODO: Maybe be more precise for this property change: detect if this
-        // range change has an effect on getMin/getMax of an axis, detect which
-        // axis changed.
+      } else if (property.equals(IRangePolicy.PROPERTY_RANGE_MAX)) {
+        // this checks if a range has changed for the whole chart
+        // and in which dimensions.
         this.updateScaling(true);
         this.repaint(200);
-      } else if (property.equals(ARangePolicy.PROPERTY_RANGE_MIN)) {
-        // TODO: Maybe be more precise for this property change: detect if this
-        // range change has an effect on getMin/getMax of an axis, detect which
-        // axis changed.
+      } else if (property.equals(IRangePolicy.PROPERTY_RANGE_MIN)) {
+        // this checks if a range has changed for the whole chart
+        // and in which dimensions.
         this.updateScaling(true);
         this.repaint(200);
       } else if (property.equals(ITrace2D.PROPERTY_TRACEPOINT)) {
@@ -1545,15 +1651,17 @@ public class Chart2D
           this.m_unscaledPoints.add(newPt);
         }
       } else if (property.equals(ITrace2D.PROPERTY_VISIBLE)) {
-        boolean visible = ((Boolean) evt.getNewValue()).booleanValue();
-        if (visible) {
-          // invisible traces don't count for max and min, so
-          // expensive search has to be started:
-          this.findMaxX();
-          this.findMaxY();
-          this.findMinX();
-          this.findMinY();
-        }
+        // invisible traces don't count for max and min, so
+        // expensive search has to be started:
+        // TODO: Do performance: Get the trace of the event and check only
+        // it's bounds here!!!
+        this.m_xmax = this.findMaxX();
+        this.m_xmin = this.findMinX();
+        this.m_ymax = this.findMaxY();
+        this.m_ymin = this.findMinY();
+        // always repaint as in static mode no regular repaint
+        // happens and the trace will not appear / disappear:
+        this.repaint(200);
       } else if (property.equals(ITrace2D.PROPERTY_STROKE)) {
         // TODO: perhaps react more fine grained for the following events:
         // just repaint the trace without all the paint code (scaling,
@@ -1564,6 +1672,20 @@ public class Chart2D
       } else if (property.equals(ITrace2D.PROPERTY_PAINTERS)) {
         this.repaint(200);
       } else if (property.equals(ITrace2D.PROPERTY_COLOR)) {
+        this.repaint(200);
+      } else if (property.equals(ITrace2D.PROPERTY_ERRORBARPOLICIES)) {
+        IErrorBarPolicy oldPolicy = (IErrorBarPolicy) evt.getOldValue();
+        IErrorBarPolicy newPolicy = (IErrorBarPolicy) evt.getOldValue();
+        if (oldPolicy != null) {
+          // has been removed
+          oldPolicy.removePropertyChangeListener(this);
+        } else if (newPolicy != null) {
+          newPolicy.addPropertyChangeListener(IErrorBarPolicy.PROPERTY_CONFIGURATION, this);
+        }
+        this.repaint(200);
+      } else if (property.equals(IErrorBarPolicy.PROPERTY_CONFIGURATION)) {
+        // the configuration of an error bar policy has changed.
+        // this is a change in rendering - everything else is of no interest.
         this.repaint(200);
       }
     }
@@ -1595,11 +1717,19 @@ public class Chart2D
         System.out.println("removeTrace, 1 lock");
       }
       this.m_traces.remove(points);
-      // all properties chart listens for
+      // TODO: stick with addTrace to explicitly remove chart as a listener for all properties!
       points.removePropertyChangeListener(ITrace2D.PROPERTY_MAX_X, this);
       points.removePropertyChangeListener(ITrace2D.PROPERTY_MIN_X, this);
       points.removePropertyChangeListener(ITrace2D.PROPERTY_MAX_Y, this);
       points.removePropertyChangeListener(ITrace2D.PROPERTY_MIN_Y, this);
+      // These are repaint candidates:
+      points.removePropertyChangeListener(ITrace2D.PROPERTY_COLOR, this);
+      points.removePropertyChangeListener(ITrace2D.PROPERTY_STROKE, this);
+      points.removePropertyChangeListener(ITrace2D.PROPERTY_VISIBLE, this);
+      points.removePropertyChangeListener(ITrace2D.PROPERTY_ZINDEX, this);
+      points.removePropertyChangeListener(ITrace2D.PROPERTY_PAINTERS, this);
+      points.removePropertyChangeListener(ITrace2D.PROPERTY_ERRORBARPOLICIES, this);
+       // rescale candidate:
       points.removePropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT, this);
 
       // update bounds:
@@ -1841,9 +1971,12 @@ public class Chart2D
   public BufferedImage snapShot() {
     BufferedImage img;
     img = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
-    Graphics g = img.getGraphics();
+    Graphics2D g2d = (Graphics2D) img.getGraphics();
+    g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+        RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     // paint is synchronized:
-    this.paint(g);
+    this.paint(g2d);
     return img;
   }
 
@@ -1895,8 +2028,8 @@ public class Chart2D
    * <p>
    * Must only be called from <code>{@link #paint(Graphics)}</code>.
    * <p>
-   * The old values for the bounds are set to the actual values afterwards to
-   * allow detection of future changes again.
+   * The old recorded values for the bounds are set to the actual values
+   * afterwards to allow detection of future changes again.
    * <p>
    * The force argument allows to enforce rescaling even if no change of data
    * bounds took place since the last scaling. This is useful if e.g. the view

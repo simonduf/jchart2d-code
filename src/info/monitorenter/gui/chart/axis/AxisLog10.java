@@ -29,8 +29,8 @@ import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 import java.util.Iterator;
 
 /**
- * An {@link info.monitorenter.gui.chart.AAxis} with log base 10 scaled display
- * of values.
+ * An {@link info.monitorenter.gui.chart.axis.AAxis} with log base 10 scaled
+ * display of values.
  * <p>
  * <h2>Caution</h2>
  * This will not work with negative values (Double.NaN is computed for log of
@@ -46,7 +46,7 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class AxisLog10
     extends AAxisTransformation {
@@ -60,8 +60,6 @@ public class AxisLog10
   public AxisLog10() {
     super(new LabelFormatterSimple());
   }
-
-
 
   /**
    * Performs {@link Math#log10(double)} with a check for reaching infinity.
