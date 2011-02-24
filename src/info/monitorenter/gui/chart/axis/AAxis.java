@@ -61,7 +61,7 @@ import java.util.LinkedList;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.28 $
+ * @version $Revision: 1.27 $
  */
 public abstract class AAxis implements IAxis, PropertyChangeListener {
 

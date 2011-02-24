@@ -23,8 +23,8 @@ package info.monitorenter.gui.chart.demo;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
-import info.monitorenter.gui.chart.ILabelFormatter;
-import info.monitorenter.gui.chart.ILabelPainter;
+import info.monitorenter.gui.chart.IAxisLabelFormatter;
+import info.monitorenter.gui.chart.IAxisTickPainter;
 import info.monitorenter.gui.chart.IRangePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.demos.StaticCollectorChart;
@@ -264,7 +264,7 @@ public abstract class ADisplayTest
     result.append("Chart2D\n");
     result.append("-------\n");
 
-    ILabelPainter labelPainter = chart.getLabelPainter();
+    IAxisTickPainter labelPainter = chart.getAxisTickPainter();
     result.append("LabelPainter: ").append(labelPainter.getClass().getName()).append("\n");
 
     // X axis
@@ -275,7 +275,7 @@ public abstract class ADisplayTest
     Range range = rangePolicy.getRange();
     result.append("    min: " + range.getMin() + "\n");
     result.append("    max: " + range.getMax() + "\n");
-    ILabelFormatter labelFormatter = axis.getFormatter();
+    IAxisLabelFormatter labelFormatter = axis.getFormatter();
     result.append("  LabelFormatter: ").append(labelFormatter.getClass().getName()).append("\n");
     AUnit unit = labelFormatter.getUnit();
     result.append("  Unit: " + unit.getClass().getName()).append("\n");

@@ -52,7 +52,7 @@ import javax.swing.event.ChangeListener;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.10 $
  */
 public class ErrorBarPolicyRelative
     extends AErrorBarPolicyConfigurable {
