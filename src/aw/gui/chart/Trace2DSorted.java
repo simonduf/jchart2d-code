@@ -1,5 +1,5 @@
-/**
- * Trace2DSorted, a TreeSet- based implementation of a ITrace2D that performs 
+/*
+ * Trace2DSorted, a TreeSet- based implementation of a ITrace2D that performs
  * insertion- sort of TracePoint2D - instances by their x- value.
  * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
  *
@@ -23,10 +23,8 @@
 
 package aw.gui.chart;
 
-import java.awt.Color;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
@@ -38,37 +36,26 @@ import java.util.TreeSet;
  * that the tracepoints will be sorted in ascending order of x- values at any
  * time.</li>
  * </UL>
- * 
+ *
  * Because sorted insertion of a List causes n! index- operations (
  * <code>get(int i)</code>) additional to the comparisons this class does not
  * extend <code>Trace2DSimple</code> which uses a List. Instead a
  * <code>TreeSet </code> is used.
- * 
- * @author Achim Westermann <a
- *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </A>
- * @version 1.0
+ *
+ * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
+ *
+ * @version $Revision: 1.11 $
  */
-public class Trace2DSorted implements ITrace2D {
-  protected TreeSet points = new TreeSet();
+public class Trace2DSorted extends AbstractTrace2D implements ITrace2D {
+  /** The sorted set of points. */
+  protected SortedSet m_points = new TreeSet();
 
-  protected Color color;
-
-  protected List changeListeners = new LinkedList();
-
-  protected String label = "";
-
-  double maxX, minX, maxY, minY;
-
-  protected boolean firsttime = true;
-
-  protected String name = "";
-
-  protected String physunit = "";
-
-  Chart2D renderer;
-
-  /** Creates new Trace2DOrdered */
+  /**
+   * Defcon.
+   * <p>
+   */
   public Trace2DSorted() {
+    // nop
   }
 
   /**
@@ -76,242 +63,58 @@ public class Trace2DSorted implements ITrace2D {
    * value will be replaced by the new one. Else the new tracepoint will be
    * added at an index in order to keep the ascending order of tracepoints with
    * a higher x- value are contained.
+   * <p>
+   *
+   * @param p
+   *          the point to add.
+   *
+   * @return true if the given point was successfully added.
    */
-  public void addPoint(TracePoint2D p) {
-    synchronized (this.renderer) {
-      synchronized (this.points) {
-        if (firsttime) {
-          this.maxX = p.getX();
-          this.minX = this.maxX;
-          this.maxY = p.getY();
-          this.minY = this.maxY;
-          firsttime = false;
-        } else {
-          double tmp = 0;
-          if ((tmp = p.getX()) > this.maxX)
-            this.maxX = tmp;
-          if ((tmp = p.getX()) < this.minX)
-            this.minX = tmp;
-          if ((tmp = p.getY()) > this.maxY)
-            this.maxY = tmp;
-          if ((tmp = p.getY()) < this.minY)
-            this.minY = tmp;
-        }
-        this.points.remove(p); //remove eventually contained to allow adding of
-                               // new one.
-        this.points.add(p);
-        this.fireTraceChanged(p);
-      }
-    }
-  }
-
-  public void addPoint(double x, double y) {
-    TracePoint2D p = new TracePoint2D(this, x, y);
-    this.addPoint(p);
+  protected boolean addPointInternal(final TracePoint2D p) {
+    // remove eventually contained to allow adding of new one
+    boolean removed = this.removePoint(p);
+    return this.m_points.add(p);
   }
 
   /**
-   * Returns the original maximum x- value ignoring the offsetX.
+   * @see aw.gui.chart.ITrace2D#getMaxSize()
    */
-  public double getMaxX() {
-    return this.maxX;
+  public int getMaxSize() {
+    return Integer.MAX_VALUE;
   }
 
   /**
-   * Returns the original maximum y- value ignoring the offsetY.
+   * @see aw.gui.chart.ITrace2D#getSize()
    */
-
-  public double getMaxY() {
-    return this.maxY;
+  public int getSize() {
+    return this.m_points.size();
   }
 
   /**
-   * Returns the original minimum x- value ignoring the offsetX.
-   */
-  public double getMinX() {
-    return this.minX;
-  }
-
-  /**
-   * Returns the original minimum y- value ignoring the offsetY.
-   */
-  public double getMinY() {
-    return this.minY;
-  }
-
-  public Color getColor() {
-    return this.color;
-  }
-
-  private void maxXSearch() {
-    synchronized (this) {
-      double ret = Double.MIN_VALUE;
-      TracePoint2D tmpoint = null;
-      double tmp;
-      Iterator it = this.points.iterator();
-      while (it.hasNext()) {
-        tmpoint = (TracePoint2D) it.next();
-        if ((tmp = tmpoint.getX()) > ret)
-          ret = tmp;
-      }
-      if (ret == Double.MIN_VALUE)
-        this.maxX = 0d;
-      else
-        this.maxX = ret;
-    }
-  }
-
-  private void minXSearch() {
-    synchronized (this) {
-      double ret = Double.MAX_VALUE;
-      TracePoint2D tmpoint = null;
-      double tmp;
-      Iterator it = this.points.iterator();
-      while (it.hasNext()) {
-        tmpoint = (TracePoint2D) it.next();
-        if ((tmp = tmpoint.getX()) < ret)
-          ret = tmp;
-      }
-      if (ret == Double.MAX_VALUE) {
-        this.minX = 0d;
-      } else
-        this.minX = ret;
-    }
-  }
-
-  private void maxYSearch() {
-    synchronized (this) {
-      double ret = Double.MIN_VALUE;
-      TracePoint2D tmpoint = null;
-      double tmp;
-      Iterator it = this.points.iterator();
-      while (it.hasNext()) {
-        tmpoint = (TracePoint2D) it.next();
-        if ((tmp = tmpoint.getY()) > ret)
-          ret = tmp;
-      }
-      if (ret == Double.MIN_VALUE)
-        this.maxY = 0d;
-      else
-        this.maxY = ret;
-    }
-  }
-
-  private void minYSearch() {
-    synchronized (this) {
-      double ret = Double.MAX_VALUE;
-      TracePoint2D tmpoint = null;
-      double tmp;
-      Iterator it = this.points.iterator();
-      while (it.hasNext()) {
-        tmpoint = (TracePoint2D) it.next();
-        if ((tmp = tmpoint.getY()) < ret)
-          ret = tmp;
-      }
-      if (ret == Double.MAX_VALUE) {
-        this.minY = 0d;
-
-      } else
-        this.minY = ret;
-    }
-  }
-
-  public void setColor(Color color) {
-    this.color = color;
-  }
-
-  public Iterator iterator() {
-    return this.points.iterator();
-  }
-
-  public void addChangeListener(ITrace2D.Trace2DListener x) {
-    changeListeners.add(x);
-    x.traceChanged(new Trace2DChangeEvent(this, ALL_POINTS_CHANGED)); // Aufruf
-                                                                      // des
-                                                                      // neuen
-                                                                      // ChangeListeners
-                                                                      // um zu
-                                                                      // aktualisieren.
-  }
-
-  public void removeChangeListener(ITrace2D.Trace2DListener x) {
-    changeListeners.remove(x);
-  }
-
-  public void setLabel(String label) {
-    this.label = label;
-  }
-
-  public String getLabel() {
-    return this.label;
-  }
-
-  public void fireTraceChanged(TracePoint2D d) {
-    Trace2DChangeEvent fire = new Trace2DChangeEvent(this, d);
-    synchronized (this.points) {
-      Iterator it = this.changeListeners.iterator();
-      while (it.hasNext()) {
-        ((ITrace2D.Trace2DListener) it.next()).traceChanged(fire);
-      }
-    }
-  }
-
-  public void pointChanged(TracePoint2D d) {
-    this.fireTraceChanged(d);
-  }
-
-  /**
-   * Tell wether no tracepoints are avaiable.
+   * @see aw.gui.chart.ITrace2D#isEmpty()
    */
   public boolean isEmpty() {
-    return this.points.size() == 0;
-  }
-
-  public String toString() {
-    return this.points.toString();
-  }
-
-  public void setName(String s) {
-    this.name = s;
-  }
-
-  public String getName() {
-    return this.name;
+    return this.m_points.size() == 0;
   }
 
   /**
-   * @see #setPhysicalUnits(String x,String y)
+   * @see aw.gui.chart.ITrace2D#iterator()
    */
-  public String getPhysicalUnits() {
-    return this.physunit;
-  }
-
-  public void setPhysicalUnits(String xunit, String yunit) {
-    if ((xunit == null) && (yunit == null))
-      return;
-    if ((xunit == null) && (yunit != null)) {
-      this.physunit = new StringBuffer("[x: , y: ").append(yunit).append("]").toString();
-      return;
-    }
-    if ((xunit != null) && (yunit == null)) {
-      this.physunit = new StringBuffer("[x: ").append(xunit).append(", y: ]").toString();
-      return;
-    }
-    this.physunit = new StringBuffer("[x: ").append(xunit).append(", y: ").append(yunit).append("]").toString();
+  public Iterator iterator() {
+    return this.m_points.iterator();
   }
 
   /**
-   * @return Returns the renderer.
+   * @see aw.gui.chart.AbstractTrace2D#addPointInternal(aw.gui.chart.TracePoint2D)
    */
-  public Chart2D getRenderer() {
-    return renderer;
+  protected void removeAllPointsInternal() {
+    this.m_points.clear();
   }
 
   /**
-   * @param renderer
-   *          The renderer to set.
+   * @see aw.gui.chart.AbstractTrace2D#removePointInternal(aw.gui.chart.TracePoint2D)
    */
-  public void setRenderer(Chart2D renderer) {
-    this.renderer = renderer;
+  protected boolean removePointInternal(final TracePoint2D point) {
+    return this.m_points.remove(point);
   }
 }

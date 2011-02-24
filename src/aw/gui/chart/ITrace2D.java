@@ -1,4 +1,4 @@
-/**
+/*
  * ITrace2D, the interface for all traces used by the Chart2D.
  * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
  *
@@ -20,234 +20,555 @@
  *  Achim.Westermann@gmx.de
  */
 package aw.gui.chart;
+
 import java.awt.Color;
-import java.util.List;
+import java.awt.Stroke;
+import java.beans.PropertyChangeListener;
+
+import aw.util.collections.IComparableProperty;
 
 /**
- *  An interface used by <code>Chart2D</code>.
- *  ITrace2D contains the values to display, the color for displaying and
- *  a suitable lable. It may be seen as a trace of the <code>Chart2D</code>
- *  that displays it. <br>
- *  Implementations may be optimized for different use- cases: <br>
- *  RingBuffers for fast changing data to keep the amount of tracepoints and
- *  consumption of memory constant,
- *  internal Lists for allowing the sorting the internal <code>TracePoint2D</code>- instances
- *  or Arrays for unordered Data (in the order of adding) for fast performance.
- *  Even an <code>ITrace2D</code> constructed by a "function- Object" may be
- *  thinkable.
- *  <p>
- *  There are various constraints for Traces:<br>
- *  - ordered by x-values<br>
- *  - ordered by the order of <code>addPoint</code> - invocation (control form outside)<br>
- *  - unique, single x- values <br>
- *  - limitation of tracepoints <br>
- *  - time- critical (fast- changing tracepoints) <br>
- *   <br>
- *  Therefore there are various <code>ITrace2D</code> - implementations. Read
- *  their description to find the one you need. Some may not have been written yet.
- *  </p>
+ * An interface used by <code>Chart2D</code>. ITrace2D contains the values to
+ * display, the color for displaying and a suitable lable. It may be seen as a
+ * trace of the <code>Chart2D</code> that displays it. <br>
+ * Implementations may be optimized for different use- cases: <br>
+ * RingBuffers for fast changing data to keep the amount of tracepoints and
+ * consumption of memory constant, internal Lists for allowing the sorting the
+ * internal <code>TracePoint2D</code>- instances or Arrays for unordered Data
+ * (in the order of adding) for fast performance. Even an <code>ITrace2D</code>
+ * constructed by a "function- Object" may be thinkable.
+ * <p>
+ * There are various constraints for Traces: <br>- ordered by x-values <br>-
+ * ordered by the order of <code>addPoint</code>- invocation (control form
+ * outside) <br>- unique, single x- values <br>- limitation of tracepoints
+ * <br>- time- critical (fast- changing tracepoints) <br>
+ * <br>
+ * Therefore there are various <code>ITrace2D</code>- implementations. Read
+ * their description to find the one you need. Some may not have been written
+ * yet.
+ * </p>
+ * <p>
+ * {@link java.lang.Comparable}should be implemented by using the internal
+ * property zIndex (see {@link #getZIndex()},{@link #setZIndex(Integer)}).
+ * </p>
  *
- * @author  Achim Westermann <a href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de</A>
- * @version 1.1
+ * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+ *
+ * @version $Revision: 1.12 $
  */
-public interface ITrace2D  {
-    /**
-     *  A static reference to a marker that sais to all listening
-     *  <code>Chart2DDataListener</code> all points have changed.
-     *  Invoke <cod>aChart2DDataListener.traceChanged(new Chart2DDataChangeEvent(this,Trace2D.ALL_POINTS_CHANGED))</code>
-     *  on the listener. He will have the possiblity to recognize that all Points
-     *  have changed in it' method <code> traceChanged(Chart2DDataEvent e)</code> by testing:
-     *  <code> ... if(e.getPoint()==ITrace2D.ALL_POINTS_CHANGED){....</code>
-     **/
-    public static TracePoint2D ALL_POINTS_CHANGED = new TracePoint2D();
-   
-    /**
-     *  Assingns a specific name to the <code>ITrace2D</code> which will be 
-     *  displayed by the <code<Chart2D</code>
-     **/
-    public void setName(String s);
-    /**
-     *  @see #setName(String s)
-     **/
-    public String getName();
-    /*
-     *  Assings a specific String representing the physical unit to the <code> 
-     *  ITrace2D</code> (e.g. Volt, Ohm, lux, ...) which will be displayed by the 
-     *  <code>Chart2D</code>
-     **/
-    public void setPhysicalUnits(String xunit,String yunit);
-    /**
-     *  @see #setPhysicalUnits(String x,String y)
-     **/
-    public String getPhysicalUnits();
-    /**
-     *  Adds the given <code> TracePoint2D </code> to the internal data.
-     *  Try to pass instances of <code>TracePoint2D</code> to increase performace.
-     *  Else the given point has to be copied into such an instance.
-     **/
-    void addPoint(TracePoint2D p);
-    /**
-     *  Adds a tracepoint to the internal data.<br>
-     *  @see #addPoint(TracePoint2D p)
-     **/
-    void addPoint(double x,double y);
-    
-    /**
-     *  Returns the maximum value to be displayed on the x- axis of the Chart2D.
-     *  Implementations should be synchronized for multithreaded use.
-     *  No exception is thrown. In case of empty data (no tracepoints) 0 should
-     *  be returned, to let the Chart2D know.
-     *  <p>
-     *  The <code>Chart2D </code> will often call this method. So try to cache 
-     *  the value in implementation and only check on modifications of <code>TracePoint</code>
-     *   instances or on <code>add</code>- invocations for changes.
-     *  </p>
-     *  @return the maximum value of the internal data for the x- dimension.
-     **/
-    double getMaxX();
-    /**
-     *  Returns the maximum value to be displayed on the y- axis of the Chart2D.
-     *  Implementations should be synchronized for multithreaded use.
-     *  No exception is thrown. In case of empty data (no tracepoints) 0 should
-     *  be returned. (watch division with zero).
-     *  @return the maximum value of the internal data for the y- dimension.
-     **/
-    double getMaxY();
-    /**
-     *  Returns the minimum value to be displayed on the x- axis of the Chart2D.
-     *  Implementations should be synchronized for multithreaded use.
-     *  No exception is thrown. In case of empty data (no tracepoints) 0 should
-     *  be returned. (watch division with zero).
-     *  <p>
-     *  The <code>Chart2D </code> will often call this method. So try to cache 
-     *  the value in implementation and only check on modifications of <code>TracePoint</code>
-     *   instances or on <code>add</code>- invocations for changes.
-     *  </p>
-     *  @return the minimum value of the internal data for the x- dimension.
-     **/
-    
-    double getMinX();
-    /**
-     *  Returns the minimum value to be displayed on the y- axis of the Chart2D.
-     *  Implementations should be synchronized for multithreaded use.
-     *  No exception is thrown. In case of empty data (no tracepoints) 0 should
-     *  be returned. (watch division with zero).
-     *  <p>
-     *  The <code>Chart2D </code> will often call this method. So try to cache 
-     *  the value in implementation and only check on modifications of <code>TracePoint</code>
-     *   instances or on <code>add</code>- invocations for changes.
-     *  </p>
-     *  @return the minimum value of the internal data for the y- dimension.
-     **/
-    
-    double getMinY();
-    
-    /**
-     *  Because the color is data common to a trace of a <code>Chart2D</code>
-     *  it is stored here. <br>
-     *  On the other hand only the corresponding <code>Chart2D </code>may detect the same
-     *  color chosen for different <code>IChart2D</code> instances to be displayed.
-     *  Therefore it is allowed to return null. This is a message to the <code>Chart2D</code>
-     *  to leave it the choice of the color. Then the <code>Chart2D</code> will chose
-     *  a color not owned by another <code>ITrace2D</code> instance managed and
-     *  assign it to the null- returning instance.
-     *  <p>
-     *  The <code>Chart2D </code> will often call this method. So try to cache 
-     *  the value in implementation and only check on modifications of <code>TracePoint</code>
-     *   instances or on <code>add</code>- invocations for changes.
-     *  </p>
-     *  @return The chosen java.awt.Color or null if the decision for the color should
-     *  be made by the corresponding <code>Chart2D</code>.
-     **/
-    Color getColor();
-    /**
-     *  Assings a <code>java.awt.Color</code> to this trace.
-     **/
-    void setColor(Color color);
-    /**
-     *  Returns an Iterator over the internal <code>TracePoint2D</code> instances.
-     *  Implementations should be synchronized.
-     *  This method is meant to allow modifications of the intenal TracePoint2Ds,
-     *  so the original Points should be returned.
-     *  There is no guarantee that changes made to the contained tracepoints will be
-     *  reflected in the display immediately. If you insist on this use the
-     *  class <code> TracePoint2D</code>  in your implementations.
-     *  Objects of this type will invoke <code>pointChanged(TracePoint2D e)</code>
-     *  on the <code>ITrace2D</code> instance they belong to when they are modified.
-     *  The last thing to do: cascade the call to all listeners (<code>Chart2D</code> -instances)
-     *  registered here. <br>
-     *  <br>
-     *   The order the iterator returns the <code>TracePoint2D</code> instances
-     *  decides how the <code>Chart2D</code> will paint the trace.
-     **/
-    java.util.Iterator iterator();
-    /**
-     *  Assings the optional label to be displayed for this trace.
-     **/
-    void setLabel(String label);
-    /**
-     *  @return null or a label to be displayed for this trace.
-     **/
-    String getLabel();
-    /**
-     *  Tell wether no tracepoints are avaiable.
-     **/
-    boolean isEmpty();
-    /**
-     *  Fires a <code>ITrace2D.Trace2DChangeEvent</code> to all
-     *  listeners.
-     **/
-    void fireTraceChanged(TracePoint2D changed);
-    /**
-     *  Method invoked by <code>TracePoint2D</code> to notify
-     *  instances of the change.
-     **/
-    void pointChanged(TracePoint2D d);
-    
-    public void addChangeListener(ITrace2D.Trace2DListener x);
-    
-    public void removeChangeListener(ITrace2D.Trace2DListener x);
-    /**
-     * @return Returns the renderer.
-     */
-    public Chart2D getRenderer();
-    /**
-     * This is a callback from {@link Chart2D#addTrace(ITrace2D)} 
-     * and must not be invoked from elswhere (needed for synchronization).
-     * Not the best design to put this to an interface, but Char2D 
-     * should handle this interface only. 
-     * 
-     * @param renderer The renderer to set.
-     */
-    void setRenderer(Chart2D renderer);
-    
-    /**
-     *  Specialized ChangeEvent which gives further information about the
-     *  <code>TracePoint2D</code> that is changed. This may be an old
-     *  tracepoint or a newly added one.
-     **/
-    class Trace2DChangeEvent extends javax.swing.event.ChangeEvent{
-        private TracePoint2D point;
-        Trace2DChangeEvent(ITrace2D source,TracePoint2D d){
-            super(source);
-            this.point = d;
-        }
-        
-        public TracePoint2D getPoint(){
-            return point;
-        }
-    }
-    /**
-     *  Interface for classes interested in ChangeEvents of <code>ITrace2D</code>
-     *  instances. The events fired to the listeners are specialized: They know
-     *  not only the source (<code>ITrace2D</code>) but the <code>TracePoint2D</code>
-     *  responsible for the change.
-     *  <br>
-     *  Defined here to obtain a save namespace.
-     *  @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann</a>
-     **/
-    public static interface Trace2DListener{
-        void traceChanged(Trace2DChangeEvent e);
-    }
-}
+public interface ITrace2D extends IComparableProperty {
 
+  /**
+   * The property key defining the <code>color</code> property. Use in
+   * combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   */
+  public static final String PROPERTY_COLOR = "color";
+
+  /**
+   * The property key defining the <code>maxX</code> property. Use in
+   * combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   */
+  public static final String PROPERTY_MAX_X = "maxX";
+
+  /**
+   * The property key defining the <code>maxY</code> property. Use in
+   * combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   */
+  public static final String PROPERTY_MAX_Y = "maxY";
+
+  /**
+   * The property key defining the <code>minX</code> property. Use in
+   * combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   */
+  public static final String PROPERTY_MIN_X = "minX";
+
+  /**
+   * The property key defining the <code>minY</code> property. Use in
+   * combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   */
+  public static final String PROPERTY_MIN_Y = "minY";
+
+  /**
+   * The property key defining the <code>name</code> property. Use in
+   * combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   */
+  public static final String PROPERTY_NAME = "name";
+
+  /**
+   * The property key defining the <code>physicalUnits</code> property. Use in
+   * combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   */
+  public static final String PROPERTY_PHYSICALUNITS = "physicalUnits";
+
+  /**
+   * The property key defining the <code>stroke</code> property. Use in
+   * combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   */
+  public static final String PROPERTY_STROKE = "stroke";
+
+  /**
+   * The property key defining a change in the collection of
+   * <code>{@link TracePoint2D}</code> instances within this trace. Use in
+   * combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   */
+  public static final String PROPERTY_TRACEPOINT = "tracepoint";
+
+  /**
+   * The property key defining the <code>visible</code> property. Use in
+   * combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   */
+  public static final String PROPERTY_VISIBLE = "visible";
+
+  /**
+   * <p>
+   * The property key defining the <code>zIndex</code> property. Use in
+   * combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   * </p>
+   */
+  public static final String PROPERTY_ZINDEX = "zIndex";
+
+  /**
+   * The minimum value for property zIndex: 0.
+   *
+   * @see #getZIndex()
+   * @see #setZIndex(Integer)
+   */
+  public static final int Z_INDEX_MIN = 0;
+
+  /**
+   * The maximum value for property zIndex: 100.
+   * <p>
+   * the descriptive name for this trace.
+   * <p>
+   *
+   * @see #getZIndex()
+   * @see #setZIndex(Integer)
+   */
+  public static final int ZINDEX_MAX = 100;
+
+  /**
+   * <p>
+   * Adds a tracepoint to the internal data.
+   * </p>
+   *
+   * @see #addPoint(TracePoint2D p)
+   * @param x
+   *          the x-value of the point to add.
+   * @param y
+   *          the y-value of the point to add.
+   * @return true if the operation was successful, false else.
+   */
+  boolean addPoint(double x, double y);
+
+  /**
+   * <p>
+   * Adds the given <code>TracePoint2D </code> to the internal data.
+   * </p>
+   * <p>
+   * Try to pass instances of <code>TracePoint2D</code> to this instance
+   * instead of invoking <code>{@link #addPoint(double, double)}</code> to
+   * increase performace. Else the given point has to be copied into such an
+   * instance from the other method and delegated to this method.
+   * </p>
+   * <p>
+   * Implementations decide wether the point will be accepted or not. So they
+   * have to update the internal properties <code>minX</code>,
+   * <code>maxX</code>,<code>maxY</code> and <code>minY</code> and also
+   * care about firing property change events for those properties by method
+   * <code>{@link java.beans.PropertyChangeSupport#firePropertyChange(java.beans.PropertyChangeEvent)}</code>.
+   * </p>
+   *
+   * @param p
+   *          the point to add.
+   * @return true if the operation was successful, false else.
+   */
+  boolean addPoint(TracePoint2D p);
+
+  /**
+   * <p>
+   * Registers a property change listener that will be informed about changes of
+   * the property identified by the given <code>propertyName</code>.
+   * </p>
+   *
+   * @param propertyName
+   *          the name of the property the listener is interested in
+   *
+   * @param listener
+   *          a listener that will only be informed if the property identified
+   *          by the argument <code>propertyName</code> changes
+   *
+   *
+   */
+  public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
+
+  /**
+   * Because the color is data common to a trace of a <code>Chart2D</code> it
+   * is stored here. <br>
+   * On the other hand only the corresponding <code>Chart2D </code> may detect
+   * the same color chosen for different <code>IChart2D</code> instances to be
+   * displayed. Therefore it is allowed to return null. This is a message to the
+   * <code>Chart2D</code> to leave it the choice of the color. Then the
+   * <code>Chart2D</code> will chose a color not owned by another
+   * <code>ITrace2D</code> instance managed and assign it to the null-
+   * returning instance.
+   * <p>
+   * The <code>Chart2D </code> will often call this method. So try to cache the
+   * value in implementation and only check on modifications of
+   * <code>TracePoint</code> instances or on <code>add</code>- invocations
+   * for changes.
+   * </p>
+   *
+   * @return The chosen java.awt.Color or null if the decision for the color
+   *         should be made by the corresponding <code>Chart2D</code>.
+   */
+  Color getColor();
+
+  /**
+   * <p>
+   * Callback method for the <code>Chart2D</code> that returns a
+   * <code>String</code> describing the lable of the <code>ITrace2D</code>
+   * that will be displayed below the drawing area of the <code>Chart2D</code>.
+   * </p>
+   * <p>
+   * This method should be implemented and finalized ASAP in the inheritance
+   * tree and rely on the property <code>name</code> and
+   * <code>physicalUnits</code>.
+   * </p>
+   *
+   * @return a String describing the Axis being accessed.
+   *
+   */
+  String getLable();
+
+  /**
+   * <p>
+   * Returns the maximum amount of {@link TracePoint2D}instances that may be
+   * added. For implementations that limit the maximum amount this is a
+   * reasonable amount. Non-limiting implementations should return
+   * {@link Integer#MAX_VALUE}. This allows to detect the unlimitedness. Of
+   * course no implementation could store that amount of points.
+   * </p>
+   *
+   * @return The maximum amount of {@link TracePoint2D}instances that may be
+   *         added.
+   *
+   */
+  public int getMaxSize();
+
+  /**
+   * Returns the maximum value to be displayed on the x- axis of the
+   * <code>Chart2D</code>. Implementations should be synchronized for
+   * multithreaded use. No exception is thrown. In case of empty data (no
+   * tracepoints) 0 should be returned, to let the Chart2D know.
+   * <p>
+   * The <code>Chart2D </code> will often call this method. So try to cache the
+   * value in implementation and only check on modifications of
+   * <code>TracePoint</code> instances or on <code>add</code>- invocations
+   * for changes.
+   * </p>
+   *
+   * @return the maximum value of the internal data for the x- dimension.
+   */
+  double getMaxX();
+
+  /**
+   * Returns the maximum value to be displayed on the y- axis of the Chart2D.
+   * Implementations should be synchronized for multithreaded use. No exception
+   * is thrown. In case of empty data (no tracepoints) 0 should be returned.
+   * (watch division with zero).
+   *
+   * @return the maximum value of the internal data for the y- dimension.
+   */
+  double getMaxY();
+
+  /**
+   * Returns the minimum value to be displayed on the x- axis of the Chart2D.
+   * Implementations should be synchronized for multithreaded use. No exception
+   * is thrown. In case of empty data (no tracepoints) 0 should be returned.
+   * (watch division with zero).
+   * <p>
+   * The <code>Chart2D </code> will often call this method. So try to cache the
+   * value in implementation and only check on modifications of
+   * <code>TracePoint</code> instances or on <code>add</code>- invocations
+   * for changes.
+   * </p>
+   *
+   * @return the minimum value of the internal data for the x- dimension.
+   */
+
+  double getMinX();
+
+  /**
+   * Returns the minimum value to be displayed on the y- axis of the Chart2D.
+   * Implementations should be synchronized for multithreaded use. No exception
+   * is thrown. In case of empty data (no tracepoints) 0 should be returned.
+   * (watch division with zero).
+   * <p>
+   * The <code>Chart2D </code> will often call this method. So try to cache the
+   * value in implementation and only check on modifications of
+   * <code>TracePoint</code> instances or on <code>add</code>- invocations
+   * for changes.
+   * </p>
+   *
+   * @return the minimum value of the internal data for the y- dimension.
+   */
+
+  double getMinY();
+
+  /**
+   * @see #setName(String s)
+   */
+  public String getName();
+
+  /**
+   *
+   * @see #setPhysicalUnits(String x,String y)
+   */
+  public String getPhysicalUnits();
+
+  /**
+   * <p>
+   * Returns all property change listeners for the given property.
+   * </p>
+   *
+   * @param property
+   *          one of the constants with teh <code>PROPERTY_</code> prefix
+   *          defined in this class or subclasses.
+   *
+   * @return the property change listeners for the given property.
+   */
+  public PropertyChangeListener[] getPropertyChangeListeners(String property);
+
+  /**
+   * @return Returns the renderer.
+   */
+  public Chart2D getRenderer();
+
+  /**
+   * @return The amount of {@link TracePoint2D}instances currently contained.
+   */
+  public int getSize();
+
+  /**
+   * @return the Stroke that is used to render this instance.
+   * @see #setStroke(Stroke)
+   *
+   */
+  Stroke getStroke();
+
+  /**
+   * Returns the painter that will be used to paint this trace.
+   * <p>
+   *
+   * @return the painter that will be used to paint this trace.
+   */
+  public ITracePainter getTracePainter();
+
+  /**
+   * @return true if this instance should be rendered.
+   *
+   */
+  public boolean getVisible();
+
+  /**
+   * <p>
+   * The z-index defines the order in which this instance will be painted. A
+   * lower value will bring it more "to the front".
+   * </p>
+   *
+   * @return the z-index that will define the order in which this instance will
+   *         be painted.
+   *
+   */
+  public Integer getZIndex();
+
+  /**
+   * <p>
+   * Returns false if internal <code>{@link TracePoint2D}</code> instances are
+   * contained or true if not.
+   * </p>
+   *
+   * @return <tt>false</tt> if internal <code>{@link TracePoint2D}</code>
+   *         instances are contained or <tt>true</tt> if not.
+   *
+   */
+  boolean isEmpty();
+
+  /**
+   * <p>
+   * Returns an <code>Iterator</code> over the internal
+   * <code>{@link TracePoint2D}</code> instances.
+   * </p>
+   * <p>
+   * Implementations should be synchronized. This method is meant to allow
+   * modifications of the intenal <code>TracePoint2D</code> instances, so the
+   * original points should be returned.
+   * </p>
+   * <p>
+   * There is no guarantee that changes made to the contained tracepoints will
+   * be reflected in the display immediately. The order the iterator returns the
+   * <code>TracePoint2D</code> instances decides how the <code>Chart2D</code>
+   * will paint the trace.
+   * </p>
+   *
+   * @return an <code>Iterator</code> over the internal
+   *         <code>{@link TracePoint2D}</code> instances.
+   */
+  java.util.Iterator iterator();
+
+  /**
+   * Removes all internal <code>TracePoint2D</code>.{@link #isEmpty()}will
+   * return true afterwards.
+   *
+   */
+  public void removeAllPoints();
+
+  /**
+   * <p>
+   * Removes the given point from this trace.
+   * </p>
+   *
+   * @param point
+   *          the point to remove.
+   *
+   * @return true if the remove opertation was successful, false else.
+   *
+   */
+  public boolean removePoint(TracePoint2D point);
+
+  /**
+   * <p>
+   * Deregisters a property change listener that has been registerd for
+   * listening on all properties.
+   * </p>
+   *
+   * @param listener
+   *          a listener that will only be informed if the property identified
+   *          by the argument <code>propertyName</code> changes
+   *
+   *
+   */
+  public void removePropertyChangeListener(PropertyChangeListener listener);
+
+  /**
+   * <p>
+   * Removes a property change listener for listening on the given property.
+   * </p>
+   *
+   * @param property
+   *          one of the constants with teh <code>PROPERTY_</code> prefix
+   *          defined in this class or subclasses.
+   *
+   * @param listener
+   *          the listener for this property change.
+   */
+  public void removePropertyChangeListener(String property, PropertyChangeListener listener);
+
+  /**
+   * <p>
+   * Set a <code>java.awt.Color</code> for this trace.
+   * </p>
+   *
+   * @param color
+   *          the <tt>Color</tt> to set.
+   */
+  void setColor(Color color);
+
+  /**
+   * Assingns a specific name to the <code>ITrace2D</code> which will be
+   * displayed by the <code>Chart2D</code>.
+   * <p>
+   *
+   * @param name
+   *          the name for this trace.
+   */
+  public void setName(String name);
+
+  /**
+   * Assings a specific String representing the physical unit to the <code>
+   *  ITrace2D</code>
+   * (e.g. Volt, Ohm, lux, ...) which will be displayed by the
+   * <code>{@link Chart2D}</code>
+   * <p>
+   *
+   * @param xunit
+   *          the physical unit for the x axis.
+   *
+   * @param yunit
+   *          the physical unit for the y axis.
+   */
+  public void setPhysicalUnits(final String xunit, final String yunit);
+
+  /**
+   * This is a callback from {@link Chart2D#addTrace(ITrace2D)}and must not be
+   * invoked from elswhere (needed for synchronization). Not the best design to
+   * put this to an interface, but Char2D should handle this interface only.
+   *
+   * @param renderer
+   *          The renderer to set.
+   */
+  void setRenderer(Chart2D renderer);
+
+  /**
+   * Allows to specify the rendering of the ITrace2D. This Stroke will be
+   * assigned to the {@link java.awt.Graphics2D}by the rendering
+   * {@link Chart2D}when painting this instance.
+   * <p>
+   *
+   * @param stroke
+   *          the stroke to use for painting this trace.
+   *
+   */
+  void setStroke(Stroke stroke);
+
+  /**
+   * Sets the painter that will be used to paint this trace.
+   * <p>
+   *
+   * @param painter
+   *          the painter that will be used to paint this trace.
+   */
+  public void setTracePainter(ITracePainter painter);
+
+  /**
+   * Set the visibility. If argument is false, this instance will not be
+   * rendered by a Chart2D.
+   * <p>
+   *
+   * @param visible
+   *          true if this trace should be painted, false else.
+   *
+   */
+  public void setVisible(boolean visible);
+
+  /**
+   * <p>
+   * Sets the internal z-index property. This decides the order in which
+   * different traces within the same <code>{@link Chart2D}</code> are
+   * painted. The lower the given value is the more this trace will be brought
+   * to front.
+   * <p>
+   * The value must not be lower than {@link #Z_INDEX_MIN}(0) and higher than
+   * {@link #ZINDEX_MAX}(100).
+   * </p>
+   * <p>
+   * This might not be tested for increased performance but ignoring these
+   * bounds may result in wrong ordering of display.
+   * </p>
+   *
+   * @see #getZIndex()
+   *
+   */
+  public void setZIndex(Integer zIndex);
+}

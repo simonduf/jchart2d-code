@@ -1,4 +1,4 @@
-/**
+/*
  * IRingBuffer, an interface for implementations of a RingBuffer.
  * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
  *
@@ -16,128 +16,198 @@
  * License along with this library; if not, write to the Free
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  If you modify or optimize the code in a useful way please let me know. 
+ *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
  */
 
 package aw.util.collections;
 
 /**
- *  Interface for implementations of RingBuffers.
- * @author  Achim Westermann <a href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de</A>
- * @version 1.1
+ * Interface for implementations of RingBuffers.
+ * <p>
+ *
+ * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
+ *
+ * @version $Revision: 1.4 $
  */
-public interface IRingBuffer extends java.io.Serializable{
+public interface IRingBuffer extends java.io.Serializable {
+
+  /**
+   * Special exception related to ringbuffer operations.
+   * <p>
+   *
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   *
+   * @version $Revision: 1.4 $
+   */
+  public final class RingBufferException extends RuntimeException {
     /**
-     *  Static marker- exception to show that the RingBuffer is full.
-     *  This way of exception- throwing avoids creation of new Exception- instances
-     *  at runtime. Your code can test the type of Exception like follows:<br>
-     *  <pre>
-     *  ...
-     *  try{
-     *      ... // do sth. with an IRingBuffer.
-     *  }catch(RingBufferException e){
-     *      if(e == IRingBuffer.BUFFER_FULL){
-     *          ... // react by increasing maxsize, storing elsewhere,...
-     *      }
-     *  }
-     *  </pre>
-     *  Note that <code>RingBufferException</code> does not need to be caught
-     *  because it is an inheritant of <code>java.lang.RuntimeException</code>.
-     *  Especially for the <code>Object add(Object element)</code>- method there
-     *  may be an implementation that never throws <code>BUFFER_FULL</code> but
-     *  returns the oldest element in case the buffer is full.
-     **/
-    IRingBuffer.RingBufferException BUFFER_FULL = new IRingBuffer.RingBufferException("Buffer is full.");
+     * Comment for <code>serialVersionUID</code>.
+     */
+    private static final long serialVersionUID = 3762255244691714610L;
+
+
     /**
-     *  Static marker- exception to show that the RingBuffer is empty.
+     * Creates an instance with the given message.
+     * <p>
      *
-     *  @see #BUFFER_FULL
-     **/
-    IRingBuffer.RingBufferException BUFFER_EMPTY = new IRingBuffer.RingBufferException("Buffer is empty. ");
-    
-    /**
-     *  Adds element to the RingBuffer. If the buffer is full, <code>BUFFER_FULL </code> will
-     *  be thrown.
-     *  <p>
-     *  Note that <code>RingBufferException</code> does not need to be caught
-     *  because it is an inheritant of <code>java.lang.RuntimeException</code>.
-     *  Especially for the <code>Object add(Object element)</code>- method there
-     *  may be an implementation that never throws <code>BUFFER_FULL</code> but
-     *  returns the oldest element in case the buffer is full.
-     *  </p>
-     **/
-    Object add(Object element)throws IRingBuffer.RingBufferException;
-    /**
-     *  Removes the oldest element from the buffer.
-     *  If the buffer is empty, <code>BUFFER_EMPTY</code> will
-     *  be thrown.
-     **/
-    Object remove()throws IRingBuffer.RingBufferException;
-    /**
-     *  Returns the last element added.
-     *  This method does not remove the element.
-     **/
-    Object getYoungest()throws IRingBuffer.RingBufferException;
-    
-    /**
-     *  Returns the oldest element from the buffer. 
-     *  This method does not remove the element.
-     **/
-    Object getOldest()throws IRingBuffer.RingBufferException;
-    
-    /**
-     *  Clears the buffer. It will return all of it's stored elements.
-     **/
-    Object[] removeAll();
-    /**
-     *  Returns the actual amount of elements stored in the buffer.
-     **/
-    int size();
-    /**
-     *  Returns the absolute amount of space in the buffer.
-     **/
-    int getBufferSize();
-    /**
-     *  Tests wether no elements are stored in the buffer.
-     **/
-    boolean isEmpty();
-    /**
-     *  Tests wether <code>getSize()==getBufferSize()</code>.
-     **/
-    boolean isFull();
-    /**
-     *  Sets a new buffer- size. <br>
-     *  Implementations may vary on handling the problem that the new size is
-     *  smaller than the actual amount of elements in the buffer:<br>
-     *  <p>
-     *  The oldest elements may be thrown away.
-     *  </p>
-     *  <p>
-     *  A new size is assigned but the elements "overhanging" are returned
-     *  by the <code>Object remove()</code> - method first. This may take time
-     *  until the buffer has its actual size again.
-     **/
-    void setBufferSize(int newSize);
-    /**
-     *  Returns an iterator starting from the first (youngest) to the 
-     *  last (oldest) element.
-     *
-     **/
-    java.util.Iterator iteratorF2L();
-    /**
-     *  Returns an iterator starting from the last (oldest) to the 
-     *  first (youngest) element.
-     **/
-    java.util.Iterator iteratorL2F();
-    
-    class RingBufferException extends RuntimeException{
-        RingBufferException(){
-            super();
-        }
-        RingBufferException(String msg){
-            super(msg);
-        }
+     * @param msg
+     *          the message of the exception.
+     */
+    protected RingBufferException(final String msg) {
+      super(msg);
     }
-    
+  }
+
+  /**
+   * Adds element to the RingBuffer.
+   * <p>
+   *
+   * If the buffer is full, an Exception will be thrown.
+   * <p>
+   *
+   * Note that <code>RingBufferException</code> does not need to be caught
+   * because it is an inheritant of <code>java.lang.RuntimeException</code>.
+   * Especially for the <code>Object add(Object element)</code>- method there
+   * may be an implementation that never throws <code>BUFFER_FULL</code> but
+   * returns the oldest element in case the buffer is full.
+   * <p>
+   *
+   * @param element
+   *          the element to add.
+   *
+   * @return the instance that had to be removed in order to add the new one or
+   *         null, if the capacity was not reached yet.
+   *
+   * @throws IRingBuffer.RingBufferException
+   *           if the buffer cannot accept any more elements.
+   *
+   *
+   */
+  public Object add(final Object element) throws IRingBuffer.RingBufferException;
+
+  /**
+   * Clears the buffer without returning anything.
+   * <p>
+   * If the content is of no interest prefer using this method instead of
+   * {@link #removeAll()}as it may be implemented in a much faster way (
+   * <code>O(constant)</code> instead of <code>O(n)</code>).
+   * <p>
+   *
+   */
+  public void clear();
+
+  /**
+   * Returns the absolute amount of space in the buffer.
+   * <p>
+   *
+   * @return the absolute amount of space in the buffer.
+   */
+  public int getBufferSize();
+
+  /**
+   * Returns the oldest element from the buffer. This method does not remove the
+   * element.
+   * <p>
+   *
+   * @return the oldest element from the buffer.
+   *
+   * @throws IRingBuffer.RingBufferException
+   *           if the buffer is empty.
+   */
+  public Object getOldest() throws IRingBuffer.RingBufferException;
+
+  /**
+   * Returns the last element added. This method does not remove the element.
+   * <p>
+   *
+   * @return the last element added.
+   *
+   * @throws IRingBuffer.RingBufferException
+   *           if the buffer is empty.
+   */
+  public Object getYoungest() throws IRingBuffer.RingBufferException;
+
+  /**
+   * Tests wether no elements are stored in the buffer.
+   * <p>
+   *
+   * @return true if no element is stored in the buffer.
+   */
+  public boolean isEmpty();
+
+  /**
+   * Returns true if no more space in the buffer is available. This method
+   * should be used to test before calling {@link #add(Object)}.
+   * <p>
+   *
+   *
+   * @return true if no more space in the buffer is available.
+   */
+  public boolean isFull();
+
+  /**
+   * Returns an iterator starting from the first (youngest) to the last (oldest)
+   * element.
+   * <p>
+   *
+   * @return an iterator starting from the first (youngest) to the last (oldest)
+   *         element.
+   */
+  public java.util.Iterator iteratorF2L();
+
+  /**
+   * Returns an iterator starting from the last (oldest) to the first (youngest)
+   * element.
+   *
+   * @return an iterator starting from the last (oldest) to the first (youngest)
+   *         element.
+   */
+  public java.util.Iterator iteratorL2F();
+
+  /**
+   * Removes the oldest element from the buffer.
+   * <p>
+   *
+   * @return the removed oldest element from the buffer.
+   *
+   * @throws IRingBuffer.RingBufferException
+   *           if the buffer is empty.
+   */
+  public Object remove() throws IRingBuffer.RingBufferException;
+
+  /**
+   * Clears the buffer. It will return all of it's stored elements.
+   * <p>
+   *
+   * @return all removed elements.
+   */
+  public Object[] removeAll();
+
+  /**
+   * Sets a new buffer- size.
+   * <p>
+   *
+   * Implementations may vary on handling the problem that the new size is
+   * smaller than the actual amount of elements in the buffer: <br>
+   * The oldest elements may be thrown away.
+   * <p>
+   * A new size is assigned but the elements "overhanging" are returned by the
+   * <code>Object remove()</code>- method first. This may take time until the
+   * buffer has its actual size again.
+   * <p>
+   *
+   * @param newSize
+   *          the new buffer size to set.
+   */
+  public void setBufferSize(final int newSize);
+
+  /**
+   * Returns the actual amount of elements stored in the buffer.
+   * <p>
+   *
+   * @return the actual amount of elements stored in the buffer.
+   */
+  public int size();
+
 }

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.2//EN" "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+
+<module name="Checker">
+<property name="severity" value="warning"/>
+<module name="TreeWalker">
+<module name="FileContentsHolder">
+</module>
+<module name="JavadocMethod">
+</module>
+<module name="JavadocType">
+</module>
+<module name="JavadocVariable">
+</module>
+<module name="JavadocStyle">
+</module>
+<module name="ConstantName">
+</module>
+<module name="LocalFinalVariableName">
+</module>
+<module name="LocalVariableName">
+</module>
+<module name="MethodName">
+</module>
+<module name="PackageName">
+</module>
+<module name="ParameterName">
+</module>
+<module name="StaticVariableName">
+</module>
+<module name="TypeName">
+</module>
+<module name="AvoidStarImport">
+</module>
+<module name="IllegalImport">
+</module>
+<module name="RedundantImport">
+</module>
+<module name="UnusedImports">
+</module>
+<module name="FileLength">
+</module>
+<module name="MethodLength">
+</module>
+<module name="ParameterNumber">
+</module>
+<module name="EmptyForIteratorPad">
+</module>
+<module name="MethodParamPad">
+</module>
+<module name="NoWhitespaceAfter">
+</module>
+<module name="NoWhitespaceBefore">
+</module>
+<module name="OperatorWrap">
+</module>
+<module name="ParenPad">
+</module>
+<module name="TypecastParenPad">
+</module>
+<module name="TabCharacter">
+</module>
+<module name="WhitespaceAfter">
+</module>
+<module name="WhitespaceAround">
+</module>
+<module name="ModifierOrder">
+</module>
+<module name="AvoidNestedBlocks">
+</module>
+<module name="EmptyBlock">
+<property name="option" value="text"/>
+</module>
+<module name="LeftCurly">
+</module>
+<module name="NeedBraces">
+</module>
+<module name="RightCurly">
+</module>
+<module name="DoubleCheckedLocking">
+</module>
+<module name="EmptyStatement">
+</module>
+<module name="EqualsHashCode">
+</module>
+<module name="HiddenField">
+<property name="severity" value="error"/>
+</module>
+<module name="IllegalInstantiation">
+</module>
+<module name="InnerAssignment">
+</module>
+<module name="MissingSwitchDefault">
+</module>
+<module name="SimplifyBooleanExpression">
+</module>
+<module name="SimplifyBooleanReturn">
+</module>
+<module name="FinalClass">
+</module>
+<module name="HideUtilityClassConstructor">
+</module>
+<module name="InterfaceIsType">
+</module>
+<module name="VisibilityModifier">
+<property name="protectedAllowed" value="true"/>
+</module>
+<module name="ArrayTypeStyle">
+</module>
+<module name="FinalParameters">
+</module>
+<module name="GenericIllegalRegexp">
+<property name="format" value="\s+$"/>
+<property name="message" value="Line has trailing spaces."/>
+</module>
+<module name="UpperEll">
+</module>
+<module name="LineLength">
+<property name="max" value="120"/>
+</module>
+<module name="RequireThis">
+<metadata name="com.atlassw.tools.eclipse.checkstyle.comment" value="Enforce this for internal member access to avoid ambiguity with arguments."/>
+<property name="checkMethods" value="false"/>
+</module>
+<module name="SuperFinalize">
+<metadata name="com.atlassw.tools.eclipse.checkstyle.comment" value="Check super finalize for correct finalization in inheritance tree."/>
+</module>
+<module name="MemberName">
+<metadata name="com.atlassw.tools.eclipse.checkstyle.comment" value="all members start with &quot;m_&quot; and continue with at least one lowercase letter."/>
+<property name="format" value="^m_[a-z][a-zA-Z0-9]*$"/>
+</module>
+</module>
+<module name="PackageHtml">
+</module>
+<module name="NewlineAtEndOfFile">
+</module>
+<module name="Translation">
+</module>
+</module>

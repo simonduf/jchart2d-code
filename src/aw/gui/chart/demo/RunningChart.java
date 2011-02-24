@@ -21,6 +21,7 @@
  */
 
 package aw.gui.chart.demo;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -31,104 +32,161 @@ import javax.swing.JFrame;
 
 import aw.gui.chart.Chart2D;
 import aw.gui.chart.ITrace2D;
+import aw.gui.chart.RangePolicyMinimumViewport;
 import aw.gui.chart.Trace2DLtd;
+import aw.gui.chart.layout.ChartPanel;
 import aw.reflection.ObjRecorder2Trace2DAdapter;
 import aw.util.Range;
+
 /**
  *
- *  A test for the <code>Chart2D</code> that constantly adds new tracepoints
- *  to a <code> Trace2DLtd</code>. Mainly the runtime- scaling is interesting.<br>
- *  <br>
- *  Furthermore this is an example on how to connect other components to the
- *  <code>Chart2D</code> using an adaptor- class. It is "hidden" in the package
- *  <i>aw.reflection</i> and called <code>ObjRecorder2Trace2DAdaptor</code> (5
- *  letters under the limit!).
+ * A test for the <code>Chart2D</code> that constantly adds new tracepoints to
+ * a <code> Trace2DLtd</code>. Mainly the runtime- scaling is interesting.
+ * <p>
+ * Furthermore this is an example on how to connect other components to the
+ * <code>Chart2D</code> using an adaptor- class. It is "hidden" in the package
+ * <i>aw.reflection </i> and called <code>ObjRecorder2Trace2DAdaptor</code>(5
+ * letters under the limit!).
+ * <p>
  *
- * @author  <a href='mailto:Achim.Westermann@gmx.de'> Achim Westermann</a>
- * @version 1.1
+ * @author <a href='mailto:Achim.Westermann@gmx.de'> Achim Westermann </a>
+ *
+ * @version $Revision: 1.10 $
  */
 public class RunningChart extends JFrame {
-    protected Chart2D chart = null;
-    
-    public RunningChart(Chart2D chart, String Label) {
-        super(Label);
-        this.chart = chart;
-        addWindowListener(
-        new WindowAdapter(){
-            public void windowClosing(WindowEvent e){
-                System.exit(0);
-            }
+  /**
+   * Helper class that holds an internal number that is randomly modified by a
+   * Thread.
+   * <p>
+   *
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   *
+   *
+   * @version $Revision: 1.10 $
+   */
+  static class RandomBumper extends Thread {
+    /** Streches or compresses the grade of jumping of the internal number. */
+    protected double m_factor;
+
+    /** The bumping number. */
+    protected double m_number = 0;
+
+    /** The propability of an increase versus a decrease of the bumped number. */
+    protected double m_plusminus = 0.5;
+
+    /** Needed for randomization of bumping the number. */
+    protected java.util.Random m_randomizer = new java.util.Random();
+
+    /**
+     * Creates an instance.
+     * <p>
+     *
+     * @param plusminus
+     *          probability to increase or decrease the number each step.
+     *
+     * @param factor
+     *          affects the amplitude of the number (severity of jumps).
+     */
+    public RandomBumper(final double plusminus, final int factor) {
+
+      if (plusminus < 0 || plusminus > 1) {
+        System.out.println(this.getClass().getName()
+            + " ignores constructor-passed value. Must be between 0.0 and 1.0!");
+      } else {
+        this.m_plusminus = plusminus;
+      }
+      this.m_factor = factor;
+      this.start();
+    }
+
+    /**
+     * @see java.lang.Runnable#run()
+     */
+    public void run() {
+
+      while (true) {
+        double rand = this.m_randomizer.nextDouble();
+        if (rand < this.m_plusminus) {
+          this.m_number += this.m_randomizer.nextDouble() * this.m_factor;
+        } else {
+          this.m_number -= this.m_randomizer.nextDouble() * this.m_factor;
         }
-        );
-        Container contentPane = getContentPane();
-        contentPane.setLayout(new BorderLayout());
-        contentPane.add(this.chart,BorderLayout.CENTER);
-    }
-    
-    public void addTrace(ITrace2D data){
-        this.chart.addTrace(data);
-    }
-    public void removeTrace(ITrace2D data){
-        this.chart.removeTrace(data);
-    }
-    
-    public static void main(String[] args){
-        System.out.println("10e3: "+10e3);
-        Chart2D chart = new Chart2D();
-        ITrace2D data = new Trace2DLtd(300);
-        data.setColor(Color.RED);
-        data.setName("random");
-        data.setPhysicalUnits("hertz","ms");
-        chart.addTrace(data);
-        RunningChart wnd = new RunningChart(chart,"RunningChart");
-        chart.setScaleX(true);
-        chart.setGridX(true);
-        chart.setDecimalsX(0);
-        chart.setScaleY(true);
-        chart.setGridY(true);
-        // force ranges:
-        chart.setForceYRange(new Range(-1e4,+1e4));
-        //chart.setFont(new Font(null,0,12));
-        wnd.setLocation(200, 300);
-        wnd.setSize(700, 210);
-        wnd.setResizable(true);
-        wnd.setVisible(true);
-        ObjRecorder2Trace2DAdapter adapter =
-        new ObjRecorder2Trace2DAdapter(data,new RandomBumper(0.5,1000),"number",40);
-    }
-    
-    static class RandomBumper extends Thread{
-        protected double number=0;
-        protected java.util.Random randomizer = new java.util.Random();
-        protected int plus =1;
-        protected double plusminus = 0.5;
-        protected double factor;
-        
-        public RandomBumper(double plusminus,int factor){
-            if(plusminus<0 || plusminus>1)
-                System.out.println(this.getClass().getName()+" ignores constructor-passed value. Must be between 0.0 and 1.0!");
-            else this.plusminus=plusminus;
-            this.factor = factor;
-            this.start();
+
+        try {
+          sleep(40);
+        } catch (InterruptedException e) {
+          // nop
         }
-        
-        public void run(){
-            while(true){
-                double rand = this.randomizer.nextDouble();
-                if(rand<this.plusminus){
-                    this.number+=this.randomizer.nextDouble()*this.factor;
-                }
-                else{
-                    this.number-=this.randomizer.nextDouble()*this.factor;
-                }
-                
-                try{
-                    sleep(40);
-                }catch(InterruptedException e){}
-                
-                
-            }
-        }
+
+      }
     }
-    
+  }
+
+  /**
+   * Generated for <code>serialVersionUID</code>.
+   */
+  private static final long serialVersionUID = 3545231432038627123L;
+
+  /**
+   * Main entry.
+   * <p>
+   *
+   * @param args
+   *          ignored.
+   */
+  public static void main(final String[] args) {
+
+    Chart2D chart = new Chart2D();
+    ITrace2D data = new Trace2DLtd(300);
+    data.setColor(Color.RED);
+    data.setName("random");
+    data.setPhysicalUnits("hertz", "ms");
+    chart.addTrace(data);
+    RunningChart wnd = new RunningChart(chart, "RunningChart");
+    chart.setScaleX(true);
+    chart.setGridX(true);
+
+    chart.setScaleY(true);
+    chart.setGridY(true);
+
+    // force ranges:
+    chart.getAxisY().setRangePolicy(new RangePolicyMinimumViewport(new Range(-1e4, +1e4)));
+    // chart.setFont(new Font(null,0,12));
+    wnd.setLocation(200, 300);
+    wnd.setSize(700, 210);
+    wnd.setResizable(true);
+    wnd.setVisible(true);
+    ObjRecorder2Trace2DAdapter adapter = new ObjRecorder2Trace2DAdapter(data, new RandomBumper(0.5,
+        1000), "m_number", 100);
+  }
+
+  /** The chart to use. */
+  protected Chart2D m_chart = null;
+
+  /**
+   * Creates an instance that will dynamically paint on the chart to a trace
+   * with the given label.
+   * <p>
+   *
+   * @param chart
+   *          the chart to use.
+   *
+   * @param label
+   *          the name of the trace too display.
+   */
+  public RunningChart(final Chart2D chart, final String label) {
+
+    super(label);
+    this.m_chart = chart;
+    addWindowListener(new WindowAdapter() {
+
+      public void windowClosing(final WindowEvent e) {
+
+        System.exit(0);
+      }
+    });
+    Container contentPane = getContentPane();
+    contentPane.setLayout(new BorderLayout());
+    contentPane.add(new ChartPanel(this.m_chart), BorderLayout.CENTER);
+  }
 }

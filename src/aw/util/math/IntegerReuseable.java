@@ -1,107 +1,210 @@
-
+/*
+ *  IntegerReusable.java, a mutable Integer for  jchart2d.
+ *  Copyright (C) Achim Westermann, created on 12.05.2005, 20:11:17
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *  If you modify or optimize the code in a useful way please let me know.
+ *  Achim.Westermann@gmx.de
+ *
+ */
 package aw.util.math;
 
 /**
- * This is a plain wrapper around an Integer. I needed an 
- * wrapper of an primitive int to share the same value between different instances and 
- * to have the changes made to the primitive value take effect on all owners of the 
- * same instance.<br>
- * What a pity that java.lang.Integer does not allow to change it's internal value at 
- * runtime. Every time a new Integer has to be constructed.
- **/
-public class IntegerReuseable
-{
-    /**
-     * The smallest value of type <code>int</code>. The constant 
-     * value of this field is <tt>-2147483648</tt>.
-     */
-    public static final int   MIN_VALUE = 0x80000000;
+ * Mutable {@link java.lang.Integer}.
+ * <p>
+ *
+ * I needed an wrapper of an primitive int to share the same value between
+ * different instances and to have the changes made to the primitive value take
+ * effect on all owners of the same instance.
+ * <p>
+ *
+ * What a pity that java.lang.Integer does not allow to change it's internal
+ * value at runtime. Every time a new Integer has to be constructed.
+ * <p>
+ *
+ */
+public class IntegerReuseable {
 
-    /**
-     * The largest value of type <code>int</code>. The constant 
-     * value of this field is <tt>2147483647</tt>.
-     */
-    public static final int   MAX_VALUE = 0x7fffffff;
+  /**
+   * The largest value of type <code>int</code>. The constant value of this
+   * field is <tt>2147483647</tt>.
+   */
+  public static final int MAX_VALUE = 0x7fffffff;
 
-	public static final ArithmeticException OVERFLOW = new ArithmeticException("Overflow detected. Value saved unchanged.");
-	public static final ArithmeticException CARRY = new ArithmeticException("Carry detected. Value saved unchanged.");
-    /**
-     * The value of the Integer.
-     *
-     * @serial
-     */
-    private int value;
+  /**
+   * The smallest value of type <code>int</code>. The constant value of this
+   * field is <tt>-2147483648</tt>.
+   */
+  public static final int MIN_VALUE = 0x80000000;
 
-    /**
-     * Constructs a newly allocated <code>Integer</code> object that
-     * represents the primitive <code>int</code> argument.
-     *
-     * @param   value   the value to be represented by the <code>Integer</code>.
-     */
-    public IntegerReuseable(int value) {
-		this.value = value;
-    }
+  /**
+   * The value of the Integer.
+   */
+  private int m_value;
 
+  /**
+   * Constructs a newly allocated <code>Integer</code> object that represents
+   * the primitive <code>int</code> argument.
+   *
+   * @param value
+   *          the value to be represented by the <code>Integer</code>.
+   */
+  public IntegerReuseable(final int value) {
+    this.m_value = value;
+  }
 
+  /**
+   * Adds the given value to the internal value.
+   * <p>
+   *
+   * @param i
+   *          the value to add.
+   *
+   * @throws ArithmeticException
+   *           if an overflow ({@link Integer#MAX_VALUE}) occurs.
+   */
+  public void add(final int i) throws ArithmeticException {
+    int oldval = this.m_value;
+    this.m_value += i;
+    if (oldval > this.m_value) {
+      this.m_value = oldval;
+      throw new ArithmeticException("Overflow detected. Value saved unchanged.");
+    }
+  }
 
-    /**
-     * Returns a String object representing this Integer's value. The 
-     * value is converted to signed decimal representation and returned 
-     * as a string, exactly as if the integer value were given as an 
-     * argument to the {@link java.lang.Integer#toString(int)} method.
-     *
-     * @return  a string representation of the value of this object in
-     *          base&nbsp;10.
-     */
-    public String toString() {
-		return String.valueOf(value);
-    }
+  /**
+   * Adds the given value to the internal value.
+   * <p>
+   *
+   * @param i
+   *          the value to add.
+   *
+   * @throws ArithmeticException
+   *           if an overflow ({@link Integer#MAX_VALUE}) occurs.
+   */
+  public void add(final Integer i) throws ArithmeticException {
+    this.add(i.intValue());
+  }
 
+  /**
+   * Adds the given value to the internal value.
+   * <p>
+   *
+   * @param i
+   *          the value to add.
+   *
+   * @throws ArithmeticException
+   *           if an overflow ({@link Integer#MAX_VALUE}) occurs.
+   */
+  public void add(final IntegerReuseable i) throws ArithmeticException {
+    this.add(i.getValue());
+  }
 
+  /**
+   * Returns the value as an int.
+   * <p>
+   *
+   * @return the value as an int.
+   */
+  public int getValue() {
+    return this.m_value;
+  }
 
-    
-    public void setValue(int value){
-    	this.value = value;
+  /**
+   * Returns the value as an int.
+   * <p>
+   *
+   * @return the value as an int.
+   */
+  public int intValue() {
+    return this.m_value;
+  }
+
+  /**
+   * Sets the value.
+   * <p>
+   *
+   * @param value
+   *          the value.
+   */
+  public void setValue(final int value) {
+    this.m_value = value;
+  }
+
+  /**
+   * Substracts the given value from the internal value.
+   * <p>
+   *
+   * @param i
+   *          the value to subtract.
+   *
+   * @throws ArithmeticException
+   *           if a carry ({@link Integer#MIN_VALUE}) occurs.
+   */
+  public void sub(final int i) throws ArithmeticException {
+    int oldval = this.m_value;
+    this.m_value -= i;
+    if (oldval < this.m_value) {
+      this.m_value = oldval;
+      throw new ArithmeticException("Carry detected. Value saved unchanged.");
     }
-    
-    public int intValue(){
-    	return this.value;
-    }
-    public int getValue(){
-    	return this.value;
-    }
-    
-    public void add(int i)throws ArithmeticException{
-    	int oldval = this.value;
-    	this.value+=i;
-    	if(oldval>this.value){
-    		this.value = oldval;
-    		throw OVERFLOW;
-    	}
-    }
-    
-    public void add(Integer i)throws ArithmeticException{
-    	this.add(i.intValue());
-    }
-    
-    public void add(IntegerReuseable i)throws ArithmeticException{
-    	this.add(i.getValue());
-    }
-    
-    public void sub(int i)throws ArithmeticException{
-    	int oldval = this.value;
-    	this.value -= i;
-    	if(oldval<this.value){
-    		this.value = oldval;
-    		throw CARRY;
-    	}
-    }
-    
-    public void sub(Integer i)throws ArithmeticException{
-    	this.sub(i.intValue());
-    }
-    
-    public void sub(IntegerReuseable i)throws ArithmeticException{
-    	this.sub(i.intValue());
-    }
+  }
+
+  /**
+   * Substracts the given value from the internal value.
+   * <p>
+   *
+   * @param i
+   *          the value to subtract.
+   *
+   * @throws ArithmeticException
+   *           if a carry ({@link Integer#MIN_VALUE}) occurs.
+   */
+  public void sub(final Integer i) throws ArithmeticException {
+    this.sub(i.intValue());
+  }
+
+  /**
+   * Substracts the given value from the internal value.
+   * <p>
+   *
+   * @param i
+   *          the value to subtract.
+   *
+   * @throws ArithmeticException
+   *           if a carry ({@link Integer#MIN_VALUE}) occurs.
+   */
+  public void sub(final IntegerReuseable i) throws ArithmeticException {
+    this.sub(i.intValue());
+  }
+
+  /**
+   * Returns a String object representing this Integer's value.
+   * <p>
+   *
+   * The value is converted to signed decimal representation and returned as a
+   * string, exactly as if the integer value were given as an argument to the
+   * {@link java.lang.Integer#toString(int)}method.
+   * <p>
+   *
+   *
+   * @return a string representation of the value of this object in
+   *         base&nbsp;10.
+   */
+  public String toString() {
+    return String.valueOf(this.m_value);
+  }
 }

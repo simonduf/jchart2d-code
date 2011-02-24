@@ -1,322 +1,606 @@
 package aw.gui.util;
-import java.util.Iterator;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+/**
+ * Iterator of ther color space.
+ * <p>
+ *
+ * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+ *
+ * @version $Revision: 1.4 $
+ */
 public class ColorIterator implements Iterator {
 
-	/**
-	 * To allow clean reset of ColorIterator, also the start HSBColor has to be reset. 
-	 * This is done by a deep copy at construction time. 
-	 **/
-	private HSBColor start;
-	private HSBColor iterate;
-	private SteppingModel stepModel;
-	/**
-	 * To allow clean reset of ColorIterator, also the SteppingModel has to be reset. 
-	 * This is done by a deep copy at construction time. 
-	 **/
-	private SteppingModel resetModel;
+  /**
+   * To allow clean reset of ColorIterator, also the start HSBColor has to be
+   * reset. This is done by a deep copy at construction time.
+   */
+  private HSBColor m_start;
 
-	public ColorIterator() {
-		this.start = new HSBColor(0.0f, 1.0f, 1.0f); // brightest red ever
-		this.iterate = (HSBColor) this.start.clone();
-		this.stepModel = new HueStep(0.001f);
-		this.resetModel = (SteppingModel) this.stepModel.clone();
-	}
-	private boolean hasnext = true;
+  /** Reference to the currently iterated color. */
+  private HSBColor m_iterate;
 
-	public boolean hasNext() {
-		return this.hasnext;
-	}
+  /** The stepping model that defines the path throught the color space. */
+  private SteppingModel m_stepModel;
 
-	/**
-	 * Returns instances of java.awt.Color or throws a NoSuchElementException, if iterator has finished.
-	 **/
-	public Object next() {
-		if (!hasnext)
-			throw new java.util.NoSuchElementException("No more colors to give (call reset for new run!)");
-		this.stepModel.doStep(this);
-		if (this.iterate.equals(this.start))
-			this.hasnext = false;
-		return this.iterate.getRGBColor();
-	}
-	/**
-	 * Resets the ColorIterator. It will be able to start a new iteration over the 
-	 * colorspace.
-	 **/
-	public void reset() {
-		this.iterate = (HSBColor) this.start.clone();
-		// also reset the SteppingModel!!!!
-		this.stepModel = (SteppingModel) this.resetModel.clone();
-		this.hasnext = true;
-	}
+  /**
+   * To allow clean reset of ColorIterator, also the SteppingModel has to be
+   * reset. This is done by a deep copy at construction time.
+   */
+  private SteppingModel m_resetModel;
 
-	/**
-	 * Nothing is done here. Do you really want to remove a color from the colorcircle 
-	 * model?
-	 * */
-	public void remove() {}
+  /**
+   * Creates an instance that starts with a red and walks the hue line with a
+   * {@link ColorIterator.HueStepper}.
+   * <p>
+   */
+  public ColorIterator() {
+    this.m_start = new HSBColor(0.0f, 1.0f, 1.0f); // brightest red ever
+    this.m_iterate = (HSBColor) this.m_start.clone();
+    this.m_stepModel = new HueStepper(0.001f);
+    this.m_resetModel = (SteppingModel) this.m_stepModel.clone();
+  }
 
-	public static interface SteppingModel extends Cloneable {
-		void doStep(ColorIterator tostep);
-		// widening the clone method of java.lang.Object
-		public Object clone();
-	}
+  /** Flag to show if more colors are iterateable. */
+  private boolean m_hasnext = true;
 
-	/**
-	 * Just for protected internal float stepping.
-	 **/
-	public static abstract class DefaultStepping implements SteppingModel {
-		protected float stepping;
+  /**
+   * Returns true if more colors are available.
+   * <p>
+   *
+   * @return true if more colors are available.
+   *
+   * @see java.util.Iterator#hasNext()
+   */
+  public boolean hasNext() {
+    return this.m_hasnext;
+  }
 
-		public DefaultStepping() throws IllegalArgumentException {
-			this(1.0f / 100.0f);
-		}
+  /**
+   * Returns instances of java.awt.Color or throws a NoSuchElementException, if
+   * iterator has finished.
+   * <p>
+   *
+   * @return the next available Color.
+   *
+   * @throws NoSuchElementException
+   *           if {@link #hasNext()}returns false.
+   */
+  public Object next() throws NoSuchElementException {
+    if (!this.m_hasnext) {
+      throw new java.util.NoSuchElementException("No more colors to give (call reset for new run!)");
+    }
+    this.m_stepModel.doStep(this);
+    if (this.m_iterate.equals(this.m_start)) {
+      this.m_hasnext = false;
+    }
+    return this.m_iterate.getRGBColor();
+  }
 
-		public DefaultStepping(float stepping) throws IllegalArgumentException {
-			if (stepping > 1.0f || stepping <= 0.0f)
-				throw new IllegalArgumentException("Illegal stepping param: choose between 0.1 and 1.0.");
-			this.stepping = stepping;
-		}
-		/**
-		 * Too lazy to implement for each subclass. 
-		 * An overhead for newInstance() (return dynamic subtype) is paid here.
-		 **/
-		public Object clone() {
-			try {
-				DefaultStepping ret = (DefaultStepping) (this.getClass().newInstance());
-				ret.stepping = this.stepping;
-				return ret;
-			} catch (Throwable f) {
-				f.printStackTrace();
-				return null; // this will never happen (fucking the compiler)
-			}
-		}
-	}
+  /**
+   * Resets the ColorIterator. It will be able to start a new iteration over the
+   * colorspace.
+   * <p>
+   */
+  public void reset() {
+    this.m_iterate = (HSBColor) this.m_start.clone();
+    // also reset the SteppingModel!!!!
+    this.m_stepModel = (SteppingModel) this.m_resetModel.clone();
+    this.m_hasnext = true;
+  }
 
-	public static class HueStep extends DefaultStepping {
-		public HueStep() throws IllegalArgumentException {
-			super();
-		}
+  /**
+   * Nothing is done here. Do you really want to remove a color from the
+   * colorcircle model?
+   * <p>
+   */
+  public void remove() {
+    // nop
+  }
 
-		public HueStep(float stepping) throws IllegalArgumentException {
-			super(stepping);
-		}
+  /**
+   * Defines the strategy of walking through the HSB color space.
+   * <p>
+   *
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   *
+   *
+   * @version $Revision: 1.4 $
+   */
+  public static interface SteppingModel extends Cloneable {
+    /**
+     * Performs a step on the given color iterator.
+     * <p>
+     *
+     * @param tostep
+     *          the color iterator to perform a step on.
+     */
+    public void doStep(final ColorIterator tostep);
 
-		/**
-		 * Performs a hue step on the given ColorIterator's HSBColor. 
-		 * The bounds are watched: if a hue step would cross 1.0f it will be continued 
-		 * beginning from 0. if a hue step would cross the hue value of the ColorIterator's 
-		 * start hue value, the step will only go as far as this value. Else there would be 
-		 * problems with finding the end of the iteration. 
-		 **/
-		public void doStep(ColorIterator tostep) {
-			float increment = tostep.iterate.hue;
-			float bound = tostep.start.hue;
-			if (increment == bound) {
-				increment += this.stepping;
-			}
-			// before crossing 1.0, i will cross the iteration bound (no care for 1.0 needed)
-			else if (increment < bound) {
-				increment += this.stepping;
-				if (increment > bound)
-					increment = bound;
-			}
-			// more complicated: watch for crossing 1.0, then watch for crossing iteration bound.
-			else {
-				increment += this.stepping;
-				if (increment > 1.0f) {
-					increment -= 1.0;
-					// only for the case that we jumped look for overtaking the bound
-					if (increment > bound)
-						increment = bound;
-				}
-			}
-			tostep.iterate.hue = increment;
-		}
-	}
+    /**
+     * Creates a clone of this stepper.
+     * <p>
+     *
+     * @return a clone of this stepper.
+     */
+    public Object clone();
+  }
 
-	public static class LuminanceStep extends DefaultStepping {
-		public LuminanceStep() throws IllegalArgumentException {
-			super();
-		}
-		public LuminanceStep(float stepping) throws IllegalArgumentException {
-			super(stepping);
-		}
+  /**
+   * Just for protected internal float stepping.
+   * <p>
+   *
+   *
+   */
+  public abstract static class DefaultStepping implements ColorIterator.SteppingModel {
+    /** The amount of stepping. */
+    protected float m_stepping;
 
-		/**
-		 * Performs a luminance step on the given ColorIterator's HSBColor. 
-		 * The bounds are watched: if a step would cross 1.0f, it will be continued 
-		 * beginning from 0. if a step would cross the luminance value of the ColorIterator's 
-		 * start luminance, the step will only go as far as this value. Else there would be 
-		 * problems with finding the end of the iteration. 
-		 **/
-		public void doStep(ColorIterator tostep) {
-			float increment = tostep.iterate.lum;
-			float bound = tostep.start.lum;
-			if (increment == bound) {
-				increment += this.stepping;
-			}
-			// before crossing 1.0, i will cross the iteration bound (no care for 1.0 needed)
-			else if (increment < bound) {
-				increment += this.stepping;
-				if (increment > bound)
-					increment = bound;
-			}
-			// more complicated: watch for crossing 1.0, then watch for crossing iteration bound.
-			else {
-				increment += this.stepping;
-				if (increment > 1.0f) {
-					increment -= 1.0;
-					if (increment > bound)
-						increment = bound;
-				}
-			}
-			tostep.iterate.lum = increment;
-		}
-	}
+    /**
+     * Creates a stepper with 100 steps in the color space.
+     * <p>
+     */
+    public DefaultStepping() {
+      this(1.0f / 100.0f);
+    }
 
-	public static class SaturationStep extends DefaultStepping {
-		public SaturationStep() throws IllegalArgumentException {
-			super();
-		}
-		public SaturationStep(float stepping) throws IllegalArgumentException {
-			super(stepping);
-		}
+    /**
+     * Creates a stepper with the given step length.
+     * <p>
+     *
+     * @param stepping
+     *          a step length in-between 0.0 and 1.0.
+     *
+     * @throws IllegalArgumentException
+     *           if the stepping is <= 0.0 or >=1.0.
+     */
+    public DefaultStepping(final float stepping) throws IllegalArgumentException {
+      if (stepping > 1.0f || stepping <= 0.0f) {
+        throw new IllegalArgumentException("Illegal stepping param: choose within 0.0 and 1.0.");
+      }
+      this.m_stepping = stepping;
+    }
 
-		/**
-		 * Performs a luminance step on the given ColorIterator's HSBColor. 
-		 * The bounds are watched: if a step would cross 1.0f, it will be continued 
-		 * beginning from 0. if a step would cross the luminance value of the ColorIterator's 
-		 * start luminance, the step will only go as far as this value. Else there would be 
-		 * problems with finding the end of the iteration. 
-		 **/
-		public void doStep(ColorIterator tostep) {
-			float increment = tostep.iterate.sat;
-			float bound = tostep.start.sat;
-			if (increment == bound) {
-				increment += this.stepping;
-			}
-			// before crossing 1.0, i will cross the iteration bound (no care for 1.0 needed)
-			else if (increment < bound) {
-				increment += this.stepping;
-				if (increment > bound)
-					increment = bound;
-			}
-			// more complicated: watch for crossing 1.0, then watch for crossing iteration bound.
-			else {
-				increment += this.stepping;
-				if (increment > 1.0f) {
-					increment -= 1.0;
-					if (increment > bound)
-						increment = bound;
-				}
-			}
-			tostep.iterate.sat = increment;
-		}
-	}
+    /**
+     * Too lazy to implement for each subclass. An overhead for newInstance()
+     * (return dynamic subtype) is paid here.
+     * <p>
+     *
+     * @return a clone of the stepper.
+     */
+    public Object clone() {
+      try {
+        DefaultStepping ret = (DefaultStepping) (this.getClass().newInstance());
+        ret.m_stepping = this.m_stepping;
+        return ret;
+      } catch (Throwable f) {
+        f.printStackTrace();
+        return null; // this will never happen
+      }
+    }
+  }
 
-	public static abstract class PiggyBackStepper extends DefaultStepping {
-		HueStep huestep;
-		SaturationStep satstep;
-		LuminanceStep lumstep;
-		public PiggyBackStepper() throws IllegalArgumentException {
-			this(0.002f,0.2f, 0.2f);
-		}
-		public PiggyBackStepper(float hueStepping, float satStepping, float lumStepping)
-			throws IllegalArgumentException {
-			this.huestep = new HueStep(hueStepping);
-			this.satstep = new SaturationStep(satStepping);
-			this.lumstep = new LuminanceStep(lumStepping);
-		}
+  /**
+   * A stepper that walks along the hue line of the color space.
+   * <p>
+   *
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   *
+   * @version $Revision: 1.4 $
+   */
+  public static class HueStepper extends ColorIterator.DefaultStepping {
+    /**
+     * Creates an instance with 100 steps left.
+     * <p>
+     */
+    public HueStepper() {
+      super();
+    }
 
-		public Object clone() {
-			PiggyBackStepper ret = (PiggyBackStepper) super.clone();
-			ret.huestep = (HueStep) this.huestep.clone();
-			ret.satstep = (SaturationStep) this.satstep.clone();
-			ret.lumstep = (LuminanceStep) this.lumstep.clone();
-			return ret;
-		}
-	}
+    /**
+     * Creates a stepper with the given step length.
+     * <p>
+     *
+     * @param stepping
+     *          a step length in-between 0.0 and 1.0.
+     *
+     * @throws IllegalArgumentException
+     *           if the stepping is <= 0.0 or >=1.0.
+     */
+    public HueStepper(final float stepping) throws IllegalArgumentException {
+      super(stepping);
+    }
 
-	public static class HSBStepper extends PiggyBackStepper {
-		public HSBStepper() throws IllegalArgumentException {
-			super();
-		}
+    /**
+     * Performs a hue step on the given ColorIterator's HSBColor.
+     * <p>
+     *
+     * The bounds are watched: if a hue step would cross 1.0f it will be
+     * continued beginning from 0. if a hue step would cross the hue value of
+     * the ColorIterator's start hue value, the step will only go as far as this
+     * value. Else there would be problems with finding the end of the
+     * iteration.
+     * <p>
+     *
+     * @param tostep
+     *          the iterator to perform the step on.
+     */
+    public void doStep(final ColorIterator tostep) {
+      float increment = tostep.m_iterate.m_hue;
+      float bound = tostep.m_start.m_hue;
+      if (increment == bound) {
+        increment += this.m_stepping;
+      } else if (increment < bound) {
+        // before crossing 1.0, i will cross the iteration bound (no care for
+        // 1.0
+        // needed)
+        increment += this.m_stepping;
+        if (increment > bound) {
+          increment = bound;
+        }
+      } else {
+        // more complicated: watch for crossing 1.0, then watch for crossing
+        // iteration bound.
+        increment += this.m_stepping;
+        if (increment > 1.0f) {
+          increment -= 1.0;
+          // only for the case that we jumped look for overtaking the bound
+          if (increment > bound) {
+            increment = bound;
+          }
+        }
+      }
+      tostep.m_iterate.m_hue = increment;
+    }
+  }
 
-		public void doStep(ColorIterator tostep) {
-			// technique: without testing the step is done
-			// this allows to restart with huestep even if start.hue==iterate.hue after having performed a step of different kind
-			this.huestep.doStep(tostep);
-			if (tostep.iterate.hue == tostep.start.hue) {
-				this.satstep.doStep(tostep);
-				if (tostep.iterate.sat == tostep.start.sat) {
-					this.lumstep.doStep(tostep);
-				}
-			}
-		}
-	}
-	public static class HSStepper extends PiggyBackStepper {
-		public HSStepper() throws IllegalArgumentException {
-			super();
-		}
-		public void doStep(ColorIterator tostep) {
-			// technique: without testing the step is done
-			// this allows to restart with huestep even if start.hue==iterate.hue after having performed a step of different kind
-			this.huestep.doStep(tostep);
-			if (tostep.iterate.hue == tostep.start.hue) {
-				this.satstep.doStep(tostep);
-			}
-		}
-	}
+  /**
+   * A stepping model that steps on the luminance line of the HSB color space.
+   * <p>
+   *
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   *
+   * @version $Revision: 1.4 $
+   */
+  public static class LuminanceStepper extends ColorIterator.DefaultStepping {
+    /**
+     * Defcon.
+     * <p>
+     */
+    public LuminanceStepper() {
+      // nop
+    }
 
-	public static void main(String[] args) {
-		final javax.swing.JFrame frame = new javax.swing.JFrame("ColorCircleIterator-test");
+    /**
+     * Creates an instance with the given stepping to go on the luminance line
+     * of the color space.
+     * <p>
+     *
+     * @param stepping
+     *          the stepping for each step in between 0.0 and 1.0.
+     *
+     * @throws IllegalArgumentException
+     *           if stepping is <= 0.0 or >= 1.0.
+     */
+    public LuminanceStepper(final float stepping) throws IllegalArgumentException {
+      super(stepping);
+    }
 
-		javax.swing.JPanel panel = new javax.swing.JPanel() {
-			private ColorIterator color = new ColorIterator();
-			{
-				//System.out.println("start: " + color.start.toString());
-				//System.out.println("iterate: " + color.iterate.toString());
-				int wdt = 0;
-				while (color.hasNext()) {
-					wdt++;
-					color.next();
-				}
-				System.out.println("found " + wdt + " different colors.");
-				System.out.println("size: " + wdt);
-				this.setSize(wdt, 100);
-				this.setPreferredSize(new java.awt.Dimension(wdt, 100));
-				this.setMinimumSize(new java.awt.Dimension(wdt, 100));
-			}
-			public void paint(java.awt.Graphics g) {
-				super.paint(g);
-				color.reset(); //refresh iterator
-				int width = this.getWidth();
-				int height = this.getHeight();
-				int pxdrawn = 0;
-				while (color.hasNext()) {
-					if (pxdrawn == width)
-						break;
-					g.setColor((java.awt.Color) color.next());
-					g.drawLine(pxdrawn, 0, pxdrawn, height);
-					pxdrawn++;
-				}
-			}
-		};
+    /**
+     * Performs a luminance step on the given ColorIterator's HSBColor.
+     * <p>
+     *
+     * The bounds are watched: if a step would cross 1.0f, it will be continued
+     * beginning from 0. if a step would cross the luminance value of the
+     * ColorIterator's start luminance, the step will only go as far as this
+     * value. Else there would be problems with finding the end of the
+     * iteration.
+     * <p>
+     *
+     * @param tostep
+     *          the color iterator to perform the step on.
+     */
+    public void doStep(final ColorIterator tostep) {
+      float increment = tostep.m_iterate.m_lum;
+      float bound = tostep.m_start.m_lum;
+      if (increment == bound) {
+        increment += this.m_stepping;
+      } else if (increment < bound) {
+        // before crossing 1.0, i will cross the iteration bound (no care for
+        // 1.0
+        // needed)
+        increment += this.m_stepping;
+        if (increment > bound) {
+          increment = bound;
+        }
+      } else {
+        // more complicated: watch for crossing 1.0, then watch for crossing
+        // iteration bound.
+        increment += this.m_stepping;
+        if (increment > 1.0f) {
+          increment -= 1.0;
+          if (increment > bound) {
+            increment = bound;
+          }
+        }
+      }
+      tostep.m_iterate.m_lum = increment;
+    }
+  }
 
-		javax.swing.JScrollPane scroll = new javax.swing.JScrollPane(panel);
-		java.awt.Container contentPane = frame.getContentPane();
-		contentPane.setLayout(new java.awt.BorderLayout());
-		contentPane.add(scroll, java.awt.BorderLayout.CENTER);
+  /**
+   * A stepping model that steps on the saturation line of the HSB color space.
+   * <p>
+   *
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   *
+   * @version $Revision: 1.4 $
+   */
+  public static class SaturationStepper extends ColorIterator.DefaultStepping {
+    /**
+     * Defcon.
+     * <p>
+     */
+    public SaturationStepper() {
+      // nop
+    }
 
-		frame.setLocation(200, 200);
-		frame.setSize(new java.awt.Dimension(400, 100));
-		frame.addWindowListener(new java.awt.event.WindowAdapter() {
-			public void windowClosing(java.awt.event.WindowEvent e) {
-				System.exit(0);
-			}
-		});
-		frame.setResizable(true);
-		frame.setVisible(true);
-	}
+    /**
+     * Creates an instance with the given stepping to go on the saturation line
+     * of the color space.
+     * <p>
+     *
+     * @param stepping
+     *          the stepping for each step in between 0.0 and 1.0.
+     *
+     * @throws IllegalArgumentException
+     *           if stepping is <= 0.0 or >= 1.0.
+     */
+    public SaturationStepper(final float stepping) throws IllegalArgumentException {
+      super(stepping);
+    }
+
+    /**
+     * Performs a saturation step on the given ColorIterator's HSBColor.
+     * <p>
+     * he bounds are watched: if a step would cross 1.0f, it will be continued
+     * beginning from 0. if a step would cross the luminance value of the
+     * ColorIterator's start luminance, the step will only go as far as this
+     * value. Else there would be problems with finding the end of the
+     * iteration.
+     * <p>
+     *
+     * @param tostep
+     *          the color iterator to perform the step on.
+     */
+    public void doStep(final ColorIterator tostep) {
+      float increment = tostep.m_iterate.m_sat;
+      float bound = tostep.m_start.m_sat;
+      if (increment == bound) {
+        increment += this.m_stepping;
+      } else if (increment < bound) {
+        // before crossing 1.0, i will cross the iteration bound (no care for
+        // 1.0
+        // needed)
+        increment += this.m_stepping;
+        if (increment > bound) {
+          increment = bound;
+        }
+      } else {
+        // more complicated: watch for crossing 1.0, then watch for crossing
+        // iteration bound.
+        increment += this.m_stepping;
+        if (increment > 1.0f) {
+          increment -= 1.0;
+          if (increment > bound) {
+            increment = bound;
+          }
+        }
+      }
+      tostep.m_iterate.m_sat = increment;
+    }
+  }
+
+  /**
+   * Base class for stepping models that may step in each direction of the Hue
+   * Saturation Luminance color space.
+   * <p>
+   *
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   *
+   *
+   * @version $Revision: 1.4 $
+   */
+  public abstract static class PiggyBackStepper extends ColorIterator.DefaultStepping {
+    /** The hue stepper to use. */
+    protected HueStepper m_huestep;
+
+    /** The saturation stepper to use. */
+    protected SaturationStepper m_satstep;
+
+    /** The luminance stepper to use. */
+    protected LuminanceStepper m_lumstep;
+
+    /**
+     * Defcon.
+     * <p>
+     */
+    public PiggyBackStepper() {
+      this(0.002f, 0.2f, 0.2f);
+    }
+
+    /**
+     * Creates an instance that uses the given step lengths for hue, luminance
+     * and saturation.
+     * <p>
+     *
+     * @param hueStepping
+     *          the step length on the hue line of the HSB color space.
+     *
+     * @param satStepping
+     *          the step length on the saturation line of the HSB color space.
+     *
+     * @param lumStepping
+     *          the step length on the luminance line of the HSB color space.
+     *
+     * @throws IllegalArgumentException
+     *           if any of the arguments is <= 0.0 or >= 1.0.
+     */
+    public PiggyBackStepper(final float hueStepping, final float satStepping,
+        final float lumStepping) throws IllegalArgumentException {
+      this.m_huestep = new HueStepper(hueStepping);
+      this.m_satstep = new SaturationStepper(satStepping);
+      this.m_lumstep = new LuminanceStepper(lumStepping);
+    }
+
+    /**
+     * @see java.lang.Object#clone()
+     */
+    public Object clone() {
+      PiggyBackStepper ret = (PiggyBackStepper) super.clone();
+      ret.m_huestep = (HueStepper) this.m_huestep.clone();
+      ret.m_satstep = (SaturationStepper) this.m_satstep.clone();
+      ret.m_lumstep = (LuminanceStepper) this.m_lumstep.clone();
+      return ret;
+    }
+  }
+
+  /**
+   * Performs hue steps until it has walked the whole hue line, then performs a
+   * saturation step to start with hue steps again. If the saturation steps have
+   * walked the whole saturation line, a luminance step is done before starting
+   * with hue steps again.
+   * <p>
+   *
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   *
+   * @version $Revision: 1.4 $
+   */
+  public static class HSBStepper extends ColorIterator.PiggyBackStepper {
+    /**
+     * Defcon.
+     * <p>
+     */
+    public HSBStepper() {
+      super();
+    }
+
+    /**
+     * @see aw.gui.util.ColorIterator.SteppingModel#doStep(aw.gui.util.ColorIterator)
+     */
+    public void doStep(final ColorIterator tostep) {
+      // technique: without testing the step is done
+      // this allows to restart with huestep even if start.hue==iterate.hue
+      // after having performed a step of different kind
+      this.m_huestep.doStep(tostep);
+      if (tostep.m_iterate.m_hue == tostep.m_start.m_hue) {
+        this.m_satstep.doStep(tostep);
+        if (tostep.m_iterate.m_sat == tostep.m_start.m_sat) {
+          this.m_lumstep.doStep(tostep);
+        }
+      }
+    }
+  }
+
+  /**
+   * Performs hue steps until it has walked the whole hue line, then performs a
+   * saturation step to start with hue steps again.
+   * <p>
+   *
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   *
+   * @version $Revision: 1.4 $
+   */
+  public static class HSStepper extends ColorIterator.PiggyBackStepper {
+    /**
+     * Defcon.
+     * <p>
+     */
+    public HSStepper() {
+      // nop
+    }
+
+    /**
+     * @see aw.gui.util.ColorIterator.SteppingModel#doStep(aw.gui.util.ColorIterator)
+     */
+    public void doStep(final ColorIterator tostep) {
+      // technique: without testing the step is done
+      // this allows to restart with huestep even if start.hue==iterate.hue
+      // after having performed a step of different kind
+      this.m_huestep.doStep(tostep);
+      if (tostep.m_iterate.m_hue == tostep.m_start.m_hue) {
+        this.m_satstep.doStep(tostep);
+      }
+    }
+  }
+
+  /**
+   * Main entry for a test application.
+   * <p>
+   *
+   * @param args
+   *          ignored.
+   */
+  public static void main(final String[] args) {
+    final javax.swing.JFrame frame = new javax.swing.JFrame("ColorCircleIterator-test");
+
+    javax.swing.JPanel panel = new javax.swing.JPanel() {
+      /**
+       * Generated <code>serialVersionUID</code>.
+       */
+      private static final long serialVersionUID = 3258408422146715703L;
+
+      private ColorIterator m_color = new ColorIterator();
+      {
+        // System.out.println("start: " + color.start.toString());
+        // System.out.println("iterate: " + color.iterate.toString());
+        int wdt = 0;
+        while (this.m_color.hasNext()) {
+          wdt++;
+          this.m_color.next();
+        }
+        System.out.println("found " + wdt + " different colors.");
+        System.out.println("size: " + wdt);
+        this.setSize(wdt, 100);
+        this.setPreferredSize(new java.awt.Dimension(wdt, 100));
+        this.setMinimumSize(new java.awt.Dimension(wdt, 100));
+      }
+
+      /**
+       * @see java.awt.Component#paint(java.awt.Graphics)
+       */
+      public void paint(final java.awt.Graphics g) {
+        super.paint(g);
+        this.m_color.reset(); // refresh iterator
+        int width = this.getWidth();
+        int height = this.getHeight();
+        int pxdrawn = 0;
+        while (this.m_color.hasNext()) {
+          if (pxdrawn == width) {
+            break;
+          }
+          g.setColor((java.awt.Color) this.m_color.next());
+          g.drawLine(pxdrawn, 0, pxdrawn, height);
+          pxdrawn++;
+        }
+      }
+    };
+
+    javax.swing.JScrollPane scroll = new javax.swing.JScrollPane(panel);
+    java.awt.Container contentPane = frame.getContentPane();
+    contentPane.setLayout(new java.awt.BorderLayout());
+    contentPane.add(scroll, java.awt.BorderLayout.CENTER);
+
+    frame.setLocation(200, 200);
+    frame.setSize(new java.awt.Dimension(400, 100));
+    frame.addWindowListener(new java.awt.event.WindowAdapter() {
+      public void windowClosing(final java.awt.event.WindowEvent e) {
+        System.exit(0);
+      }
+    });
+    frame.setResizable(true);
+    frame.setVisible(true);
+  }
 }

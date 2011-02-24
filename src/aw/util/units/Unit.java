@@ -1,67 +1,238 @@
 /*
- * Unit.java
+ *  Unit.java, base class for units in jchart2d.
+ *  Copyright (C) Achim Westermann, created on 12.05.2005, 20:11:17
  *
- * Created on 3. September 2001, 18:40
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *  If you modify or optimize the code in a useful way please let me know.
+ *  Achim.Westermann@gmx.de
+ *
  */
 
 package aw.util.units;
 
-
 /**
- *  @see aw.util.units.UnitFactory
- *  @see aw.util.units.UnitSystem
- *  @see aw.util.units.UnitSystemSI
+ * A unit.
+ * <p>
  *
- * @author  <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann</a>
- * @version 1.0
+ * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
+ *
+ * @version $Revision: 1.4 $
+ *
+ * @see aw.util.units.UnitFactory
+ *
+ * @see aw.util.units.UnitSystem
+ *
+ * @see aw.util.units.UnitSystemSI
  */
 public abstract class Unit extends Object {
 
-    public double factor;
-    protected String prefix;
-    protected int decimals = 2;
-    
-    /**
-     *  Transforms the given absolute value into the represented unit value 
-     *  by dividing by the specific factor;
-     *  The result is rounded using the actual decimal setting.
-     **/
-    public double getValue(double value){
-       return round(value/this.factor);
+  /** Decimals for rounding. */
+  protected int m_decimals = 2;
+
+  /**
+   * The factor a result of {@link #getValue(double)}had to be multiplied with
+   * if the real (unitless) value has to be calculated.
+   */
+  protected double m_factor;
+
+  /**
+   * The next smaller unit to this one within this unit's {@link UnitSystem}.
+   * <p>
+   */
+  protected Unit m_nexLowerUnit;
+
+  /**
+   * The next greater unit to this one within this unit's {@link UnitSystem}.
+   * <p>
+   */
+  protected Unit m_nextHigherUnit;
+
+  /**
+   * The short unit name of this unit a result of {@link #getValue(double)}has
+   * to be related with to know the this result is displayed in a unit.
+   * <p>
+   */
+  protected String m_unitName;
+
+  /**
+   * Protected constructor to ensure package access only.
+   * <p>
+   *
+   * Use {@link UnitFactory#getInstance()}and
+   * {@link UnitFactory#getUnit(double, UnitSystem)}too obtain a proper unit.
+   * <p>
+   *
+   */
+  protected Unit() {
+    // nop
+  }
+
+  /**
+   * Returns the number of decimals that should be be taken into account if the
+   * method {@link #getValue(double)}is invoked (rounding).
+   * <p>
+   *
+   * @return the number of decimals that should be be taken into account if the
+   *         method {@link #getValue(double)}is invoked (rounding).
+   */
+  public int getDecimals() {
+    return this.m_decimals;
+  }
+
+  /**
+   * Returns the factor a result of {@link #getValue(double)}had to be
+   * multiplied with if the real (unitless) value has to be calculated.
+   * <p>
+   *
+   * For performance reason (fast access) factor is public. This is against
+   * "safety by desing" so do never set this value.
+   * <p>
+   *
+   * @return the factor a result of {@link #getValue(double)}had to be
+   *         multiplied with if the real (unitless) value has to be calculated.
+   */
+  public double getFactor() {
+    return this.m_factor;
+  }
+
+  /**
+   * Returns the the value divided by this unit's factor, rounded to this unit's
+   * configured decimals and suffixed by the unit name.
+   * <p>
+   *
+   * @param value
+   *          the value for the label.
+   *
+   * @return the the value divided by this unit's factor, rounded by this unit's
+   *         configured decimals and suffixed by the unit name.
+   *
+   * @see #getUnitName()
+   * @see #getDecimals()
+   *
+   */
+  public String getLabel(final double value) {
+    return new StringBuffer().append(round(value / this.m_factor)).append(" ").append(
+        this.m_unitName).toString();
+  }
+
+  /**
+   * Returns the next smaller unit to this one within this unit's
+   * {@link UnitSystem}.
+   * <p>
+   *
+   * If this is already the smallest unit, this will be returned so add
+   * <code>unit == unit.getLowerUnit()</code> as the termination criteria in
+   * loops to search for the smallest unit (to avoid endless loops).
+   * <p>
+   *
+   * @return the next lower unit to this one within this unit's
+   *         {@link UnitSystem}.
+   */
+  public Unit getNexLowerUnit() {
+    return this.m_nexLowerUnit;
+  }
+
+  /**
+   * Returns the next greater unit to this one within this unit's
+   * {@link UnitSystem}.
+   * <p>
+   *
+   * If this is already the greates unit, this will be returned so add
+   * <code>unit == unit.getNextHigherUnit()</code> as the termination criteria
+   * in loops to search for the greatest unit (to avoid endless loops).
+   * <p>
+   *
+   * @return the next greater unit to this one within this unit's
+   *         {@link UnitSystem}.
+   */
+  public Unit getNextHigherUnit() {
+    return this.m_nextHigherUnit;
+  }
+
+  /**
+   * Retunrns the short unit name of this unit a result of
+   * {@link #getValue(double)}has to be related with to know the this result is
+   * displayed in a unit.
+   * <p>
+   *
+   * @return the short unit name of this unit a result of
+   *         {@link #getValue(double)}has to be related with to know the this
+   *         result is displayed in a unit.
+   *         <p>
+   */
+  public String getUnitName() {
+    return this.m_unitName;
+  }
+
+  /**
+   * Transforms the given absolute value into the represented unit value by
+   * dividing by the specific factor.
+   * <p>
+   *
+   * The result is rounded using the actual decimal setting.
+   * <p>
+   *
+   * @param value
+   *          the value to represent in this unit.
+   *
+   * @return The value to display in this unit rounded using the internal
+   *         decimals.
+   */
+  public double getValue(final double value) {
+    return round(value / this.m_factor);
+  }
+
+  /**
+   * Internal rounding routine for {@link #getValue(double)}.
+   * <p>
+   *
+   * @param value
+   *          the value to round.
+   * @return the given value rounded to the amount of decimals configured.
+   */
+  private final double round(final double value) {
+    double tmp = Math.pow(10, this.m_decimals);
+    return (Math.floor(value * tmp + 0.5d)) / tmp;
+  }
+
+  /**
+   * Define how many decimals should be taken into account if the method
+   * {@link #getValue(double)}is invoked (rounding).
+   * <p>
+   *
+   * @param aftercomma
+   *          the number of decimals that should be taken into account if the
+   *          method {@link #getValue(double)}is invoked (rounding)
+   */
+  public void setDecimals(final int aftercomma) {
+    if (aftercomma >= 0) {
+      this.m_decimals = aftercomma;
     }
-    public String getLabel(double value){
-        return new StringBuffer().append(round(value/this.factor)).append(" ").append(this.prefix).toString();
-    }
-    
-    public String getLabel(){
-        return new StringBuffer().append(this.prefix).toString();
-    }
-    
-    public String toString(){
-        return this.getLabel();
-    }
-    /**
-     *  factor is public!
-     **/
-    public double getFactor(){
-        return this.factor;
-    }
-    
-    public String getPrefix(){
-        return this.prefix;
-    }
-    
-    
-    public void setDecimals(int aftercomma){
-        if(aftercomma>=0)
-            this.decimals = aftercomma;
-    }
-    public int getDecimals(){
-        return this.decimals;
-    }
-    
-    public double round(double value){
-        double tmp = Math.pow(10,this.decimals);
-        return (Math.floor(value*tmp + 0.5d))/tmp;
-    }
+  }
+
+  /**
+   * Returns the same as {@link #getUnitName()}, prefer calling this directly
+   * if desired.
+   * <p>
+   *
+   * @return the same as {@link #getUnitName()}, prefer calling this directly
+   *         if desired.
+   *
+   */
+  public String toString() {
+    return this.getUnitName();
+  }
 }

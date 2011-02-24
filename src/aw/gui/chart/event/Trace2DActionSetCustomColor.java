@@ -1,0 +1,92 @@
+/*
+ *  Trace2DActionSetCustomColor, action to set a custom (runtime chosen) color to a ITrace2D.
+ *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ *  If you modify or optimize the code in a useful way please let me know.
+ *  Achim.Westermann@gmx.de
+ *
+ */
+package aw.gui.chart.event;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+
+import javax.swing.JColorChooser;
+
+import aw.gui.chart.ITrace2D;
+
+/**
+ * <p>
+ * <code>Action</code> that sets a custom color of the corresponding trace by
+ * showing a modal color chooser.
+ * </p>
+ *
+ * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+ *
+ * @version $Revision: 1.1 $
+ */
+public final class Trace2DActionSetCustomColor extends ATrace2DAction {
+
+  /**
+   * Generated <code>serialVersionUID</code>.
+   */
+  private static final long serialVersionUID = 3904680491952451890L;
+
+  /**
+   * The component this instance will be registered to as a listener.
+   * <p>
+   *
+   * @see Component#addMouseListener(java.awt.event.MouseListener)
+   *
+   */
+  private Component m_trigger;
+
+  /**
+   * Create an <code>Action</code> that accesses the trace and identifies
+   * itself with the given action String.
+   * <p>
+   *
+   * @param trace
+   *          the target the action will work on.
+   *
+   * @param description
+   *          the descriptive <code>String</code> that will be displayed by
+   *          {@link  javax.swing.AbstractButton}subclasses that get this
+   *          <code>Action</code> assigned (
+   *          {@link  javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   *
+   * @param trigger
+   *          the <code>Component</code> the modal color chooser dialog will
+   *          be related to.
+   *          <p>
+   */
+  public Trace2DActionSetCustomColor(final ITrace2D trace, final String description,
+      final Component trigger) {
+    super(trace, description);
+    this.m_trigger = trigger;
+  }
+
+  /**
+   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+   */
+  public void actionPerformed(final ActionEvent e) {
+    Color chosen = JColorChooser.showDialog(this.m_trigger, "choose color for "
+        + this.m_trace.getName(), this.m_trace.getColor());
+    this.m_trace.setColor(chosen);
+  }
+}

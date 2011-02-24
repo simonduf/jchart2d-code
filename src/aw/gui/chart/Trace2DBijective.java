@@ -1,4 +1,4 @@
-/**
+/*
  * Trace2DBijective, a list- based implementation of a ITrace2D that only
  *  allows a single occurance of a certain x- value.
  * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
@@ -47,124 +47,44 @@ import java.util.Iterator;
  * point used to be! </b></li>
  * </ul>
  * </p>
- * 
+ *
  * @author Achim Westermann <a
- *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </A>
- * @version 1.0
+ *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
+ *
+ * @version $Revision: 1.6 $
  */
 public class Trace2DBijective extends Trace2DSimple {
 
-  /** Creates new Class */
+  /**
+   * Defcon of this stateless instance.
+   */
   public Trace2DBijective() {
   }
 
-  public void addPoint(TracePoint2D p) {
-    synchronized (this.renderer) {
-      boolean changed = true;
-      //System.out.println("addPoint(point)");
-      double px = p.getX();
-      synchronized (this) {
-        Iterator it = this.points.iterator();
-        TracePoint2D tmp = null, removed = null;
-        while (it.hasNext()) {
-          tmp = (TracePoint2D) it.next();
-          if (tmp.getX() == px) {
-            it.remove();
-            removed = tmp;
-            break;
-          }
+  /**
+   * @see aw.gui.chart.AbstractTrace2D#addPointInternal(aw.gui.chart.TracePoint2D)
+   */
+  public boolean addPointInternal(final TracePoint2D p) {
+    boolean changed = true;
+    // System.out.println("addPoint(point)");
+    double px = p.getX();
+    synchronized (this) {
+      Iterator it = this.m_points.iterator();
+      TracePoint2D tmp = null, removed = null;
+      while (it.hasNext()) {
+        tmp = (TracePoint2D) it.next();
+        if (tmp.getX() == px) {
+          it.remove();
+          removed = tmp;
+          break;
         }
-        if (removed != null) {
-          double tmpx, tmpy;
-          tmpx = removed.getX();
-          tmpy = removed.getY();
-          if (tmpx >= this.maxX) {
-            this.maxXSearch();
-          } else if (tmpx <= minX) {
-            this.minXSearch();
-          }
-          if (tmpy >= this.maxY) {
-            this.maxYSearch();
-          } else if (tmpy <= this.minY) {
-            this.minYSearch();
-          }
-        }
-        super.addPoint(p);
       }
+      if (removed != null) {
+        this.removePoint(removed);
+        // dont use bound check routines of calling addPoint.
+        return false;
+      }
+      return super.addPointInternal(p);
     }
   }
-
-  private void maxXSearch() {
-    synchronized (this) {
-      double ret = -Double.MAX_VALUE;
-      TracePoint2D tmpoint = null;
-      double tmp;
-      Iterator it = this.points.iterator();
-      while (it.hasNext()) {
-        tmpoint = (TracePoint2D) it.next();
-        if ((tmp = tmpoint.getX()) > ret)
-          ret = tmp;
-      }
-      if (ret == -Double.MAX_VALUE)
-        this.maxX = 0d;
-      else
-        this.maxX = ret;
-    }
-  }
-
-  private void minXSearch() {
-    synchronized (this) {
-      double ret = Double.MAX_VALUE;
-      TracePoint2D tmpoint = null;
-      double tmp;
-      Iterator it = this.points.iterator();
-      while (it.hasNext()) {
-        tmpoint = (TracePoint2D) it.next();
-        if ((tmp = tmpoint.getX()) < ret)
-          ret = tmp;
-      }
-      if (ret == Double.MAX_VALUE) {
-        this.minX = 0d;
-      } else
-        this.minX = ret;
-    }
-  }
-
-  private void maxYSearch() {
-    synchronized (this) {
-      double ret = -Double.MAX_VALUE;
-      TracePoint2D tmpoint = null;
-      double tmp;
-      Iterator it = this.points.iterator();
-      while (it.hasNext()) {
-        tmpoint = (TracePoint2D) it.next();
-        if ((tmp = tmpoint.getY()) > ret)
-          ret = tmp;
-      }
-      if (ret == -Double.MAX_VALUE)
-        this.maxY = 0d;
-      else
-        this.maxY = ret;
-    }
-  }
-
-  private void minYSearch() {
-    synchronized (this) {
-      double ret = Double.MAX_VALUE;
-      TracePoint2D tmpoint = null;
-      double tmp;
-      Iterator it = this.points.iterator();
-      while (it.hasNext()) {
-        tmpoint = (TracePoint2D) it.next();
-        if ((tmp = tmpoint.getY()) < ret)
-          ret = tmp;
-      }
-      if (ret == Double.MAX_VALUE) {
-        this.minY = 0d;
-
-      } else
-        this.minY = ret;
-    }
-  }
-
 }

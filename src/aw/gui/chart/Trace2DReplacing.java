@@ -1,4 +1,4 @@
-/**
+/*
  * Trace2DReplacing, a list- based implementation of a ITrace2D.
  * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
  *
@@ -34,17 +34,20 @@ package aw.gui.chart;
  * the old tracepoint with that value will be replaced by the new tracepoint.
  * </li>
  * </UL>
- * 
+ *
  * @see Trace2DBijective
- * 
- * @author Achim Westermann <a
- *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </A>
- * @version 1.0
+ *
+ * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
+ *
+ * @version $Revision: 1.6 $
  */
 public class Trace2DReplacing extends Trace2DSimple {
 
-  /** Creates new Trace2DOrdered */
+  /**
+   * Defcon.
+   */
   public Trace2DReplacing() {
+    // nop
   }
 
   /**
@@ -52,47 +55,32 @@ public class Trace2DReplacing extends Trace2DSimple {
    * value will be replaced by the new one. Else the new tracepoint will be
    * added to the end, not caring wether tracepoints with a higher x- value are
    * contained.
+   * <p>
+   *
+   * @param p
+   *          the point to add.
+   *
+   * @return true if the point wathe maximum amount of points that will be
+   *         showns successfully added.
    */
-  public void addPoint(TracePoint2D p) {
+  public boolean addPointInternal(final TracePoint2D p) {
     boolean changed = true;
-    //System.out.println("addPoint(point)");
+
+    int index = -1;
+    double tmp = 0;
     TracePoint2D old;
-    synchronized (this.renderer) {
-      synchronized (this.points) {
-        int index = -1;
-        double tmp = 0;
-        if (firsttime) {
-          this.maxX = p.getX();
-          this.minX = this.maxX;
-          this.maxY = p.getY();
-          this.minY = this.maxY;
-          firsttime = false;
-          this.points.add(p);
-        } else {
-          if ((index = this.points.indexOf(p)) != -1) {
-            old = (TracePoint2D) this.points.get(index);
-            old.setLocation(old.getX(), p.getY());
-            if ((tmp = p.getY()) > this.maxY)
-              this.maxY = tmp;
-            if ((tmp = p.getY()) < this.minY)
-              this.minY = tmp;
-            this.fireTraceChanged(old);
-            return;
-          } else {
-            this.points.add(p);
-            if ((tmp = p.getX()) > this.maxX)
-              this.maxX = tmp;
-            if ((tmp = p.getX()) < this.minX)
-              this.minX = tmp;
-            if ((tmp = p.getY()) > this.maxY)
-              this.maxY = tmp;
-            if ((tmp = p.getY()) < this.minY)
-              this.minY = tmp;
-            this.fireTraceChanged(p);
-          }
-        }
-      }
+    if ((index = this.m_points.indexOf(p)) != -1) {
+      // already contained.
+      old = (TracePoint2D) this.m_points.get(index);
+      // fires property changes with bound checks
+      old.setLocation(old.getX(), p.getY());
+      // we don't need further bound checks and property change events from
+      // calling
+      // addPoint method.
+      return false;
+    } else {
+      this.m_points.add(p);
+      return true;
     }
   }
-
 }

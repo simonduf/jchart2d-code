@@ -1,5 +1,5 @@
 /**
- * ObjectRecorder2Trace2DAdpater, an adapter which enables drawing timestamped 
+ * ObjectRecorder2Trace2DAdpater, an adapter which enables drawing timestamped
  *  values inspected by the ObjectRecorder on a Chart2D.
  * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
  *
@@ -17,55 +17,97 @@
  * License along with this library; if not, write to the Free
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  If you modify or optimize the code in a useful way please let me know. 
+ *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
  */
 
 package aw.reflection;
-import java.awt.event.*;
-import java.util.*;
-import java.awt.geom.*;
-import javax.swing.event.*;
-import aw.gui.chart.*;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import aw.gui.chart.ITrace2D;
 import aw.util.TimeStampedValue;
 
-
 /**
- *  A simple adapter that allows displaying of timestamped values from 
- *  an inspection of the <code>ObjectRecorder</code> on a Chart2D. 
+ * A simple adapter that allows displaying of timestamped values from an
+ * inspection of the <code>{@link aw.reflection.ObjectRecorder}</code> on a
+ * Chart2D.
+ * <p>
  *
+ * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
+ *
+ * @version $Revision: 1.5 $
  */
 public class ObjRecorder2Trace2DAdapter implements ChangeListener {
-    ITrace2D view;
-    ObjectRecorder inspector;
-    String fieldname;
-    long start = System.currentTimeMillis();
-    public ObjRecorder2Trace2DAdapter(ITrace2D view, Object toinspect, String fieldname, long interval) {
-        this.view = view;
-        this.fieldname = fieldname;
-        this.view.setLabel(new StringBuffer(toinspect.getClass().getName()).append(toinspect.hashCode()).toString());
-        this.inspector = new ObjectRecorder(toinspect,interval);
-        this.inspector.addChangeListener(this);
+
+  /** The field name to inpsect. */
+  private String m_fieldname;
+
+  /** The source inspector to connect to the trace. */
+  private ObjectRecorder m_inspector;
+
+  /**
+   * The starting timestamp of this inspection that is used to put the timestamp
+   * into relation to the first inspection.
+   */
+  private long m_start = System.currentTimeMillis();
+
+  /** The target trace to use. */
+  private ITrace2D m_view;
+
+  /**
+   * Creates a bridge from the given field of the given instance to inspect to
+   * the trace.
+   * <p>
+   *
+   * @param view
+   *          the target trace that will show the inspected value.
+   *
+   * @param toinspect
+   *          the instance to inpsect.
+   *
+   * @param fieldname
+   *          the field on the instance to inspect.
+   *
+   * @param interval
+   *          the interval of inspections in ms.
+   */
+  public ObjRecorder2Trace2DAdapter(final ITrace2D view, final Object toinspect,
+      final String fieldname, final long interval) {
+    this.m_view = view;
+    this.m_fieldname = fieldname;
+    this.m_inspector = new ObjectRecorder(toinspect, interval);
+    this.m_inspector.addChangeListener(this);
+  }
+
+  /**
+   * Sets the interval for inspections in ms.
+   * <p>
+   *
+   * @param interval
+   *          the interval for inspections in ms.
+   */
+  public void setInterval(final long interval) {
+    this.m_inspector.setInterval(interval);
+  }
+
+  /**
+   * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
+   */
+  public void stateChanged(final ChangeEvent e) {
+    TimeStampedValue last;
+    try {
+      last = this.m_inspector.getLastValue(this.m_fieldname);
+    } catch (Exception f) {
+      f.printStackTrace();
+      return;
     }
-    
-    public void stateChanged(ChangeEvent e){
-        TimeStampedValue last;
-        try{
-            last = inspector.getLastValue(fieldname);
-        }catch(Exception f){
-            f.printStackTrace();
-            return;
-        }
-        if(last!=null){
-            double tmpx,tmpy;
-            tmpx = last.getTime()-start;
-            tmpy = Double.parseDouble(last.getValue().toString());
-            this.view.addPoint(tmpx,tmpy);
-        }
+    if (last != null) {
+      double tmpx, tmpy;
+      tmpx = last.getTime() - this.m_start;
+      tmpy = Double.parseDouble(last.getValue().toString());
+      this.m_view.addPoint(tmpx, tmpy);
     }
-    
-    public void setInterval(long interval){
-        this.inspector.setInterval(interval);
-    
-    }
+  }
 }
