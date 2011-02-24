@@ -50,7 +50,7 @@ import javax.swing.JFrame;
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.5 $
  */
 public final class TraceTester {
 
@@ -64,10 +64,9 @@ public final class TraceTester {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.2 $
+   * @version $Revision: 1.5 $
    */
-  static class HalfRandomPoints
-      extends TraceTester.RandomPoints {
+  static class HalfRandomPoints extends TraceTester.RandomPoints {
 
     /** The old x value. */
     private double m_oldx = 0;
@@ -84,21 +83,21 @@ public final class TraceTester {
      * <p>
      * 
      * @param minx
-     *          the lower x bound for points to generate.
+     *            the lower x bound for points to generate.
      * 
      * @param maxx
-     *          the x range for points to generate.
+     *            the x range for points to generate.
      * 
      * @param miny
-     *          the lower y bound for points to generate.
+     *            the lower y bound for points to generate.
      * 
      * @param maxy
-     *          the y range for points to generate.
+     *            the y range for points to generate.
      * 
      */
     HalfRandomPoints(final int minx, final int maxx, final int miny, final int maxy) {
       super(minx, maxx, miny, maxy);
-      this.m_oldx = (maxx - minx) / 2;
+      this.m_oldx = (maxx - minx) / 2.0;
     }
 
     /**
@@ -120,7 +119,7 @@ public final class TraceTester {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.2 $
+   * @version $Revision: 1.5 $
    */
   private static class RandomPoints {
     /** Used for randomization. */
@@ -144,16 +143,16 @@ public final class TraceTester {
      * <p>
      * 
      * @param minx
-     *          the lower x bound for points to generate.
+     *            the lower x bound for points to generate.
      * 
      * @param maxx
-     *          the x range for points to generate.
+     *            the x range for points to generate.
      * 
      * @param miny
-     *          the lower y bound for points to generate.
+     *            the lower y bound for points to generate.
      * 
      * @param maxy
-     *          the y range for points to generate.
+     *            the y range for points to generate.
      * 
      */
     RandomPoints(final int minx, final int maxx, final int miny, final int maxy) {
@@ -188,13 +187,14 @@ public final class TraceTester {
    * <p>
    * 
    * @param args
-   *          ignored.
+   *            ignored.
    */
+  @SuppressWarnings("unchecked")
   public static void main(final String[] args) {
     try {
-      Class[] traces = new Class[] {Trace2DSimple.class, Trace2DBijective.class,
-          Trace2DReplacing.class, Trace2DSorted.class, Trace2DLtd.class, Trace2DLtdReplacing.class,
-          Trace2DLtdSorted.class };
+      Class< ? extends ITrace2D>[] traces = (Class< ? extends ITrace2D>[]) new Class[] {
+          Trace2DSimple.class, Trace2DBijective.class, Trace2DReplacing.class, Trace2DSorted.class,
+          Trace2DLtd.class, Trace2DLtdReplacing.class, Trace2DLtdSorted.class };
       RandomPoints rand = new RandomPoints(0, 3, 0, 3);
 
       Chart2D test = new Chart2D();
@@ -211,7 +211,7 @@ public final class TraceTester {
       frame.setVisible(true);
       ITrace2D current = null;
       for (int i = 0; i < traces.length; i++) {
-        current = (ITrace2D) traces[i].newInstance();
+        current = traces[i].newInstance();
         test.addTrace(current);
         frame.setTitle("TraceTester: full-random, current: " + traces[i].getName());
 
@@ -224,7 +224,7 @@ public final class TraceTester {
       }
       rand = new HalfRandomPoints(0, 3, 0, 3);
       for (int i = 0; i < traces.length; i++) {
-        current = (ITrace2D) traces[i].newInstance();
+        current = traces[i].newInstance();
         test.addTrace(current);
         frame.setTitle("TraceTester: repeating x 10 times, current: " + traces[i].getName());
 

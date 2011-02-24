@@ -26,6 +26,7 @@ import info.monitorenter.gui.chart.TracePoint2D;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A basic <code>{@link info.monitorenter.gui.chart.ITrace2D}</code>
@@ -46,7 +47,7 @@ import java.util.LinkedList;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.10 $
  */
 public class Trace2DSimple
     extends ATrace2D implements ITrace2D {
@@ -55,7 +56,7 @@ public class Trace2DSimple
   private static final long serialVersionUID = -132333501493433766L;
   
   /** Internal List &lt;ITracePoint2D&gt;. */
-  protected LinkedList m_points = new LinkedList();
+  protected List<TracePoint2D> m_points = new LinkedList<TracePoint2D>();
 
   /**
    * Creates an empty trace.
@@ -108,14 +109,14 @@ public class Trace2DSimple
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#iterator()
    */
-  public Iterator iterator() {
+  public Iterator<TracePoint2D> iterator() {
     return this.m_points.iterator();
   }
 
   /**
    * @see ATrace2D#removeAllPointsInternal()
    */
-  public final void removeAllPointsInternal() {
+  protected final void removeAllPointsInternal() {
     this.m_points.clear();
   }
 

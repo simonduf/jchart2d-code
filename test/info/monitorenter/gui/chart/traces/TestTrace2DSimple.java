@@ -42,6 +42,17 @@ import junit.framework.TestSuite;
 public class TestTrace2DSimple
     extends TestCase {
   /**
+   * Creates a test case with the given name.
+   * <p>
+   * 
+   * @param testName
+   *          the name of the test.
+   */
+  public TestTrace2DSimple(final String testName) {
+    super(testName);
+  }
+
+  /**
    * Test suite for this test class.
    * <p>
    * 
@@ -59,19 +70,8 @@ public class TestTrace2DSimple
   }
 
   /**
-   * Creates a test case with the given name.
-   * <p>
-   * 
-   * @param testName
-   *            the name of the test.
-   */
-  public TestTrace2DSimple(final String testName) {
-    super(testName);
-  }
-
-  /**
-   * Adds and removes a trace to a chart and asserts that only one and afterwards zero listeners are
-   * contained in the chart.
+   * Adds and removes a trace to a chart and asserts that only one and
+   * afterwards zero listeners are contained in the chart.
    * <p>
    */
   public void testMemoryLeakTrace2DListeners() {
@@ -91,9 +91,10 @@ public class TestTrace2DSimple
 
   /**
    * <p>
-   * Adds and removes a trace to a chart 100 times and asserts that only zero listeners are
-   * contained in the chart afterwards.
+   * Adds and removes a trace to a chart 100 times and asserts that only zero
+   * listeners are contained in the chart afterwards.
    * </p>
+   * 
    */
   public void testMemoryLeakTrace2DListenersSeverity() {
     Chart2D chart = new Chart2D();

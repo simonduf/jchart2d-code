@@ -20,7 +20,6 @@
  *  Achim.Westermann@gmx.de
  *
  */
-
 package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.ITrace2D;
@@ -36,6 +35,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -46,107 +46,105 @@ import javax.swing.JFrame;
  * 
  * @author Alessio Sambarino (Contributor)
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class ZoomTest extends JFrame {
 
-    /**
-     * Generated <code>serial version UID</code>.
-     * <p>
-     */
-    private static final long serialVersionUID = -2249660781499017221L;
+  /**
+   * Generated <code>serial version UID</code>.
+   * <p>
+   */
+  private static final long serialVersionUID = -2249660781499017221L;
+
+  /**
+   * Action adapter for zoomAllButton.
+   * <p>
+   */
+  class ZoomAllAdapter implements ActionListener {
+    /** The zoomable chart to act upon. */
+    private ZoomableChart m_zoomableChart;
 
     /**
-     * Action adapter for zoomAllButton.
-     * <p>
-     */
-    class ZoomAllAdapter implements ActionListener {
-
-        /** The zoomable chart to act upon. */
-        private ZoomableChart m_zoomableChart;
-
-        /**
-         * Creates an instance that will reset zooming on the given zoomable chart
-         * upon the triggered action.
-         * <p>
-         * 
-         * @param chart
-         *          the target to reset zoomin on.
-         */
-        public ZoomAllAdapter(final ZoomableChart chart) {
-
-            this.m_zoomableChart = chart;
-        }
-
-        /**
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-         */
-        public void actionPerformed(final ActionEvent event) {
-
-            this.m_zoomableChart.zoomAll();
-        }
-    }
-
-    /**
-     * Main startup method.
+     * Creates an instance that will reset zooming on the given zoomable chart
+     * upon the triggered action.
      * <p>
      * 
-     * @param args
-     *          ignored.
+     * @param chart
+     *          the target to reset zooming on.
      */
-    public static void main(final String[] args) {
-
-        ZoomTest zoomTest = new ZoomTest();
-        // Show the frame
-        zoomTest.setSize(640, 480);
-        zoomTest.setVisible(true);
-
+    public ZoomAllAdapter(final ZoomableChart chart) {
+      this.m_zoomableChart = chart;
     }
 
     /**
-     * Defcon.
-     * <p>
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
-    public ZoomTest() {
-
-        super("ZoomTest");
-
-        Container c = this.getContentPane();
-        c.setLayout(new BorderLayout());
-
-        // Create a chart
-        ZoomableChart chart = new ZoomableChart();
-
-        // Create ITrace
-        ITrace2D trace = new Trace2DSimple("Trace");
-        trace.setColor(Color.RED);
-        trace.setStroke(new BasicStroke(2));
-
-        for (int i = 0; i < 4; i++) {
-            trace.addPoint(i, i % 2);
-        }
-
-        // Add the trace to the chart
-        chart.addTrace(trace);
-
-        // Add chart to the pane
-        c.add(new ChartPanel(chart));
-
-        // Create the zoomAll button
-        JButton zoomAllButton = new JButton("Zoom All");
-        zoomAllButton.addActionListener(new ZoomAllAdapter(chart));
-
-        // Add zoomAll button to the pane
-        c.add(zoomAllButton, BorderLayout.NORTH);
-
-        // Enable the termination button:
-        this.addWindowListener(new WindowAdapter() {
-
-            public void windowClosing(final WindowEvent e) {
-
-                System.exit(0);
-            }
-        });
-
+    public void actionPerformed(final ActionEvent event) {
+      this.m_zoomableChart.zoomAll();
     }
+  }
+
+  /**
+   * Main startup method.
+   * <p>
+   * 
+   * @param args
+   *          ignored.
+   */
+  public static void main(final String[] args) {
+
+    ZoomTest zoomTest = new ZoomTest();
+    // Show the frame
+    zoomTest.setSize(640, 480);
+    zoomTest.setVisible(true);
+
+  }
+
+  /**
+   * Defcon.
+   * <p>
+   */
+  public ZoomTest() {
+
+    super("ZoomTest");
+
+    Container c = this.getContentPane();
+    c.setLayout(new BorderLayout());
+
+    // Create a chart
+    ZoomableChart chart = new ZoomableChart();
+
+    // Create ITrace
+    ITrace2D trace = new Trace2DSimple("Trace");
+    trace.setColor(Color.RED);
+    trace.setStroke(new BasicStroke(2));
+
+    // Add all points, as it is static
+    Random random = new Random();
+
+    for (int i = 100; i < 200; i++) {
+      trace.addPoint(i, random.nextDouble() * 10.0 + i);
+    }
+
+    // Add the trace to the chart
+    chart.addTrace(trace);
+
+    // Add chart to the pane
+    c.add(new ChartPanel(chart));
+
+    // Create the zoomAll button
+    JButton zoomAllButton = new JButton("Zoom All");
+    zoomAllButton.addActionListener(new ZoomAllAdapter(chart));
+
+    // Add zoomAll button to the pane
+    c.add(zoomAllButton, BorderLayout.NORTH);
+
+    // Enable the termination button:
+    this.addWindowListener(new WindowAdapter() {
+      public void windowClosing(final WindowEvent e) {
+        System.exit(0);
+      }
+    });
+
+  }
 }

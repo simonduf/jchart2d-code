@@ -1,6 +1,6 @@
 /*
  *  Trace2DArithmeticMean.java of project jchart2d, a trace 
- *  that accumulates the lates n points added to a single point with the arithmetic 
+ *  that accumulates the latest n points added to a single point with the arithmetic 
  *  mean value. 
  *  Copyright 2007 (C) Achim Westermann, created on 23:59:21.
  *
@@ -37,7 +37,7 @@ import java.util.List;
  * arithmetic mean value.
  * <p>
  * 
- * Please note that this tracescan be used in two modes:
+ * Please note that this trace scan be used in two modes:
  * <ol>
  * <li> Stand alone: <br/> Add the <code>ITrace2D</code> implementation to a
  * chart and add data points to it as normal. </li>
@@ -52,7 +52,7 @@ import java.util.List;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.8 $
  * 
  * @since 7.0.0
  * 
@@ -64,10 +64,10 @@ public class Trace2DArithmeticMean
   private static final long serialVersionUID = -4365986306182830082L;
 
   /** The buffer for the points about to be merged. */
-  private IRingBuffer m_pointBuffer;
+  private IRingBuffer<TracePoint2D> m_pointBuffer;
 
   /** The internal list of points to render. */
-  private List m_points = new LinkedList();
+  private List<TracePoint2D> m_points = new LinkedList<TracePoint2D>();
 
   /**
    * The amount of n recent points to buffer. private int m_pointBufferSize; /**
@@ -76,12 +76,12 @@ public class Trace2DArithmeticMean
    * <p>
    * 
    * @param arithmenticMeanSpan
-   *          the amount of points to merge into one point with their arithmetic
-   *          mean.
+   *            the amount of points to merge into one point with their
+   *            arithmetic mean.
    */
   public Trace2DArithmeticMean(final int arithmenticMeanSpan) {
     super();
-    this.m_pointBuffer = new RingBufferArrayFast(arithmenticMeanSpan);
+    this.m_pointBuffer = new RingBufferArrayFast<TracePoint2D>(arithmenticMeanSpan);
   }
 
   /**
@@ -106,10 +106,9 @@ public class Trace2DArithmeticMean
   private TracePoint2D getArithmeticMean() {
     double x = 0;
     double y = 0;
-    Iterator it = this.m_pointBuffer.iteratorF2L();
     TracePoint2D result;
-    while (it.hasNext()) {
-      result = (TracePoint2D) it.next();
+    for (TracePoint2D point : this.m_pointBuffer) {
+      result = point;
       x += result.getX();
       y += result.getY();
     }
@@ -149,7 +148,7 @@ public class Trace2DArithmeticMean
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#iterator()
    */
-  public Iterator iterator() {
+  public Iterator<TracePoint2D> iterator() {
     return this.m_points.iterator();
   }
 
@@ -166,7 +165,7 @@ public class Trace2DArithmeticMean
    * @see info.monitorenter.gui.chart.traces.ATrace2D#removePointInternal(info.monitorenter.gui.chart.TracePoint2D)
    */
   protected TracePoint2D removePointInternal(final TracePoint2D point) {
-    TracePoint2D result = (TracePoint2D) this.m_points.remove(0);
+    TracePoint2D result = this.m_points.remove(0);
     return result;
   }
 

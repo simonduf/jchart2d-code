@@ -11,7 +11,7 @@
     <property name="builddir" value="${basedir}/bin" />
     <property name="sourcedir" value="${basedir}/src" />
     <property name="sourcedir.test" value="${basedir}/test" />
-    <property name="project.version" value="2.2.3" />
+    <property name="project.version" value="3.0.0" />
 
     <!-- Taskdefs -->
     <!--
@@ -78,8 +78,8 @@
         <javac srcdir="${sourcedir}"
                fork="false"
                debug="true"
-               source="1.4"
-               target="1.4"
+               source="1.5"
+               target="1.5"
                destdir="${builddir}">
             <classpath refid="classpath" />
         </javac>
@@ -89,9 +89,9 @@
         <javac srcdir="${sourcedir.test}"
                fork="true"
                debug="true"
-               source="1.4"
+               source="1.5"
                verbose="true"
-               target="1.4"
+               target="1.5"
                destdir="${builddir}">
             <classpath refid="classpath" />
         </javac>
@@ -129,101 +129,101 @@
     </target>
 
     <target name="makejarBinary" depends="makejarFat">
-        <!-- 
-         Shrink the jar file as external jars (e.g. infovis for range chooser panel) 
-         contain many unused classes. 
-         Ignorewarnings is on as external jar infovis depends on further jars.
-         Tun this off is more jars have deps that may not be ignored.
-        -->
-        <proguard obfuscate="false"
-                  shrink="true"
-                  overloadaggressively="false"
-                  warn="true"
-                  verbose="true"
-                  ignorewarnings="true"
-                  printmapping="true"
-                  allowaccessmodification="false"
-                  optimize="false">
-            <libraryjar>
-                <pathelement path="${java.home}/lib/rt.jar" />
-            </libraryjar>
-            <!--
-              caution: The name attribut value has to be the same expression
-                      as the  destfile of the makejar- target [depend].
-            -->
-            <injar name="${basedir}/${project.name}-${project.version}.jar" />
-            <outjar name="${basedir}/${project.name}-${project.version}-shrinked.jar" />
-            <!-- Filter -->
-            <keep access="public" name="info.monitorenter.gui.chart.demos.*">
-                <method access="public static" name="main" />
-                <constructor />
-            </keep>
-            <keep access="public" name="info.monitorenter.gui.chart.*">
-                <method access="public" name="*" />
-                <constructor />
-            </keep>
-            <!-- keep all error bar stuff -->
-            <keep access="public"
-                  name="info.monitorenter.gui.chart.errorbars.**">
-                <constructor />
-            </keep>
-            <!-- keep all label formatters -->
-            <keep access="public"
-                  name="info.monitorenter.gui.chart.labelformatters.**">
-            </keep>
-            <!-- keep all axis title painters -->
-            <keep access="public"
-                  name="info.monitorenter.gui.chart.axistitlepainters.**">
-            </keep>
-            <!-- keep all axis tick painters -->
-            <keep access="public"
-                  name="info.monitorenter.gui.chart.axistickpainters.**">
-            </keep>
-            <!-- keep all point painters -->
-            <keep access="public"
-                  name="info.monitorenter.gui.chart.pointpainters.**">
-            </keep>
-            <!-- keep all range policies -->
-            <keep access="public"
-                  name="info.monitorenter.gui.chart.rangepolicies.**">
-            </keep>
-            <!-- keep all constructors for traces -->
-            <keep name="info.monitorenter.gui.chart.traces.*">
-                <constructor />
-            </keep>
-            <!-- keep all computing traces -->
-            <keep access="public"
-                  name="info.monitorenter.gui.chart.traces.computing.*">
-            </keep>
-            <!-- keep all trace painters -->
-            <keep access="public"
-                  name="info.monitorenter.gui.chart.traces.painters.*">
-            </keep>
-          <!-- keep all IAxis implementations -->
-            <keep name="info.monitorenter.gui.chart.axis.*">
-            </keep>
-            <!-- keep all getters and setters of classes that are preserved -->
-            <keepclassmembers>
-                <method name="get*" />
-                <method name="set*" />
-                <method name="is*" />
-            </keepclassmembers>
-            <!-- Since version 4.0 of proguard Exceptions have to be kept -->
-            <keepattribute />
-            <!--          
-            <keepattribute name="Exceptions" />
-            <keepattribute name="Deprecated" />
-            <keepattribute name="Sourcefile" />
-            <keepattribute name="LocalVariableTable" />
-            <keepattribute name="LocalVariableTypeTable" />
-            <keepattribute name="InnerClasses" />
-            -->
-        </proguard>
-        <!-- Delete big jar and rename shrinked to that name. -->
-        <delete file="${basedir}/${project.name}-${project.version}.jar" />
-        <move tofile="${basedir}/${project.name}-${project.version}.jar"
-              file="${basedir}/${project.name}-${project.version}-shrinked.jar" />
-    </target>
+         <!-- 
+          Shrink the jar file as external jars (e.g. infovis for range chooser panel) 
+          contain many unused classes. 
+          Ignorewarnings is on as external jar infovis depends on further jars.
+          Tun this off is more jars have deps that may not be ignored.
+         -->
+         <proguard obfuscate="false"
+                   shrink="true"
+                   overloadaggressively="false"
+                   warn="true"
+                   verbose="true"
+                   ignorewarnings="true"
+                   printmapping="true"
+                   allowaccessmodification="false"
+                   optimize="false">
+             <libraryjar>
+                 <pathelement path="${java.home}/lib/rt.jar" />
+             </libraryjar>
+             <!--
+               caution: The name attribut value has to be the same expression
+                       as the  destfile of the makejar- target [depend].
+             -->
+             <injar name="${basedir}/${project.name}-${project.version}.jar" />
+             <outjar name="${basedir}/${project.name}-${project.version}-shrinked.jar" />
+             <!-- Filter -->
+             <keep access="public" name="info.monitorenter.gui.chart.demos.*">
+                 <method access="public static" name="main" />
+                 <constructor />
+             </keep>
+             <keep access="public" name="info.monitorenter.gui.chart.*">
+                 <method access="public" name="*" />
+                 <constructor />
+             </keep>
+             <!-- keep all error bar stuff -->
+             <keep access="public"
+                   name="info.monitorenter.gui.chart.errorbars.**">
+                 <constructor />
+             </keep>
+             <!-- keep all label formatters -->
+             <keep access="public"
+                   name="info.monitorenter.gui.chart.labelformatters.**">
+             </keep>
+             <!-- keep all axis title painters -->
+             <keep access="public"
+                   name="info.monitorenter.gui.chart.axistitlepainters.**">
+             </keep>
+             <!-- keep all axis tick painters -->
+             <keep access="public"
+                   name="info.monitorenter.gui.chart.axistickpainters.**">
+             </keep>
+             <!-- keep all point painters -->
+             <keep access="public"
+                   name="info.monitorenter.gui.chart.pointpainters.**">
+             </keep>
+             <!-- keep all range policies -->
+             <keep access="public"
+                   name="info.monitorenter.gui.chart.rangepolicies.**">
+             </keep>
+             <!-- keep all constructors for traces -->
+             <keep name="info.monitorenter.gui.chart.traces.*">
+                 <constructor />
+             </keep>
+             <!-- keep all computing traces -->
+             <keep access="public"
+                   name="info.monitorenter.gui.chart.traces.computing.*">
+             </keep>
+             <!-- keep all trace painters -->
+             <keep access="public"
+                   name="info.monitorenter.gui.chart.traces.painters.*">
+             </keep>
+           <!-- keep all IAxis implementations -->
+             <keep name="info.monitorenter.gui.chart.axis.*">
+             </keep>
+             <!-- keep all getters and setters of classes that are preserved -->
+             <keepclassmembers>
+                 <method name="get*" />
+                 <method name="set*" />
+                 <method name="is*" />
+             </keepclassmembers>
+             <!-- Since version 4.0 of proguard Exceptions have to be kept -->
+             <keepattribute />
+             <!--          
+             <keepattribute name="Exceptions" />
+             <keepattribute name="Deprecated" />
+             <keepattribute name="Sourcefile" />
+             <keepattribute name="LocalVariableTable" />
+             <keepattribute name="LocalVariableTypeTable" />
+             <keepattribute name="InnerClasses" />
+             -->
+         </proguard>
+         <!-- Delete big jar and rename shrinked to that name. -->
+         <delete file="${basedir}/${project.name}-${project.version}.jar" />
+         <move tofile="${basedir}/${project.name}-${project.version}.jar"
+               file="${basedir}/${project.name}-${project.version}-shrinked.jar" />
+     </target>
 
     <target name="makejarApplet" depends="makejarFat">
         <description>

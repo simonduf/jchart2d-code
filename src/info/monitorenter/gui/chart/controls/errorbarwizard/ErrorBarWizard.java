@@ -52,7 +52,7 @@ import javax.swing.JTabbedPane;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ErrorBarWizard
     extends JPanel {
@@ -66,7 +66,7 @@ public class ErrorBarWizard
    * Creates a wizard for controlling the error bars of the given trace.
    * 
    * @param trace
-   *          the trace to control the error bars of.
+   *            the trace to control the error bars of.
    */
   public ErrorBarWizard(final ITrace2D trace) {
 
@@ -81,14 +81,14 @@ public class ErrorBarWizard
     gbc.gridy = 0;
     gbc.insets = new Insets(2, 2, 2, 2);
 
-    Iterator it = trace.getErrorBarPolicies().iterator();
+    Iterator<IErrorBarPolicy> it = trace.getErrorBarPolicies().iterator();
     IErrorBarPolicy policy;
     String tabName;
     while (it.hasNext()) {
-      policy = (IErrorBarPolicy) it.next();
+      policy = it.next();
       // maybe unstable: we use a file suffix semantics method to find the
       // class file name without package information:
-      tabName = (String) FileUtil.cutExtension(policy.getClass().getName()).getValue();
+      tabName = FileUtil.cutExtension(policy.getClass().getName()).getValue();
       tabPolicies.addTab(tabName, null, new ErrorBarPolicyPanel(policy), "Does nothing");
     }
 
@@ -101,7 +101,7 @@ public class ErrorBarWizard
    * <p>
    * 
    * @param args
-   *          ignored.
+   *            ignored.
    */
 
   public static void main(final String[] args) {

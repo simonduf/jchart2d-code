@@ -22,8 +22,6 @@
  */
 package info.monitorenter.util.units;
 
-import java.io.Serializable;
-
 /**
  * A system of units ordered by their natural ascending order.
  * <p>
@@ -36,14 +34,14 @@ import java.io.Serializable;
  *
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
-public interface IUnitSystem extends Serializable {
+public interface IUnitSystem {
   /**
    * Returns the different {@link AUnit} classes in the correct order.
    * <p>
    *
    * @return the different {@link AUnit} classes in the correct order.
    */
-  public abstract Class[] getUnits();
+  public abstract Class<?>[] getUnits();
 }

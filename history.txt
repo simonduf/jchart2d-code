@@ -1,12 +1,12 @@
 /*
  * File   : $Source: /cvsroot/jchart2d/jchart2d/history.txt,v $
- * Date   : $Date: 2008/05/30 19:47:12 $
- * Version: $Revision: 1.140 $
+ * Date   : $Date: 2008/06/01 11:29:36 $
+ * Version: $Revision: 1.144 $
  *
  * This file is part of jchart2d -
  * the Open Source real time charting library.
  *
- * Copyright (c) 2005-2008 Achim Westermann
+ * Copyright (c) 2008 Achim Westermann
  */
 
 History of changes for the jchart2d project.
@@ -22,7 +22,127 @@ o API change that requires refactoring.
   Note that refactoring of protected code intended for library 
   internal details will not be listed.
 
-jchart2d-2.2.3 - May, 30st, 2008
+
+jchart2d-3.0.0 - June, 1st, 2008
+
+* Don't incorporate empty traces in extremum search.
+* Fixed bug #1821361: Output of ATrace2D.setName() subject to race condition?
+* Fixed unreleased bug with increase of minimum y value in dynamic mode (add point at runtime). 
+* Fixed unreleased NPE when setting Axis X. 
+* Fixed unreleased bug for set a new axis on chart forgetting to transfer the traces from the 
+  old to the new one. 
+* Fixed unreleased issue with missing repaint / property change event -> ChartPanel trace titles 
+  in case of removing a trace.
+* Fixed unreleased issue with setting new Axis causing NullPointerException due to missing chart member in traces. 
+* Fixed unreleased issue with clipped charts causing a scaling bug that would leave clipped 
+  charts (e.g. in internal clipped frames) unscaled thus showing wrong data. 
+* Fixed unreleased issue with duplicate labels for added traces in ChartPanel. 
+* Fixed serious error reported by Robin Weisberg: Maximum Y value change was 
+  not detected causing an infinite loop (100 % cpu usage) or an invalid scaling. 
+* Fixed issue #1967609: Chart2D is now serializable. 
+! Charts may now have multiple x axes on left and right side. 
+! Charts may now have multiple y axes on bottom and top side. 
+! A minimum repaint latency may be configured that allows to collapse many 
+  repaint requests into one (required for high performance in real time applications).
+! Added new convenience method to remove all traces from a chart / axis. 
+- Traces are now related to an x and an y axis to relate them with other traces on 
+  the same axes. 
+- Moved scaling and bound routines from chart to axes due to multiple axes support. 
+o Extended method 
+  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
+      final int nextY, final Graphics2D g);
+  in class 
+  info.monitorenter.gui.chart.IPointPainter 
+  to   
+  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
+      final int nextY, final Graphics2D g, final TracePoint2D original);
+  to provide more information to the point painters. 
+o Replaced method 
+  public double getMinFromAxis() 
+  in class 
+  info.monitorenter.gui.chart.axis.AAxis.AChartDataAccessor  
+  by new method 
+  public double getMinValue() 
+  in class 
+  info.monitorenter.gui.chart.axis.AAxis. 
+o Replaced method 
+  public double getMaxFromAxis() 
+  in class 
+  info.monitorenter.gui.chart.axis.AAxis.AChartDataAccessor  
+  by new method 
+  public double getMaxValue() 
+  in class 
+  info.monitorenter.gui.chart.axis.AAxis. 
+o Moved method 
+  public double getMax() 
+  from class 
+  info.monitorenter.gui.chart.axis.AAxis.AChartDataAccessor 
+  to class 
+  info.monitorenter.gui.chart.axis.AAxis.
+o Moved method 
+  public double getMin() 
+  from class 
+  info.monitorenter.gui.chart.axis.AAxis.AChartDataAccessor 
+  to class 
+  info.monitorenter.gui.chart.axis.AAxis.
+o Moved method 
+  public boolean isDirtyScaling(final int axis) 
+  from class 
+  info.monitorenter.gui.chart.Chart2D
+  to method 
+  public boolean isDirtyScaling()
+  in interface 
+  info.monitorenter.gui.chart.IAxis. 
+o Replaced methods: 
+  protected double findMinX() 
+  protected double findMaxX() 
+  protected double findMinY()
+  protected double findMaxY() 
+  in class 
+  info.monitorenter.gui.chart.Chart2D
+  by methods: 
+  protected double findMin() 
+  protected double findMax() 
+  in class 
+  info.monitorenter.gui.chart.axis.AAxis. 
+o Replaced methods 
+  public double getMinY()
+  public double getMaxY()
+  public double getMinX()
+  public double getMaxX()
+  in class 
+  info.monitorenter.gui.chart.Chart2D
+  by methods: 
+  public double getMinValue() 
+  public double getMaxValue()
+  in class 
+  info.monitorenter.gui.chart.axis.AAxis. 
+o Moved the property event PROPERTY_ADD_REMOVE_TRACE and handling 
+  from class 
+  info.monitorenter.gui.chart.Chart2D
+  into class 
+  info.monitorenter.gui.chart.AAxis. 
+  Traces are now contained in axis instances of traces!
+o Changed method: 
+  public void paintXTick(final int x, final int y, boolean isMajorTick, final Graphics2D g)
+  in class 
+  info.monitorenter.gui.chart.IAxisTickPainter 
+  to 
+  public void paintXTick(final int x, final int y, boolean isMajorTick, boolean isBottomSide, final Graphics2D g);
+  in order to add tick support for bottom and top x axes. 
+o Changed method: 
+  public void paintYTick(final int x, final int y, boolean isMajorTick, final Graphics2D g)
+  in class 
+  info.monitorenter.gui.chart.IAxisTickPainter 
+  to 
+  public void paintYTick(final int x, final int y, boolean isMajorTick, boolean isLeftSide, final Graphics2D g);
+  in order to add tick support for left and right y axes.
+o Refactored design of axis titles: All setter and getter access of IAxisTitlePainter 
+  instances has to be changed to IAxis.getAxisTitle() (new AxisTitle entity for separation of 
+  data and event handling from painting). 
+o Moved TracePoint2D from package info.monitorenter.gui.chart to package info.monitorenter.gui.chart.axis.
+ 
+chart2d-2.2.3 - May, 30st, 2008
 
 * Fixed bug #1878068: RangePolicyHighestValuesForcedMin is not in released jar. 
 * Fixed bug #1930893: ZoomableChart now interpolates the connections of two 
@@ -36,28 +156,12 @@ jchart2d-2.2.3 - May, 30st, 2008
 - Code style cleanup. 
 - Improved performance for charts without error bars. 
 
-jchart2d-2.2.2 - December, 13th, 2007
-
-* Fixed serious error reported by Robin Weisberg: Maximum Y value change was 
-  not detected causing an inifinte loop (100 % cpu usage) or an invalid scaling. 
-* Don't incorporate empty traces in extremum search.
-* Fixed bug #1821361: Output of ATrace2D.setName() subject to race condition?
-! A minimum repaint latency may be configured that allows to collapse many 
-  repaint requests into one (required for high performance in real time applications).
-o Extended method 
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g);
-  in class 
-  info.monitorenter.gui.chart.IPointPainter 
-  to 
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g, final TracePoint2D original);
-  to provide more information to the point painters. 
-
+  
 jchart2d-2.2.1 - October, 22nd, 2007
 
 * Fixed bug that prevented repainting when points are added / changed 
   that do not change bounds and no UI interaction has taken place. 
+! Removed internal Painter Thread for faster UI updates and increased stability. 
 * Fixed unreported bug with error bars exceeding drawing area in zoomed mode 
   of ZoomableChart.   
 * Fixed bug related to zooming with ZoomableChart that uses at least one 
@@ -67,18 +171,16 @@ jchart2d-2.2.1 - October, 22nd, 2007
   This was a serious rounding issue and is fixed by a redesign: Transformation of 
   pixel to value and to pixel again for error bars was dropped, so performance 
   has increased too. 
+! Switched to proguard version 4.0: Binary distribution is a bit smaller. 
+! Added test case for bug report #1803342: Deadlock into Chard2D.paint: Succeeds. 
+! Started to use findbugs. 
 * Fixed bug #1814786: Lowering maximum via TracePoint2D.setLocation fails 
   by contribution of Gerald Struck (tankex). 
 * Fixed unreported bug with modal dialogs dropping behind if main window 
   is minimized and then maximized again. 
-* Fixed bug #1941871: Size of image is not correct when taking snapshot. 
-! Removed internal Painter Thread for faster UI updates and increased stability. 
-! Switched to proguard version 4.0: Binary distribution is a bit smaller. 
-! Added test case for bug report #1803342: Deadlock into Chard2D.paint: Succeeds. 
-! Started to use findbugs. 
 ! New UI action for setting titles of axis. 
 ! New UI action for setting title fonts of axis. 
-- Improved performance for charts without error bars. 
+! Extended API for different types of tool tips for chart. 
 
 jchart2d-2.2.0 - September, 16th, 2007
 
@@ -90,37 +192,20 @@ jchart2d-2.2.0 - September, 16th, 2007
   added data points. See 
   info.monitorenter.gui.chart.demosDynamicChartWithArithmeticMeanTrace 
   for a demo. 
+- Changed internal API of traces for supporting chains of computational traces.
 ! Support for stacking charts vertically with same x coordinate start 
   via Chart2D.setSynchronizedXStartChart(Chart2D) 
   (contribution by Karl Piteira). 
-! Support for axis titles via IAxis.setTitlePainer(IAxisTitlePainter) 
-  and IAxis.setTitle(String). 
-! New AxisInverse allows to display values in descending order (10, 9, 8, ...0). 
-  Contribution by Andrea Plotegher while working on IR spectroscopy. 
-! Extended info.monitorenter.gui.chart.errorbars.ErrorBarPolicyRelative by 
-  allowing to configure relative x and y errors (vs. only one relative error 
-  for alll dimensions). 
-! Finished integration of error bar wizard into GUI controls of ChartPanel. 
-* Fixed issue  #1769652: zoom all menu item doesn't repaint the chart when selected. 
-* Fixed unreported deadlock when using ChartPanel with multiple traces. 
-* Fixed unreleased issue that painted a connection from the last point of 
-  a trace to the first point of the next trace (multiple traces), reported 
-  by Andrea Plotegher. 
-* Fixed bug with chart bounds upon decreasing error bar expansion. 
-* Fixed bug with non - UI property adapting strokes menu in LayoutFactory 
-  (fixed by Andrea Plotegher).
-* Fixed bug #1790622: using trace.setLocation(..) fails. Now changed points will 
-  be reflected in the UI without exception and correct display. 
-* Fixed unreported issue with incorrect repaint if partial repaint is triggered by another 
-  Thread than the painter (e.g. if a modal dialog is closed). 
-* Fixed unreported display issue with LabelFormatterNumber using a format that 
-  enforces digits (e.g.:  new DecimalFormat("000.000");) and overwrites the y axis. 
-- Changed internal API of traces for supporting chains of computational traces.
-- Moved logic for finding chart bounds to axis classes. 
 o Renamed net.monitorenter.gui.chart.ILabelFormatter to 
   net.monitorenter.gui.chart.IAxisLabelFormatter.
 o Renamed net.monitorenter.gui.chart.ILabelPainter to 
   net.monitorenter.gui.chart.IAxisTickPainter. 
+- Moved logic for finding chart bounds to axis classes. 
+! Support for axis titles via IAxis.setTitlePainer(IAxisTitlePainter) 
+  and IAxis.setTitle(String). 
+! New AxisInverse allows to display values in descending order (10, 9, 8, ...0). 
+  Contribution by Andrea Plotegher while working on IR spectroscopy. 
+* Fixed issue  #1769652: zoom all menu item doesn't repaint the chart when selected. 
 o Renamed net.monitorenter.gui.chart.ILabelPainter to 
   net.monitorenter.gui.chart.IAxisTickPainter. 
 o Renamed package info.monitorenter.gui.chart.labelpainters 
@@ -131,10 +216,35 @@ o Renamed info.monitorenter.gui.chart.Chart2D.getLabelPainter()
   to info.monitorenter.gui.chart.Chart2D.getAxisTickPainter()
 o Renamed info.monitorenter.gui.chart.Chart2D.setLabelPainter(IAxisTickPainter) 
   to info.monitorenter.gui.chart.Chart2D.setAxisTickPainter(IAxisTickPainter)
+* Fixed unreported deadlock when using ChartPanel with multiple traces. 
+* Fixed unreleased issue that painted a connection from the last point of 
+  a trace to the first point of the next trace (multiple traces), reported 
+  by Andrea Plotegher. 
+! Extended info.monitorenter.gui.chart.errorbars.ErrorBarPolicyRelative by 
+  allowing to configure relative x and y errors (vs. only one relative error 
+  for alll dimensions). 
+! Finished integration of error bar wizard into GUI controls of ChartPanel. 
+* Fixed bug with chart bounds upon decreasing error bar expansion. 
+* Fixed bug with non - UI property adapting strokes menu in LayoutFactory 
+  (fixed by Andrea Plotegher).
+* Fixed bug #1790622: using trace.setLocation(..) fails. Now changed points will 
+  be reflected in the UI without exception and correct display. 
+* Fixed unreported issue with incorrect repaint if partial repaint is triggered by another 
+  Thread than the painter (e.g. if a modal dialog is closed). 
+* Fixed unreported display issue with LabelFormatterNumber using a format that 
+  enforces digits (e.g.:  new DecimalFormat("000.000");) and overwrites the y axis. 
+
 
 jchart2d-2.1.2 - July, 25th, 2007
 
 * Fixed issue #1711148: LayoutFactory does not provide documented methods. 
+! Configurable context menu entry for zooming out for ChartPanel when wrapping 
+  a ZoomableChart. Contribution by Vasilis Pappas. 
+! Only use lower unit in LabelFormatterAutoUnits when data range is 
+  smaller 1.5 of a whole unit. 
+! New error bar policy for summation of absolute values. 
+! Added default constructors and additional setters for bean compliance 
+  of label formatters.   
 * Fixed issue with UI not reacting upon changed label formatter of Axis at runtime.
 * Fixed issue with UI not reacting upon changed number format of 
   LabelFormatterNumber at runtime.
@@ -148,13 +258,6 @@ jchart2d-2.1.2 - July, 25th, 2007
 * Fixed issue with axis scale values that appear out of the chart area (too low).
 * Fixed issue with traces being rescaled in both dimensions even if only one 
   dimension changed (Performance improvement). 
-! Configurable context menu entry for zooming out for ChartPanel when wrapping 
-  a ZoomableChart. Contribution by Vasilis Pappas. 
-! Only use lower unit in LabelFormatterAutoUnits when data range is 
-  smaller 1.5 of a whole unit. 
-! New error bar policy for summation of absolute values. 
-! Added default constructors and additional setters for bean compliance 
-  of label formatters.   
 ! Updated profiling support to Java Interactive Profiler (JIP) Version 1.1(final).
 ! Major performance improvement for updateScaling: JProfiler measured ~42 % total of paint 
   runtime before, now takes ~ 16 %.
@@ -173,59 +276,25 @@ jchart2d-2.1.1 - March, 30st, 2007
   of chart panel in case the component count of the target layout container is 0.
 * Fixed issue #1578136: Trace2DLtdSorted(int) has private access. 
 * Fixed issue #1586616: Removing trace from chart dos not delete label in ChartPanel.
-* Fixed issue #1601947: image export with snaphot() when chart is not visible (not sized).
-* Fixed issue #1644055: Bounds check in ATrace2D doesn't catch removed extremum.
-* Fixed issue #1652154: ATRace2D.setName has conditional/delayed visibility. 
-* Fixed issue #1657003: javadoc error in IAxis (setMinorTickSpacing(double)).
-* Fixed issue #1684854 (unreleased):  Phantom line appears while adding trace point.
-* Fixed issue #1663833 Bug in legend print: Contribution by Horea Haitonic.
 ! New UI action for setting physical units for traces in ChartPanel. 
 ! New UI action for removing trace in ChartPanel (disabled by default, enable by 
   LayoutFactory.getInstance().setShowRemoveTraceMenu(true)). 
+* Fixed issue #1601947: image export with snaphot() when chart is not visible (not sized).
 ! New method IErrorBarPolicy.removeErrorBarPainter(IErrorBarPainter). 
 ! Improved property change handling for IErrorBarPolicy implementations 
   along with reusable Action implementations. 
+* Fixed issue #1644055: Bounds check in ATrace2D doesn't catch removed extremum.
 ! Added constructors for all AAxis types that take an info.monitorenter.gui.chart.ILabelFormatter. 
 ! Decreased calls to repaint by using the axis range as the repaint criterium vs. the chart data bounds. 
 ! Improved property change event handling in the Chart2D. 
+* Fixed issue #1652154: ATRace2D.setName has conditional/delayed visibility. 
 ! Added visual human-judged operation tests. 
+* Fixed issue #1657003: javadoc error in IAxis (setMinorTickSpacing(double)).
+* Fixed issue #1684854 (unreleased):  Phantom line appears while adding trace point.
+* Fixed issue #1663833 Bug in legend print: Contribution by Horea Haitonic.
 
 jchart2d-2.1.0 - October, 12th, 2006
 
-* Chartpanel does not claim the correct height for an amount 
-  of trace labels (below chart) that exceeds available width.
-* Bugfix #1573885:  Range dialog has misspelled "Chancel" button.
-* Fixed obfuscated method names in ILabelFormatter of previous binary release.
-* Recalculate bound in case a trace gets visible or invisible 
-  at runtime to zoom to the optimal bounds upon visibility changes. 
-* Repaint chart in static mode if trace is set visible / invible 
-  to reflect that change (discovered by Anton Kratz).
-* Bugfix #1550773: Don't overwrite the range of a range policy in AAxis.setRangePolicy(IRangePolicy)
-* Only zoom graph with left mouse-button (Contribution by Klaus Pesendorfer, Fabalabs).
-* Bugfix #1523799: LabelFormatter property overwritten for new AAxis.
-! ZoomableChart supports zooming in both directions 
-  (contribution by Klaus Pesendorfer, Fabalabs). 
-! First error bar policy implementation: 
-  info.monitorenter.gui.chart.errorbars.ErrorBarPolicyRelative. 
-  See info.monitorenter.gui.chart.demos.StaticChartErrorBarLineDisc 
-  for a demonstration of the error bar API. 
-! Highly configurable error bar API supported in core (vs.: UI): 
-  Choose the direction (x/y,positive/negative), 
-  kind of error bar policy and the way of rendering 
-  (end point -, start point - and segment - painter). 
-! LayoutFactory supports the option for standard menus 
-  (vs. UI-property adapting menus [foreground color, background color,...].
-! Configurable visibility of menu entries for Popup and Menubar menus. 
-! Improved quality of saved images significantly by use of anti-aliasing. 
-! New trace painter for vertical filled bars: 
-  info.monitorenter.gui.chart.traces.painters.TracePainterVerticalBar
-- Redesigned re- / transformation from px values to chart data 
-  values.
-- Separated code for painting a point from code to manage painting a whole trace 
-  and reused this for error bar rendering: 
-  Factored out duplications, increased modularization and maintainability. 
-- Refactored axis actions to always be based on the current chart (stability, consistancy). 
-- Modularized the creation of trace menus in LayoutFactory. 
 o Renamed 
   info.monitorenter.gui.chart.controls.LayoutFactory.createContextMenuLable(Chart2D, ITrace2D, boolean) 
   to 
@@ -242,8 +311,31 @@ o Renamed
   info.monitorenter.chart.axis.AAxis.getMaximumPixelForLable() 
   to 
   info.monitorenter.chart.axis.AAxis.getMaximumPixelForLabel()
+* Chartpanel does not claim the correct height for an amount 
+  of trace labels (below chart) that exceeds available width.
+* Bugfix #1573885:  Range dialog has misspelled "Chancel" button.
+* Fixed obfuscated method names in ILabelFormatter of previous binary release.
+* Recalculate bound in case a trace gets visible or invisible 
+  at runtime to zoom to the optimal bounds upon visibility changes. 
+- Redesigned re- / transformation from px values to chart data 
+  values.
 o Moved AAxis from package info.monitorenter.gui.chart to 
   package info.monitorenter.gui.chart.axis.
+* Repaint chart in static mode if trace is set visible / invible 
+  to reflect that change (discovered by Anton Kratz).
+! ZoomableChart supports zooming in both directions 
+  (contribution by Klaus Pesendorfer, Fabalabs). 
+! First error bar policy implementation: 
+  info.monitorenter.gui.chart.errorbars.ErrorBarPolicyRelative. 
+  See info.monitorenter.gui.chart.demos.StaticChartErrorBarLineDisc 
+  for a demonstration of the error bar API. 
+! Highly configurable error bar API supported in core (vs.: UI): 
+  Choose the direction (x/y,positive/negative), 
+  kind of error bar policy and the way of rendering 
+  (end point -, start point - and segment - painter). 
+- Separated code for painting a point from code to manage painting a whole trace 
+  and reused this for error bar rendering: 
+  Factored out duplications, increased modularization and maintainability. 
 o Refactored 
   info.monitorenter.gui.chart.ITracePainter.discontinue()
   to
@@ -256,6 +348,15 @@ o Refactored
   info.monitorenter.gui.chart.ITracePainter.endPaintIteration()
   to
   info.monitorenter.gui.chart.ITracePainter.endPaintIteration(java.awt.Graphics2D)
+* Bugfix #1550773: Don't overwrite the range of a range policy in AAxis.setRangePolicy(IRangePolicy)
+* Only zoom graph with left mouse-button (Contribution by Klaus Pesendorfer, Fabalabs).
+! New trace painter for vertical filled bars: info.monitorenter.gui.chart.traces.painters.TracePainterVerticalBar
+* Bugfix #1523799: LabelFormatter property overwritten for new AAxis.
+- Refactored axis actions to always be based on the current chart (stability, consistancy). 
+! LayoutFactory supports the option for standard menus 
+  (vs. UI-property adapting menus [foreground color, background color,...].
+- Modularized the creation of trace menus in LayoutFactory. 
+! Configurable visibility of menu entries for Popup and Menubar menus. 
 o Moved info.monitorenter.gui.chart.layout.LayoutFactory to 
   info.monitorenter.gui.chart.controls.LayoutFactory.
 o Moved info.monitorenter.gui.chart.layout.ChartPanel to 
@@ -264,9 +365,11 @@ o Moved info.monitorenter.gui.chart.layout.demos.CoordinateViewChart to
   info.monitorenter.gui.chart.demos.CoordinateViewChart.
 o Renamed package info.monitorenter.gui.chart.layout.controls to 
   info.monitorenter.gui.chart.controls. 
+! Improved quality of saved images significantly by use of anti-aliasing. 
 
 jchart2d-2.0.1 - June, 5th, 2006
 
+- Binaries are now compiled with 1.4 option against java 1.5.0_07-b03.
 * Catch exceptions caused by illegal data for axis implementations 
   that transform values - Return 0 and only output a warning 
   (innapropriate axis implementation for this data) every 30 seconds.
@@ -284,14 +387,21 @@ jchart2d-2.0.1 - June, 5th, 2006
 * Scale value to 0 and print a warning on the console if 
   a logarithmic axis is used and a value is < 1. 
   (Instead of letting an exception go to the awt paint thread).
-- Binaries are now compiled with 1.4 option against java 1.5.0_07-b03.
   
 jchart2d-2.0.0 - May, 31th, 2006
 
+! Added profiling support in build.xml with Java Interactive 
+  Profiler (JIP).
 * Started to use a new sourceforge package for each new version 
   on sourceforge (bugreport by Ken Webb).
+! Optional use of standard UI menu items for menubar and popup menu 
+  (instead of thos that adapt their UI to the chart). 
+! New menu bar available in LayoutFactory 
+  (see info.monitorenter.chart.layout.ChartPanel). 
 * Change of grid color of chart would not fire the expected event. 
 * Ignore color choice if dialog for choosing color is cancelled. 
+! Smaller distributed jar file by shrinking to the needed classes 
+  (exclusion of unused classes in 3rd party jars).
 * Update context menu label states (for radio button or checkbox menu items) 
   if chart configuration changes from other sources than the menu itself. 
 * Repaint upon change of grid color in static mode 
@@ -304,46 +414,10 @@ jchart2d-2.0.0 - May, 31th, 2006
   (no points are added).
 * Repaint upon change of stroke of a trace in static mode 
   (no points are added).
-* Bugfix: Wrong space for the chart on right edge as wrong label length 
-  (of y labels) was used for calculation.
-* Bugfix: RingBuffer lost last element if buffer size was increased. 
-* Bugfix for unreleased version (29.04.06): 
-  Wrong minY search routine in traces.
-* Bugfix: setting new range with only one bound changed to rangepolicy 
-  would not cause rescaling. 
-* Changing paint grid state would not cause a full repaint thus leaving unpainted grid in space 
-  when nothing changes in the traces of the chart. 
-* Grid paint selection in context menu of ChartPanel was 
-  not initalized to checked state correctly. 
-* TracePainter selection in context menu of ChartPanel was 
-  not initialized to checked state correctly. 
-* No more repaint if no update has happened to the chart data model. 
-! Added profiling support in build.xml with Java Interactive 
-  Profiler (JIP).
-! Optional use of standard UI menu items for menubar and popup menu 
-  (instead of thos that adapt their UI to the chart). 
-! New menu bar available in LayoutFactory 
-  (see info.monitorenter.chart.layout.ChartPanel). 
-! Smaller distributed jar file by shrinking to the needed classes 
-  (exclusion of unused classes in 3rd party jars).
 ! Initial support for zooming in x dimension by mouse gestures in 
   info.monitorenter.gui.chart.ZoomabelChart, contribution by Alessio Sambarino.
 ! Don't use bounds of invisible traces 
   (Contribution by Klaus Pesendorfer, fabasoft).
-! Ensure that context menu remains readable if background 
-  color is set to current foreground color or foreground color 
-  is set to current background color by switching them. 
-! Added tool tip text to context menu for range policy of axis. 
-! Added RangePolicyMinimumViewport to context menu of ChartPanel.
-! Axis type (linear, log e, log 10) selectable from popup menu 
-  of ChartPanel.
-! Experimental version for logarithmic axis (base 10 and e), 
-  initial contribution by Pieter-Jan Busschaert. 
-! Added tooltip for displaying chart value coordinates 
-  along with methods to turn on and off (default: on).
-! Added panel for display of chart coordinates 
-  triggered by mouse motion.
-! Translation from mouse events to chart coordinates in chart. 
 o Renamed ITrace2D.getVisible() to ITrace2D.isVisible() 
   (bean convention).
 o Renamed package info.monitorenter.gui.chart.demo to 
@@ -373,10 +447,24 @@ o Moved IRangePolicy implementations to subpackage
   info.monitorenter.gui.chart.rangepolies.
 o Moved ILabelFormatter implementations to subpackage 
   info.monitorenter.gui.chart.labelformatters.
+* Bugfix: Wrong space for the chart on right edge as wrong label length 
+  (of y labels) was used for calculation.
 o Removed AAxis.getUnit(). Use AAxis.getFormatter().getUnit(). 
 o Changed package structure from "aw." to "info.monitorenter.".
+! Ensure that context menu remains readable if background 
+  color is set to current foreground color or foreground color 
+  is set to current background color by switching them. 
 o Renamed all interfaces with prefix I.
 o Renamed all abstract classes with prefix A.
+! Added tool tip text to context menu for range policy of axis. 
+* Bugfix: RingBuffer lost last element if buffer size was increased. 
+* Bugfix for unreleased version (29.04.06): 
+  Wrong minY search routine in traces.
+! Added RangePolicyMinimumViewport to context menu of ChartPanel.
+! Axis type (linear, log e, log 10) selectable from popup menu 
+  of ChartPanel.
+* Bugfix: setting new range with only one bound changed to rangepolicy 
+  would not cause rescaling. 
 o Chart2D.setScaleX(final boolean show) has been removed. 
   Use Chart2D.getAxisX().setPaintGrid(final boolean grid) instead.
 o Chart2D.getScaleX() has been removed. 
@@ -399,40 +487,51 @@ o Chart2D.setDecimalsY(final int decimals) has been removed.
   Use LabelFormatters instead.
 o Axis.setFractionsDigits(int) has been removed. 
   Use LabelFormatters instead.
+! Experimental version for logarithmic axis (base 10 and e), 
+  initial contribution by Pieter-Jan Busschaert. 
+* Changing paint grid state would not cause a full repaint thus leaving unpainted grid in space 
+  when nothing changes in the traces of the chart. 
+* Grid paint selection in context menu of ChartPanel was 
+  not initalized to checked state correctly. 
+* TracePainter selection in context menu of ChartPanel was 
+  not initialized to checked state correctly. 
+! Added tooltip for displaying chart value coordinates 
+  along with methods to turn on and off (default: on).
+! Added panel for display of chart coordinates 
+  triggered by mouse motion.
+! Translation from mouse events to chart coordinates in chart. 
+* No more repaint if no update has happened to the chart data model. 
+
 
 jchart2d-1.1.1 - April 13t, 2006
 
 * Bugfix 1468612: memory leak when using ChartPanel and adding / removing traces.  
 * Corrected file headers to LGPL 2.1.
-* Update scaling of chart when a new RangePolicy is set 
-  to the axis at runtime. 
-* Update scaling of chart when a new Range is set 
-  to the range policy of an axis. 
-* Javadoc correction: Missing space after {@link type}.
-* Changed wrong license file in jar: jchart2d is LGPL.
-* Close the polygon of TracePainterFill correctly.
-* Bufix: NPE when setting trace name with null argument.
-* Bugfix #1430180: Update scaling of points when range policy is changed at runtime.
 ! Allow direct edit of range bounds for range choice with keyboard. 
 ! Integrated dual slider of the invofis toolkit for range choice. 
 ! Update to most recent version of proguard. 
 ! Shrinkinig of shipped binary jar.
 ! Allow choosing viewport and it's range from context menu. 
 ! Restructured context menus of ChartPanel. 
+* Update scaling of chart when a new RangePolicy is set 
+  to the axis at runtime. 
+* Update scaling of chart when a new Range is set 
+  to the range policy of an axis. 
+* Javadoc correction: Missing space after {@link type}.
+* Changed wrong license file in jar: jchart2d is LGPL.
 ! Axis.setStartMajorTick(boolean) allows to force 
   starting with a major tick scale value.
 ! New RangePolicyForcedPoint to enforce always 
   showing a point on the axis.
 ! Control of trace painters by popup menu.
 ! Multiple trace painters for traces.
+* Close the polygon of TracePainterFill correctly.
+* Bufix: NPE when setting trace name with null argument.
+* Bugfix #1430180: Update scaling of points when range policy is changed at runtime.
 ! Set display of grid x and grid y seperately from context menu.
 
 jchart2d-1.1.0 - February 12, 2006
 
-* new Thread(anAbstractDataCollector).start() is permitted,
-  anAbstractDataCollector.start() has to be used.
-* Use JComponent foreground color (setForeground(Color))
-  for Axis and scale labels.
 ! New viewports: zoomed, maximum values only, ... .
 ! Linear interpolation towards bounds for zoomed viewports.
 ! Number formatted labels.
@@ -443,38 +542,42 @@ jchart2d-1.1.0 - February 12, 2006
   (dashed, dotted, thick,...).
 ! Z-index property for traces.
 ! Traces may be set invisible.
+- Refactored core sourcecode conforming to checkstyle
+  configuration.
+* new Thread(anAbstractDataCollector).start() is permitted,
+  anAbstractDataCollector.start() has to be used.
 ! Tracepainter for discs.
 ! Tracepainter for filled polygons.
 ! Tracepainter that uses polyline.
+* Use JComponent foreground color (setForeground(Color))
+  for Axis and scale labels.
 ! Support for fixed viewports (zooming).
 ! Rounding for scale labels to minor and major ticks.
 ! More controls in popups of ChartPanel: foreground color.
-! Refactored interface for IRangepolicy to allow viewports
-  that react upon the range of the chart.
-- Refactored core sourcecode conforming to checkstyle
-  configuration.
 - Warning all action classes in info.monitorenter.gui.chart.event
   have been renamed.
   Those were never released in previous versions but
   available in cvs.
+! Refactored interface for IRangepolicy to allow viewports
+  that react upon the range of the chart.
 
 1.03:
-! New Showcase application that demonstrates the new
-  feature.  Invoke with:
-  java -cp jchart2d-1.03.jar info.monitorenter.gui.chart.demo.Showcase
-! Improved build for source release.
-! New feature that allows saving the Chart2D to an image.
-! New feature that allows to stop data collection.
+ - New feature that allows saving the Chart2D to an image.
+ - New feature that allows to stop data collection.
+ ! New Showcase application that demonstrates the new
+   feature.  Invoke with:
+   java -cp jchart2d-1.03.jar info.monitorenter.gui.chart.demo.Showcase
+ ! Improved build for source release.
 
 1.02:
-* Deadlock when explicitly invoking Chart2D.paint(..)
-  [BTW no swing/awt program should do this]. Dropped
-  unneccessary monitor.
+ * Deadlock when explicitly invoking Chart2D.paint(..)
+   [BTW no swing/awt program should do this]. Dropped
+   unneccessary monitor.
 
 1.01:
-* A major bug in the Trace2DSimple implementation,
-  that caused a scaling error.
-* Weird "line from last point to (0,0)" - bug.
-! Complete new synchronization design:
-  Client Threads (your code) are now not involved in
-  scaling operations any more.
+ * A major bug in the Trace2DSimple implementation,
+   that caused a scaling error.
+ * Weird "line from last point to (0,0)" - bug.
+ ! Complete new synchronization design:
+   Client Threads (your code) are now not involved in
+   scaling operations any more.

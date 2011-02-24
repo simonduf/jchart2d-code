@@ -31,7 +31,7 @@ import info.monitorenter.gui.chart.ITrace2D;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.7 $
  */
 public class ErrorBarPixel implements IErrorBarPixel {
 
@@ -61,13 +61,11 @@ public class ErrorBarPixel implements IErrorBarPixel {
   private ITrace2D m_trace;
 
   /**
-   * Creates an instance backed by the given trace. 
+   * Creates an instance backed by the given trace.
    * <p>
    * 
    * @param trace
-   *          required for transformation.
-   * 
-   * @see #setTrace(ITrace2D)
+   *            required for transformation.
    */
   public ErrorBarPixel(final ITrace2D trace) {
     this.m_trace = trace;
@@ -127,7 +125,7 @@ public class ErrorBarPixel implements IErrorBarPixel {
    * <p>
    * 
    * @param negativeXError
-   *          The negativeXError in pixel to set.
+   *            The negativeXError in pixel to set.
    */
   protected final void setNegativeXErrorPixel(final int negativeXError) {
     this.m_negativeXErrorPixel = negativeXError;
@@ -138,7 +136,7 @@ public class ErrorBarPixel implements IErrorBarPixel {
    * <p>
    * 
    * @param negativeYError
-   *          The negativeYError in pixel to set.
+   *            The negativeYError in pixel to set.
    */
   protected final void setNegativeYErrorPixel(final int negativeYError) {
     this.m_negativeYErrorPixel = negativeYError;
@@ -149,7 +147,7 @@ public class ErrorBarPixel implements IErrorBarPixel {
    * <p>
    * 
    * @param positiveXError
-   *          The positiveXError in pixel to set.
+   *            The positiveXError in pixel to set.
    */
   protected final void setPositiveXErrorPixel(final int positiveXError) {
     this.m_positiveXErrorPixel = positiveXError;
@@ -160,15 +158,18 @@ public class ErrorBarPixel implements IErrorBarPixel {
    * <p>
    * 
    * @param positiveYError
-   *          The positiveYError in pixel to set.
+   *            The positiveYError in pixel to set.
    */
   protected final void setPositiveYErrorPixel(final int positiveYError) {
     this.m_positiveYErrorPixel = positiveYError;
   }
 
   /**
+   * Sets the trace to use.
+   * <p>
+   * 
    * @param trace
-   *          The trace to set.
+   *            The trace to set.
    */
   protected final void setTrace(final ITrace2D trace) {
     this.m_trace = trace;

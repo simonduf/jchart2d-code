@@ -41,7 +41,7 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class ErrorBarPolicyActionRemovePainter
     extends AErrorBarPolicyAction {
@@ -89,7 +89,7 @@ public class ErrorBarPolicyActionRemovePainter
     // update UI, these two steps have to be performed before 
     // the remove operation - the window will not be found afterwards:
     Component component = (Component) e.getSource();
-    Window dialog = UIUtil.findWindow(component);
+    Window dialog = UIUtil.findFrame(component);
     
     // remove operation:
     this.m_errorBarPolicy.removeErrorBarPainter(this.m_errorBarPainter);

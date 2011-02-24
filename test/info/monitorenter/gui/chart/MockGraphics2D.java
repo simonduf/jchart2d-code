@@ -73,7 +73,7 @@ public class MockGraphics2D
   /**
    * @see java.awt.Graphics2D#addRenderingHints(java.util.Map)
    */
-  public void addRenderingHints(final Map hints) {
+  public void addRenderingHints(final Map< ? , ? > hints) {
     // TODO Auto-generated method stub
 
   }
@@ -320,7 +320,7 @@ public class MockGraphics2D
   /**
    * @see java.awt.Graphics2D#setRenderingHints(java.util.Map)
    */
-  public void setRenderingHints(final Map hints) {
+  public void setRenderingHints(final Map< ? , ? > hints) {
     // TODO Auto-generated method stub
 
   }

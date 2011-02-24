@@ -72,13 +72,15 @@ public final class AdvancedStaticChart {
     AAxis yAxis = new AxisLinear();
     Font titleFont = UIManager.getDefaults().getFont("Label.font").deriveFont(14f).deriveFont(
         Font.BOLD);
-    yAxis.getTitlePainter().setTitleFont(titleFont);
-    yAxis.setTitle("hoppelhase");
-    chart.setAxisY(yAxis);
+    IAxis.AxisTitle axisTitle = yAxis.getAxisTitle();
+    axisTitle.setTitleFont(titleFont);
+    axisTitle.setTitle("hoppelhase");
+    chart.setAxisYLeft(yAxis);
     yAxis.setFormatter(new LabelFormatterDate(new SimpleDateFormat()));
     IAxis xAxis = chart.getAxisX();
-    xAxis.setTitle("emil");
-    xAxis.getTitlePainter().setTitleFont(titleFont);
+    axisTitle = xAxis.getAxisTitle();
+    axisTitle.setTitle("emil");
+    axisTitle.setTitleFont(titleFont);
     xAxis.setRangePolicy(new RangePolicyFixedViewport(new Range(0, 220)));
     // Add all points, as it is static:
     double high = System.currentTimeMillis();

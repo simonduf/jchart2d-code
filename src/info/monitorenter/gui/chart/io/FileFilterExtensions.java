@@ -34,19 +34,21 @@ import javax.swing.filechooser.FileSystemView;
 
 /**
  * <p>
- * Configureable implementation of {@link javax.swing.filechooser.FileFilter} that filters files by
- * their extension (e.g.: ".txt").
+ * Configureable implementation of {@link javax.swing.filechooser.FileFilter}
+ * that filters files by their extension (e.g.: ".txt").
  * </p>
  * <p>
- * The extension Strings are provided to the constructor (no configuration of initialized instance
- * provided yet) and have to be the sole extension without the dot.
+ * The extension Strings are provided to the constructor (no configuration of
+ * initialized instance provided yet) and have to be the sole extension without
+ * the dot.
  * </p>
  * <p>
- * This class is most often used to configure {@link javax.swing.JFileChooser} dialogs. Therefore it
- * accepts all directories to allow browsing.
+ * This class is most often used to configure {@link javax.swing.JFileChooser}
+ * dialogs. Therefore it accepts all directories to allow browsing.
  * </p>
  * <h3>Example usage:</h3>
  * <p>
+ * 
  * <code>
  *  
  *    ...
@@ -56,6 +58,7 @@ import javax.swing.filechooser.FileSystemView;
  *    ...
  *  
  * </code>
+ * 
  * </p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de>Achim Westermann </a>
@@ -73,8 +76,8 @@ public final class FileFilterExtensions
    * <p>
    * 
    * @param extensionsWithoutDot
-   *            A String[] containing extension strings without the dot like: <nobr><code>new String[]{"bat","txt","dict"}</code>
-   *            </nobr>.
+   *            A String[] containing extension strings without the dot like:
+   *            <nobr><code>new String[]{"bat","txt","dict"}</code> </nobr>.
    * @throws IllegalArgumentException
    *             if the given extensions are inivalid.
    */
@@ -94,7 +97,6 @@ public final class FileFilterExtensions
       result = true;
     } else {
       result = this.acceptNoDirectory(pathname.getAbsolutePath());
-
     }
     return result;
   }
@@ -107,6 +109,7 @@ public final class FileFilterExtensions
     if (this.isDirectory(urlstring)) {
       result = true;
     } else {
+
       result = this.acceptNoDirectory(urlstring);
     }
     return result;
@@ -208,8 +211,8 @@ public final class FileFilterExtensions
 
   /**
    * Needed for {@link #isDirectory(String)}: We cannot use
-   * {@link System#getProperty(java.lang.String)} to determine file separators in applet context.
-   * That would possibly throw an SecurityAccessException.
+   * {@link System#getProperty(java.lang.String)} to determine file separators
+   * in applet context. That would possibly throw an SecurityAccessException.
    * <p>
    * 
    * @return true if current OS is windows.

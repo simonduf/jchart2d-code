@@ -24,20 +24,22 @@
 
 package info.monitorenter.util.units;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
 
 /**
- * Singleton that caches instances of whole unit- systems and provides you with the matching unit
- * for a maximum value.
+ * Singleton that caches instances of whole unit- systems and provides you with
+ * the matching unit for a maximum value.
  * <p>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
- * @version $Revision: 1.5 $
+ * 
+ * @version $Revision: 1.6 $
+ * 
  * @see info.monitorenter.util.units.IUnitSystem
+ * 
  */
 public final class UnitFactory
     extends Object {
@@ -52,7 +54,7 @@ public final class UnitFactory
   public static final AUnit UNCHANGED = new UnitUnchanged();
 
   /** Cache for {@link IUnitSystem} instances. */
-  private static final Map UNITSYSTEMS = new HashMap();
+  private static final Map<String, List<AUnit>> UNITSYSTEMS = new HashMap<String, List<AUnit>>();
 
   /**
    * Singleton retrieval method.
@@ -70,6 +72,7 @@ public final class UnitFactory
   /**
    * Singleton constructor.
    * <p>
+   * 
    */
   private UnitFactory() {
     // nop
@@ -78,58 +81,51 @@ public final class UnitFactory
   /**
    * Returns the unit for the given argument absolute max.
    * <p>
+   * 
    * The unit is chosen in a way that
    * 
+   * 
    * @param absoluteMax
-   *            the absolute maximum value that has to be put into relation to the unit to retrieve.
+   *            the absolute maximum value that has to be put into relation to
+   *            the unit to retrieve.
    * @param units
    *            the UnitSystem to use.
    * @return the unit for the given argument absolute max.
    */
   public AUnit getUnit(final double absoluteMax, final IUnitSystem units) {
-    AUnit result = null;
-    List choice;
+    AUnit result = UnitFactory.UNCHANGED;
+    List<AUnit> choice;
     // lazy initialization
-    choice = (List) UnitFactory.UNITSYSTEMS.get(units.getClass().getName());
+    choice = UnitFactory.UNITSYSTEMS.get(units.getClass().getName());
     if (choice == null) {
       choice = this.initUnitSystem(units);
     }
     // Now to find the right unit.
-    Iterator it = choice.iterator();
-    AUnit ret = null;
-    AUnit old = null;
-    if (it.hasNext()) {
-      old = (AUnit) it.next();
-      while (it.hasNext()) {
-        ret = (AUnit) it.next();
-        if (absoluteMax < (ret.getFactor())) {
-          result = old;
-          break;
-        }
-        old = ret;
+    for (AUnit peek : choice) {
+      if (absoluteMax < (peek.getFactor())) {
+        // return the previous unit iterated in case we hit the ceiling:
+        break;
       }
-      // highest unit available
-      result = old;
+      result = peek;
     }
-    // no clue
-    if (result == null) {
-      result = UnitFactory.UNCHANGED;
-
-    }
+    // highest unit available
     return result;
   }
 
   /**
-   * Returns a list of all different {@link AUnit} instances available in the given unit system.
+   * Returns a list of all different {@link AUnit} instances available in the
+   * given unit system.
    * <p>
    * 
    * @param unitsystem
    *            the unit system of interest.
-   * @return a list of all different {@link AUnit} instances available in the given unit system.
+   * 
+   * @return a list of all different {@link AUnit} instances available in the
+   *         given unit system.
    */
-  public List getUnits(final IUnitSystem unitsystem) {
-    List choice = (List) UnitFactory.UNITSYSTEMS.get(unitsystem.getClass().getName());
-    // lazy initialisation
+  public List<AUnit> getUnits(final IUnitSystem unitsystem) {
+    List<AUnit> choice = UnitFactory.UNITSYSTEMS.get(unitsystem.getClass().getName());
+    // lazy initialization
     if (choice == null) {
       choice = this.initUnitSystem(unitsystem);
     }
@@ -143,11 +139,12 @@ public final class UnitFactory
    * 
    * @param units
    *            the unit system to initialize.
+   * 
    * @return the list of {@link AUnit} instances of the given unit system.
    */
-  private List initUnitSystem(final IUnitSystem units) {
-    List choice = new LinkedList();
-    Class[] clazzs = units.getUnits();
+  private List<AUnit> initUnitSystem(final IUnitSystem units) {
+    List<AUnit> choice = new LinkedList<AUnit>();
+    Class<?>[] clazzs = units.getUnits();
     AUnit unit = null;
     AUnit previous = null;
     for (int i = 0; i < clazzs.length; i++) {
@@ -181,9 +178,9 @@ public final class UnitFactory
     int stop = choice.size();
     for (int i = 0; i < stop - 1; i++) {
       min = i;
-      tmpfactori = ((AUnit) choice.get(i)).getFactor();
+      tmpfactori = choice.get(i).getFactor();
       for (int j = i + 1; j < stop; j++) {
-        tmpfactorj = ((AUnit) choice.get(j)).getFactor();
+        tmpfactorj = choice.get(j).getFactor();
         if (tmpfactorj < tmpfactori) {
           tmpfactori = tmpfactorj;
           min = j;

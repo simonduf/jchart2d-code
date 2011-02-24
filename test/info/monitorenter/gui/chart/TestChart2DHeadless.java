@@ -47,16 +47,17 @@ import junit.framework.TestSuite;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.4.4.2 $
  */
-public class TestChart2DHeadless extends TestCase {
+public class TestChart2DHeadless
+    extends TestCase {
 
   /**
    * Constructor with test name.
    * <p>
    * 
    * @param testName
-   *          the name of the test.
+   *            the name of the test.
    */
   public TestChart2DHeadless(final String testName) {
     super(testName);
@@ -87,7 +88,7 @@ public class TestChart2DHeadless extends TestCase {
   public void testMemoryLeak() {
     Chart2D chart;
     ITrace2D trace;
-    WeakHashMap chartMap = new WeakHashMap();
+    WeakHashMap<Chart2D, ? > chartMap = new WeakHashMap<Chart2D, Object>();
     for (int i = 0; i < 50; i++) {
       chart = new Chart2D();
       trace = new Trace2DLtd(100000);
@@ -125,7 +126,8 @@ public class TestChart2DHeadless extends TestCase {
    * <p>
    * 
    * @throws IOException
-   *           if sth goes wrong in I/O (saving chart, deleting test file,...).
+   *             if sth goes wrong in I/O (saving chart, deleting test
+   *             file,...).
    * 
    */
   public void testSnapshot() throws IOException {
@@ -172,7 +174,7 @@ public class TestChart2DHeadless extends TestCase {
    * <p>
    * 
    * @param args
-   *          ignored.
+   *            ignored.
    */
   public static void main(final String[] args) {
     junit.swingui.TestRunner.run(TestChart2DHeadless.class);

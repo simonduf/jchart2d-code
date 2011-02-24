@@ -45,7 +45,7 @@ import javax.swing.UIManager;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public final class Trace2DActionRemove
     extends ATrace2DAction {

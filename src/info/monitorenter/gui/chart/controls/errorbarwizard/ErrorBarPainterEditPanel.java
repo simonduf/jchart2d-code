@@ -58,7 +58,7 @@ import javax.swing.border.TitledBorder;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class ErrorBarPainterEditPanel
     extends JPanel {
@@ -79,7 +79,7 @@ public class ErrorBarPainterEditPanel
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.8 $
+   * @version $Revision: 1.9 $
    */
   private class SegmentChooserPanel
       extends JPanel {
@@ -94,7 +94,7 @@ public class ErrorBarPainterEditPanel
      * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
      * 
      * 
-     * @version $Revision: 1.8 $
+     * @version $Revision: 1.9 $
      */
     final class ColorIconUpdater implements PropertyChangeListener {
 
@@ -107,7 +107,8 @@ public class ErrorBarPainterEditPanel
        * <p>
        * 
        * @param adaptee
-       *          the color icon to adapt the color property of the segment to.
+       *            the color icon to adapt the color property of the segment
+       *            to.
        */
       private ColorIconUpdater(final ColorIcon adaptee) {
         this.m_adaptee = adaptee;
@@ -137,7 +138,7 @@ public class ErrorBarPainterEditPanel
      * <p>
      * 
      * @param errorBarPainterSegement
-     *          the error bar painter segment to configure.
+     *            the error bar painter segment to configure.
      */
     public SegmentChooserPanel(final IErrorBarPainter.ISegment errorBarPainterSegement) {
 
@@ -181,7 +182,7 @@ public class ErrorBarPainterEditPanel
 
       pointPainter = new PointPainterLine();
       action = new ErrorBarPainterActionSetSegmentPainter(errorBarPainterSegement, pointPainter,
-          (String) FileUtil.cutExtension(pointPainter.getClass().getName()).getValue());
+          FileUtil.cutExtension(pointPainter.getClass().getName()).getValue());
       painterSelector.addItem(action);
       if (usedPainter != null && pointPainter.getClass().equals(usedPainter.getClass())) {
         painterSelector.setSelectedItem(action);
@@ -189,7 +190,7 @@ public class ErrorBarPainterEditPanel
 
       pointPainter = new PointPainterDisc();
       action = new ErrorBarPainterActionSetSegmentPainter(errorBarPainterSegement, pointPainter,
-          (String) FileUtil.cutExtension(pointPainter.getClass().getName()).getValue());
+          FileUtil.cutExtension(pointPainter.getClass().getName()).getValue());
       painterSelector.addItem(action);
       if (usedPainter != null && pointPainter.getClass().equals(usedPainter.getClass())) {
         painterSelector.setSelectedItem(action);
@@ -228,14 +229,14 @@ public class ErrorBarPainterEditPanel
   private static final long serialVersionUID = -6564631494967160532L;
 
   /** The error bar painter to configure with segments. */
-  private  IErrorBarPainter m_errorBarPainter;
+  private IErrorBarPainter m_errorBarPainter;
 
   /**
    * Creates a panel that offers configuration of the given error bar painter.
    * <p>
    * 
    * @param errorBarPainter
-   *          the error bar painter to configure.
+   *            the error bar painter to configure.
    */
   public ErrorBarPainterEditPanel(final IErrorBarPainter errorBarPainter) {
 

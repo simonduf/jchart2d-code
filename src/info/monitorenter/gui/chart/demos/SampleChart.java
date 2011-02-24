@@ -25,7 +25,7 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.io.ADataCollector;
 import info.monitorenter.gui.chart.io.RandomDataCollectorOffset;
-import info.monitorenter.gui.chart.traces.Trace2DLtdReplacing;
+import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BorderLayout;
@@ -55,7 +55,7 @@ import javax.swing.JPanel;
  *
  * @author Achim Westermann (modified)
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class SampleChart extends JPanel {
   /**
@@ -99,7 +99,8 @@ public class SampleChart extends JPanel {
     // Note that dynamic charts need limited amount of values!!!
     // ITrace2D trace = new Trace2DLtd(200);
     // 3/11/-5 , let's try something else too:
-    ITrace2D trace = new Trace2DLtdReplacing(100);
+//    ITrace2D trace = new Trace2DLtdReplacing(100);
+    ITrace2D trace = new Trace2DLtd(8000);
     trace.setColor(Color.RED);
 
     // Add the trace to the chart:
@@ -112,7 +113,7 @@ public class SampleChart extends JPanel {
      * ** removing this for now, potential memory leak ? 3/11/05
      */
 
-    // Enable the termination button [cross on the upperright edge]:
+    // Enable the termination button [cross on the upper right edge]:
     // Every 50 milliseconds a new value is collected.
     ADataCollector collector = new RandomDataCollectorOffset(trace, 100);
     // Start a Thread that adds the values:

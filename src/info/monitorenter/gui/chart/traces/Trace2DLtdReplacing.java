@@ -37,7 +37,7 @@ import java.util.Iterator;
  * structure. <br>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westerman </a>
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.11 $
  */
 public class Trace2DLtdReplacing
     extends Trace2DLtd {
@@ -66,15 +66,16 @@ public class Trace2DLtdReplacing
   /**
    * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.TracePoint2D)
    */
-  public boolean addPointInternal(final TracePoint2D p) {
+  protected boolean addPointInternal(final TracePoint2D p) {
     boolean result = false;
     boolean located = false;
     TracePoint2D tmp;
     double tmpx;
     double tmpy;
-    Iterator it = this.m_buffer.iteratorF2L();
+    Iterator<TracePoint2D> it = this.m_buffer.iteratorF2L();
     while (it.hasNext()) {
-      tmp = (TracePoint2D) it.next();
+      
+      tmp = it.next();
       tmpx = tmp.getX();
       if (tmpx == p.getX()) {
         tmpy = p.getY();
@@ -87,8 +88,8 @@ public class Trace2DLtdReplacing
       }
     }
     if (!located) {
+      // no matching point was found and shifted:
       result = super.addPointInternal(p);
-
     }
     return result;
   }

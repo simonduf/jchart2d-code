@@ -55,7 +55,7 @@ import javax.swing.JPanel;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class ErrorBarPaintersPanel
     extends JPanel implements PropertyChangeListener {
@@ -72,7 +72,7 @@ public class ErrorBarPaintersPanel
    * <p>
    * 
    * @param errorBarPolicy
-   *          the error bar policy to control directions of display of.
+   *            the error bar policy to control directions of display of.
    */
   public ErrorBarPaintersPanel(final IErrorBarPolicy errorBarPolicy) {
 
@@ -89,11 +89,11 @@ public class ErrorBarPaintersPanel
     gbc.insets = new Insets(2, 2, 2, 2);
 
     // adding a row for each IErrorBarPainter:
-    Iterator itErrorBarPainters = errorBarPolicy.getErrorBarPainters().iterator();
+    Iterator<IErrorBarPainter> itErrorBarPainters = errorBarPolicy.getErrorBarPainters().iterator();
     IErrorBarPainter painter;
 
     while (itErrorBarPainters.hasNext()) {
-      painter = (IErrorBarPainter) itErrorBarPainters.next();
+      painter = itErrorBarPainters.next();
       this.add(new ErrorBarPainterConfigurablePanel(painter, errorBarPolicy), gbc);
       gbc.gridy++;
     }
@@ -116,7 +116,7 @@ public class ErrorBarPaintersPanel
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.6 $
+   * @version $Revision: 1.7 $
    */
   public class ErrorBarPainterConfigurablePanel
       extends JPanel implements PropertyChangeListener {
@@ -133,10 +133,10 @@ public class ErrorBarPaintersPanel
      * <p>
      * 
      * @param errorBarPainter
-     *          the error bar painter to control.
+     *            the error bar painter to control.
      * 
      * @param errorBarPolicy
-     *          the parent error bar policy for the remove action.
+     *            the parent error bar policy for the remove action.
      * 
      */
     public ErrorBarPainterConfigurablePanel(final IErrorBarPainter errorBarPainter,
@@ -160,7 +160,7 @@ public class ErrorBarPaintersPanel
 
       // TODO: Instable to use file extension cut semantics for getting a
       // class name without package prefix.
-      painterName = (String) FileUtil.cutExtension(errorBarPainter.getClass().getName()).getValue();
+      painterName = FileUtil.cutExtension(errorBarPainter.getClass().getName()).getValue();
       editButton = new JButton(new ErrorBarPainterActionEdit(errorBarPainter, "Edit", this));
       // layout:
       this.add(new JLabel(painterName), gbc);

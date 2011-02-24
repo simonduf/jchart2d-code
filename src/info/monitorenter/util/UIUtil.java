@@ -23,42 +23,64 @@
 package info.monitorenter.util;
 
 import java.awt.Component;
-import java.awt.Window;
+import java.awt.Frame;
+
+import javax.swing.JFrame;
+import javax.swing.JPopupMenu;
 
 /**
  * Utility class for UI / layout operations.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.2 $
+ * 
+ * 
+ * @version $Revision: 1.3 $
  */
 public final class UIUtil {
+  
   /**
-   * Utility class constructor.
+   * Finds the frame of the given component that may be contained in a
+   * <code>{@link javax.swing.JDialog}</code> with support for modal dialogs
+   * that are launched from <code>{@link JPopupMenu}</code> instances.
    * <p>
+   * This also works for nested <code>{@link javax.swing.JMenu}</code> /
+   * <code>{@link javax.swing.JMenuItem}</code> trees.
+   * <p>
+   * 
+   * @param component
+   *            the component to find the master the JFrame of.
+   * 
+   * @return the frame of the given component that may be contained in a
+   *         <code>{@link javax.swing.JDialog}</code> with support for modal
+   *         dialogs that are launched from <code>{@link JPopupMenu}</code>
+   *         instances.
    */
-  private UIUtil() {
-    // nop
+  public static Frame findFrame(final Component component) {
+
+    Frame result = null;
+    Component comp = component;
+    if (comp instanceof JFrame) {
+      result = (JFrame) comp;
+    } else {
+      if (component instanceof JPopupMenu) {
+        comp = ((JPopupMenu) component).getInvoker();
+      } else {
+        comp = component.getParent();
+      }
+
+      result = UIUtil.findFrame(comp);
+    }
+    return result;
+
   }
 
   /**
-   * Returns the window the given component is contained in or null if this is not the case.
+   * Utility class constructor.
    * <p>
    * 
-   * @param c
-   *            the component to search the parent modal dialog of.
-   * @return the window the given component is contained in or null if this is not the case.
    */
-  public static Window findWindow(final Component c) {
-    Window result = null;
-    if (c instanceof Window) {
-      result = (Window) c;
-    } else {
-      Component parent = c.getParent();
-      if (parent != null) {
-        result = UIUtil.findWindow(parent);
-      }
-    }
-    return result;
+  private UIUtil() {
+    // nop
   }
 }

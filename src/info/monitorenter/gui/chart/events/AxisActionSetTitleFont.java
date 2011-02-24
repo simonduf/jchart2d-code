@@ -40,7 +40,7 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class AxisActionSetTitleFont
     extends AAxisAction {
@@ -82,7 +82,7 @@ public class AxisActionSetTitleFont
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   public void actionPerformed(final ActionEvent e) {
-    this.getAxis().getTitlePainter().setTitleFont(this.m_titleFont);
+    this.getAxis().getAxisTitle().setTitleFont(this.m_titleFont);
 
   }
 
@@ -91,7 +91,7 @@ public class AxisActionSetTitleFont
    */
   public void propertyChange(final PropertyChangeEvent evt) {
     String property = evt.getPropertyName();
-    if (property.equals(IAxis.PROPERTY_TITLEFONT)) {
+    if (property.equals(IAxis.AxisTitle.PROPERTY_TITLEFONT)) {
       Font newFont = (Font) evt.getNewValue();
       if (newFont.equals(this.m_titleFont)) {
         this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED,

@@ -35,25 +35,29 @@ import java.beans.PropertyChangeEvent;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.2 $
+ * 
+ * 
+ * @version $Revision: 1.3 $
  */
-public class ErrorBarPolicyActionShowWizard
-    extends AErrorBarPolicyAction {
+public class ErrorBarPolicyActionShowWizard extends AErrorBarPolicyAction {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 3413195708957445554L;
 
   /**
-   * Creates a trigger for showing the error bar policy wizard dialog for the given
-   * <code>{@link IErrorBarPolicy}</code> with the given name.
+   * Creates a trigger for showing the error bar policy wizard dialog for the
+   * given <code>{@link IErrorBarPolicy}</code> with the given name.
    * <p>
    * 
    * @param errorBarPolicy
    *            the target the action will work on.
+   * 
    * @param description
    *            the descriptive <code>String</code> that will be displayed by
-   *            {@link javax.swing.AbstractButton} subclasses that get this <code>Action</code>
-   *            assigned ( {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   *            {@link javax.swing.AbstractButton} subclasses that get this
+   *            <code>Action</code> assigned (
+   *            {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   * 
    */
   public ErrorBarPolicyActionShowWizard(final IErrorBarPolicy errorBarPolicy,
       final String description) {

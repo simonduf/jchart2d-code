@@ -1,5 +1,5 @@
 /*
- * MultiTracing, a demo testing the thread- safeness of the Chart2D.
+ * MultiTracing, a demo testing the thread- safetiness of the Chart2D.
  * Copyright (c) 2007  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
@@ -38,31 +38,36 @@ import javax.swing.JFrame;
 
 /**
  * <p>
- * An example that tests the ability of multithreaded use of a single <code>Chart2D</code>. Six
- * different Threads are painting subsequently a single point to the chart and go to a sleep. After
- * having painted the whole trace, each Thread sleeps for a random time, removes it's trace, sleeps
- * for another random time and starts again. <br>
- * To be true: the data for the <code>TracePoint</code> instances is computed a single time at
- * startup.
+ * An example that tests the ability of multithreaded use of a single
+ * <code>Chart2D</code>. Six different Threads are painting subsequently a
+ * single point to the chart and go to a sleep. After having painted the whole
+ * trace, each Thread sleeps for a random time, removes it's trace, sleeps for
+ * another random time and starts again. <br>
+ * To be true: the data for the <code>TracePoint</code> instances is computed
+ * a single time at startup.
  * </p>
  * <p>
- * This test may blow your CPU. I am currently working on an AMD Athlon 1200, 512 MB RAM so I did
- * not get these problems.
+ * This test may blow your CPU. I am currently working on an AMD Athlon 1200,
+ * 512 MB RAM so I did not get these problems.
  * </p>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.9 $
+ * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  */
 
 public final class MultiTracing
     extends JFrame {
   /**
-   * Thread that adds a trace to a chart, paints the points with configurable sleep breaks and then
-   * removes it. It then goes to sleep and starts this cycle anew.
+   * Thread that adds a trace to a chart, paints the points with configurable
+   * sleep breaks and then removes it. It then goes to sleep and starts this
+   * cycle anew.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * @version $Revision: 1.7 $
+   * 
+   * 
+   * @version $Revision: 1.9 $
    */
   static final class AddPaintRemoveThread
       extends Thread {
@@ -80,17 +85,21 @@ public final class MultiTracing
     private ITrace2D m_trace;
 
     /**
-     * Creates an instance that paints data to the trace that is added to the chart.
+     * Creates an instance that paints data to the trace that is added to the
+     * chart.
      * <p>
      * 
      * @param chart
-     *            the chart to use.
+     *          the chart to use.
+     * 
      * @param trace
-     *            the trace to add points to.
+     *          the trace to add points to.
+     * 
      * @param data
-     *            the y values of the points to add.
+     *          the y values of the points to add.
+     * 
      * @param sleep
-     *            the length of the sleep break between painting points in ms.
+     *          the length of the sleep break between painting points in ms.
      */
     public AddPaintRemoveThread(final Chart2D chart, final ITrace2D trace, final double[] data,
         final long sleep) {
@@ -108,8 +117,7 @@ public final class MultiTracing
 
       while (true) {
         if (Chart2D.DEBUG_THREADING) {
-          System.out.println(this.getName() + "(" + Thread.currentThread().getName()
-              + ") adding trace.");
+          System.out.println(this.getName() + "(" + Thread.currentThread().getName() + ") adding trace.");
         }
         this.m_innnerChart.addTrace(this.m_trace);
         for (int i = 0; i < this.m_data.length; i++) {
@@ -131,8 +139,8 @@ public final class MultiTracing
           e.printStackTrace(System.err);
         }
         if (Chart2D.DEBUG_THREADING) {
-          System.out.println(this.getName() + "(" + Thread.currentThread().getName()
-              + ") removing trace.");
+          System.out
+              .println(this.getName() + "(" + Thread.currentThread().getName() + ") removing trace.");
         }
         this.m_innnerChart.removeTrace(this.m_trace);
         this.m_trace.removeAllPoints();
@@ -154,39 +162,14 @@ public final class MultiTracing
   /** Sleep break time between adding two points. */
   private static final int SLEEP = 100;
 
-  /**
-   * Helper method that generates random data for display.
-   * <p>
-   * 
-   * @param data
-   *            will be filled with random y and ascending x values.
-   * @return the range of the generated data.
-   */
-  private static Range getRange(final double[][] data) {
-    double min = Double.MAX_VALUE;
-    double max = Double.MIN_VALUE;
-    double tmp;
-    for (int i = data.length - 1; i >= 0; i--) {
-      for (int j = data[i].length - 1; j >= 0; j--) {
-        tmp = data[i][j];
-        if (tmp > max) {
-          max = tmp;
-        }
-        if (tmp < min) {
-          min = tmp;
-        }
-      }
-    }
 
-    return new Range(min, max);
-  }
 
   /**
    * Main entry.
    * <p>
    * 
    * @param args
-   *            ignored.
+   *          ignored.
    */
   public static void main(final String[] args) {
     /*
@@ -232,8 +215,8 @@ public final class MultiTracing
     }
 
     final MultiTracing wnd = new MultiTracing();
-    wnd.setForceXRange(new Range(0, data[0].length + 10));
-    wnd.setForceYRange(MultiTracing.getRange(data));
+//    wnd.setForceXRange(new Range(0, data[0].length + 10));
+//    wnd.setForceYRange(MultiTracing.getRange(data));
     wnd.setLocation(100, 300);
     wnd.setSize(800, 300);
     wnd.setResizable(true);
@@ -294,24 +277,24 @@ public final class MultiTracing
   }
 
   /**
-   * Enforces to display a certain visible x range that will be expanded if traces in the chart have
-   * higher or lower values.
+   * Enforces to display a certain visible x range that will be expanded if
+   * traces in the chart have higher or lower values.
    * <p>
    * 
    * @param forceXRange
-   *            the range that at least has to be kept visible.
+   *          the range that at least has to be kept visible.
    */
   public void setForceXRange(final Range forceXRange) {
     this.m_chart.getAxisX().setRangePolicy(new RangePolicyMinimumViewport(forceXRange));
   }
 
   /**
-   * Enforces to display a certain visible x range that will be expanded if traces in the chart have
-   * higher or lower values.
+   * Enforces to display a certain visible x range that will be expanded if
+   * traces in the chart have higher or lower values.
    * <p>
    * 
    * @param forceYRange
-   *            the range that at least has to be kept visible.
+   *          the range that at least has to be kept visible.
    */
   public void setForceYRange(final Range forceYRange) {
     this.m_chart.getAxisY().setRangePolicy(new RangePolicyMinimumViewport(forceYRange));

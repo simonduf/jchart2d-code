@@ -32,9 +32,10 @@ import java.util.Comparator;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @param <T> the type to compare by <code>{@link Object#toString()}</code>.
+ * @version $Revision: 1.5 $
  */
-public final class ComparatorToString implements Comparator, Serializable {
+public final class ComparatorToString<T> implements Comparator<T>, Serializable {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 3682328616684815036L;
@@ -53,7 +54,7 @@ public final class ComparatorToString implements Comparator, Serializable {
    * 
    * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
    */
-  public int compare(final Object o1, final Object o2) throws IllegalArgumentException {
+  public int compare(final T o1, final T o2) throws IllegalArgumentException {
     if (o1 == null) {
       throw new IllegalArgumentException("Argument 1 must not be null");
     }

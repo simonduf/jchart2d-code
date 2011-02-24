@@ -27,33 +27,45 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * Fast ringbuffer implementation.
+ * Fast ring buffer implementation.
  * <p>
- * This implementation differs from the <code>RingBufferArray</code> in one point: <br>
- * If <code>setBufferSize(int asize)</code> decreases the size of the buffer and it will get
- * smaller than the actual amount of elements stored, they will get lost. This avoids the need for
- * an internal List to store elements overhanging. Some tests may be left out that may speed up this
- * <code>IRingBuffer</code>. Adding 5000000 elements was about 25 % faster compared to the
- * <code>RingBufferArray</code> on an Athlon 1200, 256 MB RAM.
+ * 
+ * This implementation differs from the <code>RingBufferArray</code> in one
+ * point: <br>
+ * If <code>setBufferSize(int asize)</code> decreases the size of the buffer
+ * and it will get smaller than the actual amount of elements stored, they will
+ * get lost. This avoids the need for an internal List to store elements
+ * overhanging. Some tests may be left out that may speed up this
+ * <code>IRingBuffer</code>. Adding 5000000 elements was about 25 % faster
+ * compared to the <code>RingBufferArray</code> on an Athlon 1200, 256 MB RAM.
  * <p>
- * For allowing high performance single-threaded use this implementation and the implementations of
- * the retrieveable <code>Iterator</code>- instances are not synchronized at all.
+ * 
+ * For allowing high performance single-threaded use this implementation and the
+ * implementations of the retrieveable <code>Iterator</code>- instances are
+ * not synchronized at all.
  * <p>
+ * 
+ * @param <T>
+ *            the type of instances to store.
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  */
-public class RingBufferArrayFast implements Cloneable, IRingBuffer {
+public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
   /**
-   * Base for ringbuffer iterators that has access to the ringbuffer by being an non-static inner
-   * class.
+   * 
+   * Base for ring buffer iterators that has access to the ring buffer by being
+   * an non-static inner class.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * @version $Revision: 1.7 $
+   * 
+   * 
+   * @version $Revision: 1.8 $
    */
-  protected abstract class ARingBufferIterator implements Iterator {
+  protected abstract class ARingBufferIterator implements Iterator<T> {
     /**
-     * The amount of returned instances, needed for knowing if iterator is empty.
+     * The amount of returned instances, needed for knowing if iterator is
+     * empty.
      */
     protected int m_count;
 
@@ -63,6 +75,7 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
     /**
      * Defcon.
      * <p>
+     * 
      */
     ARingBufferIterator() {
       // nop
@@ -81,7 +94,8 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
     /**
      * @see java.util.Iterator#next()
      */
-    public Object next() {
+    @SuppressWarnings("unchecked")
+    public T next() {
       if (!this.hasNext()) {
         throw new NoSuchElementException();
       }
@@ -92,7 +106,7 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
         throw new NoSuchElementException("RingBufferArrayFast.iteratorF2L returns null: pos:"
             + this.m_pos + " count: " + this.m_count);
       }
-      return result;
+      return (T) result;
     }
 
     /**
@@ -101,6 +115,7 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
      * 
      * @throws UnsupportedOperationException
      *             always as this is not supported.
+     * 
      * @see java.util.Iterator#remove()
      */
     public void remove() throws UnsupportedOperationException {
@@ -110,7 +125,8 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
   }
 
   /**
-   * Flip the switch and you will see how the compiler changes the size of the classfile.
+   * Flip the switch and you will see how the compiler changes the size of the
+   * class file.
    */
   public static final boolean DEBUG = false;
 
@@ -123,7 +139,7 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
   protected Object[] m_buffer;
 
   /**
-   * Flag that marks wether this buffer is empty or not.
+   * Flag that marks whether this buffer is empty or not.
    * <p>
    * 
    * <pre>
@@ -152,13 +168,15 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
   protected boolean m_empty = true;
 
   /**
-   * The internal index to buffer where the next element is going to be placed (not placed yet!).
+   * The internal index to buffer where the next element is going to be placed
+   * (not placed yet!).
    */
   protected int m_headpointer = 0;
 
   /**
    * The internal size of the buffer.
    * <p>
+   * 
    * For performance reasons the size of the buffer -1!
    * <p>
    */
@@ -181,14 +199,18 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
   }
 
   /**
-   * Adds an element to the ring buffer, potentially removing the first element to make more room.
+   * Adds an element to the ring buffer, potentially removing the first element
+   * to make more room.
    * <P>
    * 
    * @param anObject
    *            the instance to add.
-   * @return the oldes Object, if RingBuffer was filled with 'maxsize' elements before, or null.
+   * 
+   * @return the oldest Object, if RingBuffer was filled with 'maxsize' elements
+   *         before, or null.
    */
-  public Object add(final Object anObject) {
+  @SuppressWarnings("unchecked")
+  public T add(final T anObject) {
     Object ret = null;
     if (this.isFull()) {
       ret = this.m_buffer[this.m_tailpointer];
@@ -200,11 +222,12 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
     }
     this.m_buffer[this.m_headpointer] = anObject;
     this.incHead();
-    return ret;
+    return (T) ret;
   }
 
   /**
-   * Fast method to clear the buffer - only needs to set three primitive members.
+   * Fast method to clear the buffer - only needs to set three primitive
+   * members.
    * <p>
    * 
    * @see info.monitorenter.util.collections.IRingBuffer#clear()
@@ -225,17 +248,20 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
   /**
    * @see info.monitorenter.util.collections.IRingBuffer#getOldest()
    */
-  public Object getOldest() throws RingBufferException {
+  @SuppressWarnings("unchecked")
+  public T getOldest() throws RingBufferException {
     if (this.isEmpty()) {
       throw new IRingBuffer.RingBufferException("Buffer is empty.");
     }
-    return this.m_buffer[this.m_tailpointer];
+    return (T) this.m_buffer[this.m_tailpointer];
   }
 
   /**
+   * 
    * @see info.monitorenter.util.collections.IRingBuffer#getYoungest()
    */
-  public Object getYoungest() throws RingBufferException {
+  @SuppressWarnings("unchecked")
+  public T getYoungest() throws RingBufferException {
     if (this.isEmpty()) {
       throw new IRingBuffer.RingBufferException("Buffer is empty.");
     }
@@ -245,12 +271,13 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
     } else {
       tmp--;
     }
-    return this.m_buffer[tmp];
+    return (T) this.m_buffer[tmp];
   }
 
   /**
    * Internally increases the array index pointer to the head of the buffer.
    * <p>
+   * 
    */
   private void incHead() {
     if (this.m_headpointer == this.m_size) {
@@ -264,6 +291,7 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
   /**
    * Internally increases the array index pointer to the taill of the buffer.
    * <p>
+   * 
    */
   private void incTail() {
     if (this.m_tailpointer == this.m_size) {
@@ -300,18 +328,20 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
   }
 
   /**
-   * Returns an <code>Iterator</code> that will return the elements in exactly the inverse order
-   * the subsequent call to <code>remove()</code> would do.
-   * <p>
-   * The youngest elements are returned first. <b>The <code>Iterator</code> returned is not
-   * thread- safe! </b>
+   * Returns an <code>Iterator</code> that will return the elements in exactly
+   * the inverse order the subsequent call to <code>remove()</code> would do.
    * <p>
    * 
-   * @return an <code>Iterator</code> that will return the elements in exactly the inverse order
-   *         the subsequent call to <code>remove()</code> would do.
+   * The youngest elements are returned first. <b>The <code>Iterator</code>
+   * returned is not thread- safe! </b>
+   * <p>
+   * 
+   * @return an <code>Iterator</code> that will return the elements in exactly
+   *         the inverse order the subsequent call to <code>remove()</code>
+   *         would do.
    */
 
-  public java.util.Iterator iteratorF2L() {
+  public java.util.Iterator<T> iteratorF2L() {
     return new ARingBufferIterator() {
       {
         this.m_pos = (RingBufferArrayFast.this.m_headpointer == 0) ? RingBufferArrayFast.this
@@ -329,17 +359,27 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
   }
 
   /**
-   * Returns an <code>Iterator</code> that will return the elements in exactly the order the
-   * subsequent call to <code>remove()</code> would do.
-   * <p>
-   * The oldest elements are returned first. <b>The <code>Iterator</code> returned is not thread-
-   * safe! </b>
+   * Delegates to <code>{@link RingBufferArrayFast#iteratorL2F()}</code>.
    * <p>
    * 
-   * @return an <code>Iterator</code> that will return the elements in exactly the order the
-   *         subsequent call to <code>remove()</code> would do.
+   * @see java.lang.Iterable#iterator()
    */
-  public java.util.Iterator iteratorL2F() {
+  public java.util.Iterator<T> iterator() {
+    return this.iteratorL2F();
+  }
+
+  /**
+   * Returns an <code>Iterator</code> that will return the elements in exactly
+   * the order the subsequent call to <code>remove()</code> would do.
+   * <p>
+   * The oldest elements are returned first. <b>The <code>Iterator</code>
+   * returned is not thread- safe! </b>
+   * <p>
+   * 
+   * @return an <code>Iterator</code> that will return the elements in exactly
+   *         the order the subsequent call to <code>remove()</code> would do.
+   */
+  public java.util.Iterator<T> iteratorL2F() {
     return new ARingBufferIterator() {
       {
         this.m_pos = RingBufferArrayFast.this.m_tailpointer;
@@ -361,7 +401,8 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
   /**
    * @see info.monitorenter.util.collections.IRingBuffer#remove()
    */
-  public Object remove() {
+  @SuppressWarnings("unchecked")
+  public T remove() {
     if (this.isEmpty()) {
       throw new IRingBuffer.RingBufferException("Buffer is empty.");
     }
@@ -372,13 +413,14 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
       System.out.println("Removing element: " + ret + " head: " + this.m_headpointer + " tail: "
           + this.m_tailpointer + " size: " + this.size());
     }
-    return ret;
+    return (T) ret;
   }
 
   /**
    * @see info.monitorenter.util.collections.IRingBuffer#removeAll()
    */
-  public Object[] removeAll() {
+  @SuppressWarnings("unchecked")
+  public T[] removeAll() {
     Object[] ret = new Object[this.size()];
     if (RingBufferArrayFast.DEBUG) {
       System.out.println("removeAll()");
@@ -386,17 +428,18 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
     for (int i = 0; i < ret.length; i++) {
       ret[i] = this.remove();
     }
-    return ret;
+    return (T[]) ret;
   }
 
   /**
    * Sets a new buffer- size. <br>
    * <p>
    * A new size is assigned but the elements "overhanging" are returned by the
-   * <code>Object remove()</code>- method first. This may take time until the buffer has its
-   * actual size again. Don't pretend on calling this method for saving of memory very often as the
-   * whole buffer has to be copied into a new array every time- and if newSize < getSize()
-   * additional the overhanging elements references have to be moved to the internal
+   * <code>Object remove()</code>- method first. This may take time until the
+   * buffer has its actual size again. Don't pretend on calling this method for
+   * saving of memory very often as the whole buffer has to be copied into a new
+   * array every time- and if newSize < getSize() additional the overhanging
+   * elements references have to be moved to the internal
    * <code>List pendingremove</code>.
    * 
    * @param newSize
@@ -435,7 +478,7 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
    * @see info.monitorenter.util.collections.IRingBuffer#size()
    */
   public int size() {
-    int result;
+    int result = 0;
     if (this.m_empty) {
       result = 0;
     } else if (this.m_headpointer == this.m_tailpointer) {
@@ -451,8 +494,8 @@ public class RingBufferArrayFast implements Cloneable, IRingBuffer {
   /**
    * Returns a string representation of the RingBuffer and it's contents.
    * <p>
-   * Don't call this in your application too often: hard arraycopy - operation an memalloc are
-   * triggered.
+   * Don't call this in your application too often: hard arraycopy - operation
+   * an memalloc are triggered.
    * <p>
    * 
    * @return a string representation of the RingBuffer and it's contents.

@@ -37,7 +37,7 @@ import java.io.Serializable;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  * 
  */
 public interface IAxisTickPainter extends Serializable {
@@ -67,16 +67,16 @@ public interface IAxisTickPainter extends Serializable {
    * <p>
    * 
    * @param x
-   *          the x coordinate of the baseline for the label.
+   *            the x coordinate of the baseline for the label.
    * 
    * @param y
-   *          the y coordinate of the baseline for the label.
+   *            the y coordinate of the baseline for the label.
    * 
    * @param label
-   *          the formatted label String.
+   *            the formatted label String.
    * 
    * @param g
-   *          the graphic context to draw on.
+   *            the graphic context to draw on.
    */
   public void paintXLabel(final int x, final int y, String label, final Graphics2D g);
 
@@ -85,34 +85,39 @@ public interface IAxisTickPainter extends Serializable {
    * <p>
    * 
    * @param x
-   *          the x coordinate of the baseline for the label.
+   *            the x coordinate of the baseline for the label.
    * 
    * @param y
-   *          the y coordinate of the baseline for the label.
+   *            the y coordinate of the baseline for the label.
    * 
    * @param isMajorTick
-   *          if true, this is a major tick.
+   *            if true, this is a major tick.
+   * 
+   * @param isBottomSide
+   *            if true the tick is painted for an <code>{@link IAxis}</code>
+   *            on the bottom of the chart (see e.g.:
+   *            <code>{@link Chart2D#addAxisXBottom(info.monitorenter.gui.chart.axis.AAxis)}</code>).
    * 
    * @param g
-   *          the graphic context to draw on.
+   *            the graphic context to draw on.
    */
-  public void paintXTick(final int x, final int y, boolean isMajorTick, final Graphics2D g);
+  public void paintXTick(final int x, final int y, boolean isMajorTick, boolean isBottomSide, final Graphics2D g);
 
   /**
    * Paint the given label for the y axis.
    * <p>
    * 
    * @param x
-   *          the x coordinate of the baseline for the label.
+   *            the x coordinate of the baseline for the label.
    * 
    * @param y
-   *          the y coordinate of the baseline for the label.
+   *            the y coordinate of the baseline for the label.
    * 
    * @param label
-   *          the formatted label String.
+   *            the formatted label String.
    * 
    * @param g
-   *          the graphic context to draw on.
+   *            the graphic context to draw on.
    */
   public void paintYLabel(final int x, final int y, String label, final Graphics2D g);
 
@@ -121,17 +126,23 @@ public interface IAxisTickPainter extends Serializable {
    * <p>
    * 
    * @param x
-   *          the x coordinate of the baseline for the label.
+   *            the x coordinate of the baseline for the label.
    * 
    * @param y
-   *          the y coordinate of the baseline for the label.
+   *            the y coordinate of the baseline for the label.
    * 
    * @param isMajorTick
-   *          if true, this is a major tick.
+   *            if true, this is a major tick.
+   * 
+   * @param isLeftSide
+   *            if true the tick is painted for an <code>{@link IAxis}</code>
+   *            on the left side (see e.g.:
+   *            <code>{@link Chart2D#addAxisYLeft(info.monitorenter.gui.chart.axis.AAxis)}</code>).
    * 
    * @param g
-   *          the graphic context to draw on.
+   *            the graphic context to draw on.
    */
-  public void paintYTick(final int x, final int y, boolean isMajorTick, final Graphics2D g);
+  public void paintYTick(final int x, final int y, boolean isMajorTick, boolean isLeftSide,
+      final Graphics2D g);
 
 }

@@ -33,7 +33,7 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.11 $
  * 
  */
 public class TracePainterDisc
@@ -45,7 +45,7 @@ public class TracePainterDisc
   /** The implementation for rendering the point as a disc. */
   private PointPainterDisc m_pointPainter;
 
-  /** 
+  /**
    * Creates an instance with a default disc size of 4.
    * <p>
    */
@@ -57,7 +57,7 @@ public class TracePainterDisc
    * Creates an instance with the given disc size.
    * 
    * @param discSize
-   *            the disc size in pixel to use.
+   *          the disc size in pixel to use.
    */
   public TracePainterDisc(final int discSize) {
     this.m_pointPainter = new PointPainterDisc(discSize);
@@ -71,7 +71,16 @@ public class TracePainterDisc
       this.m_pointPainter.paintPoint(this.getPreviousX(), this.getPreviousY(), 0, 0, g2d, this
           .getPreviousPoint());
     }
+    this.m_pointPainter.endPaintIteration(g2d);
   }
+  /**
+   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#startPaintIteration(java.awt.Graphics2D)
+   */
+  @Override
+  public void startPaintIteration(final Graphics2D g2d) {
+    this.m_pointPainter.startPaintIteration(g2d);
+  }
+
 
   /**
    * Returns the diameter of the discs to paint in pixel.
@@ -99,7 +108,7 @@ public class TracePainterDisc
    * <p>
    * 
    * @param discSize
-   *            the diameter of the discs to paint in pixel.
+   *          the diameter of the discs to paint in pixel.
    */
   public void setDiscSize(final int discSize) {
     this.m_pointPainter.setDiscSize(discSize);

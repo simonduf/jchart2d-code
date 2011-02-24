@@ -31,11 +31,77 @@ package info.monitorenter.util;
  * 
  * @author Achim.Westermann@gmx.de
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final class MathUtil {
   /** Singleton instance. */
   private static MathUtil instance = null;
+
+  /**
+   * Avoids creation from outside for singleton support.
+   * <p>
+   * 
+   */
+  private MathUtil() {
+    // nop
+  }
+
+  /**
+   * Asserts that the given double is not invalid for calculation.
+   * <p>
+   * It must not be one of:
+   * <ul>
+   * <li> {@link Double#NaN} </li>
+   * <li> {@link Double#NEGATIVE_INFINITY} </li>
+   * <li> {@link Double#POSITIVE_INFINITY} </li>
+   * </ul>
+   * <p>
+   * 
+   * @param d
+   *            the double to test.
+   * 
+   * @throws IllegalArgumentException
+   *             if the assertion fails.
+   */
+  public static void assertDouble(final double d) throws IllegalArgumentException {
+    if (!MathUtil.isDouble(d)) {
+      throw new IllegalArgumentException(d + " is not valid.");
+    }
+  }
+
+  /**
+   * Asserts if the given two doubles are equal within the given precision range
+   * by the operation:
+   * 
+   * <pre>
+   * Math.abs(d1 - d2) &lt; precision
+   * </pre>.
+   * <p>
+   * 
+   * Because floating point calculations may involve rounding, calculated float
+   * and double values may not be accurate. This routine should be used instead.
+   * If called with a very small precision range this routine will not be stable
+   * against the rounding of calculated floats but at least prevent a bug report
+   * of the findbugs tool. See the Java Language Specification, section 4.2.4.
+   * <p>
+   * 
+   * @param d1
+   *            a double to check equality to the other given double.
+   * 
+   * @param d2
+   *            a double to check equality to the other given double.
+   * 
+   * @param precisionRange
+   *            the range to allow differences of the two doubles without
+   *            judging a difference - this is typically a small value below
+   *            0.5.
+   * 
+   * @return true if both given doubles are equal within the given precision
+   *         range.
+   */
+  public static boolean assertEqual(final double d1, final double d2, final double precisionRange) {
+    return Math.abs(d1 - d2) < precisionRange;
+  }
 
   /**
    * Returns the singleton instance of this class.
@@ -53,7 +119,7 @@ public final class MathUtil {
     }
     return MathUtil.instance;
   }
-  
+
   /**
    * Tests that the given double is not invalid for calculation.
    * <p>
@@ -73,37 +139,5 @@ public final class MathUtil {
    */
   public static boolean isDouble(final double d) {
     return !(Double.isInfinite(d) || Double.isNaN(d));
-  }
-
-  /**
-   * Asserts that the given double is not invalid for calculation.
-   * <p>
-   * It must not be one of:
-   * <ul>
-   * <li> {@link Double#NaN} </li>
-   * <li> {@link Double#NEGATIVE_INFINITY} </li>
-   * <li> {@link Double#POSITIVE_INFINITY} </li>
-   * </ul>
-   * <p>
-   * 
-   * @param d
-   *          the double to test.
-   * 
-   * @throws IllegalArgumentException
-   *           if the assertion fails.
-   */
-  public static void assertDouble(final double d) throws IllegalArgumentException {
-    if (Double.isInfinite(d) || Double.isNaN(d)) {
-      throw new IllegalArgumentException(d + " is not valid.");
-    }
-  }
-
-  /**
-   * Avoids creation from outside for singleton support.
-   * <p>
-   * 
-   */
-  private MathUtil() {
-    // nop
   }
 }

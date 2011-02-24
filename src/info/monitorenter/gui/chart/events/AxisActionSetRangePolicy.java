@@ -25,7 +25,6 @@ package info.monitorenter.gui.chart.events;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.IRangePolicy;
-import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem;
 import info.monitorenter.util.Range;
 
@@ -44,7 +43,7 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class AxisActionSetRangePolicy
     extends AAxisAction {
@@ -97,9 +96,9 @@ public class AxisActionSetRangePolicy
    */
   public void actionPerformed(final ActionEvent e) {
     // initially configure the range to show all data (in case a fixed
-    // viewport rp is used):
-    AAxis.AChart2DDataAccessor accessor = this.getAxis().getAccessor();
-    Range actualRange = new Range(accessor.getMinFromAxis(), accessor.getMaxFromAxis());
+    // view port is used):
+    IAxis axis = this.getAxis();
+    Range actualRange = new Range(axis.getMinValue(), axis.getMaxValue());
     this.m_rangePolicy.setRange(actualRange);
     this.m_rangePolicy.setRange(actualRange);
     this.getAxis().setRangePolicy(this.m_rangePolicy);
@@ -111,7 +110,7 @@ public class AxisActionSetRangePolicy
   public void propertyChange(final PropertyChangeEvent evt) {
     String property = evt.getPropertyName();
     if (property.equals(IAxis.PROPERTY_RANGEPOLICY)) {
-      Class rangepolicyClass = evt.getNewValue().getClass();
+      Class< ? > rangepolicyClass = evt.getNewValue().getClass();
       Boolean oldValue;
       Boolean newValue;
       if (rangepolicyClass == this.m_rangePolicy.getClass()) {

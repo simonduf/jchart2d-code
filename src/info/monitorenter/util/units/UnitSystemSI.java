@@ -34,18 +34,15 @@ package info.monitorenter.util.units;
  *
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public final class UnitSystemSI implements IUnitSystem {
-
-  /** Generated <code>serialVersionUID</code>. */
-  private static final long serialVersionUID = -5311055613864145489L;
 
   /** Singleton instance. */
   private static IUnitSystem instance;
 
   /** The unit classes of this system. */
-  private static final Class[] UNITS = new Class[] {UnitFemto.class, UnitNano.class,
+  private static final Class<?>[] UNITS = new Class[] {UnitFemto.class, UnitNano.class,
       UnitMicro.class, UnitMilli.class, UnitUnchanged.class, UnitKilo.class, UnitMega.class,
       UnitGiga.class, UnitTera.class, UnitPeta.class };
 
@@ -74,9 +71,9 @@ public final class UnitSystemSI implements IUnitSystem {
   /**
    * @see info.monitorenter.util.units.IUnitSystem#getUnits()
    */
-  public Class[] getUnits() {
+  public Class<?>[] getUnits() {
     int len = UnitSystemSI.UNITS.length;
-    Class[] result = new Class[len];
+    Class<?>[] result = new Class[len];
     System.arraycopy(UnitSystemSI.UNITS, 0, result, 0, len);
     return result;
   }

@@ -1,7 +1,7 @@
 /*
  * AxisTickPainterDefault.java,  default IAxisTickPainter 
  * implementation for a tick painter that uses all given arguments 
- * (no proprietary behaviour)
+ * (no proprietary behavior)
  * Copyright (C) 2007 Achim Westermann, Achim.Westermann@gmx.de
  *
  * This library is free software; you can redistribute it and/or
@@ -34,7 +34,7 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  * 
  */
 public class AxisTickPainterDefault implements IAxisTickPainter {
@@ -66,13 +66,22 @@ public class AxisTickPainterDefault implements IAxisTickPainter {
 
   /**
    * @see info.monitorenter.gui.chart.IAxisTickPainter#paintXTick(int, int,
-   *      boolean, java.awt.Graphics2D)
+   *      boolean, boolean, java.awt.Graphics2D)
    */
-  public void paintXTick(final int x, final int y, final boolean isMajorTick, final Graphics2D g) {
+  public void paintXTick(final int x, final int y, final boolean isMajorTick,
+      final boolean isBottomSide, final Graphics2D g) {
     if (isMajorTick) {
-      g.drawLine(x, y, x, y + AxisTickPainterDefault.MAJOR_TICK_LENGTH);
+      if (isBottomSide) {
+        g.drawLine(x, y, x, y + AxisTickPainterDefault.MAJOR_TICK_LENGTH);
+      } else {
+        g.drawLine(x, y, x, y - AxisTickPainterDefault.MAJOR_TICK_LENGTH);
+      }
     } else {
-      g.drawLine(x, y, x, y + AxisTickPainterDefault.MINOR_TICK_LENGTH);
+      if (isBottomSide) {
+        g.drawLine(x, y, x, y + AxisTickPainterDefault.MINOR_TICK_LENGTH);
+      } else {
+        g.drawLine(x, y, x, y - AxisTickPainterDefault.MINOR_TICK_LENGTH);
+      }
     }
   }
 
@@ -86,13 +95,22 @@ public class AxisTickPainterDefault implements IAxisTickPainter {
 
   /**
    * @see info.monitorenter.gui.chart.IAxisTickPainter#paintYTick(int, int,
-   *      boolean, java.awt.Graphics2D)
+   *      boolean, boolean, java.awt.Graphics2D)
    */
-  public void paintYTick(final int x, final int y, final boolean isMajorTick, final Graphics2D g) {
+  public void paintYTick(final int x, final int y, final boolean isMajorTick,
+      final boolean isLeftSide, final Graphics2D g) {
     if (isMajorTick) {
-      g.drawLine(x, y, x - AxisTickPainterDefault.MAJOR_TICK_LENGTH, y);
+      if (isLeftSide) {
+        g.drawLine(x, y, x - AxisTickPainterDefault.MAJOR_TICK_LENGTH, y);
+      } else {
+        g.drawLine(x, y, x + AxisTickPainterDefault.MAJOR_TICK_LENGTH, y);
+      }
     } else {
-      g.drawLine(x, y, x - AxisTickPainterDefault.MINOR_TICK_LENGTH, y);
+      if (isLeftSide) {
+        g.drawLine(x, y, x - AxisTickPainterDefault.MINOR_TICK_LENGTH, y);
+      } else {
+        g.drawLine(x, y, x + AxisTickPainterDefault.MINOR_TICK_LENGTH, y);
+      }
     }
   }
 

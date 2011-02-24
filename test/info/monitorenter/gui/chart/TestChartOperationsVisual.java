@@ -53,7 +53,7 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.18.4.3 $
  */
 public class TestChartOperationsVisual
     extends ATestChartOperations {
@@ -70,6 +70,7 @@ public class TestChartOperationsVisual
     suite.setName(TestChartOperationsVisual.class.getName());
 
     suite.addTest(new TestChartOperationsVisual("testRemoveAllPoints"));
+    suite.addTest(new TestChartOperationsVisual("testRemoveAllTraces"));
     suite.addTest(new TestChartOperationsVisual("testAddPoint"));
     suite.addTest(new TestChartOperationsVisual("testSetStroke"));
     suite.addTest(new TestChartOperationsVisual("testSetTraceName"));
@@ -83,7 +84,7 @@ public class TestChartOperationsVisual
     suite.addTest(new TestChartOperationsVisual("testZoom"));
     suite.addTest(new TestChartOperationsVisual("testDeadLockAddPointThread"));
     suite.addTest(new TestChartOperationsVisual("testTracePointSetLocation"));
-    
+
     return suite;
   }
 
@@ -92,7 +93,7 @@ public class TestChartOperationsVisual
    * <p>
    * 
    * @param arg0
-   *          the name of the test.
+   *            the name of the test.
    */
   public TestChartOperationsVisual(final String arg0) {
     super(arg0);
@@ -202,11 +203,9 @@ public class TestChartOperationsVisual
     ATestChartOperations.AChartOperation operation = new AChartOperation(
         "trace.getErrorbarPainter().setStartPointPainter(new PointPainterDisc())") {
       public Object action(final Chart2D chart) {
-        ITrace2D trace = (ITrace2D) chart.getTraces().iterator().next();
-        IErrorBarPolicy errorBarPolicy = (IErrorBarPolicy) trace.getErrorBarPolicies().iterator()
-            .next();
-        IErrorBarPainter errorBarPainter = (IErrorBarPainter) errorBarPolicy.getErrorBarPainters()
-            .iterator().next();
+        ITrace2D trace = chart.getTraces().iterator().next();
+        IErrorBarPolicy errorBarPolicy = trace.getErrorBarPolicies().iterator().next();
+        IErrorBarPainter errorBarPainter = errorBarPolicy.getErrorBarPainters().iterator().next();
         errorBarPainter.setStartPointPainter(new PointPainterDisc(12));
         return null;
       }
@@ -216,7 +215,7 @@ public class TestChartOperationsVisual
        */
       public void preCondition(final Chart2D chart) throws Exception {
         super.preCondition(chart);
-        ITrace2D trace = (ITrace2D) chart.getTraces().iterator().next();
+        ITrace2D trace = chart.getTraces().iterator().next();
         // create an error bar policy and configure it
         IErrorBarPolicy errorBarPolicy = new ErrorBarPolicyRelative(0.2, 0.2);
         errorBarPolicy.setShowNegativeYErrors(true);
@@ -276,7 +275,7 @@ public class TestChartOperationsVisual
   }
 
   /**
-   * Removes all points of the trace and prompts for visual judgement.
+   * Removes all points of the trace and prompts for visual judgment.
    * <p>
    */
   public void testRemoveAllPoints() {
@@ -293,7 +292,24 @@ public class TestChartOperationsVisual
   }
 
   /**
-   * Sets a new name to the trace and prompts for visual judgement.
+   * Removes all traces of the chart and prompts for visual judgment.
+   * <p>
+   */
+  public void testRemoveAllTraces() {
+    ATestChartOperations.AChartOperation operation = new AChartOperation("trace.removeAllTraces()") {
+      public Object action(final Chart2D chart) {
+        TestChartOperationsVisual.this.m_chart.removeAllTraces();
+        if (Chart2D.DEBUG_THREADING) {
+          System.out.println(this.getClass().getName() + " removed all traces. ");
+        }
+        return null;
+      }
+    };
+    this.setTestOperation(operation);
+  }
+
+  /**
+   * Sets a new name to the trace and prompts for visual judgment.
    * <p>
    */
   public void testSetTraceName() {
@@ -376,7 +392,7 @@ public class TestChartOperationsVisual
     ATestChartOperations.AChartOperation operation = new AChartOperation(
         "trace.setErrorBarPolicy(...)") {
       public Object action(final Chart2D chart) {
-        ITrace2D trace = (ITrace2D) chart.getTraces().iterator().next();
+        ITrace2D trace = chart.getTraces().iterator().next();
         // create an error bar policy and configure it
         IErrorBarPolicy errorBarPolicy = new ErrorBarPolicyRelative(0.2, 0.2);
         errorBarPolicy.setShowNegativeYErrors(true);
@@ -464,9 +480,9 @@ public class TestChartOperationsVisual
       public Object action(final Chart2D chart) {
         Thread t = new Thread(new Runnable() {
           public void run() {
-            ITrace2D trace = (ITrace2D) chart.getTraces().iterator().next();
+            ITrace2D trace = chart.getTraces().iterator().next();
             for (int i = 100; i < 200; i++) {
-              trace.addPoint(i, (Math.random() + 1.0) * i);
+              trace.addPoint(i, (Math.random() + 1.0) * -i);
               try {
                 Thread.sleep(100);
               } catch (InterruptedException e) {

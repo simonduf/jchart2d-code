@@ -49,26 +49,33 @@ package info.monitorenter.util.collections;
  * </p>
  * 
  * @see java.util.Map.Entry
+ * 
+ * @param <V>
+ *            the key type.
+ * 
+ * @param <K>
+ *            the value type.
+ * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann</a>
  */
-public final class Entry implements java.util.Map.Entry {
+public final class Entry<V, K> implements java.util.Map.Entry<V, K> {
   /** The key instance. */
-  private Object m_key;
+  private V m_key;
 
   /** The value instance. */
-  private Object m_value;
+  private K m_value;
 
   /**
    * Creates an instance with the given key and value.
    * <p>
    * 
    * @param key
-   *          the key instance to use.
+   *            the key instance to use.
    * 
    * @param value
-   *          the value instance to use.
+   *            the value instance to use.
    */
-  public Entry(final Object key, final Object value) {
+  public Entry(final V key, final K value) {
     this.m_key = key;
     this.m_value = value;
   }
@@ -78,7 +85,7 @@ public final class Entry implements java.util.Map.Entry {
    * 
    * @see java.util.Map.Entry#getKey()
    */
-  public Object getKey() {
+  public V getKey() {
     return this.m_key;
   }
 
@@ -87,7 +94,7 @@ public final class Entry implements java.util.Map.Entry {
    * 
    * @see java.util.Map.Entry#getValue()
    */
-  public Object getValue() {
+  public K getValue() {
     return this.m_value;
   }
 
@@ -102,8 +109,8 @@ public final class Entry implements java.util.Map.Entry {
    * 
    * @return the previous value instance.
    */
-  public Object setValue(final Object value) {
-    Object ret = this.m_value;
+  public K setValue(final K value) {
+    K ret = this.m_value;
     this.m_value = value;
     return ret;
   }

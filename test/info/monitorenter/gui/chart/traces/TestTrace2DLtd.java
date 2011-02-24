@@ -25,7 +25,6 @@ package info.monitorenter.gui.chart.traces;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.TracePoint2D;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -39,6 +38,7 @@ import junit.framework.TestSuite;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
+ * 
  */
 public class TestTrace2DLtd
     extends TestCase {
@@ -70,10 +70,11 @@ public class TestTrace2DLtd
   }
 
   /**
-   * Adds 1000000 <code>{@link TracePoint2D}</code> instances to a <code>{@link Trace2DLtd}</code>
-   * and asserts that not more points than <code>{@link Trace2DLtd#getMaxSize()} </code> are
-   * remaining in memory.
+   * Adds 1000000 <code>{@link TracePoint2D}</code> instances to a
+   * <code>{@link Trace2DLtd}</code> and asserts that not more points than
+   * <code>{@link Trace2DLtd#getMaxSize()} </code> are remaining in memory.
    * <p>
+   * 
    */
   public void testMemoryLeak() {
     int traceSize = 10;
@@ -82,7 +83,7 @@ public class TestTrace2DLtd
     long percentModulo = max / 20;
     System.out.println("Adding " + max + " points to a Trace2DLtd and a WeakHashMap...");
     TracePoint2D point;
-    Map weakMap = new WeakHashMap();
+    Map<TracePoint2D, String> weakMap = new WeakHashMap<TracePoint2D, String>();
     for (long i = 0; i < max; i++) {
       point = new TracePoint2D(i, i);
       trace.addPoint(point);
@@ -101,13 +102,12 @@ public class TestTrace2DLtd
     System.out.println("System.gc()... ");
     System.gc();
     keys = 0;
-    Iterator it = weakMap.keySet().iterator();
-    while (it.hasNext()) {
+    for (TracePoint2D pt : weakMap.keySet()) {
       keys++;
-      System.out.println("Point " + it.next().toString() + " was not dropped.");
+      System.out.println("Point " + pt.toString() + " was not dropped.");
     }
     System.out.println("Points remaining in the weakMap: " + keys);
-    Assert.assertFalse("There are " + keys
-        + " TracePoint2D instances not deleted from the WeakHashMap.", keys > traceSize);
+    Assert.assertFalse("There are " + keys + " TracePoint2D instances not deleted from the WeakHashMap.",
+        keys > traceSize);
   }
 }

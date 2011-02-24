@@ -32,7 +32,6 @@ import info.monitorenter.util.units.UnitSystemSI;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -46,7 +45,7 @@ import java.util.Map;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.16 $
  * 
  */
 public class LabelFormatterAutoUnits
@@ -60,21 +59,19 @@ public class LabelFormatterAutoUnits
    * factor <nobr>(1*10^x = unit.factor) </nobr>.
    * <p>
    * 
-   * This is used to modifiy the result of {@link #getMaxAmountChars()} as this
+   * This is used to modify the result of {@link #getMaxAmountChars()} as this
    * unit factor will increase or decrease the characters to display.
    * <p>
    * 
    */
-  private static final Map UNITS_2_POWER = new HashMap();
+  private static final Map<AUnit, Integer> UNITS_2_POWER = new HashMap<AUnit, Integer>();
 
   static {
-    Iterator itUnits = UnitFactory.getInstance().getUnits(UnitSystemSI.getInstance()).iterator();
-    AUnit unit;
+    // Iterator itUnits = .iterator();
     double factor = 0;
     int power;
-    while (itUnits.hasNext()) {
+    for (AUnit unit : UnitFactory.getInstance().getUnits(UnitSystemSI.getInstance())) {
       power = 0;
-      unit = (AUnit) itUnits.next();
       factor = unit.getFactor();
       if (factor > 1) {
         while (factor > 1) {
@@ -123,7 +120,7 @@ public class LabelFormatterAutoUnits
    * <p>
    * 
    * @param delegate
-   *          the formatter that will be decorated with units.
+   *            the formatter that will be decorated with units.
    */
   public LabelFormatterAutoUnits(final ALabelFormatter delegate) {
     super();
@@ -148,9 +145,9 @@ public class LabelFormatterAutoUnits
    * <p>
    * 
    * @param min
-   *          the minimum value of the axis.
+   *            the minimum value of the axis.
    * @param max
-   *          the maximum value of the axis.
+   *            the maximum value of the axis.
    * 
    */
   private final void chooseUnit(final double min, final double max) {
@@ -184,7 +181,7 @@ public class LabelFormatterAutoUnits
   }
 
   /**
-   * Returns the decoroated label formatter.
+   * Returns the decorated label formatter.
    * <p>
    * 
    * @return the the decoroated label formatter.
@@ -259,9 +256,9 @@ public class LabelFormatterAutoUnits
 
   }
 
-/**
- * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getMinimumValueShiftForChange()
- */
+  /**
+   * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getMinimumValueShiftForChange()
+   */
   public double getMinimumValueShiftForChange() {
     return this.m_delegate.getMinimumValueShiftForChange() * this.m_unit.getFactor();
   }
@@ -329,8 +326,8 @@ public class LabelFormatterAutoUnits
    * <p>
    * 
    * @param delegate
-   *          the label formatter to decorate by the feature of automatic unit
-   *          choice.
+   *            the label formatter to decorate by the feature of automatic unit
+   *            choice.
    */
   final void setDelegate(final ALabelFormatter delegate) {
     this.m_delegate = delegate;

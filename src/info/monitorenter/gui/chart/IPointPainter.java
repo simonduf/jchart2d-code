@@ -22,6 +22,7 @@
  */
 package info.monitorenter.gui.chart;
 
+
 import java.awt.Graphics2D;
 import java.io.Serializable;
 
@@ -30,7 +31,7 @@ import java.io.Serializable;
  * coordinates.
  * <p>
  * 
- * This low level interface is used wherever points have to painted:
+ * This low level interface is used wherever points have to be painted:
  * <ul>
  * <li> painting traces ({@link info.monitorenter.gui.chart.ITracePainter})
  * </li>
@@ -42,9 +43,28 @@ import java.io.Serializable;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.11 $
  */
 public interface IPointPainter extends Serializable {
+  /**
+   * Invoked to inform implementations that a paint iteration ends for the
+   * corresponding {@link info.monitorenter.gui.chart.ITrace2D}.
+   * <p>
+   * 
+   * @param g2d
+   *          provided in case pending paint operations have to be performed.
+   */
+  public void endPaintIteration(Graphics2D g2d);
+
+  /**
+   * Invoked to inform implementations that a paint iteration starts for the
+   * corresponding {@link info.monitorenter.gui.chart.ITrace2D}.
+   * <p>
+   * 
+   * @param g2d
+   *          provided in case pending paint operations have to be performed.
+   */
+  public void startPaintIteration(Graphics2D g2d);
 
   /**
    * Paint the point given by absolute coordinates on the given graphic context.

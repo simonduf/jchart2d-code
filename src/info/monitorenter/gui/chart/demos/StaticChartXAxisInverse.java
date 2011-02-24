@@ -49,7 +49,7 @@ import javax.swing.JPanel;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public final class StaticChartXAxisInverse
     extends JPanel {
@@ -88,7 +88,7 @@ public final class StaticChartXAxisInverse
     this.setLayout(new BorderLayout());
     Chart2D chart = new Chart2D();
     AAxis axisXinverted = new AxisInverse();
-    chart.setAxisX(axisXinverted);
+    chart.setAxisXBottom(axisXinverted);
 
     // Create an ITrace:
     // Note that dynamic charts need limited amount of values!!!

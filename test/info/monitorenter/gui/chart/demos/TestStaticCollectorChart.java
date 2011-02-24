@@ -44,9 +44,10 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Visual Junit test that uses a <code>{@link PropertyFileStaticDataCollector}</code> with data
- * files in the same package that are named <tt>test&lt;x&gt;.properties</tt> where &gt;x&lt; is a
- * number starting from 0 and increasing by one.
+ * Visual Junit test that uses a
+ * <code>{@link PropertyFileStaticDataCollector}</code> with data files in the
+ * same package that are named <tt>test&lt;x&gt;.properties</tt> where
+ * &gt;x&lt; is a number starting from 0 and increasing by one.
  * <p>
  * 
  * @author Achim Westermann
@@ -54,14 +55,15 @@ import junit.framework.TestSuite;
 public class TestStaticCollectorChart
     extends TestCase {
 
-  /**
+  /** 
    * Main debug entry.
    * <p>
    * 
    * @param args
-   *            ignored.
+   *          ignored.
+   * 
    * @throws IOException
-   *             if sth. goes wrong reading data.
+   *           if sth. goes wrong reading data.
    */
   public static void main(final String[] args) throws IOException {
     TestStaticCollectorChart test = new TestStaticCollectorChart(TestStaticCollectorChart.class
@@ -93,7 +95,7 @@ public class TestStaticCollectorChart
    * <p>
    * 
    * @param testName
-   *            the name of the test case.
+   *          the name of the test case.
    */
   public TestStaticCollectorChart(final String testName) {
     super(testName);
@@ -104,7 +106,7 @@ public class TestStaticCollectorChart
    * <p>
    * 
    * @param chart
-   *            the chart to display.
+   *          the chart to display.
    */
   private void show(final StaticCollectorChart chart) {
     final JFrame frame = new JFrame("StaticCollectorChart");
@@ -131,7 +133,7 @@ public class TestStaticCollectorChart
    * <p>
    * 
    * @throws IOException
-   *             if sth. goes wrong.
+   *           if sth. goes wrong.
    */
   public final void testStaticCollectorChart1() throws IOException {
     InputStream stream = this.getClass().getResourceAsStream("test1.properties");
@@ -146,7 +148,7 @@ public class TestStaticCollectorChart
    * <p>
    * 
    * @throws IOException
-   *             if sth. goes wrong.
+   *           if sth. goes wrong.
    */
   public final void testStaticCollectorChart2() throws IOException {
     InputStream stream = this.getClass().getResourceAsStream("test2.properties");
@@ -164,7 +166,7 @@ public class TestStaticCollectorChart
    * <p>
    * 
    * @throws IOException
-   *             if sth. goes wrong.
+   *           if sth. goes wrong.
    */
   public final void testStaticCollectorChart3() throws IOException {
     InputStream stream = this.getClass().getResourceAsStream("test3.properties");
@@ -181,7 +183,7 @@ public class TestStaticCollectorChart
    * <p>
    * 
    * @throws IOException
-   *             if sth. goes wrong.
+   *           if sth. goes wrong.
    */
   public final void testStaticCollectorChart7() throws IOException {
     InputStream stream = this.getClass().getResourceAsStream("test7.properties");

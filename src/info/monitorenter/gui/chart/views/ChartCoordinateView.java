@@ -43,12 +43,12 @@ import javax.swing.JTextField;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.6 $
  */
 public class ChartCoordinateView extends JPanel {
 
   /**
-   * Generated <code>serial vesion UID</code>.
+   * Generated <code>serial version UID</code>.
    */
   private static final long serialVersionUID = 2547926983897553336L;
 
@@ -88,9 +88,9 @@ public class ChartCoordinateView extends JPanel {
         TracePoint2D value = ChartCoordinateView.this.m_chart2D.translateMousePosition(me);
         if (value != null) {
           ChartCoordinateView.this.m_xView.setText(ChartCoordinateView.this.m_chart2D.getAxisX()
-              .getFormatter().format(value.x));
+              .getFormatter().format(value.getX()));
           ChartCoordinateView.this.m_yView.setText(ChartCoordinateView.this.m_chart2D.getAxisY()
-              .getFormatter().format(value.y));
+              .getFormatter().format(value.getY()));
         }
       }
     };

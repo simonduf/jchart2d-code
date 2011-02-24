@@ -36,13 +36,16 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 /**
- * <code>{@link info.monitorenter.gui.chart.Chart2D}</code> enriched by a zoom-functionality in
- * the x and y dimension.
+ * <code>{@link info.monitorenter.gui.chart.Chart2D}</code> enriched by a
+ * zoom-functionality in the x and y dimension.
  * <p>
  * 
  * @author Alessio Sambarino (Contributor)
- * @version $Revision: 1.12 $
+ * 
+ * @version $Revision: 1.13 $
+ * 
  * @author Klaus Pesendorfer (klaus.pesendorfer@fabalabs.org)
+ * 
  * @version 1.3.2 zoom in both directions
  */
 public class ZoomableChart
@@ -56,7 +59,8 @@ public class ZoomableChart
 
   // modified by Fabalabs (KP) 20060802: only zoom graph with left mouse-button
   /**
-   * Store the last mouse click and test in the mouseDragged-method which mouse-button was clicked.
+   * Store the last mouse click and test in the mouseDragged-method which
+   * mouse-button was clicked.
    */
   private int m_lastPressedButton;
 
@@ -64,7 +68,8 @@ public class ZoomableChart
   private Point2D m_startPoint;
 
   /**
-   * Range policy used to zoom out to the minimum bounds that show every data point.
+   * Range policy used to zoom out to the minimum bounds that show every data
+   * point.
    */
   private IRangePolicy m_zoomAllRangePolicy = new RangePolicyUnbounded();
 
@@ -97,59 +102,63 @@ public class ZoomableChart
   public void mouseDragged(final MouseEvent e) {
     // modified by Fabalabs (KP) 20060802: only zoom graph with left
     // mouse-button
-    if (this.m_lastPressedButton == MouseEvent.BUTTON1) {
+    if (this.m_lastPressedButton != MouseEvent.BUTTON1) {
+      return;
+    }
 
-      // modified by Fabalabs (KP) 20060914: set exact reactangle for 2D-zoom
-      if ((e.getY() >= 20) && (e.getY() <= this.getYChartStart()) && (e.getX() >= 20)
-          && (e.getX() <= this.getXChartEnd())) {
-        double startX;
-        double endX;
-        double dimX;
-        double dimY;
-        double startY;
-        double endY;
+    // modified by Fabalabs (KP) 20060914: set exact reactangle for 2D-zoom
+    if ((e.getY() < 20) || (e.getY() > this.getYChartStart()) || (e.getX() < 20)
+        || (e.getX() > this.getXChartEnd())) {
+      // nop
 
-        // x-coordinate
-        if (e.getX() > this.m_startPoint.getX()) {
-          startX = this.m_startPoint.getX();
-          endX = e.getX();
-        } else {
-          startX = e.getX();
-          endX = this.m_startPoint.getX();
-        }
+    } else {
+      double startX;
+      double endX;
+      double dimX;
+      double dimY;
+      double startY;
+      double endY;
 
-        if (startX < this.getXChartStart()) {
-          startX = this.getXChartStart();
-        }
-
-        if (endX > (this.getWidth() - 20)) {
-          endX = this.getWidth() - 20;
-        }
-
-        // y-coordinate
-        if (e.getY() > this.m_startPoint.getY()) {
-          startY = this.m_startPoint.getY();
-          endY = e.getY();
-        } else {
-          startY = e.getY();
-          endY = this.m_startPoint.getY();
-        }
-
-        if (startY > this.getYChartStart()) {
-          startY = this.getYChartStart();
-        }
-
-        if (endY > (this.getHeight() - 20)) {
-          endY = this.getHeight() - 20;
-        }
-
-        dimX = endX - startX;
-        dimY = endY - startY;
-
-        this.m_zoomArea = new Rectangle2D.Double(startX, startY, dimX, dimY);
-
-        this.setRequestedRepaint(true);
+      // x-coordinate
+      if (e.getX() > this.m_startPoint.getX()) {
+        startX = this.m_startPoint.getX();
+        endX = e.getX();
+      } else {
+        startX = e.getX();
+        endX = this.m_startPoint.getX();
       }
+
+      if (startX < this.getXChartStart()) {
+        startX = this.getXChartStart();
+      }
+
+      if (endX > (this.getWidth() - 20)) {
+        endX = this.getWidth() - 20;
+      }
+
+      // y-coordinate
+      if (e.getY() > this.m_startPoint.getY()) {
+        startY = this.m_startPoint.getY();
+        endY = e.getY();
+      } else {
+        startY = e.getY();
+        endY = this.m_startPoint.getY();
+      }
+
+      if (startY > this.getYChartStart()) {
+        startY = this.getYChartStart();
+      }
+
+      if (endY > (this.getHeight() - 20)) {
+        endY = this.getHeight() - 20;
+      }
+
+      dimX = endX - startX;
+      dimY = endY - startY;
+
+      this.m_zoomArea = new Rectangle2D.Double(startX, startY, dimX, dimY);
+
+      this.setRequestedRepaint(true);
     }
   }
 
@@ -214,17 +223,17 @@ public class ZoomableChart
       if ((endPx - startPx) < 20 || (endPy - startPy) < 20) {
         this.m_zoomArea = null;
         this.setRequestedRepaint(true);
-      } else {
-        this.zoom(xAxisMin, xAxisMax, yAxisMin, yAxisMax);
+        return;
       }
-    }
 
+      this.zoom(xAxisMin, xAxisMax, yAxisMin, yAxisMax);
+    }
   }
 
   /**
    * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
    */
-  public void paintComponent(final Graphics g) {
+  protected void paintComponent(final Graphics g) {
 
     super.paintComponent(g);
 
@@ -243,6 +252,7 @@ public class ZoomableChart
    * 
    * @param xmin
    *            the lower x bound.
+   * 
    * @param xmax
    *            the upper x bound.
    */
@@ -256,16 +266,19 @@ public class ZoomableChart
   }
 
   /**
-   * Zooms to the selected bounds in both directions. modified by Fabalabs (KP) 20060914: zoom also
-   * in y-direction
+   * Zooms to the selected bounds in both directions. modified by Fabalabs (KP)
+   * 20060914: zoom also in y-direction
    * <p>
    * 
    * @param xmin
    *            the lower x bound.
+   * 
    * @param xmax
    *            the upper x bound.
+   * 
    * @param ymin
    *            the lower y bound.
+   * 
    * @param ymax
    *            the upper y bound.
    */

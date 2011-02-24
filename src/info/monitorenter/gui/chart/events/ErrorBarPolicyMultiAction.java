@@ -36,12 +36,14 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 /**
- * Highly proprietary error bar action that changes the behaviour depending on the
- * <code>{@link JMenu}</code> from which it is triggered.
+ * Highly proprietary error bar action that changes the behaviour depending on
+ * the <code>{@link JMenu}</code> from which it is triggered.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.3 $
+ * 
+ * 
+ * @version $Revision: 1.4 $
  */
 public final class ErrorBarPolicyMultiAction
     extends ATrace2DActionErrorBarPolicy {
@@ -53,8 +55,9 @@ public final class ErrorBarPolicyMultiAction
   private Action m_addAction;
 
   /**
-   * The menu for add operation items, needed to remove the add item from when an add operation was
-   * triggered and add an add item when a remove operation was triggered.
+   * The menu for add operation items, needed to remove the add item from when
+   * an add operation was triggered and add an add item when a remove operation
+   * was triggered.
    */
   private JMenu m_addMenu;
 
@@ -62,8 +65,9 @@ public final class ErrorBarPolicyMultiAction
   private Action m_editAction;
 
   /**
-   * The menu for edit operation items, needed to remove the edit item from when a remove operation
-   * was triggered and add an edit item when an add operation was triggered.
+   * The menu for edit operation items, needed to remove the edit item from when
+   * a remove operation was triggered and add an edit item when an add operation
+   * was triggered.
    */
   private JMenu m_editMenu;
 
@@ -71,34 +75,44 @@ public final class ErrorBarPolicyMultiAction
   private Action m_removeAction;
 
   /**
-   * The menu for remove operation items, needed to remove the remove item from when a remove
-   * operation was triggered and add a remove item when an add operation was triggered.
+   * The menu for remove operation items, needed to remove the remove item from
+   * when a remove operation was triggered and add a remove item when an add
+   * operation was triggered.
    */
   private JMenu m_removeMenu;
 
   /**
-   * Create an <code>Action</code> that accesses the trace and identifies itself with the given
-   * action String.
+   * Create an <code>Action</code> that accesses the trace and identifies
+   * itself with the given action String.
    * <p>
    * 
    * @param trace
-   *            the target the action will work on.
+   *          the target the action will work on.
+   * 
    * @param description
-   *            the descriptive <code>String</code> that will be displayed by
-   *            {@link  javax.swing.AbstractButton} subclasses that get this <code>Action</code>
-   *            assigned ( {@link  javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   *          the descriptive <code>String</code> that will be displayed by
+   *          {@link  javax.swing.AbstractButton} subclasses that get this
+   *          <code>Action</code> assigned (
+   *          {@link  javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   * 
    * @param errorBarPolicy
-   *            the error bar policy to use by this action.
+   *          the error bar policy to use by this action.
+   * 
    * @param addMenu
-   *            The menu for add operation items, needed to remove the add item from when an add
-   *            operation was triggered and add an add item when a remove operation was triggered.
+   *          The menu for add operation items, needed to remove the add item
+   *          from when an add operation was triggered and add an add item when
+   *          a remove operation was triggered.
+   * 
    * @param removeMenu
-   *            The menu for remove operation items, needed to remove the remove item from when a
-   *            remove operation was triggered and add a remove item when an add operation was
-   *            triggered.
+   *          The menu for remove operation items, needed to remove the remove
+   *          item from when a remove operation was triggered and add a remove
+   *          item when an add operation was triggered.
+   * 
    * @param editMenu
-   *            The menu for edit operation items, needed to remove the edit item from when a remove
-   *            operation was triggered and add an edit item when an add operation was triggered.
+   *          The menu for edit operation items, needed to remove the edit item
+   *          from when a remove operation was triggered and add an edit item
+   *          when an add operation was triggered.
+   * 
    */
   public ErrorBarPolicyMultiAction(final ITrace2D trace, final String description,
       final IErrorBarPolicy errorBarPolicy, final JMenu addMenu, final JMenu removeMenu,
@@ -127,7 +141,7 @@ public final class ErrorBarPolicyMultiAction
     String text = menu.getText();
     if (text.equals("+")) {
       // add action:
-
+   
       JMenuItem removeItem;
       JMenuItem editItem;
       // add a new JMenuItem to the remove menu and to the edit menu:
@@ -140,12 +154,13 @@ public final class ErrorBarPolicyMultiAction
         removeItem = new JMenuItem(this);
         editItem = new JMenuItem(this);
       }
+     
 
       // do the adding to the model:
       this.m_addAction.actionPerformed(e);
       // also open the edit screen for the new error bar policy:
       this.m_editAction.actionPerformed(e);
-      // this has to be done after actionPerformed because parent frame search will hit
+      // this has to be done after actionPerformed because parent frame search will hit 
       // null else as action is triggered by add menu:
       menu.remove(item);
       this.m_removeMenu.add(removeItem);
@@ -164,7 +179,7 @@ public final class ErrorBarPolicyMultiAction
       this.m_addMenu.add(addItem);
 
       this.m_removeAction.actionPerformed(e);
-      // this has to be done after actionPerformed because parent frame search will hit
+      // this has to be done after actionPerformed because parent frame search will hit 
       // null else as action is triggered by add menu:
       menu.remove(item);
       // remove also the edit menu, this is a bit trickier:

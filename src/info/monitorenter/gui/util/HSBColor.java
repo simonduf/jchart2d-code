@@ -1,7 +1,7 @@
 /*
  *  HSBColor.java, translates RGB colors into Hue-Saturation-Brightness 
  *  colors.
- *  Copyright (C) Achim Westermann, created on 19.05.2005, 22:01:51
+ *  Copyright (C) 2008 Achim Westermann
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,14 +23,15 @@
  */
 package info.monitorenter.gui.util;
 
+
 /**
  * Color that internally works with the Hue Saturation Luminance color space.
  * <p>
  * <p>
- *
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
- * @version $Revision: 1.2 $
+ * 
+ * @version $Revision: 1.3 $
  */
 public class HSBColor implements java.io.Serializable, Cloneable {
 
@@ -45,16 +46,17 @@ public class HSBColor implements java.io.Serializable, Cloneable {
    * except that algorithm is tuned <br>
    * Testing results showed about 25% speed up. Therefore the sources have
    * become harder to understand.
-   *
+   * 
    * @param color
-   *          the <code>java.awt.Color</code> (that follows the RGB model) and
-   *          should be transformed to a color instance in the
-   *          hue-saturation-luminance model.
-   *
+   *            the <code>java.awt.Color</code> (that follows the RGB model)
+   *            and should be transformed to a color instance in the
+   *            hue-saturation-luminance model.
+   * 
    * @return the transformed values of the RGB colors in that order:
    *         hue,saturation,brightness.
    */
   public static HSBColor rgbToHSB(final java.awt.Color color) {
+    // TODO: Fix alpha treatment!!!!
     int rgb = color.getRGB();
     int r = (rgb & 0xFF0000) >> 16;
     int g = (rgb & 0xFF00) >> 8;
@@ -82,17 +84,25 @@ public class HSBColor implements java.io.Serializable, Cloneable {
       ret.m_sat = 0;
       ret.m_hue = 0;
     }
+    ret.m_alpha = color.getAlpha();
     return ret;
   }
 
   /** Hue value between 0.0 and 1.0. */
-  protected float m_hue;
+  protected double m_hue;
 
   /** Luminance value between 0.0 and 1.0. */
-  protected float m_lum;
+  protected double m_lum;
 
   /** Saturation value between 0.0 and 1.0. */
-  protected float m_sat;
+  protected double m_sat;
+
+  /**
+   * The unused alpha channel between 0 and 255: stored here for allow
+   * java.awt.Color instances to be transformed to instances of this class and
+   * be re - transformed with preserving their alpha setting.
+   */
+  protected double m_alpha;
 
   /**
    * Constructor for internal use only.
@@ -105,26 +115,48 @@ public class HSBColor implements java.io.Serializable, Cloneable {
   /**
    * Creates an instance with the given values for hue saturation and luminance.
    * <p>
-   *
+   * 
    * @param hue
-   *          the hue component of the HSBColor
+   *            the hue component of the HSBColor
    * @param saturation
-   *          the saturation component of the HSBColor
+   *            the saturation component of the HSBColor
    * @param brightness
-   *          the brightness component of the HSBColor
+   *            the brightness component of the HSBColor
    */
-  HSBColor(final float hue, final float saturation, final float brightness) {
+  HSBColor(final double hue, final double saturation, final double brightness) {
+    this(hue, saturation, brightness, 255);
+  }
+
+  /**
+   * Creates an instance with the given values for hue saturation, luminance and
+   * alpha.
+   * <p>
+   * 
+   * @param hue
+   *            the hue component of the HSBColor
+   * 
+   * @param saturation
+   *            the saturation component of the HSBColor
+   * 
+   * @param brightness
+   *            the brightness component of the HSBColor
+   * 
+   * @param alpha
+   *            the alpha channed between 0.0 and 1.0.
+   */
+  HSBColor(final double hue, final double saturation, final double brightness, final int alpha) {
     this.m_hue = hue;
     this.m_sat = saturation;
     this.m_lum = brightness;
+    this.m_alpha = alpha;
   }
 
   /**
    * Creates an instance transformed from the rgb color.
    * <p>
-   *
+   * 
    * @param rgbcolor
-   *          standard java rgb color.
+   *            standard java rgb color.
    */
   public HSBColor(final java.awt.Color rgbcolor) {
     int rgb = rgbcolor.getRGB();
@@ -140,24 +172,26 @@ public class HSBColor implements java.io.Serializable, Cloneable {
       if (r == cmax) {
         this.m_hue = (g - b) / difference;
       } else if (g == cmax) {
-        this.m_hue = (b - r) / difference + 2.0f;
+        this.m_hue = (b - r) / difference + 2.0;
       } else {
-        this.m_hue = (r - g) / difference + 4.0f;
+        this.m_hue = (r - g) / difference + 4.0;
       }
-      this.m_hue /= 6.0f;
+      this.m_hue /= 6.0;
       if (this.m_hue < 0) {
-        this.m_hue += 1.0f;
+        this.m_hue += 1.0;
       }
     } else {
       this.m_sat = 0;
       this.m_hue = 0;
     }
+
+    this.m_alpha = rgbcolor.getAlpha();
   }
 
   /**
    * Clone implementation.
    * <p>
-   *
+   * 
    * Following statements are true: <br>
    * <code>
    *  x.clone() != x
@@ -166,7 +200,7 @@ public class HSBColor implements java.io.Serializable, Cloneable {
    * </code>
    * A deep copy of this HSBColor is returned.
    * <p>
-   *
+   * 
    * @return an intance copied from this one.
    */
   public Object clone() {
@@ -176,8 +210,10 @@ public class HSBColor implements java.io.Serializable, Cloneable {
       result.m_hue = this.m_hue;
       result.m_lum = this.m_lum;
       result.m_sat = this.m_sat;
+      result.m_alpha = this.m_alpha;
     } catch (CloneNotSupportedException e) {
-      result = new HSBColor(this.m_hue, this.m_sat, this.m_lum);
+      result = new HSBColor((float) this.m_hue, (float) this.m_sat, (float) this.m_lum, (int) Math
+          .round(this.m_alpha));
     }
     return result;
   }
@@ -185,18 +221,18 @@ public class HSBColor implements java.io.Serializable, Cloneable {
   /**
    * Equals implementation.
    * <p>
-   *
+   * 
    * Returns true if :<br>
    * <code>
-   * <nobr>
+   * <span style="white-space:nowrap;">
    * o.instanceof HSBColor && (this.hue==o.hue) && (this.sat == o.sat) && (this.lum == o.lum)
-   * </nobr>
+   * </span>
    * </code>
    * <p>
-   *
+   * 
    * @param o
-   *          the other {@link HSBColor} instance.
-   *
+   *            the other {@link HSBColor} instance.
+   * 
    * @return true if the colors are judged equal.
    */
   public boolean equals(final Object o) {
@@ -205,18 +241,25 @@ public class HSBColor implements java.io.Serializable, Cloneable {
     }
     HSBColor other = (HSBColor) o;
     return (this.m_hue == other.m_hue) && (this.m_sat == other.m_sat)
-        && (this.m_lum == other.m_lum);
+        && (this.m_lum == other.m_lum) && (this.m_alpha == other.m_alpha);
   }
 
   /**
    * Returns the transformation of this color to the rgb color.
    * <p>
-   *
+   * 
    * @return the transformation of this color to the rgb color.
    */
 
   public java.awt.Color getRGBColor() {
-    return new java.awt.Color(java.awt.Color.HSBtoRGB(this.m_hue, this.m_sat, this.m_lum));
+    int rgb = java.awt.Color.HSBtoRGB((float) this.m_hue, (float) this.m_sat, (float) this.m_lum);
+    // This does not work as it filters out the alpha channel!
+    // return new java.awt.Color(rgb);
+    int r = (rgb & 0xff0000) >> 16;
+    int g = (rgb & 0x00ff00) >> 8;
+    int b = (rgb & 0x0000ff);
+    return new java.awt.Color(r, g, b, (int) Math.round(this.m_alpha));
+
   }
 
   /**

@@ -39,7 +39,7 @@ import java.io.InputStream;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.2.4.1 $
  * 
  */
 public abstract class ADisplayTestPropertyDataBased

@@ -17,7 +17,7 @@
 	<li>Easy usage: only a few lines of code are necessary to use a chart.
 	No complex specification of data points, labels or grids necessary.
 	This is done per default and may optionally be configured.</li>
-	<li>Multiple traces with different behavior may be added to a single
+	<li>Multiple traces with different behaviour may be added to a single
 	chart.</li>
 	<li>Performance. JChart2D is designed for dynamic rendering. Rescaling
 	is done per axis only and only if bounds are exceeded. New points
@@ -28,7 +28,7 @@
 	event-handling, label calculation) do not impose high load even if a
 	point is added with bounds changes every 2ms. But enlarging the window
 	does. So scaling is bound to painting and the adapting painting
-	frequency is limited to a configurable amount of milliseconds. For rendering
+	frequency is limited to 20 frames / second minimum. For rendering
 	traces polylines are drawn by default (instead of many calls to
 	drawline for connecting points). No comparisons to other libraries
 	available.</li>
@@ -36,7 +36,7 @@
 	scientific unit system (nano , milli, tera, ..).</li>
 	<li>Label formatter for scale labels via java.text.NumberFormat or
 	java.text.DateFormat.</li>
-	<li>Chooseable display of grids, labels, labeled scalepoints, coordinate 
+	<li>Choosable display of grids, labels, labeled scalepoints, coordinate 
 	tooltips, ... .</li>
 	<li>Toolbox of UI controls for chart and traces via popup menus and
 	menu bar. See the applet demo. Tip: right-click on the label of the
@@ -64,17 +64,13 @@
 	ringbuffered, ordered, bijective, ...</li>
 	<li>Highly configurable error bar API.</li>
 	<li>Support for zooming (ZoomableChart)</li>
-	<li>Charts may be saved as images (jpeg, gif, jpg,... depending on the 
-	image writers of the java VM implementation), a snapshot UI control 
-    allows this. 
-    </li>
 </ol>
 </p>
 
 
 <h2>Request new features</h2>
 <p>JChart2D is quite stable now. But still some features are missing and
-may be desirable. Ideas are: image - snapshots, triggers for exceeded
+may be desireable. Ideas are: image - snapshots, triggers for exceeded
 bounds or custom painters on trace level. <em>But features will only be
 implemented by contributors or requests for features</em>. Open source
 is not paid and personally I do it for feedback and the knowledge, that
@@ -83,7 +79,7 @@ It will be tried to add features in a clever order: First the basic
 features that will be needed by the more advanced ones. This allows to
 keeps it clean and stable without long terms of blind development
 (unable to perform a build).</p>
-<p>Regardless of the unofficial road map it is important to know, which
+<p>Regardless of the unofficial roadmap it is important to know, which
 features are most desirable for the users. <br>
 So it is important to let us (by now only me) know about it: <br>
 <a href="https://sourceforge.net/tracker/?group_id=50440&atid=459737"

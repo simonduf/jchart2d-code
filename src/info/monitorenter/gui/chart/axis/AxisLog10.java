@@ -47,7 +47,7 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class AxisLog10
     extends AAxisTransformation {
@@ -106,13 +106,13 @@ public class AxisLog10
     if (toTransform < 1) {
       // allow to transform the input for empty traces or all traces with empty
       // points:
-      Iterator itTraces = this.m_accessor.getChart().getTraces().iterator();
+      Iterator<ITrace2D> itTraces = this.m_accessor.getChart().getTraces().iterator();
       if (!itTraces.hasNext()) {
         toTransform = 1.0;
       } else {
         ITrace2D trace;
         while (itTraces.hasNext()) {
-          trace = (ITrace2D) itTraces.next();
+          trace = itTraces.next();
           if (trace.iterator().hasNext()) {
             // Illegal value for transformation defined by a point added:
             throw new IllegalArgumentException(this.getClass().getName()
@@ -124,7 +124,7 @@ public class AxisLog10
       }
     }
     // TODO: change this to Math.log10 as soon as java 1.5 is used:
-    double result = Math.log10(toTransform) / Math.log(10);
+    double result = Math.log(toTransform) / Math.log(10);
     if (Double.isInfinite(result)) {
       result = Double.MAX_VALUE;
     }

@@ -36,18 +36,19 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A delegator / proxy that delegates all calls to an internal constructor-given ITrace2d and swaps
- * the data of the added Point2D instances.
+ * A delegator / proxy that delegates all calls to an internal constructor-given
+ * ITrace2d and swaps the data of the added Point2D instances.
  * <p>
- * x values become y values and vice versa. Performance is bad, as unnecessary instances are created
- * (each TracePoint2D is instantiated twice) so this instance is for debugging / testing purposes
- * only.
+ * x values become y values and vice versa. Performance is bad, as unnecessary
+ * instances are created (each TracePoint2D is instantiated twice) so this
+ * instance is for debugging / testing purposes only.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.14 $
+ * 
+ * @version $Revision: 1.17 $
  */
-public class Trace2DAxisSwap implements ITrace2D {
+public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -5987864541853522562L;
@@ -60,7 +61,7 @@ public class Trace2DAxisSwap implements ITrace2D {
    * <p>
    * 
    * @param trace
-   *            the delagate instance to decorate with axis swapping.
+   *            the delegate instance to decorate with axis swapping.
    */
   public Trace2DAxisSwap(final ITrace2D trace) {
     if (trace == null) {
@@ -118,6 +119,18 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
+   * @param o
+   *            the trace to compare to.
+   * 
+   * @return see interface.
+   * 
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  public int compareTo(final ITrace2D o) {
+    return this.m_delegate.compareTo(o);
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#containsTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
   public boolean containsTracePainter(final ITracePainter painter) {
@@ -156,7 +169,7 @@ public class Trace2DAxisSwap implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#getErrorBarPolicies()
    */
-  public Set getErrorBarPolicies() {
+  public Set<IErrorBarPolicy> getErrorBarPolicies() {
     return this.m_delegate.getErrorBarPolicies();
   }
 
@@ -266,9 +279,10 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
+   * 
    * @see info.monitorenter.gui.chart.ITrace2D#getTracePainters()
    */
-  public Set getTracePainters() {
+  public Set<ITracePainter> getTracePainters() {
     return this.m_delegate.getTracePainters();
   }
 
@@ -303,7 +317,7 @@ public class Trace2DAxisSwap implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#iterator()
    */
-  public Iterator iterator() {
+  public Iterator<TracePoint2D> iterator() {
     return this.m_delegate.iterator();
   }
 
@@ -382,7 +396,7 @@ public class Trace2DAxisSwap implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#setErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
    */
-  public Set setErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
+  public Set<IErrorBarPolicy> setErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
     return this.m_delegate.setErrorBarPolicy(errorBarPolicy);
   }
 
@@ -394,7 +408,8 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#setPhysicalUnits(java.lang.String, java.lang.String)
+   * @see info.monitorenter.gui.chart.ITrace2D#setPhysicalUnits(java.lang.String,
+   *      java.lang.String)
    */
   public void setPhysicalUnits(final String xunit, final String yunit) {
     this.m_delegate.setPhysicalUnits(xunit, yunit);
@@ -415,9 +430,10 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
+   * 
    * @see info.monitorenter.gui.chart.ITrace2D#setTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
-  public Set setTracePainter(final ITracePainter painter) {
+  public Set<ITracePainter> setTracePainter(final ITracePainter painter) {
     return this.m_delegate.setTracePainter(painter);
   }
 

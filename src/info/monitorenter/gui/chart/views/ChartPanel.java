@@ -23,6 +23,7 @@
 package info.monitorenter.gui.chart.views;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.controls.LayoutFactory;
 import info.monitorenter.gui.chart.layouts.FlowLayoutCorrectMinimumSize;
@@ -38,7 +39,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -52,8 +53,8 @@ import javax.swing.JPanel;
  * <p>
  * <h2>Performance note</h2>
  * The context menu items register themselves with the chart to adapt their
- * basic UI properties (font, foreground color, background color) via
- * weak referenced instances of
+ * basic UI properties (font, foreground color, background color) via weak
+ * referenced instances of
  * {@link info.monitorenter.gui.chart.controls.LayoutFactory.BasicPropertyAdaptSupport}.
  * This ensures that dropping a complete menu tree from the UI makes them
  * garbage collectable without introduction of highly unstable and
@@ -75,10 +76,9 @@ import javax.swing.JPanel;
  * (ouch, this should be changed).
  * <p>
  * 
- * Profiling a day with showed
- * that up to 2000 dead listeners remained in the list. The cpu load increased
- * after about 200 add / remove trace operations. Good news is that no memory
- * leak could be detected.
+ * Profiling a day with showed that up to 2000 dead listeners remained in the
+ * list. The cpu load increased after about 200 add / remove trace operations.
+ * Good news is that no memory leak could be detected.
  * <p>
  * If those add and remove trace operations on {@link ChartPanel} - connected
  * charts are performed with intermediate UI action property change events on
@@ -90,7 +90,8 @@ import javax.swing.JPanel;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  */
-public class ChartPanel extends JPanel implements PropertyChangeListener {
+public class ChartPanel
+    extends JPanel implements PropertyChangeListener {
 
   /**
    * Generated <code>serialVersionUID</code>.
@@ -102,7 +103,7 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
    * <p>
    * 
    * @param args
-   *          ignored.
+   *            ignored.
    */
   public static void main(final String[] args) {
     // some data:
@@ -161,8 +162,8 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
    * <p>
    * 
    * @param chart
-   *          A configured Chart2D instance that will be displayed and
-   *          controlled by this panel.
+   *            A configured Chart2D instance that will be displayed and
+   *            controlled by this panel.
    */
   public ChartPanel(final Chart2D chart) {
     super();
@@ -170,16 +171,14 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
     this.setBackground(chart.getBackground());
     // we paint our own labels
     chart.setPaintLabels(false);
-    // get the layout factory for popup menues: 
+    // get the layout factory for popup menues:
     LayoutFactory factory = LayoutFactory.getInstance();
-    
+
     factory.createPopupMenu(chart, true);
 
     // layouting
     this.setLayout(new BorderLayout());
     this.add(chart, BorderLayout.CENTER);
-    Iterator itTraces = chart.iterator();
-    ITrace2D trace;
     // initial Labels
     // put to a flow layout panel
     this.m_labelPanel = new JPanel();
@@ -187,16 +186,54 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
     this.m_labelPanel.setLayout(new FlowLayoutCorrectMinimumSize(FlowLayout.LEFT));
     this.m_labelPanel.setBackground(chart.getBackground());
     JLabel label;
-    while (itTraces.hasNext()) {
-      trace = (ITrace2D) itTraces.next();
+    for (ITrace2D trace : chart) {
       label = factory.createContextMenuLabel(chart, trace, true);
       this.m_labelPanel.add(label);
     }
     this.add(this.m_labelPanel, BorderLayout.SOUTH);
     chart.addPropertyChangeListener(Chart2D.PROPERTY_BACKGROUND_COLOR, this);
-    // listen to new Charts and deleted ones.
-    chart.addPropertyChangeListener(Chart2D.PROPERTY_ADD_REMOVE_TRACE, this);
+    // listen to new traces and deleted ones:
+    List<IAxis> allAxes = chart.getAxes();
+    for (IAxis currentAxis : allAxes) {
+      currentAxis.addPropertyChangeListener(IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
+    }
+    // a bit tricky: stay in touch with removed / added traces in case axes are
+    // changed in the chart: use the axis property change event to update me as
+    // a listener:
+    chart.addPropertyChangeListener(Chart2D.PROPERTY_AXIS_X, this);
+    chart.addPropertyChangeListener(Chart2D.PROPERTY_AXIS_Y, this);
+  }
 
+  /**
+   * Internal helper that returns whether a label for the given trace is already
+   * contained in the internal label panel.
+   * <p>
+   * 
+   * This is needed because an addTrace(ITrace2D) call on the Chart2D is
+   * delegated to two axes thus resulting in two events per added trace: We have
+   * to avoid adding duplicate labels!
+   * <p>
+   * 
+   * @param tracetoAdd
+   *            the trace to check whether a label for it is already contained
+   *            in the internal label panel.
+   * 
+   * @return true if a label for the given trace is already contained in the
+   *         internal label panel.
+   */
+  private boolean containsTraceLabel(final ITrace2D tracetoAdd) {
+    boolean result = false;
+    Component[] traceLabels = this.m_labelPanel.getComponents();
+    JLabel label;
+    String labelName = tracetoAdd.getLabel();
+    for (int i = traceLabels.length - 1; i >= 0; i--) {
+      label = (JLabel) traceLabels[i];
+      if (labelName.equals(label.getText())) {
+        result = true;
+        break;
+      }
+    }
+    return result;
   }
 
   /**
@@ -212,17 +249,26 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
       Color color = (Color) evt.getNewValue();
       this.setBackground(color);
       this.m_labelPanel.setBackground(color);
-    } else if (prop.equals(Chart2D.PROPERTY_ADD_REMOVE_TRACE)) {
+    } else if (prop.equals(IAxis.PROPERTY_ADD_REMOVE_TRACE)) {
+      /*
+       * This event is fired from the axis implementations, an
+       * addTrace(ITrace2D) call on the Chart2D is delegated to two axes thus
+       * resulting in two events per added trace: We have to avoid adding
+       * duplicate labels!
+       */
       ITrace2D oldTrace = (ITrace2D) evt.getOldValue();
       ITrace2D newTrace = (ITrace2D) evt.getNewValue();
       JLabel label;
       if (oldTrace == null && newTrace != null) {
-        label = LayoutFactory.getInstance().createContextMenuLabel(this.m_chart, newTrace, true);
-        this.m_labelPanel.add(label);
+        if (!this.containsTraceLabel(newTrace)) {
+          this.m_labelPanel.getComponents();
+          label = LayoutFactory.getInstance().createContextMenuLabel(this.m_chart, newTrace, true);
+          this.m_labelPanel.add(label);
           this.invalidate();
           this.m_labelPanel.invalidate();
           this.validateTree();
-        this.m_labelPanel.doLayout();
+          this.m_labelPanel.doLayout();
+        }
       } else if (oldTrace != null && newTrace == null) {
         // search for label:
         String labelName = oldTrace.getLabel();
@@ -242,10 +288,18 @@ public class ChartPanel extends JPanel implements PropertyChangeListener {
             break;
           }
         }
+      } else if (prop.equals(Chart2D.PROPERTY_AXIS_X) || prop.equals(Chart2D.PROPERTY_AXIS_Y)) {
+        IAxis newAxis = (IAxis) evt.getNewValue();
+        IAxis oldAxis = (IAxis) evt.getOldValue();
+        if (oldAxis != null) {
+          oldAxis.removePropertyChangeListener(IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
+        }
+        if (newAxis != null) {
+          newAxis.addPropertyChangeListener(IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
+        }
       } else {
         throw new IllegalArgumentException("Bad property change event for add / remove trace.");
       }
     }
   }
-
 }

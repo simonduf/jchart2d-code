@@ -28,6 +28,8 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.TracePoint2D;
 import info.monitorenter.gui.chart.traces.painters.TracePainterPolyline;
+import info.monitorenter.util.MathUtil;
+import info.monitorenter.util.SerializationUtility;
 import info.monitorenter.util.StringUtil;
 
 import java.awt.BasicStroke;
@@ -36,12 +38,16 @@ import java.awt.Stroke;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.swing.event.ChangeListener;
 import javax.swing.event.SwingPropertyChangeSupport;
 
 /**
@@ -55,9 +61,9 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.47 $
+ * @version $Revision: 1.50 $
  */
-public abstract class ATrace2D implements ITrace2D {
+public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
 
   /**
    * Instance counter for read-access in subclasses.
@@ -77,16 +83,16 @@ public abstract class ATrace2D implements ITrace2D {
    * {@link javax.swing.event.ChangeListener} instances (mainly <code>Char2D</code> instances that
    * are interested in changes of internal <code>ITracePoint2D</code> instances.
    */
-  private List m_changeListeners = new LinkedList();
+  private List<ChangeListener> m_changeListeners = new LinkedList<ChangeListener>();
 
   /** The color property. */
   private Color m_color = Color.black;
 
   /** The list of traces that compute their values from this trace. */
-  protected List m_computingTraces = new LinkedList();
+  protected List<ITrace2D> m_computingTraces = new LinkedList<ITrace2D>();
 
   /** The internal set of the error bar policies to use. */
-  private Set m_errorBarPolicies = new TreeSet();
+  private Set<IErrorBarPolicy> m_errorBarPolicies = new TreeSet<IErrorBarPolicy>();
 
   /**
    * Needed for special treatment of cached values in case of empty state (no points).
@@ -163,20 +169,20 @@ public abstract class ATrace2D implements ITrace2D {
   /**
    * The stroke property.
    */
-  private transient Stroke m_stroke = new BasicStroke(1f);
+  private transient Stroke m_stroke;
 
   /** The internal set of the painters to use. */
-  private Set m_tracePainters = new TreeSet();
+  private Set<ITracePainter> m_tracePainters;
 
   /**
    * The visible property.
    */
   private boolean m_visible = true;
-  
+
   /**
    * The zIndex property.
    */
-  private Integer m_zIndex = new Integer(ITrace2D.ZINDEX_MAX);
+  private Integer m_zIndex = Integer.valueOf(ITrace2D.ZINDEX_MAX);
 
   /**
    * Defcon.
@@ -185,8 +191,9 @@ public abstract class ATrace2D implements ITrace2D {
   public ATrace2D() {
     super();
     ATrace2D.instanceCount++;
-    this.m_tracePainters = new TreeSet();
+    this.m_tracePainters = new TreeSet<ITracePainter>();
     this.m_tracePainters.add(new TracePainterPolyline());
+    this.m_stroke = new BasicStroke(1f);
   }
 
   /**
@@ -283,10 +290,10 @@ public abstract class ATrace2D implements ITrace2D {
           p.setListener(this);
           // inform computing traces:
           if (this.m_computingTraces.size() > 0) {
-            Iterator it = this.m_computingTraces.iterator();
+            Iterator<ITrace2D> it = this.m_computingTraces.iterator();
             ITrace2D trace;
             while (it.hasNext()) {
-              trace = (ITrace2D) it.next();
+              trace = it.next();
               trace.addPoint(p);
             }
           }
@@ -315,19 +322,22 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
+   * <p>
    * Override this template method for the custom add operation that depends on the policies of the
    * implementation.
+   * </p>
    * <p>
    * No property change events have to be fired by default. If this method returns <code>true</code>
    * the outer logic of the calling method <code>{@link #addPoint(TracePoint2D)}</code> will
    * perform bound checks for the new point and fire property changes as described in method
    * <code>{@link #firePointChanged(TracePoint2D, int)}</code>.
+   * </p>
    * <p>
    * In special cases - when additional modifications to the internal set of points take place (e.g.
    * a further point gets removed) this method should return false (regardless wether the new point
    * was accepted or not) and perform bound checks and fire the property changes as mentioned above
    * "manually".
-   * <p>
+   * </p>
    * 
    * @param p
    *            the point to add.
@@ -358,6 +368,18 @@ public abstract class ATrace2D implements ITrace2D {
       }
     }
     return result;
+  }
+
+  /**
+   * @param o
+   *            the trace to compare to.
+   * @return see interface.
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  public int compareTo(final ITrace2D o) {
+    String me = this.getClass().getName() + "@" + Integer.toHexString(this.hashCode());
+    String it = o.getClass().getName() + "@" + Integer.toHexString(o.hashCode());
+    return me.compareTo(it);
   }
 
   /**
@@ -439,14 +461,11 @@ public abstract class ATrace2D implements ITrace2D {
     boolean change = false;
     double errorBarMaxXCollect = -Double.MAX_VALUE;
     if (chart != null) {
-      Iterator itErrorBarPolicies = this.getErrorBarPolicies().iterator();
-      IErrorBarPolicy erroBarPolicy;
       double errorBarMaxX = -Double.MAX_VALUE;
-      while (itErrorBarPolicies.hasNext()) {
-        erroBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
-        if (erroBarPolicy.isShowPositiveXErrors()) {
+      for (IErrorBarPolicy errorBarPolicy : this.m_errorBarPolicies) {
+        if (errorBarPolicy.isShowPositiveXErrors()) {
           // was it turned on?
-          errorBarMaxX = erroBarPolicy.getXError(this.m_maxX);
+          errorBarMaxX = errorBarPolicy.getXError(this.m_maxX);
           if (errorBarMaxX > errorBarMaxXCollect) {
             errorBarMaxXCollect = errorBarMaxX;
           }
@@ -454,9 +473,9 @@ public abstract class ATrace2D implements ITrace2D {
       }
     }
     double absoluteMax = errorBarMaxXCollect + this.m_maxX;
-    change = this.m_maxXErrorBar != absoluteMax;
-    if (change) {
+    if (!MathUtil.assertEqual(this.m_maxXErrorBar, absoluteMax, 0.00000001)) {
       this.m_maxXErrorBar = absoluteMax;
+      change = true;
     }
     return change;
   }
@@ -475,13 +494,10 @@ public abstract class ATrace2D implements ITrace2D {
     boolean change = false;
     double errorBarMaxYCollect = -Double.MAX_VALUE;
     if (chart != null) {
-      Iterator itErrorBarPolicies = this.getErrorBarPolicies().iterator();
-      IErrorBarPolicy erroBarPolicy;
       double errorBarMaxY = -Double.MAX_VALUE;
-      while (itErrorBarPolicies.hasNext()) {
-        erroBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
-        if (erroBarPolicy.isShowPositiveYErrors()) {
-          errorBarMaxY = erroBarPolicy.getYError(this.m_maxY);
+      for (IErrorBarPolicy errorBarPolicy : this.m_errorBarPolicies) {
+        if (errorBarPolicy.isShowPositiveYErrors()) {
+          errorBarMaxY = errorBarPolicy.getYError(this.m_maxY);
           if (errorBarMaxY > errorBarMaxYCollect) {
             errorBarMaxYCollect = errorBarMaxY;
           }
@@ -489,9 +505,9 @@ public abstract class ATrace2D implements ITrace2D {
       }
     }
     double absoluteMax = errorBarMaxYCollect + this.m_maxY;
-    change = this.m_maxYErrorBar != absoluteMax;
-    if (change) {
+    if (!MathUtil.assertEqual(this.m_maxYErrorBar, absoluteMax, 0.00000001)) {
       this.m_maxYErrorBar = absoluteMax;
+      change = true;
     }
     return change;
 
@@ -511,13 +527,10 @@ public abstract class ATrace2D implements ITrace2D {
     boolean change = false;
     double errorBarMinXCollect = -Double.MAX_VALUE;
     if (chart != null) {
-      Iterator itErrorBarPolicies = this.getErrorBarPolicies().iterator();
-      IErrorBarPolicy erroBarPolicy;
       double errorBarMinX = -Double.MAX_VALUE;
-      while (itErrorBarPolicies.hasNext()) {
-        erroBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
-        if (erroBarPolicy.isShowNegativeXErrors()) {
-          errorBarMinX = erroBarPolicy.getXError(this.m_minX);
+      for (IErrorBarPolicy errorBarPolicy : this.m_errorBarPolicies) {
+        if (errorBarPolicy.isShowNegativeXErrors()) {
+          errorBarMinX = errorBarPolicy.getXError(this.m_minX);
           if (errorBarMinX > errorBarMinXCollect) {
             errorBarMinXCollect = errorBarMinX;
           }
@@ -525,9 +538,9 @@ public abstract class ATrace2D implements ITrace2D {
       }
     }
     double absoluteMin = this.m_minX - errorBarMinXCollect;
-    change = this.m_minXErrorBar != absoluteMin;
-    if (change) {
+    if (!MathUtil.assertEqual(this.m_minXErrorBar, absoluteMin, 0.00000001)) {
       this.m_minXErrorBar = absoluteMin;
+      change = true;
     }
     return change;
   }
@@ -546,14 +559,11 @@ public abstract class ATrace2D implements ITrace2D {
     boolean change = false;
     double errorBarMinYCollect = -Double.MAX_VALUE;
     if (chart != null) {
-      Iterator itErrorBarPolicies = this.getErrorBarPolicies().iterator();
-      IErrorBarPolicy erroBarPolicy;
       double errorBarMinY = -Double.MAX_VALUE;
-      while (itErrorBarPolicies.hasNext()) {
-        erroBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
-        if (erroBarPolicy.isShowNegativeYErrors()) {
+      for (IErrorBarPolicy errorBarPolicy : this.getErrorBarPolicies()) {
+        if (errorBarPolicy.isShowNegativeYErrors()) {
           // calculate the error
-          errorBarMinY = erroBarPolicy.getYError(this.m_minY);
+          errorBarMinY = errorBarPolicy.getYError(this.m_minY);
           if (errorBarMinY > errorBarMinYCollect) {
             errorBarMinYCollect = errorBarMinY;
           }
@@ -561,9 +571,9 @@ public abstract class ATrace2D implements ITrace2D {
       }
     }
     double absoluteMin = this.m_minY - errorBarMinYCollect;
-    change = this.m_minYErrorBar != absoluteMin;
-    if (change) {
+    if (!MathUtil.assertEqual(this.m_minYErrorBar, absoluteMin, 0.00000001)) {
       this.m_minYErrorBar = absoluteMin;
+      change = true;
     }
     return change;
   }
@@ -573,7 +583,7 @@ public abstract class ATrace2D implements ITrace2D {
    * <p>
    * 
    * @throws Throwable
-   *             if sth. goes wrong.
+   *             if something goes wrong.
    */
   protected void finalize() throws Throwable {
     super.finalize();
@@ -776,19 +786,18 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * Returns the change listeners of this instance.
+   * Returns a shallow copied list of the change listeners of this instance.
    * <p>
    * 
-   * @return the change listeners of this instance.
+   * @return a shallow copied list of the change listeners of this instance.
    */
-  public List getChangeListeners() {
-    return new LinkedList(this.m_changeListeners);
+  public List<ChangeListener> getChangeListeners() {
+    return new LinkedList<ChangeListener>(this.m_changeListeners);
   }
 
   /**
-   * <p>
    * Get the <code>Color</code> this trace will be painted with.
-   * </p>
+   * <p>
    * 
    * @return the <code>Color</code> of this instance
    */
@@ -806,7 +815,7 @@ public abstract class ATrace2D implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#getErrorBarPolicies()
    */
-  public final Set getErrorBarPolicies() {
+  public final Set<IErrorBarPolicy> getErrorBarPolicies() {
     return this.m_errorBarPolicies;
   }
 
@@ -816,10 +825,7 @@ public abstract class ATrace2D implements ITrace2D {
   public final boolean getHasErrorBars() {
     boolean result = false;
     if (this.m_errorBarPolicies.size() > 0) {
-      Iterator itErrorBarPolicies = this.m_errorBarPolicies.iterator();
-      IErrorBarPolicy errorBarPolicy;
-      while (itErrorBarPolicies.hasNext()) {
-        errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
+      for (IErrorBarPolicy errorBarPolicy : this.m_errorBarPolicies) {
         if (errorBarPolicy.getErrorBarPainters().size() > 0) {
           result |= errorBarPolicy.isShowNegativeXErrors();
           if (result) {
@@ -849,7 +855,7 @@ public abstract class ATrace2D implements ITrace2D {
    * The label is constructed of
    * <ul>
    * <li>The name of this trace ({@link #getName()}).</li>
-   * <li>The phyical unit of this trace ({@link #getPhysicalUnits()}). </li>
+   * <li>The physical unit of this trace ({@link #getPhysicalUnits()}). </li>
    * </ul>
    * <p>
    * 
@@ -1009,9 +1015,8 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * <p>
    * Get the <code>Stroke</code> object this instance will be painted with.
-   * </p>
+   * <p>
    * 
    * @return the <code>Stroke</code> object this <code>ITrace2D</code> will be painted with.
    * @see info.monitorenter.gui.chart.ITrace2D#getStroke()
@@ -1023,7 +1028,7 @@ public abstract class ATrace2D implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#getTracePainters()
    */
-  public final Set getTracePainters() {
+  public final Set<ITracePainter> getTracePainters() {
 
     return this.m_tracePainters;
   }
@@ -1033,7 +1038,7 @@ public abstract class ATrace2D implements ITrace2D {
    */
   public final Integer getZIndex() {
     // More expensive but the contract of the order of values described in the
-    // interfaceis inverted to the contract of TreeSetGreedy.
+    // interface is inverted to the contract of TreeSetGreedy.
     // This is done here instead of get/set ComparableProperty
     // as those are invoked several times for each iteration
     // (and paint contains several iterations).
@@ -1051,7 +1056,7 @@ public abstract class ATrace2D implements ITrace2D {
           System.out.println("trace.getZindex, 2 locks");
         }
 
-        return new Integer(ZINDEX_MAX - this.m_zIndex.intValue());
+        return Integer.valueOf(ZINDEX_MAX - this.m_zIndex.intValue());
       }
     }
   }
@@ -1084,9 +1089,9 @@ public abstract class ATrace2D implements ITrace2D {
       double ret = -Double.MAX_VALUE;
       TracePoint2D tmpoint = null;
       double tmp;
-      Iterator it = this.iterator();
+      Iterator<TracePoint2D> it = this.iterator();
       while (it.hasNext()) {
-        tmpoint = (TracePoint2D) it.next();
+        tmpoint = it.next();
         tmp = tmpoint.getX();
         if (tmp > ret) {
           ret = tmp;
@@ -1120,9 +1125,9 @@ public abstract class ATrace2D implements ITrace2D {
       double ret = -Double.MAX_VALUE;
       TracePoint2D tmpoint = null;
       double tmp;
-      Iterator it = this.iterator();
+      Iterator<TracePoint2D> it = this.iterator();
       while (it.hasNext()) {
-        tmpoint = (TracePoint2D) it.next();
+        tmpoint = it.next();
         tmp = tmpoint.getY();
         if (tmp > ret) {
           ret = tmp;
@@ -1156,9 +1161,9 @@ public abstract class ATrace2D implements ITrace2D {
       double ret = Double.MAX_VALUE;
       TracePoint2D tmpoint = null;
       double tmp;
-      Iterator it = this.iterator();
+      Iterator<TracePoint2D> it = this.iterator();
       while (it.hasNext()) {
-        tmpoint = (TracePoint2D) it.next();
+        tmpoint = it.next();
         tmp = tmpoint.getX();
         if (tmp < ret) {
           ret = tmp;
@@ -1192,9 +1197,9 @@ public abstract class ATrace2D implements ITrace2D {
       double ret = Double.MAX_VALUE;
       TracePoint2D tmpoint = null;
       double tmp;
-      Iterator it = this.iterator();
+      Iterator<TracePoint2D> it = this.iterator();
       while (it.hasNext()) {
-        tmpoint = (TracePoint2D) it.next();
+        tmpoint = it.next();
         tmp = tmpoint.getY();
         if (tmp < ret) {
           ret = tmp;
@@ -1217,6 +1222,21 @@ public abstract class ATrace2D implements ITrace2D {
       this.firePropertyChange(PROPERTY_ERRORBARPOLICY_CONFIGURATION, null, evt.getSource());
     }
 
+  }
+
+  /**
+   * Provides serialization support.
+   * 
+   * @param stream
+   *            the input stream.
+   * @throws IOException
+   *             if there is an I/O error.
+   * @throws ClassNotFoundException
+   *             if there is a classpath problem.
+   */
+  private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
+    stream.defaultReadObject();
+    this.m_stroke = SerializationUtility.readStroke(stream);
   }
 
   /**
@@ -1251,13 +1271,8 @@ public abstract class ATrace2D implements ITrace2D {
             this.m_minY));
 
         // inform computing traces:
-        if (this.m_computingTraces.size() > 0) {
-          Iterator it = this.m_computingTraces.iterator();
-          ITrace2D trace;
-          while (it.hasNext()) {
-            trace = (ITrace2D) it.next();
-            trace.removeAllPoints();
-          }
+        for (ITrace2D trace : this.m_computingTraces) {
+          trace.removeAllPoints();
         }
       }
     }
@@ -1322,7 +1337,7 @@ public abstract class ATrace2D implements ITrace2D {
    * 
    * @param point
    *            the <code>TracePoint2D</code> to remove.
-   * @return true if the removal suceeded, false else: this could be that the given point was not
+   * @return true if the removal succeeded, false else: this could be that the given point was not
    *         contained.
    * @see #firePointChanged(TracePoint2D, int)
    */
@@ -1363,13 +1378,8 @@ public abstract class ATrace2D implements ITrace2D {
           this.firePointRemoved(removed);
           removed.setListener(null);
           // inform computing traces:
-          if (this.m_computingTraces.size() > 0) {
-            Iterator it = this.m_computingTraces.iterator();
-            ITrace2D trace;
-            while (it.hasNext()) {
-              trace = (ITrace2D) it.next();
-              trace.removePoint(removed);
-            }
+          for (ITrace2D trace : this.m_computingTraces) {
+            trace.removePoint(removed);
           }
         }
         return removed != null;
@@ -1471,8 +1481,8 @@ public abstract class ATrace2D implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#setErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
    */
-  public final Set setErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
-    Set result = this.m_errorBarPolicies;
+  public final Set<IErrorBarPolicy> setErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
+    Set<IErrorBarPolicy> result = this.m_errorBarPolicies;
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("setErrorBarPolicy, 0 locks");
     }
@@ -1484,7 +1494,7 @@ public abstract class ATrace2D implements ITrace2D {
         if (Chart2D.DEBUG_THREADING) {
           System.out.println("setErrorBarPolicy, 2 locks");
         }
-        this.m_errorBarPolicies = new TreeSet();
+        this.m_errorBarPolicies = new TreeSet<IErrorBarPolicy>();
         boolean added = this.m_errorBarPolicies.add(errorBarPolicy);
         if (added) {
           errorBarPolicy.setTrace(this);
@@ -1493,10 +1503,7 @@ public abstract class ATrace2D implements ITrace2D {
           this.firePropertyChange(PROPERTY_ERRORBARPOLICY, null, errorBarPolicy);
         }
         // now remove this from the previous instances:
-        Iterator itOldErrorBarPolicies = result.iterator();
-        IErrorBarPolicy oldPolicy;
-        while (itOldErrorBarPolicies.hasNext()) {
-          oldPolicy = ((IErrorBarPolicy) itOldErrorBarPolicies.next());
+        for (IErrorBarPolicy oldPolicy : result) {
           oldPolicy.setTrace(null);
           errorBarPolicy.removePropertyChangeListener(IErrorBarPolicy.PROPERTY_CONFIGURATION, this);
           this.firePropertyChange(PROPERTY_ERRORBARPOLICY, oldPolicy, null);
@@ -1578,9 +1585,9 @@ public abstract class ATrace2D implements ITrace2D {
    *            the new sole painter to use.
    * @return the <code>Set&lt;{@link ITracePainter}&gt;</code> that was used before.
    */
-  public final Set setTracePainter(final ITracePainter painter) {
-    Set result = this.m_tracePainters;
-    this.m_tracePainters = new TreeSet();
+  public final Set<ITracePainter> setTracePainter(final ITracePainter painter) {
+    Set<ITracePainter> result = this.m_tracePainters;
+    this.m_tracePainters = new TreeSet<ITracePainter>();
     boolean added = this.m_tracePainters.add(painter);
     if (added) {
       this.firePropertyChange(PROPERTY_PAINTERS, null, painter);
@@ -1604,7 +1611,8 @@ public abstract class ATrace2D implements ITrace2D {
     boolean oldValue = this.m_visible;
     this.m_visible = visible;
     if (oldValue != this.m_visible) {
-      this.firePropertyChange(PROPERTY_VISIBLE, new Boolean(oldValue), new Boolean(this.m_visible));
+      this.firePropertyChange(PROPERTY_VISIBLE, Boolean.valueOf(oldValue), Boolean
+          .valueOf(this.m_visible));
     }
   }
 
@@ -1636,7 +1644,7 @@ public abstract class ATrace2D implements ITrace2D {
           if (rendered) {
             ((Chart2D) this.m_renderer).removeTrace(this);
           }
-          this.m_zIndex = new Integer(ZINDEX_MAX - zIndex.intValue());
+          this.m_zIndex = Integer.valueOf(ZINDEX_MAX - zIndex.intValue());
           if (rendered) {
             ((Chart2D) this.m_renderer).addTrace(this);
           }
@@ -1653,10 +1661,7 @@ public abstract class ATrace2D implements ITrace2D {
    */
   public boolean showsErrorBars() {
     boolean result = false;
-    Iterator itErrorBarPolicies = this.m_errorBarPolicies.iterator();
-    IErrorBarPolicy errorBarPolicy;
-    while (itErrorBarPolicies.hasNext()) {
-      errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
+    for (IErrorBarPolicy errorBarPolicy : this.m_errorBarPolicies) {
       if (errorBarPolicy.getErrorBarPainters().size() > 0) {
         if (errorBarPolicy.isShowNegativeXErrors() || errorBarPolicy.isShowNegativeYErrors()
             || errorBarPolicy.isShowPositiveXErrors() || errorBarPolicy.isShowPositiveYErrors()) {
@@ -1673,10 +1678,7 @@ public abstract class ATrace2D implements ITrace2D {
    */
   public boolean showsNegativeXErrorBars() {
     boolean result = false;
-    Iterator itErrorBarPolicies = this.m_errorBarPolicies.iterator();
-    IErrorBarPolicy errorBarPolicy;
-    while (itErrorBarPolicies.hasNext()) {
-      errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
+    for (IErrorBarPolicy errorBarPolicy : this.m_errorBarPolicies) {
       if (errorBarPolicy.getErrorBarPainters().size() > 0) {
         if (errorBarPolicy.isShowNegativeXErrors()) {
           result = true;
@@ -1692,10 +1694,7 @@ public abstract class ATrace2D implements ITrace2D {
    */
   public boolean showsNegativeYErrorBars() {
     boolean result = false;
-    Iterator itErrorBarPolicies = this.m_errorBarPolicies.iterator();
-    IErrorBarPolicy errorBarPolicy;
-    while (itErrorBarPolicies.hasNext()) {
-      errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
+    for (IErrorBarPolicy errorBarPolicy : this.m_errorBarPolicies) {
       if (errorBarPolicy.getErrorBarPainters().size() > 0) {
         if (errorBarPolicy.isShowNegativeYErrors()) {
           result = true;
@@ -1711,10 +1710,7 @@ public abstract class ATrace2D implements ITrace2D {
    */
   public boolean showsPositiveXErrorBars() {
     boolean result = false;
-    Iterator itErrorBarPolicies = this.m_errorBarPolicies.iterator();
-    IErrorBarPolicy errorBarPolicy;
-    while (itErrorBarPolicies.hasNext()) {
-      errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
+    for (IErrorBarPolicy errorBarPolicy : this.m_errorBarPolicies) {
       if (errorBarPolicy.getErrorBarPainters().size() > 0) {
         if (errorBarPolicy.isShowPositiveXErrors()) {
           result = true;
@@ -1730,10 +1726,7 @@ public abstract class ATrace2D implements ITrace2D {
    */
   public boolean showsPositiveYErrorBars() {
     boolean result = false;
-    Iterator itErrorBarPolicies = this.m_errorBarPolicies.iterator();
-    IErrorBarPolicy errorBarPolicy;
-    while (itErrorBarPolicies.hasNext()) {
-      errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
+    for (IErrorBarPolicy errorBarPolicy : this.m_errorBarPolicies) {
       if (errorBarPolicy.getErrorBarPainters().size() > 0) {
         if (errorBarPolicy.isShowPositiveYErrors()) {
           result = true;
@@ -1745,13 +1738,25 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * <p>
    * Returns <code>{@link #getName()}.</code>
-   * </p>
+   * <p>
    * 
    * @return <code>{@link #getName()}</code>.
    */
   public String toString() {
     return this.getName();
+  }
+
+  /**
+   * Provides serialization support.
+   * 
+   * @param stream
+   *            the output stream.
+   * @throws IOException
+   *             if there is an I/O error.
+   */
+  private void writeObject(final ObjectOutputStream stream) throws IOException {
+    stream.defaultWriteObject();
+    SerializationUtility.writeStroke(this.m_stroke, stream);
   }
 }

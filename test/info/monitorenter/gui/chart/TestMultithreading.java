@@ -36,11 +36,13 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Junit test that tests jchart2d in multithreading mode: Several Threads write data to a weak map -
- * a single consumer periodically renders the data on a <code>{@link ITrace2D}</code> the chart.
+ * Junit test that tests jchart2d in multithreading mode: Several Threads write
+ * data to a weak map - a single consumer periodically renders the data on a
+ * <code>{@link ITrace2D}</code> the chart.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+ * 
  */
 public class TestMultithreading
     extends TestCase {
@@ -52,10 +54,10 @@ public class TestMultithreading
   protected ITrace2D m_trace;
 
   /** Weak storage of points to render. */
-  protected WeakHashMap m_weakMap;
+  protected WeakHashMap<TracePoint2D, String> m_weakMap;
 
   /** List of the producer Threads (produce points to render) for statistics. */
-  protected List m_producers;
+  protected List<Producer> m_producers;
 
   /**
    * Test suite for this test class.
@@ -77,7 +79,7 @@ public class TestMultithreading
   protected static final int PRODUCER_AMOUNT = 10;
 
   /**
-   * Range of millisieconds to pick a random sleep time out between producing two
+   * Range of milliseconds to pick a random sleep time out between producing two
    * <code>{@link TracePoint2D}</code> instances.
    */
   protected static final int PRODUCER_SLEEPRANGE = 100;
@@ -92,9 +94,10 @@ public class TestMultithreading
   protected static final int CONSUMER_SLEEPRANGE = 1000;
 
   /**
-   * The <code>{@link ITrace2D}</code> class to use an instance of for the test.
+   * The <code>{@link ITrace2D}</code> class to use an instance of for the
+   * test.
    */
-  private static final Class TRACE_CLASS = Trace2DLtd.class;
+  private static final Class<Trace2DLtd> TRACE_CLASS = Trace2DLtd.class;
 
   /**
    * Default constructor.
@@ -109,24 +112,26 @@ public class TestMultithreading
    * <p>
    * 
    * @see junit.framework.TestCase#setUp()
+   * 
    * @throws Exception
    *             if something goes wrong.
    */
   public void setUp() throws Exception {
     super.setUp();
     this.m_chart = new Chart2D();
-    this.m_weakMap = new WeakHashMap();
-    this.m_producers = new LinkedList();
+    this.m_weakMap = new WeakHashMap<TracePoint2D, String>();
+    this.m_producers = new LinkedList<Producer>();
     for (int add = TestMultithreading.PRODUCER_AMOUNT; add > 0; add--) {
       this.m_producers.add(new Producer(TestMultithreading.PRODUCER_ADD_POINT_AMOUNT,
           TestMultithreading.PRODUCER_SLEEPRANGE));
     }
-    this.m_trace = (ITrace2D) TestMultithreading.TRACE_CLASS.newInstance();
+    this.m_trace = TestMultithreading.TRACE_CLASS.newInstance();
     this.m_chart.addTrace(this.m_trace);
   }
 
   /**
    * @see junit.framework.TestCase#tearDown()
+   * 
    * @throws Exception
    *             if something goes wrong.
    */
@@ -171,10 +176,10 @@ public class TestMultithreading
    */
   protected boolean isAllProducersFinished() {
     boolean ret = true;
-    Iterator it = this.m_producers.iterator();
+    Iterator<Producer> it = this.m_producers.iterator();
     Producer producer;
     while (it.hasNext()) {
-      producer = (Producer) it.next();
+      producer = it.next();
       if (!producer.isAlive()) {
         it.remove();
       } else {
@@ -185,16 +190,15 @@ public class TestMultithreading
   }
 
   /**
-   * Start the Producer Threads and one Consumer Thread and blocks until all Threads are finished to
-   * avoid that teardown will be called and further tests are executed at the same time the calling
-   * test method has initiated the Threads for it's test.
+   * Start the Producer Threads and one Consumer Thread and blocks until all
+   * Threads are finished to avoid that teardown will be called and further
+   * tests are executed at the same time the calling test method has initiated
+   * the Threads for it's test.
    * <p>
+   * 
    */
   protected void startThreads() {
-    Iterator it = this.m_producers.iterator();
-    Thread producer;
-    while (it.hasNext()) {
-      producer = (Thread) it.next();
+    for (Thread producer : this.m_producers) {
       producer.start();
     }
     Consumer consumer = new Consumer(TestMultithreading.CONSUMER_SLEEPRANGE);
@@ -223,15 +227,13 @@ public class TestMultithreading
     System.gc();
     System.out.println("Points remaining in the weakMap: " + keys);
     keys = 0;
-    Iterator it = this.m_weakMap.keySet().iterator();
-    while (it.hasNext()) {
+    for (TracePoint2D point : this.m_weakMap.keySet()) {
       keys++;
-      System.out.println("Point " + it.next().toString() + " was not dropped.");
+      System.out.println("Point " + point.toString() + " was not dropped.");
     }
     System.out.println("Points remaining in the weakMap: " + keys);
-    Assert.assertFalse("There are " + keys
-        + " TracePoint2D instances not deleted from the WeakHashMap.", keys > this.m_trace
-        .getMaxSize());
+    Assert.assertFalse("There are " + keys + " TracePoint2D instances not deleted from the WeakHashMap.",
+        keys > this.m_trace.getMaxSize());
   }
 
   // ////////////////////////////
@@ -239,11 +241,13 @@ public class TestMultithreading
   // ////////////////////////////
 
   /**
-   * Thread implementation that adds random points to the trace of the outer classes's chart and
-   * takes a random sleep time between 0 and a constructor given value between two add operations.
+   * Thread implementation that adds random points to the trace of the outer
+   * classes's chart and takes a random sleep time between 0 and a constructor
+   * given value between two add operations.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   * 
    */
   class Producer
       extends Thread {
@@ -258,14 +262,17 @@ public class TestMultithreading
 
     /**
      * <p>
-     * Constructs a producer that will add <code>toAdd</code> points with random breaks of
-     * milliseconds between <code>maxSleep</code> and zero.
+     * Constructs a producer that will add <code>toAdd</code> points with
+     * random breaks of milliseconds between <code>maxSleep</code> and zero.
      * </p>
      * 
      * @param toAdd
      *            the amount of points to add.
+     * 
      * @param sleepRange
-     *            the maxium time in milliseconds the Thread will sleep between two points added.
+     *            the maxium time in milliseconds the Thread will sleep between
+     *            two points added.
+     * 
      */
     Producer(final long toAdd, final long sleepRange) {
       this.m_toAdd = toAdd;
@@ -298,11 +305,13 @@ public class TestMultithreading
   }
 
   /**
-   * Thread that invokes paint operations with a mock graphics context (thus consumes pending
-   * unscaled points) interrupted by a sleep between 0 and a configurable amount of milliseconds.
+   * Thread that invokes paint operations with a mock graphics context (thus
+   * consumes pending unscaled points) interrupted by a sleep between 0 and a
+   * configurable amount of milliseconds.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   * 
    */
   class Consumer
       extends Thread {
@@ -311,7 +320,8 @@ public class TestMultithreading
     private long m_sleepRange;
 
     /**
-     * Creates an instance that mock-paints the chart every <code>0 ..  sleeprange</code> ms.
+     * Creates an instance that mock-paints the chart every
+     * <code>0 ..  sleeprange</code> ms.
      * <p>
      * 
      * @param sleepRange

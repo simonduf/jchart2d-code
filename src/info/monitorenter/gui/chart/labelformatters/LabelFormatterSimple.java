@@ -34,11 +34,11 @@ import java.text.DecimalFormat;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.7 $
  *
  */
 public final class LabelFormatterSimple extends LabelFormatterNumber implements IAxisLabelFormatter {
- 
+
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 432931329620546628L;
 
@@ -49,7 +49,7 @@ public final class LabelFormatterSimple extends LabelFormatterNumber implements 
    *
    */
   public LabelFormatterSimple() {
-    super(new DecimalFormat("#"));
+    super(new DecimalFormat("#.#"));
     this.m_numberFormat.setMaximumFractionDigits(2);
     this.m_numberFormat.setMaximumIntegerDigits(16);
   }

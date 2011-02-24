@@ -35,7 +35,7 @@ import java.beans.PropertyChangeEvent;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public final class Chart2DActionSetAxis
     extends AChart2DAction {
@@ -62,20 +62,20 @@ public final class Chart2DActionSetAxis
    * <p>
    * 
    * @param chart
-   *          the target the action will work on.
+   *            the target the action will work on.
    * 
    * @param axis
-   *          the axis implementation to use.
+   *            the axis implementation to use.
    * 
    * @param description
-   *          the description of this action to show in the UI.
+   *            the description of this action to show in the UI.
    * 
    * @param axisTarget
-   *          Identifies where to set the axis on the chart: either
-   *          {@link Chart2D#X} or {@link Chart2D#Y}
+   *            Identifies where to set the axis on the chart: either
+   *            {@link Chart2D#X} or {@link Chart2D#Y}
    * 
    * @throws IllegalArgumentException
-   *           if the axis argument is invalid.
+   *             if the axis argument is invalid.
    */
   public Chart2DActionSetAxis(final Chart2D chart, final AAxis axis, final String description,
       final int axisTarget) throws IllegalArgumentException {
@@ -96,11 +96,11 @@ public final class Chart2DActionSetAxis
   public void actionPerformed(final ActionEvent e) {
     switch (this.m_axisTarget) {
       case Chart2D.X:
-        this.m_chart.setAxisX(this.m_axis);
+        this.m_chart.setAxisXBottom(this.m_axis);
         break;
 
       case Chart2D.Y:
-        this.m_chart.setAxisY(this.m_axis);
+        this.m_chart.setAxisYLeft(this.m_axis);
         break;
 
       default:
@@ -114,29 +114,33 @@ public final class Chart2DActionSetAxis
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
   public void propertyChange(final PropertyChangeEvent evt) {
-    if (evt.getPropertyName().equals(Chart2D.PROPERTY_AXIS_X) && this.m_axisTarget == Chart2D.X) {
 
-      Class axisClass = evt.getNewValue().getClass();
-      if (this.m_axis.getClass() == axisClass) {
-        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED,
-            new Boolean(false), new Boolean(true));
-      } else {
-        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED,
-            new Boolean(true), new Boolean(false));
+    if (evt.getPropertyName().equals(Chart2D.PROPERTY_AXIS_X) && this.m_axisTarget == Chart2D.X) {
+      // Is this a remove event? We only care for add:
+      if (evt.getNewValue() != null) {
+        Class< ? > axisClass = evt.getNewValue().getClass();
+        if (this.m_axis.getClass() == axisClass) {
+          this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, new Boolean(
+              false), new Boolean(true));
+        } else {
+          this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, new Boolean(
+              true), new Boolean(false));
+        }
       }
     } else if (evt.getPropertyName().equals(Chart2D.PROPERTY_AXIS_Y)
         && this.m_axisTarget == Chart2D.Y) {
+      // Is this a remove event? We only care for add:
+      if (evt.getNewValue() != null) {
 
-      Class axisClass = evt.getNewValue().getClass();
-      if (this.m_axis.getClass() == axisClass) {
-        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED,
-            new Boolean(false), new Boolean(true));
-      } else {
-        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED,
-            new Boolean(true), new Boolean(false));
+        Class< ? > axisClass = evt.getNewValue().getClass();
+        if (this.m_axis.getClass() == axisClass) {
+          this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, new Boolean(
+              false), new Boolean(true));
+        } else {
+          this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, new Boolean(
+              true), new Boolean(false));
+        }
       }
     }
-
   }
-
 }

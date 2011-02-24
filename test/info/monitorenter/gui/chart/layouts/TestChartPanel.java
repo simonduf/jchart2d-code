@@ -34,7 +34,6 @@ import java.awt.Dimension;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.JFrame;
@@ -46,22 +45,27 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * TestChartPanelMemoryLeak.java of project jchart2d, a test for a memory leak detected by
- * Pieter-Jan Busschaert.
+ * 
+ * TestChartPanelMemoryLeak.java of project jchart2d, a test for a memory leak
+ * detected by Pieter-Jan Busschaert.
  * <p>
  * 
  * @author Pieter-Jan Busschaert
  * @author Holger Brandl
- * @version $Revision: 1.3 $
+ * 
+ * 
+ * @version $Revision: 1.2.4.2 $
  */
 public class TestChartPanel
     extends TestCase {
   /**
-   * Main debug / profiler entry, do not drop - it's used from build xml to profile.
+   * Main debug / profiler entry, do not drop - it's used from build xml to
+   * profile.
    * <p>
    * 
    * @param args
    *            ignored.
+   * 
    * @throws Exception
    *             if sth. goes wrong.
    */
@@ -102,12 +106,15 @@ public class TestChartPanel
   }
 
   /**
-   * Creates a <code>{@link ChartPanel}</code> with a <code>{@link Chart2D}</code> that has many
-   * traces and shows it for some seconds.
+   * Creates a <code>{@link ChartPanel}</code> with a
+   * <code>{@link Chart2D}</code> that has many traces and shows it for some
+   * seconds.
    * <p>
-   * Warning: For now this is only a visual test, especially for seeing if the space for the labels
-   * works correctly. This test will never fail if sth. is wrong. So watch it!
+   * Warning: For now this is only a visual test, especially for seeing if the
+   * space for the labels works correctly. This test will never fail if sth. is
+   * wrong. So watch it!
    * <p>
+   * 
    */
   public void testManyTraces() {
     Chart2D chart = new Chart2D();
@@ -144,9 +151,10 @@ public class TestChartPanel
   }
 
   /**
-   * Tests a memory leak that was found in jchart2d-1.1.0 and was related to adding and removing
-   * traces with charts wrapped in a {@link ChartPanel}.
+   * Tests a memory leak that was found in jchart2d-1.1.0 and was related to
+   * adding and removing traces with charts wrapped in a {@link ChartPanel}.
    * <p>
+   * 
    */
   public void testMemoryLeak() {
     Chart2D chart = new Chart2D();
@@ -183,10 +191,10 @@ public class TestChartPanel
     Assert.assertTrue(after < before);
 
     // reporting / analysis
-    Map classes2count = new HashMap();
-    Map props2count = new HashMap();
+    Map<Class< ? >, Integer> classes2count = new HashMap<Class< ? >, Integer>();
+    Map<String, Integer> props2count = new HashMap<String, Integer>();
     Integer count;
-    Class clazz;
+    Class< ? > clazz;
     String property;
     for (int i = propertyChangeListeners.length - 1; i >= 0; i--) {
       System.out.println(propertyChangeListeners[i].getClass().getName());
@@ -194,7 +202,7 @@ public class TestChartPanel
       // count the properties:
       if (clazz == PropertyChangeListenerProxy.class) {
         property = ((PropertyChangeListenerProxy) propertyChangeListeners[i]).getPropertyName();
-        count = (Integer) props2count.get(property);
+        count = props2count.get(property);
         if (count == null) {
           count = new Integer(1);
         } else {
@@ -204,7 +212,7 @@ public class TestChartPanel
       }
       count = null;
       // count the listener classes:
-      count = (Integer) classes2count.get(clazz);
+      count = classes2count.get(clazz);
       if (count == null) {
         count = new Integer(1);
       } else {
@@ -212,23 +220,22 @@ public class TestChartPanel
       }
       classes2count.put(clazz, count);
     }
-    Map.Entry entry;
 
-    for (Iterator it = classes2count.entrySet().iterator(); it.hasNext();) {
-      entry = (Map.Entry) it.next();
-      System.out.println(((Class) entry.getKey()).getName() + " : " + entry.getValue());
+    for (Map.Entry<Class< ? >, Integer> entry : classes2count.entrySet()) {
+      System.out.println((entry.getKey()).getName() + " : " + entry.getValue());
     }
     System.out.println();
-    for (Iterator it = props2count.entrySet().iterator(); it.hasNext();) {
-      entry = (Map.Entry) it.next();
+    for (Map.Entry<String, Integer> entry : props2count.entrySet()) {
       System.out.println(entry.getKey() + " : " + entry.getValue());
     }
   }
 
   /**
-   * Creates a <code>{@link ChartPanel}</code> with a <code>{@link Chart2D}</code> that has no
-   * traces and shows it for some seconds.
+   * Creates a <code>{@link ChartPanel}</code> with a
+   * <code>{@link Chart2D}</code> that has no traces and shows it for some
+   * seconds.
    * <p>
+   * 
    */
   public void testNoTraces() {
     Chart2D chart = new Chart2D();

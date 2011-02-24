@@ -27,6 +27,7 @@ import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.gui.chart.IAxisTickPainter;
 import info.monitorenter.gui.chart.IRangePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.units.AUnit;
 
@@ -39,8 +40,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -54,38 +53,42 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 /**
- * Basic junit test method hook that searches for files in this package with name "textX.properties"
- * (where "X" is a number that starts from 1) collects the data in the files and shows a chart with
- * a trace that contains this data along with buttons for judging the display as right or wrong.
+ * Basic junit test method hook that searches for files in this package with
+ * name "textX.properties" (where "X" is a number that starts from 1) collects
+ * the data in the files and shows a chart with a trace that contains this data
+ * along with buttons for judging the display as right or wrong.
  * <p>
- * Note that the test files have to be named with ascending numbers to ensure all are shown.
+ * Note that the test files have to be named with ascending numbers to ensure
+ * all are shown.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.6 $
+ * 
+ * @version $Revision: 1.5.4.2 $
+ * 
  */
-public abstract class ADisplayTest
-    extends TestCase {
+public abstract class ADisplayTest extends TestCase {
 
   /** The frame currently visible. */
   private JFrame m_frame;
 
   /**
-   * Chart2D inistance that failed, set by UI Threads to trigger failure on the junit testcase
-   * Thread.
+   * Chart2D inistance that failed, set by UI Threads to trigger failure on the
+   * junit testcase Thread.
    * <p>
    */
   protected Chart2D m_failure = null;
 
   /**
-   * Basic junit test method hook that searches for files in this package with name
-   * "textX.properties" (where "X" is a number that starts from 1) collects the data in the files
-   * and shows a chart with a trace that contains this data along with buttons for judging the
-   * display as right or wrong.
+   * Basic junit test method hook that searches for files in this package with
+   * name "textX.properties" (where "X" is a number that starts from 1) collects
+   * the data in the files and shows a chart with a trace that contains this
+   * data along with buttons for judging the display as right or wrong.
    * <p>
    * 
    * @throws IOException
    *             if sth. goes wrong.
+   * 
    * @throws InterruptedException
    *             if sleeping is interrupted.
    */
@@ -104,10 +107,12 @@ public abstract class ADisplayTest
   }
 
   /**
-   * Template method that returns the next chart to test or null if no further chart is available.
+   * Template method that returns the next chart to test or null if no further
+   * chart is available.
    * <p>
    * 
    * @return the next chart to test or null if no further chart is available.
+   * 
    * @throws IOException
    *             if sth. goes wrong.
    */
@@ -160,6 +165,7 @@ public abstract class ADisplayTest
    * 
    * @param chart
    *            the chart to display.
+   * 
    * @throws InterruptedException
    *             if sleeping fails.
    */
@@ -238,6 +244,7 @@ public abstract class ADisplayTest
    * 
    * @param collectorchart
    *            the instance to describe.
+   * 
    * @return the description of the given instance.
    */
   private final String describe(final StaticCollectorChart collectorchart) {
@@ -250,6 +257,7 @@ public abstract class ADisplayTest
    * 
    * @param chart
    *            the instance to describe.
+   * 
    * @return the description of the given instance.
    */
   private final String describe(final Chart2D chart) {
@@ -292,11 +300,8 @@ public abstract class ADisplayTest
 
     // Traces
     result.append("  Traces:\n");
-    Iterator itTraces = chart.getTraces().iterator();
-    ITrace2D trace;
     Stroke stroke;
-    while (itTraces.hasNext()) {
-      trace = (ITrace2D) itTraces.next();
+    for (ITrace2D trace : chart.getTraces()) {
       result.append("    ").append(trace.getClass().getName()).append(":\n");
       result.append("      amount of poijnts : ").append(trace.getSize()).append("\n");
       result.append("      x-range: [").append(trace.getMinX()).append(",").append(trace.getMaxX())
@@ -308,10 +313,8 @@ public abstract class ADisplayTest
       result.append("      Visible: ").append(trace.isVisible()).append("\n");
       result.append("      Z-index: ").append(trace.getZIndex()).append("\n");
       result.append("      TracePainters: \n");
-      Set painters = trace.getTracePainters();
-      Iterator itPainters = painters.iterator();
-      while (itPainters.hasNext()) {
-        result.append("        ").append(itPainters.next().getClass().getName()).append("\n");
+      for (ITracePainter tracePainter : trace.getTracePainters()) {
+        result.append("        ").append(tracePainter.getClass().getName()).append("\n");
       }
       stroke = trace.getStroke();
       result.append("       Stroke: ").append(stroke.getClass().getName()).append("\n");

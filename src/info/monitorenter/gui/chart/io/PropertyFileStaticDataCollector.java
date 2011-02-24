@@ -30,11 +30,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Data collector that collects data in form of
@@ -58,12 +58,12 @@ public class PropertyFileStaticDataCollector extends AStaticDataCollector {
    * <p>
    * 
    * @param trace
-   *          the target trace to add data to.
+   *            the target trace to add data to.
    * 
    * @param propertyFileStream
-   *          the stream of the file in the {@link java.util.Properties} format
-   *          where {@link info.monitorenter.gui.chart.TracePoint2D} instances
-   *          (key is x, value is y) is parsed from.
+   *            the stream of the file in the {@link java.util.Properties}
+   *            format where {@link info.monitorenter.gui.chart.TracePoint2D}
+   *            instances (key is x, value is y) is parsed from.
    */
   public PropertyFileStaticDataCollector(final ITrace2D trace, final InputStream propertyFileStream) {
     super(trace);
@@ -76,18 +76,16 @@ public class PropertyFileStaticDataCollector extends AStaticDataCollector {
   public void collectData() throws FileNotFoundException, IOException {
     Properties props = new Properties();
     props.load(this.m_source);
-    Map.Entry entry;
-    Iterator it = props.entrySet().iterator();
-    List sortList = new LinkedList();
-    while (it.hasNext()) {
-      entry = (Map.Entry) it.next();
+    Set<Map.Entry<Object, Object>> entries =  props.entrySet();
+    List<TracePoint2D> sortList = new LinkedList<TracePoint2D>();
+    for (Map.Entry<Object, Object> entry : entries) {
       sortList.add(new TracePoint2D(Double.parseDouble((String) entry.getKey()), Double
           .parseDouble((String) entry.getValue())));
+
     }
     Collections.sort(sortList);
-    it = sortList.iterator();
-    while (it.hasNext()) {
-      this.m_trace.addPoint((TracePoint2D) it.next());
+    for (TracePoint2D point : sortList) {
+      this.m_trace.addPoint(point);
     }
   }
 }

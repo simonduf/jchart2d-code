@@ -63,7 +63,7 @@ import javax.swing.event.ChangeListener;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  * 
  */
 public final class Showcase
@@ -76,7 +76,7 @@ public final class Showcase
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.8 $
+   * @version $Revision: 1.9 $
    */
   final class ControlPanel
       extends JPanel {
@@ -207,7 +207,7 @@ public final class Showcase
        * <p>
        * 
        * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-       * @version $Revision: 1.8 $
+       * @version $Revision: 1.9 $
        */
       final class ColorItem
           extends Color {
@@ -365,7 +365,7 @@ public final class Showcase
   private Chart2D m_chart;
 
   /** The data collector to use. */
-  private ADataCollector m_collector;
+  private transient ADataCollector m_collector;
 
   /** The trace to use. */
   private Trace2DLtd m_trace;

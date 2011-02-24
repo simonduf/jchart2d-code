@@ -53,7 +53,7 @@ import info.monitorenter.gui.chart.TracePoint2D;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.6 $
  */
 public abstract class ADataCollector implements Runnable {
 
@@ -104,7 +104,7 @@ public abstract class ADataCollector implements Runnable {
    * longer than the latency time that desired refresh rate will not be reached.
    * </p>
    * 
-   * @return the colleted point.
+   * @return the collected point.
    */
   public abstract TracePoint2D collectData();
 

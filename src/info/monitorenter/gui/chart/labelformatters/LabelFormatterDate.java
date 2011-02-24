@@ -42,7 +42,7 @@ import java.util.Date;
  * time known as "the epoch", namely January 1, 1970, 00:00:00 GMT. </b>
  * <p>
  * <b>Caution: <br>
- * This implentation is not completly conformat with the constraint: <code>
+ * This implementation is not completely conform with the constraint: <code>
  * instance.parse(instance.format(value)) == value
  * </code>
  * </b> This only works for subsequent call: one call to format contains the
@@ -65,7 +65,7 @@ import java.util.Date;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  * 
  * @see java.util.Date
  */

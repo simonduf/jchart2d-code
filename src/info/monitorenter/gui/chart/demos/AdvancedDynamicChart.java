@@ -55,7 +55,7 @@ import javax.swing.JFrame;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  *
  */
 public final class AdvancedDynamicChart {
@@ -81,7 +81,7 @@ public final class AdvancedDynamicChart {
 
     // Set a date formatter:
     yAxis.setFormatter(new LabelFormatterDate(new SimpleDateFormat("HH:mm:ss")));
-    chart.setAxisY(yAxis);
+    chart.setAxisYLeft(yAxis);
 
     // set a number formatter to get rid of the unnecessary ".0" prefixes for
     // the X-Axis:
@@ -93,7 +93,7 @@ public final class AdvancedDynamicChart {
     format.setMaximumIntegerDigits(3);
     xAxis.setFormatter(new LabelFormatterNumber(format));
 
-    chart.setAxisX(xAxis);
+    chart.setAxisXBottom(xAxis);
     // Try a range policy:
     // This must not be invoked before the Axis is connected to a Chart2D
     // (chart.setXAxis...)

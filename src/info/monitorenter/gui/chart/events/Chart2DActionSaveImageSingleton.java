@@ -48,26 +48,29 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 /**
- * Singleton <code>Action</code> that saves the current chart to an image at the location
- * specified by showing a modal file chooser save dialog.
+ * Singleton <code>Action</code> that saves the current chart to an image at
+ * the location specified by showing a modal file chooser save dialog.
  * <p>
  * Only one instance per target component may exist.
  * <p>
  * 
  * @see info.monitorenter.gui.chart.events.Chart2DActionSetCustomGridColor
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.6 $
+ * 
+ * @version $Revision: 1.7 $
  */
-public final class Chart2DActionSaveImageSingleton
-    extends AChart2DAction {
+public final class Chart2DActionSaveImageSingleton extends AChart2DAction {
   /**
    * Generated <code>serial version UID</code>.
    * <p>
+   * 
    */
   private static final long serialVersionUID = -2800571545563022874L;
 
   /**
-   * The <code>JFileChooser</code> used to choose the location for saving snapshot images.
+   * The <code>JFileChooser</code> used to choose the location for saving
+   * snapshot images.
    * <p>
    */
   private JFileChooser m_filechooser;
@@ -75,7 +78,7 @@ public final class Chart2DActionSaveImageSingleton
   /**
    * Map for instances.
    */
-  private static Map instances = new HashMap();
+  private static Map<String, Chart2DActionSaveImageSingleton> instances = new HashMap<String, Chart2DActionSaveImageSingleton>();
 
   /**
    * Creates a key for the component for internal storage.
@@ -83,6 +86,7 @@ public final class Chart2DActionSaveImageSingleton
    * 
    * @param chart
    *            the chart to generate the storage key for.
+   * 
    * @return a storage key unique for the given chart instance.
    */
   private static String key(final Chart2D chart) {
@@ -90,22 +94,27 @@ public final class Chart2DActionSaveImageSingleton
   }
 
   /**
-   * Returns the single instance for the given component, potentially creating it.
+   * Returns the single instance for the given component, potentially creating
+   * it.
    * <p>
-   * If an instance for the given component had been created the description String is ignored.
+   * 
+   * If an instance for the given component had been created the description
+   * String is ignored.
    * <p>
    * 
    * @param chart
    *            the target the action will work on
    * @param actionName
    *            the descriptive <code>String</code> that will be displayed by
-   *            {@link javax.swing.AbstractButton} subclasses that get this <code>Action</code>
-   *            assigned ( {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   *            {@link javax.swing.AbstractButton} subclasses that get this
+   *            <code>Action</code> assigned (
+   *            {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   * 
    * @return the single instance for the given component.
    */
   public static Chart2DActionSaveImageSingleton getInstance(final Chart2D chart,
       final String actionName) {
-    Chart2DActionSaveImageSingleton result = (Chart2DActionSaveImageSingleton) Chart2DActionSaveImageSingleton.instances
+    Chart2DActionSaveImageSingleton result = Chart2DActionSaveImageSingleton.instances
         .get(Chart2DActionSaveImageSingleton.key(chart));
     if (result == null) {
       result = new Chart2DActionSaveImageSingleton(chart, actionName);
@@ -116,21 +125,23 @@ public final class Chart2DActionSaveImageSingleton
   }
 
   /**
-   * Reference to the last custom color chosen to check wether the corresponding menu is selected.
+   * Reference to the last custom color chosen to check whether the
+   * corresponding menu is selected.
    */
   private Color m_lastChosenColor;
 
   /**
-   * Create an <code>Action</code> that accesses the trace and identifies itself with the given
-   * action String.
+   * Create an <code>Action</code> that accesses the trace and identifies
+   * itself with the given action String.
    * <p>
    * 
    * @param chart
    *            the target the action will work on
    * @param colorName
    *            the descriptive <code>String</code> that will be displayed by
-   *            {@link javax.swing.AbstractButton} subclasses that get this <code>Action</code>
-   *            assigned ( {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   *            {@link javax.swing.AbstractButton} subclasses that get this
+   *            <code>Action</code> assigned (
+   *            {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    */
   private Chart2DActionSaveImageSingleton(final Chart2D chart, final String colorName) {
     super(chart, colorName);
@@ -138,6 +149,8 @@ public final class Chart2DActionSaveImageSingleton
     // configure the file chooser:
     this.m_filechooser = new JFileChooser();
     this.m_filechooser.setAcceptAllFileFilterUsed(false);
+    // fool findbugs tool:
+    this.m_lastChosenColor = null;
   }
 
   /**
@@ -154,9 +167,9 @@ public final class Chart2DActionSaveImageSingleton
     }
     // collect capable writers by format name (API even gets worse!)
     String[] encodings = ImageIO.getWriterFormatNames();
-    Set writers = new TreeSet();
+    Set<String> writers = new TreeSet<String>();
     ImageTypeSpecifier spec = ImageTypeSpecifier.createFromRenderedImage(img);
-    Iterator itWriters;
+    Iterator<ImageWriter> itWriters;
     for (int i = 0; i < encodings.length; i++) {
       itWriters = ImageIO.getImageWriters(spec, encodings[i]);
       if (itWriters.hasNext()) {
@@ -164,10 +177,10 @@ public final class Chart2DActionSaveImageSingleton
       }
     }
     // add the file filters:
-    itWriters = writers.iterator();
+    Iterator<String> itWriterFormats = writers.iterator();
     String extension;
-    while (itWriters.hasNext()) {
-      extension = (String) itWriters.next();
+    while (itWriterFormats.hasNext()) {
+      extension = itWriterFormats.next();
       this.m_filechooser
           .addChoosableFileFilter(new FileFilterExtensions(new String[] {extension }));
     }
@@ -177,7 +190,7 @@ public final class Chart2DActionSaveImageSingleton
       File file = this.m_filechooser.getSelectedFile();
       // get the encoding
       extension = this.m_filechooser.getFileFilter().getDescription().substring(2);
-      ImageWriter imgWriter = (ImageWriter) ImageIO.getImageWritersBySuffix(extension).next();
+      ImageWriter imgWriter = ImageIO.getImageWritersBySuffix(extension).next();
       // parameters for the writer:
       ImageWriteParam params = imgWriter.getDefaultWriteParam();
       if (params.canWriteCompressed()) {
@@ -203,12 +216,12 @@ public final class Chart2DActionSaveImageSingleton
     if (property.equals(Chart2D.PROPERTY_GRID_COLOR)) {
       Color newColor = (Color) evt.getNewValue();
       if (newColor.equals(this.m_lastChosenColor)) {
-        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED,
-            new Boolean(false), new Boolean(true));
+        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, Boolean
+            .valueOf(false), Boolean.valueOf(true));
 
       } else {
-        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED,
-            new Boolean(true), new Boolean(false));
+        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, Boolean
+            .valueOf(true), Boolean.valueOf(false));
       }
     }
   }

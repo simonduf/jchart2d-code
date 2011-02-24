@@ -36,7 +36,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.EventListenerList;
 
-
 /**
  * The <code>ObjectRecorder</code> takes records(inspections) of an objects
  * state using reflection and accessibility- framework.
@@ -49,7 +48,7 @@ import javax.swing.event.EventListenerList;
  *  - try to get the value of the field.
  *  - if not suceed: try to invoke a bean- conform getter.
  *  - if NoSuchMethod, it's useless (no implementation of MagicClazz here).
- *  </pre>
+ * </pre>
  * 
  * <p>
  * 
@@ -59,9 +58,10 @@ import javax.swing.event.EventListenerList;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
-public class ObjectRecorder extends Thread {
+public class ObjectRecorder
+    extends Thread {
 
   /**
    * Data container for the inspection of the internal intance.
@@ -70,14 +70,15 @@ public class ObjectRecorder extends Thread {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.5 $
+   * @version $Revision: 1.6 $
    */
   public final class ObjectInspection {
-    /** Timestamp of the inspection. */
+
+    /** Time stamp of the inspection. */
     protected long m_time;
 
     /** The values taken on the inspection. */
-    private LinkedList m_values;
+    private LinkedList<Object> m_values;
 
     /**
      * Creates an instance linked to the outer recorder.
@@ -86,15 +87,15 @@ public class ObjectRecorder extends Thread {
      */
     private ObjectInspection() {
       this.m_time = new java.util.Date().getTime();
-      this.m_values = new LinkedList();
+      this.m_values = new LinkedList<Object>();
     }
 
     /**
-     * Adds an inspected value to this inpsection.
+     * Adds an inspected value to this inspection.
      * <p>
      * 
      * @param value
-     *          an inspected value of this inpsection.
+     *            an inspected value of this inspection.
      */
     private void add(final Object value) {
       this.m_values.add(value);
@@ -105,9 +106,9 @@ public class ObjectRecorder extends Thread {
      * <p>
      * 
      * @param index
-     *          the index of the inspected value according to the order it was
-     *          found on the instance by {@link Class#getDeclaredFields()}.
-     *          <p>
+     *            the index of the inspected value according to the order it was
+     *            found on the instance by {@link Class#getDeclaredFields()}.
+     *            <p>
      * 
      * @return the value for the attribute at the given index.
      */
@@ -116,10 +117,10 @@ public class ObjectRecorder extends Thread {
     }
 
     /**
-     * Returns the timestamp in ms of this inspection.
+     * Returns the time stamp in ms of this inspection.
      * <p>
      * 
-     * @return the timestamp in ms of this inspection.
+     * @return the time stamp in ms of this inspection.
      */
     public long getTime() {
       return this.m_time;
@@ -134,7 +135,7 @@ public class ObjectRecorder extends Thread {
      * <p>
      * 
      * @param value
-     *          the inspected value from this inspection.
+     *            the inspected value from this inspection.
      */
     protected void remove(final Object value) {
       this.m_values.remove(value);
@@ -165,7 +166,8 @@ public class ObjectRecorder extends Thread {
   protected static final boolean VERBOSE = false;
 
   /** Fast buffer to store recorded fiels. */
-  protected IRingBuffer m_buffer = new RingBufferArrayFast(100);
+  protected IRingBuffer<ObjectRecorder.ObjectInspection> m_buffer = new RingBufferArrayFast<ObjectRecorder.ObjectInspection>(
+      100);
 
   /** The listeners on this recorder. */
   protected EventListenerList m_changeListeners = new EventListenerList();
@@ -178,7 +180,7 @@ public class ObjectRecorder extends Thread {
    */
   protected long m_interval;
 
-  /** The instance to instpec. */
+  /** The instance to inspect. */
   protected Object m_toinspect;
 
   /**
@@ -187,28 +189,28 @@ public class ObjectRecorder extends Thread {
    * <p>
    * 
    * @param toinspect
-   *          the instance to inspect.
+   *            the instance to inspect.
    * 
    * @param interval
-   *          the interval of inspection in ms.
+   *            the interval of inspection in ms.
    */
   public ObjectRecorder(final Object toinspect, final long interval) {
     this.m_interval = interval;
     this.m_toinspect = toinspect;
     this.setDaemon(true);
-    // getting the fieldnames.
+    // getting the field names.
     this.m_fields = toinspect.getClass().getDeclaredFields();
     this.start();
   }
 
   /**
    * Adds a change listener that will be informed about new recordings of the
-   * inpected instances.
+   * inspected instances.
    * <p>
    * 
    * @param x
-   *          the change listener that will be informed about new recordings of
-   *          the inpected instances.
+   *            the change listener that will be informed about new recordings
+   *            of the inspected instances.
    */
   public void addChangeListener(final ChangeListener x) {
     this.m_changeListeners.add(ChangeListener.class, x);
@@ -236,14 +238,14 @@ public class ObjectRecorder extends Thread {
    * taken from the inspected Object and ends with the oldest.
    * 
    * @param attributeName
-   *          field name of the internal instance to inspect.
+   *            field name of the internal instance to inspect.
    * 
    * @return An array filled with TimeStampedValues that represent the past of
    *         the last inspections of the field with attributeName.
    * 
    * @throws NoSuchAttributeException
-   *           if the attribute / field described by the given argument does not
-   *           exist on the internal Object to instpect.
+   *             if the attribute / field described by the given argument does
+   *             not exist on the internal Object to instpect.
    * 
    * @see ObjectRecorder#getInspected()
    */
@@ -263,12 +265,9 @@ public class ObjectRecorder extends Thread {
     }
     int stop = this.m_buffer.size();
     TimeStampedValue[] ret = new TimeStampedValue[stop];
-    ObjectInspection tmp;
     synchronized (this.m_buffer) {
-      java.util.Iterator it = this.m_buffer.iteratorF2L();
-      int i = 0;
-      while (it.hasNext()) {
-        tmp = (ObjectInspection) it.next();
+      for (ObjectInspection tmp : this.m_buffer) {
+        int i = 0;
         ret[i++] = new TimeStampedValue(tmp.getTime(), tmp.get(attribindex));
       }
     }
@@ -301,18 +300,18 @@ public class ObjectRecorder extends Thread {
   }
 
   /**
-   * Returns the last recoreded value taken from the given field along with the
-   * timestamp identifying the time this value was recored.
+   * Returns the last recorded value taken from the given field along with the
+   * time stamp identifying the time this value was recored.
    * <p>
    * 
    * @param fieldname
-   *          the field whose value was recorded.
+   *            the field whose value was recorded.
    * 
-   * @return the last recoreded value taken from the given field along with the
-   *         timestamp identifying the time this value was recored.
+   * @return the last recorded value taken from the given field along with the
+   *         time stamp identifying the time this value was recored.
    * 
    * @throws NoSuchAttributeException
-   *           if no such field exists on the Object to inspect.
+   *             if no such field exists on the Object to inspect.
    * 
    */
   public TimeStampedValue getLastValue(final String fieldname) throws NoSuchAttributeException {
@@ -328,7 +327,7 @@ public class ObjectRecorder extends Thread {
       throw new NoSuchAttributeException("The Attribute with the name: " + fieldname
           + " does not exist in " + this.m_toinspect.getClass().getName());
     }
-    ObjectInspection tmp = (ObjectInspection) this.m_buffer.getYoungest();
+    ObjectInspection tmp = this.m_buffer.getYoungest();
     return new TimeStampedValue(tmp.getTime(), tmp.get(attribindex));
   }
 
@@ -341,8 +340,8 @@ public class ObjectRecorder extends Thread {
    *         {@link ObjectRecorder.ObjectInspection} instances that have been
    *         done.
    */
-  public IRingBuffer getRingBuffer() {
-    return this.m_buffer;
+  public IRingBuffer<ObjectRecorder.ObjectInspection> getRingBuffer() {
+    return this.m_buffer; 
   }
 
   /**
@@ -352,7 +351,7 @@ public class ObjectRecorder extends Thread {
    * values. If a field is private it's value is tried to be taken from the
    * Object by invoking a getter - method conform with the bean - specification:
    * The name of the method has to be "get" followed by the name of the field
-   * with first letter uppercase.
+   * with first letter upper case.
    */
   public void inspect() {
     ObjectInspection newentry = new ObjectInspection();
@@ -404,7 +403,7 @@ public class ObjectRecorder extends Thread {
    * <p>
    * 
    * @param x
-   *          the listener to remove.
+   *            the listener to remove.
    */
   public void removeChangeListener(final ChangeListener x) {
     this.m_changeListeners.remove(ChangeListener.class, x);
@@ -434,8 +433,8 @@ public class ObjectRecorder extends Thread {
    * <p>
    * 
    * @param length
-   *          the amount of recorded states of the Object to inspect that remain
-   *          in memory.
+   *            the amount of recorded states of the Object to inspect that
+   *            remain in memory.
    */
   public void setHistoryLength(final int length) {
     this.m_buffer.setBufferSize(length);
@@ -446,7 +445,7 @@ public class ObjectRecorder extends Thread {
    * <p>
    * 
    * @param sleeptime
-   *          the interval for inpection of the instance to inspect in ms.
+   *            the interval for inpection of the instance to inspect in ms.
    * 
    * @see ObjectRecorder#ObjectRecorder(Object, long)
    */

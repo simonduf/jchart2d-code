@@ -35,12 +35,12 @@ import junit.framework.TestSuite;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.1.4.1 $
  * 
  * @since 7.0.0
  * 
  */
-public class TestTracePoint2D extends TestChart2D {
+public class TestTracePoint2D extends TestChart {
   /**
    * Constructor with the test name.
    * <p>
@@ -77,7 +77,7 @@ public class TestTracePoint2D extends TestChart2D {
    * 
    */
   public void testSetLocationDoubleDouble() throws InterruptedException {
-    TracePoint2D point = (TracePoint2D) this.m_trace.iterator().next();
+    TracePoint2D point = this.m_trace.iterator().next();
     Thread.sleep(2000);
     point.setLocation(point.getX(), point.getY() + 20);
     Thread.sleep(2000);

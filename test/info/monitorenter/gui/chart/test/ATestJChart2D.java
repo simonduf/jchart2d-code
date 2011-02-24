@@ -39,6 +39,7 @@ import junit.framework.TestCase;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+ * 
  */
 public abstract class ATestJChart2D
     extends TestCase {
@@ -49,58 +50,14 @@ public abstract class ATestJChart2D
   /** The y axis configured for the test chart. */
   protected AAxis m_axisY;
 
+  /** The trace configured for the test chart. */
+  protected ITrace2D m_trace;
+
   /** The test chart. */
   protected Chart2D m_chart;
 
   /** The frame to show the test chart. */
   protected JFrame m_frame;
-
-  /** The trace configured for the test chart. */
-  protected ITrace2D m_trace;
-
-  /**
-   * Constructor with the test name.
-   * <p>
-   * 
-   * @param arg0
-   *            the name of the test.
-   */
-  public ATestJChart2D(final String arg0) {
-    super(arg0);
-  }
-
-  /**
-   * Implement and return an instance of the type to test.
-   * <p>
-   * 
-   * @return the <code>{@link AAxis}</code> to test.
-   */
-  protected abstract AAxis createAxisX();
-
-  /**
-   * Implement and return an instance of the type to test.
-   * <p>
-   * 
-   * @return the y axis to test.
-   */
-  protected abstract AAxis createAxisY();
-
-  /**
-   * Implement and return an instance of the type to test.
-   * <p>
-   * 
-   * @return the trace to test.
-   */
-  protected abstract ITrace2D createTrace();
-
-  /**
-   * Template method that fills the configured trace with data.
-   * <p>
-   * 
-   * @param trace2D
-   *            this class will use the internal configured trace for the test.
-   */
-  protected abstract void fillTrace(ITrace2D trace2D);
 
   /**
    * Sets up a chart and shows it in a frame.
@@ -116,32 +73,58 @@ public abstract class ATestJChart2D
     this.fillTrace(this.m_trace);
 
     this.m_chart = new Chart2D();
-    this.m_chart.setAxisX(this.m_axisX);
-    this.m_chart.setAxisY(this.m_axisY);
+    this.m_chart.setAxisXBottom(this.m_axisX);
+    this.m_chart.setAxisYLeft(this.m_axisY);
     this.m_chart.addTrace(this.m_trace);
     Assert.assertNotSame(this.m_axisX, this.m_axisY);
 
     this.m_frame = new JFrame();
     this.m_frame.getContentPane().add(this.m_chart);
-    // this.m_frame.add(new ChartPanel(this.m_chart));
+//    this.m_frame.add(new ChartPanel(this.m_chart));
     this.m_frame.setSize(400, 600);
     this.m_frame.setVisible(true);
     Thread.sleep(1000);
   }
 
   /**
-   * @see junit.framework.TestCase#tearDown()
+   * Template method that fills the configured trace with data.
+   * <p>
+   * 
+   * @param trace2D
+   *          this class will use the internal configured trace for the test.
    */
-  protected void tearDown() throws Exception {
-    super.tearDown();
-    this.m_frame.setVisible(false);
-    this.m_frame.dispose();
-  }
+  protected abstract void fillTrace(ITrace2D trace2D);
 
   /**
-   * Creates a range policy with fixed viewport and a configured range, sets it to the both axis and
-   * tests wether the configured range is modified in bounds.
+   * Implement and return an instance of the type to test.
    * <p>
+   * 
+   * @return the y axis to test.
+   */
+  protected abstract AAxis createAxisY();
+
+  /**
+   * Implement and return an instance of the type to test.
+   * <p>
+   * 
+   * @return the <code>{@link AAxis}</code> to test.
+   */
+  protected abstract AAxis createAxisX();
+
+  /**
+   * Implement and return an instance of the type to test.
+   * <p>
+   * 
+   * @return the trace to test.
+   */
+  protected abstract ITrace2D createTrace();
+
+  /**
+   * Creates a range policy with fixed viewport and a configured range, sets it
+   * to the both axis and tests wether the configured range is modified in
+   * bounds.
+   * <p>
+   * 
    */
   public void testSetRangePolicyFixedViewPort() {
     Range range = new Range(1, 2);
@@ -154,5 +137,25 @@ public abstract class ATestJChart2D
     axisRange = this.m_axisY.getRangePolicy().getRange();
     Assert.assertEquals(range.getMin(), axisRange.getMin(), 0);
     Assert.assertSame(range, axisRange);
+  }
+
+  /**
+   * @see junit.framework.TestCase#tearDown()
+   */
+  protected void tearDown() throws Exception {
+    super.tearDown();
+    this.m_frame.setVisible(false);
+    this.m_frame.dispose();
+  }
+
+  /**
+   * Constructor with the test name.
+   * <p>
+   * 
+   * @param arg0
+   *          the name of the test.
+   */
+  public ATestJChart2D(final String arg0) {
+    super(arg0);
   }
 }

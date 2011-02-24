@@ -49,7 +49,8 @@ import javax.swing.JFrame;
  * <p>
  * 
  * @author Achim Westermann
- * @version $Revision: 1.5 $
+ * 
+ * @version $Revision: 1.6 $
  */
 public class ZoomChartWithErrorBarsAndLogAxis
     extends JFrame {
@@ -69,12 +70,12 @@ public class ZoomChartWithErrorBarsAndLogAxis
     private ZoomableChart m_zoomableChart;
 
     /**
-     * Creates an instance that will reset zooming on the given zoomable chart upon the triggered
-     * action.
+     * Creates an instance that will reset zooming on the given zoomable chart
+     * upon the triggered action.
      * <p>
      * 
      * @param chart
-     *            the target to reset zoomin on.
+     *          the target to reset zoomin on.
      */
     public ZoomAllAdapter(final ZoomableChart chart) {
       this.m_zoomableChart = chart;
@@ -93,7 +94,7 @@ public class ZoomChartWithErrorBarsAndLogAxis
    * <p>
    * 
    * @param args
-   *            ignored.
+   *          ignored.
    */
   public static void main(final String[] args) {
 
@@ -127,10 +128,10 @@ public class ZoomChartWithErrorBarsAndLogAxis
     errorBarPolicy.addErrorBarPainter(painter);
     trace.addErrorBarPolicy(errorBarPolicy);
 
-    chart.setAxisY(new AxisLogE());
+    chart.setAxisYLeft(new AxisLogE());
 
     // Add all points, as it is static
-    for (int i = 1; i < 100; i++) {
+       for (int i = 1; i < 100; i++) {
       trace.addPoint(i, i);
     }
 

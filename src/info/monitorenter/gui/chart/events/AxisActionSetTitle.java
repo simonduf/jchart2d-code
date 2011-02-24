@@ -33,13 +33,13 @@ import java.beans.PropertyChangeEvent;
 
 /**
  * <code>Action</code> that sets the title String of the <code>{@link IAxis}</code>
- * specified by the constructor via <code>{@link IAxis#setTitle(String)}</code>. 
+ * specified by the constructor. 
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class AxisActionSetTitle extends AAxisAction {
 
@@ -76,11 +76,11 @@ public class AxisActionSetTitle extends AAxisAction {
   public void actionPerformed(final ActionEvent e) {
 
     IAxis axis = this.getAxis();
-    OneStringChooserPanel titlePanel = new OneStringChooserPanel("Title", axis.getTitle());
+    OneStringChooserPanel titlePanel = new OneStringChooserPanel("Title", axis.getAxisTitle().getTitle());
     ModalDialog dialog = new ModalDialog(axis.getAccessor().getChart(), "Choose a Title for the "
         + axis.toString() + " axis", titlePanel);
     dialog.showDialog();
-    axis.setTitle(titlePanel.getValue());
+    axis.getAxisTitle().setTitle(titlePanel.getValue());
   }
 
   /**

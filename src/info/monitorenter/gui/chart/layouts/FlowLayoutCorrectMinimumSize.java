@@ -42,10 +42,9 @@ import java.awt.Insets;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
-public class FlowLayoutCorrectMinimumSize
-    extends FlowLayout {
+public class FlowLayoutCorrectMinimumSize extends FlowLayout {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 5192358035459949687L;
@@ -58,7 +57,7 @@ public class FlowLayoutCorrectMinimumSize
    * <code>FlowLayout.LEADING</code>, or <code>FlowLayout.TRAILING</code>.
    * 
    * @param align
-   *          the alignment value
+   *            the alignment value
    */
   public FlowLayoutCorrectMinimumSize(final int align) {
     this(align, 5, 5);
@@ -74,13 +73,13 @@ public class FlowLayoutCorrectMinimumSize
    * <code>FlowLayout.TRAILING</code>.
    * 
    * @param align
-   *          the alignment value
+   *            the alignment value
    * @param hgap
-   *          the horizontal gap between components and between the components
-   *          and the borders of the <code>Container</code>
+   *            the horizontal gap between components and between the components
+   *            and the borders of the <code>Container</code>
    * @param vgap
-   *          the vertical gap between components and between the components and
-   *          the borders of the <code>Container</code>
+   *            the vertical gap between components and between the components
+   *            and the borders of the <code>Container</code>
    */
   public FlowLayoutCorrectMinimumSize(final int align, final int hgap, final int vgap) {
     super(align, hgap, vgap);
@@ -91,7 +90,7 @@ public class FlowLayoutCorrectMinimumSize
    * components in the specified target container.
    * 
    * @param target
-   *          the container that needs to be laid out
+   *            the container that needs to be laid out
    * @return the preferred dimensions to lay out the subcomponents of the
    *         specified container
    * @see Container
@@ -142,7 +141,7 @@ public class FlowLayoutCorrectMinimumSize
    * components contained in the specified target container.
    * 
    * @param target
-   *          the container that needs to be laid out
+   *            the container that needs to be laid out
    * @return the minimum dimensions to lay out the subcomponents of the
    *         specified container
    * @see #preferredLayoutSize
@@ -194,7 +193,7 @@ public class FlowLayoutCorrectMinimumSize
    * in order to satisfy the alignment of this <code>FlowLayout</code> object.
    * 
    * @param target
-   *          the specified component being laid out
+   *            the specified component being laid out
    * @see Container
    * @see java.awt.Container#doLayout
    */
@@ -242,19 +241,21 @@ public class FlowLayoutCorrectMinimumSize
    * Centers the elements in the specified row, if there is any slack.
    * 
    * @param target
-   *          the component which needs to be moved
+   *            the component which needs to be moved
    * @param x
-   *          the x coordinate
+   *            the x coordinate
    * @param y
-   *          the y coordinate
+   *            the y coordinate
    * @param width
-   *          the width dimensions
+   *            the width dimensions
    * @param height
-   *          the height dimensions
+   *            the height dimensions
    * @param rowStart
-   *          the beginning of the row
+   *            the beginning of the row
    * @param rowEnd
-   *          the the ending of the row
+   *            the the ending of the row
+   * @param ltr
+   *            if true, left to right alignment is used.
    */
   private void moveComponents(final Container target, final int x, final int y, final int width,
       final int height, final int rowStart, final int rowEnd, final boolean ltr) {

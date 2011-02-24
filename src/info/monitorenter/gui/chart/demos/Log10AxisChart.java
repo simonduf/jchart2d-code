@@ -46,7 +46,7 @@ import javax.swing.JFrame;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  * 
  */
 public final class Log10AxisChart {
@@ -66,14 +66,14 @@ public final class Log10AxisChart {
     DecimalFormat df = new DecimalFormat();
     df.setMaximumFractionDigits(100);
     axisy.setFormatter(new LabelFormatterAutoUnits(new LabelFormatterNumber(df)));
-    chart.setAxisY(new AxisLog10());
+    chart.setAxisYLeft(new AxisLog10());
 
     // Create an ITrace:
     ITrace2D trace = new Trace2DSimple();
     trace.setTracePainter(new TracePainterDisc(1));
     trace.setColor(Color.DARK_GRAY);
     // Add the function 1/x + random
-    for (double i = 1; i < 10; i += 0.1) {
+    for (int i = 1; i < 10; i += 1) {
       trace.addPoint(i, Math.pow(10, i));
     }
     // Add the trace to the chart:

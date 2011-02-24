@@ -81,7 +81,6 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.WeakReference;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -107,14 +106,16 @@ import javax.swing.JRadioButtonMenuItem;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.27 $
+ * 
+ * @version $Revision: 1.28 $
  */
 public final class LayoutFactory {
 
   /**
-   * Implementation for a <code>PropertyChangeListener</code> that adpapts a wrapped
-   * <code>JComponent</code> to the following properties.
+   * Implementation for a <code>PropertyChangeListener</code> that adpapts a
+   * wrapped <code>JComponent</code> to the following properties.
    * <p>
+   * 
    * <ul>
    * <li>background color</li>
    * <li>foreground color (text)</li>
@@ -123,27 +124,31 @@ public final class LayoutFactory {
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   * 
    */
   public static class BasicPropertyAdaptSupport implements PropertyChangeListener {
 
     /**
      * The component to whose properties the delegate adapts to.
      * <p>
-     * This is not needed to read the properties of because the fired change events contain the re
+     * This is not needed to read the properties of because the fired change
+     * events contain the re
+     * 
      */
     private Component m_adaptee;
 
     /** The weak reference to the component to adapt properties on. */
-    protected WeakReference m_delegate;
+    protected WeakReference<Component> m_delegate;
 
     /**
+     * 
      * @param delegate
      *            The component to adapt the properties on.
      * @param adaptee
      *            The peer component delegate will be adapted to.
      */
     public BasicPropertyAdaptSupport(final Component delegate, final Component adaptee) {
-      this.m_delegate = new WeakReference(delegate);
+      this.m_delegate = new WeakReference<Component>(delegate);
       this.m_adaptee = adaptee;
       delegate.setFont(adaptee.getFont());
       delegate.setBackground(adaptee.getBackground());
@@ -152,14 +157,14 @@ public final class LayoutFactory {
     }
 
     /**
-     * Removes the listener for basic property changes from the component to adapt to.
+     * Removes the listener for basic property changes from the component to
+     * adapt to.
      * <p>
      * 
-     * @see java.lang.Object#finalize()
      * @throws Throwable
-     *             if sth. goes wrong cleaning up.
+     *             if something goes wrong cleaning up.
      */
-    public void finalize() throws Throwable {
+    protected void finalize() throws Throwable {
       super.finalize();
       this.m_adaptee.removePropertyChangeListener(this);
     }
@@ -200,27 +205,28 @@ public final class LayoutFactory {
   }
 
   /**
-   * A checkbox menu item that will change it's order in the known {@link JMenu} it is contained in
-   * whenever it's state changes.
+   * A checkbox menu item that will change it's order in the known {@link JMenu}
+   * it is contained in whenever it's state changes.
    * <p>
-   * Whenever it is deselected it is put to the end, whenever it is selected it will put itself to
-   * the top. Not very perfomant but close to minimal code.
+   * 
+   * Whenever it is unselected it is put to the end, whenever it is selected it
+   * will put itself to the top. Not very fast but close to minimal code.
    * <p>
    */
-  private static class OrderingCheckBoxMenuItem
-      extends JCheckBoxMenuItem {
+  private static class OrderingCheckBoxMenuItem extends JCheckBoxMenuItem {
 
     /**
-     * Enriches a wrapped {@link Action} by the service of ordering it's corresponding
-     * {@link JMenuItem} in it's {@link JMenu} according to the description of
-     * {@link LayoutFactory.OrderingCheckBoxMenuItem}.
+     * Enriches a wrapped {@link Action} by the service of ordering it's
+     * corresponding {@link JMenuItem} in it's {@link JMenu} according to the
+     * description of {@link LayoutFactory.OrderingCheckBoxMenuItem}.
      * <p>
      * 
      * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-     * @version $Revision: 1.27 $
+     * 
+     * 
+     * @version $Revision: 1.28 $
      */
-    private final class JMenuOrderingAction
-        extends AbstractAction {
+    private final class JMenuOrderingAction extends AbstractAction {
 
       /**
        * Generated <code>serialVersionUID</code>.
@@ -228,23 +234,26 @@ public final class LayoutFactory {
       private static final long serialVersionUID = 3835159462649672505L;
 
       /**
-       * The action that is enriched by the service of ordering it's corresponding {@link JMenuItem}
-       * in it's {@link JMenu} according to the description of
-       * {@link LayoutFactory.OrderingCheckBoxMenuItem}.
+       * The action that is enriched by the service of ordering it's
+       * corresponding {@link JMenuItem} in it's {@link JMenu} according to the
+       * description of {@link LayoutFactory.OrderingCheckBoxMenuItem}.
        */
       private Action m_action;
 
       /**
-       * Creates an instance delegating to the given action and adding the ordering service of
-       * enriching a wrapped {@link Action} by the service of ordering it's corresponding
-       * {@link JMenuItem} in it's {@link JMenu} according to the description of
+       * Creates an instance delegating to the given action and adding the
+       * ordering service of enriching a wrapped {@link Action} by the service
+       * of ordering it's corresponding {@link JMenuItem} in it's {@link JMenu}
+       * according to the description of
        * {@link LayoutFactory.OrderingCheckBoxMenuItem}.
        * <p>
        * 
        * @param delegate
-       *            the action that is enriched by the service of ordering it's corresponding
-       *            {@link JMenuItem} in it's {@link JMenu} according to the description of
+       *            the action that is enriched by the service of ordering it's
+       *            corresponding {@link JMenuItem} in it's {@link JMenu}
+       *            according to the description of
        *            {@link LayoutFactory.OrderingCheckBoxMenuItem}.
+       * 
        */
       private JMenuOrderingAction(final Action delegate) {
         this.m_action = delegate;
@@ -307,7 +316,8 @@ public final class LayoutFactory {
       }
 
       /**
-       * @see javax.swing.AbstractAction#putValue(java.lang.String, java.lang.Object)
+       * @see javax.swing.AbstractAction#putValue(java.lang.String,
+       *      java.lang.Object)
        */
       public void putValue(final String key, final Object value) {
         this.m_action.putValue(key, value);
@@ -344,16 +354,20 @@ public final class LayoutFactory {
     private JMenu m_menu;
 
     /**
-     * Creates an instance that will trigger the given action upon checkbox selection / deselection
-     * and order itself in the given menu as described in the class comment.
+     * Creates an instance that will trigger the given action upon checkbox
+     * selection / deselection and order itself in the given menu as described
+     * in the class comment.
      * <p>
      * 
      * @param action
      *            the action to trigger.
+     * 
      * @param container
      *            the instance this menu item is contained in.
+     * 
      * @param checked
      *            the initial state of the checkbox.
+     * 
      * @see LayoutFactory.PropertyChangeCheckBoxMenuItem
      */
     public OrderingCheckBoxMenuItem(final Action action, final JMenu container,
@@ -369,34 +383,41 @@ public final class LayoutFactory {
   }
 
   /**
-   * A checkbox menu item that will change it's order in the known {@link JMenu} it is contained in
-   * whenever it's state changes (see superclass) and additionally adapt basic UI propierties font,
-   * foreground color, background color to the constructor given component.
+   * A checkbox menu item that will change it's order in the known {@link JMenu}
+   * it is contained in whenever it's state changes (see superclass) and
+   * additionally adapt basic UI propierties font, foreground color, background
+   * color to the constructor given component.
    * <p>
-   * Whenever it is deselected it is put to the end, whenever it is selected it will put itself to
-   * the top. Not very perfomant but close to minimal code.
+   * 
+   * Whenever it is deselected it is put to the end, whenever it is selected it
+   * will put itself to the top. Not very perfomant but close to minimal code.
    * <p>
    */
-  private static class OrderingCheckBoxPropertyChangeMenuItem
-      extends LayoutFactory.OrderingCheckBoxMenuItem {
+  private static class OrderingCheckBoxPropertyChangeMenuItem extends
+      LayoutFactory.OrderingCheckBoxMenuItem {
 
     /** Generated <code>serial version UID</code>. */
     private static final long serialVersionUID = 3889088574130596540L;
 
     /**
-     * Creates an instance that will adapt it's own basic UI properties to the given component,
-     * trigger the given action upon checkbox selection / deselection and order itself in the given
-     * menu as described in the class comment.
+     * Creates an instance that will adapt it's own basic UI properties to the
+     * given component, trigger the given action upon checkbox selection /
+     * deselection and order itself in the given menu as described in the class
+     * comment.
      * <p>
      * 
      * @param component
      *            the component to adapt basic UI properties to.
+     * 
      * @param action
      *            the action to trigger.
+     * 
      * @param container
      *            the instance this menu item is contained in.
+     * 
      * @param checked
      *            the initial state of the checkbox.
+     * 
      * @see LayoutFactory.PropertyChangeCheckBoxMenuItem
      */
     public OrderingCheckBoxPropertyChangeMenuItem(final JComponent component, final Action action,
@@ -408,23 +429,26 @@ public final class LayoutFactory {
   }
 
   /**
-   * A <code>JCheckBoxMenuItem</code> that listens for changes of background color, foreground
-   * color and font of the given <code>JComponent</code> and adapts it's own settings.
+   * A <code>JCheckBoxMenuItem</code> that listens for changes of background
+   * color, foreground color and font of the given <code>JComponent</code> and
+   * adapts it's own settings.
    * <p>
-   * Additionally - as this item has a state - it is possible to let the state be changed from
-   * outside (unlike only changing it from the UI): Sth. that seems to have been forgotten in the
-   * java implementation. It's state ({@link JCheckBoxMenuItem#setState(boolean)},
-   * {@link javax.swing.AbstractButton#setSelected(boolean)}) listens on property
-   * {@link #PROPERTY_SELECTED} for changes of the state. These events are normally fired by the
-   * custom {@link Action} implementations like {@link Chart2DActionSetAxis}.
+   * Additionally - as this item has a state - it is possible to let the state
+   * be changed from outside (unlike only changing it from the UI): Sth. that
+   * seems to have been forgotten in the java implementation. It's state ({@link JCheckBoxMenuItem#setState(boolean)},
+   * {@link javax.swing.AbstractButton#setSelected(boolean)}) listens on
+   * property {@link #PROPERTY_SELECTED} for changes of the state. These events
+   * are normally fired by the custom {@link Action} implementations like
+   * {@link Chart2DActionSetAxis}.
    * <p>
-   * Instances register themselves to receive events from the action given to their constructor.
+   * Instances register themselves to receive events from the action given to
+   * their constructor.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   * 
    */
-  public static class PropertyChangeCheckBoxMenuItem
-      extends JCheckBoxMenuItem {
+  public static class PropertyChangeCheckBoxMenuItem extends JCheckBoxMenuItem {
 
     /** The property identifying a change of selection. */
     public static final String PROPERTY_SELECTED = "";
@@ -435,18 +459,24 @@ public final class LayoutFactory {
     private static final long serialVersionUID = 3690196534012752439L;
 
     /**
-     * Creates an instance with the given name that listens to the components background color,
-     * foreground color and font.
+     * Creates an instance with the given name that listens to the components
+     * background color, foreground color and font.
      * <p>
-     * The source of the {@link java.awt.event.ActionEvent} given to the {@link Action} ({@link java.util.EventObject#getSource()})
-     * will be of type {@link JCheckBoxMenuItem}- the state (selected / deselected) may be obtained
-     * from it.
+     * 
+     * The source of the {@link java.awt.event.ActionEvent} given to the
+     * {@link Action} ({@link java.util.EventObject#getSource()}) will be of
+     * type {@link JCheckBoxMenuItem}- the state (selected / deselected) may be
+     * obtained from it.
      * <p>
      * 
      * @param component
-     *            The component to whose basic UI properties this item will adapt.
+     *            The component to whose basic UI properties this item will
+     *            adapt.
+     * 
      * @param action
-     *            The <code>Action</code> to trigger when this item is clicked.
+     *            The <code>Action</code> to trigger when this item is
+     *            clicked.
+     * 
      * @param checked
      *            the inital state of the checkbox.
      */
@@ -462,14 +492,17 @@ public final class LayoutFactory {
 
     /**
      * Internal constructor that should not be used unless
-     * {@link javax.swing.AbstractButton#setAction(javax.swing.Action)} is invoked afterwards on
-     * this instance (else NPE!).
+     * {@link javax.swing.AbstractButton#setAction(javax.swing.Action)} is
+     * invoked afterwards on this instance (else NPE!).
      * <p>
      * 
      * @param component
-     *            The component to whose basic UI properties this item will adapt.
+     *            The component to whose basic UI properties this item will
+     *            adapt.
+     * 
      * @param checked
      *            the inital state of the checkbox.
+     * 
      */
     protected PropertyChangeCheckBoxMenuItem(final JComponent component, final boolean checked) {
       this(component, null, checked);
@@ -487,15 +520,16 @@ public final class LayoutFactory {
   }
 
   /**
-   * A <code>JPopupMenu</code> that listens for changes of background color, foreground color and
-   * font of the given <code>JComponent</code> and adapts it's own settings.
+   * A <code>JPopupMenu</code> that listens for changes of background color,
+   * foreground color and font of the given <code>JComponent</code> and adapts
+   * it's own settings.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   * 
    */
 
-  private static class PropertyChangeJMenuBar
-      extends JMenuBar {
+  private static class PropertyChangeJMenuBar extends JMenuBar {
 
     /**
      * Generated <code>serial version UID</code>.
@@ -513,24 +547,28 @@ public final class LayoutFactory {
   }
 
   /**
-   * A <code>JRadioButtonMenuItem</code> that listens for changes of background color, foreground
-   * color and font of the given <code>JComponent</code> and adapts it's own settings.
+   * A <code>JRadioButtonMenuItem</code> that listens for changes of
+   * background color, foreground color and font of the given
+   * <code>JComponent</code> and adapts it's own settings.
    * <p>
-   * Additionally - as this item has a state - it is possible to let the state be changed from
-   * outside (unlike only changing it from the UI): Sth. that seems to have been forgotten in the
-   * java implementation. It's state ({@link JCheckBoxMenuItem#setState(boolean)},
-   * {@link javax.swing.AbstractButton#setSelected(boolean)}) listens on property
-   * {@link LayoutFactory.PropertyChangeCheckBoxMenuItem#PROPERTY_SELECTED} for changes of the
-   * state. These events are normally fired by the custom {@link Action} implementations like
-   * {@link Chart2DActionSetAxis}.
+   * 
+   * Additionally - as this item has a state - it is possible to let the state
+   * be changed from outside (unlike only changing it from the UI): Sth. that
+   * seems to have been forgotten in the java implementation. It's state ({@link JCheckBoxMenuItem#setState(boolean)},
+   * {@link javax.swing.AbstractButton#setSelected(boolean)}) listens on
+   * property
+   * {@link LayoutFactory.PropertyChangeCheckBoxMenuItem#PROPERTY_SELECTED} for
+   * changes of the state. These events are normally fired by the custom
+   * {@link Action} implementations like {@link Chart2DActionSetAxis}.
    * <p>
-   * Instances register themselves to receive events from the action given to their constructor.
+   * Instances register themselves to receive events from the action given to
+   * their constructor.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   * 
    */
-  private static class PropertyChangeJRadioButtonMenuItem
-      extends JRadioButtonMenuItem {
+  private static class PropertyChangeJRadioButtonMenuItem extends JRadioButtonMenuItem {
 
     /**
      * Generated <code>serial version UID</code>.
@@ -540,29 +578,35 @@ public final class LayoutFactory {
 
     /**
      * Internal constructor that should not be used unless
-     * {@link javax.swing.AbstractButton#setAction(javax.swing.Action)} is invoked afterwards on
-     * this instance (else NPE!).
+     * {@link javax.swing.AbstractButton#setAction(javax.swing.Action)} is
+     * invoked afterwards on this instance (else NPE!).
      * <p>
      * 
      * @param component
-     *            The component to whose basic UI properties this item will adapt.
+     *            The component to whose basic UI properties this item will
+     *            adapt.
      */
     protected PropertyChangeJRadioButtonMenuItem(final JComponent component) {
       this(component, null);
     }
 
     /**
-     * Creates an instance with the given name that listens to the components background color,
-     * foreground color and font.
+     * Creates an instance with the given name that listens to the components
+     * background color, foreground color and font.
      * <p>
-     * The source of the {@link java.awt.event.ActionEvent} given to the {@link Action} ({@link java.util.EventObject#getSource()})
-     * will be of type {@link JRadioButtonMenuItem}.
+     * 
+     * The source of the {@link java.awt.event.ActionEvent} given to the
+     * {@link Action} ({@link java.util.EventObject#getSource()}) will be of
+     * type {@link JRadioButtonMenuItem}.
      * <p>
      * 
      * @param component
-     *            The component to whose basic UI properties this item will adapt.
+     *            The component to whose basic UI properties this item will
+     *            adapt.
+     * 
      * @param action
-     *            The <code>Action</code> to trigger when this item is clicked.
+     *            The <code>Action</code> to trigger when this item is
+     *            clicked.
      */
     public PropertyChangeJRadioButtonMenuItem(final JComponent component, final Action action) {
       super(action);
@@ -586,34 +630,38 @@ public final class LayoutFactory {
   }
 
   /**
-   * A <code>JMenu</code> that listens for changes of background color, foreground color and font
-   * of the given <code>JComponent</code> and adapts it's own settings.
+   * A <code>JMenu</code> that listens for changes of background color,
+   * foreground color and font of the given <code>JComponent</code> and adapts
+   * it's own settings.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   * 
    */
-  private static class PropertyChangeMenu
-      extends JMenu {
+  private static class PropertyChangeMenu extends JMenu {
     /**
      * Generated <code>serialVersionUID</code>.
      */
     private static final long serialVersionUID = 3256437027795973685L;
 
     /**
-     * Creates an instance with the given name that listens to the components background color,
-     * foreground color and font.
+     * Creates an instance with the given name that listens to the components
+     * background color, foreground color and font.
      * <p>
      * 
      * @param name
      *            The name to display.
+     * 
      * @param component
      *            The component to whose background color this item will adapt.
      */
     public PropertyChangeMenu(final JComponent component, final String name) {
       super(name);
       /*
-       * For java 1.5 menus that are submenus don't use background color in ocean theme:
-       * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5097866 workaround:
+       * For java 1.5 menus that are submenus don't use background color in
+       * ocean theme: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5097866
+       * 
+       * workaround:
        */
       this.setOpaque(true);
       new BasicPropertyAdaptSupport(this, component);
@@ -622,14 +670,15 @@ public final class LayoutFactory {
   }
 
   /**
-   * A <code>JMenuItem</code> that listens for changes of background color, foreground color and
-   * font of the given <code>JComponent</code> and adapts it's own settings.
+   * A <code>JMenuItem</code> that listens for changes of background color,
+   * foreground color and font of the given <code>JComponent</code> and adapts
+   * it's own settings.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   * 
    */
-  public static class PropertyChangeMenuItem
-      extends JMenuItem {
+  public static class PropertyChangeMenuItem extends JMenuItem {
 
     /**
      * Generated <code>serialVersionUID</code>.
@@ -637,50 +686,54 @@ public final class LayoutFactory {
     private static final long serialVersionUID = 3690196534012752439L;
 
     /**
-     * Weak reference (suspicion of cyclic reference) to the <code>{@link JComponent}</code> that
-     * is used to adapt basic UI properties to.
+     * Weak reference (suspicion of cyclic reference) to the
+     * <code>{@link JComponent}</code> that is used to adapt basic UI
+     * properties to.
      */
-    private WeakReference m_component;
+    private WeakReference<JComponent> m_component;
 
     /**
-     * Creates an instance with the given name that listens to the components background color,
-     * foreground color and font.
+     * Creates an instance with the given name that listens to the components
+     * background color, foreground color and font.
      * <p>
      * 
      * @param component
      *            The component to whose background color this item will adapt.
+     * 
      * @param action
-     *            The <code>Action</code> to trigger when this item is clicked.
+     *            The <code>Action</code> to trigger when this item is
+     *            clicked.
      */
     public PropertyChangeMenuItem(final JComponent component, final Action action) {
       super(action);
       new BasicPropertyAdaptSupport(this, component);
-      this.m_component = new WeakReference(component);
+      this.m_component = new WeakReference<JComponent>(component);
     }
 
     /**
-     * Returns the adaptee this menu item adapts basic UI properties to if still not garbage
-     * collected or null.
+     * Returns the adaptee this menu item adapts basic UI properties to if still
+     * not garbage collected or null.
      * <p>
      * 
-     * @return the adaptee this menu item adapts basic UI properties to if still not garbage
-     *         collected or null.
+     * @return the adaptee this menu item adapts basic UI properties to if still
+     *         not garbage collected or null.
      */
     public JComponent getUIAdaptee() {
-      return (JComponent) this.m_component.get();
+      return this.m_component.get();
     }
   }
 
   /**
-   * A <code>JPopupMenu</code> that listens for changes of background color, foreground color and
-   * font of the given <code>JComponent</code> and adapts it's own settings.
+   * A <code>JPopupMenu</code> that listens for changes of background color,
+   * foreground color and font of the given <code>JComponent</code> and adapts
+   * it's own settings.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   * 
    */
 
-  private static class PropertyChangePopupMenu
-      extends JPopupMenu {
+  private static class PropertyChangePopupMenu extends JPopupMenu {
 
     /**
      * Generated <code>serialVersionUID</code>.
@@ -697,24 +750,27 @@ public final class LayoutFactory {
   }
 
   /**
-   * A <code>JCheckBoxMenuItem</code> that listens on it's assigned <code>Action</code> for
-   * selection changes.
+   * A <code>JCheckBoxMenuItem</code> that listens on it's assigned
+   * <code>Action</code> for selection changes.
    * <p>
-   * As this item has a state - it is possible to let the state be changed from outside (unlike only
-   * changing it from the UI): Sth. that seems to have been forgotten in the java implementation.
-   * It's state ({@link JCheckBoxMenuItem#setState(boolean)},
-   * {@link javax.swing.AbstractButton#setSelected(boolean)}) listens on property
-   * {@link LayoutFactory.PropertyChangeCheckBoxMenuItem#PROPERTY_SELECTED} for changes of the
-   * state. These events are normally fired by the custom {@link Action} implementations like
-   * {@link Chart2DActionSetAxis}.
+   * 
+   * As this item has a state - it is possible to let the state be changed from
+   * outside (unlike only changing it from the UI): Sth. that seems to have been
+   * forgotten in the java implementation. It's state ({@link JCheckBoxMenuItem#setState(boolean)},
+   * {@link javax.swing.AbstractButton#setSelected(boolean)}) listens on
+   * property
+   * {@link LayoutFactory.PropertyChangeCheckBoxMenuItem#PROPERTY_SELECTED} for
+   * changes of the state. These events are normally fired by the custom
+   * {@link Action} implementations like {@link Chart2DActionSetAxis}.
    * <p>
-   * Instances register themselves to receive events from the action given to their constructor.
+   * Instances register themselves to receive events from the action given to
+   * their constructor.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   * 
    */
-  private static class SelectionAdaptJCheckBoxMenuItem
-      extends JCheckBoxMenuItem {
+  private static class SelectionAdaptJCheckBoxMenuItem extends JCheckBoxMenuItem {
 
     /**
      * Generated <code>serial version UID</code>.
@@ -723,15 +779,19 @@ public final class LayoutFactory {
     private static final long serialVersionUID = 5737559379056167605L;
 
     /**
-     * Creates an instance with the given name that listens to the components background color,
-     * foreground color and font.
+     * Creates an instance with the given name that listens to the components
+     * background color, foreground color and font.
      * <p>
-     * The source of the {@link java.awt.event.ActionEvent} given to the {@link Action} ({@link java.util.EventObject#getSource()})
-     * will be of type {@link JRadioButtonMenuItem}.
+     * 
+     * The source of the {@link java.awt.event.ActionEvent} given to the
+     * {@link Action} ({@link java.util.EventObject#getSource()}) will be of
+     * type {@link JRadioButtonMenuItem}.
      * <p>
      * 
      * @param action
-     *            The <code>Action</code> to trigger when this item is clicked.
+     *            The <code>Action</code> to trigger when this item is
+     *            clicked.
+     * 
      * @param state
      *            the initial state of the checkbox.
      */
@@ -756,24 +816,27 @@ public final class LayoutFactory {
   }
 
   /**
-   * A <code>JRadioButtonMenuItem</code> that listens on it's assigned <code>Action</code> for
-   * selection changes.
+   * A <code>JRadioButtonMenuItem</code> that listens on it's assigned
+   * <code>Action</code> for selection changes.
    * <p>
-   * As this item has a state - it is possible to let the state be changed from outside (unlike only
-   * changing it from the UI): Sth. that seems to have been forgotten in the java implementation.
-   * It's state ({@link JCheckBoxMenuItem#setState(boolean)},
-   * {@link javax.swing.AbstractButton#setSelected(boolean)}) listens on property
-   * {@link LayoutFactory.PropertyChangeCheckBoxMenuItem#PROPERTY_SELECTED} for changes of the
-   * state. These events are normally fired by the custom {@link Action} implementations like
-   * {@link Chart2DActionSetAxis}.
+   * 
+   * As this item has a state - it is possible to let the state be changed from
+   * outside (unlike only changing it from the UI): Sth. that seems to have been
+   * forgotten in the java implementation. It's state ({@link JCheckBoxMenuItem#setState(boolean)},
+   * {@link javax.swing.AbstractButton#setSelected(boolean)}) listens on
+   * property
+   * {@link LayoutFactory.PropertyChangeCheckBoxMenuItem#PROPERTY_SELECTED} for
+   * changes of the state. These events are normally fired by the custom
+   * {@link Action} implementations like {@link Chart2DActionSetAxis}.
    * <p>
-   * Instances register themselves to receive events from the action given to their constructor.
+   * Instances register themselves to receive events from the action given to
+   * their constructor.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   * 
    */
-  private static class SelectionAdaptJRadioButtonMenuItem
-      extends JRadioButtonMenuItem {
+  private static class SelectionAdaptJRadioButtonMenuItem extends JRadioButtonMenuItem {
 
     /**
      * Generated <code>serial version UID</code>.
@@ -782,15 +845,18 @@ public final class LayoutFactory {
     private static final long serialVersionUID = 6949450166704804365L;
 
     /**
-     * Creates an instance with the given name that listens to the components background color,
-     * foreground color and font.
+     * Creates an instance with the given name that listens to the components
+     * background color, foreground color and font.
      * <p>
-     * The source of the {@link java.awt.event.ActionEvent} given to the {@link Action} ({@link java.util.EventObject#getSource()})
-     * will be of type {@link JRadioButtonMenuItem}.
+     * 
+     * The source of the {@link java.awt.event.ActionEvent} given to the
+     * {@link Action} ({@link java.util.EventObject#getSource()}) will be of
+     * type {@link JRadioButtonMenuItem}.
      * <p>
      * 
      * @param action
-     *            The <code>Action</code> to trigger when this item is clicked.
+     *            The <code>Action</code> to trigger when this item is
+     *            clicked.
      */
     public SelectionAdaptJRadioButtonMenuItem(final Action action) {
       super(action);
@@ -812,9 +878,10 @@ public final class LayoutFactory {
   }
 
   /**
-   * Implementation for a <code>PropertyChangeListener</code> that adpapts a wrapped
-   * <code>JComponent</code> to the following properties.
+   * Implementation for a <code>PropertyChangeListener</code> that adpapts a
+   * wrapped <code>JComponent</code> to the following properties.
    * <p>
+   * 
    * <ul>
    * <li>background color</li>
    * <li>foreground color (text)</li>
@@ -823,18 +890,20 @@ public final class LayoutFactory {
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   * 
    */
   public static class SelectionPropertyAdaptSupport implements PropertyChangeListener {
 
     /** The model to adapt selection upon. */
-    protected WeakReference m_delegate;
+    protected WeakReference<AbstractButton> m_delegate;
 
     /**
+     * 
      * @param delegate
      *            The component to adapt the properties on.
      */
     public SelectionPropertyAdaptSupport(final AbstractButton delegate) {
-      this.m_delegate = new WeakReference(delegate);
+      this.m_delegate = new WeakReference<AbstractButton>(delegate);
     }
 
     /**
@@ -842,7 +911,7 @@ public final class LayoutFactory {
      */
     public void propertyChange(final PropertyChangeEvent evt) {
       String prop = evt.getPropertyName();
-      AbstractButton button = (AbstractButton) this.m_delegate.get();
+      AbstractButton button = this.m_delegate.get();
       if (button != null) {
         if (prop.equals(LayoutFactory.PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED)) {
           boolean state = ((Boolean) evt.getNewValue()).booleanValue();
@@ -856,14 +925,15 @@ public final class LayoutFactory {
   }
 
   /**
-   * A <code>JLabel</code> that implements <code>ActionListener</code> in order to change it's
-   * text color whenever the color of a corresponding {@link ITrace2D} is changed.
+   * A <code>JLabel</code> that implements <code>ActionListener</code> in
+   * order to change it's text color whenever the color of a corresponding
+   * {@link ITrace2D} is changed.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   * 
    */
-  final class TraceJLabel
-      extends JLabel implements PropertyChangeListener {
+  final class TraceJLabel extends JLabel implements PropertyChangeListener {
 
     /**
      * Generated <code>serialVersionUID</code>.
@@ -934,6 +1004,7 @@ public final class LayoutFactory {
    * 
    * @param pointSize
    *            the size for the fonts to return.
+   * 
    * @return the system fonts in the given point size
    */
   private static Font[] getSystemFonts(final float pointSize) {
@@ -955,12 +1026,14 @@ public final class LayoutFactory {
   private boolean m_showAxisXMenu = true;
 
   /**
-   * Boolean flag that controls showing the range policy submenu and range menu item on the x axis.
+   * Boolean flag that controls showing the range policy submenu and range menu
+   * item on the x axis.
    */
   private boolean m_showAxisXRangePolicyMenu = true;
 
   /**
-   * Boolean flag that controls showing the title settings submenu for the x axis.
+   * Boolean flag that controls showing the title settings submenu for the x
+   * axis.
    */
   private boolean m_showAxisXTitleMenu = true;
 
@@ -976,12 +1049,14 @@ public final class LayoutFactory {
   private boolean m_showAxisYMenu = true;
 
   /**
-   * Boolean flag that controls showing the range policy submenu and range menu item on the y axis.
+   * Boolean flag that controls showing the range policy submenu and range menu
+   * item on the y axis.
    */
   private boolean m_showAxisYRangePolicyMenu = true;
 
   /**
-   * Boolean flag that controls showing the title settings submenu for the y axis.
+   * Boolean flag that controls showing the title settings submenu for the y
+   * axis.
    */
   private boolean m_showAxisYTitleMenu = true;
 
@@ -1073,12 +1148,16 @@ public final class LayoutFactory {
    * 
    * @param axis
    *            the axis to control.
+   * 
    * @param axisDimension
-   *            Identifies which dimension the axis controls in the chart: either {@link Chart2D#X}
-   *            or {@link Chart2D#Y}
+   *            Identifies which dimension the axis controls in the chart:
+   *            either {@link Chart2D#X} or {@link Chart2D#Y}
+   * 
    * @param adaptUI2Chart
-   *            if true the menu will adapt it's basic UI properies (font, foreground and background
-   *            color) to the given chart.
+   *            if true the menu will adapt it's basic UI properies (font,
+   *            foreground and background color) to the given chart.
+   * 
+   * 
    * @return a {@link JMenuItem} that allows to trigger the features related to
    *         {@link info.monitorenter.gui.chart.axis.AAxis} features.
    */
@@ -1134,20 +1213,24 @@ public final class LayoutFactory {
 
   /**
    * Creates a radio button menu for choose one the available
-   * {@link info.monitorenter.gui.chart.IRangePolicy} implementations to set to it's axis identified
-   * by argument <code>axis</code>.
+   * {@link info.monitorenter.gui.chart.IRangePolicy} implementations to set to
+   * it's axis identified by argument <code>axis</code>.
    * <p>
    * 
    * @param axis
    *            the axis to control.
+   * 
    * @param adaptUI2Chart
-   *            if true the menu will adapt it's basic UI properies (font, foreground and background
-   *            color) to the given chart.
+   *            if true the menu will adapt it's basic UI properies (font,
+   *            foreground and background color) to the given chart.
+   * 
    * @param chart
-   *            the component to adapt the UI of this menu if adaption is requested.
+   *            the component to adapt the UI of this menu if adaption is
+   *            requested.
+   * 
    * @return a radio button menu for choose one the available
-   *         {@link info.monitorenter.gui.chart.IRangePolicy} implementations to set to it's axis
-   *         identified by argument <code>axis</code>.
+   *         {@link info.monitorenter.gui.chart.IRangePolicy} implementations to
+   *         set to it's axis identified by argument <code>axis</code>.
    */
   public JMenu createAxisRangePolicyMenu(final Chart2D chart, final IAxis axis,
       final boolean adaptUI2Chart) {
@@ -1162,8 +1245,8 @@ public final class LayoutFactory {
     // Use a button group to control unique selection state of radio buttons:
     ButtonGroup buttonGroup = new ButtonGroup();
     // check the default selected item:
-    Class rangePolicyClass = axis.getRangePolicy().getClass();
-    if (adaptUI2Chart) {
+    Class< ? > rangePolicyClass = axis.getRangePolicy().getClass();
+    if (adaptUI2Chart) { 
       item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(chart,
           "Fixed viewport", axis.getDimension(), new RangePolicyFixedViewport()));
     } else {
@@ -1241,22 +1324,28 @@ public final class LayoutFactory {
   }
 
   /**
-   * Creates a menu for settings related to the axis title of the axis of the given chart that will
-   * be identified by argument <code>axisDimension</code>.
+   * Creates a menu for settings related to the axis title of the axis of the
+   * given chart that will be identified by argument <code>axisDimension</code>.
    * <p>
    * 
    * @param axis
    *            the axis to control.
+   * 
    * @param axisDimension
-   *            Identifies which dimension the axis controls in the chart: either {@link Chart2D#X}
-   *            or {@link Chart2D#Y}
+   *            Identifies which dimension the axis controls in the chart:
+   *            either {@link Chart2D#X} or {@link Chart2D#Y}
+   * 
    * @param adaptUI2Chart
-   *            if true the menu will adapt it's basic UI properies (font, foreground and background
-   *            color) to the given chart.
+   *            if true the menu will adapt it's basic UI properies (font,
+   *            foreground and background color) to the given chart.
+   * 
    * @param chart
-   *            the component to adapt the UI of this menu if adaption is requested.
-   * @return a menu for settings related to the axis title of the axis of the given chart that will
-   *         be identified by argument <code>axisDimension</code>.
+   *            the component to adapt the UI of this menu if adaption is
+   *            requested.
+   * 
+   * @return a menu for settings related to the axis title of the axis of the
+   *         given chart that will be identified by argument
+   *         <code>axisDimension</code>.
    */
   public JMenu createAxisTitleMenu(final Chart2D chart, final IAxis axis, final int axisDimension,
       final boolean adaptUI2Chart) {
@@ -1303,22 +1392,29 @@ public final class LayoutFactory {
   }
 
   /**
-   * Creates a radio button menu for choose one the available axis types of the given chart that
-   * will be set to it's axis identified by argument <code>axisDimension</code>.
+   * Creates a radio button menu for choose one the available axis types of the
+   * given chart that will be set to it's axis identified by argument
+   * <code>axisDimension</code>.
    * <p>
    * 
    * @param axis
    *            the axis to control.
+   * 
    * @param axisDimension
-   *            Identifies which dimension the axis controls in the chart: either {@link Chart2D#X}
-   *            or {@link Chart2D#Y}
+   *            Identifies which dimension the axis controls in the chart:
+   *            either {@link Chart2D#X} or {@link Chart2D#Y}
+   * 
    * @param adaptUI2Chart
-   *            if true the menu will adapt it's basic UI properies (font, foreground and background
-   *            color) to the given chart.
+   *            if true the menu will adapt it's basic UI properies (font,
+   *            foreground and background color) to the given chart.
+   * 
    * @param chart
-   *            the component to adapt the UI of this menu if adaption is requested.
-   * @return a radio button menu for choose one the available axis types of the given chart that
-   *         will be set to it's axis identified by argument <code>axisDimension</code>.
+   *            the component to adapt the UI of this menu if adaption is
+   *            requested.
+   * 
+   * @return a radio button menu for choose one the available axis types of the
+   *         given chart that will be set to it's axis identified by argument
+   *         <code>axisDimension</code>.
    */
   public JMenu createAxisTypeMenu(final Chart2D chart, final IAxis axis, final int axisDimension,
       final boolean adaptUI2Chart) {
@@ -1332,7 +1428,7 @@ public final class LayoutFactory {
     // Use a button group to control unique selection state of radio buttons:
     ButtonGroup buttonGroup = new ButtonGroup();
     // check the default selected item:
-    Class typeClass = axis.getClass();
+    Class< ? > typeClass = axis.getClass();
     JMenuItem item;
 
     if (adaptUI2Chart) {
@@ -1381,9 +1477,11 @@ public final class LayoutFactory {
    * 
    * @param chart
    *            the chart to set the background color of by the menu to return.
+   * 
    * @param adaptUI2Chart
-   *            if true the menu will adapt it's basic UI properies (font, foreground and background
-   *            color) to the given chart.
+   *            if true the menu will adapt it's basic UI properies (font,
+   *            foreground and background color) to the given chart.
+   * 
    * @return a menu for choosing the background color of the given chart.
    */
   public JMenu createBackgroundColorMenu(final Chart2D chart, final boolean adaptUI2Chart) {
@@ -1466,21 +1564,26 @@ public final class LayoutFactory {
   }
 
   /**
-   * Creates a <code>JLabel</code> that is capable of triggering a <code>JPopupMenu</code> for
-   * the settings available for the <code>ITrace2D</code>.
+   * Creates a <code>JLabel</code> that is capable of triggering a
+   * <code>JPopupMenu</code> for the settings available for the
+   * <code>ITrace2D</code>.
    * <p>
    * 
    * @param chart
-   *            The chart the given trace is a member of. This will be used for getting a
-   *            <code>PopupMenu</code> that adapts to layout properties (such as background
-   *            color).
+   *            The chart the given trace is a member of. This will be used for
+   *            getting a <code>PopupMenu</code> that adapts to layout
+   *            properties (such as background color).
+   * 
    * @param trace
-   *            The trace on which the <code>JPopupMenu</code> of the <code>JLabel</code> will
-   *            act.
+   *            The trace on which the <code>JPopupMenu</code> of the
+   *            <code>JLabel</code> will act.
+   * 
    * @param adaptUI2Chart
-   *            if true the menu will adapt it's basic UI properies (font, foreground and background
-   *            color) to the given chart.
-   * @return a label that offers a popup menue with controls for the given trace.
+   *            if true the menu will adapt it's basic UI properies (font,
+   *            foreground and background color) to the given chart.
+   * 
+   * @return a label that offers a popup menue with controls for the given
+   *         trace.
    */
   public JLabel createContextMenuLabel(final Chart2D chart, final ITrace2D trace,
       final boolean adaptUI2Chart) {
@@ -1562,21 +1665,24 @@ public final class LayoutFactory {
   }
 
   /**
-   * Creates a menu for showing the wizard for the <code>{@link IErrorBarPolicy}</code> instances
-   * of the given trace.
+   * Creates a menu for showing the wizard for the
+   * <code>{@link IErrorBarPolicy}</code> instances of the given trace.
    * <p>
    * 
    * @param chart
-   *            needed to adapt the basic ui properties to (font, foreground color, background
-   *            color).
+   *            needed to adapt the basic ui properties to (font, foreground
+   *            color, background color).
+   * 
    * @param trace
    *            the trace to show the error bar wizards of.
+   * 
    * @param adaptUI2Chart
-   *            if true the menu will adapt it's basic UI properies (font, foreground and background
-   *            color) to the given chart.
+   *            if true the menu will adapt it's basic UI properies (font,
+   *            foreground and background color) to the given chart.
+   * 
    * @return a menu that offers to show the
-   *         {@link info.monitorenter.gui.chart.controls.errorbarwizard.ErrorBarWizard} dialogs for
-   *         the given trace.
+   *         {@link info.monitorenter.gui.chart.controls.errorbarwizard.ErrorBarWizard}
+   *         dialogs for the given trace.
    */
   public JMenu createErrorBarWizardMenu(final Chart2D chart, final ITrace2D trace,
       final boolean adaptUI2Chart) {
@@ -1623,24 +1729,21 @@ public final class LayoutFactory {
 
     // creating groups for the special add / remove item
     // handling:
-    List group1 = new LinkedList();
+    List<JMenu> group1 = new LinkedList<JMenu>();
     group1.add(erroBarEditMenu);
     group1.add(errorBarRemoveMenu);
-    List group2 = new LinkedList();
+    List<JMenu> group2 = new LinkedList<JMenu>();
     group2.add(errorBarAddMenu);
 
     // set of all error bar policies available, needed for finding
     // addable / removable error bar policies.
-    Set allErrorBarPolicies = new TreeSet();
+    Set<IErrorBarPolicy> allErrorBarPolicies = new TreeSet<IErrorBarPolicy>();
     allErrorBarPolicies.add(new ErrorBarPolicyRelative(0.02, 0.02));
     allErrorBarPolicies.add(new ErrorBarPolicyAbsoluteSummation(4, 4));
 
     // the edit action items (show wizard for existing error bar policies):
-    Set errorBarPolicies = trace.getErrorBarPolicies();
-    Iterator itErrorBarPolicies = errorBarPolicies.iterator();
-    IErrorBarPolicy errorBarPolicy;
-    while (itErrorBarPolicies.hasNext()) {
-      errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
+    Set<IErrorBarPolicy> errorBarPolicies = trace.getErrorBarPolicies();
+    for (IErrorBarPolicy errorBarPolicy : errorBarPolicies) {
       if (adaptUI2Chart) {
         item = new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(trace,
             errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
@@ -1653,16 +1756,13 @@ public final class LayoutFactory {
     }
 
     // find the error bar policies to add:
-    Set addableErrorBarPolicies = new TreeSet(allErrorBarPolicies);
-    itErrorBarPolicies = errorBarPolicies.iterator();
-    while (itErrorBarPolicies.hasNext()) {
-      addableErrorBarPolicies.remove(itErrorBarPolicies.next());
+    Set<IErrorBarPolicy> addableErrorBarPolicies = new TreeSet<IErrorBarPolicy>(allErrorBarPolicies);
+    for (IErrorBarPolicy errorBarPolicy : errorBarPolicies) {
+      addableErrorBarPolicies.remove(errorBarPolicy);
     }
-    // now add them:
-    itErrorBarPolicies = addableErrorBarPolicies.iterator();
 
-    while (itErrorBarPolicies.hasNext()) {
-      errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
+    // now add them:
+    for (IErrorBarPolicy errorBarPolicy : addableErrorBarPolicies) {
       if (adaptUI2Chart) {
         errorBarAddMenu.add(new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(trace,
             errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
@@ -1676,9 +1776,7 @@ public final class LayoutFactory {
     }
 
     // the error bar policies to remove
-    itErrorBarPolicies = errorBarPolicies.iterator();
-    while (itErrorBarPolicies.hasNext()) {
-      errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
+    for (IErrorBarPolicy errorBarPolicy : errorBarPolicies) {
       if (adaptUI2Chart) {
         errorBarRemoveMenu.add(new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(
             trace, errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
@@ -1699,9 +1797,11 @@ public final class LayoutFactory {
    * 
    * @param chart
    *            the chart to set the foreground color of by the menu to return.
+   * 
    * @param adaptUI2Chart
-   *            if true the menu will adapt it's basic UI properies (font, foreground and background
-   *            color) to the given chart.
+   *            if true the menu will adapt it's basic UI properies (font,
+   *            foreground and background color) to the given chart.
+   * 
    * @return a menu for choosing the foreground color of the given chart.
    */
   public JMenuItem createForegroundColorMenu(final Chart2D chart, final boolean adaptUI2Chart) {
@@ -1788,9 +1888,11 @@ public final class LayoutFactory {
    * 
    * @param chart
    *            the chart to set the grid color of by the menu to return.
+   * 
    * @param adaptUI2Chart
-   *            if true the menu will adapt it's basic UI properies (font, foreground and background
-   *            color) to the given chart.
+   *            if true the menu will adapt it's basic UI properies (font,
+   *            foreground and background color) to the given chart.
+   * 
    * @return a menu for choosing the grid color of the given chart.
    */
   public JMenu createGridColorMenu(final Chart2D chart, final boolean adaptUI2Chart) {
@@ -1878,9 +1980,11 @@ public final class LayoutFactory {
    * 
    * @param chart
    *            the chart to access.
+   * 
    * @param adaptUI2Chart
-   *            if true the menu will adapt it's basic UI properies (font, foreground and background
-   *            color) to the given chart.
+   *            if true the menu will adapt it's basic UI properies (font,
+   *            foreground and background color) to the given chart.
+   * 
    * @return a menu that offers various controls over the given chart.
    */
   public JMenu createMenu(final Chart2D chart, final boolean adaptUI2Chart) {
@@ -1946,9 +2050,11 @@ public final class LayoutFactory {
    * 
    * @param chart
    *            the chart to access.
+   * 
    * @param adaptUI2Chart
-   *            if true the menu will adapt it's basic UI properies (font, foreground and background
-   *            color) to the given chart.
+   *            if true the menu will adapt it's basic UI properies (font,
+   *            foreground and background color) to the given chart.
+   * 
    * @return a menu bar that offers various controls over the given chart.
    */
   public JMenuBar createMenuBar(final Chart2D chart, final boolean adaptUI2Chart) {
@@ -1970,9 +2076,10 @@ public final class LayoutFactory {
    * 
    * @param chart
    *            the chart to add the popup menue to.
+   * 
    * @param adaptUI2Chart
-   *            if true the menu will adapt it's basic UI properies (font, foreground and background
-   *            color) to the given chart.
+   *            if true the menu will adapt it's basic UI properies (font,
+   *            foreground and background color) to the given chart.
    */
   public void createPopupMenu(final Chart2D chart, final boolean adaptUI2Chart) {
 
@@ -2045,15 +2152,19 @@ public final class LayoutFactory {
    * <p>
    * 
    * @param chart
-   *            needed to adapt the basic ui properties to (font, foreground color, background
-   *            color).
+   *            needed to adapt the basic ui properties to (font, foreground
+   *            color, background color).
+   * 
    * @param trace
    *            the trace to set the color of.
+   * 
    * @param parent
    *            needed for a modal dialog for custom color as parent component.
+   * 
    * @param adaptUI2Chart
-   *            if true the menu will adapt it's basic UI properies (font, foreground and background
-   *            color) to the given chart.
+   *            if true the menu will adapt it's basic UI properies (font,
+   *            foreground and background color) to the given chart.
+   * 
    * @return a menu for choosing the color of the given trace.
    */
   public JMenu createTraceColorMenu(final Chart2D chart, final ITrace2D trace,
@@ -2134,13 +2245,16 @@ public final class LayoutFactory {
    * <p>
    * 
    * @param chart
-   *            needed to adapt the basic ui properties to (font, foreground color, background
-   *            color).
+   *            needed to adapt the basic ui properties to (font, foreground
+   *            color, background color).
+   * 
    * @param trace
    *            the trace to set the painter of.
+   * 
    * @param adaptUI2Chart
-   *            if true the menu will adapt it's basic UI properies (font, foreground and background
-   *            color) to the given chart.
+   *            if true the menu will adapt it's basic UI properies (font,
+   *            foreground and background color) to the given chart.
+   * 
    * @return a menu for choosing the {@link ITracePainter} of the given trace.
    */
   public JMenu createTracePainterMenu(final Chart2D chart, final ITrace2D trace,
@@ -2218,13 +2332,16 @@ public final class LayoutFactory {
    * <p>
    * 
    * @param chart
-   *            needed to adapt the basic ui properties to (font, foreground color, background
-   *            color).
+   *            needed to adapt the basic ui properties to (font, foreground
+   *            color, background color).
+   * 
    * @param trace
    *            the trace to set the stroke of.
+   * 
    * @param adaptUI2Chart
-   *            if true the menu will adapt it's basic UI properies (font, foreground and background
-   *            color) to the given chart.
+   *            if true the menu will adapt it's basic UI properies (font,
+   *            foreground and background color) to the given chart.
+   * 
    * @return a menu for choosing the stroke of the given trace.
    */
   public JMenu createTraceStrokesMenu(final Chart2D chart, final ITrace2D trace,
@@ -2255,13 +2372,16 @@ public final class LayoutFactory {
    * <p>
    * 
    * @param chart
-   *            needed to adapt the basic ui properties to (font, foreground color, background
-   *            color).
+   *            needed to adapt the basic ui properties to (font, foreground
+   *            color, background color).
+   * 
    * @param trace
    *            the trace to set the z-index of.
+   * 
    * @param adaptUI2Chart
-   *            if true the menu will adapt it's basic UI properies (font, foreground and background
-   *            color) to the given chart.
+   *            if true the menu will adapt it's basic UI properies (font,
+   *            foreground and background color) to the given chart.
+   * 
    * @return a menu for choosing the z-index of the given trace.
    */
   public JMenu createTraceZindexMenu(final Chart2D chart, final ITrace2D trace,

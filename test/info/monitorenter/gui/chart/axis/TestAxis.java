@@ -34,13 +34,14 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
- * Junit test for <code>{@link info.monitorenter.gui.chart.IAxis}</code> implementations.
+ * Junit test for <code>{@link info.monitorenter.gui.chart.IAxis}</code>
+ * implementations.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
+ * 
  */
-public class TestAxis
-    extends ATestJChart2D {
+public class TestAxis extends ATestJChart2D {
   /**
    * Test suite for this test class.
    * <p>
@@ -168,6 +169,7 @@ public class TestAxis
   /**
    * Tests the method {@link AAxis.AChart2DDataAccessor#translatePxToValue(int)}.
    * <p>
+   * 
    */
   public void testTransformValueToPx() {
     double value = 50;

@@ -37,9 +37,8 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A decorator for any ITrace2D implementation. Useful if your chart looks
- * unexpected and the problem may be related to the data that is added. It
- * prints every point added to the console.
+ * A decorator for any ITrace2D implementation. Useful if your chart looks unexpected and the
+ * problem may be related to the data that is added. It prints every point added to the console.
  * <p>
  * Use it by decorating the ITrace2D you normally use:
  * 
@@ -55,13 +54,12 @@ import java.util.Set;
  * </pre>
  * 
  * <p>
- * One can use {@link #setXRange(Range)},{@link #setYRange(Range)} to let this
- * instance throw an Exception if bounds for legal data are exceeded.
+ * One can use {@link #setXRange(Range)},{@link #setYRange(Range)} to let this instance throw an
+ * Exception if bounds for legal data are exceeded.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.18 $
  */
 public class Trace2DDebugger implements ITrace2D {
 
@@ -90,7 +88,7 @@ public class Trace2DDebugger implements ITrace2D {
    * <p>
    * 
    * @param debug
-   *          the trace to debug.
+   *            the trace to debug.
    */
   public Trace2DDebugger(final ITrace2D debug) {
     if (debug == null) {
@@ -108,7 +106,7 @@ public class Trace2DDebugger implements ITrace2D {
 
   /**
    * @param debug
-   *          The ITrace to debug.
+   *            The ITrace to debug.
    */
 
   /**
@@ -162,6 +160,16 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
+   * @param o
+   *            the trace to compare to.
+   * @return see interface.
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  public int compareTo(final ITrace2D o) {
+    return this.m_delegate.compareTo(o);
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#containsTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
   public boolean containsTracePainter(final ITracePainter painter) {
@@ -176,7 +184,6 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * 
    * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(info.monitorenter.gui.chart.TracePoint2D,
    *      int)
    */
@@ -201,7 +208,7 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#getErrorBarPolicies()
    */
-  public Set getErrorBarPolicies() {
+  public Set<IErrorBarPolicy> getErrorBarPolicies() {
     return this.m_delegate.getErrorBarPolicies();
   }
 
@@ -262,7 +269,6 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * 
    * @see info.monitorenter.gui.chart.ITrace2D#getPhysicalUnits()
    */
   public String getPhysicalUnits() {
@@ -314,7 +320,7 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#getTracePainters()
    */
-  public final Set getTracePainters() {
+  public final Set<ITracePainter> getTracePainters() {
     return this.m_delegate.getTracePainters();
   }
 
@@ -369,7 +375,7 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#iterator()
    */
-  public Iterator iterator() {
+  public Iterator<TracePoint2D> iterator() {
     return this.m_delegate.iterator();
   }
 
@@ -448,7 +454,7 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#setErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
    */
-  public Set setErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
+  public Set<IErrorBarPolicy> setErrorBarPolicy(final IErrorBarPolicy errorBarPolicy) {
     return this.m_delegate.setErrorBarPolicy(errorBarPolicy);
   }
 
@@ -460,8 +466,7 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#setPhysicalUnits(java.lang.String,
-   *      java.lang.String)
+   * @see info.monitorenter.gui.chart.ITrace2D#setPhysicalUnits(java.lang.String, java.lang.String)
    */
   public void setPhysicalUnits(final String xunit, final String yunit) {
     this.m_delegate.setPhysicalUnits(xunit, yunit);
@@ -482,10 +487,9 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * 
    * @see info.monitorenter.gui.chart.ITrace2D#setTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
-  public final Set setTracePainter(final ITracePainter painter) {
+  public final Set<ITracePainter> setTracePainter(final ITracePainter painter) {
     return this.m_delegate.setTracePainter(painter);
   }
 
@@ -502,7 +506,7 @@ public class Trace2DDebugger implements ITrace2D {
    * <p>
    * 
    * @param range
-   *          The xRange to set.
+   *            The xRange to set.
    */
   public void setXRange(final Range range) {
     if (range == null) {
@@ -517,7 +521,7 @@ public class Trace2DDebugger implements ITrace2D {
    * <p>
    * 
    * @param range
-   *          The yRange to set.
+   *            The yRange to set.
    */
   public void setYRange(final Range range) {
     if (range == null) {

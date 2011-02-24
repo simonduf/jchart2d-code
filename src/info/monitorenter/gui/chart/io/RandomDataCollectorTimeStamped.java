@@ -34,7 +34,7 @@ import info.monitorenter.gui.chart.TracePoint2D;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.5 $
  */
 public class RandomDataCollectorTimeStamped extends ADataCollector {
 
@@ -63,6 +63,6 @@ public class RandomDataCollectorTimeStamped extends ADataCollector {
     double rand = Math.random();
     boolean add = (rand >= 0.5) ? true : false;
     this.m_y = (add) ? this.m_y + Math.random() : this.m_y - Math.random();
-    return new TracePoint2D((double) System.currentTimeMillis(), this.m_y);
+    return new TracePoint2D(System.currentTimeMillis(), this.m_y);
   }
 }

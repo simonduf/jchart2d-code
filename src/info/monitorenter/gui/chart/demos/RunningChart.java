@@ -24,12 +24,13 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyMinimumViewport;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
+import info.monitorenter.gui.chart.traces.painters.TracePainterPolyline;
 import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.reflection.ObjRecorder2Trace2DAdapter;
 import info.monitorenter.util.Range;
-import info.monitorenter.util.UIUtil;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -40,26 +41,25 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 
 /**
- * A test for the <code>Chart2D</code> that constantly adds new tracepoints to
- * a <code> Trace2DLtd</code>. Mainly the runtime- scaling is interesting.
+ * A test for the <code>Chart2D</code> that constantly adds new tracepoints to a
+ * <code> Trace2DLtd</code>. Mainly the runtime- scaling is interesting.
  * <p>
- * Furthermore this is an example on how to connect other components to the
- * <code>Chart2D</code> using an adaptor- class. If interested have a look on
+ * Furthermore this is an example on how to connect other components to the <code>Chart2D</code>
+ * using an adaptor- class. If interested have a look on
  * {@link info.monitorenter.reflection.ObjRecorder2Trace2DAdapter}.
  * <p>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'> Achim Westermann </a>
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class RunningChart
     extends JFrame {
   /**
-   * Helper class that holds an internal number that is randomly modified by a
-   * Thread.
+   * Helper class that holds an internal number that is randomly modified by a Thread.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * @version $Revision: 1.10 $
+   * @version $Revision: 1.11 $
    */
   static class RandomBumper
       extends Thread {
@@ -80,9 +80,9 @@ public class RunningChart
      * <p>
      * 
      * @param plusminus
-     *          probability to increase or decrease the number each step.
+     *            probability to increase or decrease the number each step.
      * @param factor
-     *          affects the amplitude of the number (severity of jumps).
+     *            affects the amplitude of the number (severity of jumps).
      */
     public RandomBumper(final double plusminus, final int factor) {
 
@@ -94,7 +94,6 @@ public class RunningChart
       }
       this.m_factor = factor;
       this.setDaemon(true);
-      this.setName(this.getClass().getName());
       this.start();
     }
 
@@ -131,19 +130,24 @@ public class RunningChart
    * <p>
    * 
    * @param args
-   *          ignored.
+   *            ignored.
    */
   public static void main(final String[] args) {
 
     Chart2D chart = new Chart2D();
-    chart.setMinPaintLatency(100);
+    chart.setMinPaintLatency(20);
     ITrace2D data = new Trace2DLtd(300);
-    data.setColor(Color.RED);
+    data.setColor(new Color(255, 0, 0, 255));
     data.setName("random");
     data.setPhysicalUnits("hertz", "ms");
+
+    ITracePainter dotPainter = new TracePainterPolyline();
+    data.setTracePainter(dotPainter);
     chart.addTrace(data);
+
     RunningChart wnd = new RunningChart(chart, "RunningChart");
     chart.getAxisX().setPaintGrid(true);
+    chart.getAxisX().setStartMajorTick(false);
     chart.getAxisY().setPaintGrid(true);
 
     chart.getAxisX().setPaintScale(true);
@@ -156,21 +160,20 @@ public class RunningChart
     wnd.setSize(700, 210);
     wnd.setResizable(true);
     wnd.setVisible(true);
-    new ObjRecorder2Trace2DAdapter(data, new RandomBumper(0.5, 1000), "m_number", 50);
+    new ObjRecorder2Trace2DAdapter(data, new RandomBumper(0.5, 1000), "m_number", 100);
   }
 
   /** The chart to use. */
   protected Chart2D m_chart = null;
 
   /**
-   * Creates an instance that will dynamically paint on the chart to a trace
-   * with the given label.
+   * Creates an instance that will dynamically paint on the chart to a trace with the given label.
    * <p>
    * 
    * @param chart
-   *          the chart to use.
+   *            the chart to use.
    * @param label
-   *          the name of the trace too display.
+   *            the name of the trace too display.
    */
   public RunningChart(final Chart2D chart, final String label) {
 
@@ -181,7 +184,9 @@ public class RunningChart
       public void windowClosing(final WindowEvent e) {
 
         RunningChart.this.setVisible(false);
-        UIUtil.findWindow(RunningChart.this).dispose();
+        RunningChart.this.dispose();
+        System.exit(0);
+
       }
     });
     Container contentPane = this.getContentPane();

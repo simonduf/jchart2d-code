@@ -38,7 +38,7 @@ import info.monitorenter.gui.chart.TracePoint2D;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.7 $
  */
 public class Trace2DLtdSorted extends Trace2DSorted {
 
@@ -68,9 +68,9 @@ public class Trace2DLtdSorted extends Trace2DSorted {
   }
 
   /**
-   * In case point has an x- value already contained, the old tracepoint with
-   * that value will be replaced by the new one. Else the new tracepoint will be
-   * added at an index in order to keep the ascending order of tracepoints with
+   * In case point has an x- value already contained, the old trace point with
+   * that value will be replaced by the new one. Else the new trace point will be
+   * added at an index in order to keep the ascending order of trace points with
    * a higher x- value are contained.
    * <p>
    * If points takes additional space (it's x- value is not already contained)
@@ -89,7 +89,7 @@ public class Trace2DLtdSorted extends Trace2DSorted {
     this.m_points.add(point);
     if (!rem) {
       if (this.m_points.size() > this.m_maxsize) {
-        TracePoint2D remove = (TracePoint2D) this.m_points.last();
+        TracePoint2D remove =  this.m_points.last();
         this.removePoint(remove);
       }
     }

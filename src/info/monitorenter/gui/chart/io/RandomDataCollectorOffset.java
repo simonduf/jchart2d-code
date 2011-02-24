@@ -38,7 +38,7 @@ import info.monitorenter.gui.chart.TracePoint2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  */
 public class RandomDataCollectorOffset extends ADataCollector {
 

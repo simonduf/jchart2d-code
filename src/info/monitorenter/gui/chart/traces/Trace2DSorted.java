@@ -49,7 +49,7 @@ import java.util.TreeSet;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.8 $
  */
 public class Trace2DSorted
     extends ATrace2D implements ITrace2D {
@@ -58,7 +58,7 @@ public class Trace2DSorted
   private static final long serialVersionUID = -3518797764292132652L;
   
   /** The sorted set of points. */
-  protected SortedSet m_points = new TreeSet();
+  protected SortedSet<TracePoint2D> m_points = new TreeSet<TracePoint2D>();
 
   /**
    * Defcon.
@@ -110,7 +110,7 @@ public class Trace2DSorted
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#iterator()
    */
-  public Iterator iterator() {
+  public Iterator<TracePoint2D> iterator() {
     return this.m_points.iterator();
   }
 

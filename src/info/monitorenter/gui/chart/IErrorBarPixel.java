@@ -32,7 +32,7 @@ import java.io.Serializable;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.8 $
  */
 public interface IErrorBarPixel extends Serializable {
 

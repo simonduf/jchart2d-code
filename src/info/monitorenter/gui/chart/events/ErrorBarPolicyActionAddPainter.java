@@ -41,7 +41,7 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ErrorBarPolicyActionAddPainter
     extends AErrorBarPolicyAction {
@@ -77,7 +77,7 @@ public class ErrorBarPolicyActionAddPainter
     this.m_errorBarPolicy.addErrorBarPainter(painter);
     // update UI:
     Component component = (Component) e.getSource();
-    Window dialog = UIUtil.findWindow(component);
+    Window dialog = UIUtil.findFrame(component);
     dialog.pack();
   }
 

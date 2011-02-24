@@ -40,7 +40,7 @@ import javax.swing.JComponent;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public final class JComponentActionSetCustomForeground extends AJComponentAction {
 
@@ -61,16 +61,18 @@ public final class JComponentActionSetCustomForeground extends AJComponentAction
    * <p>
    * 
    * @param component
-   *          the target the action will work on.
+   *            the target the action will work on.
    * 
    * @param description
-   *          the descriptive <code>String</code> that will be displayed by
-   *          {@link javax.swing.AbstractButton} subclasses that get this
-   *          <code>Action</code> assigned (
-   *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   *            the descriptive <code>String</code> that will be displayed by
+   *            {@link javax.swing.AbstractButton} subclasses that get this
+   *            <code>Action</code> assigned (
+   *            {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    */
   public JComponentActionSetCustomForeground(final JComponent component, final String description) {
     super(component, description);
+    // fool find bugs "unwritten field":
+    this.m_lastChosenColor = null;
     component.addPropertyChangeListener(Chart2D.PROPERTY_FOREGROUND_COLOR, this);
   }
 
@@ -90,13 +92,13 @@ public final class JComponentActionSetCustomForeground extends AJComponentAction
     String property = evt.getPropertyName();
     if (property.equals(Chart2D.PROPERTY_FOREGROUND_COLOR)) {
       Color newColor = (Color) evt.getNewValue();
-      if (newColor.equals(this.m_lastChosenColor)) {
-        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED,
-            new Boolean(false), new Boolean(true));
+      if ((this.m_lastChosenColor != null) && (newColor.equals(this.m_lastChosenColor))) {
+        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, Boolean
+            .valueOf(false), Boolean.valueOf(true));
 
       } else {
-        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED,
-            new Boolean(true), new Boolean(false));
+        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, Boolean
+            .valueOf(true), Boolean.valueOf(false));
       }
     }
   }

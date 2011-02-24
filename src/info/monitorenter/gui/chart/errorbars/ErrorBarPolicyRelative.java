@@ -41,19 +41,22 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
- * Configurable <code>{@link info.monitorenter.gui.chart.IErrorBarPolicy}</code> that adds a
- * relative error (relative to the absolute values) to the points to render.
+ * Configurable <code>{@link info.monitorenter.gui.chart.IErrorBarPolicy}</code>
+ * that adds a relative error (relative to the absolute values) to the points to
+ * render.
  * <p>
- * You should not use this if you have a small value range but very high values: The relative value
- * will cause exteremely long lines (be much higher than the value range to display) and fold the
- * trace to a minimum line.
+ * 
+ * You should not use this if you have a small value range but very high values:
+ * The relative value will cause exteremely long lines (be much higher than the
+ * value range to display) and fold the trace to a minimum line.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.12 $
+ * 
+ * 
+ * @version $Revision: 1.15 $
  */
-public class ErrorBarPolicyRelative
-    extends AErrorBarPolicyConfigurable {
+public class ErrorBarPolicyRelative extends AErrorBarPolicyConfigurable {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 1031825382468141565L;
@@ -67,14 +70,18 @@ public class ErrorBarPolicyRelative
   /**
    * Creates an instance with the given relative errors.
    * <p>
-   * The relative error is related to the absolut x and y values to render. It has to be between 0.0
-   * and 1.0.
+   * 
+   * The relative error is related to the absolut x and y values to render. It
+   * has to be between 0.0 and 1.0.
    * <p>
    * 
    * @param relativeError
-   *            the relative error value between 0.0 and 1.0 for x and y dimension.
+   *            the relative error value between 0.0 and 1.0 for x and y
+   *            dimension.
+   * 
    * @throws IllegalArgumentException
    *             if the argument is not between 0.0 and 1.0.
+   * 
    * @see #ErrorBarPolicyRelative(double, double)
    */
   public ErrorBarPolicyRelative(final double relativeError) throws IllegalArgumentException {
@@ -84,14 +91,17 @@ public class ErrorBarPolicyRelative
   /**
    * Creates an instance with the given relative errors.
    * <p>
-   * The relative error is related to the absolut x and y values to render. It has to be between 0.0
-   * and 1.0.
+   * 
+   * The relative error is related to the absolut x and y values to render. It
+   * has to be between 0.0 and 1.0.
    * <p>
    * 
    * @param relativeXError
    *            the relative x error value between 0.0 and 1.0.
+   * 
    * @param relativeYError
    *            the relative y error value between 0.0 and 1.0.
+   * 
    * @throws IllegalArgumentException
    *             if the argument is not between 0.0 and 1.0.
    */
@@ -252,12 +262,14 @@ public class ErrorBarPolicyRelative
   /**
    * Sets the relative X error to add to each error bar.
    * <p>
-   * The relative error is related to the absolut x values to render. It has to be between 0.0 and
-   * 1.0.
+   * 
+   * The relative error is related to the absolut x values to render. It has to
+   * be between 0.0 and 1.0.
    * <p>
    * 
    * @param relativeXError
    *            a value between 0.0 and 1.0.
+   * 
    * @throws IllegalArgumentException
    *             if the argument is not between 0.0 and 1.0.
    */
@@ -276,12 +288,14 @@ public class ErrorBarPolicyRelative
   /**
    * Sets the relative Y error to add to each error bar.
    * <p>
-   * The relative error is related to the absolut y values to render. It has to be between 0.0 and
-   * 1.0.
+   * 
+   * The relative error is related to the absolut y values to render. It has to
+   * be between 0.0 and 1.0.
    * <p>
    * 
    * @param relativeYError
    *            a value between 0.0 and 1.0.
+   * 
    * @throws IllegalArgumentException
    *             if the argument is not between 0.0 and 1.0.
    */

@@ -22,6 +22,7 @@
  */
 package info.monitorenter.gui.chart.controls;
 
+import info.monitorenter.util.MathUtil;
 import info.monitorenter.util.Range;
 import infovis.panel.DoubleBoundedRangeModel;
 import infovis.panel.dqinter.DoubleRangeSlider;
@@ -40,7 +41,6 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-
 /**
  * A panel that allows to choose a range from a special
  * {@link javax.swing.JSlider} with two sliders (dual Slider).
@@ -51,7 +51,7 @@ import javax.swing.event.ChangeListener;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class RangeChooserPanel extends JPanel {
 
@@ -71,8 +71,8 @@ public class RangeChooserPanel extends JPanel {
    * <p>
    * 
    * @param range
-   *          defines the bounds of the current selection and the extension of
-   *          these that is chooseable.
+   *            defines the bounds of the current selection and the extension of
+   *            these that is chooseable.
    */
   public RangeChooserPanel(final Range range) {
 
@@ -85,14 +85,13 @@ public class RangeChooserPanel extends JPanel {
     double max = range.getMax();
     double minBound = min;
     double maxBound = max;
-    if (minBound == Double.NEGATIVE_INFINITY || minBound == Double.NaN
+    if (minBound == Double.NEGATIVE_INFINITY || Double.isNaN(minBound)
         || minBound == Double.POSITIVE_INFINITY || minBound == -Double.MAX_VALUE) {
       min = -100;
     }
     minBound = min - (max - min) / 2;
 
-    if (maxBound == Double.NEGATIVE_INFINITY || maxBound == Double.NaN
-        || maxBound == Double.POSITIVE_INFINITY || maxBound == Double.MAX_VALUE) {
+    if (MathUtil.isDouble(maxBound)) {
       max = 100;
     }
     maxBound = max + (max - min) / 2;
@@ -150,7 +149,7 @@ public class RangeChooserPanel extends JPanel {
     rangeMaxView.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent ae) {
         JTextField textField = (JTextField) ae.getSource();
-        try { 
+        try {
           Number entered = RangeChooserPanel.this.m_nf.parse(textField.getText());
           double low = RangeChooserPanel.this.m_slider.getLowValue();
           double high = entered.doubleValue();

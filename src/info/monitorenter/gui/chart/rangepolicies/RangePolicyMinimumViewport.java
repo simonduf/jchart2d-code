@@ -42,7 +42,7 @@ import info.monitorenter.util.Range;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  */
 public class RangePolicyMinimumViewport extends ARangePolicy {
 

@@ -33,11 +33,10 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.11 $
  * 
  */
-public class TracePainterLine
-    extends ATracePainter {
+public class TracePainterLine extends ATracePainter {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -3310431930065989648L;
@@ -66,4 +65,21 @@ public class TracePainterLine
     super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
     this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
   }
+
+  /**
+   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#startPaintIteration(java.awt.Graphics2D)
+   */
+  @Override
+  public void startPaintIteration(final Graphics2D g2d) {
+    this.m_pointPainter.startPaintIteration(g2d);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#endPaintIteration(java.awt.Graphics2D)
+   */
+  @Override
+  public void endPaintIteration(final Graphics2D g2d) {
+    this.m_pointPainter.endPaintIteration(g2d);
+  }
+
 }

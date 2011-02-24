@@ -31,9 +31,9 @@ import java.awt.geom.Point2D;
  * <code>Chart2D</code> to cache the scaled values (between 0.0 and 1.0) without having to keep a
  * copy of the aggregators (<code>ITrace2D</code>) complete tracepoints.
  * <p>
- * This avoids the necessity to care for the correct order of a set of scaled tracepoints copied for
- * caching purposes. Especially in the case of new <code>TracePoint2D</code> instances added to a
- * <code>ITrace2D</code> instance managed by a <code>Chart2D</code> there remains no
+ * This avoids the necessity to care for the correct order of a set of scaled tracepoints copied
+ * for caching purposes. Especially in the case of new <code>TracePoint2D</code> instances added
+ * to a <code>ITrace2D</code> instance managed by a <code>Chart2D</code> there remains no
  * responsibility for sorting the cached copy. This allows that the managing <code>Chart2D</code>
  * may just rescale the newly added tracepoint instead of searching for the correct order of the new
  * tracepoint by value - comparisons of x and y: The <code>TracePoint2D</code> passed to the
@@ -49,10 +49,10 @@ import java.awt.geom.Point2D;
  * <p>
  * 
  * @author Achim Westermann <a href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.14 $
  */
 public class TracePoint2D
-    extends Point2D.Double implements Comparable, java.io.Serializable, Cloneable {
+    extends Point2D.Double implements Comparable<TracePoint2D>, java.io.Serializable, Cloneable {
 
   /**
    * Generated <code>serialVersionUID</code>.
@@ -69,14 +69,6 @@ public class TracePoint2D
   /**
    * The state flag used to inform the <code>{@link ITrace2D}</code> listener via
    * <code>{@link ITrace2D#firePointChanged(TracePoint2D, int)}</code> in case a point was
-   * removed.
-   * <p>
-   */
-  public static final transient int STATE_REMOVED = 2;
-
-  /**
-   * The state flag used to inform the <code>{@link ITrace2D}</code> listener via
-   * <code>{@link ITrace2D#firePointChanged(TracePoint2D, int)}</code> in case a point was
    * changed.
    * <p>
    * Will be used by <code>{@link #setLocation(double, double)}</code> and
@@ -84,6 +76,14 @@ public class TracePoint2D
    * <p>
    */
   public static final transient int STATE_CHANGED = 4;
+
+  /**
+   * The state flag used to inform the <code>{@link ITrace2D}</code> listener via
+   * <code>{@link ITrace2D#firePointChanged(TracePoint2D, int)}</code> in case a point was
+   * removed.
+   * <p>
+   */
+  public static final transient int STATE_REMOVED = 2;
 
   /**
    * The reference to the listening <code>ITrace</code> who owns this point.
@@ -94,19 +94,20 @@ public class TracePoint2D
   private ITrace2D m_listener;
 
   /**
-   * Flag for the Chart2D painter that allows it to render only instances he has processed before.
+   * Scaled x value.
    */
-  protected boolean m_scaledOnce = false;
+ private double m_scaledX;
 
   /**
-   * Public level for the access of <code>AAxis</code>.
+   * Scaled y value.
    */
-  public double m_scaledX;
+ private double m_scaledY;
 
-  /**
-   * Public level for the access of <code>AAxis</code>.
-   */
-  public double m_scaledY;
+  /** The x coordinate, re-declared as the super class member will not be serialized. */
+  private double m_x;
+
+  /** The y coordinate, re-declared as the super class member will not be serialized. */
+  private double m_y;
 
   /**
    * Construct a TracePoint2D whose coords are initalized to (x,y).
@@ -119,7 +120,8 @@ public class TracePoint2D
    */
   public TracePoint2D(final double xValue, final double yValue) {
 
-    super(xValue, yValue);
+    this.m_x = xValue;
+    this.m_y = yValue;
   }
 
   /**
@@ -127,9 +129,8 @@ public class TracePoint2D
    */
   public Object clone() {
     TracePoint2D result = (TracePoint2D) super.clone();
-    result.x = this.x;
-    result.y = this.y;
-    result.m_scaledOnce = this.m_scaledOnce;
+    result.m_x = this.m_x;
+    result.m_y = this.m_y;
     result.m_scaledX = this.m_scaledX;
     result.m_scaledY = this.m_scaledY;
     return result;
@@ -144,17 +145,15 @@ public class TracePoint2D
    * @return -1 if the given point has a higher x value, 0 if it has the same value or 1 if it has a
    *         lower x value.
    * @see Comparable#compareTo(java.lang.Object)
-   * @throws ClassCastException
-   *             if the given instance is not of this type.
    */
-  public int compareTo(final Object obj) throws ClassCastException {
+  public int compareTo(final TracePoint2D obj) {
 
     int result;
-    double othx = ((Point2D.Double) obj).getX();
-    if (this.x < othx) {
+    double othx = obj.getX();
+    if (this.m_x < othx) {
       result = -1;
     } else {
-      if (this.x == othx) {
+      if (this.m_x == othx) {
         result = 0;
       } else {
         result = 1;
@@ -167,10 +166,18 @@ public class TracePoint2D
    * @see java.lang.Object#equals(java.lang.Object)
    */
   public boolean equals(final Object o) {
-    if (o == null) {
-      return false;
-    }
-    return this.compareTo(o) == 0;
+    return this.compareTo((TracePoint2D) o) == 0;
+
+  }
+
+  /**
+   * Returns the listener trace connected to this trace point.
+   * <p>
+   * 
+   * @return the listener trace connected to this trace point.
+   */
+  public ITrace2D getListener() {
+    return this.m_listener;
   }
 
   /**
@@ -207,9 +214,70 @@ public class TracePoint2D
    */
   public void setLocation(final double xValue, final double yValue) {
 
-    super.setLocation(xValue, yValue);
+    this.m_x = xValue;
+    this.m_y = yValue;
     if (this.m_listener != null) {
       this.m_listener.firePointChanged(this, TracePoint2D.STATE_CHANGED);
     }
+  }
+
+  /**
+   * @see java.awt.geom.Point2D.Double#getX()
+   */
+  @Override
+  public double getX() {
+    return this.m_x;
+  }
+
+  /**
+   * @see java.awt.geom.Point2D.Double#getY()
+   */
+  @Override
+  public double getY() {
+    return this.m_y;
+  }
+
+  /**
+   * @see java.awt.geom.Point2D.Double#toString()
+   */
+  @Override
+  public String toString() {
+    return "TracePoint2D[" + this.m_x + ", " + this.m_y + "]";
+  }
+
+  /**
+   * @return the scaledX.
+   */
+  public final double getScaledX() {
+    return this.m_scaledX;
+  }
+
+  /**
+   * Only intended for Chart2D!!!.
+   * <p>
+   * 
+   * @param scaledX
+   *            the scaledX to set
+   */
+  public final void setScaledX(final double scaledX) {
+    this.m_scaledX = scaledX;
+  }
+
+  /**
+   * @return the scaledY.
+   */
+  public final double getScaledY() {
+    return this.m_scaledY;
+  }
+
+  /**
+   * Only intended for Chart2D!!!.
+   * <p>
+   * 
+   * @param scaledY
+   *            the scaledY to set
+   */
+  public final void setScaledY(final double scaledY) {
+    this.m_scaledY = scaledY;
   }
 }

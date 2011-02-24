@@ -43,7 +43,7 @@ import javax.swing.JFrame;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  * 
  */
 public final class LogAxisChart {
@@ -60,7 +60,7 @@ public final class LogAxisChart {
     // Create a chart:
     Chart2D chart = new Chart2D();
     // set a special axis:
-    chart.setAxisY(new AxisLogE());
+    chart.setAxisYLeft(new AxisLogE());
 
     // Create an ITrace:
     ITrace2D trace = new Trace2DSimple();

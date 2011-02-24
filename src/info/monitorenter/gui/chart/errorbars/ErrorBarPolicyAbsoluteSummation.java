@@ -52,10 +52,9 @@ import javax.swing.event.ChangeListener;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.11 $
  */
-public class ErrorBarPolicyAbsoluteSummation
-    extends AErrorBarPolicyConfigurable {
+public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 256014145931710475L;
@@ -76,15 +75,15 @@ public class ErrorBarPolicyAbsoluteSummation
    * <p>
    * 
    * @param xError
-   *          a positive value that is added to / subtracted from the x value to
-   *          render.
+   *            a positive value that is added to / subtracted from the x value
+   *            to render.
    * 
    * @param yError
-   *          a positive value that is added to / subtracted from the y value to
-   *          render.
+   *            a positive value that is added to / subtracted from the y value
+   *            to render.
    * 
    * @throws IllegalArgumentException
-   *           if arguments are < 0.
+   *             if arguments are < 0.
    */
   public ErrorBarPolicyAbsoluteSummation(final double xError, final double yError)
       throws IllegalArgumentException {
@@ -184,7 +183,6 @@ public class ErrorBarPolicyAbsoluteSummation
     return this.m_yError;
   }
 
-
   /**
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeXError(int,
    *      int, info.monitorenter.gui.chart.TracePoint2D)
@@ -248,6 +246,7 @@ public class ErrorBarPolicyAbsoluteSummation
     int result = axisY.translateValueToPx(original.getY() + this.m_yError);
     return result;
   }
+
   /**
    * Sets the absolute x error to add to each error bar.
    * <p>
@@ -257,10 +256,10 @@ public class ErrorBarPolicyAbsoluteSummation
    * <p>
    * 
    * @param xError
-   *          a positive value.
+   *            a positive value.
    * 
    * @throws IllegalArgumentException
-   *           if the argument is < 0.
+   *             if the argument is < 0.
    */
   public final void setXError(final double xError) throws IllegalArgumentException {
     if (xError < 0.0) {
@@ -282,10 +281,10 @@ public class ErrorBarPolicyAbsoluteSummation
    * <p>
    * 
    * @param yError
-   *          a positive value.
+   *            a positive value.
    * 
    * @throws IllegalArgumentException
-   *           if the argument is < 0.
+   *             if the argument is < 0.
    */
   public final void setYError(final double yError) throws IllegalArgumentException {
     if (yError < 0.0) {

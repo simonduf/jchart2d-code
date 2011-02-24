@@ -32,9 +32,6 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 
 /**
  * An <code>{@link IAxisTitlePainter}</code> implementation that will render
@@ -47,41 +44,12 @@ import java.beans.PropertyChangeSupport;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.9 $
  */
 public class AxisTitlePainterDefault implements IAxisTitlePainter {
 
   /** Generated <code>serialVersionUID</code>. */
-  private static final long serialVersionUID = 708574068345824849L;
-
-  /** Internal support for property change management.*/
-  private PropertyChangeSupport m_propertyChangeSupport = new PropertyChangeSupport(this);
-
-  /** the font to use for painting the title. */
-  private Font m_titleFont;
-
-  /**
-   * @see info.monitorenter.gui.chart.IAxisTitlePainter#addPropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)
-   */
-  public void addPropertyChangeListener(final String propertyName,
-      final PropertyChangeListener listener) {
-    this.m_propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IAxisTitlePainter#getPropertyChangeListeners(java.lang.String)
-   */
-  public PropertyChangeListener[] getPropertyChangeListeners(final String propertyName) {
-    return this.m_propertyChangeSupport.getPropertyChangeListeners(propertyName);
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IAxisTitlePainter#removePropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)
-   */
-  public void removePropertyChangeListener(final String property,
-      final PropertyChangeListener listener) {
-    this.m_propertyChangeSupport.removePropertyChangeListener(property, listener);
-  }
+  private static final long serialVersionUID = -8076180259242501703L;
 
   /**
    * Defcon.
@@ -97,7 +65,8 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
    */
   public int getHeight(final IAxis axis, final Graphics2D g2d) {
     int result = 0;
-    String title = axis.getTitle();
+    IAxis.AxisTitle axisTitle = axis.getAxisTitle();
+    String title = axisTitle.getTitle();
     if (!StringUtil.isEmpty(title)) {
       Rectangle2D bounds = g2d.getFontMetrics().getStringBounds(title, g2d);
       int dimension = axis.getDimension();
@@ -118,24 +87,19 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IAxisTitlePainter#getTitleFont()
-   */
-  public final Font getTitleFont() {
-    return this.m_titleFont;
-  }
-
-  /**
    * @see info.monitorenter.gui.chart.IAxisTitlePainter#getWidth(info.monitorenter.gui.chart.IAxis,
    *      java.awt.Graphics2D)
    */
   public int getWidth(final IAxis axis, final Graphics2D g2d) {
     int result = 0;
-    String title = axis.getTitle();
+    IAxis.AxisTitle axisTitle = axis.getAxisTitle();
+    String title = axisTitle.getTitle();
     if (!StringUtil.isEmpty(title)) {
       // incorporation of our font if there:
       Font backUpFont = g2d.getFont();
-      if (this.m_titleFont != null) {
-        g2d.setFont(this.m_titleFont);
+      Font titleFont = axisTitle.getTitleFont();
+      if (titleFont != null) {
+        g2d.setFont(titleFont);
       }
       Rectangle2D bounds = g2d.getFontMetrics().getStringBounds(title, g2d);
       int dimension = axis.getDimension();
@@ -152,7 +116,7 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
               "Given axis.getDimension() is neither Chart2D.X nor Chart2D.Y!");
       }
       // resetting original font if it was changed:
-      if (this.m_titleFont != null) {
+      if (titleFont != null) {
         g2d.setFont(backUpFont);
       }
     }
@@ -161,65 +125,105 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
   }
 
   /**
+   * TODO: This will not work for multiple axis in the same dimension and
+   * position (overwriting titles)!
+   * 
    * @see info.monitorenter.gui.chart.IAxisTitlePainter#paintTitle(info.monitorenter.gui.chart.IAxis,
    *      java.awt.Graphics2D)
    */
   public void paintTitle(final IAxis axis, final Graphics2D g) {
 
-    String title = axis.getTitle();
+    IAxis.AxisTitle axisTitle = axis.getAxisTitle();
+    String title = axisTitle.getTitle();
     Rectangle2D bounds;
     // manage the title font if there:
+    Font titleFont = axisTitle.getTitleFont();
     Font backUpFont = g.getFont();
-    if (this.m_titleFont != null) {
-      g.setFont(this.m_titleFont);
+    if (titleFont != null) {
+      g.setFont(titleFont);
     }
 
     bounds = g.getFontMetrics().getStringBounds(title, g);
+
     Chart2D chart = axis.getAccessor().getChart();
 
     int dimension = axis.getDimension();
+    int position = axis.getAxisPosition();
     switch (dimension) {
       case Chart2D.X:
-        int startX = chart.getXChartStart();
-        int endX = chart.getXChartEnd();
-        double xspace = bounds.getWidth();
-        int titleStartX = (int) ((endX - startX) / 2.0 - xspace / 2.0);
-        int xTickAndLabelHeight = chart.getAxisTickPainter().getMajorTickLength();
-        if (chart.isPaintLabels()) {
-          xTickAndLabelHeight += chart.getFontMetrics(chart.getFont()).getHeight();
+        switch (position) {
+          case Chart2D.CHART_POSITION_BOTTOM: {
+
+            int startX = chart.getXChartStart();
+            int endX = chart.getXChartEnd();
+            double xspace = bounds.getWidth();
+            int titleStartX = (int) ((endX - startX) / 2.0 - xspace / 2.0);
+            g.drawString(title, titleStartX, axis.getPixelYBottom() - 4);
+            break;
+          }
+          case Chart2D.CHART_POSITION_TOP: {
+            int startX = chart.getXChartStart();
+            int endX = chart.getXChartEnd();
+            double xspace = bounds.getWidth();
+            int titleStartX = (int) ((endX - startX) / 2.0 - xspace / 2.0);
+            g.drawString(title, titleStartX, axis.getPixelYTop()
+                + chart.getFontMetrics(chart.getFont()).getHeight());
+            break;
+          }
+          default: {
+            // nop
+          }
         }
-        g.drawString(title, titleStartX, chart.getHeight() - xTickAndLabelHeight);
         break;
       case Chart2D.Y:
-        int startY = chart.getYChartStart();
-        int endY = chart.getYChartEnd();
-        double yspace = bounds.getWidth();
-        int titleStartY = (int) ((startY - endY) / 2.0 + yspace / 2.0);
-        AffineTransform tr = g.getTransform();
-        AffineTransform at = AffineTransform.getTranslateInstance(10, titleStartY);
-        at.rotate(-Math.PI / 2);
-        g.setTransform(at);
-        g.drawString(title, 0, 0);
-        g.setTransform(tr);
+        switch (position) {
+          case (Chart2D.CHART_POSITION_LEFT): {
+            int startY = chart.getYChartStart();
+            int endY = chart.getYChartEnd();
+            double yspace = bounds.getWidth();
+            int titleStartY = (int) ((startY - endY) / 2.0 + yspace / 2.0);
+            AffineTransform tr = g.getTransform();
+            AffineTransform at = AffineTransform.getTranslateInstance(axis.getPixelXLeft()
+                + chart.getFontMetrics(chart.getFont()).getHeight(), titleStartY);
+            at.rotate(-Math.PI / 2);
+            g.setTransform(at);
+            g.drawString(title, 0, 0);
+            g.setTransform(tr);
+            break;
+          }
+          case (Chart2D.CHART_POSITION_RIGHT): {
+            int startY = chart.getYChartStart();
+            int endY = chart.getYChartEnd();
+            double yspace = bounds.getWidth();
+            int titleStartY = (int) ((startY - endY) / 2.0 + yspace / 2.0);
+
+            int chartLabelFontWidth = chart.getFontMetrics(chart.getFont()).charWidth('0');
+            int xShiftPosition = chart.getAxisTickPainter().getMajorTickLength();
+            xShiftPosition += axis.getFormatter().getMaxAmountChars() * chartLabelFontWidth;
+
+            AffineTransform tr = g.getTransform();
+            AffineTransform at = AffineTransform.getTranslateInstance(chart.getXChartEnd()
+                + xShiftPosition, titleStartY);
+            at.rotate(-Math.PI / 2);
+            g.setTransform(at);
+            g.drawString(title, 0, 0);
+            g.setTransform(tr);
+            break;
+          }
+          default: {
+            // nop
+          }
+        }
         break;
       default:
         throw new IllegalArgumentException(
             "Given axis.getDimension() is neither Chart2D.X nor Chart2D.Y!");
     }
     // resetting original font if it was changed:
-    if (this.m_titleFont != null) {
+    if (titleFont != null) {
       g.setFont(backUpFont);
     }
 
   }
 
-  /**
-   * @see info.monitorenter.gui.chart.IAxisTitlePainter#setTitleFont(java.awt.Font)
-   */
-  public final void setTitleFont(final Font titleFont) {
-    PropertyChangeEvent evt = new PropertyChangeEvent(this, IAxisTitlePainter.PROPERTY_TITLEFONT,
-        this.m_titleFont, titleFont);
-    this.m_titleFont = titleFont;
-    this.m_propertyChangeSupport.firePropertyChange(evt);
-  }
 }
