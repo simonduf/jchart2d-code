@@ -59,7 +59,7 @@ import java.util.Set;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.22 $
  */
 public class Trace2DDebugger implements ITrace2D {
 
@@ -179,6 +179,7 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see java.lang.Object#equals(java.lang.Object)
    */
+  @Override
   public boolean equals(final Object obj) {
     return this.m_delegate.equals(obj);
   }
@@ -269,6 +270,13 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getNearestPointManhattan(double, double)
+   */
+  public ManhattanDistancePoint getNearestPointManhattan(final double x, final double y) {
+    return this.m_delegate.getNearestPointManhattan(x, y);
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#getPhysicalUnits()
    */
   public String getPhysicalUnits() {
@@ -354,6 +362,7 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see java.lang.Object#hashCode()
    */
+  @Override
   public int hashCode() {
     return this.m_delegate.hashCode();
   }
@@ -575,7 +584,9 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see java.lang.Object#toString()
    */
+  @Override
   public String toString() {
     return this.m_delegate.toString();
   }
+
 }

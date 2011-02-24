@@ -41,7 +41,7 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.6.4.2 $
+ * @version $Revision: 1.8 $
  */
 public class TestChart2DSetAxis extends TestCase {
 

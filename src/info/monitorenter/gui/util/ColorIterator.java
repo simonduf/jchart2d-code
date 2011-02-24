@@ -33,7 +33,7 @@ import java.util.NoSuchElementException;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ColorIterator implements Iterator<Color> {
 
@@ -78,6 +78,7 @@ public class ColorIterator implements Iterator<Color> {
      * 
      * @return a clone of the stepper.
      */
+    @Override
     public Object clone() {
       ADefaultStepping result = null;
       try {
@@ -105,7 +106,7 @@ public class ColorIterator implements Iterator<Color> {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.4 $
+   * @version $Revision: 1.5 $
    */
   public abstract static class APiggyBackStepper implements ColorIterator.ISteppingModel {
     /** The hue stepper to use. */
@@ -152,6 +153,7 @@ public class ColorIterator implements Iterator<Color> {
     /**
      * @see java.lang.Object#clone()
      */
+    @Override
     public Object clone() {
       try {
         APiggyBackStepper ret = (APiggyBackStepper) super.clone();
@@ -185,7 +187,7 @@ public class ColorIterator implements Iterator<Color> {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.4 $
+   * @version $Revision: 1.5 $
    */
   public static class HSBStepper extends ColorIterator.APiggyBackStepper {
     /**
@@ -203,7 +205,7 @@ public class ColorIterator implements Iterator<Color> {
      */
     public void doStep(final ColorIterator tostep) {
       // technique: without testing the step is done
-      // this allows to restart with huestep even if start.hue==iterate.hue
+      // this allows to restart with hue step even if start.hue==iterate.hue
       // after having performed a step of different kind
       this.m_huestep.doStep(tostep);
       if (tostep.m_iterate.m_hue == tostep.m_startColor.m_hue) {
@@ -222,7 +224,7 @@ public class ColorIterator implements Iterator<Color> {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.4 $
+   * @version $Revision: 1.5 $
    */
   public static class HSStepper extends ColorIterator.APiggyBackStepper {
     /**
@@ -254,7 +256,7 @@ public class ColorIterator implements Iterator<Color> {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.4 $
+   * @version $Revision: 1.5 $
    */
   public static class HueStepper extends ColorIterator.ADefaultStepping {
     /**
@@ -354,7 +356,7 @@ public class ColorIterator implements Iterator<Color> {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.4 $
+   * @version $Revision: 1.5 $
    */
   public static interface ISteppingModel extends Cloneable {
     /**
@@ -390,7 +392,7 @@ public class ColorIterator implements Iterator<Color> {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.4 $
+   * @version $Revision: 1.5 $
    */
   public static class LuminanceStepper extends ColorIterator.ADefaultStepping {
     /**
@@ -490,7 +492,7 @@ public class ColorIterator implements Iterator<Color> {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.4 $
+   * @version $Revision: 1.5 $
    */
   public static class SaturationStepper extends ColorIterator.ADefaultStepping {
     /**
@@ -590,7 +592,7 @@ public class ColorIterator implements Iterator<Color> {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.4 $
+   * @version $Revision: 1.5 $
    */
   public static class AlphaStepper extends ColorIterator.ADefaultStepping {
     /**
@@ -604,6 +606,7 @@ public class ColorIterator implements Iterator<Color> {
     /**
      * @see info.monitorenter.gui.util.ColorIterator.ADefaultStepping#setSteps(int)
      */
+    @Override
     public void setSteps(final int steps) {
       this.m_stepping = 255.0 / steps;
     }
@@ -700,7 +703,7 @@ public class ColorIterator implements Iterator<Color> {
   private boolean m_firstTime = true;
 
   /** Reference to the currently iterated color. */
-  private HSBColor m_iterate;
+  protected HSBColor m_iterate;
 
   /**
    * To allow clean reset of ColorIterator, also the SteppingModel has to be
@@ -712,7 +715,7 @@ public class ColorIterator implements Iterator<Color> {
    * The starting color which is also used to detect if a whole iteration has
    * been performed.
    */
-  private HSBColor m_startColor;
+  protected HSBColor m_startColor;
 
   /** The stepping model that defines the path through the color space. */
   private ColorIterator.ISteppingModel m_stepModel;
@@ -779,6 +782,7 @@ public class ColorIterator implements Iterator<Color> {
       /**
        * @see java.awt.Component#paint(java.awt.Graphics)
        */
+      @Override
       public void paint(final java.awt.Graphics g) {
         super.paint(g);
         // refresh iterator
@@ -790,7 +794,7 @@ public class ColorIterator implements Iterator<Color> {
           if (pxdrawn == width) {
             break;
           }
-          g.setColor((java.awt.Color) this.m_color.next());
+          g.setColor(this.m_color.next());
           g.drawLine(pxdrawn, 0, pxdrawn, height);
           pxdrawn++;
         }
@@ -805,6 +809,10 @@ public class ColorIterator implements Iterator<Color> {
     frame.setLocation(200, 200);
     frame.setSize(new java.awt.Dimension(400, 100));
     frame.addWindowListener(new java.awt.event.WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final java.awt.event.WindowEvent e) {
         System.exit(0);
       }

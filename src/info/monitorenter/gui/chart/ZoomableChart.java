@@ -42,7 +42,7 @@ import java.awt.geom.Rectangle2D;
  * 
  * @author Alessio Sambarino (Contributor)
  * 
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  * 
  * @author Klaus Pesendorfer (klaus.pesendorfer@fabalabs.org)
  * 
@@ -233,6 +233,7 @@ public class ZoomableChart
   /**
    * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
    */
+  @Override
   protected void paintComponent(final Graphics g) {
 
     super.paintComponent(g);

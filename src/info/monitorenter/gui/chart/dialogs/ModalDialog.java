@@ -60,34 +60,32 @@ import javax.swing.JPanel;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  * 
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
-public class ModalDialog
-    extends JDialog {
+public class ModalDialog extends JDialog {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 6915311633181971117L;
-
 
   /** The UI controls and model to interact with. */
   private JComponent m_chooserPanel;
 
   /** Stores whether OK or Cancel was pressed. */
-  private boolean m_ok;
+  protected boolean m_ok;
 
   /**
    * Creates a modal dialog.
    * <p>
    * 
    * @param dialogParent
-   *            the parent <code>Component</code> for the dialog.
+   *          the parent <code>Component</code> for the dialog.
    * 
    * @param title
-   *            the String containing the dialog's title.
+   *          the String containing the dialog's title.
    * 
    * @param controlComponent
-   *            the UI component that is additionally shown and returned from
-   *            {@link #showDialog()}.
+   *          the UI component that is additionally shown and returned from
+   *          {@link #showDialog()}.
    */
   public ModalDialog(final Component dialogParent, final String title,
       final JComponent controlComponent) {
@@ -100,6 +98,10 @@ public class ModalDialog
 
     // Window listeners:
     this.addWindowListener(new WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent e) {
         Window w = e.getWindow();
         w.setVisible(false);
@@ -107,6 +109,10 @@ public class ModalDialog
     });
     // Close this Modal dialog:
     this.addComponentListener(new ComponentAdapter() {
+      /**
+       * @see java.awt.event.ComponentAdapter#componentHidden(java.awt.event.ComponentEvent)
+       */
+      @Override
       public void componentHidden(final ComponentEvent e) {
         Window w = (Window) e.getComponent();
         w.dispose();
@@ -119,6 +125,9 @@ public class ModalDialog
     okCancelPanel.add(Box.createHorizontalGlue());
     JButton ok = new JButton("OK");
     ok.addActionListener(new ActionListener() {
+      /**
+       * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+       */
       public void actionPerformed(final ActionEvent e) {
         ModalDialog.this.m_ok = true;
         ModalDialog.this.setVisible(false);
@@ -166,7 +175,7 @@ public class ModalDialog
    *         settings or <code>null</code> if the user opted out.
    * 
    * @exception HeadlessException
-   *                if GraphicsEnvironment.isHeadless() returns true.
+   *              if GraphicsEnvironment.isHeadless() returns true.
    * 
    * @see java.awt.GraphicsEnvironment#isHeadless
    */

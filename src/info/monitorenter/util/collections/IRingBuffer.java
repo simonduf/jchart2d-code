@@ -19,7 +19,6 @@
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
  */
-
 package info.monitorenter.util.collections;
 
 
@@ -33,7 +32,7 @@ package info.monitorenter.util.collections;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public interface IRingBuffer<T> extends java.io.Serializable, Iterable<T> {
 
@@ -43,7 +42,7 @@ public interface IRingBuffer<T> extends java.io.Serializable, Iterable<T> {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.3 $
+   * @version $Revision: 1.4 $
    */
   public final class RingBufferException
       extends RuntimeException {

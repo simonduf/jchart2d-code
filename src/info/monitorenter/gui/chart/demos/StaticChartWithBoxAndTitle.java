@@ -48,10 +48,9 @@ import javax.swing.border.TitledBorder;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
-public final class StaticChartWithBoxAndTitle
-    extends JPanel {
+public final class StaticChartWithBoxAndTitle extends JPanel {
   /**
    * Generated for <code>serialVersionUID</code>.
    */
@@ -69,6 +68,10 @@ public final class StaticChartWithBoxAndTitle
       JFrame frame = new JFrame("StaticChartWithBoxAndTitle");
       frame.getContentPane().add(new StaticChartWithBoxAndTitle());
       frame.addWindowListener(new WindowAdapter() {
+        /**
+         * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+         */
+        @Override
         public void windowClosing(final WindowEvent e) {
           System.exit(0);
         }

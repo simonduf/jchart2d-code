@@ -47,7 +47,7 @@ import java.util.Iterator;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class Trace2DLtd
     extends ATrace2D implements ITrace2D {
@@ -111,10 +111,10 @@ public class Trace2DLtd
   /**
    * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   protected boolean addPointInternal(final TracePoint2D p) {
 
     TracePoint2D removed = this.m_buffer.add(p);
-
     double tmpx;
     double tmpy;
     if (removed != null) {
@@ -200,6 +200,7 @@ public class Trace2DLtd
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#removeAllPoints()
    */
+  @Override
   public void removeAllPointsInternal() {
     this.m_buffer.clear();
   }
@@ -218,6 +219,7 @@ public class Trace2DLtd
    *         ring buffer.
    * 
    */
+  @Override
   protected TracePoint2D removePointInternal(final TracePoint2D point) {
     return null;
   }

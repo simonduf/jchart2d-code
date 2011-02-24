@@ -31,7 +31,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * Has the behaviour of <code>Trace2DReplacing</code> and additional features.
+ * Has the behavior of <code>Trace2DReplacing</code> and additional features.
  * <p>
  * <ul>
  * <li>All traceoints added whose x- values are not already contained are added
@@ -49,7 +49,7 @@ import java.util.TreeSet;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.10 $
  */
 public class Trace2DSorted
     extends ATrace2D implements ITrace2D {
@@ -80,6 +80,7 @@ public class Trace2DSorted
    * 
    * @return true if the given point was successfully added.
    */
+  @Override
   protected boolean addPointInternal(final TracePoint2D p) {
     // remove eventually contained to allow adding of new one
     this.removePoint(p);
@@ -117,6 +118,7 @@ public class Trace2DSorted
   /**
    * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   protected void removeAllPointsInternal() {
     this.m_points.clear();
   }
@@ -124,6 +126,7 @@ public class Trace2DSorted
   /**
    * @see ATrace2D#removePointInternal(info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   protected TracePoint2D removePointInternal(final TracePoint2D point) {
     TracePoint2D result = null;
     if (this.m_points.remove(point)) {

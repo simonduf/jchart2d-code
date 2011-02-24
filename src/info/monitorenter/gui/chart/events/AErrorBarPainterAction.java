@@ -36,12 +36,14 @@ import javax.swing.AbstractAction;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  * 
  */
-public abstract class AErrorBarPainterAction 
-    extends AbstractAction {
-  
+public abstract class AErrorBarPainterAction extends AbstractAction {
+
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = -810722000562110487L;
+
   /** The error bar painter to trigger the action upon. */
   protected IErrorBarPainter m_errorBarPainter;
 
@@ -63,4 +65,3 @@ public abstract class AErrorBarPainterAction
     this.m_errorBarPainter = errorBarPainter;
   }
 }
-

@@ -37,7 +37,7 @@ import java.util.Iterator;
  * structure. <br>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westerman </a>
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class Trace2DLtdReplacing
     extends Trace2DLtd {
@@ -66,6 +66,7 @@ public class Trace2DLtdReplacing
   /**
    * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   protected boolean addPointInternal(final TracePoint2D p) {
     boolean result = false;
     boolean located = false;

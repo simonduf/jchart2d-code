@@ -38,11 +38,14 @@ import javax.swing.AbstractAction;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  * 
  */
-public abstract class AErrorBarPolicyAction
-    extends AbstractAction implements PropertyChangeListener {
+public abstract class AErrorBarPolicyAction extends AbstractAction implements
+    PropertyChangeListener {
+
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = -5125972469704790485L;
 
   /** The error bar policy to trigger the action upon. */
   protected IErrorBarPolicy m_errorBarPolicy;

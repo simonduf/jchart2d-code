@@ -20,6 +20,7 @@
  *  Achim.Westermann@gmx.de
  *
  */
+
 package info.monitorenter.gui.chart.events;
 
 import info.monitorenter.gui.chart.Chart2D;
@@ -37,62 +38,66 @@ import java.beans.PropertyChangeListener;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  * 
  */
-public abstract class AAxisAction
-    extends AChart2DAction implements PropertyChangeListener {
+public abstract class AAxisAction extends AChart2DAction implements PropertyChangeListener {
 
-  /** The target of this action. */
-  private int m_axis;
+    /** Generated <code>serialVersionUID</code>. **/
+    private static final long serialVersionUID = 2602716712958711393L;
+    
+    /** The target of this action. */
+    private int m_axis;
 
-  /**
-   * Create an <code>Action</code> that accesses the chart's axis by argument
-   * <code>axis</code> and identifies itself with the given action String.
-   * <p>
-   * 
-   * @param chart
-   *          the owner of the axis to trigger actions upon.
-   * 
-   * @param axis
-   *          needed to identify the axis of the chart: one of {@link Chart2D#X},
-   *          {@link Chart2D#Y}.
-   * 
-   * @param description
-   *          the descriptive <code>String</code> that will be displayed by
-   *          {@link javax.swing.AbstractButton} subclasses that get this
-   *          <code>Action</code> assigned (
-   *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
-   * 
-   */
-  public AAxisAction(final Chart2D chart, final String description, final int axis) {
-    super(chart, description);
-    this.m_axis = axis;
-  }
+    /**
+     * Create an <code>Action</code> that accesses the chart's axis by argument
+     * <code>axis</code> and identifies itself with the given action String.
+     * <p>
+     * 
+     * @param chart
+     *          the owner of the axis to trigger actions upon.
+     * 
+     * @param axis
+     *          needed to identify the axis of the chart: one of {@link Chart2D#X},
+     *          {@link Chart2D#Y}.
+     * 
+     * @param description
+     *          the descriptive <code>String</code> that will be displayed by
+     *          {@link javax.swing.AbstractButton} subclasses that get this
+     *          <code>Action</code> assigned (
+     *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+     * 
+     */
+    public AAxisAction(final Chart2D chart, final String description, final int axis) {
 
-  /**
-   * Returns the axis that is controlled.
-   * <p>
-   * Note that several calls may return different instances (<code>a.getAxis() == a.getAxis()</code>
-   * may be false) in case the corresponding chart of the former axis gets a new
-   * axis assigned.
-   * <p>
-   * 
-   * @return the axis that is controlled.
-   */
-  protected IAxis getAxis() {
-    // update in case the corresponding chart has a new axis:
-    IAxis axis = null;
-    switch (this.m_axis) {
-      case Chart2D.X:
-        axis = this.m_chart.getAxisX();
-        break;
-      case Chart2D.Y:
-        axis = this.m_chart.getAxisY();
-        break;
-      default:
-        break;
+        super(chart, description);
+        this.m_axis = axis;
     }
-    return axis;
-  }
+
+    /**
+     * Returns the axis that is controlled.
+     * <p>
+     * Note that several calls may return different instances (<code>a.getAxis() == a.getAxis()</code>
+     * may be false) in case the corresponding chart of the former axis gets a new
+     * axis assigned.
+     * <p>
+     * 
+     * @return the axis that is controlled.
+     */
+    protected IAxis getAxis() {
+
+        // update in case the corresponding chart has a new axis:
+        IAxis axis = null;
+        switch (this.m_axis) {
+            case Chart2D.X:
+                axis = this.m_chart.getAxisX();
+                break;
+            case Chart2D.Y:
+                axis = this.m_chart.getAxisY();
+                break;
+            default:
+                break;
+        }
+        return axis;
+    }
 }

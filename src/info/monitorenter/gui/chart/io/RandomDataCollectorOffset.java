@@ -38,11 +38,11 @@ import info.monitorenter.gui.chart.TracePoint2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class RandomDataCollectorOffset extends ADataCollector {
 
-  /** The start tiime of this collector. */
+  /** The start time of this collector. */
   private long m_starttime = System.currentTimeMillis();
 
   /** The last y value added. */
@@ -66,6 +66,7 @@ public class RandomDataCollectorOffset extends ADataCollector {
   /**
    * @see ADataCollector#collectData()
    */
+  @Override
   public TracePoint2D collectData() {
     double rand = Math.random();
     boolean add = (rand >= 0.5) ? true : false;

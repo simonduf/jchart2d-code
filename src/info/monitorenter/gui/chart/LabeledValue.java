@@ -31,7 +31,7 @@ package info.monitorenter.gui.chart;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class LabeledValue {
 
@@ -148,6 +148,7 @@ public class LabeledValue {
    * 
    * @see java.lang.Object#toString()
    */
+  @Override
   public String toString() {
     return new StringBuffer().append(this.m_label).append(" : ").append(this.m_value).toString();
   }

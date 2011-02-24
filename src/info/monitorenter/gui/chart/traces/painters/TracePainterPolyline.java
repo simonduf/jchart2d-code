@@ -23,20 +23,20 @@ package info.monitorenter.gui.chart.traces.painters;
 
 import info.monitorenter.gui.chart.TracePoint2D;
 
-import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  * A trace painter that increases performance by summing up all points to render for a paint
- * iteration (submitted by {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}
- * invocations between {@link #startPaintIteration(Graphics2D)} and
- * {@link #endPaintIteration(Graphics2D)}) and only invoking only one polyline paint for a paint
+ * iteration (submitted by {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}
+ * invocations between {@link #startPaintIteration(Graphics)} and
+ * {@link #endPaintIteration(Graphics)}) and only invoking only one polyline paint for a paint
  * call of the corresponding {@link info.monitorenter.gui.chart.Chart2D}.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.16 $
  */
 public class TracePainterPolyline
     extends ATracePainter {
@@ -59,9 +59,10 @@ public class TracePainterPolyline
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics)
    */
-  public void endPaintIteration(final Graphics2D g2d) {
+  @Override
+  public void endPaintIteration(final Graphics g2d) {
     if (g2d != null) {
 
       int[] x = new int[this.m_xPoints.size() + 1];
@@ -86,10 +87,11 @@ public class TracePainterPolyline
 
   /**
    * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int, int, int, int,
-   *      java.awt.Graphics2D, info.monitorenter.gui.chart.TracePoint2D)
+   *      java.awt.Graphics, info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g, final TracePoint2D original) {
+      final int nextY, final Graphics g, final TracePoint2D original) {
     super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
     this.m_xPoints.add(new Integer(absoluteX));
     this.m_yPoints.add(new Integer(absoluteY));
@@ -97,9 +99,10 @@ public class TracePainterPolyline
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#startPaintIteration(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ITracePainter#startPaintIteration(java.awt.Graphics)
    */
-  public void startPaintIteration(final Graphics2D g2d) {
+  @Override
+  public void startPaintIteration(final Graphics g2d) {
     super.startPaintIteration(g2d);
     if (this.m_xPoints == null) {
       this.m_xPoints = new LinkedList<Integer>();

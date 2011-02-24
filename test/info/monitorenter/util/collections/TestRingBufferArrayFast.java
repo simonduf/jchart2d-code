@@ -30,21 +30,17 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * 
  * Testcase for {@link info.monitorenter.util.collections.RingBufferArrayFast}.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * 
- * 
- * @version $Revision: 1.5.4.2 $
+ * @version $Revision: 1.8 $
  */
 public class TestRingBufferArrayFast
     extends TestCase {
 
   /**
-   * Test method for
-   * {@link info.monitorenter.util.collections.RingBufferArrayFast#add(Object)}.
+   * Test method for {@link info.monitorenter.util.collections.RingBufferArrayFast#add(Object)}.
    * <p>
    */
   public void testAdd() {
@@ -56,8 +52,7 @@ public class TestRingBufferArrayFast
   }
 
   /**
-   * Test method for
-   * {@link info.monitorenter.util.collections.RingBufferArrayFast#size()}.
+   * Test method for {@link info.monitorenter.util.collections.RingBufferArrayFast#size()}.
    * <p>
    */
   public void testSize() {
@@ -79,8 +74,7 @@ public class TestRingBufferArrayFast
   }
 
   /**
-   * Test method for
-   * {@link info.monitorenter.util.collections.RingBufferArrayFast#iteratorL2F()}.
+   * Test method for {@link info.monitorenter.util.collections.RingBufferArrayFast#iteratorL2F()}.
    * <p>
    */
   public void testIteratorL2F() {
@@ -158,8 +152,7 @@ public class TestRingBufferArrayFast
   }
 
   /**
-   * Test method for
-   * {@link info.monitorenter.util.collections.RingBufferArrayFast#iteratorF2L()}.
+   * Test method for {@link info.monitorenter.util.collections.RingBufferArrayFast#iteratorF2L()}.
    * <p>
    */
   public void testIteratorF2L() {
@@ -170,7 +163,10 @@ public class TestRingBufferArrayFast
     }
     Assert.assertEquals(2, ringBuffer.size());
     int value = 1;
-    for (Integer removed : ringBuffer) {
+    Iterator<Integer> it = ringBuffer.iteratorF2L();
+    Integer removed;
+    while (it.hasNext()) {
+      removed = it.next();
       Assert.assertNotNull("Element no. " + value + " is null.", removed);
       // tests the order of the iterator:
       Assert.assertEquals(removed.intValue(), value);
@@ -185,7 +181,9 @@ public class TestRingBufferArrayFast
       ringBuffer.add(new Integer(i));
     }
     Assert.assertEquals(1, ringBuffer.size());
-    for (Integer removed : ringBuffer) {
+    it = ringBuffer.iteratorF2L();
+    while (it.hasNext()) {
+      removed = it.next();
       Assert.assertNotNull("Element no. " + value + " is null.", removed);
       // tests the order of the iterator:
       Assert.assertEquals(removed.intValue(), value);
@@ -200,7 +198,10 @@ public class TestRingBufferArrayFast
       ringBuffer.add(new Integer(i));
     }
     Assert.assertEquals(10, ringBuffer.size());
-    for (Integer removed : ringBuffer) {
+    it = ringBuffer.iteratorF2L();
+    while (it.hasNext()) {
+      removed = it.next();
+
       Assert.assertNotNull("Element no. " + value + " is null.", removed);
       // tests the order of the iterator:
       Assert.assertEquals(removed.intValue(), value);
@@ -215,7 +216,10 @@ public class TestRingBufferArrayFast
       ringBuffer.add(new Integer(i));
     }
     Assert.assertEquals(10, ringBuffer.size());
-    for (Integer removed : ringBuffer) {
+    it = ringBuffer.iteratorF2L();
+    while (it.hasNext()) {
+      removed = it.next();
+
       Assert.assertNotNull("Element no. " + value + " is null.", removed);
       // tests the order of the iterator:
       Assert.assertEquals(removed.intValue(), value);
@@ -223,7 +227,7 @@ public class TestRingBufferArrayFast
     }
 
     System.out.println("Testing for side effects of hasNext()...");
-    Iterator<Integer> it = ringBuffer.iteratorF2L();
+    it = ringBuffer.iteratorF2L();
     for (int i = 0; i < 100; i++) {
       Assert.assertTrue(it.hasNext());
     }
@@ -247,7 +251,6 @@ public class TestRingBufferArrayFast
    * Test method for
    * {@link info.monitorenter.util.collections.RingBufferArrayFast#setBufferSize(int)}.
    * <p>
-   * 
    */
   public void testSetBufferSize() {
     IRingBuffer<Integer> buffer = new RingBufferArrayFast<Integer>(3);

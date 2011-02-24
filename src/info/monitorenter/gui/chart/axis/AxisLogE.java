@@ -47,10 +47,9 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
-public class AxisLogE
-    extends AAxisTransformation {
+public class AxisLogE extends AAxisTransformation {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 1839309514449455729L;
@@ -96,6 +95,7 @@ public class AxisLogE
    * 
    * @return log base 10 for the given value.
    */
+  @Override
   protected double transform(final double in) {
     double toTransform = in;
     // Starting from 1 downwards the transformation of this value becomes
@@ -134,6 +134,7 @@ public class AxisLogE
   /**
    * @see AAxisTransformation#untransform(double)
    */
+  @Override
   protected double untransform(final double in) {
     return Math.pow(Math.E, in);
   }

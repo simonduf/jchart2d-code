@@ -5,7 +5,7 @@
   by the generic footer via a "document.write(update);" - script.
  -->
 <script language="javascript">
-  var update="13/10/2006";
+  var update="06/03/2008";
  </script>
 <body id="screenshot">
 <div id="wrapper">
@@ -27,6 +27,19 @@
 		<br>
 		</td>
 		<td>&nbsp;</td>
+	</tr>
+
+	<tr>
+		<td>&nbsp;</td>
+		<td><img src="./img/multiaxes.png" width="600px" height="600px"
+			alt="Chart with multiple x and y axes." /><br>
+		<br>
+		<font size="2">Chart with multiple x and y axes.</font></td>
+		<td>&nbsp;</td>
+	</tr>
+
+	<tr id="vspacer">
+		<td colspan="3">&nbsp;</td>
 	</tr>
 
 	<tr>

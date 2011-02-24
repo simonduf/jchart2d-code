@@ -21,7 +21,7 @@
  */
 package info.monitorenter.gui.chart;
 
-import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.io.Serializable;
 
 /**
@@ -37,7 +37,7 @@ import java.io.Serializable;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  * 
  */
 public interface IAxisTickPainter extends Serializable {
@@ -78,7 +78,7 @@ public interface IAxisTickPainter extends Serializable {
    * @param g
    *            the graphic context to draw on.
    */
-  public void paintXLabel(final int x, final int y, String label, final Graphics2D g);
+  public void paintXLabel(final int x, final int y, String label, final Graphics g);
 
   /**
    * Paint the little marker for a label of the x axis.
@@ -101,7 +101,7 @@ public interface IAxisTickPainter extends Serializable {
    * @param g
    *            the graphic context to draw on.
    */
-  public void paintXTick(final int x, final int y, boolean isMajorTick, boolean isBottomSide, final Graphics2D g);
+  public void paintXTick(final int x, final int y, boolean isMajorTick, boolean isBottomSide, final Graphics g);
 
   /**
    * Paint the given label for the y axis.
@@ -119,7 +119,7 @@ public interface IAxisTickPainter extends Serializable {
    * @param g
    *            the graphic context to draw on.
    */
-  public void paintYLabel(final int x, final int y, String label, final Graphics2D g);
+  public void paintYLabel(final int x, final int y, String label, final Graphics g);
 
   /**
    * Paint the little marker for a label of the y axis.
@@ -143,6 +143,6 @@ public interface IAxisTickPainter extends Serializable {
    *            the graphic context to draw on.
    */
   public void paintYTick(final int x, final int y, boolean isMajorTick, boolean isLeftSide,
-      final Graphics2D g);
+      final Graphics g);
 
 }

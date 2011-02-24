@@ -35,7 +35,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-
 /**
  * A view that displays the data value of the point the mouse pointer currently
  * is over the Chart2D component within two {@link javax.swing.JTextField}
@@ -43,7 +42,7 @@ import javax.swing.JTextField;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class ChartCoordinateView extends JPanel {
 
@@ -53,13 +52,13 @@ public class ChartCoordinateView extends JPanel {
   private static final long serialVersionUID = 2547926983897553336L;
 
   /** The chart to display the values from. */
-  private Chart2D m_chart2D;
+  protected Chart2D m_chart2D;
 
   /** The x value view. */
-  private JTextField m_xView;
+  protected JTextField m_xView;
 
   /** The y value view. */
-  private JTextField m_yView;
+  protected JTextField m_yView;
 
   /**
    * Handle to the mouse listener that is registered to the chart component.
@@ -84,6 +83,10 @@ public class ChartCoordinateView extends JPanel {
     this.m_yView.setEditable(false);
 
     this.m_mouseListener = new MouseMotionAdapter() {
+      /**
+       * @see java.awt.event.MouseMotionAdapter#mouseMoved(java.awt.event.MouseEvent)
+       */
+      @Override
       public void mouseMoved(final MouseEvent me) {
         TracePoint2D value = ChartCoordinateView.this.m_chart2D.translateMousePosition(me);
         if (value != null) {
@@ -145,9 +148,10 @@ public class ChartCoordinateView extends JPanel {
    * <p>
    * 
    * @throws Throwable
-   *           if sth. goes wrong in superclasses finalize.
+   *           if something goes wrong in super classes finalize.
    * @see java.lang.Object#finalize()
    */
+  @Override
   protected void finalize() throws Throwable {
     super.finalize();
     this.m_chart2D.removeMouseMotionListener(this.m_mouseListener);

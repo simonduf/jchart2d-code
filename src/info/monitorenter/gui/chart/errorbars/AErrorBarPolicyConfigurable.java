@@ -29,7 +29,7 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.TracePoint2D;
 
-import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -60,10 +60,13 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.26 $
+ * @version $Revision: 1.29 $
  */
 public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
     PropertyChangeListener {
+
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = -1163969612681194656L;
 
   /** The internal set of error bar painters delegated to. */
   private Set<IErrorBarPainter> m_errorBarPainters = new LinkedHashSet<IErrorBarPainter>();
@@ -73,9 +76,9 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
 
   /**
    * The last x coordinate that was sent to
-   * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   * {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    * <p>
-   * It will be needed at {@link #endPaintIteration(Graphics2D)} as the former
+   * It will be needed at {@link #endPaintIteration(Graphics)} as the former
    * method only uses the first set of coordinates to store in the internal list
    * to avoid duplicates.
    * <p>
@@ -84,9 +87,9 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
 
   /**
    * The last trace point coordinate that was sent to
-   * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   * {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    * <p>
-   * It will be needed at {@link #endPaintIteration(Graphics2D)} as the former
+   * It will be needed at {@link #endPaintIteration(Graphics)} as the former
    * method only uses the first set of coordinates to store in the internal list
    * to avoid duplicates.
    * <p>
@@ -96,9 +99,9 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
 
   /**
    * The last y coordinate that was sent to
-   * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   * {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    * <p>
-   * It will be needed at {@link #endPaintIteration(Graphics2D)} as the former
+   * It will be needed at {@link #endPaintIteration(Graphics)} as the former
    * method only uses the first set of coordinates to store in the internal list
    * to avoid duplicates.
    * <p>
@@ -162,9 +165,9 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    * <p>
    * 
    * @param propertyName
-   *            The name of the property to listen on.
+   *          The name of the property to listen on.
    * @param listener
-   *            The PropertyChangeListener to be added.
+   *          The PropertyChangeListener to be added.
    * @see info.monitorenter.gui.chart.ITrace2D#addPropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
@@ -202,7 +205,7 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    * <p>
    * 
    * @param arg0
-   *            the instance to compare with.
+   *          the instance to compare with.
    * 
    * @return the result of <code>{@link String#compareTo(String)}</code> with
    *         the class name as value.
@@ -212,17 +215,17 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#discontinue(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ITracePainter#discontinue(java.awt.Graphics)
    */
-  public void discontinue(final Graphics2D g2d) {
+  public void discontinue(final Graphics g2d) {
     this.endPaintIteration(g2d);
     this.startPaintIteration(g2d);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics)
    */
-  public void endPaintIteration(final Graphics2D g2d) {
+  public void endPaintIteration(final Graphics g2d) {
     if (g2d != null) {
       this.calculateErrorBar(this.getPreviousX(), this.getPreviousY(), this.m_reusedErrorBarPixel,
           this.getPreviousTracePoint());
@@ -238,14 +241,14 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    * <p>
    * 
    * @param property
-   *            one of the <code>PROPERTY_XXX</code> constants defined in
-   *            <code>{@link info.monitorenter.gui.chart.ITrace2D}</code>.
+   *          one of the <code>PROPERTY_XXX</code> constants defined in <code>
+   *          {@link info.monitorenter.gui.chart.ITrace2D}</code>.
    * 
    * @param oldvalue
-   *            the old value of the property.
+   *          the old value of the property.
    * 
    * @param newvalue
-   *            the new value of the property.
+   *          the new value of the property.
    */
   protected final void firePropertyChange(final String property, final Object oldvalue,
       final Object newvalue) {
@@ -268,7 +271,7 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
 
   /**
    * Returns the previous X value that had to be painted by
-   * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   * {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    * <p>
    * 
    * This value will be {@link Integer#MIN_VALUE} if no previous point had to be
@@ -276,7 +279,7 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    * <p>
    * 
    * @return the previous X value that had to be painted by
-   *         {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   *         {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    */
   private int getPreviousX() {
     int result = this.m_lastX;
@@ -292,7 +295,7 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
 
   /**
    * Returns the previous X value that had to be painted by
-   * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   * {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    * <p>
    * 
    * This value will be {@link Integer#MIN_VALUE} if no previous point had to be
@@ -300,7 +303,7 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    * <p>
    * 
    * @return the previous X value that had to be painted by
-   *         {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   *         {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    */
   private TracePoint2D getPreviousTracePoint() {
     TracePoint2D result = this.m_lastPoint;
@@ -309,7 +312,7 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
 
   /**
    * Returns the previous Y value that had to be painted by
-   * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   * {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    * <p>
    * 
    * This value will be {@link Integer#MIN_VALUE} if no previous point had to be
@@ -317,7 +320,7 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    * <p>
    * 
    * @return the previous Y value that had to be painted by
-   *         {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   *         {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    */
   private int getPreviousY() {
     int result = this.m_lastY;
@@ -346,13 +349,13 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    * <p>
    * 
    * @param xPixel
-   *            the x value in pixel for the error to render.
+   *          the x value in pixel for the error to render.
    * 
    * @param yPixel
-   *            the y value in pixel for the error to render.
+   *          the y value in pixel for the error to render.
    * 
    * @param original
-   *            the original point, possibly useful for calculations.
+   *          the original point, possibly useful for calculations.
    * 
    * @return the negative x error in pixel for the given point as an absolute
    *         value (not relative to the the origin value).
@@ -367,16 +370,16 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    * <p>
    * 
    * @param xPixel
-   *            the x value in pixel for the error to render.
+   *          the x value in pixel for the error to render.
    * 
    * @param yPixel
-   *            the y value in pixel for the error to render.
+   *          the y value in pixel for the error to render.
    * 
    * @return the negative y error in pixel for the given point as an absolute
    *         value (not relative to the the origin value).
    * 
    * @param original
-   *            the original point, possibly useful for calculations.
+   *          the original point, possibly useful for calculations.
    */
   protected abstract int internalGetNegativeYError(final int xPixel, final int yPixel,
       final TracePoint2D original);
@@ -387,13 +390,13 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    * <p>
    * 
    * @param xPixel
-   *            the x value in pixel for the error to render.
+   *          the x value in pixel for the error to render.
    * 
    * @param yPixel
-   *            the y value in pixel for the error to render.
+   *          the y value in pixel for the error to render.
    * 
    * @param original
-   *            the original point, possibly useful for calculations.
+   *          the original point, possibly useful for calculations.
    * 
    * @return the positive x error in pixel for the given point as an absolute
    *         value (not relative to the the origin value).
@@ -407,13 +410,13 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    * <p>
    * 
    * @param xPixel
-   *            the x coordinate in pixel for the error to render.
+   *          the x coordinate in pixel for the error to render.
    * 
    * @param yPixel
-   *            the y coordinate in pixel for the error to render.
+   *          the y coordinate in pixel for the error to render.
    * 
    * @param original
-   *            the original point, possibly useful for calculations.
+   *          the original point, possibly useful for calculations.
    * 
    * @return the positive y error in pixel for the given point as an absolute
    *         value (not relative to the the origin value).
@@ -451,10 +454,10 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
 
   /**
    * @see info.monitorenter.gui.chart.IPointPainter#paintPoint(int, int, int,
-   *      int, java.awt.Graphics2D, info.monitorenter.gui.chart.TracePoint2D)
+   *      int, java.awt.Graphics, info.monitorenter.gui.chart.TracePoint2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g, final TracePoint2D original) {
+      final int nextY, final Graphics g, final TracePoint2D original) {
 
     this.calculateErrorBar(absoluteX, absoluteY, this.m_reusedErrorBarPixel, original);
     for (IErrorBarPainter painter : this.m_errorBarPainters) {
@@ -468,10 +471,10 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
 
   /**
    * Just turns the property change event of subsequent configuration (like
-   * <code>{@link IErrorBarPainter#PROPERTY_CONNECTION}</code> to
-   * <code>{@link IErrorBarPolicy#PROPERTY_CONFIGURATION}</code> and informs
-   * outer <code>{@link PropertyChangeListener}</code> addes with
-   * <code>{@link #addPropertyChangeListener(String, PropertyChangeListener)}</code>.
+   * <code>{@link IErrorBarPainter#PROPERTY_CONNECTION}</code> to <code>
+   * {@link IErrorBarPolicy#PROPERTY_CONFIGURATION}</code> and informs outer
+   * <code>{@link PropertyChangeListener}</code> addes with <code>
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}</code>.
    * <p>
    * 
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
@@ -604,7 +607,7 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    * <p>
    * 
    * @param trace
-   *            the trace error bars are rendered for.
+   *          the trace error bars are rendered for.
    */
   public void setTrace(final ITrace2D trace) {
     this.m_trace = trace;
@@ -612,9 +615,9 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#startPaintIteration(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ITracePainter#startPaintIteration(java.awt.Graphics)
    */
-  public void startPaintIteration(final Graphics2D g2d) {
+  public void startPaintIteration(final Graphics g2d) {
     // nop
   }
 }

@@ -48,7 +48,7 @@ import javax.swing.JPanel;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class StaticCollectorChart extends JPanel {
 
@@ -77,6 +77,10 @@ public class StaticCollectorChart extends JPanel {
 
     frame.getContentPane().add(new StaticCollectorChart(collector));
     frame.addWindowListener(new WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent e) {
         System.exit(0);
       }

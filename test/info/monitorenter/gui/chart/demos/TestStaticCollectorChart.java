@@ -46,22 +46,20 @@ import junit.framework.TestSuite;
 /**
  * Visual Junit test that uses a
  * <code>{@link PropertyFileStaticDataCollector}</code> with data files in the
- * same package that are named <tt>test&lt;x&gt;.properties</tt> where
- * &gt;x&lt; is a number starting from 0 and increasing by one.
+ * same package that are named <tt>test&lt;x&gt;.properties</tt> where &gt;x&lt;
+ * is a number starting from 0 and increasing by one.
  * <p>
  * 
  * @author Achim Westermann
  */
-public class TestStaticCollectorChart
-    extends TestCase {
+public class TestStaticCollectorChart extends TestCase {
 
-  /** 
+  /**
    * Main debug entry.
    * <p>
    * 
    * @param args
    *          ignored.
-   * 
    * @throws IOException
    *           if sth. goes wrong reading data.
    */
@@ -112,6 +110,11 @@ public class TestStaticCollectorChart
     final JFrame frame = new JFrame("StaticCollectorChart");
     frame.getContentPane().add(chart);
     frame.addWindowListener(new WindowAdapter() {
+
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent e) {
         frame.setVisible(false);
         frame.dispose();

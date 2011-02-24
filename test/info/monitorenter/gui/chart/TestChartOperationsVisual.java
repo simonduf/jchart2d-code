@@ -53,10 +53,9 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.18.4.3 $
+ * @version $Revision: 1.23 $
  */
-public class TestChartOperationsVisual
-    extends ATestChartOperations {
+public class TestChartOperationsVisual extends ATestChartOperations {
 
   /**
    * Test suite for this test class.
@@ -84,7 +83,10 @@ public class TestChartOperationsVisual
     suite.addTest(new TestChartOperationsVisual("testZoom"));
     suite.addTest(new TestChartOperationsVisual("testDeadLockAddPointThread"));
     suite.addTest(new TestChartOperationsVisual("testTracePointSetLocation"));
-
+    suite.addTest(new TestChartOperationsVisual("testSetNullTraceTitle"));
+    suite.addTest(new TestChartOperationsVisual("testSetEmptyTraceTitle"));
+    suite.addTest(new TestChartOperationsVisual("testSetTraceTitleOnEmptyTitleTrace"));
+    
     return suite;
   }
 
@@ -93,7 +95,7 @@ public class TestChartOperationsVisual
    * <p>
    * 
    * @param arg0
-   *            the name of the test.
+   *          the name of the test.
    */
   public TestChartOperationsVisual(final String arg0) {
     super(arg0);
@@ -102,6 +104,7 @@ public class TestChartOperationsVisual
   /**
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#createAxisX()
    */
+  @Override
   protected AAxis createAxisX() {
     return new AxisLinear();
   }
@@ -109,6 +112,7 @@ public class TestChartOperationsVisual
   /**
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#createAxisY()
    */
+  @Override
   protected AAxis createAxisY() {
     return this.createAxisX();
   }
@@ -116,6 +120,7 @@ public class TestChartOperationsVisual
   /**
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#createTrace()
    */
+  @Override
   protected ITrace2D createTrace() {
     return new Trace2DSimple();
   }
@@ -123,6 +128,7 @@ public class TestChartOperationsVisual
   /**
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#fillTrace(info.monitorenter.gui.chart.ITrace2D)
    */
+  @Override
   protected void fillTrace(final ITrace2D trace2D) {
     long timeOffset = System.currentTimeMillis();
     for (int i = 0; i < 101; i++) {
@@ -137,7 +143,7 @@ public class TestChartOperationsVisual
   public void testAddPoint() {
     ATestChartOperations.AChartOperation operation = new AChartOperation("trace.addPoint(50, 110)") {
       public Object action(final Chart2D chart) {
-        TestChartOperationsVisual.this.m_trace.addPoint(50, 110);
+        TestChartOperationsVisual.this.getTrace().addPoint(50, 110);
         return null;
       }
     };
@@ -145,13 +151,17 @@ public class TestChartOperationsVisual
   }
 
   /**
-   * Sets a new number format to a <code>{@link LabelFormatterNumber}</code>
-   * of the y axis.
+   * Sets a new number format to a <code>{@link LabelFormatterNumber}</code> of
+   * the y axis.
    * <p>
    */
   public void testAxisLabelFormatterNumberFormatSetNumberFormat() {
     ATestChartOperations.AChartOperation operation = new AChartOperation(
         "chart.getAxisY().getFormatter().setNumberFormat(new DecimalFormat(\"000.000\"))") {
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
       public Object action(final Chart2D chart) {
         NumberFormat nf = new DecimalFormat("000.000");
         LabelFormatterNumber labelFormatter = (LabelFormatterNumber) chart.getAxisY()
@@ -163,6 +173,7 @@ public class TestChartOperationsVisual
       /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#preCondition(info.monitorenter.gui.chart.Chart2D)
        */
+      @Override
       public void preCondition(final Chart2D chart) throws Exception {
         super.preCondition(chart);
         chart.getAxisY().setFormatter(new LabelFormatterNumber());
@@ -184,6 +195,10 @@ public class TestChartOperationsVisual
   public void testAxisSetLabelFormatter() {
     ATestChartOperations.AChartOperation operation = new AChartOperation(
         "chart.getAxisX().setFormatter(new LabelFormatterNumber(new SimpleDateFormat(\"HH:mm:ss SSS\")))") {
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
       public Object action(final Chart2D chart) {
         SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss SSS");
         chart.getAxisX().setFormatter(new LabelFormatterDate(df));
@@ -194,14 +209,17 @@ public class TestChartOperationsVisual
   }
 
   /**
-   * Invokes
-   * <code>{@link IErrorBarPainter#setStartPointPainter(IPointPainter)}</code>
-   * with a <code>{@link PointPainterDisc}</code>.
+   * Invokes <code>{@link IErrorBarPainter#setStartPointPainter(IPointPainter)}
+   * </code> with a <code>{@link PointPainterDisc}</code>.
    * <p>
    */
   public void testIErrorBarPainterSetStartPointPainter() {
     ATestChartOperations.AChartOperation operation = new AChartOperation(
         "trace.getErrorbarPainter().setStartPointPainter(new PointPainterDisc())") {
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
       public Object action(final Chart2D chart) {
         ITrace2D trace = chart.getTraces().iterator().next();
         IErrorBarPolicy errorBarPolicy = trace.getErrorBarPolicies().iterator().next();
@@ -213,6 +231,7 @@ public class TestChartOperationsVisual
       /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#preCondition(info.monitorenter.gui.chart.Chart2D)
        */
+      @Override
       public void preCondition(final Chart2D chart) throws Exception {
         super.preCondition(chart);
         ITrace2D trace = chart.getTraces().iterator().next();
@@ -241,9 +260,8 @@ public class TestChartOperationsVisual
   }
 
   /**
-   * Invokes
-   * <code>{@link TracePoint2D#setLocation(java.awt.geom.Point2D)}</code> on
-   * an extremum point to move away from the extremum.
+   * Invokes <code>{@link TracePoint2D#setLocation(java.awt.geom.Point2D)}
+   * </code> on an extremum point to move away from the extremum.
    * <p>
    */
   public void testTracePointSetLocation() {
@@ -252,6 +270,10 @@ public class TestChartOperationsVisual
       /** An extremum point that is shifted away from this extremum. */
       private TracePoint2D m_extremum;
 
+      /**
+       * 
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
       public Object action(final Chart2D chart) {
         this.m_extremum.setLocation(4, -1);
         return null;
@@ -260,6 +282,7 @@ public class TestChartOperationsVisual
       /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#createTrace()
        */
+      @Override
       public ITrace2D createTrace() {
         ITrace2D result = new Trace2DLtdSorted();
         this.m_extremum = new TracePoint2D(10, 10);
@@ -280,8 +303,12 @@ public class TestChartOperationsVisual
    */
   public void testRemoveAllPoints() {
     ATestChartOperations.AChartOperation operation = new AChartOperation("trace.removeAllPoints()") {
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
       public Object action(final Chart2D chart) {
-        TestChartOperationsVisual.this.m_trace.removeAllPoints();
+        TestChartOperationsVisual.this.getTrace().removeAllPoints();
         if (Chart2D.DEBUG_THREADING) {
           System.out.println(this.getClass().getName() + " removed all points. ");
         }
@@ -297,8 +324,12 @@ public class TestChartOperationsVisual
    */
   public void testRemoveAllTraces() {
     ATestChartOperations.AChartOperation operation = new AChartOperation("trace.removeAllTraces()") {
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
       public Object action(final Chart2D chart) {
-        TestChartOperationsVisual.this.m_chart.removeAllTraces();
+        TestChartOperationsVisual.this.getChart().removeAllTraces();
         if (Chart2D.DEBUG_THREADING) {
           System.out.println(this.getClass().getName() + " removed all traces. ");
         }
@@ -315,8 +346,12 @@ public class TestChartOperationsVisual
   public void testSetTraceName() {
     ATestChartOperations.AChartOperation operation = new AChartOperation(
         "trace.setName(\"Iphigenie\")") {
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
       public Object action(final Chart2D chart) {
-        TestChartOperationsVisual.this.m_trace.setName("Iphigenie");
+        TestChartOperationsVisual.this.getTrace().setName("Iphigenie");
         return null;
       }
     };
@@ -334,6 +369,7 @@ public class TestChartOperationsVisual
       /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#createTrace()
        */
+      @Override
       public ITrace2D createTrace() {
 
         ITrace2D result = new Trace2DLtdSorted();
@@ -341,8 +377,11 @@ public class TestChartOperationsVisual
         return result;
       }
 
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
       public Object action(final Chart2D chart) {
-        TestChartOperationsVisual.this.m_trace.setName("Tauris");
+        TestChartOperationsVisual.this.getTrace().setName("Tauris");
         return null;
       }
     };
@@ -358,6 +397,9 @@ public class TestChartOperationsVisual
     ATestChartOperations.AChartOperation operation = new AChartOperation(
         "chart.getAxisX().setRangePolicy( "
             + "new RangePolicyFixedViewport(new Range(System.currentTimeMillis()-8000, System.currentTimeMillis())))") {
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
       public Object action(final Chart2D chart) {
         IRangePolicy rangePolicy = new RangePolicyFixedViewport(new Range(System
             .currentTimeMillis() - 8000, System.currentTimeMillis()));
@@ -375,10 +417,75 @@ public class TestChartOperationsVisual
   public void testSetStroke() {
     ATestChartOperations.AChartOperation operation = new AChartOperation(
         "trace.setStroke(new BasicStroke(2f))") {
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
       public Object action(final Chart2D chart) {
-        TestChartOperationsVisual.this.m_trace.setStroke(new BasicStroke(2f));
+        TestChartOperationsVisual.this.getTrace().setStroke(new BasicStroke(2f));
         return null;
       }
+    };
+    this.setTestOperation(operation);
+  }
+
+  /**
+   * Sets an empty String title to the trace: The label should disappear.
+   * <p>
+   */
+  public void testSetEmptyTraceTitle() {
+    ATestChartOperations.AChartOperation operation = new AChartOperation("trace.setName(\"\")") {
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
+      public Object action(final Chart2D chart) {
+        TestChartOperationsVisual.this.getTrace().setName("");
+        return null;
+      }
+    };
+    this.setTestOperation(operation);
+  }
+
+  /**
+   * Sets null title to the trace: The label should disappear.
+   * <p>
+   */
+  public void testSetNullTraceTitle() {
+    ATestChartOperations.AChartOperation operation = new AChartOperation("trace.setName(null)") {
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
+      public Object action(final Chart2D chart) {
+        TestChartOperationsVisual.this.getTrace().setName(null);
+        return null;
+      }
+    };
+    this.setTestOperation(operation);
+  }
+
+  /**
+   * Sets a String title to the trace that has an empty title initially: The
+   * label should appear.
+   * <p>
+   */
+  public void testSetTraceTitleOnEmptyTitleTrace() {
+    ATestChartOperations.AChartOperation operation = new AChartOperation("trace.setName(null)") {
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
+      public Object action(final Chart2D chart) {
+        TestChartOperationsVisual.this.getTrace().setName("foobar");
+        return null;
+      }
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#preCondition(info.monitorenter.gui.chart.Chart2D)
+       */
+      @Override
+      public void preCondition(final Chart2D chart) throws Exception {
+        super.preCondition(chart);
+        TestChartOperationsVisual.this.getTrace().setName("");
+      }
+
     };
     this.setTestOperation(operation);
   }
@@ -391,6 +498,10 @@ public class TestChartOperationsVisual
   public void testTraceSetErrorBarPolicy() {
     ATestChartOperations.AChartOperation operation = new AChartOperation(
         "trace.setErrorBarPolicy(...)") {
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
       public Object action(final Chart2D chart) {
         ITrace2D trace = chart.getTraces().iterator().next();
         // create an error bar policy and configure it
@@ -426,6 +537,7 @@ public class TestChartOperationsVisual
       /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#createChartInstance()
        */
+      @Override
       public Chart2D createChartInstance() {
 
         return new ZoomableChart();
@@ -434,6 +546,7 @@ public class TestChartOperationsVisual
       /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#createTrace()
        */
+      @Override
       public ITrace2D createTrace() {
         ITrace2D trace = new Trace2DSimple();
         for (int i = 0; i < 100; i++) {
@@ -442,6 +555,9 @@ public class TestChartOperationsVisual
         return trace;
       }
 
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
       public Object action(final Chart2D chart) {
         ZoomableChart zoomChart = (ZoomableChart) chart;
         zoomChart.zoom(0.01, 20, 0, 20);
@@ -464,6 +580,7 @@ public class TestChartOperationsVisual
       /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#createChartInstance()
        */
+      @Override
       public Chart2D createChartInstance() {
 
         return new Chart2D();
@@ -472,11 +589,15 @@ public class TestChartOperationsVisual
       /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#createTrace()
        */
+      @Override
       public ITrace2D createTrace() {
         ITrace2D trace = new Trace2DSimple();
         return trace;
       }
 
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
       public Object action(final Chart2D chart) {
         Thread t = new Thread(new Runnable() {
           public void run() {

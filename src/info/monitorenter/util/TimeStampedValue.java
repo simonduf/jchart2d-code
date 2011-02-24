@@ -33,7 +33,7 @@ import java.util.Map;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann</a>
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public final class TimeStampedValue implements Map.Entry<Long, Object>,
     Comparable<TimeStampedValue> {
@@ -126,6 +126,7 @@ public final class TimeStampedValue implements Map.Entry<Long, Object>,
    * @return true, if o!=null && this.key.equals(0) &&
    *         o.insanceOf(TimeStampedValue).
    */
+  @Override
   public boolean equals(final Object o) {
     if (o == null) {
       return false;
@@ -146,6 +147,7 @@ public final class TimeStampedValue implements Map.Entry<Long, Object>,
    * 
    * @see java.lang.Object#hashCode()
    */
+  @Override
   public int hashCode() {
     int result = (int) this.m_key;
     if (this.m_key > Integer.MAX_VALUE) {

@@ -1,0 +1,13 @@
+NOTICE 
+
+This product optionally includes parts of software developed under other licenses and by other organizations and people.
+If you have any questions regarding access to the third party source code or binaries, please contact achimwestermann@users.sourceforge.net.
+
+
+http://www.opensource.org/licenses/gpl-2.0.php
+
+jlibeps is an optional library that will allow you to print charts to encapsulated postscript files (eps) if the corresponding 
+jar file (object code) is included in the java class path. 
+The source code may be downloaded at http://jlibeps.sourceforge.net/download.html 
+
+

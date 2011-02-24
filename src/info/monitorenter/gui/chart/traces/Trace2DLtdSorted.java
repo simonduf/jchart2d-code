@@ -38,7 +38,7 @@ import info.monitorenter.gui.chart.TracePoint2D;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class Trace2DLtdSorted extends Trace2DSorted {
 
@@ -83,6 +83,7 @@ public class Trace2DLtdSorted extends Trace2DSorted {
    * 
    * @return true if the point was successfully removed.
    */
+  @Override
   protected boolean addPointInternal(final TracePoint2D point) {
 
     boolean rem = this.removePoint(point);
@@ -99,6 +100,7 @@ public class Trace2DLtdSorted extends Trace2DSorted {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#getMaxSize()
    */
+  @Override
   public final int getMaxSize() {
 
     return this.m_maxsize;

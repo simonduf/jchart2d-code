@@ -49,7 +49,7 @@ import java.util.List;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  *         (adaption for core)
  * 
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 
 public class AxisInverse
@@ -89,6 +89,7 @@ public class AxisInverse
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#scaleTrace(info.monitorenter.gui.chart.ITrace2D,
      *      info.monitorenter.util.Range)
      */
+    @Override
     protected void scaleTrace(final ITrace2D trace, final Range range) {
       Iterator<TracePoint2D> itPoints;
       final double scaler = range.getExtent();
@@ -110,6 +111,7 @@ public class AxisInverse
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translatePxToValue(int)
      */
+    @Override
     public double translatePxToValue(final int pixel) {
       double result = 0;
 
@@ -180,6 +182,7 @@ public class AxisInverse
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#scaleTrace(info.monitorenter.gui.chart.ITrace2D,
      *      info.monitorenter.util.Range)
      */
+    @Override
     protected void scaleTrace(final ITrace2D trace, final Range range) {
       if (trace.isVisible()) {
         double scaler = range.getExtent();
@@ -200,6 +203,7 @@ public class AxisInverse
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translatePxToValue(int)
      */
+    @Override
     public double translatePxToValue(final int pixel) {
       double result = 0;
       // invert, as awt px are higher the lower the chart value is:
@@ -261,6 +265,7 @@ public class AxisInverse
    * @see info.monitorenter.gui.chart.axis.AAxis#createAccessor(info.monitorenter.gui.chart.Chart2D,
    *      int, int)
    */
+  @Override
   protected AChart2DDataAccessor createAccessor(final Chart2D chart, final int dimension,
       final int position) {
     AChart2DDataAccessor result;
@@ -297,7 +302,7 @@ public class AxisInverse
    * 
    * @return the labels for this axis.
    */
-
+  @Override
   protected List<LabeledValue> getLabels(final double resolution) {
 
     List<LabeledValue> ret = super.getLabels(resolution);

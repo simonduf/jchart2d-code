@@ -44,8 +44,7 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  */
-public class TestMultithreading
-    extends TestCase {
+public class TestMultithreading extends TestCase {
 
   /** The chart used for testing. */
   protected Chart2D m_chart;
@@ -94,8 +93,7 @@ public class TestMultithreading
   protected static final int CONSUMER_SLEEPRANGE = 1000;
 
   /**
-   * The <code>{@link ITrace2D}</code> class to use an instance of for the
-   * test.
+   * The <code>{@link ITrace2D}</code> class to use an instance of for the test.
    */
   private static final Class<Trace2DLtd> TRACE_CLASS = Trace2DLtd.class;
 
@@ -114,8 +112,9 @@ public class TestMultithreading
    * @see junit.framework.TestCase#setUp()
    * 
    * @throws Exception
-   *             if something goes wrong.
+   *           if something goes wrong.
    */
+  @Override
   public void setUp() throws Exception {
     super.setUp();
     this.m_chart = new Chart2D();
@@ -133,8 +132,9 @@ public class TestMultithreading
    * @see junit.framework.TestCase#tearDown()
    * 
    * @throws Exception
-   *             if something goes wrong.
+   *           if something goes wrong.
    */
+  @Override
   protected void tearDown() throws Exception {
     super.tearDown();
     this.m_weakMap = null;
@@ -232,8 +232,9 @@ public class TestMultithreading
       System.out.println("Point " + point.toString() + " was not dropped.");
     }
     System.out.println("Points remaining in the weakMap: " + keys);
-    Assert.assertFalse("There are " + keys + " TracePoint2D instances not deleted from the WeakHashMap.",
-        keys > this.m_trace.getMaxSize());
+    Assert.assertFalse("There are " + keys
+        + " TracePoint2D instances not deleted from the WeakHashMap.", keys > this.m_trace
+        .getMaxSize());
   }
 
   // ////////////////////////////
@@ -249,8 +250,7 @@ public class TestMultithreading
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    */
-  class Producer
-      extends Thread {
+  class Producer extends Thread {
     /** The amount of points to add before termination. */
     private long m_toAdd;
 
@@ -262,16 +262,16 @@ public class TestMultithreading
 
     /**
      * <p>
-     * Constructs a producer that will add <code>toAdd</code> points with
-     * random breaks of milliseconds between <code>maxSleep</code> and zero.
+     * Constructs a producer that will add <code>toAdd</code> points with random
+     * breaks of milliseconds between <code>maxSleep</code> and zero.
      * </p>
      * 
      * @param toAdd
-     *            the amount of points to add.
+     *          the amount of points to add.
      * 
      * @param sleepRange
-     *            the maxium time in milliseconds the Thread will sleep between
-     *            two points added.
+     *          the maxium time in milliseconds the Thread will sleep between
+     *          two points added.
      * 
      */
     Producer(final long toAdd, final long sleepRange) {
@@ -283,6 +283,7 @@ public class TestMultithreading
      * Does the job.
      * <p>
      */
+    @Override
     public void run() {
       TracePoint2D point;
       while (this.m_toAdd > 0 && !this.m_stop) {
@@ -313,8 +314,7 @@ public class TestMultithreading
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    */
-  class Consumer
-      extends Thread {
+  class Consumer extends Thread {
 
     /** The maximum sleep time between two paint operations. */
     private long m_sleepRange;
@@ -325,7 +325,7 @@ public class TestMultithreading
      * <p>
      * 
      * @param sleepRange
-     *            the maximum sleep range between two rendering operations.
+     *          the maximum sleep range between two rendering operations.
      */
     Consumer(final long sleepRange) {
       this.m_sleepRange = sleepRange;
@@ -338,6 +338,7 @@ public class TestMultithreading
      * Do the job.
      * <p>
      */
+    @Override
     public void run() {
       MockGraphics2D mockGraphics = new MockGraphics2D();
       while (!(this.m_stop || TestMultithreading.this.isAllProducersFinished())) {

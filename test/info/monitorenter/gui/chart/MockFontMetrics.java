@@ -53,6 +53,7 @@ public class MockFontMetrics
   /**
    * @see java.awt.FontMetrics#charsWidth(char[], int, int)
    */
+  @Override
   public int charsWidth(final char[] data, final int off, final int len) {
     return len * this.getFont().getSize() / 2;
   }
@@ -60,6 +61,7 @@ public class MockFontMetrics
   /**
    * @see java.awt.FontMetrics#charWidth(char)
    */
+  @Override
   public int charWidth(final char ch) {
     return this.getFont().getSize();
   }
@@ -67,6 +69,7 @@ public class MockFontMetrics
   /**
    * @see java.awt.FontMetrics#getAscent()
    */
+  @Override
   public int getAscent() {
     return this.getFont().getSize();
   }
@@ -74,6 +77,7 @@ public class MockFontMetrics
   /**
    * @see java.awt.FontMetrics#getLeading()
    */
+  @Override
   public int getLeading() {
     return 2;
   }
@@ -81,6 +85,7 @@ public class MockFontMetrics
   /**
    * @see java.awt.FontMetrics#getMaxAdvance()
    */
+  @Override
   public int getMaxAdvance() {
     return this.getFont().getSize();
   }

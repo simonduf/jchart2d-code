@@ -21,9 +21,13 @@
  */
 package info.monitorenter.gui.chart;
 
+import info.monitorenter.gui.chart.ITrace2D.ManhattanDistancePoint;
 import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.axistickpainters.AxisTickPainterDefault;
+import info.monitorenter.gui.chart.events.Chart2DActionPrintSingleton;
+import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
+import info.monitorenter.util.StringUtil;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -35,10 +39,14 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
@@ -54,38 +62,45 @@ import javax.swing.Timer;
 
 /**
  * <code> Chart2D</code> is a component for displaying the data contained in a
- * <code>ITrace2D</code>. It inherits many features from <code>javax.swing.JPanel</code> and
- * allows specific configuration. <br>
- * In order to simplify the use of it, the scaling, labeling and choosing of display- range is done
- * automatically which flattens the free configuration.
+ * <code>ITrace2D</code>. It inherits many features from
+ * <code>javax.swing.JPanel</code> and allows specific configuration. <br>
+ * In order to simplify the use of it, the scaling, labeling and choosing of
+ * display- range is done automatically which flattens the free configuration.
  * <p>
- * There are several default settings that may be changed in <code>Chart2D</code><br>
+ * There are several default settings that may be changed in
+ * <code>Chart2D</code><br>
  * <ul>
- * <li>The display range is chosen always big enough to show every <code>TracePoint2D</code>
- * contained in the all <code>ITrace2d</code> instances connected. This is because the
- * {@link info.monitorenter.gui.chart.IAxis} of the chart (for x and y) use by default a
- * {@link info.monitorenter.gui.chart.rangepolicies.RangePolicyUnbounded}. To change this, get the
- * axis of the chart to change (via {@link #getAxisX()}, {@link #getAxisY()}) and invoke
- * {@link info.monitorenter.gui.chart.IAxis#setRangePolicy(IRangePolicy)} with the desired view port
- * behavior.
- * <li>During the <code>paint()</code> operation every <code>TracePoint2D</code> is taken from
- * the <code>ITrace2D</code>- instance exactly in the order, it's iterator returns them. From
- * every <code>TracePoint2D</code> then a line is drawn to the next. <br>
- * Unordered traces may cause a weird display. Choose the right implementation of
- * <code>ITrace2D</code> to avoid this. To change this line painting behavior you can use custom
- * renderers at the level of traces via
- * {@link info.monitorenter.gui.chart.ITrace2D#addTracePainter(ITracePainter)} or
+ * <li>The display range is chosen always big enough to show every
+ * <code>TracePoint2D</code> contained in the all <code>ITrace2d</code>
+ * instances connected. This is because the
+ * {@link info.monitorenter.gui.chart.IAxis} of the chart (for x and y) use by
+ * default a
+ * {@link info.monitorenter.gui.chart.rangepolicies.RangePolicyUnbounded}. To
+ * change this, get the axis of the chart to change (via {@link #getAxisX()},
+ * {@link #getAxisY()}) and invoke
+ * {@link info.monitorenter.gui.chart.IAxis#setRangePolicy(IRangePolicy)} with
+ * the desired view port behavior.
+ * <li>During the <code>paint()</code> operation every <code>TracePoint2D</code>
+ * is taken from the <code>ITrace2D</code>- instance exactly in the order, it's
+ * iterator returns them. From every <code>TracePoint2D</code> then a line is
+ * drawn to the next. <br>
+ * Unordered traces may cause a weird display. Choose the right implementation
+ * of <code>ITrace2D</code> to avoid this. To change this line painting behavior
+ * you can use custom renderers at the level of traces via
+ * {@link info.monitorenter.gui.chart.ITrace2D#addTracePainter(ITracePainter)}
+ * or
  * {@link info.monitorenter.gui.chart.ITrace2D#setTracePainter(ITracePainter)}.
  * <li>If no scaling is chosen, no grids will be painted. See:
- * <code>{@link IAxis#setPaintScale(boolean)}</code> This allows saving of many computations.
- * <li>The distance of the scalepoints is always big enough to display the labels fully without
- * overwriting each other.</li>
+ * <code>{@link IAxis#setPaintScale(boolean)}</code> This allows saving of many
+ * computations.
+ * <li>The distance of the scalepoints is always big enough to display the
+ * labels fully without overwriting each other.</li>
  * </ul>
  * <p>
  * <h3>Demo- code:</h3>
  * 
  * <pre>
- *       
+ * 
  *   ...
  *   Chart2D test = new Chart2D();
  *   JFrame frame = new JFrame(&quot;Chart2D- Debug&quot;);
@@ -107,15 +122,15 @@ import javax.swing.Timer;
  * <p>
  * <h3>PropertyChangeEvents</h3>
  * {@link java.beans.PropertyChangeListener} instances may be added via
- * {@link javax.swing.JComponent#addPropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)}.
- * They inherit the properties to listen from
- * {@link java.awt.Container#addPropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)}.
- * Additionally more <code>PropertyChangeEvents</code> are triggered.
+ * {@link javax.swing.JComponent#addPropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)}
+ * . They inherit the properties to listen from
+ * {@link java.awt.Container#addPropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)}
+ * . Additionally more <code>PropertyChangeEvents</code> are triggered.
  * <p>
- * As the set of traces inside this class is a collection (and no single property) the
- * {@link java.beans.PropertyChangeEvent} fired for a change of properties property will contain a
- * reference to the <code>Chart2D</code> instance as well as the <code>ITrace2D</code> (if
- * involved in the change). <br>
+ * As the set of traces inside this class is a collection (and no single
+ * property) the {@link java.beans.PropertyChangeEvent} fired for a change of
+ * properties property will contain a reference to the <code>Chart2D</code>
+ * instance as well as the <code>ITrace2D</code> (if involved in the change). <br>
  * <table width="100%">
  * <tr>
  * <th ><code>getPropertyName()</code></th>
@@ -163,21 +178,29 @@ import javax.swing.Timer;
  * <p>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
- * @version $Revision: 1.88 $
+ * @version $Revision: 1.100 $
  */
 
-public class Chart2D
-    extends JPanel implements PropertyChangeListener, Iterable<ITrace2D> {
+public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<ITrace2D>,
+    Printable {
 
   /**
    * Types of tool tip.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
-   * @version $Revision: 1.88 $
+   * @version $Revision: 1.100 $
    */
   public enum ToolTipType {
-    /** Chart data value tool tips are shown. */
+    /**
+     * Chart data value tool tips are shown.
+     * <p>
+     * Note that this implementation only works correctly for one left y axis
+     * and one bottom x axis as it does not search for the nearest trace.
+     * Displayed values will be formatted according to the formatting of the
+     * axes mentioned above.
+     * <p>
+     */
     DATAVALUES {
 
       /**
@@ -209,15 +232,50 @@ public class Chart2D
         return "pixel, not implemented yet";
       }
 
+    },
+    /**
+     * Snaps to the nearest <code>{@link TracePoint2D}</code> and shows it's
+     * value.
+     * <p>
+     * Warning: due to the data structure of multiple axes this is very
+     * expensive!
+     * <p>
+     */
+    VALUE_SNAP_TO_TRACEPOINTS {
+
+      /**
+       * @see info.monitorenter.gui.chart.Chart2D.ToolTipType#getToolTipText(java.awt.event.MouseEvent)
+       */
+      @Override
+      public String getToolTipText(final Chart2D chart, final MouseEvent me) {
+        String result;
+        TracePoint2D point = chart.getNearestPointManhattan(me);
+        /*
+         * We need the axes of the point for correct formatting (expensive...).
+         */
+        ITrace2D trace = point.getListener();
+        IAxis xAxis = chart.getAxisX(trace);
+        IAxis yAxis = chart.getAxisY(trace);
+
+        point.setHighlight(true);
+        chart.setRequestedRepaint(true);
+        StringBuffer buffer = new StringBuffer("X: ");
+        buffer.append(xAxis.getFormatter().format(point.getX())).append(" ");
+        buffer.append("Y: ");
+        buffer.append(yAxis.getFormatter().format(point.getY()));
+        result = buffer.toString();
+        return result;
+      }
     };
     /**
-     * Returns the tool tip text for the given mouse event.
+     * The base class implementation that returns the tool tip text for the
+     * given mouse event which is a NONE implementation here.
      * <p>
      * 
      * @param chart
-     *            the chart for computation of tool tips.
+     *          the chart for computation of tool tips.
      * @param me
-     *            the corresponding mouse event.
+     *          the corresponding mouse event.
      * @return the tool tip text for the given mouse event.
      */
     public String getToolTipText(final Chart2D chart, final MouseEvent me) {
@@ -262,23 +320,23 @@ public class Chart2D
   public static final int CHART_POSITION_TOP = 16;
 
   /**
-   * A package wide switch for debugging problems with scaling. Set to false the compiler will
-   * remove the debugging statements.
+   * A package wide switch for debugging problems with scaling. Set to false the
+   * compiler will remove the debugging statements.
    */
   public static final boolean DEBUG_SCALING = false;
 
   /**
-   * A package wide switch for debugging problems with multithreading. Set to false the compiler
-   * will remove the debugging statements.
+   * A package wide switch for debugging problems with multithreading. Set to
+   * false the compiler will remove the debugging statements.
    */
   public static final boolean DEBUG_THREADING = false;
 
   /**
-   * The bean property <code>constant</code> identifying a change of the internal
-   * <code>{@link IAxis}</code> instance for the x dimension.
+   * The bean property <code>constant</code> identifying a change of the
+   * internal <code>{@link IAxis}</code> instance for the x dimension.
    * <p>
-   * Use this constant to register a {@link java.beans.PropertyChangeListener} with the
-   * <code>Chart2D</code>.
+   * Use this constant to register a {@link java.beans.PropertyChangeListener}
+   * with the <code>Chart2D</code>.
    * <p>
    * See the class description for property change events fired.
    * <p>
@@ -286,11 +344,11 @@ public class Chart2D
   public static final String PROPERTY_AXIS_X = "Chart2D.PROPERTY_AXIS_X";
 
   /**
-   * The bean property <code>constant</code> identifying a change of the internal
-   * <code>{@link IAxis}</code> instance for the y dimension.
+   * The bean property <code>constant</code> identifying a change of the
+   * internal <code>{@link IAxis}</code> instance for the y dimension.
    * <p>
-   * Use this constant to register a {@link java.beans.PropertyChangeListener} with the
-   * <code>Chart2D</code>.
+   * Use this constant to register a {@link java.beans.PropertyChangeListener}
+   * with the <code>Chart2D</code>.
    * <p>
    * See the class description for property change events fired.
    * <p>
@@ -298,56 +356,61 @@ public class Chart2D
   public static final String PROPERTY_AXIS_Y = "Chart2D.PROPERTY_AXIS_Y";
 
   /**
-   * The bean property <code>constant</code> identifying a change of the background color. <br>
-   * Use this constant to register a {@link java.beans.PropertyChangeListener} with the
-   * <code>Chart2D</code>.
+   * The bean property <code>constant</code> identifying a change of the
+   * background color. <br>
+   * Use this constant to register a {@link java.beans.PropertyChangeListener}
+   * with the <code>Chart2D</code>.
    * <p>
-   * The property change events for this change are constructed and fired by the superclass
-   * {@link java.awt.Container} so this constant is just for clarification of the String that is
-   * related to that property.
+   * The property change events for this change are constructed and fired by the
+   * superclass {@link java.awt.Container} so this constant is just for
+   * clarification of the String that is related to that property.
    * <p>
    */
   public static final String PROPERTY_BACKGROUND_COLOR = "Chart2D.PROPERTY_BACKGROUND_COLOR";
 
   /**
-   * The bean property <code>constant</code> identifying a change of the font. <br/>
+   * The bean property <code>constant</code> identifying a change of the font.
+   * <br/>
    * <p>
-   * Use this constant to register a {@link java.beans.PropertyChangeListener} with the
-   * <code>Chart2D</code>.
+   * Use this constant to register a {@link java.beans.PropertyChangeListener}
+   * with the <code>Chart2D</code>.
    * <p>
-   * The property change events for this change are constructed and fired by the superclass
-   * {@link java.awt.Container} so this constant is just for clarification of the String that is
-   * related to that property.
+   * The property change events for this change are constructed and fired by the
+   * superclass {@link java.awt.Container} so this constant is just for
+   * clarification of the String that is related to that property.
    * <p>
    */
   public static final String PROPERTY_FONT = "Chart2D.PROPERTY_FONT";
 
   /**
-   * The bean property <code>constant</code> identifying a change of the foreground color. <br>
-   * Use this constant to register a {@link java.beans.PropertyChangeListener} with the
-   * <code>Chart2D</code>.
+   * The bean property <code>constant</code> identifying a change of the
+   * foreground color. <br>
+   * Use this constant to register a {@link java.beans.PropertyChangeListener}
+   * with the <code>Chart2D</code>.
    * <p>
-   * The property change events for this change are constructed and fired by the superclass
-   * {@link java.awt.Container} so this constant is just for clarification of the String that is
-   * related to that property.
+   * The property change events for this change are constructed and fired by the
+   * superclass {@link java.awt.Container} so this constant is just for
+   * clarification of the String that is related to that property.
    * <p>
    */
   public static final String PROPERTY_FOREGROUND_COLOR = "Chart2D.PROPERTY_FOREGROUND_COLOR";
 
   /**
-   * The bean property <code>constant</code> identifying a change of the grid color.
+   * The bean property <code>constant</code> identifying a change of the grid
+   * color.
    * <p>
-   * Use this constant to register a {@link java.beans.PropertyChangeListener} with the
-   * <code>Chart2D</code>.
+   * Use this constant to register a {@link java.beans.PropertyChangeListener}
+   * with the <code>Chart2D</code>.
    * <p>
    */
   public static final String PROPERTY_GRID_COLOR = "Chart2D.PROPERTY_GRID_COLOR";
 
   /**
-   * The bean property <code>constant</code> identifying a change of the paint labels flag.
+   * The bean property <code>constant</code> identifying a change of the paint
+   * labels flag.
    * <p>
-   * Use this constant to register a {@link java.beans.PropertyChangeListener} with the
-   * <code>Chart2D</code>.
+   * Use this constant to register a {@link java.beans.PropertyChangeListener}
+   * with the <code>Chart2D</code>.
    * <p>
    */
   public static final String PROPERTY_PAINTLABELS = "Chart2D.PROPERTY_PAINTLABELS";
@@ -367,8 +430,8 @@ public class Chart2D
   /**
    * The bottom x axes of the chart.
    * <p>
-   * The first element is always existing and is the downward compatible result of the call
-   * <code>{@link Chart2D#getAxisX()}</code>.
+   * The first element is always existing and is the downward compatible result
+   * of the call <code>{@link Chart2D#getAxisX()}</code>.
    * <p>
    */
   private List<IAxis> m_axesXBottom;
@@ -384,8 +447,8 @@ public class Chart2D
   /**
    * The left y axes of the chart.
    * <p>
-   * The first element is always existing and is the downward compatible result of the call
-   * <code>{@link Chart2D#getAxisY()}</code>.
+   * The first element is always existing and is the downward compatible result
+   * of the call <code>{@link Chart2D#getAxisY()}</code>.
    * <p>
    */
   private List<IAxis> m_axesYLeft;
@@ -405,11 +468,12 @@ public class Chart2D
   private Color m_gridcolor = Color.lightGray;
 
   /**
-   * Chart - wide setting for the ms to give a repaint operation time for collecting several repaint
-   * requests into one (performance vs. update speed).
+   * Chart - wide setting for the ms to give a repaint operation time for
+   * collecting several repaint requests into one (performance versus update
+   * speed).
    * <p>
    */
-  private int m_minPaintLatency = 50;
+  protected int m_minPaintLatency = 50;
 
   /**
    * The axis that is used for translation from mouse event to x value by method
@@ -430,20 +494,30 @@ public class Chart2D
   private AAxis m_mouseTranslationYAxis;
 
   /**
+   * When not null this format will be used within paint: then we deal with a
+   * printing request.
+   */
+  private transient PageFormat m_pageFormat;
+
+  /**
    * Flag that decides whether labels for traces are painted below the chart.
    */
   private boolean m_paintLabels = true;
 
+  /** The point highlighter. */
+  private IPointPainter m_pointHighlighter;
+
   /**
-   * Internal timer for repaint control with guarantee that the interval between two frames will not
-   * be lower than <code>{@link Chart2D#m_minPaintLatency}</code> ms.
+   * Internal timer for repaint control with guarantee that the interval between
+   * two frames will not be lower than <code>{@link Chart2D#m_minPaintLatency}
+   * </code> ms.
    * <p>
    */
   private Timer m_repainter;
 
   /**
-   * Internal flag that stores a request for a repaint that guarantees that two invocations of
-   * <code></code> will always have at least have an interval of
+   * Internal flag that stores a request for a repaint that guarantees that two
+   * invocations of <code></code> will always have at least have an interval of
    * <code>{@link Chart2D#m_minPaintLatency}</code> ms.
    * <p>
    * Access to it has to be synchronized!
@@ -451,8 +525,8 @@ public class Chart2D
   private boolean m_requestedRepaint;
 
   /**
-   * Flag to remember whether this chart has synchronized it's x start coordinates with another
-   * chart.
+   * Flag to remember whether this chart has synchronized it's x start
+   * coordinates with another chart.
    */
   private boolean m_synchronizedXStart = false;
 
@@ -475,7 +549,8 @@ public class Chart2D
   /**
    * The y coordinate of the upper edge of the chart's display area in px.
    * <p>
-   * The px coordinates in awt / swing start from top and increase towards the bottom.
+   * The px coordinates in awt / swing start from top and increase towards the
+   * bottom.
    * <p>
    */
   private int m_yChartEnd;
@@ -520,8 +595,8 @@ public class Chart2D
     // set a custom cursor:
     this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 
-    // turn on tool tip coordinates at mouse cursor:
-    this.setToolTipCoords(true);
+    // set default point highlighter:
+    this.setPointHighlighter(new PointPainterDisc(8));
 
     this.m_repainter = new Timer(this.m_minPaintLatency, new ActionListener() {
 
@@ -530,7 +605,7 @@ public class Chart2D
        * <p>
        * 
        * @param e
-       *            invoked by the timer to trigger the action.
+       *          invoked by the timer to trigger the action.
        */
       public void actionPerformed(final ActionEvent e) {
         synchronized (Chart2D.this) {
@@ -552,11 +627,12 @@ public class Chart2D
   /**
    * Adds the given x axis to the list of internal bottom x axes.
    * <p>
-   * The given axis must not be contained before (e.g. as right y axis or bottom x axis...).
+   * The given axis must not be contained before (e.g. as right y axis or bottom
+   * x axis...).
    * <p>
    * 
    * @param axisX
-   *            the additional bottom x axis.
+   *          the additional bottom x axis.
    */
   public void addAxisXBottom(final AAxis axisX) {
     this.ensureUniqueAxis(axisX);
@@ -572,11 +648,12 @@ public class Chart2D
   /**
    * Adds the given x axis to the list of internal top x axes.
    * <p>
-   * The given axis must not be contained before (e.g. as right y axis or bottom x axis...).
+   * The given axis must not be contained before (e.g. as right y axis or bottom
+   * x axis...).
    * <p>
    * 
    * @param axisX
-   *            the additional top x axis.
+   *          the additional top x axis.
    */
   public void addAxisXTop(final AAxis axisX) {
     this.ensureUniqueAxis(axisX);
@@ -592,11 +669,12 @@ public class Chart2D
   /**
    * Adds the given y axis to the list of internal left y axes.
    * <p>
-   * The given axis must not be contained before (e.g. as right y axis or bottom x axis...).
+   * The given axis must not be contained before (e.g. as right y axis or bottom
+   * x axis...).
    * <p>
    * 
    * @param axisY
-   *            the additional left y axis.
+   *          the additional left y axis.
    */
   public void addAxisYLeft(final AAxis axisY) {
     this.ensureUniqueAxis(axisY);
@@ -612,11 +690,12 @@ public class Chart2D
   /**
    * Adds the given y axis to the list of internal right y axes.
    * <p>
-   * The given axis must not be contained before (e.g. as right y axis or bottom x axis...).
+   * The given axis must not be contained before (e.g. as right y axis or bottom
+   * x axis...).
    * <p>
    * 
    * @param axisY
-   *            the additional right y axis.
+   *          the additional right y axis.
    */
   public void addAxisYRight(final AAxis axisY) {
     this.ensureUniqueAxis(axisY);
@@ -630,19 +709,20 @@ public class Chart2D
   }
 
   /**
-   * Convenience method that adds the trace to this chart with relation to the first bottom x axis
-   * and the first left y axis. It will be painted (if it's {@link ITrace2D#isVisible()} returns
-   * true) in this chart.
+   * Convenience method that adds the trace to this chart with relation to the
+   * first bottom x axis and the first left y axis. It will be painted (if it's
+   * {@link ITrace2D#isVisible()} returns true) in this chart.
    * <p>
-   * This method will trigger a {@link java.beans.PropertyChangeEvent} being fired on all instances
-   * registered by
+   * This method will trigger a {@link java.beans.PropertyChangeEvent} being
+   * fired on all instances registered by
    * {@link javax.swing.JComponent#addPropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)}
-   * (registered with <code>String</code> argument {@link IAxis#PROPERTY_ADD_REMOVE_TRACE}) on
-   * the internal bottom x axis and left y axis.
+   * (registered with <code>String</code> argument
+   * {@link IAxis#PROPERTY_ADD_REMOVE_TRACE}) on the internal bottom x axis and
+   * left y axis.
    * <p>
    * 
    * @param points
-   *            the trace to add.
+   *          the trace to add.
    * @see IAxis#PROPERTY_ADD_REMOVE_TRACE
    * @see Chart2D#addTrace(ITrace2D, IAxis, IAxis)
    */
@@ -653,26 +733,28 @@ public class Chart2D
   }
 
   /**
-   * Adds the trace to this chart with relation to the given x axis and y axis. It will be painted
-   * (if it's {@link ITrace2D#isVisible()} returns true) in this chart.
+   * Adds the trace to this chart with relation to the given x axis and y axis.
+   * It will be painted (if it's {@link ITrace2D#isVisible()} returns true) in
+   * this chart.
    * <p>
-   * This method will trigger a {@link java.beans.PropertyChangeEvent} being fired on all instances
-   * registered by
+   * This method will trigger a {@link java.beans.PropertyChangeEvent} being
+   * fired on all instances registered by
    * {@link javax.swing.JComponent#addPropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)}
-   * (registered with <code>String</code> argument {@link IAxis#PROPERTY_ADD_REMOVE_TRACE}) on
-   * the axis of this chart.
+   * (registered with <code>String</code> argument
+   * {@link IAxis#PROPERTY_ADD_REMOVE_TRACE}) on the axis of this chart.
    * <p>
-   * The given x and y axis will be responsible for computation of the scale of this trace.
+   * The given x and y axis will be responsible for computation of the scale of
+   * this trace.
    * <p>
    * 
    * @param points
-   *            the trace to add.
+   *          the trace to add.
    * @param xAxis
-   *            the x axis responsible for the scale of this trace - it has to be contained in this
-   *            chart or an exception will be thrown.
+   *          the x axis responsible for the scale of this trace - it has to be
+   *          contained in this chart or an exception will be thrown.
    * @param yAxis
-   *            the y axis responsible for the scale of this trace - it has to be contained in this
-   *            chart or an exception will be thrown.
+   *          the y axis responsible for the scale of this trace - it has to be
+   *          contained in this chart or an exception will be thrown.
    * @see IAxis#PROPERTY_ADD_REMOVE_TRACE
    */
   public final void addTrace(final ITrace2D points, final IAxis xAxis, final IAxis yAxis) {
@@ -697,178 +779,14 @@ public class Chart2D
   }
 
   /**
-   * Calculates the end x coordinate (right bound) in pixel of the chart to draw.
-   * <p>
-   * This value depends on the current <code>{@link FontMetrics}</code> used to paint the x labels
-   * and the maximum amount of characters that are used for the x labels (<code>{@link IAxisLabelFormatter#getMaxAmountChars()}</code>)
-   * because an x label may occur on the right edge of the chart and should not be clipped.
-   * <p>
-   * 
-   * @param g2d
-   *            needed for size informations.
-   * @return the end x coordinate (right bound) in pixel of the chart to draw.
-   */
-  private int calculateXChartEnd(final Graphics2D g2d) {
-    int result = (int) this.getSize().getWidth();
-    IAxis currentAxis;
-    int axisWidth = 0;
-    if (this.m_axesYRight.size() > 0) {
-      ListIterator<IAxis> it = this.m_axesYRight.listIterator(this.m_axesYRight.size());
-      while (it.hasPrevious()) {
-        currentAxis = it.previous();
-        axisWidth = currentAxis.getWidth(g2d);
-        currentAxis.setPixelXRight(result);
-        result = result - axisWidth;
-        currentAxis.setPixelXLeft(result);
-      }
-    } else {
-      // use the maximum label width of the x axes to avoid x labels
-      // being clipped in case there are no right y axes:
-      Iterator<IAxis> it = this.m_axesXBottom.iterator();
-      int xAxesMaxLabelWidth = 0;
-      int tmp;
-      while (it.hasNext()) {
-        currentAxis = it.next();
-        tmp = currentAxis.getWidth(g2d);
-        if (tmp > xAxesMaxLabelWidth) {
-          xAxesMaxLabelWidth = tmp;
-        }
-      }
-      it = this.m_axesXTop.iterator();
-      while (it.hasNext()) {
-        currentAxis = it.next();
-        tmp = currentAxis.getWidth(g2d);
-        if (tmp > xAxesMaxLabelWidth) {
-          xAxesMaxLabelWidth = tmp;
-        }
-      }
-      result = result - xAxesMaxLabelWidth;
-    }
-
-    return result;
-  }
-
-  /**
-   * Calculates the start x coordinate (left bound) in pixel of the chart to draw.
-   * <p>
-   * This value depends on the current <code>{@link FontMetrics}</code> used to paint the y labels
-   * and the maximum amount of characters that are used for the y labels (<code>{@link IAxisLabelFormatter#getMaxAmountChars()}</code>).
-   * <p>
-   * 
-   * @param g2d
-   *            needed for size information.
-   * @return the start x coordinate (left bound) in pixel of the chart to draw.
-   */
-  private int calculateXChartStart(final Graphics2D g2d) {
-    int result = 0;
-    // reverse iteration because the most left axes are the latter ones:
-    ListIterator<IAxis> it = this.m_axesYLeft.listIterator(this.m_axesYLeft.size());
-    IAxis currentAxis;
-    while (it.hasPrevious()) {
-      currentAxis = it.previous();
-      currentAxis.setPixelXLeft(result);
-      result += currentAxis.getWidth(g2d);
-      currentAxis.setPixelXRight(result);
-    }
-    return result;
-  }
-
-  /**
-   * Calculates the end y coordinate (upper bound) in pixel of the chart to draw.
-   * <p>
-   * Note that y coordinates are related to the top of a frame, so a higher y value marks a visual
-   * lower chart value.
-   * <p>
-   * The value computed here is the maximum overhang of all y axes caused by their font height of
-   * their labels or the summation of all top x axis heights (if this is greater) .
-   * <p>
-   * 
-   * @param g2d
-   *            needed for size informations.
-   * @return the end y coordinate (upper bound) in pixel of the chart to draw.
-   */
-  private int calculateYChartEnd(final Graphics2D g2d) {
-    IAxis currentAxis;
-    int tmp;
-    int result = 0;
-    int maxAxisYHeight = 0;
-    int axesXTopHeight = 0;
-    // 1) Find the max y axis height (this is just the overhang cause by label
-    // TODO: maybe this is too much work in case all fonts of all axes are the
-    // same and
-    // every axis will give the same result for the height (debug).
-    Iterator<IAxis> it = this.m_axesYLeft.iterator();
-    while (it.hasNext()) {
-      currentAxis = it.next();
-      tmp = currentAxis.getHeight(g2d);
-      if (tmp > maxAxisYHeight) {
-        maxAxisYHeight = tmp;
-      }
-    }
-    it = this.m_axesYRight.iterator();
-    while (it.hasNext()) {
-      currentAxis = it.next();
-      tmp = currentAxis.getHeight(g2d);
-      if (tmp > maxAxisYHeight) {
-        maxAxisYHeight = tmp;
-      }
-    }
-
-    // 2) Find the total height of top x axes
-    // (and calculate the y pixel of the top axes):
-    ListIterator<IAxis> listIt = this.m_axesXTop.listIterator(this.m_axesXTop.size());
-    int axisHeight = 0;
-    while (listIt.hasPrevious()) {
-      currentAxis = listIt.previous();
-      currentAxis.setPixelYTop(axesXTopHeight);
-      axisHeight = currentAxis.getHeight(g2d);
-      axesXTopHeight += axisHeight;
-      currentAxis.setPixelYBottom(axesXTopHeight);
-    }
-
-    // 3) Find the maximum result:
-    result = Math.max(maxAxisYHeight, axesXTopHeight);
-    return result;
-  }
-
-  /**
-   * Calculates the start y coordinate (lower bound) in pixel of the chart to draw.
-   * <p>
-   * Note that y coordinates are related to the top of a frame, so a higher y value marks a visual
-   * lower chart value.
-   * <p>
-   * 
-   * @param g2d
-   *            needed for size informations.
-   * @param labelHeight
-   *            the height of the labels below the chart.
-   * @return the start y coordinate (lower bound) in pixel of the chart to draw.
-   */
-  private int calculateYChartStart(final Graphics2D g2d, final int labelHeight) {
-    int result = (int) this.getSize().getHeight();
-    result = result - labelHeight;
-    IAxis currentAxis;
-    int axesXBottomHeight = 0;
-    Iterator<IAxis> it = this.m_axesXBottom.iterator();
-    while (it.hasNext()) {
-      currentAxis = it.next();
-      currentAxis.setPixelYBottom(result);
-      result -= currentAxis.getHeight(g2d);
-      currentAxis.setPixelYTop(result);
-    }
-
-    result = result - axesXBottomHeight;
-    return result;
-
-  }
-
-  /**
    * @see javax.swing.JComponent#createToolTip()
    */
+  @Override
   public JToolTip createToolTip() {
     /*
-     * If desired return here a HTMLToolTip that transforms the text given to setTipText into a View
-     * (with BasicHTML) and sets it as the putClientProperty BasicHtml.html of itself.
+     * If desired return here a HTMLToolTip that transforms the text given to
+     * setTipText into a View (with BasicHTML) and sets it as the
+     * putClientProperty BasicHtml.html of itself.
      */
     JToolTip result = super.createToolTip();
     return result;
@@ -877,9 +795,9 @@ public class Chart2D
   /**
    * Destroys the chart.
    * <p>
-   * This method is only of interest if you have an application that dynamically adds and removes
-   * charts. So if you use the same Chart2D object(s) during the applications lifetime there is no
-   * need to use this method.
+   * This method is only of interest if you have an application that dynamically
+   * adds and removes charts. So if you use the same Chart2D object(s) during
+   * the applications lifetime there is no need to use this method.
    * <p>
    */
   public void destroy() {
@@ -900,54 +818,70 @@ public class Chart2D
       this.m_axesYRight.clear();
       this.m_axesYRight = null;
 
+      // terminate the timer
+      this.m_repainter.stop();
+
     }
   }
 
   /**
-   * Ensures that the axis to add is not in duty in any axis function for this chart.
+   * Returns an array with the x (position 0) and the y axis (position 1) of the
+   * given trace if it is correctly set up. If the given trace is not set up
+   * correctly with this chart a missing axis in one dimension will be reflected
+   * in <code>null</code> on the corresponding position
    * <p>
    * 
-   * @param axisToAdd
-   *            the axis to test.
+   * @param trace
+   *          the trace to find the axes of.
+   * @return an array with the x (position 0) and the y axis (position 1) of the
+   *         given trace if it is correctly set up.
    */
-  private void ensureUniqueAxis(final IAxis axisToAdd) {
-    if (this.m_axesXBottom.contains(axisToAdd)) {
-      throw new IllegalArgumentException("Given axis (" + axisToAdd.getAxisTitle().getTitle()
-          + " is already configured as bottom x axis!");
+  public IAxis[] findAxesOfTrace(final ITrace2D trace) {
+    IAxis[] result = new IAxis[2];
+    // 1) find x axis:
+    IAxis xAxis = null;
+    for (IAxis axis : this.m_axesXBottom) {
+      if (axis.getTraces().contains(trace)) {
+        xAxis = axis;
+        break;
+      }
     }
-    if (this.m_axesXTop.contains(axisToAdd)) {
-      throw new IllegalArgumentException("Given axis (" + axisToAdd.getAxisTitle().getTitle()
-          + " is already configured as top x axis!");
+    if (xAxis == null) {
+      for (IAxis axis : this.m_axesXTop) {
+        if (axis.getTraces().contains(trace)) {
+          xAxis = axis;
+          break;
+        }
+      }
     }
-    if (this.m_axesYLeft.contains(axisToAdd)) {
-      throw new IllegalArgumentException("Given axis (" + axisToAdd.getAxisTitle().getTitle()
-          + " is already configured as left y axis!");
+    // 2) find y axis:
+    IAxis yAxis = null;
+    for (IAxis axis : this.m_axesYLeft) {
+      if (axis.getTraces().contains(trace)) {
+        yAxis = axis;
+        break;
+      }
     }
-    if (this.m_axesYRight.contains(axisToAdd)) {
-      throw new IllegalArgumentException("Given axis (" + axisToAdd.getAxisTitle().getTitle()
-          + " is already configured as right y axis!");
+    if (yAxis == null) {
+      for (IAxis axis : this.m_axesYRight) {
+        if (axis.getTraces().contains(trace)) {
+          yAxis = axis;
+          break;
+        }
+      }
     }
-
+    result[0] = xAxis;
+    result[1] = yAxis;
+    return result;
   }
 
   /**
-   * Cleanup when this instance is dropped.
+   * Returns the <code>{@link List}&lt;{@link IAxis}&gt;</code> with all axes of
+   * the chart.
    * <p>
    * 
-   * @see java.lang.Object#finalize()
-   * @throws Throwable
-   *             if a finalizer of a superclass fails.
-   */
-  protected void finalize() throws Throwable {
-    super.finalize();
-    this.destroy();
-  }
-
-  /**
-   * Returns the <code>{@link List}&lt;{@link IAxis}&gt;</code> with all axes of the chart.
-   * <p>
-   * 
-   * @return the <code>{@link List}&lt;{@link IAxis}&gt;</code> with all axes of the chart
+   * @return the <code>{@link List}&lt;{@link IAxis}&gt;</code> with all axes of
+   *         the chart
    */
   public final List<IAxis> getAxes() {
     List<IAxis> result = new LinkedList<IAxis>();
@@ -959,60 +893,60 @@ public class Chart2D
   }
 
   /**
-   * Returns the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances that are painted
-   * in x dimension on the bottom of the chart.
+   * Returns the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances
+   * that are painted in x dimension on the bottom of the chart.
    * <p>
-   * <b>Caution!</b> The original list is returned so modifications of it will cause unpredictable
-   * side effects.
+   * <b>Caution!</b> The original list is returned so modifications of it will
+   * cause unpredictable side effects.
    * <p>
    * 
-   * @return the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances that are painted
-   *         in x dimension on the bottom of the chart.
+   * @return the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances
+   *         that are painted in x dimension on the bottom of the chart.
    */
   public final List<IAxis> getAxesXBottom() {
     return this.m_axesXBottom;
   }
 
   /**
-   * Returns the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances that are painted
-   * in x dimension on top of the chart.
+   * Returns the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances
+   * that are painted in x dimension on top of the chart.
    * <p>
-   * <b>Caution!</b> The original list is returned so modifications of it will cause unpredictable
-   * side effects.
+   * <b>Caution!</b> The original list is returned so modifications of it will
+   * cause unpredictable side effects.
    * <p>
    * 
-   * @return the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances that are painted
-   *         in x dimension on top of the chart.
+   * @return the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances
+   *         that are painted in x dimension on top of the chart.
    */
   public final List<IAxis> getAxesXTop() {
     return this.m_axesXTop;
   }
 
   /**
-   * Returns the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances that are painted
-   * in y dimension on the left side of the chart.
+   * Returns the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances
+   * that are painted in y dimension on the left side of the chart.
    * <p>
-   * <b>Caution!</b> The original list is returned so modifications of it will cause unpredictable
-   * side effects.
+   * <b>Caution!</b> The original list is returned so modifications of it will
+   * cause unpredictable side effects.
    * <p>
    * 
-   * @return the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances that are painted
-   *         in y dimension on the left side of the chart.
+   * @return the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances
+   *         that are painted in y dimension on the left side of the chart.
    */
   public final List<IAxis> getAxesYLeft() {
     return this.m_axesYLeft;
   }
 
   /**
-   * Returns the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances that are painted
-   * in y dimension on the right side of the chart.
+   * Returns the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances
+   * that are painted in y dimension on the right side of the chart.
    * <p>
-   * <b>Caution!</b> The original list is returned so modifications of it will cause unpredictable
-   * side effects.
+   * <b>Caution!</b> The original list is returned so modifications of it will
+   * cause unpredictable side effects.
    * <p>
    * 
-   * @return the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances that are painted
-   *         in y dimension on the right side of the chart.
+   * @return the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances
+   *         that are painted in y dimension on the right side of the chart.
    */
   public final List<IAxis> getAxesYRight() {
     return this.m_axesYRight;
@@ -1039,14 +973,14 @@ public class Chart2D
   }
 
   /**
-   * Returns the x axis that the given trace belongs to or null if this trace does not belong to any
-   * x axis of this chart.
+   * Returns the x axis that the given trace belongs to or null if this trace
+   * does not belong to any x axis of this chart.
    * <p>
    * 
    * @param trace
-   *            the trace to find the corresponding x axis of this chart for.
-   * @return the x axis that the given trace belongs to or null if this trace does not belong to any
-   *         x axis of this chart.
+   *          the trace to find the corresponding x axis of this chart for.
+   * @return the x axis that the given trace belongs to or null if this trace
+   *         does not belong to any x axis of this chart.
    */
   public IAxis getAxisX(final ITrace2D trace) {
     IAxis result = null;
@@ -1083,14 +1017,14 @@ public class Chart2D
   }
 
   /**
-   * Returns the y axis that the given trace belongs to or null if this trace does not belong to any
-   * y axis of this chart.
+   * Returns the y axis that the given trace belongs to or null if this trace
+   * does not belong to any y axis of this chart.
    * <p>
    * 
    * @param trace
-   *            the trace to find the corresponding y axis of this chart for.
-   * @return the y axis that the given trace belongs to or null if this trace does not belong to any
-   *         y axis of this chart.
+   *          the trace to find the corresponding y axis of this chart for.
+   * @return the y axis that the given trace belongs to or null if this trace
+   *         does not belong to any y axis of this chart.
    */
   public IAxis getAxisY(final ITrace2D trace) {
     IAxis result = null;
@@ -1127,44 +1061,131 @@ public class Chart2D
   }
 
   /**
-   * Returns the chart - wide setting for the ms to give a repaint operation time for collecting
-   * several repaint requests into one (performance vs. update speed).
+   * @see javax.swing.JComponent#getHeight()
+   */
+  @Override
+  public int getHeight() {
+    int result = -1;
+    if (this.m_pageFormat != null) {
+      Chart2DActionPrintSingleton printTrigger = Chart2DActionPrintSingleton.getInstance(this);
+      if (printTrigger != null) {
+        if (printTrigger.isPrintWholePage()) {
+          int dpiScreen = Toolkit.getDefaultToolkit().getScreenResolution();
+          result = (int) this.m_pageFormat.getImageableHeight() * 72 / dpiScreen;
+        }
+      }
+    }
+    if (result == -1) {
+      result = super.getHeight();
+    }
+
+    return result;
+  }
+
+  /**
+   * Returns the chart - wide setting for the ms to give a repaint operation
+   * time for collecting several repaint requests into one (performance vs.
+   * update speed).
    * <p>
    * 
-   * @return the setting for the ms to give a repaint operation time for collecting several repaint
-   *         requests into one (performance vs. update speed).
+   * @return the setting for the ms to give a repaint operation time for
+   *         collecting several repaint requests into one (performance vs.
+   *         update speed).
    */
   public synchronized int getMinPaintLatency() {
     return this.m_minPaintLatency;
   }
 
   /**
-   * Returns the minimum x-value displayed by the first bottom x axis of this chart.
+   * Returns the nearest <code>{@link MouseEvent}</code> to the given mouse
+   * event's screen coordinates.
    * <p>
-   * This value is not necessarily the minimum x-value of all <code>{@link ITrace2D}</code>
-   * instances of the first bottom x axis. Rounding or forced bounds on the internal
-   * <code>X - {@link AAxis}</code> may have an effect on this value.
+   * This method is expensive and should not be used when rendering fast
+   * changing charts with many points.
+   * <p>
+   * Note that the given mouse event should be an event fired on this chart
+   * component. Else results will point to the nearest point of the chart in the
+   * direction of the mouse event's position.
    * <p>
    * 
-   * @return the minimum x-value of the first bottom x axis displayed by this chart.
-   * @deprecated this method seems unused and buggy and will be dropped in future releases.
+   * @param me
+   *          a mouse event fired on this component.
+   * @return nearest <code>{@link MouseEvent}</code> to the given mouse event's
+   *         screen coordinates or <code>null</code> if the chart is empty.
    */
-  public final double getOffsetX() {
-    return this.m_axesXBottom.get(0).getRange().getMin();
+  public TracePoint2D getNearestPointManhattan(final MouseEvent me) {
+    TracePoint2D result = null;
+    int pixelX = me.getX();
+    int pixelY = me.getY();
+    /*
+     * Normalize pixel values:
+     */
+    double scaledX = 0;
+    double scaledY = 0;
+    double rangeX = this.getXChartEnd() - this.getXChartStart();
+    if (rangeX != 0) {
+      scaledX = ((double) pixelX - this.getXChartStart()) / rangeX;
+    }
+    double rangeY = this.getYChartStart() - this.getYChartEnd();
+    if (rangeY != 0) {
+      scaledY = 1.0 - ((double) pixelY - this.getYChartEnd()) / rangeY;
+    }
+
+    /*
+     * TODO: Maybe cache this call because it searches all axes and evicts
+     * duplicates of their assigned traces (subject to profiling).
+     */
+    Set<ITrace2D> traces = this.getTraces();
+    ManhattanDistancePoint distanceBean;
+    ManhattanDistancePoint winner = null;
+    for (ITrace2D trace : traces) {
+      distanceBean = trace.getNearestPointManhattan(scaledX, scaledY);
+      if (winner == null) {
+        winner = distanceBean;
+      } else {
+        if (distanceBean.getManhattanDistance() < winner.getManhattanDistance()) {
+          winner = distanceBean;
+        }
+      }
+    }
+    if (winner != null) {
+      result = winner.getPoint();
+    }
+    return result;
   }
 
   /**
-   * Returns the chart that will be synchronized for finding the start coordinate of this chart to
-   * draw in x dimension (<code>{@link #getXChartStart()}</code>).
-   * <p>
-   * This feature is used to allow two separate charts to be painted stacked in y dimension (one
-   * below the other) that have different x start coordinates (because of different y labels that
-   * shift that value) with an equal starting x value (thus be comparable visually if their x values
-   * match).
+   * @return the pointHighlighter.
+   */
+  public final IPointPainter getPointHighlighter() {
+    return this.m_pointHighlighter;
+  }
+
+  /**
+   * Overridden to allow full - page printing.
    * <p>
    * 
-   * @return the chart that will be synchronized for finding the start coordinate of this chart to
-   *         draw in x dimension (<code>{@link #getXChartStart()}</code>).
+   * @see java.awt.Component#getSize()
+   */
+  @Override
+  public Dimension getSize() {
+    return new Dimension(this.getWidth(), this.getHeight());
+  }
+
+  /**
+   * Returns the chart that will be synchronized for finding the start
+   * coordinate of this chart to draw in x dimension (<code>
+   * {@link #getXChartStart()}</code>).
+   * <p>
+   * This feature is used to allow two separate charts to be painted stacked in
+   * y dimension (one below the other) that have different x start coordinates
+   * (because of different y labels that shift that value) with an equal
+   * starting x value (thus be comparable visually if their x values match).
+   * <p>
+   * 
+   * @return the chart that will be synchronized for finding the start
+   *         coordinate of this chart to draw in x dimension (<code>
+   *         {@link #getXChartStart()}</code>).
    */
   public final Chart2D getSynchronizedXStartChart() {
     return this.m_synchronizedXStartChart;
@@ -1173,6 +1194,7 @@ public class Chart2D
   /**
    * @see javax.swing.JComponent#getToolTipText(java.awt.event.MouseEvent)
    */
+  @Override
   public String getToolTipText(final MouseEvent event) {
     String result;
     result = this.m_toolTip.getToolTipText(this, event);
@@ -1198,8 +1220,8 @@ public class Chart2D
    * The instances are collected from all underlying axes. The resulting <code> 
    * {@link Set}</code>
    * is not an original set. Therefore modification methods like
-   * <code>{@link Set#add(Object)}</code> or <code>{@link Set#clear()}</code> will not have any
-   * effect on the setup of this chart.
+   * <code>{@link Set#add(Object)}</code> or <code>{@link Set#clear()}</code>
+   * will not have any effect on the setup of this chart.
    * <p>
    * 
    * @return the set of traces that are currently rendered by this instance.
@@ -1230,6 +1252,28 @@ public class Chart2D
   }
 
   /**
+   * @see javax.swing.JComponent#getWidth()
+   */
+  @Override
+  public int getWidth() {
+    int result = -1;
+    if (this.m_pageFormat != null) {
+      Chart2DActionPrintSingleton printTrigger = Chart2DActionPrintSingleton.getInstance(this);
+      if (printTrigger != null) {
+        if (printTrigger.isPrintWholePage()) {
+          int dpiScreen = Toolkit.getDefaultToolkit().getScreenResolution();
+          result = (int) this.m_pageFormat.getImageableWidth() * 72 / dpiScreen;
+        }
+      }
+    }
+    if (result == -1) {
+      result = super.getWidth();
+    }
+
+    return result;
+  }
+
+  /**
    * Returns the x coordinate of the chart's right edge in px.
    * <p>
    * 
@@ -1250,12 +1294,15 @@ public class Chart2D
   }
 
   /**
-   * Returns the y coordinate of the upper edge of the chart's display area in px.
+   * Returns the y coordinate of the upper edge of the chart's display area in
+   * px.
    * <p>
-   * Pixel coordinates in awt / swing start from top and increase towards the bottom.
+   * Pixel coordinates in awt / swing start from top and increase towards the
+   * bottom.
    * <p>
    * 
-   * @return The y coordinate of the upper edge of the chart's display area in px.
+   * @return The y coordinate of the upper edge of the chart's display area in
+   *         px.
    */
   public final synchronized int getYChartEnd() {
     return this.m_yChartEnd;
@@ -1264,117 +1311,14 @@ public class Chart2D
   /**
    * Returns the y coordinate of the chart's lower edge in px.
    * <p>
-   * Pixel coordinates in awt / swing start from top and increase towards the bottom.
+   * Pixel coordinates in awt / swing start from top and increase towards the
+   * bottom.
    * <p>
    * 
    * @return Returns the y coordinate of the chart's lower edge in px.
    */
   public synchronized int getYChartStart() {
     return this.m_yChartStart;
-  }
-
-  /**
-   * Interpolates (linear) the two neighboring points.
-   * <p>
-   * Calling this method only makes sense if argument invisible is not null or if argument visible
-   * is not null (if then invisible is null, the visible point will be returned).
-   * <p>
-   * Visibility is determined only by their internally normalized coordinates that are within
-   * [0.0,1.0] for visible points.
-   * <p>
-   * 
-   * @param visible
-   *            the visible point.
-   * @param invisible
-   *            the invisible point.
-   * @return the interpolation towards the exceeded bound.
-   */
-  private TracePoint2D interpolateVisible(final TracePoint2D invisible, final TracePoint2D visible) {
-
-    TracePoint2D result;
-    /*
-     * In the first call invisible is null because it is the previous point (there was no previous
-     * point: just return the new point):
-     */
-    if (invisible == null) {
-      result = visible;
-    } else {
-
-      /*
-       * Interpolation is done by the two point form: (y - y1)/(x - x1) = (y2 - y1)/(x2 - x1) solved
-       * to the missing value.
-       */
-      // interpolate
-      double xInterpolate = Double.NaN;
-      double yInterpolate = Double.NaN;
-      // find the bounds that has been exceeded:
-      // It is possible that two bound have been exceeded,
-      // then only one interpolation will be valid:
-      boolean interpolated = false;
-      boolean interpolatedWrong = false;
-      if (invisible.getScaledX() > 1.0) {
-        // right x bound
-        xInterpolate = 1.0;
-        yInterpolate = (visible.getScaledY() - invisible.getScaledY())
-            / (visible.getScaledX() - invisible.getScaledX()) * (1.0 - invisible.getScaledX())
-            + invisible.getScaledY();
-        interpolated = true;
-        interpolatedWrong = Double.isNaN(yInterpolate) || yInterpolate < 0.0 || yInterpolate > 1.0;
-      }
-      if ((invisible.getScaledX() < 0.0) && (!interpolated || interpolatedWrong)) {
-        // left x bound
-        xInterpolate = 0.0;
-        yInterpolate = (visible.getScaledY() - invisible.getScaledY())
-            / (visible.getScaledX() - invisible.getScaledX()) * -invisible.getScaledX()
-            + invisible.getScaledY();
-        interpolated = true;
-        interpolatedWrong = Double.isNaN(yInterpolate) || yInterpolate < 0.0 || yInterpolate > 1.0;
-      }
-      if ((invisible.getScaledY() > 1.0) && (!interpolated || interpolatedWrong)) {
-        // upper y bound, checked
-        yInterpolate = 1.0;
-        xInterpolate = (1.0 - invisible.getScaledY())
-            * (visible.getScaledX() - invisible.getScaledX())
-            / (visible.getScaledY() - invisible.getScaledY()) + invisible.getScaledX();
-        interpolated = true;
-        interpolatedWrong = Double.isNaN(xInterpolate) || xInterpolate < 0.0 || xInterpolate > 1.0;
-
-      }
-      if ((invisible.getScaledY() < 0.0) && (!interpolated || interpolatedWrong)) {
-        // lower y bound
-        yInterpolate = 0.0;
-        xInterpolate = -invisible.getScaledY() * (visible.getScaledX() - invisible.getScaledX())
-            / (visible.getScaledY() - invisible.getScaledY()) + invisible.getScaledX();
-        interpolated = true;
-        interpolatedWrong = Double.isNaN(xInterpolate) || xInterpolate < 0.0 || xInterpolate > 1.0;
-      }
-      if (interpolatedWrong) {
-        result = visible;
-      } else {
-        // TODO: do we have to compute and set the unscaled real values too?
-        result = new TracePoint2D(0.0, 0.0);
-        result.setScaledX(xInterpolate);
-        result.setScaledY(yInterpolate);
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Checks if both interpolated points were interpolated to the same bound thus their
-   * interconnections does not cross the visible bounds.
-   * <p>
-   * 
-   * @param oldpoint
-   *            the interpolated old point.
-   * @param newpoint
-   *            the interpolated new point.
-   * @return true if both interpolated points were interpolated towards the same bounds thus do not
-   *         have an interconnection that crosses the visible range.
-   */
-  private boolean isEqualInterPolationBound(final TracePoint2D oldpoint, final TracePoint2D newpoint) {
-    return (oldpoint.getScaledX() == newpoint.getScaledX())
-        || (oldpoint.getScaledY() == newpoint.getScaledY());
   }
 
   /**
@@ -1388,16 +1332,6 @@ public class Chart2D
   }
 
   /**
-   * Returns the requestedRepaint.
-   * <p>
-   * 
-   * @return the requestedRepaint
-   */
-  protected synchronized boolean isRequestedRepaint() {
-    return this.m_requestedRepaint;
-  }
-
-  /**
    * Returns true if chart coordinates are drawn as tool tips.
    * <p>
    * 
@@ -1408,446 +1342,49 @@ public class Chart2D
   }
 
   /**
-   * Returns true if the given point is in the visible drawing area of the Chart2D.
-   * <p>
-   * If the point is null false will be returned.
-   * <p>
-   * This only works if the point argument has been scaled already.
-   * <p>
+   * Returns an <code>Iterator</code> over the contained {@link ITrace2D}
+   * instances.
    * 
-   * @param point
-   *            the point to test.
-   * @return true if the given point is in the visible drawing area of the Chart2D.
-   */
-  private boolean isVisible(final TracePoint2D point) {
-    boolean result;
-    if (point == null) {
-      result = false;
-    } else {
-      result = !(point.getScaledX() > 1.0 || point.getScaledX() < 0.0 || point.getScaledY() > 1.0 || point
-          .getScaledY() < 0.0);
-    }
-    return result;
-  }
-
-  /**
-   * Returns an <code>Iterator</code> over the contained {@link ITrace2D} instances.
-   * 
-   * @return an <code>Iterator</code> over the contained {@link ITrace2D} instances.
+   * @return an <code>Iterator</code> over the contained {@link ITrace2D}
+   *         instances.
    */
   public final Iterator<ITrace2D> iterator() {
     return this.getTraces().iterator();
   }
 
   /**
-   * Helper that adds this chart as a listener to the required property change events.
-   * <p>
-   * 
-   * @param axis
-   *            the axis to listen to.
+   * @see java.awt.print.Printable#print(java.awt.Graphics,
+   *      java.awt.print.PageFormat, int)
    */
-  private void listenToAxis(final IAxis axis) {
-    axis.addPropertyChangeListener(IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
-    axis.addPropertyChangeListener(IAxis.PROPERTY_LABELFORMATTER, this);
-    axis.addPropertyChangeListener(IAxis.PROPERTY_PAINTGRID, this);
-    axis.addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, this);
-  }
-
-  /**
-   * Internally sets the value of <code>{@link #getXChartStart()}</code> and
-   * <code>{@link #getXChartEnd()}</code> with respect to another chart synchronized to the same
-   * value.
-   * <p>
-   * 
-   * @param g2d
-   *            needed for size information.
-   * @see #calculateXChartStart(Graphics2D)
-   * @see #calculateXChartEnd(Graphics2D)
-   */
-  private void negociateXChart(final Graphics2D g2d) {
-    if (this.m_synchronizedXStartChart != null) {
-      this.m_xChartStart = Math.max(this.calculateXChartStart(g2d), this.m_synchronizedXStartChart
-          .calculateXChartStart(g2d));
-      this.m_xChartEnd = Math.max(this.calculateXChartEnd(g2d), this.m_synchronizedXStartChart
-          .calculateXChartEnd(g2d));
-      this.m_synchronizedXStartChart.m_xChartStart = this.m_xChartStart;
-      this.m_synchronizedXStartChart.m_xChartEnd = this.m_xChartEnd;
+  public int print(final Graphics graphics, final PageFormat pageFormat, final int pageIndex)
+      throws PrinterException {
+    int result;
+    if (pageIndex > 0) {
+      // We have only one page, and 'page' is zero-based.
+      result = NO_SUCH_PAGE;
     } else {
-      if (!this.m_synchronizedXStart) {
-        this.m_xChartStart = this.calculateXChartStart(g2d);
-        this.m_xChartEnd = this.calculateXChartEnd(g2d);
-      }
+
+      // mark we are in a printing - paint iteration:
+      this.m_pageFormat = pageFormat;
+      this.updateScaling(true);
+      /* Now print the window and its visible contents */
+      this.printAll(graphics);
+
+      /* tell the caller that this page is part of the printed document */
+      result = PAGE_EXISTS;
     }
+
+    return result;
   }
 
   /**
-   * A basic rule of a JComponent is: <br>
-   * <b>Never invoke this method directly. </b> <br>
-   * See the description of <code>{@link javax.swing.JComponent#paint(java.awt.Graphics)}</code>
-   * for details.
-   * <p>
-   * If you do invoke this method you may encounter performance issues, flickering UI and even
-   * deadlocks.
-   * <p>
-   * 
-   * @param g
-   *            the graphics context to use.
-   */
-  public synchronized void paint(final Graphics g) {
-    if (Chart2D.DEBUG_THREADING) {
-      System.out.println("paint, 1 lock");
-    }
-    super.paint(g);
-    this.updateScaling(false);
-    // Some operations (e.g. stroke) need Graphics2d
-    Graphics2D g2d = (Graphics2D) g;
-    // will be used in several iterations.
-    ITrace2D tmpdata;
-    Iterator<ITrace2D> traceIt;
-    // painting trace labels
-    this.negociateXChart(g2d);
-    int labelHeight = this.paintTraceLabels(g2d);
-    // finding start point of coordinate System.
-    this.m_yChartStart = this.calculateYChartStart(g2d, labelHeight);
-    this.m_yChartEnd = this.calculateYChartEnd(g2d);
-    int rangex = this.m_xChartEnd - this.m_xChartStart;
-    int rangey = this.m_yChartStart - this.m_yChartEnd;
-    this.paintCoordinateSystem(g2d);
-    // paint Traces.
-    int tmpx = 0;
-    int oldtmpx;
-    int tmpy = 0;
-    int oldtmpy;
-    TracePoint2D oldpoint = null;
-    TracePoint2D newpoint = null;
-    TracePoint2D tmppt = null;
-    traceIt = this.getTraces().iterator();
-    Stroke backupStroke = g2d.getStroke();
-    int count = 0;
-    Iterator<ITracePainter> itTracePainters;
-    Iterator<IErrorBarPolicy> itTraceErrorBarPolicies;
-    ITracePainter tracePainter;
-    IErrorBarPolicy errorBarPolicy;
-
-    while (traceIt.hasNext()) {
-      oldpoint = null;
-      newpoint = null;
-      count++;
-      tmpdata = traceIt.next();
-      if (tmpdata.isVisible()) {
-        boolean hasErrorBars = tmpdata.getHasErrorBars();
-        g2d.setStroke(tmpdata.getStroke());
-        g2d.setColor(tmpdata.getColor());
-        synchronized (tmpdata) {
-          if (Chart2D.DEBUG_THREADING) {
-            System.out.println("paint(" + Thread.currentThread().getName()
-                + "), 2 locks (lock on trace " + tmpdata.getName() + ")");
-          }
-          Set<ITracePainter> tracePainters = tmpdata.getTracePainters();
-          itTracePainters = tracePainters.iterator();
-          tracePainter = null;
-          while (itTracePainters.hasNext()) {
-            tracePainter = itTracePainters.next();
-            tracePainter.startPaintIteration(g2d);
-          }
-          errorBarPolicy = null;
-          Set<IErrorBarPolicy> errorBarPolicies = tmpdata.getErrorBarPolicies();
-          itTraceErrorBarPolicies = errorBarPolicies.iterator();
-          while (itTraceErrorBarPolicies.hasNext()) {
-            errorBarPolicy = itTraceErrorBarPolicies.next();
-            errorBarPolicy.startPaintIteration(g2d);
-          }
-          Iterator<TracePoint2D> pointIt = tmpdata.iterator();
-          boolean newpointVisible = false;
-          boolean oldpointVisible = false;
-          while (pointIt.hasNext()) {
-            oldpoint = newpoint;
-            oldtmpx = tmpx;
-            oldtmpy = tmpy;
-            newpoint = pointIt.next();
-            newpointVisible = this.isVisible(newpoint);
-            oldpointVisible = this.isVisible(oldpoint);
-            if (!newpointVisible && !oldpointVisible) {
-              // save for next loop:
-              tmppt = (TracePoint2D) newpoint.clone();
-              int tmptmpx = tmpx;
-              int tmptmpy = tmpy;
-              // check if the interconnection of
-              // both invisible points cuts the visible
-              // area:
-              oldpoint = this.interpolateVisible(oldpoint, newpoint);
-              newpoint = this.interpolateVisible(newpoint, oldpoint);
-              /*
-               * Check if: - both invisible points were interpolated towards the same bound (their
-               * connection did not cross the visible range). - both interpolated points are still
-               * visible.
-               */
-              if (!this.isEqualInterPolationBound(oldpoint, newpoint) && this.isVisible(oldpoint)
-                  && this.isVisible(newpoint)) {
-
-                tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
-                tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
-                oldtmpx = this.m_xChartStart + (int) Math.round(oldpoint.getScaledX() * rangex);
-                oldtmpy = this.m_yChartStart - (int) Math.round(oldpoint.getScaledY() * rangey);
-                this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, tmpdata, g2d, newpoint,
-                    hasErrorBars);
-              }
-              // restore for next loop start:
-              newpoint = tmppt;
-              tmpx = tmptmpx;
-              tmpy = tmptmpy;
-            } else if (newpointVisible && !oldpointVisible) {
-              // entering the visible bounds: interpolate from old point
-              // to new point
-              oldpoint = this.interpolateVisible(oldpoint, newpoint);
-              tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
-              tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
-              oldtmpx = this.m_xChartStart + (int) Math.round(oldpoint.getScaledX() * rangex);
-              oldtmpy = this.m_yChartStart - (int) Math.round(oldpoint.getScaledY() * rangey);
-              this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, tmpdata, g2d, newpoint,
-                  hasErrorBars);
-            } else if (!newpointVisible && oldpointVisible) {
-              // leaving the visible bounds:
-              tmppt = (TracePoint2D) newpoint.clone();
-              newpoint = this.interpolateVisible(newpoint, oldpoint);
-              tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
-              tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
-              this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, tmpdata, g2d, newpoint,
-                  hasErrorBars);
-              // restore for next loop start:
-              newpoint = tmppt;
-            } else {
-              // staying in the visible bounds: just paint
-              tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
-              tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
-              this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, false, tmpdata, g2d, newpoint,
-                  hasErrorBars);
-            }
-          }
-          itTracePainters = tmpdata.getTracePainters().iterator();
-          while (itTracePainters.hasNext()) {
-            tracePainter = itTracePainters.next();
-            tracePainter.endPaintIteration(g2d);
-          }
-          itTraceErrorBarPolicies = tmpdata.getErrorBarPolicies().iterator();
-          while (itTraceErrorBarPolicies.hasNext()) {
-            errorBarPolicy = itTraceErrorBarPolicies.next();
-            errorBarPolicy.endPaintIteration(g2d);
-          }
-        }
-      }
-      if (Chart2D.DEBUG_THREADING) {
-        System.out.println("paint(" + Thread.currentThread().getName() + "), left lock on trace "
-            + tmpdata.getName());
-      }
-    }
-    g2d.setStroke(backupStroke);
-  }
-
-  /**
-   * Paints the axis, the scales and the labels for the chart.
-   * <p>
-   * <b>Caution</b> This is highly coupled code and only factored out for better overview. This
-   * method may only be called by {@link #paint(Graphics)} and the order of this invocation there
-   * must not be changed.
-   * <p>
-   * 
-   * @param g2d
-   *            the graphics context to use.
-   */
-  private void paintCoordinateSystem(final Graphics2D g2d) {
-    // drawing the axes:
-    g2d.setColor(this.getForeground());
-    IAxis currentAxis;
-    // 1) x axes:
-    // 1.1) x axes bottom:
-    Iterator<IAxis> it = this.m_axesXBottom.iterator();
-    while (it.hasNext()) {
-      currentAxis = it.next();
-      currentAxis.paint(g2d);
-    }
-    // 1.2) Top x axes:
-    it = this.m_axesXTop.iterator();
-    while (it.hasNext()) {
-      currentAxis = it.next();
-      currentAxis.paint(g2d);
-    }
-
-    // 2) y axes:
-    // 2.1) y axes left
-    it = this.m_axesYLeft.iterator();
-    while (it.hasNext()) {
-      currentAxis = it.next();
-      currentAxis.paint(g2d);
-    }
-
-    // 2.1) y axes right
-    it = this.m_axesYRight.iterator();
-    while (it.hasNext()) {
-      currentAxis = it.next();
-      currentAxis.paint(g2d);
-    }
-  }
-
-  /**
-   * Internally renders the error bars for the given point for the given trace.
-   * <p>
-   * The current point to render in px is defined by the first two arguments, the next point to
-   * render in px is defined by the 2nd two arguments.
-   * <p>
-   * 
-   * @param trace
-   *            needed to get the {@link IErrorBarPolicy} instances to use.
-   * @param oldtmpx
-   *            the x coordinate of the original point to render an error bar for.
-   * @param oldtmpy
-   *            the y coordinate of the original point to render an error bar for.
-   * @param tmpx
-   *            the x coordinate of the original next point to render an error bar for.
-   * @param tmpy
-   *            the y coordinate of the original next point to render an error bar for.
-   * @param g2d
-   *            the graphics context to use.
-   * @param discontinue
-   *            if a discontinuation has been taken place and all potential cached points by an
-   *            <code>{@link ITracePainter}</code> (done for polyline performance boost) have to
-   *            be drawn immediately before starting a new point caching.
-   * @param original
-   *            intended for information only, should nor be needed to paint the point neither be
-   *            changed in any way!
-   */
-  private void paintErrorBars(final ITrace2D trace, final int oldtmpx, final int oldtmpy,
-      final int tmpx, final int tmpy, final Graphics2D g2d, final boolean discontinue,
-      final TracePoint2D original) {
-    IErrorBarPolicy errorBarPolicy;
-    Iterator<IErrorBarPolicy> itTraceErrorBarPolicies = trace.getErrorBarPolicies().iterator();
-    while (itTraceErrorBarPolicies.hasNext()) {
-      errorBarPolicy = itTraceErrorBarPolicies.next();
-      errorBarPolicy.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, g2d, original);
-      if (discontinue) {
-        errorBarPolicy.discontinue(g2d);
-      }
-    }
-  }
-
-  /**
-   * Internally paints the point with respect to trace painters ({@link ITracePainter}) and error
-   * bar painter ({@link IErrorBarPolicy}) of the trace.
-   * <p>
-   * This method must not be called directly as it does not support interpolation of visibility
-   * bounds (discontinuations).
-   * <p>
-   * 
-   * @param xPxOld
-   *            the x coordinate of the previous point to render in px (potentially an interpolation
-   *            of it if the old point was not visible and the new point is).
-   * @param yPxOld
-   *            the y coordinate of the previous point to render in px (potentially an interpolation
-   *            of it if the old point was not visible and the new point is).
-   * @param xPxNew
-   *            the x coordinate of the point to render in px (potentially an interpolation of it if
-   *            the old point was visible and the new point is not).
-   * @param yPxNew
-   *            the y coordinate of the point to render in px (potentially an interpolation of it if
-   *            the old point was visible and the new point is not).
-   * @param trace
-   *            needed for obtaining trace painters and error bar painters.
-   * @param g2d
-   *            the graphics context to use.
-   * @param discontinue
-   *            if a discontinuation has been taken place and all potential cached points by an
-   *            <code>{@link ITracePainter}</code> (done for polyline performance boost) have to
-   *            be drawn immediately before starting a new point caching.
-   * @param original
-   *            intended for information only, should nor be needed to paint the point neither be
-   *            changed in any way!
-   * @param errorBarSupport
-   *            optimization that allows to skip error bar code.
-   */
-  private final void paintPoint(final int xPxOld, final int yPxOld, final int xPxNew,
-      final int yPxNew, final boolean discontinue, final ITrace2D trace, final Graphics2D g2d,
-      final TracePoint2D original, final boolean errorBarSupport) {
-    Iterator<ITracePainter> itTracePainters;
-    ITracePainter tracePainter;
-    itTracePainters = trace.getTracePainters().iterator();
-    while (itTracePainters.hasNext()) {
-      tracePainter = itTracePainters.next();
-      tracePainter.paintPoint(xPxOld, yPxOld, xPxNew, yPxNew, g2d, original);
-      if (discontinue) {
-        tracePainter.discontinue(g2d);
-      }
-    }
-    if (errorBarSupport) {
-      this.paintErrorBars(trace, xPxOld, yPxOld, xPxNew, yPxNew, g2d, discontinue, original);
-    }
-  }
-
-  /**
-   * Internally paints the labels for the traces below the chart.
-   * <p>
-   * 
-   * @param g2d
-   *            the graphic context to use.
-   * @return the amount of vertical (y) px used for the labels.
-   */
-
-  private int paintTraceLabels(final Graphics2D g2d) {
-    int labelheight = 0;
-    Dimension d = this.getSize();
-    if (this.m_paintLabels) {
-      ITrace2D trace;
-      Iterator<ITrace2D> traceIt = this.getTraces().iterator();
-      int xtmpos = this.m_xChartStart;
-      int ytmpos = (int) d.getHeight() - 2;
-      int remwidth = (int) d.getWidth() - this.m_xChartStart;
-      int allwidth = remwidth;
-      int lblwidth = 0;
-      String tmplabel;
-      boolean crlfdone = false;
-      // finding the font- dimensions in px
-      FontMetrics fontdim = g2d.getFontMetrics();
-      // includes leading space
-      int fontheight = fontdim.getHeight();
-
-      if (traceIt.hasNext()) {
-        labelheight += fontheight;
-      }
-      while (traceIt.hasNext()) {
-        trace = traceIt.next();
-        if (trace.isVisible()) {
-          tmplabel = trace.getLabel();
-          lblwidth = fontdim.stringWidth(tmplabel) + 10;
-          // conditional linebreak.
-          // crlfdone avoids never doing linebreak if all
-          // labels.length()>allwidth
-          if (lblwidth > remwidth) {
-            if (!(lblwidth > allwidth) || (!crlfdone)) {
-              ytmpos -= fontheight;
-              xtmpos = this.m_xChartStart;
-              labelheight += fontheight;
-              crlfdone = true;
-              remwidth = (int) d.getWidth() - this.m_xChartStart;
-            } else {
-              crlfdone = false;
-            }
-          }
-          remwidth -= lblwidth;
-          g2d.setColor(trace.getColor());
-          g2d.drawString(tmplabel, xtmpos, ytmpos);
-          xtmpos += lblwidth;
-        }
-      }
-    }
-    return labelheight;
-  }
-
-  /**
-   * Receives all <code>{@link PropertyChangeEvent}</code> from all instances the chart registers
-   * itself as a <code>{@link PropertyChangeListener}</code>.
+   * Receives all <code>{@link PropertyChangeEvent}</code> from all instances
+   * the chart registers itself as a <code>{@link PropertyChangeListener}</code>
+   * .
    * <p>
    * 
    * @param evt
-   *            the property change event that was fired.
+   *          the property change event that was fired.
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
   public void propertyChange(final PropertyChangeEvent evt) {
@@ -1868,16 +1405,17 @@ public class Chart2D
         // nop
       } else if (property.equals(ITrace2D.PROPERTY_STROKE)) {
         /*
-         * TODO: perhaps react more fine grained for the following events: just repaint the trace
-         * without all the paint code (scaling, axis,...). But: These property changes are triggered
-         * by humans and occur very seldom. Huge work non-l&f performance improvement.
+         * TODO: perhaps react more fine grained for the following events: just
+         * repaint the trace without all the paint code (scaling, axis,...).
+         * But: These property changes are triggered by humans and occur very
+         * seldom. Huge work non-l&f performance improvement.
          */
       } else if (property.equals(ITrace2D.PROPERTY_COLOR)) {
         // nop
       } else if (property.equals(IAxis.PROPERTY_LABELFORMATTER)) {
         /*
-         * TODO: Maybe only repaint the axis? Much complicated work vs. occassional user
-         * interaction.
+         * TODO: Maybe only repaint the axis? Much complicated work vs.
+         * occassional user interaction.
          */
       } else if (property.equals(IAxis.PROPERTY_ADD_REMOVE_TRACE)) {
         // repaint definetely!
@@ -1889,15 +1427,16 @@ public class Chart2D
   /**
    * Convenience method to remove all traces from this chart.
    * <p>
-   * This method is broken down to every axis contained in the trace and will fire a
-   * <code>{@link PropertyChangeEvent}</code> for the
-   * <code>{@link PropertyChangeEvent#getPropertyName()}</code> 
-   * <code>{@link IAxis#PROPERTY_ADD_REMOVE_TRACE}</code>
-   * for every single trace removed to <code>{@link PropertyChangeListener}</code> of the
-   * corresponding axes.
+   * This method is broken down to every axis contained in the trace and will
+   * fire a <code>{@link PropertyChangeEvent}</code> for the
+   * <code>{@link PropertyChangeEvent#getPropertyName()}</code>
+   * <code>{@link IAxis#PROPERTY_ADD_REMOVE_TRACE}</code> for every single trace
+   * removed to <code>{@link PropertyChangeListener}</code> of the corresponding
+   * axes.
    * <p>
    * 
-   * @return a non-original-backed set of distinct traces that was contained in this chart before.
+   * @return a non-original-backed set of distinct traces that was contained in
+   *         this chart before.
    */
   public Set<ITrace2D> removeAllTraces() {
 
@@ -1922,8 +1461,8 @@ public class Chart2D
       axisTraces.clear();
     }
     /*
-     * We skip "result.addAll(...) for y axes as by contract every trace has to be at least in one x
-     * axis (not logical if trace is e.g. in y axes only).
+     * We skip "result.addAll(...) for y axes as by contract every trace has to
+     * be at least in one x axis (not logical if trace is e.g. in y axes only).
      */
     // 2.1) axes y left:
     it = this.m_axesYLeft.iterator();
@@ -1951,9 +1490,10 @@ public class Chart2D
    * <p>
    * 
    * @param axisX
-   *            the bottom x axis to remove.
-   * @return true if the given axis was successfully removed or false if it was not configured as a
-   *         bottom x axis before or could not be removed for another reason.
+   *          the bottom x axis to remove.
+   * @return true if the given axis was successfully removed or false if it was
+   *         not configured as a bottom x axis before or could not be removed
+   *         for another reason.
    */
   public boolean removeAxisXBottom(final IAxis axisX) {
     boolean result = this.m_axesXBottom.remove(axisX);
@@ -1972,9 +1512,10 @@ public class Chart2D
    * <p>
    * 
    * @param axisX
-   *            the top x axis to remove.
-   * @return true if the given axis was successfully removed or false if it was not configured as a
-   *         top x axis before or could not be removed for another reason.
+   *          the top x axis to remove.
+   * @return true if the given axis was successfully removed or false if it was
+   *         not configured as a top x axis before or could not be removed for
+   *         another reason.
    */
   public boolean removeAxisXTop(final IAxis axisX) {
     boolean result = this.m_axesXTop.remove(axisX);
@@ -1993,9 +1534,10 @@ public class Chart2D
    * <p>
    * 
    * @param axisY
-   *            the left y axis to remove.
-   * @return true if the given axis was successfully removed or false if it was not configured as a
-   *         left y axis before or could not be removed for another reason.
+   *          the left y axis to remove.
+   * @return true if the given axis was successfully removed or false if it was
+   *         not configured as a left y axis before or could not be removed for
+   *         another reason.
    */
   public boolean removeAxisYLeft(final IAxis axisY) {
 
@@ -2014,9 +1556,10 @@ public class Chart2D
    * <p>
    * 
    * @param axisY
-   *            the right y axis to remove.
-   * @return true if the given axis was successfully removed or false if it was not configured as a
-   *         right y axis before or could not be removed for another reason.
+   *          the right y axis to remove.
+   * @return true if the given axis was successfully removed or false if it was
+   *         not configured as a right y axis before or could not be removed for
+   *         another reason.
    */
   public boolean removeAxisYRight(final IAxis axisY) {
     boolean result = this.m_axesYRight.remove(axisY);
@@ -2030,17 +1573,18 @@ public class Chart2D
   }
 
   /**
-   * Removes the given instance from this <code>Chart2D</code> if it is contained.
+   * Removes the given instance from this <code>Chart2D</code> if it is
+   * contained.
    * <p>
-   * This method will trigger a {@link java.beans.PropertyChangeEvent} being fired on all instances
-   * registered by
+   * This method will trigger a {@link java.beans.PropertyChangeEvent} being
+   * fired on all instances registered by
    * {@link javax.swing.JComponent#addPropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)}
-   * (registered with <code>String</code> argument {@link IAxis#PROPERTY_ADD_REMOVE_TRACE} on the
-   * internal axes).
+   * (registered with <code>String</code> argument
+   * {@link IAxis#PROPERTY_ADD_REMOVE_TRACE} on the internal axes).
    * <p>
    * 
    * @param points
-   *            the trace to remove.
+   *          the trace to remove.
    * @see IAxis#PROPERTY_ADD_REMOVE_TRACE
    */
   public final void removeTrace(final ITrace2D points) {
@@ -2109,6 +1653,8 @@ public class Chart2D
    * @deprecated use {@link #setRequestedRepaint(boolean)}.
    * @see java.awt.Component#repaint()
    */
+  @Override
+  @Deprecated
   public void repaint() {
     super.repaint();
   }
@@ -2117,6 +1663,8 @@ public class Chart2D
    * @deprecated use {@link #setRequestedRepaint(boolean)}.
    * @see java.awt.Component#repaint(int, int, int, int)
    */
+  @Override
+  @Deprecated
   public void repaint(final int x, final int y, final int width, final int height) {
     super.repaint(x, y, width, height);
   }
@@ -2125,6 +1673,8 @@ public class Chart2D
    * @deprecated use {@link #setRequestedRepaint(boolean)}.
    * @see java.awt.Component#repaint(long)
    */
+  @Override
+  @Deprecated
   public void repaint(final long tm) {
     super.repaint(tm);
   }
@@ -2133,6 +1683,8 @@ public class Chart2D
    * @deprecated use {@link #setRequestedRepaint(boolean)}.
    * @see javax.swing.JComponent#repaint(long, int, int, int, int)
    */
+  @Override
+  @Deprecated
   public void repaint(final long tm, final int x, final int y, final int width, final int height) {
     super.repaint(tm, x, y, width, height);
   }
@@ -2141,8 +1693,19 @@ public class Chart2D
    * @deprecated use {@link #setRequestedRepaint(boolean)}.
    * @see javax.swing.JComponent#repaint(java.awt.Rectangle)
    */
+  @Override
+  @Deprecated
   public void repaint(final Rectangle r) {
     super.repaint(r);
+  }
+
+  /**
+   * Only intended for <code>{@link Chart2DActionPrintSingleton}</code>.
+   * <p>
+   */
+  public void resetPrintMode() {
+    this.m_pageFormat = null;
+    this.setRequestedRepaint(true);
   }
 
   /**
@@ -2150,7 +1713,7 @@ public class Chart2D
    * <p>
    * 
    * @param tickPainter
-   *            The axis tick painter to set.
+   *          The axis tick painter to set.
    */
   public synchronized void setAxisTickPainter(final IAxisTickPainter tickPainter) {
     this.m_axisTickPainter = tickPainter;
@@ -2159,17 +1722,18 @@ public class Chart2D
   /**
    * Sets the first bottom x axis to use.
    * <p>
-   * This is compatiblity support for the API of jchart2d prior to 3.0.0 where only one x axis was
-   * supported.
+   * This is compatiblity support for the API of jchart2d prior to 3.0.0 where
+   * only one x axis was supported.
    * <p>
    * 
    * @deprecated use <code>{@link #setAxisXBottom(AAxis)}</code> instead.
    * @see #setAxisXBottom(AAxis)
    * @param axisX
-   *            the first bottom x axis to use.
-   * @return a copied List with the previous bottom x <code>{@link IAxis}</code> instances that
-   *         were used.
+   *          the first bottom x axis to use.
+   * @return a copied List with the previous bottom x <code>{@link IAxis}</code>
+   *         instances that were used.
    */
+  @Deprecated
   public List<IAxis> setAxisX(final AAxis axisX) {
     return this.setAxisXBottom(axisX);
   }
@@ -2177,19 +1741,19 @@ public class Chart2D
   /**
    * Sets the first bottom x axis to use.
    * <p>
-   * The <code>{@link ITrace2D}</code> intances contained in the previous x bottom axes will be
-   * implanted to this new axis.
+   * The <code>{@link ITrace2D}</code> intances contained in the previous x
+   * bottom axes will be implanted to this new axis.
    * <p>
    * 
    * @param axisX
-   *            the first bottom x axis to use.
-   * @return a copied List with the previous bottom x <code>{@link AAxis}</code> instances that
-   *         were used.
+   *          the first bottom x axis to use.
+   * @return a copied List with the previous bottom x <code>{@link AAxis}</code>
+   *         instances that were used.
    */
   public List<IAxis> setAxisXBottom(final AAxis axisX) {
     /*
-     * cannot iterate over this.m_axexBottom or concurrent modification exception will occur (remove
-     * within).
+     * cannot iterate over this.m_axexBottom or concurrent modification
+     * exception will occur (remove within).
      */
     List<IAxis> result = new LinkedList<IAxis>(this.m_axesXBottom);
     IAxis old = null;
@@ -2202,8 +1766,8 @@ public class Chart2D
       old = itAxesBottom.next();
       traces = old.getTraces();
       /*
-       * add the traces: this has to be after adding axis to avoid npe in addTrace as no chart is
-       * set!
+       * add the traces: this has to be after adding axis to avoid npe in
+       * addTrace as no chart is set!
        */
       for (ITrace2D trace : traces) {
         axisX.addTrace(trace);
@@ -2218,19 +1782,19 @@ public class Chart2D
   /**
    * Sets the first and only top x axis to use.
    * <p>
-   * The <code>{@link ITrace2D}</code> intances contained in the previous x top axes will be
-   * implanted to this new axis.
+   * The <code>{@link ITrace2D}</code> intances contained in the previous x top
+   * axes will be implanted to this new axis.
    * <p>
    * 
    * @param axisX
-   *            the first top x axis to use.
-   * @return a copied List with the previous top x <code>{@link AAxis}</code> instances that were
-   *         used.
+   *          the first top x axis to use.
+   * @return a copied List with the previous top x <code>{@link AAxis}</code>
+   *         instances that were used.
    */
   public List<IAxis> setAxisXTop(final AAxis axisX) {
     /*
-     * Cannot iterate over this.m_axexTop concurrent modification exception will occur (remove
-     * within)
+     * Cannot iterate over this.m_axexTop concurrent modification exception will
+     * occur (remove within)
      */
     List<IAxis> result = new LinkedList<IAxis>(this.m_axesXTop);
     IAxis old = null;
@@ -2257,17 +1821,18 @@ public class Chart2D
   /**
    * Sets the first and only left y axis to use.
    * <p>
-   * This is compatiblity support for the API of jchart2d prior to 3.0.0 where only one y axis was
-   * supported.
+   * This is compatiblity support for the API of jchart2d prior to 3.0.0 where
+   * only one y axis was supported.
    * <p>
    * 
    * @deprecated use <code>{@link #setAxisYLeft(AAxis)}</code> instead.
    * @see #setAxisYLeft(AAxis)
    * @param axisY
-   *            the first left y axis to use.
-   * @return a copied List with the previous left y <code>{@link AAxis}</code> instances that were
-   *         used.
+   *          the first left y axis to use.
+   * @return a copied List with the previous left y <code>{@link AAxis}</code>
+   *         instances that were used.
    */
+  @Deprecated
   public List<IAxis> setAxisY(final AAxis axisY) {
     return this.setAxisYLeft(axisY);
   }
@@ -2275,12 +1840,12 @@ public class Chart2D
   /**
    * Sets the first and only left y axis to use.
    * <p>
-   * The <code>{@link ITrace2D}</code> intances contained in the previous y left axes will be
-   * implanted to this new axis.
+   * The <code>{@link ITrace2D}</code> intances contained in the previous y left
+   * axes will be implanted to this new axis.
    * <p>
    * 
    * @param axisY
-   *            the first left y axis to use.
+   *          the first left y axis to use.
    * @return a copied List with the previous left y axes that were used.
    */
 
@@ -2312,12 +1877,12 @@ public class Chart2D
   /**
    * Sets the first and only right y axis to use.
    * <p>
-   * The <code>{@link ITrace2D}</code> intances contained in the previous y right axes will be
-   * implanted to this new axis.
+   * The <code>{@link ITrace2D}</code> intances contained in the previous y
+   * right axes will be implanted to this new axis.
    * <p>
    * 
    * @param axisY
-   *            the first and only right y axis to use.
+   *          the first and only right y axis to use.
    * @return a copied List with the previous right y axes that were used.
    */
   public List<IAxis> setAxisYRight(final AAxis axisY) {
@@ -2328,8 +1893,8 @@ public class Chart2D
     this.addAxisYRight(axisY);
 
     /*
-     * cannot iterate over this.m_axexYRight or concurrent modification exception will occur (remove
-     * within)
+     * cannot iterate over this.m_axexYRight or concurrent modification
+     * exception will occur (remove within)
      */
     Iterator<IAxis> itAxexYRight = result.iterator();
     while (itAxexYRight.hasNext()) {
@@ -2337,8 +1902,8 @@ public class Chart2D
       this.removeAxisYRight(old);
       traces = old.getTraces();
       /*
-       * Add the traces: this has to be after adding axis to avoid npe in addTrace as no chart is
-       * set!
+       * Add the traces: this has to be after adding axis to avoid npe in
+       * addTrace as no chart is set!
        */
       for (ITrace2D trace : traces) {
         axisY.addTrace(trace);
@@ -2352,6 +1917,7 @@ public class Chart2D
   /**
    * @see java.awt.Component#setBackground(java.awt.Color)
    */
+  @Override
   public void setBackground(final Color bg) {
     Color old = this.getBackground();
     super.setBackground(bg);
@@ -2361,6 +1927,7 @@ public class Chart2D
   /**
    * @see java.awt.Component#setForeground(java.awt.Color)
    */
+  @Override
   public void setForeground(final Color fg) {
     Color old = this.getForeground();
     super.setForeground(fg);
@@ -2372,7 +1939,7 @@ public class Chart2D
    * <p>
    * 
    * @param gridclr
-   *            the grid color to use.
+   *          the grid color to use.
    */
   public final void setGridColor(final Color gridclr) {
     if (gridclr != null) {
@@ -2386,13 +1953,14 @@ public class Chart2D
   }
 
   /**
-   * Sets the ms to give a repaint operation time for collecting several repaint requests into one
-   * (performance vs. update speed).
+   * Sets the ms to give a repaint operation time for collecting several repaint
+   * requests into one (performance vs. update speed).
    * <p>
    * 
    * @param minPaintLatency
-   *            the setting for the ms to give a repaint operation time for collecting several
-   *            repaint requests into one (performance vs. update speed).
+   *          the setting for the ms to give a repaint operation time for
+   *          collecting several repaint requests into one (performance vs.
+   *          update speed).
    */
   public synchronized void setMinPaintLatency(final int minPaintLatency) {
     this.m_minPaintLatency = minPaintLatency;
@@ -2400,12 +1968,12 @@ public class Chart2D
   }
 
   /**
-   * Decide wether labels for each chart are painted below it. If set to true this will be done,
-   * else labels will be ommited.
+   * Decide wether labels for each chart are painted below it. If set to true
+   * this will be done, else labels will be ommited.
    * <p>
    * 
    * @param paintLabels
-   *            the value for paintLabels to set.
+   *          the value for paintLabels to set.
    */
   public void setPaintLabels(final boolean paintLabels) {
     final boolean change = this.m_paintLabels != paintLabels;
@@ -2418,44 +1986,55 @@ public class Chart2D
   }
 
   /**
+   * @param pointHighlighter
+   *          the pointHighlighter to set
+   */
+  public final void setPointHighlighter(final IPointPainter pointHighlighter) {
+    this.m_pointHighlighter = pointHighlighter;
+  }
+
+  /**
    * Sets the requestedRepaint.
    * <p>
-   * Internal method to request a repaint that guarantees that two invocations of <code></code>
-   * will always have at least have an interval of <code>{@link Chart2D#getMinPaintLatency()}</code>
-   * ms.
+   * Internal method to request a repaint that guarantees that two invocations
+   * of <code></code> will always have at least have an interval of
+   * <code>{@link Chart2D#getMinPaintLatency()}</code> ms.
    * <p>
    * Methods <code>{@link Chart2D#repaint()}, {@link Chart2D#repaint(long)}, 
    * {@link Chart2D#repaint(Rectangle)}, {@link Chart2D#repaint(int, int, int, int)} 
-   * and {@link Chart2D#repaint(long, int, int, int, int)}</code>
-   * must not be called from application code that has to inform the UI to update the chart directly
-   * or a performance problem may arise as java awt / swing implementation does not guarantee to
-   * collapse several repaint requests into a single one but prefers to issue many paint invocations
-   * causing a high CPU load in realtime scenarios (adding several 100 points per second to a
+   * and {@link Chart2D#repaint(long, int, int, int, int)}</code> must not be
+   * called from application code that has to inform the UI to update the chart
+   * directly or a performance problem may arise as java awt / swing
+   * implementation does not guarantee to collapse several repaint requests into
+   * a single one but prefers to issue many paint invocations causing a high CPU
+   * load in realtime scenarios (adding several 100 points per second to a
    * chart).
    * <p>
    * Only the internal timer may invoke the methods mentioned above.
    * <p>
    * 
    * @param requestedRepaint
-   *            the requestedRepaint to set.
+   *          the requestedRepaint to set.
    */
   public final synchronized void setRequestedRepaint(final boolean requestedRepaint) {
     this.m_requestedRepaint = requestedRepaint;
   }
 
   /**
-   * Sets the chart that will be synchronized for finding the start coordinate of this chart to draw
-   * in x dimension (<code>{@link #getXChartStart()}</code>).
+   * Sets the chart that will be synchronized for finding the start coordinate
+   * of this chart to draw in x dimension (<code>{@link #getXChartStart()}
+   * </code>).
    * <p>
-   * This feature is used to allow two separate charts to be painted stacked in y dimension (one
-   * below the other) that have different x start coordinates (because of different y labels that
-   * shift that value) with an equal starting x value (thus be comparable visually if their x values
-   * match).
+   * This feature is used to allow two separate charts to be painted stacked in
+   * y dimension (one below the other) that have different x start coordinates
+   * (because of different y labels that shift that value) with an equal
+   * starting x value (thus be comparable visually if their x values match).
    * <p>
    * 
    * @param synchronizedXStartChart
-   *            the chart that will be synchronized for finding the start coordinate of this chart
-   *            to draw in x dimension (<code>{@link #getXChartStart()}</code>).
+   *          the chart that will be synchronized for finding the start
+   *          coordinate of this chart to draw in x dimension (<code>
+   *          {@link #getXChartStart()}</code>).
    */
   public void setSynchronizedXStartChart(final Chart2D synchronizedXStartChart) {
     this.m_synchronizedXStartChart = synchronizedXStartChart;
@@ -2464,18 +2043,22 @@ public class Chart2D
   }
 
   /**
-   * Set wether this component should display the chart coordinates as a tool tip.
+   * Set wether this component should display the chart coordinates as a tool
+   * tip.
    * <p>
    * This turns on tool tip support (like
-   * {@link javax.swing.JComponent#setToolTipText(java.lang.String)}) if neccessary.
+   * {@link javax.swing.JComponent#setToolTipText(java.lang.String)}) if
+   * neccessary.
    * <p>
    * 
-   * @deprecated use
-   *             <code>{@link #setToolTipType(info.monitorenter.gui.chart.Chart2D.ToolTipType)}</code>
-   *             with <code>{@link ToolTipType#DATAVALUES}</code> instead.
+   * @deprecated use <code>
+   *             {@link #setToolTipType(info.monitorenter.gui.chart.Chart2D.ToolTipType)}
+   *             </code> with <code>{@link ToolTipType#DATAVALUES}</code>
+   *             instead.
    * @param toolTipCoords
-   *            The toolTipCoords to set.
+   *          The toolTipCoords to set.
    */
+  @Deprecated
   public final void setToolTipCoords(final boolean toolTipCoords) {
     this.setToolTipType(Chart2D.ToolTipType.DATAVALUES);
   }
@@ -2487,7 +2070,7 @@ public class Chart2D
    * <p>
    * 
    * @param toolTipType
-   *            one of the available <code>{@link ToolTipType}</code> constants.
+   *          one of the available <code>{@link ToolTipType}</code> constants.
    */
   public final void setToolTipType(final Chart2D.ToolTipType toolTipType) {
     if (toolTipType == Chart2D.ToolTipType.NONE) {
@@ -2502,21 +2085,26 @@ public class Chart2D
   }
 
   /**
-   * Returns a BufferedImage with the current width and height of the chart filled with the
-   * Chart2D's graphics that may be written to a file or OutputStream by using:
-   * {@link javax.imageio.ImageIO#write(java.awt.image.RenderedImage, java.lang.String, java.io.File)}.
+   * Returns a BufferedImage with the current width and height of the chart
+   * filled with the Chart2D's graphics that may be written to a file or
+   * OutputStream by using:
+   * {@link javax.imageio.ImageIO#write(java.awt.image.RenderedImage, java.lang.String, java.io.File)}
+   * .
    * <p>
-   * If the width and height of this chart is zero (this happens when the chart has not been
-   * {@link javax.swing.JComponent#setVisible(boolean)}, the chart was not integrated into layout
-   * correctly or the chart's dimenision was set to this value, a default of width 600 and height
-   * 400 will temporarily be set (syncrhonized), the image will be rendered, the old dimension will
-   * be reset and the image will be returned.<br/> If you want to paint offscreen images (without
-   * displayed chart) prefer invoke {@link #snapShot(int, int)} instead.
+   * If the width and height of this chart is zero (this happens when the chart
+   * has not been {@link javax.swing.JComponent#setVisible(boolean)}, the chart
+   * was not integrated into layout correctly or the chart's dimenision was set
+   * to this value, a default of width 600 and height 400 will temporarily be
+   * set (syncrhonized), the image will be rendered, the old dimension will be
+   * reset and the image will be returned.<br/> If you want to paint offscreen
+   * images (without displayed chart) prefer invoke {@link #snapShot(int, int)}
+   * instead.
    * <p>
    * 
-   * @return a BufferedImage of the Chart2D's graphics that may be written to a file or
-   *         OutputStream.
-   * @since 1.03 - please download versions equal or greater than jchart2d-1.03.jar.
+   * @return a BufferedImage of the Chart2D's graphics that may be written to a
+   *         file or OutputStream.
+   * @since 1.03 - please download versions equal or greater than
+   *        jchart2d-1.03.jar.
    */
   public BufferedImage snapShot() {
     int width = this.getWidth();
@@ -2529,18 +2117,20 @@ public class Chart2D
   }
 
   /**
-   * Returns a BufferedImage with the given width and height that is filled with tChart2D's graphics
-   * that may be written to a file or OutputStream by using:
-   * {@link javax.imageio.ImageIO#write(java.awt.image.RenderedImage, java.lang.String, java.io.File)}.
+   * Returns a BufferedImage with the given width and height that is filled with
+   * tChart2D's graphics that may be written to a file or OutputStream by using:
+   * {@link javax.imageio.ImageIO#write(java.awt.image.RenderedImage, java.lang.String, java.io.File)}
+   * .
    * <p>
    * 
    * @param width
-   *            the width of the image to create.
+   *          the width of the image to create.
    * @param height
-   *            the height of the image to create.
-   * @return a BufferedImage of the Chart2D's graphics that may be written to a file or
-   *         OutputStream.
-   * @since 1.03 - please download versions equal or greater than jchart2d-1.03.jar.
+   *          the height of the image to create.
+   * @return a BufferedImage of the Chart2D's graphics that may be written to a
+   *         file or OutputStream.
+   * @since 1.03 - please download versions equal or greater than
+   *        jchart2d-1.03.jar.
    */
   public BufferedImage snapShot(final int width, final int height) {
 
@@ -2562,6 +2152,7 @@ public class Chart2D
   /**
    * @see java.lang.Object#toString()
    */
+  @Override
   public String toString() {
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("toString(), " + Thread.currentThread().getName() + ", 0 locks");
@@ -2572,19 +2163,22 @@ public class Chart2D
   }
 
   /**
-   * Returns the translation of the mouse event coordinates of the given mouse event to the value
-   * within the chart.
+   * Returns the translation of the mouse event coordinates of the given mouse
+   * event to the value within the chart.
    * <p>
    * Note that the mouse event has to be an event fired on this component!
    * <p>
+   * Note that the returned tracepoint is not a real trace point of a trace but
+   * just used as a container here.
+   * <p>
    * 
    * @param mouseEvent
-   *            a mouse event that has been fired on this component.
-   * @return the translation of the mouse event coordinates of the given mouse event to the value
-   *         within the chart or null if no calculations could be performed as the chart was not
-   *         painted before.
+   *          a mouse event that has been fired on this component.
+   * @return the translation of the mouse event coordinates of the given mouse
+   *         event to the value within the chart or null if no calculations
+   *         could be performed as the chart was not painted before.
    * @throws IllegalArgumentException
-   *             if the given mouse event does not belong to this component.
+   *           if the given mouse event does not belong to this component.
    */
   public TracePoint2D translateMousePosition(final MouseEvent mouseEvent)
       throws IllegalArgumentException {
@@ -2601,11 +2195,814 @@ public class Chart2D
   }
 
   /**
-   * Helper that removes this chart as a listener from the required property change events.
+   * Cleanup when this instance is dropped.
+   * <p>
+   * 
+   * @see java.lang.Object#finalize()
+   * @throws Throwable
+   *           if a finalizer of a superclass fails.
+   */
+  @Override
+  protected void finalize() throws Throwable {
+    super.finalize();
+    this.destroy();
+  }
+
+  /**
+   * Returns the requestedRepaint.
+   * <p>
+   * 
+   * @return the requestedRepaint
+   */
+  protected synchronized boolean isRequestedRepaint() {
+    return this.m_requestedRepaint;
+  }
+
+  /**
+   * A basic rule of a JComponent is: <br>
+   * <b>Never invoke this method directly. </b> <br>
+   * See the description of <code>
+   * {@link javax.swing.JComponent#paintComponent(java.awt.Graphics)}</code> for
+   * details.
+   * <p>
+   * If you do invoke this method you may encounter performance issues,
+   * flickering UI and even deadlocks.
+   * <p>
+   * 
+   * @param g
+   *          the graphics context to use.
+   */
+  @Override
+  protected synchronized void paintComponent(final Graphics g) {
+    super.paintComponent(g);
+    if (Chart2D.DEBUG_THREADING) {
+      System.out.println("paint, 1 lock");
+    }
+    // printing ?
+    if (this.m_pageFormat != null) {
+      /*
+       * User (0,0) is typically outside the imageable area, so we must
+       * translate by the X and Y values in the PageFormat to avoid clipping
+       */
+      Graphics2D g2d = (Graphics2D) g;
+      double startX = this.m_pageFormat.getImageableX();
+      double startY = this.m_pageFormat.getImageableY();
+      g2d.translate(startX, startY);
+    }
+    this.updateScaling(false);
+    // Some operations (e.g. stroke) need Graphics2d
+    // will be used in several iterations.
+    ITrace2D tmpdata;
+    Iterator<ITrace2D> traceIt;
+    // painting trace labels
+    this.negociateXChart(g);
+    int labelHeight = this.paintTraceLabels(g);
+    // finding start point of coordinate System.
+    this.m_yChartStart = this.calculateYChartStart(g, labelHeight);
+    this.m_yChartEnd = this.calculateYChartEnd(g);
+    int rangex = this.m_xChartEnd - this.m_xChartStart;
+    int rangey = this.m_yChartStart - this.m_yChartEnd;
+    this.paintCoordinateSystem(g);
+    // paint Traces.
+    int tmpx = 0;
+    int oldtmpx;
+    int tmpy = 0;
+    int oldtmpy;
+    TracePoint2D oldpoint = null;
+    TracePoint2D newpoint = null;
+    TracePoint2D tmppt = null;
+    traceIt = this.getTraces().iterator();
+    Graphics2D g2d = null;
+    Stroke backupStroke = null;
+    boolean strokeSupport = g instanceof Graphics2D;
+    if (strokeSupport) {
+      g2d = (Graphics2D) g;
+      backupStroke = g2d.getStroke();
+    }
+
+    int count = 0;
+    Iterator<ITracePainter> itTracePainters;
+    Iterator<IErrorBarPolicy> itTraceErrorBarPolicies;
+    ITracePainter tracePainter;
+    IErrorBarPolicy errorBarPolicy;
+    while (traceIt.hasNext()) {
+      oldpoint = null;
+      newpoint = null;
+      count++;
+      tmpdata = traceIt.next();
+      if (tmpdata.isVisible()) {
+        boolean hasErrorBars = tmpdata.getHasErrorBars();
+        if (strokeSupport) {
+          g2d.setStroke(tmpdata.getStroke());
+        }
+        g.setColor(tmpdata.getColor());
+        synchronized (tmpdata) {
+          if (Chart2D.DEBUG_THREADING) {
+            System.out.println("paint(" + Thread.currentThread().getName()
+                + "), 2 locks (lock on trace " + tmpdata.getName() + ")");
+          }
+          Set<ITracePainter> tracePainters = tmpdata.getTracePainters();
+          itTracePainters = tracePainters.iterator();
+          tracePainter = null;
+          while (itTracePainters.hasNext()) {
+            tracePainter = itTracePainters.next();
+            tracePainter.startPaintIteration(g);
+          }
+          errorBarPolicy = null;
+          Set<IErrorBarPolicy> errorBarPolicies = tmpdata.getErrorBarPolicies();
+          itTraceErrorBarPolicies = errorBarPolicies.iterator();
+          while (itTraceErrorBarPolicies.hasNext()) {
+            errorBarPolicy = itTraceErrorBarPolicies.next();
+            errorBarPolicy.startPaintIteration(g);
+          }
+          Iterator<TracePoint2D> pointIt = tmpdata.iterator();
+          boolean newpointVisible = false;
+          boolean oldpointVisible = false;
+          while (pointIt.hasNext()) {
+            oldpoint = newpoint;
+            oldtmpx = tmpx;
+            oldtmpy = tmpy;
+            newpoint = pointIt.next();
+            newpointVisible = this.isVisible(newpoint);
+            oldpointVisible = this.isVisible(oldpoint);
+            if (!newpointVisible && !oldpointVisible) {
+              // save for next loop:
+              tmppt = (TracePoint2D) newpoint.clone();
+              int tmptmpx = tmpx;
+              int tmptmpy = tmpy;
+              /*
+               * check if the interconnection of both invisible points cuts the
+               * visible area:
+               */
+              oldpoint = this.interpolateVisible(oldpoint, newpoint);
+              newpoint = this.interpolateVisible(newpoint, oldpoint);
+              /*
+               * Check if: - both invisible points were interpolated towards the
+               * same bound (their connection did not cross the visible range).
+               * - both interpolated points are still visible.
+               */
+              if (!this.isEqualInterPolationBound(oldpoint, newpoint) && this.isVisible(oldpoint)
+                  && this.isVisible(newpoint)) {
+
+                tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
+                tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
+                oldtmpx = this.m_xChartStart + (int) Math.round(oldpoint.getScaledX() * rangex);
+                oldtmpy = this.m_yChartStart - (int) Math.round(oldpoint.getScaledY() * rangey);
+                this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, tmpdata, g, newpoint,
+                    hasErrorBars);
+              }
+              // restore for next loop start:
+              newpoint = tmppt;
+              tmpx = tmptmpx;
+              tmpy = tmptmpy;
+            } else if (newpointVisible && !oldpointVisible) {
+              // entering the visible bounds: interpolate from old point
+              // to new point
+              oldpoint = this.interpolateVisible(oldpoint, newpoint);
+              tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
+              tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
+              oldtmpx = this.m_xChartStart + (int) Math.round(oldpoint.getScaledX() * rangex);
+              oldtmpy = this.m_yChartStart - (int) Math.round(oldpoint.getScaledY() * rangey);
+              this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, tmpdata, g, newpoint,
+                  hasErrorBars);
+            } else if (!newpointVisible && oldpointVisible) {
+              // leaving the visible bounds:
+              tmppt = (TracePoint2D) newpoint.clone();
+              newpoint = this.interpolateVisible(newpoint, oldpoint);
+              tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
+              tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
+              this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, tmpdata, g, newpoint,
+                  hasErrorBars);
+              // restore for next loop start:
+              newpoint = tmppt;
+            } else {
+              // staying in the visible bounds: just paint
+              tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
+              tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
+              this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, false, tmpdata, g, newpoint,
+                  hasErrorBars);
+            }
+          }
+          itTracePainters = tmpdata.getTracePainters().iterator();
+          while (itTracePainters.hasNext()) {
+            tracePainter = itTracePainters.next();
+            tracePainter.endPaintIteration(g);
+          }
+          itTraceErrorBarPolicies = tmpdata.getErrorBarPolicies().iterator();
+          while (itTraceErrorBarPolicies.hasNext()) {
+            errorBarPolicy = itTraceErrorBarPolicies.next();
+            errorBarPolicy.endPaintIteration(g);
+          }
+        }
+      }
+      if (Chart2D.DEBUG_THREADING) {
+        System.out.println("paint(" + Thread.currentThread().getName() + "), left lock on trace "
+            + tmpdata.getName());
+      }
+    }
+    if (strokeSupport) {
+      g2d.setStroke(backupStroke);
+    }
+
+  }
+
+  /**
+   * Calculates the end x coordinate (right bound) in pixel of the chart to
+   * draw.
+   * <p>
+   * This value depends on the current <code>{@link FontMetrics}</code> used to
+   * paint the x labels and the maximum amount of characters that are used for
+   * the x labels (<code>{@link IAxisLabelFormatter#getMaxAmountChars()}</code>)
+   * because an x label may occur on the right edge of the chart and should not
+   * be clipped.
+   * <p>
+   * 
+   * @param g2d
+   *          needed for size informations.
+   * @return the end x coordinate (right bound) in pixel of the chart to draw.
+   */
+  private int calculateXChartEnd(final Graphics g2d) {
+    int result;
+    result = (int) this.getSize().getWidth();
+
+    IAxis currentAxis;
+    int axisWidth = 0;
+    if (this.m_axesYRight.size() > 0) {
+      ListIterator<IAxis> it = this.m_axesYRight.listIterator(this.m_axesYRight.size());
+      while (it.hasPrevious()) {
+        currentAxis = it.previous();
+        axisWidth = currentAxis.getWidth(g2d);
+        currentAxis.setPixelXRight(result);
+        result = result - axisWidth;
+        currentAxis.setPixelXLeft(result);
+      }
+    } else {
+      // use the maximum label width of the x axes to avoid x labels
+      // being clipped in case there are no right y axes:
+      Iterator<IAxis> it = this.m_axesXBottom.iterator();
+      int xAxesMaxLabelWidth = 0;
+      int tmp;
+      while (it.hasNext()) {
+        currentAxis = it.next();
+        tmp = currentAxis.getWidth(g2d);
+        if (tmp > xAxesMaxLabelWidth) {
+          xAxesMaxLabelWidth = tmp;
+        }
+      }
+      it = this.m_axesXTop.iterator();
+      while (it.hasNext()) {
+        currentAxis = it.next();
+        tmp = currentAxis.getWidth(g2d);
+        if (tmp > xAxesMaxLabelWidth) {
+          xAxesMaxLabelWidth = tmp;
+        }
+      }
+      result = result - xAxesMaxLabelWidth;
+    }
+
+    return result;
+  }
+
+  /**
+   * Calculates the start x coordinate (left bound) in pixel of the chart to
+   * draw.
+   * <p>
+   * This value depends on the current <code>{@link FontMetrics}</code> used to
+   * paint the y labels and the maximum amount of characters that are used for
+   * the y labels (<code>{@link IAxisLabelFormatter#getMaxAmountChars()}</code>
+   * ).
+   * <p>
+   * 
+   * @param g2d
+   *          needed for size information.
+   * @return the start x coordinate (left bound) in pixel of the chart to draw.
+   */
+  private int calculateXChartStart(final Graphics g2d) {
+    int result = 0;
+    // reverse iteration because the most left axes are the latter ones:
+    ListIterator<IAxis> it = this.m_axesYLeft.listIterator(this.m_axesYLeft.size());
+    IAxis currentAxis;
+    while (it.hasPrevious()) {
+      currentAxis = it.previous();
+      currentAxis.setPixelXLeft(result);
+      result += currentAxis.getWidth(g2d);
+      currentAxis.setPixelXRight(result);
+    }
+    return result;
+  }
+
+  /**
+   * Calculates the end y coordinate (upper bound) in pixel of the chart to
+   * draw.
+   * <p>
+   * Note that y coordinates are related to the top of a frame, so a higher y
+   * value marks a visual lower chart value.
+   * <p>
+   * The value computed here is the maximum overhang of all y axes caused by
+   * their font height of their labels or the summation of all top x axis
+   * heights (if this is greater) .
+   * <p>
+   * 
+   * @param g2d
+   *          needed for size informations.
+   * @return the end y coordinate (upper bound) in pixel of the chart to draw.
+   */
+  private int calculateYChartEnd(final Graphics g2d) {
+    IAxis currentAxis;
+    int tmp;
+    int result = 0;
+    int maxAxisYHeight = 0;
+    int axesXTopHeight = 0;
+    // 1) Find the max y axis height (this is just the overhang cause by label
+    // TODO: maybe this is too much work in case all fonts of all axes are the
+    // same and
+    // every axis will give the same result for the height (debug).
+    Iterator<IAxis> it = this.m_axesYLeft.iterator();
+    while (it.hasNext()) {
+      currentAxis = it.next();
+      tmp = currentAxis.getHeight(g2d);
+      if (tmp > maxAxisYHeight) {
+        maxAxisYHeight = tmp;
+      }
+    }
+    it = this.m_axesYRight.iterator();
+    while (it.hasNext()) {
+      currentAxis = it.next();
+      tmp = currentAxis.getHeight(g2d);
+      if (tmp > maxAxisYHeight) {
+        maxAxisYHeight = tmp;
+      }
+    }
+
+    // 2) Find the total height of top x axes
+    // (and calculate the y pixel of the top axes):
+    ListIterator<IAxis> listIt = this.m_axesXTop.listIterator(this.m_axesXTop.size());
+    int axisHeight = 0;
+    while (listIt.hasPrevious()) {
+      currentAxis = listIt.previous();
+      currentAxis.setPixelYTop(axesXTopHeight);
+      axisHeight = currentAxis.getHeight(g2d);
+      axesXTopHeight += axisHeight;
+      currentAxis.setPixelYBottom(axesXTopHeight);
+    }
+
+    // 3) Find the maximum result:
+    result = Math.max(maxAxisYHeight, axesXTopHeight);
+    return result;
+  }
+
+  /**
+   * Calculates the start y coordinate (lower bound) in pixel of the chart to
+   * draw.
+   * <p>
+   * Note that y coordinates are related to the top of a frame, so a higher y
+   * value marks a visual lower chart value.
+   * <p>
+   * 
+   * @param g2d
+   *          needed for size informations.
+   * @param labelHeight
+   *          the height of the labels below the chart.
+   * @return the start y coordinate (lower bound) in pixel of the chart to draw.
+   */
+  private int calculateYChartStart(final Graphics g2d, final int labelHeight) {
+    int result;
+    result = (int) this.getSize().getHeight();
+    result = result - labelHeight;
+    IAxis currentAxis;
+    int axesXBottomHeight = 0;
+    Iterator<IAxis> it = this.m_axesXBottom.iterator();
+    while (it.hasNext()) {
+      currentAxis = it.next();
+      currentAxis.setPixelYBottom(result);
+      result -= currentAxis.getHeight(g2d);
+      currentAxis.setPixelYTop(result);
+    }
+
+    result = result - axesXBottomHeight;
+    return result;
+
+  }
+
+  /**
+   * Ensures that the axis to add is not in duty in any axis function for this
+   * chart.
+   * <p>
+   * 
+   * @param axisToAdd
+   *          the axis to test.
+   */
+  private void ensureUniqueAxis(final IAxis axisToAdd) {
+    if (this.m_axesXBottom.contains(axisToAdd)) {
+      throw new IllegalArgumentException("Given axis (" + axisToAdd.getAxisTitle().getTitle()
+          + " is already configured as bottom x axis!");
+    }
+    if (this.m_axesXTop.contains(axisToAdd)) {
+      throw new IllegalArgumentException("Given axis (" + axisToAdd.getAxisTitle().getTitle()
+          + " is already configured as top x axis!");
+    }
+    if (this.m_axesYLeft.contains(axisToAdd)) {
+      throw new IllegalArgumentException("Given axis (" + axisToAdd.getAxisTitle().getTitle()
+          + " is already configured as left y axis!");
+    }
+    if (this.m_axesYRight.contains(axisToAdd)) {
+      throw new IllegalArgumentException("Given axis (" + axisToAdd.getAxisTitle().getTitle()
+          + " is already configured as right y axis!");
+    }
+
+  }
+
+  /**
+   * Interpolates (linear) the two neighboring points.
+   * <p>
+   * Calling this method only makes sense if argument invisible is not null or
+   * if argument visible is not null (if then invisible is null, the visible
+   * point will be returned).
+   * <p>
+   * Visibility is determined only by their internally normalized coordinates
+   * that are within [0.0,1.0] for visible points.
+   * <p>
+   * 
+   * @param visible
+   *          the visible point.
+   * @param invisible
+   *          the invisible point.
+   * @return the interpolation towards the exceeded bound.
+   */
+  private TracePoint2D interpolateVisible(final TracePoint2D invisible, final TracePoint2D visible) {
+
+    TracePoint2D result;
+    /*
+     * In the first call invisible is null because it is the previous point
+     * (there was no previous point: just return the new point):
+     */
+    if (invisible == null) {
+      result = visible;
+    } else {
+      /*
+       * Interpolation is done by the two point form: (y - y1)/(x - x1) = (y2 -
+       * y1)/(x2 - x1) solved to the missing value.
+       */
+      // interpolate
+      double xInterpolate = Double.NaN;
+      double yInterpolate = Double.NaN;
+      // find the bounds that has been exceeded:
+      // It is possible that two bound have been exceeded,
+      // then only one interpolation will be valid:
+      boolean interpolated = false;
+      boolean interpolatedWrong = false;
+      if (invisible.getScaledX() > 1.0) {
+        // right x bound
+        xInterpolate = 1.0;
+        yInterpolate = (visible.getScaledY() - invisible.getScaledY())
+            / (visible.getScaledX() - invisible.getScaledX()) * (1.0 - invisible.getScaledX())
+            + invisible.getScaledY();
+        interpolated = true;
+        interpolatedWrong = Double.isNaN(yInterpolate) || yInterpolate < 0.0 || yInterpolate > 1.0;
+      }
+      if ((invisible.getScaledX() < 0.0) && (!interpolated || interpolatedWrong)) {
+        // left x bound
+        xInterpolate = 0.0;
+        yInterpolate = (visible.getScaledY() - invisible.getScaledY())
+            / (visible.getScaledX() - invisible.getScaledX()) * -invisible.getScaledX()
+            + invisible.getScaledY();
+        interpolated = true;
+        interpolatedWrong = Double.isNaN(yInterpolate) || yInterpolate < 0.0 || yInterpolate > 1.0;
+      }
+      if ((invisible.getScaledY() > 1.0) && (!interpolated || interpolatedWrong)) {
+        // upper y bound, checked
+        yInterpolate = 1.0;
+        xInterpolate = (1.0 - invisible.getScaledY())
+            * (visible.getScaledX() - invisible.getScaledX())
+            / (visible.getScaledY() - invisible.getScaledY()) + invisible.getScaledX();
+        interpolated = true;
+        interpolatedWrong = Double.isNaN(xInterpolate) || xInterpolate < 0.0 || xInterpolate > 1.0;
+
+      }
+      if ((invisible.getScaledY() < 0.0) && (!interpolated || interpolatedWrong)) {
+        // lower y bound
+        yInterpolate = 0.0;
+        xInterpolate = -invisible.getScaledY() * (visible.getScaledX() - invisible.getScaledX())
+            / (visible.getScaledY() - invisible.getScaledY()) + invisible.getScaledX();
+        interpolated = true;
+        interpolatedWrong = Double.isNaN(xInterpolate) || xInterpolate < 0.0 || xInterpolate > 1.0;
+      }
+      if (interpolatedWrong) {
+        result = visible;
+      } else {
+        // TODO: do we have to compute and set the unscaled real values too?
+        result = new TracePoint2D(0.0, 0.0);
+        result.setHighlight(invisible.isHighlight());
+        result.setScaledX(xInterpolate);
+        result.setScaledY(yInterpolate);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Checks if both interpolated points were interpolated to the same bound thus
+   * their interconnections does not cross the visible bounds.
+   * <p>
+   * 
+   * @param oldpoint
+   *          the interpolated old point.
+   * @param newpoint
+   *          the interpolated new point.
+   * @return true if both interpolated points were interpolated towards the same
+   *         bounds thus do not have an interconnection that crosses the visible
+   *         range.
+   */
+  private boolean isEqualInterPolationBound(final TracePoint2D oldpoint, final TracePoint2D newpoint) {
+    return (oldpoint.getScaledX() == newpoint.getScaledX())
+        || (oldpoint.getScaledY() == newpoint.getScaledY());
+  }
+
+  /**
+   * Returns true if the given point is in the visible drawing area of the
+   * Chart2D.
+   * <p>
+   * If the point is null false will be returned.
+   * <p>
+   * This only works if the point argument has been scaled already.
+   * <p>
+   * 
+   * @param point
+   *          the point to test.
+   * @return true if the given point is in the visible drawing area of the
+   *         Chart2D.
+   */
+  private boolean isVisible(final TracePoint2D point) {
+    boolean result;
+    if (point == null) {
+      result = false;
+    } else {
+      result = !(point.getScaledX() > 1.0 || point.getScaledX() < 0.0 || point.getScaledY() > 1.0 || point
+          .getScaledY() < 0.0);
+    }
+    return result;
+  }
+
+  /**
+   * Helper that adds this chart as a listener to the required property change
+   * events.
+   * <p>
+   * 
+   * @param axis
+   *          the axis to listen to.
+   */
+  private void listenToAxis(final IAxis axis) {
+    axis.addPropertyChangeListener(IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
+    axis.addPropertyChangeListener(IAxis.PROPERTY_LABELFORMATTER, this);
+    axis.addPropertyChangeListener(IAxis.PROPERTY_PAINTGRID, this);
+    axis.addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, this);
+  }
+
+  /**
+   * Internally sets the value of <code>{@link #getXChartStart()}</code> and
+   * <code>{@link #getXChartEnd()}</code> with respect to another chart
+   * synchronized to the same value.
+   * <p>
+   * 
+   * @param g2d
+   *          needed for size information.
+   * @see #calculateXChartStart(Graphics2D)
+   * @see #calculateXChartEnd(Graphics2D)
+   */
+  private void negociateXChart(final Graphics g2d) {
+    if (this.m_synchronizedXStartChart != null) {
+      this.m_xChartStart = Math.max(this.calculateXChartStart(g2d), this.m_synchronizedXStartChart
+          .calculateXChartStart(g2d));
+      this.m_xChartEnd = Math.max(this.calculateXChartEnd(g2d), this.m_synchronizedXStartChart
+          .calculateXChartEnd(g2d));
+      this.m_synchronizedXStartChart.m_xChartStart = this.m_xChartStart;
+      this.m_synchronizedXStartChart.m_xChartEnd = this.m_xChartEnd;
+    } else {
+      if (!this.m_synchronizedXStart) {
+        this.m_xChartStart = this.calculateXChartStart(g2d);
+        this.m_xChartEnd = this.calculateXChartEnd(g2d);
+      }
+    }
+  }
+
+  /**
+   * Paints the axis, the scales and the labels for the chart.
+   * <p>
+   * <b>Caution</b> This is highly coupled code and only factored out for better
+   * overview. This method may only be called by {@link #paint(Graphics)} and
+   * the order of this invocation there must not be changed.
+   * <p>
+   * 
+   * @param g2d
+   *          the graphics context to use.
+   */
+  private void paintCoordinateSystem(final Graphics g2d) {
+    // drawing the axes:
+    g2d.setColor(this.getForeground());
+    IAxis currentAxis;
+    // 1) x axes:
+    // 1.1) x axes bottom:
+    Iterator<IAxis> it = this.m_axesXBottom.iterator();
+    while (it.hasNext()) {
+      currentAxis = it.next();
+      currentAxis.paint(g2d);
+    }
+    // 1.2) Top x axes:
+    it = this.m_axesXTop.iterator();
+    while (it.hasNext()) {
+      currentAxis = it.next();
+      currentAxis.paint(g2d);
+    }
+
+    // 2) y axes:
+    // 2.1) y axes left
+    it = this.m_axesYLeft.iterator();
+    while (it.hasNext()) {
+      currentAxis = it.next();
+      currentAxis.paint(g2d);
+    }
+
+    // 2.1) y axes right
+    it = this.m_axesYRight.iterator();
+    while (it.hasNext()) {
+      currentAxis = it.next();
+      currentAxis.paint(g2d);
+    }
+  }
+
+  /**
+   * Internally renders the error bars for the given point for the given trace.
+   * <p>
+   * The current point to render in px is defined by the first two arguments,
+   * the next point to render in px is defined by the 2nd two arguments.
+   * <p>
+   * 
+   * @param trace
+   *          needed to get the {@link IErrorBarPolicy} instances to use.
+   * @param oldtmpx
+   *          the x coordinate of the original point to render an error bar for.
+   * @param oldtmpy
+   *          the y coordinate of the original point to render an error bar for.
+   * @param tmpx
+   *          the x coordinate of the original next point to render an error bar
+   *          for.
+   * @param tmpy
+   *          the y coordinate of the original next point to render an error bar
+   *          for.
+   * @param g2d
+   *          the graphics context to use.
+   * @param discontinue
+   *          if a discontinuation has been taken place and all potential cached
+   *          points by an <code>{@link ITracePainter}</code> (done for polyline
+   *          performance boost) have to be drawn immediately before starting a
+   *          new point caching.
+   * @param original
+   *          intended for information only, should nor be needed to paint the
+   *          point neither be changed in any way!
+   */
+  private void paintErrorBars(final ITrace2D trace, final int oldtmpx, final int oldtmpy,
+      final int tmpx, final int tmpy, final Graphics g2d, final boolean discontinue,
+      final TracePoint2D original) {
+    IErrorBarPolicy errorBarPolicy;
+    Iterator<IErrorBarPolicy> itTraceErrorBarPolicies = trace.getErrorBarPolicies().iterator();
+    while (itTraceErrorBarPolicies.hasNext()) {
+      errorBarPolicy = itTraceErrorBarPolicies.next();
+      errorBarPolicy.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, g2d, original);
+      if (discontinue) {
+        errorBarPolicy.discontinue(g2d);
+      }
+    }
+  }
+
+  /**
+   * Internally paints the point with respect to trace painters (
+   * {@link ITracePainter}) and error bar painter ({@link IErrorBarPolicy}) of
+   * the trace.
+   * <p>
+   * This method must not be called directly as it does not support
+   * interpolation of visibility bounds (discontinuations).
+   * <p>
+   * 
+   * @param xPxOld
+   *          the x coordinate of the previous point to render in px
+   *          (potentially an interpolation of it if the old point was not
+   *          visible and the new point is).
+   * @param yPxOld
+   *          the y coordinate of the previous point to render in px
+   *          (potentially an interpolation of it if the old point was not
+   *          visible and the new point is).
+   * @param xPxNew
+   *          the x coordinate of the point to render in px (potentially an
+   *          interpolation of it if the old point was visible and the new point
+   *          is not).
+   * @param yPxNew
+   *          the y coordinate of the point to render in px (potentially an
+   *          interpolation of it if the old point was visible and the new point
+   *          is not).
+   * @param trace
+   *          needed for obtaining trace painters and error bar painters.
+   * @param g2d
+   *          the graphics context to use.
+   * @param discontinue
+   *          if a discontinuation has been taken place and all potential cached
+   *          points by an <code>{@link ITracePainter}</code> (done for polyline
+   *          performance boost) have to be drawn immediately before starting a
+   *          new point caching.
+   * @param original
+   *          intended for information only, should nor be needed to paint the
+   *          point neither be changed in any way!
+   * @param errorBarSupport
+   *          optimization that allows to skip error bar code.
+   */
+  private final void paintPoint(final int xPxOld, final int yPxOld, final int xPxNew,
+      final int yPxNew, final boolean discontinue, final ITrace2D trace, final Graphics g2d,
+      final TracePoint2D original, final boolean errorBarSupport) {
+    Iterator<ITracePainter> itTracePainters;
+    ITracePainter tracePainter;
+    itTracePainters = trace.getTracePainters().iterator();
+    while (itTracePainters.hasNext()) {
+      tracePainter = itTracePainters.next();
+      tracePainter.paintPoint(xPxOld, yPxOld, xPxNew, yPxNew, g2d, original);
+      if (original.isHighlight()) {
+        this.getPointHighlighter().paintPoint(xPxNew, yPxNew, xPxNew, yPxNew, g2d, original);
+        original.setHighlight(false);
+      }
+      if (discontinue) {
+        tracePainter.discontinue(g2d);
+      }
+    }
+    if (errorBarSupport) {
+      this.paintErrorBars(trace, xPxOld, yPxOld, xPxNew, yPxNew, g2d, discontinue, original);
+    }
+  }
+
+  /**
+   * Internally paints the labels for the traces below the chart.
+   * <p>
+   * 
+   * @param g2d
+   *          the graphic context to use.
+   * @return the amount of vertical (y) px used for the labels.
+   */
+  private int paintTraceLabels(final Graphics g2d) {
+    int labelheight = 0;
+    Dimension d = this.getSize();
+    if (this.m_paintLabels) {
+      ITrace2D trace;
+      Iterator<ITrace2D> traceIt = this.getTraces().iterator();
+      int xtmpos = this.m_xChartStart;
+      int ytmpos = (int) d.getHeight() - 2;
+      int remwidth = (int) d.getWidth() - this.m_xChartStart;
+      int allwidth = remwidth;
+      int lblwidth = 0;
+      String tmplabel;
+      boolean crlfdone = false;
+      // finding the font- dimensions in px
+      FontMetrics fontdim = g2d.getFontMetrics();
+      // includes leading space
+      int fontheight = fontdim.getHeight();
+
+      if (traceIt.hasNext()) {
+        labelheight += fontheight;
+      }
+      while (traceIt.hasNext()) {
+        trace = traceIt.next();
+        if (trace.isVisible()) {
+          tmplabel = trace.getLabel();
+          if (!StringUtil.isEmpty(tmplabel)) {
+            lblwidth = fontdim.stringWidth(tmplabel) + 10;
+            // conditional linebreak.
+            // crlfdone avoids never doing linebreak if all
+            // labels.length()>allwidth
+            if (lblwidth > remwidth) {
+              if (!(lblwidth > allwidth) || (!crlfdone)) {
+                ytmpos -= fontheight;
+                xtmpos = this.m_xChartStart;
+                labelheight += fontheight;
+                crlfdone = true;
+                remwidth = (int) d.getWidth() - this.m_xChartStart;
+              } else {
+                crlfdone = false;
+              }
+            }
+            remwidth -= lblwidth;
+            g2d.setColor(trace.getColor());
+            g2d.drawString(tmplabel, xtmpos, ytmpos);
+            xtmpos += lblwidth;
+          }
+        }
+      }
+    }
+    return labelheight;
+  }
+
+  /**
+   * Helper that removes this chart as a listener from the required property
+   * change events.
    * <p>
    * 
    * @param removedAxis
-   *            the axis to not listen to any more.
+   *          the axis to not listen to any more.
    */
   private void unlistenToAxis(final IAxis removedAxis) {
     removedAxis.removePropertyChangeListener(IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
@@ -2615,22 +3012,25 @@ public class Chart2D
   }
 
   /**
-   * Compares wether the bounds since last invocation have changed and conditionally rescales the
-   * internal <code>{@link TracePoint2D}</code> instances.
+   * Compares wether the bounds since last invocation have changed and
+   * conditionally rescales the internal <code>{@link TracePoint2D}</code>
+   * instances.
    * <p>
    * Must only be called from <code>{@link #paint(Graphics)}</code>.
    * <p>
-   * The old recorded values for the bounds are set to the actual values afterwards to allow
-   * detection of future changes again.
+   * The old recorded values for the bounds are set to the actual values
+   * afterwards to allow detection of future changes again.
    * <p>
-   * The force argument allows to enforce rescaling even if no change of data bounds took place
-   * since the last scaling. This is useful if e.g. the view upon the data is changed by a
-   * constraint (e.g. {@link info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport}).
+   * The force argument allows to enforce rescaling even if no change of data
+   * bounds took place since the last scaling. This is useful if e.g. the view
+   * upon the data is changed by a constraint (e.g.
+   * {@link info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport}
+   * ).
    * <p>
    * 
    * @param force
-   *            if true no detection of changes of the data bounds as described above are performed:
-   *            Rescaling is done unconditional.
+   *          if true no detection of changes of the data bounds as described
+   *          above are performed: Rescaling is done unconditional.
    */
   private synchronized void updateScaling(final boolean force) {
 

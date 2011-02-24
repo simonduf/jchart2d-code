@@ -36,7 +36,7 @@ import junit.framework.TestSuite;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  * 
  */
 public class DefaultDisplayTest
@@ -52,6 +52,7 @@ public class DefaultDisplayTest
    * 
    * @see info.monitorenter.gui.chart.demos.ADisplayTest#createTrace()
    */
+  @Override
   protected ITrace2D createTrace() {
     ITrace2D result = new Trace2DSimple();
     result.setColor(Color.RED);
@@ -62,6 +63,7 @@ public class DefaultDisplayTest
   /**
    * @see info.monitorenter.gui.chart.demos.ADisplayTest#configure(info.monitorenter.gui.chart.demos.StaticCollectorChart)
    */
+  @Override
   protected void configure(final StaticCollectorChart chart) {
     // chart.getChart().getAxisY().setFormatter(new LabelFormatterNumber(new
     // DecimalFormat("#.###")));

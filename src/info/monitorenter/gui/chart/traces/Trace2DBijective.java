@@ -53,7 +53,7 @@ import java.util.Iterator;
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
  * 
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class Trace2DBijective
     extends Trace2DSimple {
@@ -72,6 +72,7 @@ public class Trace2DBijective
    * 
    * @see info.monitorenter.gui.chart.traces.Trace2DSimple#addPointInternal(info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   protected boolean addPointInternal(final TracePoint2D p) {
     boolean result = false;
     double px = p.getX();

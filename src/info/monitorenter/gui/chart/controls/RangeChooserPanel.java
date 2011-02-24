@@ -51,7 +51,7 @@ import javax.swing.event.ChangeListener;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class RangeChooserPanel extends JPanel {
 
@@ -61,10 +61,10 @@ public class RangeChooserPanel extends JPanel {
   private static final long serialVersionUID = 3258413911148410931L;
 
   /** Used for formatting the numbers displayed in the text fields. */
-  private NumberFormat m_nf = NumberFormat.getNumberInstance(Locale.getDefault());
+  protected NumberFormat m_nf = NumberFormat.getNumberInstance(Locale.getDefault());
 
   /** The bislider to choose a range. */
-  private DoubleRangeSlider m_slider;
+  protected DoubleRangeSlider m_slider;
 
   /**
    * Creates an instance that works on the given range.
@@ -110,6 +110,10 @@ public class RangeChooserPanel extends JPanel {
     DoubleBoundedRangeModel rangeModel = this.m_slider.getModel();
     rangeMinView.setEditable(true);
     rangeModel.addChangeListener(new ChangeListener() {
+      /**
+       * 
+       * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
+       */
       public void stateChanged(final ChangeEvent e) {
         rangeMinView.setText(RangeChooserPanel.this.m_nf.format(new Double(
             RangeChooserPanel.this.m_slider.getLowValue())));

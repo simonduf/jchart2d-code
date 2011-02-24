@@ -42,7 +42,7 @@ import javax.swing.JPopupMenu;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public final class PopupListener
     extends MouseAdapter {
@@ -69,6 +69,7 @@ public final class PopupListener
   /**
    * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
    */
+  @Override
   public void mousePressed(final MouseEvent me) {
     this.maybeShopwPopup(me);
   }
@@ -76,6 +77,7 @@ public final class PopupListener
   /**
    * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
    */
+  @Override
   public void mouseReleased(final MouseEvent me) {
     this.maybeShopwPopup(me);
   }
@@ -97,7 +99,7 @@ public final class PopupListener
   }
 
   /**
-   * @return the popup menue.
+   * @return the popup menu.
    */
   public final JPopupMenu getPopup() {
     return this.m_popup;

@@ -28,13 +28,13 @@ import java.awt.Insets;
 
 /**
  * A flow layout that claims the correct height of the component managed in case
- * the available width is known. The standard {@link java.awt.FlowLayout} does
+ * the available width is known. The standard <code>{@link java.awt.FlowLayout}</code> does
  * not claim the correct size but chooses the maximum width of all components to
  * render which is worthless as the fact of flow breaks is not taken into
  * account.
  * <p>
  * 
- * This clas is inspired by the sun class
+ * This class is inspired by the sun class
  * <code>{@link java.awt.FlowLayout}</code> with modifications to the methods
  * <code>{@link #preferredLayoutSize(Container)}</code> and
  * <code>{@link #minimumLayoutSize(Container)}</code>.
@@ -42,7 +42,7 @@ import java.awt.Insets;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class FlowLayoutCorrectMinimumSize extends FlowLayout {
 
@@ -97,6 +97,7 @@ public class FlowLayoutCorrectMinimumSize extends FlowLayout {
    * @see #minimumLayoutSize
    * @see java.awt.Container#getPreferredSize
    */
+  @Override
   public Dimension preferredLayoutSize(final Container target) {
     synchronized (target.getTreeLock()) {
       int hgap = this.getHgap();
@@ -148,6 +149,7 @@ public class FlowLayoutCorrectMinimumSize extends FlowLayout {
    * @see java.awt.Container
    * @see java.awt.Container#doLayout
    */
+  @Override
   public Dimension minimumLayoutSize(final Container target) {
     synchronized (target.getTreeLock()) {
       int hgap = this.getHgap();
@@ -197,6 +199,7 @@ public class FlowLayoutCorrectMinimumSize extends FlowLayout {
    * @see Container
    * @see java.awt.Container#doLayout
    */
+  @Override
   public void layoutContainer(final Container target) {
     synchronized (target.getTreeLock()) {
       int hgap = this.getHgap();

@@ -204,6 +204,7 @@ public class IntegerReuseable {
    * @return a string representation of the value of this object in
    *         base&nbsp;10.
    */
+  @Override
   public String toString() {
     return String.valueOf(this.m_value);
   }

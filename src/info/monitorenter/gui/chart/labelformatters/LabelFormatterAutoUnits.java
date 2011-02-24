@@ -45,7 +45,7 @@ import java.util.Map;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.17 $
  * 
  */
 public class LabelFormatterAutoUnits
@@ -131,6 +131,7 @@ public class LabelFormatterAutoUnits
    * @see info.monitorenter.gui.chart.IAxisLabelFormatter#addPropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
+  @Override
   public void addPropertyChangeListener(final String propertyName,
       final PropertyChangeListener listener) {
     this.m_delegate.addPropertyChangeListener(propertyName, listener);
@@ -161,6 +162,7 @@ public class LabelFormatterAutoUnits
   /**
    * @see java.lang.Object#equals(java.lang.Object)
    */
+  @Override
   public boolean equals(final Object obj) {
     return this.m_delegate.equals(obj);
   }
@@ -176,6 +178,7 @@ public class LabelFormatterAutoUnits
   /**
    * @see ALabelFormatter#getAxis()
    */
+  @Override
   public IAxis getAxis() {
     return this.m_delegate.getAxis();
   }
@@ -193,6 +196,7 @@ public class LabelFormatterAutoUnits
   /**
    * @see ALabelFormatter#getMaxAmountChars()
    */
+  @Override
   public int getMaxAmountChars() {
     // find the fractions by using range information:
     int fractionDigits = 0;
@@ -274,6 +278,7 @@ public class LabelFormatterAutoUnits
   /**
    * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getUnit()
    */
+  @Override
   public AUnit getUnit() {
     return this.m_unit;
   }
@@ -281,6 +286,7 @@ public class LabelFormatterAutoUnits
   /**
    * @see java.lang.Object#hashCode()
    */
+  @Override
   public int hashCode() {
     return this.m_delegate.hashCode();
   }
@@ -288,6 +294,7 @@ public class LabelFormatterAutoUnits
   /**
    * @see info.monitorenter.gui.chart.IAxisLabelFormatter#initPaintIteration()
    */
+  @Override
   public void initPaintIteration() {
     this.m_delegate.initPaintIteration();
     Range domain = this.m_delegate.getAxis().getRange();
@@ -307,6 +314,7 @@ public class LabelFormatterAutoUnits
    * @see info.monitorenter.gui.chart.labelformatters.ALabelFormatter#removePropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
+  @Override
   public void removePropertyChangeListener(final String property,
       final PropertyChangeListener listener) {
     this.m_delegate.removePropertyChangeListener(property, listener);
@@ -315,6 +323,7 @@ public class LabelFormatterAutoUnits
   /**
    * @see ALabelFormatter#setAxis(IAxis)
    */
+  @Override
   public void setAxis(final IAxis axis) {
 
     this.m_delegate.setAxis(axis);
@@ -336,6 +345,7 @@ public class LabelFormatterAutoUnits
   /**
    * @see java.lang.Object#toString()
    */
+  @Override
   public String toString() {
     return this.m_delegate.toString();
   }

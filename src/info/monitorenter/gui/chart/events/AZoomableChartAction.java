@@ -29,31 +29,31 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
 
-
 /**
- * <p>
  * The base class that connects triggered actions with an
  * {@link info.monitorenter.gui.chart.ZoomableChart} instance.
- * </p>
  * <p>
  * Every subclass may delegate it's constructor-given <code>Chart2D</code>
  * instance as protected member <code>m_chart</code>.
- * </p>
- *
+ * <p>
+ * 
  * @author <a href="mailto:vpappas@gmail.com">Vasilis Pappas </a>
- *
- * @version $Revision: 1.1 $
- *
+ * 
+ * @version $Revision: 1.2 $
+ * 
  */
 public abstract class AZoomableChartAction extends AbstractAction implements PropertyChangeListener {
+
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = 4752833979551851279L;
 
   /** The target of this action. */
   protected ZoomableChart m_chart;
 
   /**
-   * Create an <code>Action</code> that accesses the chart and identifies
-   * itself with the given action String.
-   *
+   * Create an <code>Action</code> that accesses the chart and identifies itself
+   * with the given action String.
+   * 
    * @param chart
    *          the target the action will work on
    * @param description
@@ -68,4 +68,3 @@ public abstract class AZoomableChartAction extends AbstractAction implements Pro
   }
 
 }
-

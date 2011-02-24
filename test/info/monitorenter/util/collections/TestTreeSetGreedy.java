@@ -51,7 +51,7 @@ public class TestTreeSetGreedy
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.5.4.3 $
+   * @version $Revision: 1.8 $
    */
   final class Element implements IComparableProperty {
 
@@ -86,6 +86,7 @@ public class TestTreeSetGreedy
     /**
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
       StringBuffer ret = new StringBuffer(this.m_compare.toString());
       return ret.toString();
@@ -120,7 +121,7 @@ public class TestTreeSetGreedy
   }
 
   /** The instance to test. */
-  private TreeSetGreedy<IComparableProperty> m_test;
+  protected TreeSetGreedy<IComparableProperty> m_test;
 
   /**
    * Creates an instance with the given name.
@@ -136,6 +137,7 @@ public class TestTreeSetGreedy
   /**
    * @see junit.framework.TestCase#setUp()
    */
+  @Override
   protected void setUp() throws Exception {
     super.setUp();
     this.m_test = new TreeSetGreedy<IComparableProperty>();
@@ -144,6 +146,7 @@ public class TestTreeSetGreedy
   /**
    * @see junit.framework.TestCase#tearDown()
    */
+  @Override
   protected void tearDown() throws Exception {
     super.tearDown();
     this.m_test = null;
@@ -470,7 +473,7 @@ public class TestTreeSetGreedy
      * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
      * 
      * 
-     * @version $Revision: 1.5.4.3 $
+     * @version $Revision: 1.8 $
      */
     class TreeSetGreedyAddRemover
         extends Thread {
@@ -485,13 +488,13 @@ public class TestTreeSetGreedy
       private IComparableProperty m_element = new Element();
 
       /** Exception caught. */
-      private Exception m_failure = null;
+      protected Exception m_failure = null;
 
       /** Amount of add / remove cycles per instance. */
       private final int m_iterations = 20;
 
       /** Flag to stop this Thread at a checked codepoint. */
-      private boolean m_stop = false;
+      protected boolean m_stop = false;
 
       /**
        * Defcon.
@@ -504,6 +507,7 @@ public class TestTreeSetGreedy
       /**
        * @see java.lang.Thread#run()
        */
+      @Override
       public void run() {
         boolean success = false;
         long sleep;

@@ -52,7 +52,7 @@ import javax.swing.event.ChangeListener;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable {
 
@@ -75,15 +75,15 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
    * <p>
    * 
    * @param xError
-   *            a positive value that is added to / subtracted from the x value
-   *            to render.
+   *          a positive value that is added to / subtracted from the x value to
+   *          render.
    * 
    * @param yError
-   *            a positive value that is added to / subtracted from the y value
-   *            to render.
+   *          a positive value that is added to / subtracted from the y value to
+   *          render.
    * 
    * @throws IllegalArgumentException
-   *             if arguments are < 0.
+   *           if arguments are < 0.
    */
   public ErrorBarPolicyAbsoluteSummation(final double xError, final double yError)
       throws IllegalArgumentException {
@@ -93,6 +93,7 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
   /**
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#getCustomConfigurator()
    */
+  @Override
   public JComponent getCustomConfigurator() {
     JPanel panel = new JPanel();
     panel.setBorder(BorderFactory.createEtchedBorder());
@@ -187,6 +188,7 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeXError(int,
    *      int, info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   protected int internalGetNegativeXError(final int xPixel, final int yPixel,
       final TracePoint2D original) {
     ITrace2D trace = this.getTrace();
@@ -203,6 +205,7 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeYError(int,
    *      int, info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   protected int internalGetNegativeYError(final int xPixel, final int yPixel,
       final TracePoint2D original) {
     ITrace2D trace = this.getTrace();
@@ -219,6 +222,7 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetPositiveXError(int,
    *      int, info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   protected int internalGetPositiveXError(final int xPixel, final int yPixel,
       final TracePoint2D original) {
     ITrace2D trace = this.getTrace();
@@ -235,6 +239,7 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetPositiveYError(int,
    *      int, info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   protected int internalGetPositiveYError(final int xPixel, final int yPixel,
       final TracePoint2D original) {
     ITrace2D trace = this.getTrace();
@@ -251,15 +256,15 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
    * Sets the absolute x error to add to each error bar.
    * <p>
    * 
-   * The absolute error is added to the absolut x values to render. It has to be >
-   * 0.
+   * The absolute error is added to the absolut x values to render. It has to be
+   * > 0.
    * <p>
    * 
    * @param xError
-   *            a positive value.
+   *          a positive value.
    * 
    * @throws IllegalArgumentException
-   *             if the argument is < 0.
+   *           if the argument is < 0.
    */
   public final void setXError(final double xError) throws IllegalArgumentException {
     if (xError < 0.0) {
@@ -276,15 +281,15 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
    * Sets the absolute y error to add to each error bar.
    * <p>
    * 
-   * The absolute error is added to the absolut y values to render. It has to be >
-   * 0.
+   * The absolute error is added to the absolut y values to render. It has to be
+   * > 0.
    * <p>
    * 
    * @param yError
-   *            a positive value.
+   *          a positive value.
    * 
    * @throws IllegalArgumentException
-   *             if the argument is < 0.
+   *           if the argument is < 0.
    */
   public final void setYError(final double yError) throws IllegalArgumentException {
     if (yError < 0.0) {

@@ -31,7 +31,7 @@ import java.io.Serializable;
  *
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  *
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  *
  * @see info.monitorenter.util.units.UnitFactory
  *
@@ -40,6 +40,9 @@ import java.io.Serializable;
  * @see info.monitorenter.util.units.UnitSystemSI
  */
 public abstract class AUnit extends Object implements Serializable {
+
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = -8890511971185813347L;
 
   /** Decimals for rounding. */
   protected int m_decimals = 2;
@@ -234,6 +237,7 @@ public abstract class AUnit extends Object implements Serializable {
    *         if desired.
    *
    */
+  @Override
   public String toString() {
     return this.getUnitName();
   }

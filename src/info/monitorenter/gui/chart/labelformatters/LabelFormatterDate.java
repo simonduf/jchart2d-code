@@ -65,7 +65,7 @@ import java.util.Date;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  * 
  * @see java.util.Date
  */
@@ -127,6 +127,7 @@ public class LabelFormatterDate
   /**
    * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getMaxAmountChars()
    */
+  @Override
   public int getMaxAmountChars() {
     Range range = this.getAxis().getRange();
     double dRange = range.getExtent();

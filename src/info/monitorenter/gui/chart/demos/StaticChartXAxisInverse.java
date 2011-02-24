@@ -43,17 +43,15 @@ import javax.swing.JPanel;
  * Title: StaticChartXAxisInverse.
  * <p>
  * 
- * Description: A demonstration 
- *  of the minimal code to set up a chart with static data and an 
- *  inverse x axis (<code>{@link AxisInverse}</code>). 
+ * Description: A demonstration of the minimal code to set up a chart with
+ * static data and an inverse x axis (<code>{@link AxisInverse}</code>).
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public final class StaticChartXAxisInverse
-    extends JPanel {
- 
+public final class StaticChartXAxisInverse extends JPanel {
+
   /**
    * Generated for <code>serialVersionUID</code>.
    */
@@ -71,6 +69,10 @@ public final class StaticChartXAxisInverse
       JFrame frame = new JFrame("Static Chart x inverted");
       frame.getContentPane().add(new StaticChartXAxisInverse());
       frame.addWindowListener(new WindowAdapter() {
+        /**
+         * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+         */
+        @Override
         public void windowClosing(final WindowEvent e) {
           System.exit(0);
         }

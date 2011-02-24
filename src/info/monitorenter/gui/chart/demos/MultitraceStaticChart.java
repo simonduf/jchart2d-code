@@ -26,6 +26,7 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.views.ChartPanel;
 
@@ -44,7 +45,7 @@ import javax.swing.JPanel;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.3 $
  */
 public final class MultitraceStaticChart
     extends JPanel {
@@ -66,6 +67,10 @@ public final class MultitraceStaticChart
       JFrame frame = new JFrame("SampleChart");
       frame.getContentPane().add(new MultitraceStaticChart());
       frame.addWindowListener(new WindowAdapter() {
+        /**
+         * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+         */
+        @Override
         public void windowClosing(final WindowEvent e) {
           System.exit(0);
         }
@@ -83,6 +88,9 @@ public final class MultitraceStaticChart
   private MultitraceStaticChart() {
     this.setLayout(new BorderLayout());
     Chart2D chart = new Chart2D();
+
+    chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
+    chart.setPointHighlighter(new PointPainterDisc(8));
 
     // Create first ITrace:
     // Note that dynamic charts need limited amount of values!!!

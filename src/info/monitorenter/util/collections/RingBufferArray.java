@@ -38,26 +38,25 @@ import java.util.NoSuchElementException;
  * to the end and the first entry is removed from it. In this case, all elements
  * are stored in a Object[]. But don't worry there will not be a single call to
  * <code>System.arraycopy</code> caused by invocation of the
- * <code>add(Object element)</code>- method. Internal indexes into the array
- * for the head and tail allow to reuse the same memory again and again. <br>
+ * <code>add(Object element)</code>- method. Internal indexes into the array for
+ * the head and tail allow to reuse the same memory again and again. <br>
  * No element is lost: If <code>setBufferSize(int asize)</code> decreases the
  * size of the buffer and it will get smaller than the actual amount of elements
  * stored, they will get cached until removed.
  * <p>
  * For allowing high performance single-threaded use this implementation and the
- * implementations of the retrievable <code>Iterator</code>- instances are
- * not synchronized at all.
+ * implementations of the retrievable <code>Iterator</code>- instances are not
+ * synchronized at all.
  * <p>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
  * @param <T>
- *            the type to store.
+ *          the type to store.
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
-public class RingBufferArray<T>
-    extends RingBufferArrayFast<T> {
+public class RingBufferArray<T> extends RingBufferArrayFast<T> {
 
   /**
    * Base class for ring buffer iterators with pending removals (those who do
@@ -67,10 +66,9 @@ public class RingBufferArray<T>
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.6 $
+   * @version $Revision: 1.7 $
    */
-  abstract class ARingBufferIterator
-      extends RingBufferArrayFast<T>.ARingBufferIterator {
+  abstract class ARingBufferIterator extends RingBufferArrayFast<T>.ARingBufferIterator {
 
     /**
      * The position of the next instance of the pending removed elements to
@@ -81,6 +79,7 @@ public class RingBufferArray<T>
     /**
      * @see java.util.Iterator#hasNext()
      */
+    @Override
     public boolean hasNext() {
       return super.hasNext() || this.m_pendpos >= 0;
     }
@@ -88,6 +87,7 @@ public class RingBufferArray<T>
     /**
      * @see info.monitorenter.util.collections.RingBufferArrayFast.ARingBufferIterator#incPos()
      */
+    @Override
     protected void incPos() {
       // TODO Auto-generated method stub
 
@@ -97,6 +97,7 @@ public class RingBufferArray<T>
      * @see java.util.Iterator#next()
      */
     @SuppressWarnings("unchecked")
+    @Override
     public T next() {
       Object ret = null;
       // Pending elements are the oldest
@@ -139,7 +140,7 @@ public class RingBufferArray<T>
    * <p>
    * 
    * @param aSize
-   *            the size of the buffer.
+   *          the size of the buffer.
    */
   public RingBufferArray(final int aSize) {
     super(aSize);
@@ -148,6 +149,7 @@ public class RingBufferArray<T>
   /**
    * @see info.monitorenter.util.collections.IRingBuffer#isEmpty()
    */
+  @Override
   public boolean isEmpty() {
     return super.isEmpty() && (this.m_pendingremove.size() == 0);
   }
@@ -155,6 +157,7 @@ public class RingBufferArray<T>
   /**
    * @see info.monitorenter.util.collections.IRingBuffer#iteratorF2L()
    */
+  @Override
   public java.util.Iterator<T> iteratorF2L() {
     return new ARingBufferIterator() {
       {
@@ -163,6 +166,10 @@ public class RingBufferArray<T>
         this.m_pendpos = RingBufferArray.this.m_pendingremove.size() - 1;
       }
 
+      /**
+       * @see info.monitorenter.util.collections.RingBufferArray.ARingBufferIterator#incPos()
+       */
+      @Override
       protected void incPos() {
         if (this.m_pos == 0) {
           this.m_pos = RingBufferArray.this.m_size;
@@ -177,6 +184,7 @@ public class RingBufferArray<T>
   /**
    * @see info.monitorenter.util.collections.IRingBuffer#iteratorL2F()
    */
+  @Override
   public java.util.Iterator<T> iteratorL2F() {
     return new ARingBufferIterator() {
       {
@@ -184,6 +192,10 @@ public class RingBufferArray<T>
         this.m_pendpos = 0;
       }
 
+      /**
+       * @see info.monitorenter.util.collections.RingBufferArray.ARingBufferIterator#incPos()
+       */
+      @Override
       protected void incPos() {
         if (this.m_pos == RingBufferArray.this.m_size) {
           this.m_pos = 0;
@@ -197,6 +209,7 @@ public class RingBufferArray<T>
   /**
    * @see info.monitorenter.util.collections.IRingBuffer#remove()
    */
+  @Override
   public T remove() {
     T result = null;
     if (this.m_pendingremove.size() > 0) {
@@ -214,6 +227,7 @@ public class RingBufferArray<T>
    * @see info.monitorenter.util.collections.IRingBuffer#removeAll()
    */
   @SuppressWarnings("unchecked")
+  @Override
   public T[] removeAll() {
     Object[] ret = new Object[this.size() + this.m_pendingremove.size()];
     int stop = this.m_pendingremove.size();
@@ -240,9 +254,10 @@ public class RingBufferArray<T>
    * <p>
    * 
    * @param newSize
-   *            the new size of the buffer.
+   *          the new size of the buffer.
    * 
    */
+  @Override
   public void setBufferSize(final int newSize) {
     List<T> newpending = null;
     if (this.size() > newSize) {
@@ -279,6 +294,7 @@ public class RingBufferArray<T>
   /**
    * @see info.monitorenter.util.collections.IRingBuffer#size()
    */
+  @Override
   public int size() {
     return super.size() + this.m_pendingremove.size();
   }
@@ -293,6 +309,7 @@ public class RingBufferArray<T>
    * 
    * @return a string representation of the RingBuffer and it's contents.
    */
+  @Override
   public String toString() {
     String result;
     if (this.isEmpty()) {

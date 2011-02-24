@@ -39,8 +39,8 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 
 /**
- * A testclass that steps through all <code>ITrace2D</code> implementations
- * and adds random or "half- random" <code>TracePoint2D</code> -instances.
+ * A test class that steps through all <code>ITrace2D</code> implementations and
+ * adds random or "half- random" <code>TracePoint2D</code> -instances.
  * <p>
  * 
  * You may see, that not all <code>ITrace2D</code> implementations work as
@@ -50,7 +50,7 @@ import javax.swing.JFrame;
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public final class TraceTester {
 
@@ -64,7 +64,7 @@ public final class TraceTester {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.5 $
+   * @version $Revision: 1.6 $
    */
   static class HalfRandomPoints extends TraceTester.RandomPoints {
 
@@ -83,16 +83,16 @@ public final class TraceTester {
      * <p>
      * 
      * @param minx
-     *            the lower x bound for points to generate.
+     *          the lower x bound for points to generate.
      * 
      * @param maxx
-     *            the x range for points to generate.
+     *          the x range for points to generate.
      * 
      * @param miny
-     *            the lower y bound for points to generate.
+     *          the lower y bound for points to generate.
      * 
      * @param maxy
-     *            the y range for points to generate.
+     *          the y range for points to generate.
      * 
      */
     HalfRandomPoints(final int minx, final int maxx, final int miny, final int maxy) {
@@ -103,6 +103,7 @@ public final class TraceTester {
     /**
      * @see info.monitorenter.gui.chart.demos.TraceTester.RandomPoints#nextPoint()
      */
+    @Override
     public TracePoint2D nextPoint() {
       if (this.m_samexcount == 10) {
         this.m_samexcount = 0;
@@ -119,7 +120,7 @@ public final class TraceTester {
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
-   * @version $Revision: 1.5 $
+   * @version $Revision: 1.6 $
    */
   private static class RandomPoints {
     /** Used for randomization. */
@@ -143,16 +144,16 @@ public final class TraceTester {
      * <p>
      * 
      * @param minx
-     *            the lower x bound for points to generate.
+     *          the lower x bound for points to generate.
      * 
      * @param maxx
-     *            the x range for points to generate.
+     *          the x range for points to generate.
      * 
      * @param miny
-     *            the lower y bound for points to generate.
+     *          the lower y bound for points to generate.
      * 
      * @param maxy
-     *            the y range for points to generate.
+     *          the y range for points to generate.
      * 
      */
     RandomPoints(final int minx, final int maxx, final int miny, final int maxy) {
@@ -187,19 +188,23 @@ public final class TraceTester {
    * <p>
    * 
    * @param args
-   *            ignored.
+   *          ignored.
    */
   @SuppressWarnings("unchecked")
   public static void main(final String[] args) {
     try {
-      Class< ? extends ITrace2D>[] traces = (Class< ? extends ITrace2D>[]) new Class[] {
-          Trace2DSimple.class, Trace2DBijective.class, Trace2DReplacing.class, Trace2DSorted.class,
-          Trace2DLtd.class, Trace2DLtdReplacing.class, Trace2DLtdSorted.class };
+      Class< ? extends ITrace2D>[] traces = new Class[] {Trace2DSimple.class,
+          Trace2DBijective.class, Trace2DReplacing.class, Trace2DSorted.class, Trace2DLtd.class,
+          Trace2DLtdReplacing.class, Trace2DLtdSorted.class };
       RandomPoints rand = new RandomPoints(0, 3, 0, 3);
 
       Chart2D test = new Chart2D();
       JFrame frame = new JFrame("TraceTester");
       frame.addWindowListener(new WindowAdapter() {
+        /**
+         * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+         */
+        @Override
         public void windowClosing(final WindowEvent e) {
           System.exit(0);
         }

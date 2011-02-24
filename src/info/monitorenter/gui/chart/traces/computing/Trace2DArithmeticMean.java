@@ -52,7 +52,7 @@ import java.util.List;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  * 
  * @since 7.0.0
  * 
@@ -87,6 +87,7 @@ public class Trace2DArithmeticMean
   /**
    * @see info.monitorenter.gui.chart.traces.ATrace2D#addPointInternal(info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   protected boolean addPointInternal(final TracePoint2D p) {
     this.m_pointBuffer.add(p);
     TracePoint2D cumulate = this.getArithmeticMean();
@@ -155,6 +156,7 @@ public class Trace2DArithmeticMean
   /**
    * @see info.monitorenter.gui.chart.traces.ATrace2D#removeAllPointsInternal()
    */
+  @Override
   protected void removeAllPointsInternal() {
     this.m_pointBuffer.clear();
     this.m_points.clear();
@@ -164,6 +166,7 @@ public class Trace2DArithmeticMean
   /**
    * @see info.monitorenter.gui.chart.traces.ATrace2D#removePointInternal(info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   protected TracePoint2D removePointInternal(final TracePoint2D point) {
     TracePoint2D result = this.m_points.remove(0);
     return result;

@@ -39,11 +39,10 @@ import java.io.InputStream;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2.4.1 $
+ * @version $Revision: 1.5 $
  * 
  */
-public abstract class ADisplayTestPropertyDataBased
-    extends ADisplayTest {
+public abstract class ADisplayTestPropertyDataBased extends ADisplayTest {
 
   /** Internal counter for search routine of property files. */
   private int m_count = 0;
@@ -51,11 +50,13 @@ public abstract class ADisplayTestPropertyDataBased
   /**
    * @see info.monitorenter.gui.chart.demos.ADisplayTest#getNextChart()
    */
+  @Override
   protected final StaticCollectorChart getNextChart() throws IOException {
     InputStream in;
     ITrace2D trace;
     StaticCollectorChart chart;
-    in = ADisplayTestPropertyDataBased.class.getResourceAsStream("test" + this.m_count + ".properties");
+    in = ADisplayTestPropertyDataBased.class.getResourceAsStream("test" + this.m_count
+        + ".properties");
     if (in == null) {
       chart = null;
     } else {

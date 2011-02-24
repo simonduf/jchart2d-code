@@ -25,16 +25,16 @@ import info.monitorenter.gui.chart.pointpainters.PointPainterLine;
 
 /**
  * An error bar painter that renders no end point and start point and renders a
- * line as segment ({@link info.monitorenter.gui.chart.pointpainters.PointPainterLine}).
+ * line as segment (
+ * {@link info.monitorenter.gui.chart.pointpainters.PointPainterLine}).
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
-public class ErrorBarPainterLine
-    extends ErrorBarPainter {
+public class ErrorBarPainterLine extends ErrorBarPainter {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -7877672177550520292L;

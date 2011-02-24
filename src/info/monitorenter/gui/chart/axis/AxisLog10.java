@@ -47,10 +47,9 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
-public class AxisLog10
-    extends AAxisTransformation {
+public class AxisLog10 extends AAxisTransformation {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -1783172443489534956L;
@@ -74,8 +73,8 @@ public class AxisLog10
    * 
    */
   public AxisLog10(final IAxisLabelFormatter formatter) {
-      super(formatter);
-    }
+    super(formatter);
+  }
 
   /**
    * Performs {@link Math#log10(double)} with a check for reaching infinity.
@@ -95,6 +94,7 @@ public class AxisLog10
    * 
    * @return log base 10 for the given value.
    */
+  @Override
   protected double transform(final double in) {
 
     double toTransform = in;
@@ -134,6 +134,7 @@ public class AxisLog10
   /**
    * @see AAxisTransformation#untransform(double)
    */
+  @Override
   protected double untransform(final double in) {
     return Math.pow(10, in);
   }

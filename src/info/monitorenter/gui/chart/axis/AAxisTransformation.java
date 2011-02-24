@@ -40,9 +40,12 @@ import java.util.Iterator;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.26 $
+ * @version $Revision: 1.27 $
  */
 public abstract class AAxisTransformation extends AAxis {
+
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = -4665444421196939779L;
 
   /**
    * An accessor for the x axis of a chart.
@@ -55,12 +58,13 @@ public abstract class AAxisTransformation extends AAxis {
 
     /** Generated <code>serialVersionUID</code>. */
     private static final long serialVersionUID = 8775312615991487847L;
+
     /**
      * Creates an instance that accesses the given chart's x axis.
      * <p>
      * 
      * @param chart
-     *            the chart to access.
+     *          the chart to access.
      */
     public XDataAccessor(final Chart2D chart) {
 
@@ -71,6 +75,7 @@ public abstract class AAxisTransformation extends AAxis {
      * @see info.monitorenter.gui.chart.axis.AAxis.XDataAccessor#scaleTrace(info.monitorenter.gui.chart.ITrace2D,
      *      info.monitorenter.util.Range)
      */
+    @Override
     protected void scaleTrace(final ITrace2D trace, final Range range) {
       if (trace.isVisible()) {
         Iterator<TracePoint2D> itPoints = trace.iterator();
@@ -99,9 +104,11 @@ public abstract class AAxisTransformation extends AAxis {
         }
       }
     }
+
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.XDataAccessor#translateValueToPx(double)
      */
+    @Override
     public final int translateValueToPx(final double value) {
       /*
        * Note: This code (the math) is the combination of the scaleTrace code
@@ -155,7 +162,7 @@ public abstract class AAxisTransformation extends AAxis {
      * <p>
      * 
      * @param chart
-     *            the chart to access.
+     *          the chart to access.
      */
     public YDataAccessor(final Chart2D chart) {
       super(chart);
@@ -165,6 +172,7 @@ public abstract class AAxisTransformation extends AAxis {
      * @see info.monitorenter.gui.chart.axis.AAxis.YDataAccessor#scaleTrace(info.monitorenter.gui.chart.ITrace2D,
      *      info.monitorenter.util.Range)
      */
+    @Override
     protected void scaleTrace(final ITrace2D trace, final Range range) {
       if (trace.isVisible()) {
         TracePoint2D point;
@@ -198,6 +206,7 @@ public abstract class AAxisTransformation extends AAxis {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateValueToPx(double)
      */
+    @Override
     public final int translateValueToPx(final double value) {
       /*
        * Note: This code (the math) is the combination of the scaleTrace code
@@ -245,7 +254,7 @@ public abstract class AAxisTransformation extends AAxis {
   /**
    * Internal timestamp of the last transformation error reporting.
    */
-  private long m_outputErrorTstamp = 0;
+  protected long m_outputErrorTstamp = 0;
 
   /**
    * Creates a default instance that will use a
@@ -263,7 +272,7 @@ public abstract class AAxisTransformation extends AAxis {
    * <p>
    * 
    * @param formatter
-   *            needed for formatting labels of this axis.
+   *          needed for formatting labels of this axis.
    */
   public AAxisTransformation(final IAxisLabelFormatter formatter) {
     super(formatter);
@@ -273,6 +282,7 @@ public abstract class AAxisTransformation extends AAxis {
    * @see info.monitorenter.gui.chart.axis.AAxis#createAccessor(info.monitorenter.gui.chart.Chart2D,
    *      int, int)
    */
+  @Override
   protected AAxis.AChart2DDataAccessor createAccessor(final Chart2D chart, final int dimension,
       final int position) {
     AAxis.AChart2DDataAccessor result;
@@ -299,6 +309,7 @@ public abstract class AAxisTransformation extends AAxis {
   /**
    * @see info.monitorenter.gui.chart.axis.AAxis#getMax()
    */
+  @Override
   public double getMax() {
     double result = 1.0;
     try {
@@ -312,6 +323,7 @@ public abstract class AAxisTransformation extends AAxis {
   /**
    * @see info.monitorenter.gui.chart.axis.AAxis#getMin()
    */
+  @Override
   public double getMin() {
     double result = 0.0;
     try {
@@ -326,6 +338,7 @@ public abstract class AAxisTransformation extends AAxis {
    * @deprecated replaced by {@link #scaleTrace(ITrace2D)}
    * @see info.monitorenter.gui.chart.IAxis#getScaledValue(double)
    */
+  @Deprecated
   public final double getScaledValue(final double absolute) {
     double result;
     Range range = this.getRange();
@@ -355,18 +368,19 @@ public abstract class AAxisTransformation extends AAxis {
    * <p>
    * 
    * @param in
-   *            the value to transform.
+   *          the value to transform.
    * @return the transformed value.
    * @throws IllegalArgumentException
-   *             if scaling is impossible (due to some mathematical
-   *             transformation in implementations like
-   *             {@link info.monitorenter.gui.chart.axis.AxisLog10}
+   *           if scaling is impossible (due to some mathematical transformation
+   *           in implementations like
+   *           {@link info.monitorenter.gui.chart.axis.AxisLog10}
    */
   protected abstract double transform(final double in) throws IllegalArgumentException;
 
   /**
    * @see info.monitorenter.gui.chart.axis.AAxis#translateMousePosition(java.awt.event.MouseEvent)
    */
+  @Override
   public final double translateMousePosition(final MouseEvent mouseEvent)
       throws IllegalArgumentException {
     return this.untransform(this.getAccessor().translateMousePosition(mouseEvent));
@@ -375,6 +389,7 @@ public abstract class AAxisTransformation extends AAxis {
   /**
    * @see info.monitorenter.gui.chart.axis.AAxis#translatePxToValue(int)
    */
+  @Override
   public double translatePxToValue(final int pixel) {
     return this.untransform(this.m_accessor.translatePxToValue(pixel));
   }
@@ -386,7 +401,7 @@ public abstract class AAxisTransformation extends AAxis {
    * <p>
    * 
    * @param in
-   *            the transformed value.
+   *          the transformed value.
    * @return the normal value;
    */
   protected abstract double untransform(final double in);

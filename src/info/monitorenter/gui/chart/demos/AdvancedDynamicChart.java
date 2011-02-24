@@ -55,7 +55,7 @@ import javax.swing.JFrame;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  *
  */
 public final class AdvancedDynamicChart {
@@ -121,6 +121,10 @@ public final class AdvancedDynamicChart {
     frame.setSize(400, 300);
     // Enable the termination button [cross on the upper right edge]:
     frame.addWindowListener(new WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent e) {
         System.exit(0);
       }

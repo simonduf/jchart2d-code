@@ -4,7 +4,9 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="lib" path="ext/build/junit.jar"/>
-	<classpathentry kind="lib" path="ext/build/proguard.jar"/>
-	<classpathentry kind="lib" path="ext/infovis.jar"/>
+	<classpathentry kind="lib" path="ext/build/jipViewer.jar"/>
+	<classpathentry kind="lib" path="ext/build/profile.jar"/>
+	<classpathentry kind="lib" path="ext/build/proguard-4.2.jar"/>
+	<classpathentry kind="lib" path="ext/jlibeps-0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

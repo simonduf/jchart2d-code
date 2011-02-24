@@ -23,7 +23,6 @@
  */
 package info.monitorenter.gui.util;
 
-
 /**
  * Color that internally works with the Hue Saturation Luminance color space.
  * <p>
@@ -31,7 +30,7 @@ package info.monitorenter.gui.util;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class HSBColor implements java.io.Serializable, Cloneable {
 
@@ -48,9 +47,9 @@ public class HSBColor implements java.io.Serializable, Cloneable {
    * become harder to understand.
    * 
    * @param color
-   *            the <code>java.awt.Color</code> (that follows the RGB model)
-   *            and should be transformed to a color instance in the
-   *            hue-saturation-luminance model.
+   *          the <code>java.awt.Color</code> (that follows the RGB model) and
+   *          should be transformed to a color instance in the
+   *          hue-saturation-luminance model.
    * 
    * @return the transformed values of the RGB colors in that order:
    *         hue,saturation,brightness.
@@ -65,10 +64,10 @@ public class HSBColor implements java.io.Serializable, Cloneable {
 
     int cmax = (r >= g) ? (r >= b) ? r : b : (g >= b) ? g : b;
     int cmin = (r <= g) ? (r <= b) ? r : b : (g <= b) ? g : b;
-    ret.m_lum = ((float) cmax) / 255f;
+    ret.m_lum = (cmax) / 255f;
     if (cmax != cmin) {
       float difference = (cmax - cmin);
-      ret.m_sat = difference / ((float) cmax);
+      ret.m_sat = difference / (cmax);
       if (r == cmax) {
         ret.m_hue = (g - b) / difference;
       } else if (g == cmax) {
@@ -117,11 +116,11 @@ public class HSBColor implements java.io.Serializable, Cloneable {
    * <p>
    * 
    * @param hue
-   *            the hue component of the HSBColor
+   *          the hue component of the HSBColor
    * @param saturation
-   *            the saturation component of the HSBColor
+   *          the saturation component of the HSBColor
    * @param brightness
-   *            the brightness component of the HSBColor
+   *          the brightness component of the HSBColor
    */
   HSBColor(final double hue, final double saturation, final double brightness) {
     this(hue, saturation, brightness, 255);
@@ -133,16 +132,16 @@ public class HSBColor implements java.io.Serializable, Cloneable {
    * <p>
    * 
    * @param hue
-   *            the hue component of the HSBColor
+   *          the hue component of the HSBColor
    * 
    * @param saturation
-   *            the saturation component of the HSBColor
+   *          the saturation component of the HSBColor
    * 
    * @param brightness
-   *            the brightness component of the HSBColor
+   *          the brightness component of the HSBColor
    * 
    * @param alpha
-   *            the alpha channed between 0.0 and 1.0.
+   *          the alpha channed between 0.0 and 1.0.
    */
   HSBColor(final double hue, final double saturation, final double brightness, final int alpha) {
     this.m_hue = hue;
@@ -156,7 +155,7 @@ public class HSBColor implements java.io.Serializable, Cloneable {
    * <p>
    * 
    * @param rgbcolor
-   *            standard java rgb color.
+   *          standard java rgb color.
    */
   public HSBColor(final java.awt.Color rgbcolor) {
     int rgb = rgbcolor.getRGB();
@@ -165,10 +164,10 @@ public class HSBColor implements java.io.Serializable, Cloneable {
     int b = (rgb & 0xFF);
     int cmax = (r >= g) ? (r >= b) ? r : b : (g >= b) ? g : b;
     int cmin = (r <= g) ? (r <= b) ? r : b : (g <= b) ? g : b;
-    this.m_lum = ((float) cmax) / 255f;
+    this.m_lum = (cmax) / 255f;
     if (cmax != cmin) {
       float difference = (cmax - cmin);
-      this.m_sat = difference / ((float) cmax);
+      this.m_sat = difference / (cmax);
       if (r == cmax) {
         this.m_hue = (g - b) / difference;
       } else if (g == cmax) {
@@ -197,12 +196,12 @@ public class HSBColor implements java.io.Serializable, Cloneable {
    *  x.clone() != x
    *  x.clone().getClass() == x.getClass()
    *  x.clone().equals(x)
-   * </code>
-   * A deep copy of this HSBColor is returned.
+   * </code> A deep copy of this HSBColor is returned.
    * <p>
    * 
-   * @return an intance copied from this one.
+   * @return an instance copied from this one.
    */
+  @Override
   public Object clone() {
     HSBColor result = null;
     try {
@@ -231,10 +230,11 @@ public class HSBColor implements java.io.Serializable, Cloneable {
    * <p>
    * 
    * @param o
-   *            the other {@link HSBColor} instance.
+   *          the other {@link HSBColor} instance.
    * 
    * @return true if the colors are judged equal.
    */
+  @Override
   public boolean equals(final Object o) {
     if (!(o instanceof HSBColor)) {
       return false;
@@ -265,6 +265,7 @@ public class HSBColor implements java.io.Serializable, Cloneable {
   /**
    * @see java.lang.Object#hashCode()
    */
+  @Override
   public int hashCode() {
 
     return (int) (this.m_hue * 10000 + this.m_sat * 1000 + this.m_lum * 100);

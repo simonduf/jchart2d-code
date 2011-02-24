@@ -53,7 +53,7 @@ import info.monitorenter.gui.chart.TracePoint2D;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public abstract class ADataCollector implements Runnable {
 
@@ -111,6 +111,7 @@ public abstract class ADataCollector implements Runnable {
   /**
    * @see java.lang.Object#finalize()
    */
+  @Override
   protected void finalize() throws Throwable {
     super.finalize();
     this.stop();

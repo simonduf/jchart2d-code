@@ -36,17 +36,16 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * A delegator / proxy that delegates all calls to an internal constructor-given
- * ITrace2d and swaps the data of the added Point2D instances.
+ * A delegator / proxy that delegates all calls to an internal constructor-given ITrace2d and swaps
+ * the data of the added Point2D instances.
  * <p>
- * x values become y values and vice versa. Performance is bad, as unnecessary
- * instances are created (each TracePoint2D is instantiated twice) so this
- * instance is for debugging / testing purposes only.
+ * x values become y values and vice versa. Performance is bad, as unnecessary instances are created
+ * (each TracePoint2D is instantiated twice) so this instance is for debugging / testing purposes
+ * only.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.21 $
  */
 public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
 
@@ -121,9 +120,7 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
   /**
    * @param o
    *            the trace to compare to.
-   * 
    * @return see interface.
-   * 
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   public int compareTo(final ITrace2D o) {
@@ -140,6 +137,7 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
   /**
    * @see java.lang.Object#equals(java.lang.Object)
    */
+  @Override
   public boolean equals(final Object obj) {
     return this.m_delegate.equals(obj);
   }
@@ -230,6 +228,13 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getNearestPointManhattan(double, double)
+   */
+  public ManhattanDistancePoint getNearestPointManhattan(final double x, final double y) {
+    return this.m_delegate.getNearestPointManhattan(x, y);
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#getPhysicalUnits()
    */
   public String getPhysicalUnits() {
@@ -279,7 +284,6 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
   }
 
   /**
-   * 
    * @see info.monitorenter.gui.chart.ITrace2D#getTracePainters()
    */
   public Set<ITracePainter> getTracePainters() {
@@ -296,6 +300,7 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
   /**
    * @see java.lang.Object#hashCode()
    */
+  @Override
   public int hashCode() {
     return this.m_delegate.hashCode();
   }
@@ -408,8 +413,7 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#setPhysicalUnits(java.lang.String,
-   *      java.lang.String)
+   * @see info.monitorenter.gui.chart.ITrace2D#setPhysicalUnits(java.lang.String, java.lang.String)
    */
   public void setPhysicalUnits(final String xunit, final String yunit) {
     this.m_delegate.setPhysicalUnits(xunit, yunit);
@@ -430,7 +434,6 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
   }
 
   /**
-   * 
    * @see info.monitorenter.gui.chart.ITrace2D#setTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
   public Set<ITracePainter> setTracePainter(final ITracePainter painter) {
@@ -489,7 +492,9 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
   /**
    * @see java.lang.Object#toString()
    */
+  @Override
   public String toString() {
     return this.m_delegate.toString();
   }
+
 }

@@ -91,6 +91,7 @@ public final class FileFilterExtensions
   /**
    * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
    */
+  @Override
   public boolean accept(final File pathname) {
     boolean result;
     if (pathname.isDirectory()) {
@@ -146,6 +147,7 @@ public final class FileFilterExtensions
   /**
    * @see javax.swing.filechooser.FileFilter#getDescription()
    */
+  @Override
   public String getDescription() {
     StringBuffer ret = new StringBuffer();
     int len = this.m_extensions.length;

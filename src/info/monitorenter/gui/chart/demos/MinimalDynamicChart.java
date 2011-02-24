@@ -23,7 +23,6 @@
  */
 package info.monitorenter.gui.chart.demos;
 
-
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.io.ADataCollector;
@@ -39,16 +38,16 @@ import javax.swing.JFrame;
 /**
  * Demonstrates minimal effort to create a dynamic chart.
  * <p>
- *
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
+ * 
  */
 public final class MinimalDynamicChart {
 
   /**
    * Main entry.
    * <p>
-   *
+   * 
    * @param args
    *          ignored
    */
@@ -57,7 +56,7 @@ public final class MinimalDynamicChart {
     Chart2D chart = new Chart2D();
     // Create an ITrace:
     // Note that dynamic charts need limited amount of values!!!
-    ITrace2D trace = new Trace2DLtd(800);
+    ITrace2D trace = new Trace2DLtd(1000);
     trace.setColor(Color.RED);
 
     // Add the trace to the chart:
@@ -71,13 +70,17 @@ public final class MinimalDynamicChart {
     frame.setSize(400, 300);
     // Enable the termination button [cross on the upper right edge]:
     frame.addWindowListener(new WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent e) {
         System.exit(0);
       }
     });
     frame.setVisible(true);
-    // Every 50 milliseconds a new value is collected.
-    ADataCollector collector = new RandomDataCollectorOffset(trace, 2);
+    // Every 20 milliseconds a new value is collected.
+    ADataCollector collector = new RandomDataCollectorOffset(trace, 20);
     collector.start();
   }
 

@@ -64,16 +64,16 @@ import junit.framework.TestCase;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5.4.2 $
+ * @version $Revision: 1.8 $
  * 
  */
 public abstract class ADisplayTest extends TestCase {
 
   /** The frame currently visible. */
-  private JFrame m_frame;
+  protected JFrame m_frame;
 
   /**
-   * Chart2D inistance that failed, set by UI Threads to trigger failure on the
+   * Chart2D instance that failed, set by UI Threads to trigger failure on the
    * junit testcase Thread.
    * <p>
    */
@@ -209,6 +209,10 @@ public abstract class ADisplayTest extends TestCase {
     content.add(controls);
 
     this.m_frame.addWindowListener(new WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent e) {
         ADisplayTest.this.m_frame.setVisible(false);
         ADisplayTest.this.m_frame.dispose();

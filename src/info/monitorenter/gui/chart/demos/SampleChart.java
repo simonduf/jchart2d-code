@@ -37,25 +37,24 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-
 /**
  * <p>
  * Sample chart from Java 2D open source package.
  * </p>
- *
+ * 
  * <p>
  * Copyright: sample code taken from http://jchart2d.sourceforge.net/usage.shtml
  * </p>
- *
+ * 
  * <p>
  * Company: Infotility
  * </p>
- *
+ * 
  * @author Martin Rojo
- *
+ * 
  * @author Achim Westermann (modified)
- *
- * @version $Revision: 1.4 $
+ * 
+ * @version $Revision: 1.6 $
  */
 public class SampleChart extends JPanel {
   /**
@@ -66,16 +65,19 @@ public class SampleChart extends JPanel {
   /**
    * Main entry.
    * <p>
-   *
+   * 
    * @param args
    *          ignored.
-   *          <p>
    */
   public static void main(final String[] args) {
     for (int i = 0; i < 1; i++) {
       JFrame frame = new JFrame("SampleChart");
       frame.getContentPane().add(new SampleChart());
       frame.addWindowListener(new WindowAdapter() {
+        /**
+         * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+         */
+        @Override
         public void windowClosing(final WindowEvent e) {
           System.exit(0);
         }
@@ -99,7 +101,7 @@ public class SampleChart extends JPanel {
     // Note that dynamic charts need limited amount of values!!!
     // ITrace2D trace = new Trace2DLtd(200);
     // 3/11/-5 , let's try something else too:
-//    ITrace2D trace = new Trace2DLtdReplacing(100);
+    // ITrace2D trace = new Trace2DLtdReplacing(100);
     ITrace2D trace = new Trace2DLtd(8000);
     trace.setColor(Color.RED);
 

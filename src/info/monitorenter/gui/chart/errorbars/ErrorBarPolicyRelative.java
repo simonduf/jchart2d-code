@@ -54,7 +54,7 @@ import javax.swing.event.ChangeListener;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.16 $
  */
 public class ErrorBarPolicyRelative extends AErrorBarPolicyConfigurable {
 
@@ -114,6 +114,7 @@ public class ErrorBarPolicyRelative extends AErrorBarPolicyConfigurable {
   /**
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#getCustomConfigurator()
    */
+  @Override
   public JComponent getCustomConfigurator() {
     JPanel panel = new JPanel();
     panel.setBorder(BorderFactory.createEtchedBorder());
@@ -214,6 +215,7 @@ public class ErrorBarPolicyRelative extends AErrorBarPolicyConfigurable {
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeXError(int,
    *      int, info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   protected int internalGetNegativeXError(final int xPixel, final int yPixel,
       final TracePoint2D original) {
     double error = (xPixel - this.getTrace().getRenderer().getXChartStart())
@@ -226,6 +228,7 @@ public class ErrorBarPolicyRelative extends AErrorBarPolicyConfigurable {
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeYError(int,
    *      int, info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   protected int internalGetNegativeYError(final int xPixel, final int yPixel,
       final TracePoint2D original) {
     int error = (int) Math.round((this.getTrace().getRenderer().getYChartStart() - yPixel)
@@ -238,6 +241,7 @@ public class ErrorBarPolicyRelative extends AErrorBarPolicyConfigurable {
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetPositiveXError(int,
    *      int, info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   protected int internalGetPositiveXError(final int xPixel, final int yPixel,
       final TracePoint2D original) {
     double error = (xPixel - this.getTrace().getRenderer().getXChartStart())
@@ -250,6 +254,7 @@ public class ErrorBarPolicyRelative extends AErrorBarPolicyConfigurable {
    * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetPositiveYError(int,
    *      int, info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   protected int internalGetPositiveYError(final int xPixel, final int yPixel,
       final TracePoint2D original) {
     // y pixel are bigger the lower the value is, so inversion

@@ -33,7 +33,7 @@ import junit.framework.TestSuite;
  * <p>
  * 
  * @author Achim Westermann
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  * 
  * @since 2.1.0
  */
@@ -66,11 +66,20 @@ public final class AllTests {
 
     TestSetup wrapper = new TestSetup(suite) {
 
+      /**
+       * @see junit.extensions.TestSetup#setUp()
+       */
+      @Override
       protected void setUp() {
 
         // oneTimeSetUp();
       }
 
+      /**
+       * 
+       * @see junit.extensions.TestSetup#tearDown()
+       */
+      @Override
       protected void tearDown() {
 
         // oneTimeTearDown();

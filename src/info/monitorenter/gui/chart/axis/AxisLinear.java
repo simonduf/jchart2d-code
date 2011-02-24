@@ -34,7 +34,7 @@ import info.monitorenter.util.Range;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.18 $
  */
 public class AxisLinear
     extends AAxis {
@@ -66,6 +66,7 @@ public class AxisLinear
    * @see info.monitorenter.gui.chart.axis.AAxis#createAccessor(info.monitorenter.gui.chart.Chart2D,
    *      int, int)
    */
+  @Override
   protected AChart2DDataAccessor createAccessor(final Chart2D chart, final int dimension,
       final int position) {
     AChart2DDataAccessor result;

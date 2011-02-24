@@ -25,7 +25,7 @@ import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.TracePoint2D;
 import info.monitorenter.gui.chart.pointpainters.PointPainterLine;
 
-import java.awt.Graphics2D;
+import java.awt.Graphics;
 
 /**
  * A trace painter that renders a trace by lines.
@@ -33,7 +33,7 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.14 $
  * 
  */
 public class TracePainterLine extends ATracePainter {
@@ -57,28 +57,29 @@ public class TracePainterLine extends ATracePainter {
    * <p>
    * 
    * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int,
-   *      int, int, int, java.awt.Graphics2D,
+   *      int, int, int, java.awt.Graphics,
    *      info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g, final TracePoint2D original) {
+      final int nextY, final Graphics g, final TracePoint2D original) {
     super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
     this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#startPaintIteration(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#startPaintIteration(java.awt.Graphics)
    */
   @Override
-  public void startPaintIteration(final Graphics2D g2d) {
+  public void startPaintIteration(final Graphics g2d) {
     this.m_pointPainter.startPaintIteration(g2d);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#endPaintIteration(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#endPaintIteration(java.awt.Graphics)
    */
   @Override
-  public void endPaintIteration(final Graphics2D g2d) {
+  public void endPaintIteration(final Graphics g2d) {
     this.m_pointPainter.endPaintIteration(g2d);
   }
 

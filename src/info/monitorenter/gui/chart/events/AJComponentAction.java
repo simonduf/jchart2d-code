@@ -39,10 +39,13 @@ import javax.swing.JComponent;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  * 
  */
 public abstract class AJComponentAction extends AbstractAction implements PropertyChangeListener {
+
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = -9150128862126829805L;
 
   /** The target of this action. */
   protected JComponent m_component;

@@ -24,7 +24,7 @@ package info.monitorenter.gui.chart.pointpainters;
 import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.TracePoint2D;
 
-import java.awt.Graphics2D;
+import java.awt.Graphics;
 
 /**
  * A point painter that renders a trace by lines.
@@ -32,7 +32,7 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  * 
  */
 public class PointPainterLine extends APointPainter implements IPointPainter {
@@ -53,10 +53,10 @@ public class PointPainterLine extends APointPainter implements IPointPainter {
    * <p>
    * 
    * @see info.monitorenter.gui.chart.IPointPainter#paintPoint(int, int, int,
-   *      int, java.awt.Graphics2D, info.monitorenter.gui.chart.TracePoint2D)
+   *      int, java.awt.Graphics, info.monitorenter.gui.chart.TracePoint2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g, final TracePoint2D point) {
+      final int nextY, final Graphics g, final TracePoint2D point) {
     g.drawLine(absoluteX, absoluteY, nextX, nextY);
   }
 }

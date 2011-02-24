@@ -49,16 +49,17 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
 
   /**
    * Runnable that will take a random break between 0 and
-   * <code>sleepRange</code> milliseconds and then consume added
-   * <code>{@link TracePoint2D}</code> (by <code>{@link Producer}</code>)
-   * by invoking <code>{@link Chart2D#paint(java.awt.Graphics)}</code>.
+   * <code>sleepRange</code> milliseconds and then consume added <code>
+   * {@link TracePoint2D}</code> (by <code>{@link Producer}</code>) by invoking
+   * <code>{@link Chart2D#paint(java.awt.Graphics)}</code>.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
-   * @version $Revision: 1.5.4.2 $
+   * @version $Revision: 1.10 $
    */
   class Consumer extends TestMultithreading.Consumer {
+
     /** The maximum of milliseconds between two add operations. */
     private long m_sleepRange;
 
@@ -71,7 +72,7 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
      * <p>
      * 
      * @param sleepRange
-     *            the maximum of milliseconds between two add operations.
+     *          the maximum of milliseconds between two add operations.
      */
     Consumer(final long sleepRange) {
       super(sleepRange);
@@ -80,6 +81,7 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
     /**
      * @see info.monitorenter.gui.chart.TestMultithreading.Consumer#run()
      */
+    @Override
     public void run() {
       MockGraphics2D mockGraphics = new MockGraphics2D();
       while (!(this.m_stop || TestMultiThreadingAndTracing.this.isAllProducersFinished())) {
@@ -99,9 +101,8 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
   /**
    * Producer implementation that sleeps a random range of milliseconds within
    * <code>{@link #PRODUCER_SLEEPRANGE}</code> and then adds a newly created
-   * <code>{@link TracePoint2D}</code> to a random picked
-   * <code>{@link ITrace2D}</code> for
-   * <code>{@link #PRODUCER_ADD_POINT_AMOUNT}</code> times.
+   * <code>{@link TracePoint2D}</code> to a random picked <code>{@link ITrace2D}
+   * </code> for <code>{@link #PRODUCER_ADD_POINT_AMOUNT}</code> times.
    * <p>
    */
   class Producer extends TestMultithreading.Producer {
@@ -116,15 +117,15 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
 
     /**
      * <p>
-     * Constructs a producer that will add <code>toAdd</code> points with
-     * random breaks of milliseconds between <code>maxSleep</code> and zero.
+     * Constructs a producer that will add <code>toAdd</code> points with random
+     * breaks of milliseconds between <code>maxSleep</code> and zero.
      * </p>
      * 
      * @param toAdd
-     *            the amount of points to add
+     *          the amount of points to add
      * @param sleepRange
-     *            the maxium time in milliseconds the Thread will sleep between
-     *            two points added
+     *          the maxium time in milliseconds the Thread will sleep between
+     *          two points added
      */
     Producer(final long toAdd, final long sleepRange) {
       super(toAdd, sleepRange);
@@ -133,6 +134,7 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
     /**
      * @see info.monitorenter.gui.chart.TestMultithreading.Producer#run()
      */
+    @Override
     public void run() {
       TracePoint2D point;
       ITrace2D tmpTrace;
@@ -191,7 +193,7 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
    * <p>
    * 
    * @param testName
-   *            the name of the test case.
+   *          the name of the test case.
    */
   public TestMultiThreadingAndTracing(final String testName) {
     super(testName);
@@ -218,6 +220,7 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
    * 
    * @see info.monitorenter.gui.chart.TestMultithreading#report()
    */
+  @Override
   void report() {
     long keys = this.m_weakMap.size();
     System.out.println("Points remaining in the weakMap: " + keys);
@@ -245,8 +248,9 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
    * @see info.monitorenter.gui.chart.TestMultithreading#setUp()
    * 
    * @throws Exception
-   *             if something goes wrong.
+   *           if something goes wrong.
    */
+  @Override
   public void setUp() throws Exception {
     this.m_trace = (ITrace2D) TestMultiThreadingAndTracing.TRACE_CLASS.newInstance();
     this.m_chart = new Chart2D();
@@ -277,6 +281,7 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
    * 
    * @see info.monitorenter.gui.chart.TestMultithreading#tearDown()
    */
+  @Override
   protected void tearDown() throws Exception {
     super.tearDown();
     this.m_traces = null;

@@ -50,7 +50,7 @@ import javax.swing.JFrame;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class ZoomChartWithErrorBarsAndLogAxis
     extends JFrame {
@@ -150,6 +150,10 @@ public class ZoomChartWithErrorBarsAndLogAxis
 
     // Enable the termination button:
     this.addWindowListener(new WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent e) {
         System.exit(0);
       }

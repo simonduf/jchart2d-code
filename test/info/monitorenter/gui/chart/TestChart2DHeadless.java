@@ -39,6 +39,7 @@ import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import junit.textui.TestRunner;
 
 /**
  * Junit testcase for <code>{@link info.monitorenter.gui.chart.Chart2D}</code>
@@ -47,7 +48,7 @@ import junit.framework.TestSuite;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.4.4.2 $
+ * @version $Revision: 1.8 $
  */
 public class TestChart2DHeadless
     extends TestCase {
@@ -150,6 +151,10 @@ public class TestChart2DHeadless
       /** serialVersionUID */
       private static final long serialVersionUID = -1171046385909150778L;
 
+      /**
+       * @see javax.swing.JComponent#paint(java.awt.Graphics)
+       */
+      @Override
       public void paint(final Graphics g) {
         super.paint(g);
         g.drawImage(img, 0, 0, null);
@@ -177,7 +182,7 @@ public class TestChart2DHeadless
    *            ignored.
    */
   public static void main(final String[] args) {
-    junit.swingui.TestRunner.run(TestChart2DHeadless.class);
+    TestRunner.run(TestChart2DHeadless.class);
   }
 
 }

@@ -28,6 +28,8 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.dialogs.ModalDialog;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 
+import java.awt.Dimension;
+import java.awt.Point;
 import java.lang.reflect.Method;
 
 import javax.swing.JFrame;
@@ -42,16 +44,16 @@ import junit.framework.Assert;
  * 
  * Test methods should only contain the code to set the test operation they want
  * to perform (via
- * <code>{@link #setTestOperation(ATestChartOperations.IChart2DOperation)}</code>).
+ * <code>{@link #setTestOperation(ATestChartOperations.IChart2DOperation)}</code>
+ * ).
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.7.4.3 $
+ * @version $Revision: 1.11 $
  */
-public abstract class ATestChartOperations
-    extends ATestJChart2D {
+public abstract class ATestChartOperations extends ATestJChart2D {
 
   /**
    * Encapsulation of an action to perform upon the chart to test.
@@ -59,7 +61,7 @@ public abstract class ATestChartOperations
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
-   * @version $Revision: 1.7.4.3 $
+   * @version $Revision: 1.11 $
    */
   public interface IChart2DOperation {
     /**
@@ -68,10 +70,10 @@ public abstract class ATestChartOperations
      * <p>
      * 
      * @param chart
-     *            the chart to invoke the operation on.
+     *          the chart to invoke the operation on.
      * 
      * @throws Exception
-     *             if the preCondition is not fulfilled.
+     *           if the preCondition is not fulfilled.
      */
     public void preCondition(final Chart2D chart) throws Exception;
 
@@ -81,13 +83,13 @@ public abstract class ATestChartOperations
      * <p>
      * 
      * @param chart
-     *            the chart the operation was tested on.
+     *          the chart the operation was tested on.
      * 
      * @param result
-     *            the result of the operation or null if there is none.
+     *          the result of the operation or null if there is none.
      * 
      * @throws Exception
-     *             if the postCondition was not fulfilled.
+     *           if the postCondition was not fulfilled.
      */
     public void postCondition(final Chart2D chart, Object result) throws Exception;
 
@@ -96,12 +98,12 @@ public abstract class ATestChartOperations
      * <p>
      * 
      * @param chart
-     *            the chart to test the action upon.
+     *          the chart to test the action upon.
      * 
      * @return null or a result of the operation.
      * 
      * @throws Exception
-     *             if sth. goes wrong.
+     *           if sth. goes wrong.
      */
     public Object action(final Chart2D chart) throws Exception;
 
@@ -152,7 +154,7 @@ public abstract class ATestChartOperations
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.7.4.3 $
+   * @version $Revision: 1.11 $
    */
   public abstract class AChartOperationReflectionBased implements
       ATestChartOperations.IChart2DOperation {
@@ -190,16 +192,16 @@ public abstract class ATestChartOperations
      * <p>
      * 
      * @param methodName
-     *            the name of the method to invoke.
+     *          the name of the method to invoke.
      * 
      * @param arguments
-     *            the arguments for the method to invoke.
+     *          the arguments for the method to invoke.
      * 
      * @throws SecurityException
-     *             if the method is not accessible.
+     *           if the method is not accessible.
      * 
      * @throws NoSuchMethodException
-     *             if the method does not exist.
+     *           if the method does not exist.
      */
     public AChartOperationReflectionBased(final String methodName, final Object[] arguments)
         throws SecurityException, NoSuchMethodException {
@@ -212,7 +214,7 @@ public abstract class ATestChartOperations
      * <p>
      * 
      * @param args
-     *            the argument instances for the method to invoke.
+     *          the argument instances for the method to invoke.
      * 
      * @return the argument types for the method to invoke.
      */
@@ -242,6 +244,7 @@ public abstract class ATestChartOperations
     /**
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
       return this.getName();
     }
@@ -255,7 +258,7 @@ public abstract class ATestChartOperations
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.7.4.3 $
+   * @version $Revision: 1.11 $
    */
   public abstract class AChartOperation implements ATestChartOperations.IChart2DOperation {
 
@@ -279,7 +282,7 @@ public abstract class ATestChartOperations
      * <p>
      * 
      * @param name
-     *            the name of this operation.
+     *          the name of this operation.
      */
     public AChartOperation(final String name) {
       this.m_name = name;
@@ -318,6 +321,7 @@ public abstract class ATestChartOperations
     /**
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
       return this.getName();
     }
@@ -331,7 +335,7 @@ public abstract class ATestChartOperations
    * <p>
    * 
    * @param arg0
-   *            the name of the test.
+   *          the name of the test.
    */
   public ATestChartOperations(final String arg0) {
     super(arg0);
@@ -346,7 +350,7 @@ public abstract class ATestChartOperations
    * <p>
    * 
    * @param testOperation
-   *            the operation to test for the current test method.
+   *          the operation to test for the current test method.
    */
   protected void setTestOperation(final ATestChartOperations.IChart2DOperation testOperation) {
     this.m_testOperation = testOperation;
@@ -355,6 +359,7 @@ public abstract class ATestChartOperations
   /**
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#tearDown()
    */
+  @Override
   protected void tearDown() throws Exception {
     Assert.assertNotNull(
         "Test method has to invoke setTestOperation(ATestChartOperations.IChart2DOperation)",
@@ -374,7 +379,9 @@ public abstract class ATestChartOperations
     this.m_frame.getContentPane().add(this.m_chart);
     // this.m_frame.add(new ChartPanel(this.m_chart));
     this.m_frame.setSize(400, 600);
+    this.m_frame.setLocation(new Point(200, 200));
     this.m_frame.setVisible(true);
+
     Thread.sleep(1000);
 
     this.m_testOperation.preCondition(this.m_chart);
@@ -384,6 +391,7 @@ public abstract class ATestChartOperations
     textArea.setEditable(false);
     textArea.setText(this.m_testOperation.getName());
     ModalDialog dialog = new ModalDialog(this.m_frame, "Operation to test...", textArea);
+    dialog.setSize(new Dimension(400, 100));
     dialog.showDialog();
     boolean failure = false;
     if (dialog.isOk()) {
@@ -405,7 +413,8 @@ public abstract class ATestChartOperations
     }
     super.tearDown();
     if (failure) {
-      Assert.fail("Operation test " + this.m_testOperation.getName() + " was judged as a failure. ");
+      Assert
+          .fail("Operation test " + this.m_testOperation.getName() + " was judged as a failure. ");
     }
     this.m_testOperation = null;
   }
@@ -413,6 +422,7 @@ public abstract class ATestChartOperations
   /**
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#setUp()
    */
+  @Override
   protected void setUp() throws Exception {
     // nop
   }

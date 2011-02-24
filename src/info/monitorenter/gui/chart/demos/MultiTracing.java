@@ -51,7 +51,7 @@ import javax.swing.JFrame;
  * 512 MB RAM so I did not get these problems.
  * </p>
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  */
@@ -67,7 +67,7 @@ public final class MultiTracing
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.9 $
+   * @version $Revision: 1.10 $
    */
   static final class AddPaintRemoveThread
       extends Thread {
@@ -113,6 +113,7 @@ public final class MultiTracing
     /**
      * @see java.lang.Runnable#run()
      */
+    @Override
     public void run() {
 
       while (true) {
@@ -267,6 +268,10 @@ public final class MultiTracing
     this.m_chart.setGridColor(new Color(0xDD, 0xDD, 0xDD));
     // add WindowListener
     this.addWindowListener(new WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent e) {
         System.exit(0);
       }

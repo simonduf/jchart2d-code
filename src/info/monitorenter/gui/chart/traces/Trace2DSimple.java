@@ -47,7 +47,7 @@ import java.util.List;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class Trace2DSimple
     extends ATrace2D implements ITrace2D {
@@ -80,6 +80,7 @@ public class Trace2DSimple
   /**
    * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   protected boolean addPointInternal(final TracePoint2D p) {
     this.m_points.add(p);
     return true;
@@ -116,6 +117,7 @@ public class Trace2DSimple
   /**
    * @see ATrace2D#removeAllPointsInternal()
    */
+  @Override
   protected final void removeAllPointsInternal() {
     this.m_points.clear();
   }
@@ -123,6 +125,7 @@ public class Trace2DSimple
   /**
    * @see ATrace2D#removePointInternal(info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   protected TracePoint2D removePointInternal(final TracePoint2D point) {
     TracePoint2D result = null;
     if (this.m_points.remove(point)) {

@@ -23,7 +23,7 @@
 package info.monitorenter.gui.chart;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 
@@ -31,7 +31,7 @@ import java.io.Serializable;
  * Interface for a renderer of error bars.
  * <p>
  * It contains a similar method to
- * {@link info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}
+ * {@link info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int, int, Graphics, TracePoint2D)}
  * with an additional {@link info.monitorenter.gui.chart.IErrorBarPixel} for getting information
  * about the error to render.
  * <p>
@@ -52,7 +52,7 @@ import java.io.Serializable;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.20 $
  */
 public interface IErrorBarPainter extends Serializable {
 
@@ -64,7 +64,7 @@ public interface IErrorBarPainter extends Serializable {
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
-   * @version $Revision: 1.18 $
+   * @version $Revision: 1.20 $
    */
   public interface ISegment extends Serializable {
     /**
@@ -389,7 +389,7 @@ public interface IErrorBarPainter extends Serializable {
    *            the graphic context to paint on.
    * @see IErrorBarPixel
    */
-  public void paintErrorBar(final int absoluteX, final int absoluteY, final Graphics2D g,
+  public void paintErrorBar(final int absoluteX, final int absoluteY, final Graphics g,
       final IErrorBarPixel errorBar);
 
   /**
@@ -428,7 +428,7 @@ public interface IErrorBarPainter extends Serializable {
   /**
    * Note that the choice for the right point painter has to be taken with care: It is senseless to
    * use an implementation that does not interconnect both coordinates given to
-   * {@link IPointPainter#paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   * {@link IPointPainter#paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    * <p>
    * Choosing a {@link info.monitorenter.gui.chart.pointpainters.PointPainterLine} will have the
    * same visual effect as setting such an instance for the start point painter.
@@ -460,7 +460,7 @@ public interface IErrorBarPainter extends Serializable {
    * <p>
    * Note that the choice for the right point painter has to be taken with care: It is senseless to
    * use an implementation that interconnects both coordinates given to
-   * {@link IPointPainter#paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   * {@link IPointPainter#paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    * <p>
    * Choosing a {@link info.monitorenter.gui.chart.pointpainters.PointPainterLine} will have the
    * same visual effect as setting such an instance for the connection segment painter.
@@ -485,7 +485,7 @@ public interface IErrorBarPainter extends Serializable {
   /**
    * Note that the choice for the right point painter has to be taken with care: It is senseless to
    * use an implementation that interconnects both coordinates given to
-   * {@link IPointPainter#paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   * {@link IPointPainter#paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    * <p>
    * Choosing a {@link info.monitorenter.gui.chart.pointpainters.PointPainterLine} will have the
    * same visual effect as setting such an instance for the connection segment painter.

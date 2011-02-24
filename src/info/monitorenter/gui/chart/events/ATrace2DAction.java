@@ -38,11 +38,14 @@ import javax.swing.AbstractAction;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  * 
  */
 public abstract class ATrace2DAction extends AbstractAction implements PropertyChangeListener {
   
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = 374572347443757594L;
+ 
   /** The trace to trigger the action upon. */
   protected ITrace2D m_trace;
 

@@ -52,7 +52,7 @@ import javax.swing.JTabbedPane;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class ErrorBarWizard
     extends JPanel {
@@ -143,6 +143,10 @@ public class ErrorBarWizard
     JFrame frame = new JFrame(ErrorBarWizard.class.getName());
     frame.getContentPane().add(wizard);
     frame.addWindowListener(new WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent e) {
         System.exit(0);
       }

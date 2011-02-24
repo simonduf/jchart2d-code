@@ -24,7 +24,7 @@ package info.monitorenter.gui.chart.traces.painters;
 import info.monitorenter.gui.chart.TracePoint2D;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 
-import java.awt.Graphics2D;
+import java.awt.Graphics;
 
 /**
  * Renders traces by painting a disc (hollow circle) with choosable diameter for
@@ -33,7 +33,7 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.13 $
  * 
  */
 public class TracePainterDisc
@@ -64,9 +64,10 @@ public class TracePainterDisc
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics)
    */
-  public void endPaintIteration(final Graphics2D g2d) {
+  @Override
+  public void endPaintIteration(final Graphics g2d) {
     if (g2d != null) {
       this.m_pointPainter.paintPoint(this.getPreviousX(), this.getPreviousY(), 0, 0, g2d, this
           .getPreviousPoint());
@@ -74,10 +75,10 @@ public class TracePainterDisc
     this.m_pointPainter.endPaintIteration(g2d);
   }
   /**
-   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#startPaintIteration(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#startPaintIteration(java.awt.Graphics)
    */
   @Override
-  public void startPaintIteration(final Graphics2D g2d) {
+  public void startPaintIteration(final Graphics g2d) {
     this.m_pointPainter.startPaintIteration(g2d);
   }
 
@@ -94,11 +95,12 @@ public class TracePainterDisc
 
   /**
    * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int,
-   *      int, int, int, java.awt.Graphics2D,
+   *      int, int, int, java.awt.Graphics,
    *      info.monitorenter.gui.chart.TracePoint2D)
    */
+  @Override
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g, final TracePoint2D original) {
+      final int nextY, final Graphics g, final TracePoint2D original) {
     super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
     this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
   }

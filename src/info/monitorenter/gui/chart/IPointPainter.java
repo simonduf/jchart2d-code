@@ -23,7 +23,7 @@
 package info.monitorenter.gui.chart;
 
 
-import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.io.Serializable;
 
 /**
@@ -43,7 +43,7 @@ import java.io.Serializable;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.13 $
  */
 public interface IPointPainter extends Serializable {
   /**
@@ -54,7 +54,7 @@ public interface IPointPainter extends Serializable {
    * @param g2d
    *          provided in case pending paint operations have to be performed.
    */
-  public void endPaintIteration(Graphics2D g2d);
+  public void endPaintIteration(Graphics g2d);
 
   /**
    * Invoked to inform implementations that a paint iteration starts for the
@@ -64,7 +64,7 @@ public interface IPointPainter extends Serializable {
    * @param g2d
    *          provided in case pending paint operations have to be performed.
    */
-  public void startPaintIteration(Graphics2D g2d);
+  public void startPaintIteration(Graphics g2d);
 
   /**
    * Paint the point given by absolute coordinates on the given graphic context.
@@ -103,6 +103,6 @@ public interface IPointPainter extends Serializable {
    *            it should not be changed too!
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g, final TracePoint2D original);
+      final int nextY, final Graphics g, final TracePoint2D original);
 
 }

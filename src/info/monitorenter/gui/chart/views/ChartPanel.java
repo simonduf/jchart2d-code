@@ -28,6 +28,7 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.controls.LayoutFactory;
 import info.monitorenter.gui.chart.layouts.FlowLayoutCorrectMinimumSize;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
+import info.monitorenter.util.StringUtil;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -55,8 +56,8 @@ import javax.swing.JPanel;
  * The context menu items register themselves with the chart to adapt their
  * basic UI properties (font, foreground color, background color) via weak
  * referenced instances of
- * {@link info.monitorenter.gui.chart.controls.LayoutFactory.BasicPropertyAdaptSupport}.
- * This ensures that dropping a complete menu tree from the UI makes them
+ * {@link info.monitorenter.gui.chart.controls.LayoutFactory.BasicPropertyAdaptSupport}
+ * . This ensures that dropping a complete menu tree from the UI makes them
  * garbage collectable without introduction of highly unstable and
  * unmaintainable active memory management code. A side effect is that these
  * listeners remain in the property change listener list of the chart unless
@@ -68,10 +69,10 @@ import javax.swing.JPanel;
  * amount of listeners for non-visible uncleaned menu items in the chart which
  * causes a high cpu throttle for increasing the listener list.
  * <p>
- * The reason seems to be the implementation of ({@link javax.swing.event.EventListenerList}
- * that is used by {@link javax.swing.event.SwingPropertyChangeSupport}). It is
- * based upon an array an grows only for the space of an additional listener by
- * using
+ * The reason seems to be the implementation of (
+ * {@link javax.swing.event.EventListenerList} that is used by
+ * {@link javax.swing.event.SwingPropertyChangeSupport}). It is based upon an
+ * array an grows only for the space of an additional listener by using
  * {@link java.lang.System#arraycopy(java.lang.Object, int, java.lang.Object, int, int)}
  * (ouch, this should be changed).
  * <p>
@@ -90,8 +91,7 @@ import javax.swing.JPanel;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  */
-public class ChartPanel
-    extends JPanel implements PropertyChangeListener {
+public class ChartPanel extends JPanel implements PropertyChangeListener {
 
   /**
    * Generated <code>serialVersionUID</code>.
@@ -103,7 +103,7 @@ public class ChartPanel
    * <p>
    * 
    * @param args
-   *            ignored.
+   *          ignored.
    */
   public static void main(final String[] args) {
     // some data:
@@ -135,6 +135,10 @@ public class ChartPanel
     frame.getContentPane().add(new ChartPanel(chart));
     frame.setSize(new Dimension(400, 600));
     frame.addWindowListener(new WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent w) {
         System.exit(0);
       }
@@ -158,12 +162,12 @@ public class ChartPanel
 
   /**
    * Creates an instance that decorates the given chart with controls in form of
-   * popup menues.
+   * popup menus.
    * <p>
    * 
    * @param chart
-   *            A configured Chart2D instance that will be displayed and
-   *            controlled by this panel.
+   *          A configured Chart2D instance that will be displayed and
+   *          controlled by this panel.
    */
   public ChartPanel(final Chart2D chart) {
     super();
@@ -176,7 +180,7 @@ public class ChartPanel
 
     factory.createPopupMenu(chart, true);
 
-    // layouting
+    // layout
     this.setLayout(new BorderLayout());
     this.add(chart, BorderLayout.CENTER);
     // initial Labels
@@ -188,7 +192,13 @@ public class ChartPanel
     JLabel label;
     for (ITrace2D trace : chart) {
       label = factory.createContextMenuLabel(chart, trace, true);
-      this.m_labelPanel.add(label);
+      if (label != null) {
+        this.m_labelPanel.add(label);
+      }
+      // In case trace.getLabel() becomes empty hide the corresponding menu
+      // label via listeners!
+      trace.addPropertyChangeListener(ITrace2D.PROPERTY_PHYSICALUNITS, this);
+      trace.addPropertyChangeListener(ITrace2D.PROPERTY_NAME, this);
     }
     this.add(this.m_labelPanel, BorderLayout.SOUTH);
     chart.addPropertyChangeListener(Chart2D.PROPERTY_BACKGROUND_COLOR, this);
@@ -215,8 +225,8 @@ public class ChartPanel
    * <p>
    * 
    * @param tracetoAdd
-   *            the trace to check whether a label for it is already contained
-   *            in the internal label panel.
+   *          the trace to check whether a label for it is already contained in
+   *          the internal label panel.
    * 
    * @return true if a label for the given trace is already contained in the
    *         internal label panel.
@@ -237,8 +247,8 @@ public class ChartPanel
   }
 
   /**
-   * Listens for property "background" of the <code>Chart2D</code> instance
-   * that is contained in this component and sets the background color.
+   * Listens for property "background" of the <code>Chart2D</code> instance that
+   * is contained in this component and sets the background color.
    * <p>
    * 
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
@@ -261,31 +271,34 @@ public class ChartPanel
       JLabel label;
       if (oldTrace == null && newTrace != null) {
         if (!this.containsTraceLabel(newTrace)) {
-          this.m_labelPanel.getComponents();
           label = LayoutFactory.getInstance().createContextMenuLabel(this.m_chart, newTrace, true);
-          this.m_labelPanel.add(label);
-          this.invalidate();
-          this.m_labelPanel.invalidate();
-          this.validateTree();
-          this.m_labelPanel.doLayout();
+          if (label != null) {
+            this.m_labelPanel.add(label);
+            this.invalidate();
+            this.m_labelPanel.invalidate();
+            this.validateTree();
+            this.m_labelPanel.doLayout();
+          }
         }
       } else if (oldTrace != null && newTrace == null) {
         // search for label:
         String labelName = oldTrace.getLabel();
-        Component[] labels = (this.m_labelPanel.getComponents());
-        for (int i = 0; i < labels.length; i++) {
-          if (((JLabel) labels[i]).getText().equals(labelName)) {
-            this.m_labelPanel.remove(labels[i]);
-            this.m_chart.removePropertyChangeListener((PropertyChangeListener) labels[i]);
-            oldTrace.removePropertyChangeListener((PropertyChangeListener) labels[i]);
-            // clear the popup menu listeners too:
-            MouseListener[] mouseListeners = labels[i].getMouseListeners();
-            for (int j = 0; j < mouseListeners.length; j++) {
-              labels[i].removeMouseListener(mouseListeners[j]);
+        if (!StringUtil.isEmpty(labelName)) {
+          Component[] labels = (this.m_labelPanel.getComponents());
+          for (int i = 0; i < labels.length; i++) {
+            if (((JLabel) labels[i]).getText().equals(labelName)) {
+              this.m_labelPanel.remove(labels[i]);
+              this.m_chart.removePropertyChangeListener((PropertyChangeListener) labels[i]);
+              oldTrace.removePropertyChangeListener((PropertyChangeListener) labels[i]);
+              // clear the popup menu listeners too:
+              MouseListener[] mouseListeners = labels[i].getMouseListeners();
+              for (int j = 0; j < mouseListeners.length; j++) {
+                labels[i].removeMouseListener(mouseListeners[j]);
+              }
+              this.m_labelPanel.doLayout();
+              this.doLayout();
+              break;
             }
-            this.m_labelPanel.doLayout();
-            this.doLayout();
-            break;
           }
         }
       } else if (prop.equals(Chart2D.PROPERTY_AXIS_X) || prop.equals(Chart2D.PROPERTY_AXIS_Y)) {
@@ -296,6 +309,41 @@ public class ChartPanel
         }
         if (newAxis != null) {
           newAxis.addPropertyChangeListener(IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
+        }
+      } else if (prop.equals(ITrace2D.PROPERTY_LABEL)) {
+        ITrace2D trace = (ITrace2D) evt.getSource();
+        String oldLabel = (String) evt.getOldValue();
+        String newLabel = (String) evt.getNewValue();
+
+        if ((!StringUtil.isEmpty(oldLabel)) && (StringUtil.isEmpty(newLabel))) {
+          Component[] labels = (this.m_labelPanel.getComponents());
+          for (int i = 0; i < labels.length; i++) {
+            if (((JLabel) labels[i]).getText().equals(oldLabel)) {
+              this.m_labelPanel.remove(labels[i]);
+              this.m_chart.removePropertyChangeListener((PropertyChangeListener) labels[i]);
+              trace.removePropertyChangeListener((PropertyChangeListener) labels[i]);
+              // clear the popup menu listeners too:
+              MouseListener[] mouseListeners = labels[i].getMouseListeners();
+              for (int j = 0; j < mouseListeners.length; j++) {
+                labels[i].removeMouseListener(mouseListeners[j]);
+              }
+              this.m_labelPanel.doLayout();
+              this.doLayout();
+              break;
+            }
+          }
+        } else if ((StringUtil.isEmpty(oldLabel)) && (!StringUtil.isEmpty(newLabel))) {
+          if (!this.containsTraceLabel(newTrace)) {
+            label = LayoutFactory.getInstance()
+                .createContextMenuLabel(this.m_chart, newTrace, true);
+            if (label != null) {
+              this.m_labelPanel.add(label);
+              this.invalidate();
+              this.m_labelPanel.invalidate();
+              this.validateTree();
+              this.m_labelPanel.doLayout();
+            }
+          }
         }
       } else {
         throw new IllegalArgumentException("Bad property change event for add / remove trace.");

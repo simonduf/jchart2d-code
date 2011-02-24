@@ -24,7 +24,7 @@ package info.monitorenter.gui.chart.traces.painters;
 import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.TracePoint2D;
 
-import java.awt.Graphics2D;
+import java.awt.Graphics;
 
 /**
  * A trace painter that adds the service of knowing the previous point that had
@@ -33,19 +33,22 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.17 $
  * 
  */
 public abstract class ATracePainter implements info.monitorenter.gui.chart.ITracePainter {
+
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = -1091004082187803076L;
 
   /** Flag to remember if a paint iteration has ended. */
   private boolean m_isEnded = false;
 
   /**
    * The last x coordinate that was sent to
-   * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   * {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    * <p>
-   * It will be needed at {@link #endPaintIteration(Graphics2D)} as the former
+   * It will be needed at {@link #endPaintIteration(Graphics)} as the former
    * method only uses the first set of coordinates to store in the internal list
    * to avoid duplicates.
    * <p>
@@ -54,9 +57,9 @@ public abstract class ATracePainter implements info.monitorenter.gui.chart.ITrac
 
   /**
    * The last y coordinate that was sent to
-   * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   * {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    * <p>
-   * It will be needed at {@link #endPaintIteration(Graphics2D)} as the former
+   * It will be needed at {@link #endPaintIteration(Graphics)} as the former
    * method only uses the first set of coordinates to store in the internal list
    * to avoid duplicates.
    * <p>
@@ -65,9 +68,9 @@ public abstract class ATracePainter implements info.monitorenter.gui.chart.ITrac
 
   /**
    * The last trace point that was sent to
-   * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   * {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    * <p>
-   * It will be needed at {@link #endPaintIteration(Graphics2D)} as the former
+   * It will be needed at {@link #endPaintIteration(Graphics)} as the former
    * method only uses the first set of coordinates to store in the internal list
    * to avoid duplicates.
    * <p>
@@ -76,7 +79,7 @@ public abstract class ATracePainter implements info.monitorenter.gui.chart.ITrac
 
   /**
    * @param o
-   *            the instance to compare to.
+   *          the instance to compare to.
    * 
    * @return see interface.
    * 
@@ -88,31 +91,32 @@ public abstract class ATracePainter implements info.monitorenter.gui.chart.ITrac
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#discontinue(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ITracePainter#discontinue(java.awt.Graphics)
    */
-  public void discontinue(final Graphics2D g2d) {
+  public void discontinue(final Graphics g2d) {
     this.endPaintIteration(g2d);
     this.startPaintIteration(g2d);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics)
    */
-  public void endPaintIteration(final Graphics2D g2d) {
+  public void endPaintIteration(final Graphics g2d) {
     // nop
   }
 
   /**
    * Two instances are judged equal if they are of the same class.
    * <p>
-   * This implies that any state of a {@link ATracePainter} is unimportant -
+   * This implies that any state of a <code>{@link ATracePainter}</code> is unimportant -
    * implementations that have a state (e.g. the radius for discs to paint in
-   * {@link TracePainterDisc}) this method should be considered to be
-   * overrriden (along with {@link #hashCode()}.
+   * <code>{@link TracePainterDisc}</code>) this method should be considered to be overridden
+   * (along with <code>{@link #hashCode()}</code>}.
    * <p>
    * 
    * @see java.lang.Object#equals(java.lang.Object)
    */
+  @Override
   public boolean equals(final Object obj) {
     boolean result = false;
     if (obj != null) {
@@ -123,7 +127,7 @@ public abstract class ATracePainter implements info.monitorenter.gui.chart.ITrac
 
   /**
    * Returns the previous X value that had to be painted by
-   * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   * {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    * <p>
    * 
    * This value will be {@link Integer#MIN_VALUE} if no previous point had to be
@@ -131,7 +135,7 @@ public abstract class ATracePainter implements info.monitorenter.gui.chart.ITrac
    * <p>
    * 
    * @return the previous X value that had to be painted by
-   *         {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   *         {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    */
   public int getPreviousX() {
     int result = this.m_previousX;
@@ -147,7 +151,7 @@ public abstract class ATracePainter implements info.monitorenter.gui.chart.ITrac
 
   /**
    * Returns the previous Y value that had to be painted by
-   * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   * {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    * <p>
    * 
    * This value will be {@link Integer#MIN_VALUE} if no previous point had to be
@@ -155,7 +159,7 @@ public abstract class ATracePainter implements info.monitorenter.gui.chart.ITrac
    * <p>
    * 
    * @return the previous Y value that had to be painted by
-   *         {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   *         {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    */
   public int getPreviousY() {
     int result = this.m_previousY;
@@ -171,31 +175,32 @@ public abstract class ATracePainter implements info.monitorenter.gui.chart.ITrac
   /**
    * @see java.lang.Object#hashCode()
    */
+  @Override
   public int hashCode() {
     return this.getClass().hashCode();
   }
 
   /**
    * @see info.monitorenter.gui.chart.IPointPainter#paintPoint(int, int, int,
-   *      int, java.awt.Graphics2D, info.monitorenter.gui.chart.TracePoint2D)
+   *      int, java.awt.Graphics, info.monitorenter.gui.chart.TracePoint2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g, final TracePoint2D original) {
+      final int nextY, final Graphics g, final TracePoint2D original) {
     this.m_previousX = nextX;
     this.m_previousY = nextY;
     this.m_previousPoint = original;
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePainter#startPaintIteration(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.ITracePainter#startPaintIteration(java.awt.Graphics)
    */
-  public void startPaintIteration(final Graphics2D g2d) {
+  public void startPaintIteration(final Graphics g2d) {
     // nop
   }
 
   /**
    * Returns the previous trace point that had to be painted by
-   * {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   * {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    * <p>
    * 
    * This value will be <code>null</code> if no previous point had to be
@@ -203,7 +208,7 @@ public abstract class ATracePainter implements info.monitorenter.gui.chart.ITrac
    * <p>
    * 
    * @return the previous trace point that had to be painted by
-   *         {@link #paintPoint(int, int, int, int, Graphics2D, TracePoint2D)}.
+   *         {@link #paintPoint(int, int, int, int, Graphics, TracePoint2D)}.
    */
   protected TracePoint2D getPreviousPoint() {
     return this.m_previousPoint;

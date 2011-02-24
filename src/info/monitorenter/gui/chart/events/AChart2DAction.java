@@ -28,7 +28,6 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.AbstractAction;
 
-
 /**
  * The base class that connects triggered actions with an
  * {@link info.monitorenter.gui.chart.Chart2D} instance.
@@ -36,21 +35,24 @@ import javax.swing.AbstractAction;
  * Every subclass may delegate it's constructor-given <code>Chart2D</code>
  * instance as protected member <code>m_chart</code>.
  * <p>
- *
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
- * @version $Revision: 1.3 $
- *
+ * 
+ * @version $Revision: 1.4 $
+ * 
  */
 public abstract class AChart2DAction extends AbstractAction implements PropertyChangeListener {
+
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = 1583028358015580585L;
 
   /** The target of this action. */
   protected Chart2D m_chart;
 
   /**
-   * Create an <code>Action</code> that accesses the chart and identifies
-   * itself with the given action String.
-   *
+   * Create an <code>Action</code> that accesses the chart and identifies itself
+   * with the given action String.
+   * 
    * @param chart
    *          the target the action will work on
    * @param description
@@ -62,6 +64,6 @@ public abstract class AChart2DAction extends AbstractAction implements PropertyC
   public AChart2DAction(final Chart2D chart, final String description) {
     super(description);
     this.m_chart = chart;
-  }  
-  
+  }
+
 }

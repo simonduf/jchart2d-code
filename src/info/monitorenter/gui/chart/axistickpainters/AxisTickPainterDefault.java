@@ -25,7 +25,7 @@ package info.monitorenter.gui.chart.axistickpainters;
 
 import info.monitorenter.gui.chart.IAxisTickPainter;
 
-import java.awt.Graphics2D;
+import java.awt.Graphics;
 
 /**
  * Default implementation for a tick painter that uses all given arguments (no
@@ -34,7 +34,7 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  * 
  */
 public class AxisTickPainterDefault implements IAxisTickPainter {
@@ -58,18 +58,18 @@ public class AxisTickPainterDefault implements IAxisTickPainter {
 
   /**
    * @see info.monitorenter.gui.chart.IAxisTickPainter#paintXLabel(int, int,
-   *      java.lang.String, java.awt.Graphics2D)
+   *      java.lang.String, java.awt.Graphics)
    */
-  public void paintXLabel(final int x, final int y, final String label, final Graphics2D g) {
+  public void paintXLabel(final int x, final int y, final String label, final Graphics g) {
     g.drawString(label, x, y);
   }
 
   /**
    * @see info.monitorenter.gui.chart.IAxisTickPainter#paintXTick(int, int,
-   *      boolean, boolean, java.awt.Graphics2D)
+   *      boolean, boolean, java.awt.Graphics)
    */
   public void paintXTick(final int x, final int y, final boolean isMajorTick,
-      final boolean isBottomSide, final Graphics2D g) {
+      final boolean isBottomSide, final Graphics g) {
     if (isMajorTick) {
       if (isBottomSide) {
         g.drawLine(x, y, x, y + AxisTickPainterDefault.MAJOR_TICK_LENGTH);
@@ -87,18 +87,18 @@ public class AxisTickPainterDefault implements IAxisTickPainter {
 
   /**
    * @see info.monitorenter.gui.chart.IAxisTickPainter#paintYLabel(int, int,
-   *      java.lang.String, java.awt.Graphics2D)
+   *      java.lang.String, java.awt.Graphics)
    */
-  public void paintYLabel(final int x, final int y, final String label, final Graphics2D g) {
+  public void paintYLabel(final int x, final int y, final String label, final Graphics g) {
     g.drawString(label, x, y);
   }
 
   /**
    * @see info.monitorenter.gui.chart.IAxisTickPainter#paintYTick(int, int,
-   *      boolean, boolean, java.awt.Graphics2D)
+   *      boolean, boolean, java.awt.Graphics)
    */
   public void paintYTick(final int x, final int y, final boolean isMajorTick,
-      final boolean isLeftSide, final Graphics2D g) {
+      final boolean isLeftSide, final Graphics g) {
     if (isMajorTick) {
       if (isLeftSide) {
         g.drawLine(x, y, x - AxisTickPainterDefault.MAJOR_TICK_LENGTH, y);

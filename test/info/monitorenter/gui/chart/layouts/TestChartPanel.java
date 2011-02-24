@@ -54,7 +54,7 @@ import junit.framework.TestSuite;
  * @author Holger Brandl
  * 
  * 
- * @version $Revision: 1.2.4.2 $
+ * @version $Revision: 1.4 $
  */
 public class TestChartPanel
     extends TestCase {

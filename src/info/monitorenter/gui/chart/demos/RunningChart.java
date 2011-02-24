@@ -44,25 +44,24 @@ import javax.swing.JFrame;
  * A test for the <code>Chart2D</code> that constantly adds new tracepoints to a
  * <code> Trace2DLtd</code>. Mainly the runtime- scaling is interesting.
  * <p>
- * Furthermore this is an example on how to connect other components to the <code>Chart2D</code>
- * using an adaptor- class. If interested have a look on
+ * Furthermore this is an example on how to connect other components to the
+ * <code>Chart2D</code> using an adaptor- class. If interested have a look on
  * {@link info.monitorenter.reflection.ObjRecorder2Trace2DAdapter}.
  * <p>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'> Achim Westermann </a>
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
-public class RunningChart
-    extends JFrame {
+public class RunningChart extends JFrame {
   /**
-   * Helper class that holds an internal number that is randomly modified by a Thread.
+   * Helper class that holds an internal number that is randomly modified by a
+   * Thread.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * @version $Revision: 1.11 $
+   * @version $Revision: 1.12 $
    */
-  static class RandomBumper
-      extends Thread {
+  static class RandomBumper extends Thread {
     /** Streches or compresses the grade of jumping of the internal number. */
     protected double m_factor;
 
@@ -80,9 +79,9 @@ public class RunningChart
      * <p>
      * 
      * @param plusminus
-     *            probability to increase or decrease the number each step.
+     *          probability to increase or decrease the number each step.
      * @param factor
-     *            affects the amplitude of the number (severity of jumps).
+     *          affects the amplitude of the number (severity of jumps).
      */
     public RandomBumper(final double plusminus, final int factor) {
 
@@ -100,6 +99,7 @@ public class RunningChart
     /**
      * @see java.lang.Runnable#run()
      */
+    @Override
     public void run() {
 
       while (true) {
@@ -130,7 +130,7 @@ public class RunningChart
    * <p>
    * 
    * @param args
-   *            ignored.
+   *          ignored.
    */
   public static void main(final String[] args) {
 
@@ -167,20 +167,24 @@ public class RunningChart
   protected Chart2D m_chart = null;
 
   /**
-   * Creates an instance that will dynamically paint on the chart to a trace with the given label.
+   * Creates an instance that will dynamically paint on the chart to a trace
+   * with the given label.
    * <p>
    * 
    * @param chart
-   *            the chart to use.
+   *          the chart to use.
    * @param label
-   *            the name of the trace too display.
+   *          the name of the trace too display.
    */
   public RunningChart(final Chart2D chart, final String label) {
 
     super(label);
     this.m_chart = chart;
     this.addWindowListener(new WindowAdapter() {
-
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent e) {
 
         RunningChart.this.setVisible(false);

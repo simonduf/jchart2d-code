@@ -73,6 +73,7 @@ public class PropertyFileStaticDataCollector extends AStaticDataCollector {
   /**
    * @see info.monitorenter.gui.chart.io.AStaticDataCollector#collectData()
    */
+  @Override
   public void collectData() throws FileNotFoundException, IOException {
     Properties props = new Properties();
     props.load(this.m_source);

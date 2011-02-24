@@ -1,7 +1,7 @@
 /*
  * File   : $Source: /cvsroot/jchart2d/jchart2d/history.txt,v $
- * Date   : $Date: 2008/06/01 11:29:36 $
- * Version: $Revision: 1.144 $
+ * Date   : $Date: 2008/12/02 07:27:33 $
+ * Version: $Revision: 1.160 $
  *
  * This file is part of jchart2d -
  * the Open Source real time charting library.
@@ -21,6 +21,30 @@ Legend:
 o API change that requires refactoring. 
   Note that refactoring of protected code intended for library 
   internal details will not be listed.
+
+jchart2d-3.1.0 - December, 2nd, 2008
+
+* Fixed bug #2016296: Creating an instance of Chart2D prevents the application from stopping.
+* info.monitorenter.gui.uti.ColorIterator was missing in jar file. 
+* Fixed issue with missing menu entries for frame menu bar (compared to items in popup menu).
+* Fixed unreported bug: Axis title for y axes on right side were not painted. 
+* Fixed unreported unreleased bug: popup menu would not work any more. 
+* Fixed bug: missing constants in binary jar. 
+! Data points may be highlighted now. Use: TracePoint.setHighlight(true);.
+  Configure the way of highlighting (example): chart.setPointHighlighter(new PointPainterDisc(8));
+! Traces may be traced visually now by tool tips that mark a data point. 
+  Use: chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
+! Axis titles may now have a custom color. 
+! Added method for finding minimum normalized Manhattan distance of points of a trace. 
+! Chart may now be saved to an encapsulated postscript file.
+! Chart may now be printed via a print dialog. 
+! Updated coding conventions (use helpful annotations). 
+! It is possible to deactivate labels for traces (by setting name and physical units to "" or null).
+! The binary distribution / build has been changed: 3rd party libraries are not contained in the core jar any more. 
+! Switched to proguard version 4.2. 
+o Deactivated tool tip by default: Use chart.setToolTipType(Chart2D.ToolTipType.DATAVALUES); 
+  for classic behavior. But note that this will only work when using one left y axis and 
+  one bottom x axis. 
 
 
 jchart2d-3.0.0 - June, 1st, 2008

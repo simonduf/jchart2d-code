@@ -44,7 +44,7 @@ import info.monitorenter.gui.chart.TracePoint2D;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class Trace2DReplacing extends Trace2DSimple {
 
@@ -71,6 +71,7 @@ public class Trace2DReplacing extends Trace2DSimple {
    * @return true if the point wathe maximum amount of points that will be
    *         showns successfully added.
    */
+  @Override
   public boolean addPointInternal(final TracePoint2D p) {
     boolean result = true;
     int index = -1;

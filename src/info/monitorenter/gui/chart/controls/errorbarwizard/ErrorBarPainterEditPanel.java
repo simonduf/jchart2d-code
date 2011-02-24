@@ -58,7 +58,7 @@ import javax.swing.border.TitledBorder;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class ErrorBarPainterEditPanel
     extends JPanel {
@@ -79,7 +79,7 @@ public class ErrorBarPainterEditPanel
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.9 $
+   * @version $Revision: 1.10 $
    */
   private class SegmentChooserPanel
       extends JPanel {
@@ -94,7 +94,7 @@ public class ErrorBarPainterEditPanel
      * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
      * 
      * 
-     * @version $Revision: 1.9 $
+     * @version $Revision: 1.10 $
      */
     final class ColorIconUpdater implements PropertyChangeListener {
 
@@ -110,7 +110,7 @@ public class ErrorBarPainterEditPanel
        *            the color icon to adapt the color property of the segment
        *            to.
        */
-      private ColorIconUpdater(final ColorIcon adaptee) {
+      protected ColorIconUpdater(final ColorIcon adaptee) {
         this.m_adaptee = adaptee;
       }
 
@@ -131,7 +131,7 @@ public class ErrorBarPainterEditPanel
     private static final long serialVersionUID = 6645527616687209066L;
 
     /** The error bar painter segment to configure. */
-    private IErrorBarPainter.ISegment m_segment;
+    protected IErrorBarPainter.ISegment m_segment;
 
     /**
      * Creates a panel that offers configuration of the given error bar painter.

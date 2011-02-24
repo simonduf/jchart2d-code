@@ -42,15 +42,14 @@ import javax.swing.JFrame;
 
 /**
  * A demo that uses a
- * {@link info.monitorenter.gui.chart.views.ChartCoordinateView} to
- * display the position of the mouse over the chart.
+ * {@link info.monitorenter.gui.chart.views.ChartCoordinateView} to display the
+ * position of the mouse over the chart.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
-public class CoordinateViewChart
-    extends JFrame {
+public class CoordinateViewChart extends JFrame {
 
   /**
    * Generated <code>serial version UID</code>.
@@ -105,6 +104,10 @@ public class CoordinateViewChart
     contentPane.add(viewChartValue, gbc);
 
     this.addWindowListener(new WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent e) {
         System.exit(0);
       }

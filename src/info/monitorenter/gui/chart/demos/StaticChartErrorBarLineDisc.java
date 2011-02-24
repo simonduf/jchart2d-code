@@ -55,10 +55,9 @@ import javax.swing.JPanel;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
-public final class StaticChartErrorBarLineDisc
-    extends JPanel {
+public final class StaticChartErrorBarLineDisc extends JPanel {
   /**
    * Generated for <code>serialVersionUID</code>.
    */
@@ -76,6 +75,10 @@ public final class StaticChartErrorBarLineDisc
       JFrame frame = new JFrame(StaticChartErrorBarLineDisc.class.getName());
       frame.getContentPane().add(new StaticChartErrorBarLineDisc());
       frame.addWindowListener(new WindowAdapter() {
+        /**
+         * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+         */
+        @Override
         public void windowClosing(final WindowEvent e) {
           System.exit(0);
         }

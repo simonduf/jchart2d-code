@@ -32,7 +32,7 @@ import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.pointpainters.PointPainterLine;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
@@ -45,8 +45,9 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * <p>
  * 
  * Property change events are fired as described in method
- * <code>{@link info.monitorenter.gui.chart.IErrorBarPainter#addPropertyChangeListener(String, PropertyChangeListener) }</code>.
- * Note that adding property change listeners to the nested access facades of
+ * 
+ * <code>{@link info.monitorenter.gui.chart.IErrorBarPainter#addPropertyChangeListener(String, PropertyChangeListener) }</code>
+ * . Note that adding property change listeners to the nested access facades of
  * type
  * <code>{@link info.monitorenter.gui.chart.IErrorBarPainter.ISegment}</code>
  * accessible via <code>getXXXSegment()</code> methods will fire the
@@ -61,7 +62,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.16 $
  */
 public class ErrorBarPainter implements IErrorBarPainter {
 
@@ -100,22 +101,35 @@ public class ErrorBarPainter implements IErrorBarPainter {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.13 $
+   * @version $Revision: 1.16 $
    */
   private abstract class ASegment implements ISegment {
 
     /**
-     * Properties supported are defined in
-     * <code>{@link IErrorBarPainter#addPropertyChangeListener(String, PropertyChangeListener)}</code>.
+     * Defcon.
+     * <p>
+     */
+    protected ASegment() {
+      super();
+    }
+
+    /** Generated <code>serialVersionUID</code>. **/
+    private static final long serialVersionUID = 6620706884643200785L;
+
+    /**
+     * Properties supported are defined in <code>
+     * {@link IErrorBarPainter#addPropertyChangeListener(String, PropertyChangeListener)}
+     * </code>.
      * <p>
      * 
      * Note that adding property change listeners to the nested access facades
      * of type <code>{@link IErrorBarPainter.ISegment}</code> accessible via
      * <code>getXXXSegment()</code> methods will fire the corresponding events
      * for listeners of this instance (as they delegate the calls) while they
-     * fire events for properties defined in <code>{@link IErrorBarPainter.ISegment}</code>
-     * too. If you register for events of this instance and for the retrieved
-     * segments you will receive two
+     * fire events for properties defined in
+     * <code>{@link IErrorBarPainter.ISegment}</code> too. If you register for
+     * events of this instance and for the retrieved segments you will receive
+     * two
      * <code>{@link PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)}</code>
      * for the same value changed.
      * <p>
@@ -429,9 +443,9 @@ public class ErrorBarPainter implements IErrorBarPainter {
 
   /**
    * @see info.monitorenter.gui.chart.IErrorBarPainter#paintErrorBar(int, int,
-   *      java.awt.Graphics2D, info.monitorenter.gui.chart.IErrorBarPixel)
+   *      java.awt.Graphics, info.monitorenter.gui.chart.IErrorBarPixel)
    */
-  public void paintErrorBar(final int absoluteX, final int absoluteY, final Graphics2D g,
+  public void paintErrorBar(final int absoluteX, final int absoluteY, final Graphics g,
       final IErrorBarPixel errorBar) {
 
     Chart2D chart = errorBar.getTrace().getRenderer();
@@ -542,7 +556,7 @@ public class ErrorBarPainter implements IErrorBarPainter {
    * and invisibility (null painter) management.
    * <p>
    * Factored out code to keep calling method
-   * {@link #paintErrorBar(int, int, Graphics2D, IErrorBarPixel)} smaller.
+   * {@link #paintErrorBar(int, int, Graphics, IErrorBarPixel)} smaller.
    * <p>
    * 
    * @param absoluteX
@@ -569,7 +583,7 @@ public class ErrorBarPainter implements IErrorBarPainter {
    *          needed for painting.
    */
   private final void paintErrorBarPart(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final IPointPainter pointPainter, final Color color, final Graphics2D g2d) {
+      final int nextY, final IPointPainter pointPainter, final Color color, final Graphics g2d) {
     if (pointPainter != null) {
       boolean colorChange = false;
       Color backupColor = g2d.getColor();

@@ -30,7 +30,7 @@ import info.monitorenter.util.Range;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  * 
  */
 public final class RangePolicyForcedPoint extends RangePolicyMinimumViewport {
@@ -72,6 +72,7 @@ public final class RangePolicyForcedPoint extends RangePolicyMinimumViewport {
    *          and
    *          {@link info.monitorenter.gui.chart.IRangePolicy#getMax(double, double)}.
    */
+  @Override
   public void setRange(final Range range) {
     double min = range.getMin();
     if (min != range.getMax()) {

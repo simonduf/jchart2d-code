@@ -34,7 +34,7 @@ import java.util.List;
  * 
  * @author Achim.Westermann@gmx.de
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.6 $
  */
 public final class StringUtil {
   /** Singleton instance. */
@@ -49,10 +49,10 @@ public final class StringUtil {
    * <p>
    * 
    * @param s
-   *            the base String to append spaces to.
+   *          the base String to append spaces to.
    * 
    * @param count
-   *            the amount of spaces to append.
+   *          the amount of spaces to append.
    * 
    * @return a String consisting of s and count trailing whitespaces.
    */
@@ -87,9 +87,9 @@ public final class StringUtil {
    * <p>
    * 
    * @param objects
-   *            the List of objects that will be changed to a list of the String
-   *            representation of the Objects with respect to special array
-   *            treatment.
+   *          the List of objects that will be changed to a list of the String
+   *          representation of the Objects with respect to special array
+   *          treatment.
    * 
    */
   public static final void arraysToString(final List<Object> objects) {
@@ -123,7 +123,7 @@ public final class StringUtil {
    * </code>
    * 
    * @param isArr
-   *            The Array to represent as String.
+   *          The Array to represent as String.
    * 
    * @return a String-representation of the Object.
    * 
@@ -173,10 +173,8 @@ public final class StringUtil {
    * 
    * @return the system - dependent line separator.
    */
-  @SuppressWarnings("unchecked")
   public static String getNewLine() {
-    return (String) java.security.AccessController
-        .doPrivileged(new sun.security.action.GetPropertyAction("line.separator"));
+    return  System.getProperty("line.separator");
   }
 
   /**
@@ -185,7 +183,8 @@ public final class StringUtil {
    * 
    * This method is useless for now as all methods are static. It may be used in
    * future if VM-global configuration will be put to the state of the instance.
-   * <p>#
+   * <p>
+   * #
    * 
    * @return the singleton instance of this class.
    */
@@ -201,7 +200,7 @@ public final class StringUtil {
    * <p>
    * 
    * @param test
-   *            the <code>String</code> to test.
+   *          the <code>String</code> to test.
    * 
    * @return true if the argument is null or consists of whitespaces only.
    */
@@ -231,8 +230,8 @@ public final class StringUtil {
    * </pre>
    * 
    * @param objects
-   *            the <code>List&lt;Object&gt;</code> to inspect for the maximum
-   *            length of a {@link Object#toString()} result.
+   *          the <code>List&lt;Object&gt;</code> to inspect for the maximum
+   *          length of a {@link Object#toString()} result.
    * 
    * @return The length of the longest String - representation of an Object in
    *         the List <b>or 0 if objects was null or of size 0. </b>
@@ -267,9 +266,9 @@ public final class StringUtil {
    * 
    * 
    * @param s
-   *            the String to expand.
+   *          the String to expand.
    * @param length
-   *            the desired length of the String to be returned.
+   *          the desired length of the String to be returned.
    * @return A String that represents the content of the old String including
    *         extra whitespaces.
    */
@@ -298,8 +297,8 @@ public final class StringUtil {
    * <li>You have got an AbstractList or subclass containing Objects you do not
    * know.</li>
    * <li>You want to transform all Elements in the List to Strings.</li>
-   * <li>There might be Array's in the Object (whose toString method will
-   * return only their hashcode).</li>
+   * <li>There might be Array's in the Object (whose toString method will return
+   * only their hashcode).</li>
    * </ul>
    * <p>
    * 
@@ -322,8 +321,8 @@ public final class StringUtil {
    * <p>
    * 
    * @param objects
-   *            contains the Objects to replace by their toString()
-   *            representation.
+   *          contains the Objects to replace by their toString()
+   *          representation.
    */
   public static final void toLongestString(final List<Object> objects) {
     if (objects == null) {

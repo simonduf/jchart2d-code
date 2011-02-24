@@ -39,7 +39,7 @@ import javax.swing.Action;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final class ErrorBarPainterActionSetSegmentPainter
     extends AbstractAction {
@@ -94,6 +94,7 @@ public final class ErrorBarPainterActionSetSegmentPainter
    * 
    * @see java.lang.Object#toString()
    */
+  @Override
   public String toString() {
     return (String) this.getValue(Action.NAME);
   }

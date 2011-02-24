@@ -26,7 +26,7 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.TracePoint2D;
 
-import java.awt.Graphics2D;
+import java.awt.Graphics;
 
 /**
  * Renders points by painting a bar with choosable width for each point to show.
@@ -37,7 +37,7 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  * 
  */
 public class PointPainterVerticalBar extends APointPainter implements IPointPainter {
@@ -92,10 +92,10 @@ public class PointPainterVerticalBar extends APointPainter implements IPointPain
 
   /**
    * @see info.monitorenter.gui.chart.IPointPainter#paintPoint(int, int, int,
-   *      int, java.awt.Graphics2D, info.monitorenter.gui.chart.TracePoint2D)
+   *      int, java.awt.Graphics, info.monitorenter.gui.chart.TracePoint2D)
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics2D g, final TracePoint2D original) {
+      final int nextY, final Graphics g, final TracePoint2D original) {
     g.fillRect(absoluteX - this.m_halfWidth, absoluteY, 2 * this.m_halfWidth, this.m_chart
         .getYChartStart()
         - absoluteY);

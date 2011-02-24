@@ -22,7 +22,6 @@
 
 package info.monitorenter.gui.chart;
 
-
 import java.awt.geom.Point2D;
 
 /**
@@ -31,9 +30,9 @@ import java.awt.geom.Point2D;
  * <code>Chart2D</code> to cache the scaled values (between 0.0 and 1.0) without having to keep a
  * copy of the aggregators (<code>ITrace2D</code>) complete tracepoints.
  * <p>
- * This avoids the necessity to care for the correct order of a set of scaled tracepoints copied
- * for caching purposes. Especially in the case of new <code>TracePoint2D</code> instances added
- * to a <code>ITrace2D</code> instance managed by a <code>Chart2D</code> there remains no
+ * This avoids the necessity to care for the correct order of a set of scaled tracepoints copied for
+ * caching purposes. Especially in the case of new <code>TracePoint2D</code> instances added to a
+ * <code>ITrace2D</code> instance managed by a <code>Chart2D</code> there remains no
  * responsibility for sorting the cached copy. This allows that the managing <code>Chart2D</code>
  * may just rescale the newly added tracepoint instead of searching for the correct order of the new
  * tracepoint by value - comparisons of x and y: The <code>TracePoint2D</code> passed to the
@@ -49,7 +48,7 @@ import java.awt.geom.Point2D;
  * <p>
  * 
  * @author Achim Westermann <a href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.17 $
  */
 public class TracePoint2D
     extends Point2D.Double implements Comparable<TracePoint2D>, java.io.Serializable, Cloneable {
@@ -85,6 +84,9 @@ public class TracePoint2D
    */
   public static final transient int STATE_REMOVED = 2;
 
+  /** Flag to highlight the point. * */
+  private boolean m_highlight;
+
   /**
    * The reference to the listening <code>ITrace</code> who owns this point.
    * <p>
@@ -96,12 +98,12 @@ public class TracePoint2D
   /**
    * Scaled x value.
    */
- private double m_scaledX;
+  private double m_scaledX;
 
   /**
    * Scaled y value.
    */
- private double m_scaledY;
+  private double m_scaledY;
 
   /** The x coordinate, re-declared as the super class member will not be serialized. */
   private double m_x;
@@ -127,12 +129,14 @@ public class TracePoint2D
   /**
    * @see java.lang.Object#clone()
    */
+  @Override
   public Object clone() {
     TracePoint2D result = (TracePoint2D) super.clone();
     result.m_x = this.m_x;
     result.m_y = this.m_y;
     result.m_scaledX = this.m_scaledX;
     result.m_scaledY = this.m_scaledY;
+    result.m_highlight = this.m_highlight;
     return result;
   }
 
@@ -165,6 +169,7 @@ public class TracePoint2D
   /**
    * @see java.lang.Object#equals(java.lang.Object)
    */
+  @Override
   public boolean equals(final Object o) {
     return this.compareTo((TracePoint2D) o) == 0;
 
@@ -181,10 +186,91 @@ public class TracePoint2D
   }
 
   /**
+   * Returns the Manhattan distance of this point's normalized values (<code>{@link #getScaledX()}, {@link #getScaledY()}</code>)
+   * to the given normalized coordinates.
+   * <p>
+   * 
+   * @param xNormalized
+   *            the normalized x coordinate between 0 and 1.0 to measure the Manhattan distance to.
+   * @param yNormalized
+   *            the normalized y coordinate between 0 and 1.0 to measure the Manhattan distance to.
+   * @return the Manhattan distance of this point's normalized values (<code>{@link #getScaledX()}, {@link #getScaledY()}</code>)
+   * to the given normalized coordinates.
+   */
+  public double getManhattanDistance(final double xNormalized, final double yNormalized) {
+    double result;
+    result = Math.abs(this.m_scaledX - xNormalized) + Math.abs(this.m_scaledY - yNormalized);
+    return result;
+  }
+
+  /**
+   * Returns the Manhattan distance of this point to the given one.
+   * <p>
+   * 
+   * @param point
+   *            the point to measure the Manhattan distance to.
+   * @return the Manhattan distance of this point to the given one.
+   */
+  public double getManhattanDistance(final TracePoint2D point) {
+    return this.getManhattanDistance(point.getX(), point.getY());
+  }
+
+  /**
+   * @return the scaledX.
+   */
+  public final double getScaledX() {
+    return this.m_scaledX;
+  }
+
+  /**
+   * @return the scaledY.
+   */
+  public final double getScaledY() {
+    return this.m_scaledY;
+  }
+
+  /**
+   * @see java.awt.geom.Point2D.Double#getX()
+   */
+  @Override
+  public double getX() {
+    return this.m_x;
+  }
+
+  /**
+   * @see java.awt.geom.Point2D.Double#getY()
+   */
+  @Override
+  public double getY() {
+    return this.m_y;
+  }
+
+  /**
    * @see java.lang.Object#hashCode()
    */
+  @Override
   public int hashCode() {
     return super.hashCode();
+  }
+
+  /**
+   * @return the highlight.
+   */
+  public final boolean isHighlight() {
+    return this.m_highlight;
+  }
+
+  /**
+   * Sets if this point should be highlighted.<p>
+   * 
+   * If a point is highligted it will be additionally painted by <code>{@link Chart2D#getPointHighlighter()}</code> 
+   * in the next paint cycle. After the paint cycle this will be reset to <code>false</code>.<p>
+   *  
+   * @param highlight
+   *            the highlight to set
+   */
+  public final void setHighlight(final boolean highlight) {
+    this.m_highlight = highlight;
   }
 
   /**
@@ -212,6 +298,7 @@ public class TracePoint2D
    * @param yValue
    *            the new y-coordinate for this point.
    */
+  @Override
   public void setLocation(final double xValue, final double yValue) {
 
     this.m_x = xValue;
@@ -219,37 +306,6 @@ public class TracePoint2D
     if (this.m_listener != null) {
       this.m_listener.firePointChanged(this, TracePoint2D.STATE_CHANGED);
     }
-  }
-
-  /**
-   * @see java.awt.geom.Point2D.Double#getX()
-   */
-  @Override
-  public double getX() {
-    return this.m_x;
-  }
-
-  /**
-   * @see java.awt.geom.Point2D.Double#getY()
-   */
-  @Override
-  public double getY() {
-    return this.m_y;
-  }
-
-  /**
-   * @see java.awt.geom.Point2D.Double#toString()
-   */
-  @Override
-  public String toString() {
-    return "TracePoint2D[" + this.m_x + ", " + this.m_y + "]";
-  }
-
-  /**
-   * @return the scaledX.
-   */
-  public final double getScaledX() {
-    return this.m_scaledX;
   }
 
   /**
@@ -264,13 +320,6 @@ public class TracePoint2D
   }
 
   /**
-   * @return the scaledY.
-   */
-  public final double getScaledY() {
-    return this.m_scaledY;
-  }
-
-  /**
    * Only intended for Chart2D!!!.
    * <p>
    * 
@@ -279,5 +328,13 @@ public class TracePoint2D
    */
   public final void setScaledY(final double scaledY) {
     this.m_scaledY = scaledY;
+  }
+
+  /**
+   * @see java.awt.geom.Point2D.Double#toString()
+   */
+  @Override
+  public String toString() {
+    return "TracePoint2D[" + this.m_x + ", " + this.m_y + "]";
   }
 }

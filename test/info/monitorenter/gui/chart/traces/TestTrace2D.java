@@ -262,7 +262,7 @@ public class TestTrace2D
      * 
      * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
      * 
-     * @version $Revision: 1.1.4.3 $
+     * @version $Revision: 1.5 $
      */
     class PropertyChangeDetector implements PropertyChangeListener {
 

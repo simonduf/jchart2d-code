@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-  var update="08/08/2006";
+  var update="12/16/2007";
  </script>
  <body id="usage">
   <div id="wrapper">
@@ -24,7 +24,7 @@
      <p>
       Before you start you might want to take a look at JChart2D's realtime performance. 
       This may be done on the <a href="./applet.shtml">applet</a> page or by downloading the 
-      binary jar file, let's say <em>jchart2d-2.0.0.jar</em>
+      binary jar file, let's say <em>jchart2d-3.1.0.jar</em>
       <ol>
        <li>
        Download the file to a directory &lt;dir&gt;. 
@@ -47,7 +47,7 @@
      <p>
       Now go to &lt;dir&gt; via the "cd" command and type. 
       <blockquote>
-       java -jar jchart2d-2.0.0.jar 
+       java -jar jchart2d-3.1.0.jar 
       </blockquote>
       The showcase example chart starts. 
      </p>
@@ -61,13 +61,25 @@
      <p>
       Another example with multithreaded traces may be viewed by typing: 
       <blockquote>
-       java -cp jchart2d-2.0.0.jar info.monitorenter.gui.chart.demos.MultiTracing
+       java -cp jchart2d-3.1.0.jar info.monitorenter.gui.chart.demos.MultiTracing
       </blockquote>
       You may resize the window and see how the scaling takes advantage of more space. 
       The command looks different to the first. This is because the first command tells 
       java to look into the jar file for a file <em>META-INF/manifest.mf</em> in which 
       the name of the entry point (main class) is written. The 2<sup>nd</sup> command 
       tells plain-forward which class to start. 
+     </p>
+     <p>
+     If you want to use all features of JChart2D enabled (e.g. eps export) you have to include all libraries (*.jar files) from the 
+     binary distribution zip file in the class path of the java process. <br/>
+     For Windows type:  
+     <blockquote>
+       java -cp jchart2d-3.1.0.jar;jlibeps-0.1.jar info.monitorenter.gui.chart.demos.MultiTracing
+     </blockquote> 
+     For Linux type: 
+     <blockquote>
+       java -cp jchart2d-3.1.0.jar:jlibeps-0.1.jar info.monitorenter.gui.chart.demos.MultiTracing
+     </blockquote> 
      </p>
      
      <h3>Design</h3>
@@ -94,7 +106,7 @@
       of the data points. By default a trace painter that interconnects the 
       data points with lines is used but dots, circles and filled polygon 
       is currently supported. <br>
-      The interaction needed for rendering is a chain: The applicatioin code that 
+      The interaction needed for rendering is a chain: The application code that 
       uses the API just adds a point to a trace. The trace then notifies it's chart 
       that it has changed. The chart then keeps this change in mind and will rescale and 
       repaint in the next painting cycle. Nothing more has to be done at runtime by the user code 
@@ -141,7 +153,7 @@
 	 
 	 <p>
 	  <h4>TracePoint2D</h4>
-	  A simple datatype that contains the two double values that define a location in a two dimensional 
+	  A simple data type that contains the two double values that define a location in a two dimensional 
 	  coordinate system. Instances are created by the application code, that uses the JChart2D API. 
 	  The Chart2D uses two package friendly members to cache values scaled between 0.0 and 1.0. It is possible to 
 	  alter the values inside [setLocation(double,double)] which will notify the corresponding ITrace 
@@ -158,7 +170,7 @@
       For playing around with the demo code provided I recommend to use an IDE like 
       <a href="http://eclipse.org" target="_blank">eclipse</a>. Download the binary distribution 
       in form of a jar file here: 
-      <a href="http://prdownloads.sourceforge.net/jchart2d/jchart2d-2.0.0.jar?download" target="_blank">jchart2d-2.0.0.jar</a>. 
+      <a href="http://prdownloads.sourceforge.net/jchart2d/jchart2d-2.2.2.jar?download" target="_blank">jchart2d-2.2.2.jar</a>. 
       Put this jar file into the classpath of your IDE. Under eclipse this is done by copying 
       the file in your eclipse workspace/&lt;projectname&gt; directory and then choosing: 
       <PRE>

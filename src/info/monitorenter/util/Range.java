@@ -99,6 +99,7 @@ public class Range implements Serializable {
   /**
    * @see java.lang.Object#equals(java.lang.Object)
    */
+  @Override
   public boolean equals(final Object obj) {
     boolean result = true;
     if (obj instanceof Range) {
@@ -143,6 +144,7 @@ public class Range implements Serializable {
   /**
    * @see java.lang.Object#hashCode()
    */
+  @Override
   public int hashCode() {
     return this.toString().hashCode();
   }
@@ -201,6 +203,7 @@ public class Range implements Serializable {
   /**
    * @see java.lang.Object#toString()
    */
+  @Override
   public String toString() {
     StringBuffer ret = new StringBuffer("Range[");
     ret.append(this.m_min).append(',');

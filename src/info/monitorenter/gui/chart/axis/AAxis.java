@@ -42,7 +42,6 @@ import info.monitorenter.util.collections.TreeSetGreedy;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -60,45 +59,57 @@ import java.util.TreeSet;
  * The base class for an axis of the <code>{@link Chart2D}</code>.
  * <p>
  * Normally - as the design and interaction of an <code>Axis</code> with the
- * <code>{@link Chart2D}D</code> is very fine-grained - it is not instantiated by users of
- * jchart2d: It is automatically instantiated by the constructor of <code>Chart2D</code>. It then
- * may be retrieved from the <code>Chart2D</code> by the methods {@link Chart2D#getAxisX()} and
- * {@link Chart2D#getAxisY()} for further configuration.
+ * <code>{@link Chart2D}D</code> is very fine-grained - it is not instantiated
+ * by users of jchart2d: It is automatically instantiated by the constructor of
+ * <code>Chart2D</code>. It then may be retrieved from the <code>Chart2D</code>
+ * by the methods {@link Chart2D#getAxisX()} and {@link Chart2D#getAxisY()} for
+ * further configuration.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.37 $
+ * @version $Revision: 1.42 $
  */
 public abstract class AAxis implements IAxis, PropertyChangeListener {
+
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = -3615740476406530580L;
+
   /**
-   * Flag to detect if a rescaling has to be done.
+   * Flag to detect if a re-scaling has to be done.
    * <p>
-   * It is set to false in <code>{@link #scale()}</code> which is triggered from the painting
-   * Thread. Whenever a bound change is detected in
-   * <code>{@link #propertyChange(PropertyChangeEvent)}</code> this is set to true.
+   * It is set to false in <code>{@link #scale()}</code> which is triggered from
+   * the painting Thread. Whenever a bound change is detected in
+   * <code>{@link #propertyChange(PropertyChangeEvent)}</code> this is set to
+   * true.
    * <p>
-   * Please remind: In previous versions there was only a test if the bounds had changed since the
-   * last scaling. This was not always correct: If in between two paint cycles the bounds were
-   * changed and new points added but at the point in time when the 2nd paint cycle starts the
-   * bounds would be equal no full rescaling would be performed even if the added points would have
-   * been scaled in relation to the changed bounds at their adding time: Bounds checks are not
-   * sufficient!
+   * Please remind: In previous versions there was only a test if the bounds had
+   * changed since the last scaling. This was not always correct: If in between
+   * two paint cycles the bounds were changed and new points added but at the
+   * point in time when the 2nd paint cycle starts the bounds would be equal no
+   * full rescaling would be performed even if the added points would have been
+   * scaled in relation to the changed bounds at their adding time: Bounds
+   * checks are not sufficient!
    * <p>
    */
-  private boolean m_needsFullRescale = false;
+  protected boolean m_needsFullRescale = false;
 
   /**
    * An internal connector class that will connect the axis to the a Chart2D.
    * <p>
-   * It is aggregated to the {@link AAxis} in order to access either y values or x values of the
-   * Chart2D thus making the IAxis an Y Axis or X axis. This strategy reduces redundant code for
-   * label creation. It avoids complex inheritance / interface implements for different IAxis
-   * implementation that would be necessary for y-axis / x-axis implementations.
+   * It is aggregated to the {@link AAxis} in order to access either y values or
+   * x values of the Chart2D thus making the IAxis an Y Axis or X axis. This
+   * strategy reduces redundant code for label creation. It avoids complex
+   * inheritance / interface implements for different IAxis implementation that
+   * would be necessary for y-axis / x-axis implementations.
    * <p>
    * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    */
   public abstract class AChart2DDataAccessor implements Serializable {
+
+    /** Generated <code>serialVersionUID</code>. **/
+    private static final long serialVersionUID = 5023422232812082122L;
+
     /** The chart that is accessed. */
     protected Chart2D m_chart;
 
@@ -107,7 +118,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * <p>
      * 
      * @param chart
-     *            the chart that is accessed.
+     *          the chart that is accessed.
      */
     protected AChart2DDataAccessor(final Chart2D chart) {
 
@@ -129,7 +140,8 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * Returns the constant for the dimension that is accessed on the chart.
      * <p>
      * 
-     * @return {@link Chart2D#X}, {@link Chart2D#Y} or -1 if this axis is not assigned to a chart.
+     * @return {@link Chart2D#X}, {@link Chart2D#Y} or -1 if this axis is not
+     *         assigned to a chart.
      */
     public abstract int getDimension();
 
@@ -140,110 +152,122 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * <p>
      * 
      * @param g2d
-     *            needed for font metric information.
+     *          needed for font metric information.
      * @return the height in pixel the corresponding axis needs to paint itself.
      */
-    public abstract int getHeight(Graphics2D g2d);
+    public abstract int getHeight(Graphics g2d);
 
     /**
      * Returns the maximum pixels that will be needed to paint a label.
      * <p>
      * 
      * @param g2d
-     *            provides information about the graphics context to paint on (e.g. font size).
+     *          provides information about the graphics context to paint on
+     *          (e.g. font size).
      * @return the maximum pixels that will be needed to paint a label.
      */
     protected abstract double getMaximumPixelForLabel(final Graphics g2d);
 
     /**
-     * Returns the max value of the given trace according to the dimension the outer axis belongs
-     * to.
+     * Returns the max value of the given trace according to the dimension the
+     * outer axis belongs to.
      * <p>
-     * This is either an x or an y value depending on the dimension the outer axis is working in.
+     * This is either an x or an y value depending on the dimension the outer
+     * axis is working in.
      * <p>
      * 
      * @param trace
-     *            the trace to read the maximum of.
-     * @return the max value of the given trace according to the dimension the outer axis belongs
-     *         to.
+     *          the trace to read the maximum of.
+     * @return the max value of the given trace according to the dimension the
+     *         outer axis belongs to.
      */
     protected abstract double getMaxValue(ITrace2D trace);
 
     /**
-     * Returns the minimum amount of increase in the value that will be needed to display all labels
-     * without overwriting each others.
+     * Returns the minimum amount of increase in the value that will be needed
+     * to display all labels without overwriting each others.
      * <p>
-     * This procedure needs the amount of pixels needed by the largest possible label and relies on
-     * the implementation of {@link #getMaximumPixelForLabel(Graphics)}, whose result is multiplied
+     * This procedure needs the amount of pixels needed by the largest possible
+     * label and relies on the implementation of
+     * {@link #getMaximumPixelForLabel(Graphics)}, whose result is multiplied
      * with the "value per pixel" quantifier.
      * <p>
      * 
      * @param g2d
-     *            the current graphic context to use in case further information is required.
-     * @return the minimum amount of increase in the value that will be needed to display all labels
-     *         without overwriting each others.
+     *          the current graphic context to use in case further information
+     *          is required.
+     * @return the minimum amount of increase in the value that will be needed
+     *         to display all labels without overwriting each others.
      */
     protected abstract double getMinimumValueDistanceForLabels(final Graphics g2d);
 
     /**
-     * Returns the min value of the given trace according to the dimension the outer axis belongs
-     * to.
+     * Returns the min value of the given trace according to the dimension the
+     * outer axis belongs to.
      * <p>
-     * This is either an x or an y value depending on the dimension the outer axis is working in.
+     * This is either an x or an y value depending on the dimension the outer
+     * axis is working in.
      * <p>
      * 
      * @param trace
-     *            the trace to read the maximum of.
-     * @return the min value of the given trace according to the dimension the outer axis belongs
-     *         to.
+     *          the trace to read the maximum of.
+     * @return the min value of the given trace according to the dimension the
+     *         outer axis belongs to.
      */
     protected abstract double getMinValue(ITrace2D trace);
 
     /**
-     * Returns the amount of pixel available for displaying the values on the chart in the dimension
-     * this accessor stands for.
+     * Returns the amount of pixel available for displaying the values on the
+     * chart in the dimension this accessor stands for.
      * <p>
-     * This method must not be called within the first lines of a paint cycle (necessary underlying
-     * values then are computed new).
+     * This method must not be called within the first lines of a paint cycle
+     * (necessary underlying values then are computed new).
      * <p>
      * 
-     * @return the amount of pixel available for displaying the values on the chart in the dimension
-     *         this accessor stands for.
+     * @return the amount of pixel available for displaying the values on the
+     *         chart in the dimension this accessor stands for.
      */
     protected abstract int getPixelRange();
 
     /**
-     * Returns the value of the given point according to the dimension the outer axis belongs to.
+     * Returns the value of the given point according to the dimension the outer
+     * axis belongs to.
      * <p>
      * This is either <code>{@link TracePoint2D#getX()}</code> or
      * <code>{@link TracePoint2D#getY()}</code>.
      * <p>
      * 
      * @param point
-     *            the point to read <code>{@link TracePoint2D#getX()}</code> or
-     *            <code>{@link TracePoint2D#getY()}</code> from.
-     * @return the value of the given point according to the dimension the outer axis belongs to.
+     *          the point to read <code>{@link TracePoint2D#getX()}</code> or
+     *          <code>{@link TracePoint2D#getY()}</code> from.
+     * @return the value of the given point according to the dimension the outer
+     *         axis belongs to.
      */
     protected abstract double getValue(TracePoint2D point);
 
     /**
-     * Returns the value distance on the current chart that exists for the given amount of pixel
-     * distance in the given direction of this <code>AAxis</code>.
+     * Returns the value distance on the current chart that exists for the given
+     * amount of pixel distance in the given direction of this
+     * <code>AAxis</code>.
      * <p>
-     * Depending on the width of the actual Chart2D and the contained values, the relation between
-     * displayed distances (pixel) and value distances (the values of the added
-     * <code>{@link info.monitorenter.gui.chart.ITrace2D}</code> instances changes.
+     * Depending on the width of the actual Chart2D and the contained values,
+     * the relation between displayed distances (pixel) and value distances (the
+     * values of the added
+     * <code>{@link info.monitorenter.gui.chart.ITrace2D}</code> instances
+     * changes.
      * <p>
-     * This method calculates depending on the actual painting area of the Chart2D, the shift in
-     * value between two points that have a screen distance of the given pixel. <br>
+     * This method calculates depending on the actual painting area of the
+     * Chart2D, the shift in value between two points that have a screen
+     * distance of the given pixel. <br>
      * This method is not used by the chart itself but a helper for outside use.
      * <p>
      * 
      * @param pixel
-     *            The desired distance between to scale points of the x- axis in pixel.
-     * @return a scaled (from pixel to internal value-range) and normed (to the factor of the
-     *         current unit of the axis) value usable to calculate the coordinates for the scale
-     *         points of the axis.
+     *          The desired distance between to scale points of the x- axis in
+     *          pixel.
+     * @return a scaled (from pixel to internal value-range) and normed (to the
+     *         factor of the current unit of the axis) value usable to calculate
+     *         the coordinates for the scale points of the axis.
      */
     protected abstract double getValueDistanceForPixel(int pixel);
 
@@ -254,37 +278,39 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * <p>
      * 
      * @param g2d
-     *            needed for font metric information.
+     *          needed for font metric information.
      * @return the width in pixel the corresponding axis needs to paint itself.
      */
-    public abstract int getWidth(Graphics2D g2d);
+    public abstract int getWidth(Graphics g2d);
 
     /**
      * Scales the given trace in the dimension represented by this axis.
      * <p>
-     * This method is not deadlock - safe and should be called by the <code>{@link Chart2D}</code>
-     * only!
+     * This method is not deadlock - safe and should be called by the
+     * <code>{@link Chart2D}</code> only!
      * <p>
      * 
      * @param trace
-     *            the trace to scale.
+     *          the trace to scale.
      * @param range
-     *            the range to use as scaler.
+     *          the range to use as scaler.
      */
     protected abstract void scaleTrace(ITrace2D trace, Range range);
 
     /**
-     * Returns the translation of the mouse event coordinates of the given mouse event to the value
-     * within the chart for the dimension (x,y) covered by this axis.
+     * Returns the translation of the mouse event coordinates of the given mouse
+     * event to the value within the chart for the dimension (x,y) covered by
+     * this axis.
      * <p>
      * Note that the mouse event has to be an event fired on this component!
      * <p>
      * 
      * @param mouseEvent
-     *            a mouse event that has been fired on this component.
-     * @return the translation of the mouse event coordinates of the given mouse event to the value
-     *         within the chart for the dimension covered by this axis (x or y) or null if no
-     *         calculations could be performed as the chart was not painted before.
+     *          a mouse event that has been fired on this component.
+     * @return the translation of the mouse event coordinates of the given mouse
+     *         event to the value within the chart for the dimension covered by
+     *         this axis (x or y) or null if no calculations could be performed
+     *         as the chart was not painted before.
      */
     public abstract double translateMousePosition(final MouseEvent mouseEvent);
 
@@ -292,29 +318,32 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * Transforms the given pixel value (which has to be a awt value like
      * {@link java.awt.event.MouseEvent#getX()} into the chart value.
      * <p>
-     * Internal use only, the interface does not guarantee that the pixel corresponds to any valid
-     * awt pixel value within the chart component.
+     * Internal use only, the interface does not guarantee that the pixel
+     * corresponds to any valid awt pixel value within the chart component.
      * <p>
-     * Warning: A value transformed to a pixel by {@link #translateValueToPx(double)} and then
-     * retransformed by {@link #translatePxToValue(int)} will most often have changed, as the
-     * transformation from value to px a) has to hit an exact int b) most often will map from a
-     * bigger domain (value range) to a smaller one (range of chart on the screen).
+     * Warning: A value transformed to a pixel by
+     * {@link #translateValueToPx(double)} and then retransformed by
+     * {@link #translatePxToValue(int)} will most often have changed, as the
+     * transformation from value to px a) has to hit an exact int b) most often
+     * will map from a bigger domain (value range) to a smaller one (range of
+     * chart on the screen).
      * <p>
      * 
      * @param pixel
-     *            a pixel value of the chart component as used by awt.
+     *          a pixel value of the chart component as used by awt.
      * @return the awt pixel value transformed to the chart value.
      */
     public abstract double translatePxToValue(final int pixel);
 
     /**
-     * Transforms the given chart data value into the corresponding awt pixel value for the chart.
+     * Transforms the given chart data value into the corresponding awt pixel
+     * value for the chart.
      * <p>
      * The inverse transformation to {@link #translatePxToValue(int)}.
      * <p>
      * 
      * @param value
-     *            a chart data value.
+     *          a chart data value.
      * @return the awt pixel value corresponding to the chart data value.
      */
     public abstract int translateValueToPx(final double value);
@@ -327,8 +356,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * @author <a href="mailto:Achim.Westermann@gmx.de>Achim Westermann </a>
    * @see Chart2D#getAxisX()
    */
-  public class XDataAccessor
-      extends AAxis.AChart2DDataAccessor {
+  public class XDataAccessor extends AAxis.AChart2DDataAccessor {
 
     /** Generated <code>serialVersionUID</code>. */
     private static final long serialVersionUID = 1185826702304621485L;
@@ -338,7 +366,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * <p>
      * 
      * @param chart
-     *            the chart to access.
+     *          the chart to access.
      */
     public XDataAccessor(final Chart2D chart) {
 
@@ -348,14 +376,16 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getDimension()
      */
+    @Override
     public int getDimension() {
       return Chart2D.X;
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getHeight(java.awt.Graphics2D)
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getHeight(java.awt.Graphics)
      */
-    public int getHeight(final Graphics2D g2d) {
+    @Override
+    public int getHeight(final Graphics g2d) {
       FontMetrics fontdim = g2d.getFontMetrics();
       // the height of the font:
       int height = fontdim.getHeight();
@@ -369,14 +399,15 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMaximumPixelForLabel(Graphics)
      */
+    @Override
     protected final double getMaximumPixelForLabel(final Graphics g2d) {
 
       FontMetrics fontdim = g2d.getFontMetrics();
       int fontwidth = fontdim.charWidth('0');
       /*
-       * multiply with longest possible number. longest possible number is the non-fraction part of
-       * the highest number plus the maximum amount of fraction digits plus one for the fraction
-       * separator dot.
+       * multiply with longest possible number. longest possible number is the
+       * non-fraction part of the highest number plus the maximum amount of
+       * fraction digits plus one for the fraction separator dot.
        */
       int len = AAxis.this.getFormatter().getMaxAmountChars();
       return fontwidth * (len + 2);
@@ -385,6 +416,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMaxValue(info.monitorenter.gui.chart.ITrace2D)
      */
+    @Override
     protected double getMaxValue(final ITrace2D trace) {
       return trace.getMaxX();
     }
@@ -392,6 +424,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMinimumValueDistanceForLabels(java.awt.Graphics)
      */
+    @Override
     protected final double getMinimumValueDistanceForLabels(final Graphics g2d) {
 
       double result;
@@ -413,6 +446,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMinValue(info.monitorenter.gui.chart.ITrace2D)
      */
+    @Override
     protected double getMinValue(final ITrace2D trace) {
       return trace.getMinX();
     }
@@ -420,6 +454,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getPixelRange()
      */
+    @Override
     protected int getPixelRange() {
       return this.m_chart.getXChartEnd() - this.m_chart.getXChartStart();
     }
@@ -427,6 +462,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getValue(info.monitorenter.gui.chart.TracePoint2D)
      */
+    @Override
     protected double getValue(final TracePoint2D point) {
       return point.getX();
     }
@@ -434,6 +470,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getValueDistanceForPixel(int)
      */
+    @Override
     protected final double getValueDistanceForPixel(final int pixel) {
       double result;
       Dimension d = this.m_chart.getSize();
@@ -449,9 +486,10 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getWidth(java.awt.Graphics2D)
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getWidth(java.awt.Graphics)
      */
-    public int getWidth(final Graphics2D g2d) {
+    @Override
+    public int getWidth(final Graphics g2d) {
       FontMetrics fontdim = g2d.getFontMetrics();
       // only the space required for the right side label:
       int fontwidth = fontdim.charWidth('0');
@@ -464,6 +502,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#scaleTrace(info.monitorenter.gui.chart.ITrace2D,
      *      info.monitorenter.util.Range)
      */
+    @Override
     protected void scaleTrace(final ITrace2D trace, final Range range) {
       Iterator<TracePoint2D> itPoints;
       final double scaler = range.getExtent();
@@ -488,6 +527,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * 
      * @return "X"
      */
+    @Override
     public String toString() {
       return "X";
     }
@@ -495,6 +535,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateMousePosition(java.awt.event.MouseEvent)
      */
+    @Override
     public final double translateMousePosition(final MouseEvent mouseEvent) {
 
       return this.translatePxToValue(mouseEvent.getX());
@@ -503,15 +544,14 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translatePxToValue(int)
      */
+    @Override
     public double translatePxToValue(final int pixel) {
       double result = 0;
       // relate to the offset:
       double px = pixel - this.m_chart.getXChartStart();
 
       int rangeX = this.m_chart.getXChartEnd() - this.m_chart.getXChartStart();
-      if (rangeX == 0) {
-        // return 0
-      } else {
+      if (rangeX != 0) {
         double scaledX = px / rangeX;
         Range valueRangeX = AAxis.this.getRange();
         result = scaledX * valueRangeX.getExtent() + valueRangeX.getMin();
@@ -522,6 +562,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateValueToPx(double)
      */
+    @Override
     public int translateValueToPx(final double value) {
       int result = 0;
       // first normalize to [00.0..1.0]
@@ -549,8 +590,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * @see AAxis#setAccessor(info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor)
    * @see Chart2D#getAxisY()
    */
-  protected class YDataAccessor
-      extends AAxis.AChart2DDataAccessor {
+  protected class YDataAccessor extends AAxis.AChart2DDataAccessor {
 
     /** Generated <code>serialVersionUID</code>. */
     private static final long serialVersionUID = -3665759247443586028L;
@@ -560,7 +600,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * <p>
      * 
      * @param chart
-     *            the chart to access.
+     *          the chart to access.
      */
     public YDataAccessor(final Chart2D chart) {
 
@@ -570,14 +610,16 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getDimension()
      */
+    @Override
     public final int getDimension() {
       return Chart2D.Y;
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getHeight(java.awt.Graphics2D)
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getHeight(java.awt.Graphics)
      */
-    public final int getHeight(final Graphics2D g2d) {
+    @Override
+    public final int getHeight(final Graphics g2d) {
       FontMetrics fontdim = g2d.getFontMetrics();
       // only the space required for the right side label:
       int fontHeight = fontdim.getHeight();
@@ -587,10 +629,12 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMaximumPixelForLabel(Graphics) *
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMaximumPixelForLabel(Graphics)
      * @param g2d
-     *            the current graphic context to use in case further information is required.
+     *          the current graphic context to use in case further information
+     *          is required.
      */
+    @Override
     protected final double getMaximumPixelForLabel(final Graphics g2d) {
 
       FontMetrics fontdim = g2d.getFontMetrics();
@@ -601,6 +645,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMaxValue(info.monitorenter.gui.chart.ITrace2D)
      */
+    @Override
     protected double getMaxValue(final ITrace2D trace) {
       return trace.getMaxY();
     }
@@ -608,6 +653,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMinimumValueDistanceForLabels(Graphics)
      */
+    @Override
     protected final double getMinimumValueDistanceForLabels(final Graphics g2d) {
 
       double result;
@@ -629,6 +675,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMinValue(info.monitorenter.gui.chart.ITrace2D)
      */
+    @Override
     protected double getMinValue(final ITrace2D trace) {
       return trace.getMinY();
     }
@@ -636,6 +683,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getPixelRange()
      */
+    @Override
     protected final int getPixelRange() {
       return this.m_chart.getYChartStart() - this.m_chart.getYChartEnd();
     }
@@ -643,6 +691,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getValue(info.monitorenter.gui.chart.TracePoint2D)
      */
+    @Override
     protected double getValue(final TracePoint2D point) {
       return point.getY();
     }
@@ -650,6 +699,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getValueDistanceForPixel(int)
      */
+    @Override
     protected final double getValueDistanceForPixel(final int pixel) {
       double result;
       Dimension d = this.m_chart.getSize();
@@ -665,9 +715,10 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getWidth(java.awt.Graphics2D)
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getWidth(java.awt.Graphics)
      */
-    public final int getWidth(final Graphics2D g2d) {
+    @Override
+    public final int getWidth(final Graphics g2d) {
       FontMetrics fontdim = g2d.getFontMetrics();
       // the width of the font:
       int fontWidth = fontdim.charWidth('0');
@@ -685,6 +736,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#scaleTrace(info.monitorenter.gui.chart.ITrace2D,
      *      info.monitorenter.util.Range)
      */
+    @Override
     protected void scaleTrace(final ITrace2D trace, final Range range) {
       if (trace.isVisible()) {
         double scaler = range.getExtent();
@@ -709,6 +761,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * 
      * @return "Y"
      */
+    @Override
     public String toString() {
       return "Y";
     }
@@ -716,6 +769,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateMousePosition(java.awt.event.MouseEvent)
      */
+    @Override
     public double translateMousePosition(final MouseEvent mouseEvent) {
 
       return this.translatePxToValue(mouseEvent.getY());
@@ -724,15 +778,14 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translatePxToValue(int)
      */
+    @Override
     public double translatePxToValue(final int pixel) {
       double result = 0;
       // invert, as awt px are higher the lower the chart value is:
       double px = this.m_chart.getYChartStart() - pixel;
 
       int rangeY = this.m_chart.getYChartStart() - this.m_chart.getYChartEnd();
-      if (rangeY == 0) {
-        // return null
-      } else {
+      if (rangeY != 0) {
         double scaledY = px / rangeY;
         Range valueRangeY = AAxis.this.getRange();
         result = scaledY * valueRangeY.getExtent() + valueRangeY.getMin();
@@ -743,6 +796,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateValueToPx(double)
      */
+    @Override
     public int translateValueToPx(final double value) {
       int result = 0;
       // first normalize to [00.0..1.0]
@@ -778,8 +832,9 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   private int m_axisPosition = -1;
 
   /**
-   * The title of this axis, by default an empty title with an
-   * <code>{@link info.monitorenter.gui.chart.axistitlepainters.AxisTitlePainterDefault}</code>.
+   * The title of this axis, by default an empty title with an <code>
+   * {@link info.monitorenter.gui.chart.axistitlepainters.AxisTitlePainterDefault}
+   * </code>.
    */
   private IAxis.AxisTitle m_axisTitle;
 
@@ -798,10 +853,10 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   protected double m_majorTickSpacing = 5;
 
   /** The current maximum value for all points in all traces. */
-  private double m_max;
+  protected double m_max;
 
   /** The current minimum value for all points in all traces. */
-  private double m_min;
+  protected double m_min;
 
   /**
    * The minor tick spacing for label generations.
@@ -829,7 +884,9 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   /** The top y pixel coordinate of this axis. */
   private int m_pixelYTop;
 
-  /** Internally used for rounding to ticks, calculated once per paint iteration. */
+  /**
+   * Internally used for rounding to ticks, calculated once per paint iteration.
+   */
   protected double m_power;
 
   /** Support for acting as a property change event producer for listeners. */
@@ -860,13 +917,15 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   private boolean m_startMajorTick = false;
 
   /**
-   * The internal <code>TreeSetGreedy</code> use to store the different <code>ITrace2d</code>
-   * instances to paint with z-index ordering based on <code>{@link ITrace2D#getZIndex()}</code>.
+   * The internal <code>TreeSetGreedy</code> use to store the different
+   * <code>ITrace2d</code> instances to paint with z-index ordering based on
+   * <code>{@link ITrace2D#getZIndex()}</code>.
    */
   private TreeSetGreedy<ITrace2D> m_traces = new TreeSetGreedy<ITrace2D>();
 
   /**
-   * Default constructor that uses a {@link LabelFormatterAutoUnits} for formatting labels.
+   * Default constructor that uses a {@link LabelFormatterAutoUnits} for
+   * formatting labels.
    * <p>
    */
   public AAxis() {
@@ -878,7 +937,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * <p>
    * 
    * @param formatter
-   *            needed for formatting labels of this axis.
+   *          needed for formatting labels of this axis.
    */
   public AAxis(final IAxisLabelFormatter formatter) {
     this.m_propertyChangeSupport = new PropertyChangeSupport(this);
@@ -958,35 +1017,39 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Template method to create the proper <code>{@link AAxis.AChart2DDataAccessor}</code>
-   * implementation.
+   * Template method to create the proper <code>
+   * {@link AAxis.AChart2DDataAccessor}</code> implementation.
    * <p>
    * 
    * @param chart
-   *            the chart to access.
+   *          the chart to access.
    * @param dimension
-   *            <code>{@link Chart2D#X}</code> or <code>{@link Chart2D#Y}</code>.
+   *          <code>{@link Chart2D#X}</code> or <code>{@link Chart2D#Y}</code>.
    * @param position
-   *            <code>{@link Chart2D#CHART_POSITION_BOTTOM}</code>,
-   *            <code>{@link Chart2D#CHART_POSITION_LEFT}</code>,
-   *            <code>{@link Chart2D#CHART_POSITION_RIGHT}</code> or
-   *            <code>{@link Chart2D#CHART_POSITION_TOP}</code>.
-   * @return the proper <code>{@link AAxis.AChart2DDataAccessor}</code> implementation.
+   *          <code>{@link Chart2D#CHART_POSITION_BOTTOM}</code>, <code>
+   *          {@link Chart2D#CHART_POSITION_LEFT}</code>, <code>
+   *          {@link Chart2D#CHART_POSITION_RIGHT}</code> or <code>
+   *          {@link Chart2D#CHART_POSITION_TOP}</code>.
+   * @return the proper <code>{@link AAxis.AChart2DDataAccessor}</code>
+   *         implementation.
    */
   protected abstract AChart2DDataAccessor createAccessor(Chart2D chart, int dimension, int position);
 
   /**
-   * Searches for the maximum value of all contained ITraces in the dimension this axis stands for.
+   * Searches for the maximum value of all contained ITraces in the dimension
+   * this axis stands for.
    * <p>
    * This method is triggered when a trace fired a property change for property
-   * <code>{@link ITrace2D#PROPERTY_MAX_X}</code> or <code>{@link ITrace2D#PROPERTY_MAX_Y}</code>
-   * with a value lower than the internal stored maximum.
+   * <code>{@link ITrace2D#PROPERTY_MAX_X}</code> or
+   * <code>{@link ITrace2D#PROPERTY_MAX_Y}</code> with a value lower than the
+   * internal stored maximum.
    * <p>
-   * Performance breakdown is avoided because all <code>ITrace2D</code> implementations cache
-   * their max and min values.
+   * Performance breakdown is avoided because all <code>ITrace2D</code>
+   * implementations cache their max and min values.
    * <p>
    * 
-   * @return the maximum value of all traces for the dimension this axis works in.
+   * @return the maximum value of all traces for the dimension this axis works
+   *         in.
    */
   protected final double findMax() {
     double max = -Double.MAX_VALUE;
@@ -1009,17 +1072,20 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Searches for the minimum value of all contained ITraces in the dimension this axis stands for.
+   * Searches for the minimum value of all contained ITraces in the dimension
+   * this axis stands for.
    * <p>
    * This method is triggered when a trace fired a property change for property
-   * <code>{@link ITrace2D#PROPERTY_MAX_X}</code> or <code>{@link ITrace2D#PROPERTY_MAX_Y}</code>
-   * with a value lower than the internal stored minimum.
+   * <code>{@link ITrace2D#PROPERTY_MAX_X}</code> or
+   * <code>{@link ITrace2D#PROPERTY_MAX_Y}</code> with a value lower than the
+   * internal stored minimum.
    * <p>
-   * Performance breakdown is avoided because all <code>ITrace2D</code> implementations cache
-   * their max and min values.
+   * Performance breakdown is avoided because all <code>ITrace2D</code>
+   * implementations cache their max and min values.
    * <p>
    * 
-   * @return the minimum value of all traces for the dimension this axis works in.
+   * @return the minimum value of all traces for the dimension this axis works
+   *         in.
    */
 
   protected final double findMin() {
@@ -1086,9 +1152,9 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IAxis#getHeight(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.IAxis#getHeight(java.awt.Graphics)
    */
-  public final int getHeight(final Graphics2D g2d) {
+  public final int getHeight(final Graphics g2d) {
 
     return this.getAccessor().getHeight(g2d);
   }
@@ -1096,13 +1162,13 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   /**
    * Returns the labels for this axis.
    * <p>
-   * The labels will have at least the given argument <code>resolution</code> as distance in the
-   * value domain of the chart.
+   * The labels will have at least the given argument <code>resolution</code> as
+   * distance in the value domain of the chart.
    * <p>
    * 
    * @param resolution
-   *            the distance in the value domain of the chart that has to be at least between to
-   *            labels.
+   *          the distance in the value domain of the chart that has to be at
+   *          least between to labels.
    * @return the labels for this axis.
    */
   protected List<LabeledValue> getLabels(final double resolution) {
@@ -1249,11 +1315,12 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * This method is used by the Chart2D to scale it's values during painting.
    * <p>
    * Caution: This method does not necessarily return the Range configured with
-   * {@link #setRange(Range)}. The internal {@link IRangePolicy} is taken into account.
+   * {@link #setRange(Range)}. The internal {@link IRangePolicy} is taken into
+   * account.
    * <p>
    * 
-   * @return the range corresponding to the upper and lower bound of the values that will be
-   *         displayable on this Axis of the Chart2D.
+   * @return the range corresponding to the upper and lower bound of the values
+   *         that will be displayable on this Axis of the Chart2D.
    * @see #setRangePolicy(IRangePolicy)
    */
   public final Range getRange() {
@@ -1289,17 +1356,21 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * @deprecated use {@link #getAxisTitle()} and on the result {@link IAxis.AxisTitle#getTitle()}.
+   * @deprecated use {@link #getAxisTitle()} and on the result
+   *             {@link IAxis.AxisTitle#getTitle()}.
    * @see info.monitorenter.gui.chart.IAxis#getTitle()
    */
+  @Deprecated
   public final String getTitle() {
     return this.getAxisTitle().getTitle();
   }
 
   /**
-   * @deprecated this method might be dropped because the painter should be of no concern.
+   * @deprecated this method might be dropped because the painter should be of
+   *             no concern.
    * @see info.monitorenter.gui.chart.IAxis#getTitlePainter()
    */
+  @Deprecated
   public final IAxisTitlePainter getTitlePainter() {
     return this.getAxisTitle().getTitlePainter();
   }
@@ -1312,31 +1383,36 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Returns the value distance on the current chart that exists for the given amount of pixel
-   * distance in the given direction of this <code>Axis</code>.
+   * Returns the value distance on the current chart that exists for the given
+   * amount of pixel distance in the given direction of this <code>Axis</code>.
    * <p>
-   * Depending on the width of the actual Chart2D and the contained values, the relation between
-   * displayed distances (pixel) and value distances (the values of the addes
-   * <code>{@link info.monitorenter.gui.chart.ITrace2D}</code> instances changes.
+   * Depending on the width of the actual Chart2D and the contained values, the
+   * relation between displayed distances (pixel) and value distances (the
+   * values of the addes
+   * <code>{@link info.monitorenter.gui.chart.ITrace2D}</code> instances
+   * changes.
    * <p>
-   * This method calculates depending on the actual painting area of the Chart2D, the shift in value
-   * between two points that have a screen distance of the given pixel. <br>
+   * This method calculates depending on the actual painting area of the
+   * Chart2D, the shift in value between two points that have a screen distance
+   * of the given pixel. <br>
    * This method is not used by the chart itself but a helper for outside use.
    * <p>
    * 
    * @param pixel
-   *            The desired distance between to scalepoints of the x- axis in pixel.
-   * @return a scaled (from pixel to internal value-range) and normed (to the factor of the current
-   *         unit of the axis) value usable to calculate the coords for the scalepoints of the axis.
+   *          The desired distance between to scalepoints of the x- axis in
+   *          pixel.
+   * @return a scaled (from pixel to internal value-range) and normed (to the
+   *         factor of the current unit of the axis) value usable to calculate
+   *         the coords for the scalepoints of the axis.
    */
   protected final double getValueDistanceForPixel(final int pixel) {
     return this.m_accessor.getValueDistanceForPixel(pixel);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IAxis#getWidth(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.IAxis#getWidth(java.awt.Graphics)
    */
-  public final int getWidth(final Graphics2D g2d) {
+  public final int getWidth(final Graphics g2d) {
 
     return this.getAccessor().getWidth(g2d);
   }
@@ -1351,15 +1427,16 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Perfomres expensive calculations for various values that are used by many calls throughout a
-   * paint iterations.
+   * Perfomres expensive calculations for various values that are used by many
+   * calls throughout a paint iterations.
    * <p>
-   * These values are constant throughout a paint iteration by the contract that no point is added
-   * removed or changed in this period. Because these values are used from many methods it is
-   * impossible to calculate them at a "transparent" method that may perform this caching over a
-   * paint period without knowledge from outside. The first method called in a paint iteration is
-   * called several further times in the iteration. So this is the common hook to invoke before
-   * painting a chart.
+   * These values are constant throughout a paint iteration by the contract that
+   * no point is added removed or changed in this period. Because these values
+   * are used from many methods it is impossible to calculate them at a
+   * "transparent" method that may perform this caching over a paint period
+   * without knowledge from outside. The first method called in a paint
+   * iteration is called several further times in the iteration. So this is the
+   * common hook to invoke before painting a chart.
    * <p>
    */
   public void initPaintIteration() {
@@ -1438,12 +1515,12 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Adds this axis as a listener to all property change events of the given trace that are needed
-   * here.
+   * Adds this axis as a listener to all property change events of the given
+   * trace that are needed here.
    * <p>
    * 
    * @param trace
-   *            the trace to listen to.
+   *          the trace to listen to.
    */
   private void listen2Trace(final ITrace2D trace) {
     // listen to bound changes and more
@@ -1474,11 +1551,12 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   /**
    * Internal routine for an axis to listen to the new given axis title.
    * <p>
-   * Factored out to have a better overview of event handling (vs. putting this code in setters).
+   * Factored out to have a better overview of event handling (vs. putting this
+   * code in setters).
    * <p>
    * 
    * @param axisTitle
-   *            the axis title to listen to.
+   *          the axis title to listen to.
    */
   private void listenToAxisTitle(final AxisTitle axisTitle) {
     axisTitle.addPropertyChangeListener(AxisTitle.PROPERTY_TITLE, this);
@@ -1487,9 +1565,9 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IAxis#paint(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.IAxis#paint(java.awt.Graphics)
    */
-  public void paint(final Graphics2D g2d) {
+  public void paint(final Graphics g2d) {
     switch (this.getDimension() | this.getAxisPosition()) {
       case (Chart2D.X | Chart2D.CHART_POSITION_BOTTOM): {
         this.paintAxisXBottom(g2d);
@@ -1515,14 +1593,14 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Internally paints this axis in the case it is assigned as an x axis on bottom of the
-   * corresponding chart.
+   * Internally paints this axis in the case it is assigned as an x axis on
+   * bottom of the corresponding chart.
    * <p>
    * 
    * @param g2d
-   *            the graphics context to use.
+   *          the graphics context to use.
    */
-  private void paintAxisXBottom(final Graphics2D g2d) {
+  private void paintAxisXBottom(final Graphics g2d) {
     Chart2D chart = this.getAccessor().getChart();
     int tmp = 0;
     FontMetrics fontdim = g2d.getFontMetrics();
@@ -1568,14 +1646,14 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Internally paints this axis in the case it is assigned as an x axis on top of the corresponding
-   * chart.
+   * Internally paints this axis in the case it is assigned as an x axis on top
+   * of the corresponding chart.
    * <p>
    * 
    * @param g2d
-   *            the graphics context to use.
+   *          the graphics context to use.
    */
-  private void paintAxisXTop(final Graphics2D g2d) {
+  private void paintAxisXTop(final Graphics g2d) {
     Chart2D chart = this.getAccessor().getChart();
     int tmp = 0;
     FontMetrics fontdim = g2d.getFontMetrics();
@@ -1620,14 +1698,14 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Internally paints this axis in the case it is assigned as a y axis on the left side of the
-   * corresponding chart.
+   * Internally paints this axis in the case it is assigned as a y axis on the
+   * left side of the corresponding chart.
    * <p>
    * 
    * @param g2d
-   *            the graphics context to use.
+   *          the graphics context to use.
    */
-  private void paintAxisYLeft(final Graphics2D g2d) {
+  private void paintAxisYLeft(final Graphics g2d) {
     Chart2D chart = this.getAccessor().getChart();
     int tmp = 0;
     FontMetrics fontdim = g2d.getFontMetrics();
@@ -1672,14 +1750,14 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Internally paints this axis in the case it is assigned as a y axis on the right side of the
-   * corresponding chart.
+   * Internally paints this axis in the case it is assigned as a y axis on the
+   * right side of the corresponding chart.
    * <p>
    * 
    * @param g2d
-   *            the graphics context to use.
+   *          the graphics context to use.
    */
-  private void paintAxisYRight(final Graphics2D g2d) {
+  private void paintAxisYRight(final Graphics g2d) {
     Chart2D chart = this.getAccessor().getChart();
     int tmp = 0;
     FontMetrics fontdim = g2d.getFontMetrics();
@@ -1692,6 +1770,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     int xAxisLine = this.getPixelXLeft();
     g2d.drawLine(xAxisLine, yAxisStart, xAxisLine, yAxisEnd);
     // drawing the y title :
+    this.paintTitle(g2d);
     // drawing tick - scale, corresponding values, grid and conditional unit
     // label:
     if (this.isPaintScale()) {
@@ -1715,7 +1794,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
       }
       // unit-labeling
       String unitName = this.getFormatter().getUnit().getUnitName();
-      g2d.drawString(unitName, chart.getWidth()
+      g2d.drawString(unitName, (int) chart.getSize().getWidth()
           - fontdim.charsWidth(unitName.toCharArray(), 0, unitName.length()) - 4, yAxisEnd);
       // increase of x for next loop (xChartStart [-> xAxisLine]
       // is lowest x value + width of all y axes):
@@ -1725,9 +1804,9 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IAxis#paintTitle(java.awt.Graphics2D)
+   * @see info.monitorenter.gui.chart.IAxis#paintTitle(java.awt.Graphics)
    */
-  public int paintTitle(final Graphics2D g2d) {
+  public int paintTitle(final Graphics g2d) {
     int result = 0;
     // TODO: Add support for different axis locations: top, bottom, left,right!
     // drawing the title :
@@ -1756,12 +1835,13 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Receives all <code>{@link PropertyChangeEvent}</code> from all instances the chart registers
-   * itself as a <code>{@link PropertyChangeListener}</code>.
+   * Receives all <code>{@link PropertyChangeEvent}</code> from all instances
+   * the chart registers itself as a <code>{@link PropertyChangeListener}</code>
+   * .
    * <p>
    * 
    * @param evt
-   *            the property change event that was fired.
+   *          the property change event that was fired.
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
   public void propertyChange(final PropertyChangeEvent evt) {
@@ -1779,50 +1859,54 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   /**
    * Internal encapsulation of the code to react upon a property change.
    * <p>
-   * Used on the value side of a map to have a fast dispatch to the code to react.
+   * Used on the value side of a map to have a fast dispatch to the code to
+   * react.
    * <p>
    * 
    * @author Achim Westermann
-   * @version $Revision: 1.37 $
+   * @version $Revision: 1.42 $
    * @since 3.0.0
    */
   private static interface IPropertyChangeReactor {
     /**
      * Handle the property change of the given receiver.
      * <p>
-     * Please note: You must not react upon the property name because the sole intention of this
-     * interface is to have a map with the property name as key and access implementations of this
-     * interface very fast which allows to avoid large else if - code for identification of the
-     * proper property name for the code to execute.
+     * Please note: You must not react upon the property name because the sole
+     * intention of this interface is to have a map with the property name as
+     * key and access implementations of this interface very fast which allows
+     * to avoid large else if - code for identification of the proper property
+     * name for the code to execute.
      * <p>
-     * Implementations are highly proprietary as they have to trust that they are only invoked with
-     * the correct property change events!!!
+     * Implementations are highly proprietary as they have to trust that they
+     * are only invoked with the correct property change events!!!
      * <p>
      * 
      * @param changeEvent
-     *            the change event the receiver received.
+     *          the change event the receiver received.
      * @param receiver
-     *            the original receiver of the change event.
+     *          the original receiver of the change event.
      */
     public void propertyChange(PropertyChangeEvent changeEvent, final AAxis receiver);
   }
 
   /**
-   * Internal fast access to the right property change code encapsulation via the property name.
+   * Internal fast access to the right property change code encapsulation via
+   * the property name.
    * <p>
    * This is done for better performance - an old endless
-   * <code>..else if(propertyName.equals(..))..</code> has been replaced by this.
+   * <code>..else if(propertyName.equals(..))..</code> has been replaced by
+   * this.
    * <p>
    */
   private static SortedMap<String, AAxis.IPropertyChangeReactor> propertyReactors;
 
   /**
-   * Reused property change listener that will signal the chart to repaint. TODO: Enter a comment
-   * that ends with a '.'
+   * Reused property change listener that will signal the chart to repaint.
+   * TODO: Enter a comment that ends with a '.'
    * <p>
    * 
    * @author Achim Westermann
-   * @version $Revision: 1.37 $
+   * @version $Revision: 1.42 $
    * @since 3.0.0
    */
   private static final class PropertyChangeRepainter implements AAxis.IPropertyChangeReactor {
@@ -1831,7 +1915,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * Defcon, internal use only.
      * <p>
      */
-    private PropertyChangeRepainter() {
+    protected PropertyChangeRepainter() {
       super();
     }
 
@@ -1852,16 +1936,24 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Base implementation that delegates the call to a template method after synchronization on the
-   * chart.
+   * Base implementation that delegates the call to a template method after
+   * synchronization on the chart.
    * <p>
    * 
    * @author Achim Westermann
-   * @version $Revision: 1.37 $
+   * @version $Revision: 1.42 $
    * @since 3.0.0
    */
   private abstract static class APropertyChangeReactorSynced implements
       AAxis.IPropertyChangeReactor {
+
+    /**
+     * Defcon.
+     * <p>
+     */
+    protected APropertyChangeReactorSynced() {
+      super();
+    }
 
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.IPropertyChangeReactor#propertyChange(java.beans.PropertyChangeEvent,
@@ -1886,19 +1978,20 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * <p>
      * This method is invoked with synchronization on the chart of the receiver.
      * <p>
-     * Please note: You must not react upon the property name because the sole intention of this
-     * interface is to have a map with the property name as key and access implementations of this
-     * interface very fast which allows to avoid large else if - code for identification of the
-     * proper property name for the code to execute.
+     * Please note: You must not react upon the property name because the sole
+     * intention of this interface is to have a map with the property name as
+     * key and access implementations of this interface very fast which allows
+     * to avoid large else if - code for identification of the proper property
+     * name for the code to execute.
      * <p>
-     * Implementations are highly proprietary as they have to trust that they are only invoked with
-     * the correct property change events!!!
+     * Implementations are highly proprietary as they have to trust that they
+     * are only invoked with the correct property change events!!!
      * <p>
      * 
      * @param changeEvent
-     *            the change event the receiver received.
+     *          the change event the receiver received.
      * @param receiver
-     *            the original receiver of the change event.
+     *          the original receiver of the change event.
      * @return if true a repaint request will be marked for the chart.
      */
     protected abstract boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
@@ -1928,6 +2021,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
        * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
        *      info.monitorenter.gui.chart.axis.AAxis)
        */
+      @Override
       protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
           final AAxis receiver) {
         boolean result = false;
@@ -1961,6 +2055,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
        * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
        *      info.monitorenter.gui.chart.axis.AAxis)
        */
+      @Override
       protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
           final AAxis receiver) {
         boolean result = false;
@@ -1992,6 +2087,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
        * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
        *      info.monitorenter.gui.chart.axis.AAxis)
        */
+      @Override
       protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
           final AAxis receiver) {
         boolean result = false;
@@ -2023,6 +2119,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
        * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
        *      info.monitorenter.gui.chart.axis.AAxis)
        */
+      @Override
       protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
           final AAxis receiver) {
         boolean result = false;
@@ -2054,6 +2151,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
        * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
        *      info.monitorenter.gui.chart.axis.AAxis)
        */
+      @Override
       protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
           final AAxis receiver) {
         boolean result = false;
@@ -2078,6 +2176,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
        * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
        *      info.monitorenter.gui.chart.axis.AAxis)
        */
+      @Override
       protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
           final AAxis receiver) {
         boolean result = false;
@@ -2102,6 +2201,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
        * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
        *      info.monitorenter.gui.chart.axis.AAxis)
        */
+      @Override
       protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
           final AAxis receiver) {
         boolean result = false;
@@ -2120,7 +2220,8 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     Set<ITrace2D> result = new TreeSet<ITrace2D>();
     result.addAll(this.m_traces);
     /*
-     * cannot work on this.m_traces as remove will cause concurrent modification exception!
+     * cannot work on this.m_traces as remove will cause concurrent modification
+     * exception!
      */
     for (ITrace2D trace : result) {
       this.removeTrace(trace);
@@ -2154,19 +2255,20 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   /**
    * Internal rounding routine.
    * <p>
-   * Arguments are not chosen to be "understandable" or "usable" but optimized for performance.
+   * Arguments are not chosen to be "understandable" or "usable" but optimized
+   * for performance.
    * <p>
-   * The <code> findMajorTick</code> argument may be used e.g. to force labels to start from a
-   * major tick.
+   * The <code> findMajorTick</code> argument may be used e.g. to force labels
+   * to start from a major tick.
    * <p>
    * 
    * @param value
-   *            the value to round.
+   *          the value to round.
    * @param floor
-   *            if true, rounding goes to floor else to ceiling.
+   *          if true, rounding goes to floor else to ceiling.
    * @param findMajorTick
-   *            if true the returned value will be a major tick (which might be fare more away from
-   *            the given value than the next major tick).
+   *          if true the returned value will be a major tick (which might be
+   *          fare more away from the given value than the next major tick).
    * @return the value rounded to minor or major ticks.
    */
   protected LabeledValue roundToTicks(final double value, final boolean floor,
@@ -2238,14 +2340,15 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Internally rescales the given <code>{@link TracePoint2D}</code> in the dimension this axis
-   * works in.
+   * Internally rescales the given <code>{@link TracePoint2D}</code> in the
+   * dimension this axis works in.
    * <p>
    * 
    * @param point
-   *            the point to scale (between 0.0 and 1.0) according to the internal bounds.
+   *          the point to scale (between 0.0 and 1.0) according to the internal
+   *          bounds.
    */
-  private final void scalePoint(final TracePoint2D point) {
+  protected final void scalePoint(final TracePoint2D point) {
     int axis = this.getAccessor().getDimension();
     if (axis == Chart2D.X) {
       point.setScaledX(this.getScaledValue(point.getX()));
@@ -2277,7 +2380,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * <p>
    * 
    * @param accessor
-   *            the accessor to the axis of the chart.
+   *          the accessor to the axis of the chart.
    */
   protected final void setAccessor(final AChart2DDataAccessor accessor) {
 
@@ -2289,9 +2392,11 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * <p>
    * 
    * @param axisPosition
-   *            {@link Chart2D#CHART_POSITION_LEFT}, {@link Chart2D#CHART_POSITION_RIGHT},
-   *            {@link Chart2D#CHART_POSITION_TOP}, {@link Chart2D#CHART_POSITION_BOTTOM} or -1 if
-   *            this axis is not assigned to a chart.
+   *          {@link Chart2D#CHART_POSITION_LEFT},
+   *          {@link Chart2D#CHART_POSITION_RIGHT},
+   *          {@link Chart2D#CHART_POSITION_TOP},
+   *          {@link Chart2D#CHART_POSITION_BOTTOM} or -1 if this axis is not
+   *          assigned to a chart.
    */
   protected final synchronized void setAxisPosition(final int axisPosition) {
     this.m_axisPosition = axisPosition;
@@ -2315,14 +2420,14 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * <p>
    * 
    * @param chart
-   *            the chart to register itself with this axis.
+   *          the chart to register itself with this axis.
    * @param dimension
-   *            <code>{@link Chart2D#X}</code> or <code>{@link Chart2D#Y}</code>.
+   *          <code>{@link Chart2D#X}</code> or <code>{@link Chart2D#Y}</code>.
    * @param position
-   *            <code>{@link Chart2D#CHART_POSITION_BOTTOM}</code>,
-   *            <code>{@link Chart2D#CHART_POSITION_LEFT}</code>,
-   *            <code>{@link Chart2D#CHART_POSITION_RIGHT}</code> or
-   *            <code>{@link Chart2D#CHART_POSITION_TOP}</code>.
+   *          <code>{@link Chart2D#CHART_POSITION_BOTTOM}</code>, <code>
+   *          {@link Chart2D#CHART_POSITION_LEFT}</code>, <code>
+   *          {@link Chart2D#CHART_POSITION_RIGHT}</code> or <code>
+   *          {@link Chart2D#CHART_POSITION_TOP}</code>.
    */
   public void setChart(final Chart2D chart, final int dimension, final int position) {
     this.m_accessor = this.createAccessor(chart, dimension, position);
@@ -2333,7 +2438,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * <p>
    * 
    * @param formatter
-   *            The formatter to set.
+   *          The formatter to set.
    */
   public void setFormatter(final IAxisLabelFormatter formatter) {
 
@@ -2363,23 +2468,26 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * <p>
    * Only values between 0.0 and 100.0 are allowed.
    * <p>
-   * The number that is passed-in represents the distance, measured in values, between each major
-   * tick mark. If you have a trace with a range from 0 to 50 and the major tick spacing is set to
-   * 10, you will get major ticks next to the following values: 0, 10, 20, 30, 40, 50.
+   * The number that is passed-in represents the distance, measured in values,
+   * between each major tick mark. If you have a trace with a range from 0 to 50
+   * and the major tick spacing is set to 10, you will get major ticks next to
+   * the following values: 0, 10, 20, 30, 40, 50.
    * <p>
    * <b>Note: </b> <br>
-   * Ticks are free of any multiples of 1000. If the chart contains values between 0 an 1000 and
-   * configured a tick of 2 the values 0, 200, 400, 600, 800 and 1000 will highly probable to be
-   * displayed. This depends on the size (in pixels) of the <code>Chart2D<</code>. Of course
-   * there is a difference: ticks are used in divisions and multiplications: If the internal values
-   * are very low and the ticks are very high, huge rounding errors might occur (division by ticks
-   * results in very low values a double cannot hit exactly. So prefer setting ticks between 0 an 10
-   * or - if you know your values are very small (e.g. in nano range [10 <sup>-9 </sup>]) use a
-   * small value (e.g. 2*10 <sup>-9 </sup>).
+   * Ticks are free of any multiples of 1000. If the chart contains values
+   * between 0 an 1000 and configured a tick of 2 the values 0, 200, 400, 600,
+   * 800 and 1000 will highly probable to be displayed. This depends on the size
+   * (in pixels) of the <code>Chart2D<</code>. Of course there is a difference:
+   * ticks are used in divisions and multiplications: If the internal values are
+   * very low and the ticks are very high, huge rounding errors might occur
+   * (division by ticks results in very low values a double cannot hit exactly.
+   * So prefer setting ticks between 0 an 10 or - if you know your values are
+   * very small (e.g. in nano range [10 <sup>-9 </sup>]) use a small value (e.g.
+   * 2*10 <sup>-9 </sup>).
    * <p>
    * 
    * @param majorTickSpacing
-   *            the major tick spacing for label generation.
+   *          the major tick spacing for label generation.
    */
   public void setMajorTickSpacing(final double majorTickSpacing) {
     this.m_majorTickSpacing = majorTickSpacing;
@@ -2388,24 +2496,28 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   /**
    * This method sets the minor tick spacing for label generation.
    * <p>
-   * The number that is passed-in represents the distance, measured in values, between each major
-   * tick mark. If you have a trace with a range from 0 to 50 and the major tick spacing is set to
-   * 10, you will get major ticks next to the following values: 0, 10, 20, 30, 40, 50.
+   * The number that is passed-in represents the distance, measured in values,
+   * between each major tick mark. If you have a trace with a range from 0 to 50
+   * and the major tick spacing is set to 10, you will get major ticks next to
+   * the following values: 0, 10, 20, 30, 40, 50.
    * <p>
    * <b>Note: </b> <br>
-   * Ticks are free of any powers of 10. There is no difference between setting a tick to 2, 200 or
-   * 20000 because ticks cannot break the rule that every scale label has to be visible. If the
-   * chart contains values between 0 an 1000 and configured a tick of 2 the values 0, 200, 400, 600,
-   * 800 and 1000 will highly probable to be displayed. This depends on the size (in pixels) of the
-   * <code>Chart2D<</code>. Of course there is a difference: ticks are used in divisions and
-   * multiplications: If the internal values are very low and the ticks are very high, huge rounding
-   * errors might occur (division by ticks results in very low values a double cannot hit exactly.
-   * So prefer setting ticks between 0 an 10 or - if you know your values are very small (e.g. in
-   * nano range [10 <sup>-9 </sup>]) use a small value (e.g. 2*10 <sup>-9 </sup>).
+   * Ticks are free of any powers of 10. There is no difference between setting
+   * a tick to 2, 200 or 20000 because ticks cannot break the rule that every
+   * scale label has to be visible. If the chart contains values between 0 an
+   * 1000 and configured a tick of 2 the values 0, 200, 400, 600, 800 and 1000
+   * will highly probable to be displayed. This depends on the size (in pixels)
+   * of the <code>Chart2D<</code>. Of course there is a difference: ticks are
+   * used in divisions and multiplications: If the internal values are very low
+   * and the ticks are very high, huge rounding errors might occur (division by
+   * ticks results in very low values a double cannot hit exactly. So prefer
+   * setting ticks between 0 an 10 or - if you know your values are very small
+   * (e.g. in nano range [10 <sup>-9 </sup>]) use a small value (e.g. 2*10
+   * <sup>-9 </sup>).
    * <p>
    * 
    * @param minorTickSpacing
-   *            the minor tick spacing to set.
+   *          the minor tick spacing to set.
    */
   public void setMinorTickSpacing(final double minorTickSpacing) {
     this.m_minorTickSpacing = minorTickSpacing;
@@ -2414,13 +2526,14 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   /**
    * Set wether the grid in this dimension should be painted or not.
    * <p>
-   * If the grid is set to show (argument is <code>true</code>) also the painting of the scale
-   * labels (<code>{@link #setPaintScale(boolean)}</code> is turned on. This implicit behaviour
-   * is chosen as it seems senseless to have gridlines without knowing which value they stand for.
+   * If the grid is set to show (argument is <code>true</code>) also the
+   * painting of the scale labels (<code>{@link #setPaintScale(boolean)}</code>
+   * is turned on. This implicit behaviour is chosen as it seems senseless to
+   * have gridlines without knowing which value they stand for.
    * <p>
    * 
    * @param grid
-   *            true if the grid should be painted or false if not.
+   *          true if the grid should be painted or false if not.
    */
   public final void setPaintGrid(final boolean grid) {
     boolean oldValue = this.m_paintGrid;
@@ -2439,7 +2552,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * <p>
    * 
    * @param show
-   *            true if the scale on this axis should be shown, false else.
+   *          true if the scale on this axis should be shown, false else.
    */
   public final void setPaintScale(final boolean show) {
     this.m_paintScale = show;
@@ -2475,8 +2588,8 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
 
   /**
    * <p>
-   * Sets a Range to use for filtering the view to the the connected Axis. Note that it's effect
-   * will be affected by the internal {@link IRangePolicy}.
+   * Sets a Range to use for filtering the view to the the connected Axis. Note
+   * that it's effect will be affected by the internal {@link IRangePolicy}.
    * </p>
    * <p>
    * To get full control use: <br>
@@ -2484,7 +2597,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * </p>
    * 
    * @param range
-   *            Range to use for filtering the view to the the connected Axis.
+   *          Range to use for filtering the view to the the connected Axis.
    * @see #getRangePolicy()
    * @see IRangePolicy#setRange(Range)
    */
@@ -2498,16 +2611,18 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * Sets the RangePolicy.
    * </p>
    * <p>
-   * If the given RangePolicy has an unconfigured internal Range ( {@link Range#RANGE_UNBOUNDED})
-   * the old internal RangePolicy is taken into account: <br>
-   * If the old RangePolicy has a configured Range this is transferred to the new RangePolicy.
+   * If the given RangePolicy has an unconfigured internal Range (
+   * {@link Range#RANGE_UNBOUNDED}) the old internal RangePolicy is taken into
+   * account: <br>
+   * If the old RangePolicy has a configured Range this is transferred to the
+   * new RangePolicy.
    * </p>
-   * A property change event for {@link IAxis#PROPERTY_RANGEPOLICY} is fired and receives listeners
-   * if a change took place.
+   * A property change event for {@link IAxis#PROPERTY_RANGEPOLICY} is fired and
+   * receives listeners if a change took place.
    * <p>
    * 
    * @param rangePolicy
-   *            The rangePolicy to set.
+   *          The rangePolicy to set.
    */
   public void setRangePolicy(final IRangePolicy rangePolicy) {
 
@@ -2546,7 +2661,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * <p>
    * 
    * @param majorTick
-   *            true if scale values shall start with a major tick.
+   *          true if scale values shall start with a major tick.
    * @see AAxis#setMajorTickSpacing(double)
    */
   public void setStartMajorTick(final boolean majorTick) {
@@ -2558,40 +2673,47 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    *             {@link IAxis.AxisTitle#setTitle(String)}
    * @see info.monitorenter.gui.chart.IAxis#setTitle(String)
    */
+  @Deprecated
   public final String setTitle(final String title) {
     String result = this.getAxisTitle().setTitle(title);
     return result;
   }
 
   /**
-   * Sets the title painter of this axis which is by default
-   * <code>{@link info.monitorenter.gui.chart.axistitlepainters.AxisTitlePainterDefault}</code>.
+   * Sets the title painter of this axis which is by default <code>
+   * {@link info.monitorenter.gui.chart.axistitlepainters.AxisTitlePainterDefault}
+   * </code>.
    * <p>
    * 
    * @deprecated use {@link #getAxisTitle()} and on the result
-   *             {@link IAxis.AxisTitle#setTitlePainter(IAxisTitlePainter)} instead.
+   *             {@link IAxis.AxisTitle#setTitlePainter(IAxisTitlePainter)}
+   *             instead.
    * @see info.monitorenter.gui.chart.IAxis#setTitlePainter(info.monitorenter.gui.chart.IAxisTitlePainter)
    */
+  @Deprecated
   public final IAxisTitlePainter setTitlePainter(final IAxisTitlePainter painter) {
     IAxisTitlePainter result = this.getAxisTitle().setTitlePainter(painter);
     return result;
   }
 
   /**
-   * Returns the translation of the mouse event coordinates of the given mouse event to the value
-   * within the chart for the dimension (x,y) covered by this axis.
+   * Returns the translation of the mouse event coordinates of the given mouse
+   * event to the value within the chart for the dimension (x,y) covered by this
+   * axis.
    * <p>
-   * Note that the mouse event has to be an event fired on the correspondinig chart component!
+   * Note that the mouse event has to be an event fired on the correspondinig
+   * chart component!
    * <p>
    * 
    * @param mouseEvent
-   *            a mouse event that has been fired on this component.
-   * @return the translation of the mouse event coordinates of the given mouse event to the value
-   *         within the chart for the dimension covered by this axis (x or y) or null if no
-   *         calculations could be performed as the chart was not painted before.
+   *          a mouse event that has been fired on this component.
+   * @return the translation of the mouse event coordinates of the given mouse
+   *         event to the value within the chart for the dimension covered by
+   *         this axis (x or y) or null if no calculations could be performed as
+   *         the chart was not painted before.
    * @throws IllegalArgumentException
-   *             if the given mouse event is out of the current graphics context (not a mouse event
-   *             of the chart component).
+   *           if the given mouse event is out of the current graphics context
+   *           (not a mouse event of the chart component).
    */
   public double translateMousePosition(final MouseEvent mouseEvent) throws IllegalArgumentException {
     return this.getAccessor().translateMousePosition(mouseEvent);
@@ -2612,14 +2734,14 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Removes this axis as a listener for all property change events of the given trace that are
-   * needed here.
+   * Removes this axis as a listener for all property change events of the given
+   * trace that are needed here.
    * <p>
    * TODO: stick to <code>{@link AAxis#listen2Trace(ITrace2D)}</code>.
    * <p>
    * 
    * @param trace
-   *            the trace to not listen to any more.
+   *          the trace to not listen to any more.
    */
   private void unlisten2Trace(final ITrace2D trace) {
     if (this.getAccessor().getDimension() == Chart2D.X) {
@@ -2642,13 +2764,15 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Internal routine for an axis to not listen to the new given axis title any more.
+   * Internal routine for an axis to not listen to the new given axis title any
+   * more.
    * <p>
-   * Factored out to have a better overview of event handling (vs. putting this code in setters).
+   * Factored out to have a better overview of event handling (vs. putting this
+   * code in setters).
    * <p>
    * 
    * @param axisTitle
-   *            the axis title not to listen to any more.
+   *          the axis title not to listen to any more.
    */
   private void unListenToAxisTitle(final AxisTitle axisTitle) {
     // This is the case when the axis is created: m_axisTitle is null then.

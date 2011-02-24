@@ -40,9 +40,12 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public abstract class ARangePolicy implements IRangePolicy {
+
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = 1895087230983658166L;
 
   /**
    * The instance that add support for firing <code>PropertyChangeEvents</code>

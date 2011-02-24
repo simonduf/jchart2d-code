@@ -39,7 +39,6 @@ import junit.framework.TestSuite;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * 
  */
 public class TestAxis extends ATestJChart2D {
   /**
@@ -65,7 +64,7 @@ public class TestAxis extends ATestJChart2D {
    * <p>
    * 
    * @param testname
-   *            the test name.
+   *          the test name.
    */
   public TestAxis(final String testname) {
     super(testname);
@@ -74,6 +73,7 @@ public class TestAxis extends ATestJChart2D {
   /**
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#createAxisX()
    */
+  @Override
   protected AAxis createAxisX() {
     return new AxisLinear();
   }
@@ -81,6 +81,7 @@ public class TestAxis extends ATestJChart2D {
   /**
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#createAxisY()
    */
+  @Override
   protected AAxis createAxisY() {
     return this.createAxisX();
   }
@@ -88,6 +89,7 @@ public class TestAxis extends ATestJChart2D {
   /**
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#createTrace()
    */
+  @Override
   protected ITrace2D createTrace() {
     return new Trace2DSimple();
   }
@@ -95,6 +97,7 @@ public class TestAxis extends ATestJChart2D {
   /**
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#fillTrace(info.monitorenter.gui.chart.ITrace2D)
    */
+  @Override
   protected void fillTrace(final ITrace2D trace2D) {
     for (int i = 0; i < 101; i++) {
       this.m_trace.addPoint(i, i);
@@ -102,12 +105,13 @@ public class TestAxis extends ATestJChart2D {
   }
 
   /**
-   * Tests <code>{@link AAxis#setRangePolicy(IRangePolicy)}</code> with a
-   * <code>{@link RangePolicyFixedViewport}</code>.
+   * Tests <code>{@link AAxis#setRangePolicy(IRangePolicy)}</code> with a <code>
+   * {@link RangePolicyFixedViewport}</code>.
    * <p>
    * 
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#testSetRangePolicyFixedViewPort()
    */
+  @Override
   public void testSetRangePolicyFixedViewPort() {
     Range range = new Range(1, 2);
     IRangePolicy rangePolicy = new RangePolicyFixedViewport(range);
@@ -122,7 +126,8 @@ public class TestAxis extends ATestJChart2D {
   }
 
   /**
-   * Tests the method {@link AAxis.AChart2DDataAccessor#translatePxToValue(int)}.
+   * Tests the method {@link AAxis.AChart2DDataAccessor#translatePxToValue(int)}
+   * .
    * <p>
    */
   public void testTransformPxToValue() {
@@ -167,9 +172,9 @@ public class TestAxis extends ATestJChart2D {
   }
 
   /**
-   * Tests the method {@link AAxis.AChart2DDataAccessor#translatePxToValue(int)}.
+   * Tests the method {@link AAxis.AChart2DDataAccessor#translatePxToValue(int)}
+   * .
    * <p>
-   * 
    */
   public void testTransformValueToPx() {
     double value = 50;

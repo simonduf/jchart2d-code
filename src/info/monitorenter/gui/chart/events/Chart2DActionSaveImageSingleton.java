@@ -1,7 +1,7 @@
 /*
  *  Chart2DActionSaveImageSingleton, 
- *  singleton action that sets a custom grid color to the chart.
- *  Copyright (C) Achim Westermann, created on 05.06.2006, 11:06:55
+ *  singleton action that saves the chart to an image.
+ *  Copyright (C) 2008 Achim Westermann
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,10 +24,8 @@
 package info.monitorenter.gui.chart.events;
 
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem;
 import info.monitorenter.gui.chart.io.FileFilterExtensions;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
@@ -48,29 +46,26 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 /**
- * Singleton <code>Action</code> that saves the current chart to an image at
- * the location specified by showing a modal file chooser save dialog.
+ * Singleton <code>Action</code> that saves the current chart to an image at the location
+ * specified by showing a modal file chooser save dialog.
  * <p>
  * Only one instance per target component may exist.
  * <p>
  * 
  * @see info.monitorenter.gui.chart.events.Chart2DActionSetCustomGridColor
- * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.9 $
  */
-public final class Chart2DActionSaveImageSingleton extends AChart2DAction {
+public final class Chart2DActionSaveImageSingleton
+    extends AChart2DAction {
   /**
    * Generated <code>serial version UID</code>.
    * <p>
-   * 
    */
   private static final long serialVersionUID = -2800571545563022874L;
 
   /**
-   * The <code>JFileChooser</code> used to choose the location for saving
-   * snapshot images.
+   * The <code>JFileChooser</code> used to choose the location for saving snapshot images.
    * <p>
    */
   private JFileChooser m_filechooser;
@@ -86,7 +81,6 @@ public final class Chart2DActionSaveImageSingleton extends AChart2DAction {
    * 
    * @param chart
    *            the chart to generate the storage key for.
-   * 
    * @return a storage key unique for the given chart instance.
    */
   private static String key(final Chart2D chart) {
@@ -94,22 +88,17 @@ public final class Chart2DActionSaveImageSingleton extends AChart2DAction {
   }
 
   /**
-   * Returns the single instance for the given component, potentially creating
-   * it.
+   * Returns the single instance for the given component, potentially creating it.
    * <p>
-   * 
-   * If an instance for the given component had been created the description
-   * String is ignored.
+   * If an instance for the given component had been created the description String is ignored.
    * <p>
    * 
    * @param chart
    *            the target the action will work on
    * @param actionName
    *            the descriptive <code>String</code> that will be displayed by
-   *            {@link javax.swing.AbstractButton} subclasses that get this
-   *            <code>Action</code> assigned (
-   *            {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
-   * 
+   *            {@link javax.swing.AbstractButton} subclasses that get this <code>Action</code>
+   *            assigned ( {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    * @return the single instance for the given component.
    */
   public static Chart2DActionSaveImageSingleton getInstance(final Chart2D chart,
@@ -125,23 +114,16 @@ public final class Chart2DActionSaveImageSingleton extends AChart2DAction {
   }
 
   /**
-   * Reference to the last custom color chosen to check whether the
-   * corresponding menu is selected.
-   */
-  private Color m_lastChosenColor;
-
-  /**
-   * Create an <code>Action</code> that accesses the trace and identifies
-   * itself with the given action String.
+   * Create an <code>Action</code> that accesses the trace and identifies itself with the given
+   * action String.
    * <p>
    * 
    * @param chart
    *            the target the action will work on
    * @param colorName
    *            the descriptive <code>String</code> that will be displayed by
-   *            {@link javax.swing.AbstractButton} subclasses that get this
-   *            <code>Action</code> assigned (
-   *            {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   *            {@link javax.swing.AbstractButton} subclasses that get this <code>Action</code>
+   *            assigned ( {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    */
   private Chart2DActionSaveImageSingleton(final Chart2D chart, final String colorName) {
     super(chart, colorName);
@@ -149,8 +131,6 @@ public final class Chart2DActionSaveImageSingleton extends AChart2DAction {
     // configure the file chooser:
     this.m_filechooser = new JFileChooser();
     this.m_filechooser.setAcceptAllFileFilterUsed(false);
-    // fool findbugs tool:
-    this.m_lastChosenColor = null;
   }
 
   /**
@@ -212,17 +192,6 @@ public final class Chart2DActionSaveImageSingleton extends AChart2DAction {
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
   public void propertyChange(final PropertyChangeEvent evt) {
-    String property = evt.getPropertyName();
-    if (property.equals(Chart2D.PROPERTY_GRID_COLOR)) {
-      Color newColor = (Color) evt.getNewValue();
-      if (newColor.equals(this.m_lastChosenColor)) {
-        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, Boolean
-            .valueOf(false), Boolean.valueOf(true));
-
-      } else {
-        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, Boolean
-            .valueOf(true), Boolean.valueOf(false));
-      }
-    }
+    // nop
   }
 }

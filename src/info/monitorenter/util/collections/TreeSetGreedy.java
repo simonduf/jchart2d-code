@@ -91,7 +91,7 @@ public class TreeSetGreedy<T extends IComparableProperty>
      * Reference to an instance that has to be ordered in the
      * <code>TreeSetGreedy</code> due to modification.
      */
-    private T m_resort = null;
+    protected T m_resort = null;
 
     /**
      * Compares two Objects by casting them to {@link IComparableProperty} and
@@ -216,6 +216,7 @@ public class TreeSetGreedy<T extends IComparableProperty>
    * @return see superclass.
    * @see java.util.TreeSet#add(java.lang.Object)
    */
+  @Override
   public synchronized boolean add(final T o) {
     boolean ret = this.addInternal(o);
     this.packComparableProperties();
@@ -280,4 +281,7 @@ public class TreeSetGreedy<T extends IComparableProperty>
       i++;
     }
   }
+
+
 }
+

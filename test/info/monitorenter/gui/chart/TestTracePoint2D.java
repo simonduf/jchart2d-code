@@ -35,7 +35,7 @@ import junit.framework.TestSuite;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.1.4.1 $
+ * @version $Revision: 1.6 $
  * 
  * @since 7.0.0
  * 
@@ -87,6 +87,7 @@ public class TestTracePoint2D extends TestChart {
   /**
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#createTrace()
    */
+  @Override
   protected ITrace2D createTrace() {
     return new Trace2DLtd(200);
   }

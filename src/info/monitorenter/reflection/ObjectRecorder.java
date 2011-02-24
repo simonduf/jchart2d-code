@@ -58,7 +58,7 @@ import javax.swing.event.EventListenerList;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public class ObjectRecorder
     extends Thread {
@@ -70,7 +70,7 @@ public class ObjectRecorder
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.6 $
+   * @version $Revision: 1.7 $
    */
   public final class ObjectInspection {
 
@@ -85,7 +85,7 @@ public class ObjectRecorder
      * <p>
      * 
      */
-    private ObjectInspection() {
+    protected ObjectInspection() {
       this.m_time = new java.util.Date().getTime();
       this.m_values = new LinkedList<Object>();
     }
@@ -97,7 +97,7 @@ public class ObjectRecorder
      * @param value
      *            an inspected value of this inspection.
      */
-    private void add(final Object value) {
+    protected void add(final Object value) {
       this.m_values.add(value);
     }
 
@@ -149,6 +149,7 @@ public class ObjectRecorder
      * 
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString() {
       StringBuffer ret = new StringBuffer("\nObjectInspection:\n");
       ret.append("-----------------\n");
@@ -413,6 +414,7 @@ public class ObjectRecorder
    * 
    * @see java.lang.Runnable#run()
    */
+  @Override
   public void run() {
     while (true) {
       try {
@@ -456,6 +458,7 @@ public class ObjectRecorder
   /**
    * @see java.lang.Object#toString()
    */
+  @Override
   public String toString() {
     return this.m_buffer.toString();
   }

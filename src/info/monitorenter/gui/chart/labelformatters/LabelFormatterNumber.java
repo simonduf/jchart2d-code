@@ -47,7 +47,7 @@ import java.text.ParseException;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class LabelFormatterNumber
     extends ALabelFormatter implements IAxisLabelFormatter {
@@ -100,6 +100,7 @@ public class LabelFormatterNumber
   /**
    * @see info.monitorenter.gui.chart.IAxisLabelFormatter#getMaxAmountChars()
    */
+  @Override
   public int getMaxAmountChars() {
     // find the fractions by using range information:
     int fractionDigits = 0;

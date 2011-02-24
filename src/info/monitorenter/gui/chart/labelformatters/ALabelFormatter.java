@@ -43,9 +43,13 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
 public abstract class ALabelFormatter implements IAxisLabelFormatter {
+  
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = 5211073371003781159L;
+
   /**
    * The default unit with the factor 1 that is returned as the default for
    * {@link #getUnit()}.

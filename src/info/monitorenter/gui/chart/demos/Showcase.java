@@ -63,7 +63,7 @@ import javax.swing.event.ChangeListener;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  * 
  */
 public final class Showcase
@@ -76,7 +76,7 @@ public final class Showcase
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.9 $
+   * @version $Revision: 1.10 $
    */
   final class ControlPanel
       extends JPanel {
@@ -111,7 +111,7 @@ public final class Showcase
      * Defcon.
      * <p>
      */
-    private ControlPanel() {
+    protected ControlPanel() {
       // create the components:
       this.setBackground(Color.WHITE);
       this.createAmountPointSlider();
@@ -207,7 +207,7 @@ public final class Showcase
        * <p>
        * 
        * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-       * @version $Revision: 1.9 $
+       * @version $Revision: 1.10 $
        */
       final class ColorItem
           extends Color {
@@ -237,6 +237,7 @@ public final class Showcase
         /**
          * @see java.lang.Object#toString()
          */
+        @Override
         public String toString() {
           return this.m_name;
         }
@@ -354,6 +355,10 @@ public final class Showcase
     frame.setSize(400, 600);
     // Enable the termination button [cross on the upper right edge]:
     frame.addWindowListener(new WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent e) {
         System.exit(0);
       }
@@ -362,7 +367,7 @@ public final class Showcase
   }
 
   /** The char to use. */
-  private Chart2D m_chart;
+  protected Chart2D m_chart;
 
   /** The data collector to use. */
   private transient ADataCollector m_collector;
@@ -419,6 +424,7 @@ public final class Showcase
   /**
    * @see java.applet.Applet#init()
    */
+  @Override
   public void init() {
     super.init();
     Chart2D chart = new Chart2D();

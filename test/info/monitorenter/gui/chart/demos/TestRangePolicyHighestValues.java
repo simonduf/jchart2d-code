@@ -32,14 +32,12 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
- * Junit test for class
- * <code>{@link RangePolicyHighestValues}</code>.
+ * Junit test for class <code>{@link RangePolicyHighestValues}</code>.
  * <p>
  * 
  * @author Achim Westermann
  */
-public class TestRangePolicyHighestValues
-    extends ADisplayTestPropertyDataBased {
+public class TestRangePolicyHighestValues extends ADisplayTestPropertyDataBased {
   /**
    * Test suite for this test class.
    * <p>
@@ -70,6 +68,7 @@ public class TestRangePolicyHighestValues
   /**
    * @see info.monitorenter.gui.chart.demos.ADisplayTest#configure(info.monitorenter.gui.chart.demos.StaticCollectorChart)
    */
+  @Override
   protected void configure(final StaticCollectorChart chart) {
     IAxis axis = chart.getChart().getAxisX();
     axis.setRangePolicy(new RangePolicyHighestValues(new Range(2, 50), 6.0));
@@ -80,6 +79,7 @@ public class TestRangePolicyHighestValues
   /**
    * @see info.monitorenter.gui.chart.demos.ADisplayTest#createTrace()
    */
+  @Override
   protected ITrace2D createTrace() {
     return new Trace2DSimple();
   }

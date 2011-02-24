@@ -60,7 +60,7 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.8 $
+   * @version $Revision: 1.9 $
    */
   protected abstract class ARingBufferIterator implements Iterator<T> {
     /**
@@ -348,6 +348,10 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
             .size() - 1 : RingBufferArrayFast.this.m_headpointer - 1;
       }
 
+      /**
+       * @see info.monitorenter.util.collections.RingBufferArrayFast.ARingBufferIterator#incPos()
+       */
+      @Override
       protected void incPos() {
         if (this.m_pos == 0) {
           this.m_pos = RingBufferArrayFast.this.m_size;
@@ -388,6 +392,7 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
       /**
        * @see info.monitorenter.util.collections.RingBufferArrayFast.ARingBufferIterator#incPos()
        */
+      @Override
       protected void incPos() {
         if (this.m_pos == RingBufferArrayFast.this.m_size) {
           this.m_pos = 0;
@@ -495,11 +500,12 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
    * Returns a string representation of the RingBuffer and it's contents.
    * <p>
    * Don't call this in your application too often: hard arraycopy - operation
-   * an memalloc are triggered.
+   * an malloc are triggered.
    * <p>
    * 
    * @return a string representation of the RingBuffer and it's contents.
    */
+  @Override
   public String toString() {
     String result;
     if (this.isEmpty()) {
@@ -530,6 +536,7 @@ public class RingBufferArrayFast<T> implements Cloneable, IRingBuffer<T> {
   /**
    * @see java.lang.Object#clone()
    */
+  @Override
   protected Object clone() throws CloneNotSupportedException {
     return super.clone();
   }
