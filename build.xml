@@ -11,7 +11,7 @@
     <property name="builddir" value="${basedir}/bin" />
     <property name="sourcedir" value="${basedir}/src" />
     <property name="sourcedir.test" value="${basedir}/test" />
-    <property name="project.version" value="1.1.0" />
+    <property name="project.version" value="1.1.1" />
 
     <!-- Taskdefs -->
     <!--
@@ -104,7 +104,7 @@
     </target>
 
     <target name="integrate.jars">
-        <copy file="${basedir}/gpl.txt" toDir="${builddir}" />
+        <copy file="${basedir}/lgpl.txt" toDir="${builddir}" />
         <unjar dest="${builddir}">
             <fileset refid="externalJars" />
         </unjar>
@@ -115,8 +115,8 @@
             </fileset>
         </delete>
     </target>
-
-    <target name="makejarBinary" depends="delete.classfiles,build">
+    
+    <target name="makejarFat" depends="delete.classfiles,build">
         <jar destfile="${project.name}-${project.version}.jar"
              basedir="${builddir}"
              manifest="manifest.mf">
@@ -127,7 +127,42 @@
         </antcall>
     </target>
 
-    <target name="makejarApplet" depends="makejarBinary">
+    <target name="makejarBinary" depends="makejarFat">
+        <!-- 
+         Shrink the jar file as external jars (e.g. infovis for range chooser panel) 
+         contain many unused classes. 
+         Ignorewarnings is on as external jar infovis depends on further jars.
+         Tun this off is more jars have deps that may not be ignored.
+        -->
+        <proguard obfuscate="false"
+                  shrink="true"
+                  overloadaggressively="true"
+                  warn="true"
+                  verbose="true"
+                  ignorewarnings="true">
+            <libraryjar>
+                <pathelement path="${java.home}/lib/rt.jar" />
+                <fileset refid="allJars" />
+            </libraryjar>
+            <!--
+              caution: The name attribut value has to be the same expression
+                      as the  destfile of the makejar- target [depend].
+                     -->
+            <injar name="${basedir}/${project.name}-${project.version}.jar" />
+            <outjar name="${basedir}/${project.name}-${project.version}-shrinked.jar" />
+            <!-- Filter -->
+            <keep access="public" name="aw.gui.chart.demo.*">
+                <method access="public static" name="main" />
+            </keep>
+        </proguard>
+        <!-- Delete big jar and rename shrinked to that name. -->
+        <delete file="${basedir}/${project.name}-${project.version}.jar" />
+        <move dest="${basedir}/${project.name}-${project.version}.jar"
+              src="${basedir}/${project.name}-${project.version}-shrinked.jar" />
+    </target>
+
+
+    <target name="makejarApplet">
         <description>
      Create a jar file that is shrinked by proguard for
      faster download. Only the codepath for the applet
@@ -137,8 +172,10 @@
         <proguard obfuscate="false"
                   shrink="true"
                   overloadaggressively="true"
-            warn="true"
-                  verbose="true">
+                  warn="true"
+                  verbose="true"
+            	ignorewarnings="true"
+            >
             <libraryjar name="${java.home}/lib/rt.jar" />
             <!--
              caution: The name attribut value has to be the same expression
@@ -148,9 +185,12 @@
             <outjar name="${basedir}/${project.name}-applet.jar" />
             <!-- Filter -->
             <keep access="public" name="aw.gui.chart.demo.Showcase">
-                <method access="public" name="init()" />
+                <method access="public" name="init" />
             </keep>
         </proguard>
+        <signjar jar="${basedir}/${project.name}-applet.jar"
+                 alias="sourceforge"
+                 storepass="password" />
     </target>
 
     <!-- Dependency only for ensuring validity -->
@@ -159,7 +199,7 @@
              basedir="${basedir}/.."
              update="false">
             <include name="${project.name}/src/**/*.java" />
-            <include name="${project.name}/gpl.txt" />
+            <include name="${project.name}/lgpl.txt" />
             <include name="${project.name}/ext/**/*.jar" />
             <include name="${project.name}/.classpath" />
             <include name="${project.name}/.project" />
@@ -176,7 +216,7 @@
         </zip>
     </target>
 
-    <target name="javadoc" depends="build">
+    <target name="javadoc" depends="">
         <mkdir dir="${basedir}/doc" />
         <javadoc destdir="${basedir}/doc"
                  access="protected"
@@ -197,7 +237,7 @@
                  docencoding="UTF-8">
             <classpath refid="classpath" />
             <bottom>
-                <![CDATA[<i>Copyright &#169; 2001 - 2006 GLPL, All Rights Footloose.</i>]]></bottom>
+                <![CDATA[<i>Copyright &#169; 2001 - 2006 <a href="http://www.opensource.org/licenses/lgpl-license.php" target="_blank">LGPL</a>, All Rights Footloose.</i>]]></bottom>
         <fileset refid="sourcefiles" />
         <link offline="true"
               href="http://java.sun.com/j2se/1.4.2/docs/api/"

@@ -1,7 +1,7 @@
 /*
  * File   : $Source: /cvsroot/jchart2d/jchart2d/history.txt,v $
- * Date   : $Date: 2006/02/12 16:19:26 $
- * Version: $Revision: 1.6 $
+ * Date   : $Date: 2006/04/12 21:20:42 $
+ * Version: $Revision: 1.11 $
  *
  * This file is part of jchart2d -
  * the Open Source real time charting library.
@@ -17,6 +17,29 @@ Legend:
 ! New Feature
 * Bug fixed
 - General comment
+
+jchart2d-1.1.1 - ???
+
+* Bugfix 1468612: memory leak when using ChartPanel and adding / removing traces.  
+* Corrected file headers to LGPL 2.1.
+! Allow direct edit of range bounds for range choice with keyboard. 
+! Integrated dual slider of the invofis toolkit for range choice. 
+! Update to most recent version of proguard. 
+! Shrinkinig of shipped binary jar.
+! Allow choosing viewport and it's range from context menu. 
+! Restructured context menus of ChartPanel. 
+* Update scaling of chart when a new RangePolicy is set to the axis at runtime. 
+* Update scaling of chart when a new Range is set to the range policy of an axis. 
+* Javadoc correction: Missing space after {@link type}.
+* Changed wrong license file in jar: jchart2d is LGPL.
+! Axis.setStartMajorTick(boolean) allows to force starting with a major tick scale value.
+! New RangePolicyForcedPoint to enforce always showing a point on the axis.
+! Control of trace painters by popup menu.
+! Multiple trace painters for traces.
+* Close the polygon of TracePainterFill correctly.
+* Bufix: NPE when setting trace name with null argument.
+* Bugfix #1430180: Update scaling of points when range policy is changed at runtime.
+! Set display of grid x and grid y seperately from context menue.
 
 jchart2d-1.1.0 - February 12, 2006
 

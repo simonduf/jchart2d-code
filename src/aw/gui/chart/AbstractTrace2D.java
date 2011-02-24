@@ -3,20 +3,20 @@
  *  AbstractTrace2D.java  jchart2d
  *  Copyright (C) Achim Westermann, created on 22.05.2005, 19:28:36
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
  *
@@ -31,8 +31,12 @@ import java.beans.PropertyChangeSupport;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.event.SwingPropertyChangeSupport;
+
+import aw.util.StringUtil;
 
 /**
  * <p>
@@ -106,7 +110,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.15 $
  */
 public abstract class AbstractTrace2D implements ITrace2D {
 
@@ -127,7 +131,7 @@ public abstract class AbstractTrace2D implements ITrace2D {
   }
 
   /**
-   * {@link Trace2DListener}instances (mainly <code>Char2D</code> instances
+   * {@link Trace2DListener} instances (mainly <code>Char2D</code> instances
    * that are interested in changes of internal <code>ITracePoint2D</code>
    * instances.
    */
@@ -174,14 +178,11 @@ public abstract class AbstractTrace2D implements ITrace2D {
    */
   protected String m_physicalUnits = "";
 
-  /** The trace painter that will be used to paint this trace. */
-  protected ITracePainter m_tracePainter;
-
   /**
    * The instance that add support for firing <code>PropertyChangeEvents</code>
    * and maintaining <code>PropertyChangeListeners</code>.
    *
-   * {@link PropertyChangeListener}instances.
+   * {@link PropertyChangeListener} instances.
    */
 
   protected PropertyChangeSupport m_propertyChangeSupport = new SwingPropertyChangeSupport(this);
@@ -215,7 +216,8 @@ public abstract class AbstractTrace2D implements ITrace2D {
   public AbstractTrace2D() {
     super();
     AbstractTrace2D.instanceCount++;
-    this.m_tracePainter = new TracePainterPolyline();
+    this.m_tracePainters = new TreeSet();
+    this.m_tracePainters.add(new TracePainterPolyline());
   }
 
   /**
@@ -245,7 +247,7 @@ public abstract class AbstractTrace2D implements ITrace2D {
    * </p>
    * <p>
    * This implementation performs caching of minimum and maximum values for x
-   * and y and the delegates to {@link #addPointInternal(TracePoint2D)}that has
+   * and y and the delegates to {@link #addPointInternal(TracePoint2D)} that has
    * to perform the "real" add operation.
    * </p>
    * <p>
@@ -333,6 +335,25 @@ public abstract class AbstractTrace2D implements ITrace2D {
   }
 
   /**
+   * @see aw.gui.chart.ITrace2D#addTracePainter(aw.gui.chart.ITracePainter)
+   */
+  public boolean addTracePainter(final ITracePainter painter) {
+    return this.m_tracePainters.add(painter);
+  }
+
+  /**
+   * Decreases internal instance count by one.
+   * <p>
+   *
+   * @throws Throwable
+   *           if sth. goes wrong.
+   */
+  public void finalize() throws Throwable {
+    super.finalize();
+    AbstractTrace2D.instanceCount--;
+  }
+
+  /**
    * <p>
    * Fire property change events related to an added point.
    * </p>
@@ -354,30 +375,6 @@ public abstract class AbstractTrace2D implements ITrace2D {
   protected void firePointAdded(final TracePoint2D added) {
     this.firePointChanged(added, true);
     this.firePropertyChange(PROPERTY_TRACEPOINT, null, added);
-  }
-
-  /**
-   * <p>
-   * Fire property change events related to a removed point.
-   * </p>
-   * <p>
-   * A property change event for property
-   * <code>{@link ITrace2D#PROPERTY_TRACEPOINT}</code> with a point as the old
-   * value and null as the new value is fired. This allows e.g. rescaling of
-   * those instances (instead of having to rescale a whole trace).
-   * </p>
-   * <p>
-   * Additionally before this property change, property change events for bounds
-   * are fired as described in method
-   * <code>{@link #firePointChanged(TracePoint2D, boolean)}</code>.
-   * </p>
-   *
-   * @param removed
-   *          the point that was removed.
-   */
-  protected void firePointRemoved(final TracePoint2D removed) {
-    this.firePointChanged(removed, false);
-    this.firePropertyChange(PROPERTY_TRACEPOINT, removed, null);
   }
 
   /**
@@ -449,15 +446,27 @@ public abstract class AbstractTrace2D implements ITrace2D {
   }
 
   /**
-   * Decreases internal instance count by one.
    * <p>
+   * Fire property change events related to a removed point.
+   * </p>
+   * <p>
+   * A property change event for property
+   * <code>{@link ITrace2D#PROPERTY_TRACEPOINT}</code> with a point as the old
+   * value and null as the new value is fired. This allows e.g. rescaling of
+   * those instances (instead of having to rescale a whole trace).
+   * </p>
+   * <p>
+   * Additionally before this property change, property change events for bounds
+   * are fired as described in method
+   * <code>{@link #firePointChanged(TracePoint2D, boolean)}</code>.
+   * </p>
    *
-   * @throws Throwable
-   *           if sth. goes wrong.
+   * @param removed
+   *          the point that was removed.
    */
-  public void finalize() throws Throwable {
-    super.finalize();
-    AbstractTrace2D.instanceCount--;
+  protected void firePointRemoved(final TracePoint2D removed) {
+    this.firePointChanged(removed, false);
+    this.firePropertyChange(PROPERTY_TRACEPOINT, removed, null);
   }
 
   /**
@@ -498,218 +507,6 @@ public abstract class AbstractTrace2D implements ITrace2D {
    */
   public List getChangeListeners() {
     return new LinkedList(this.m_changeListeners);
-  }
-
-  /**
-   * <p>
-   * Remove the given point from this <code>ITrace2D</code>.
-   * </p>
-   * <p>
-   * This implementation performs caching of minimum and maximum values for x
-   * and y and the delegates to
-   * <code>{@link #removePointInternal(TracePoint2D)}</code> that has to
-   * perform the "real" add remove operation.
-   * </p>
-   * <p>
-   * Property change events are fired as described in method
-   * <code>{@link #firePointRemoved(TracePoint2D)}</code>.
-   * </p>
-   *
-   * @param point
-   *          the <code>TracePoint2D</code> to remove.
-   *
-   * @return true if the removal suceeded, false else: this could be that the
-   *         given point was not contained.
-   *
-   * @see #firePointChanged(TracePoint2D, boolean)
-   */
-  public boolean removePoint(final TracePoint2D point) {
-    synchronized (this.m_renderer) {
-      if (Chart2D.THREAD_DEBUG) {
-
-        System.out.println("removePoint, 0 locks");
-      }
-      synchronized (this) {
-        if (Chart2D.THREAD_DEBUG) {
-          System.out.println("removePoint, 1 lock");
-        }
-        boolean success = this.removePointInternal(point);
-        if (success) {
-          double tmpx, tmpy;
-          tmpx = point.getX();
-          tmpy = point.getY();
-          this.firePointRemoved(point);
-        }
-        return success;
-
-      }
-    }
-  }
-
-  /**
-   * <p>
-   * Override this template method for the custom remove operation that depends
-   * on the internal storage the implementation.
-   * </p>
-   * <p>
-   * No property change events have to be fired by default. If this method
-   * returns <code>true</code> the outer logic of the calling method
-   * <code>{@link #removePoint(TracePoint2D)}</code> will perform bound checks
-   * for the new point and fire property changes for the properties
-   * <code>{@link ITrace2D#PROPERTY_MAX_X}</code>,
-   * <code>{@link ITrace2D#PROPERTY_MIN_X}</code>,
-   * <code>{@link ITrace2D#PROPERTY_MAX_Y}</code> and
-   * <code>{@link ITrace2D#PROPERTY_MIN_Y}</code>.
-   * </p>
-   * <p>
-   * In special cases - when additional modifications to the internal set of
-   * points take place (e.g. a further point get added) this method should
-   * return false (regardless wether the old point was really removed or not)
-   * and perform bound checks and fire the property changes as mentioned above
-   * "manually".
-   * </p>
-   *
-   * @param point
-   *          the point to remove.
-   *
-   * @return true if the given point was removed or false if not.
-   */
-  protected abstract boolean removePointInternal(final TracePoint2D point);
-
-  /**
-   * Internal search for the maximum x value that is only invoked if no cached
-   * value is at hand or bounds have changed by adding new points.
-   * <p>
-   *
-   * The result is assigned to the property maxX.
-   * <p>
-   *
-   * @see #getMaxX()
-   */
-  protected void maxXSearch() {
-    if (Chart2D.THREAD_DEBUG) {
-      System.out.println("trace.maxXSearch, 0 locks");
-    }
-
-    synchronized (this) {
-      if (Chart2D.THREAD_DEBUG) {
-        System.out.println("trace.maxXSearch, 1 locks");
-      }
-      double ret = -Double.MAX_VALUE;
-      TracePoint2D tmpoint = null;
-      double tmp;
-      Iterator it = this.iterator();
-      while (it.hasNext()) {
-        tmpoint = (TracePoint2D) it.next();
-        if ((tmp = tmpoint.getX()) > ret) {
-          ret = tmp;
-        }
-      }
-      this.m_maxX = ret;
-    }
-  }
-
-  /**
-   * Internal search for the minimum x value that is only invoked if no cached
-   * value is at hand or bounds have changed by adding new points.
-   * <p>
-   *
-   * The result is assigned to the property minX.
-   * <p>
-   *
-   * @see #getMinX()
-   */
-  protected void minXSearch() {
-    if (Chart2D.THREAD_DEBUG) {
-      System.out.println("trace.minXSearch, 0 locks");
-    }
-
-    synchronized (this) {
-      if (Chart2D.THREAD_DEBUG) {
-        System.out.println("trace.minXSearch, 1 locks");
-      }
-
-      double ret = Double.MAX_VALUE;
-      TracePoint2D tmpoint = null;
-      double tmp;
-      Iterator it = this.iterator();
-      while (it.hasNext()) {
-        tmpoint = (TracePoint2D) it.next();
-        if ((tmp = tmpoint.getX()) < ret) {
-          ret = tmp;
-        }
-      }
-      this.m_minX = ret;
-    }
-  }
-
-  /**
-   * Internal search for the maximum y value that is only invoked if no cached
-   * value is at hand or bounds have changed by adding new points.
-   * <p>
-   *
-   * The result is assigned to the property maxY.
-   * <p>
-   *
-   * @see #getMaxY()
-   */
-  protected void maxYSearch() {
-    if (Chart2D.THREAD_DEBUG) {
-      System.out.println("trace.maxYSearch, 0 locks");
-    }
-
-    synchronized (this) {
-      if (Chart2D.THREAD_DEBUG) {
-        System.out.println("trace.maxYSearch, 1 lock");
-      }
-
-      double ret = -Double.MAX_VALUE;
-      TracePoint2D tmpoint = null;
-      double tmp;
-      Iterator it = this.iterator();
-      while (it.hasNext()) {
-        tmpoint = (TracePoint2D) it.next();
-        if ((tmp = tmpoint.getY()) > ret) {
-          ret = tmp;
-        }
-      }
-      this.m_maxY = ret;
-    }
-  }
-
-  /**
-   * Internal search for the minimum y value that is only invoked if no cached
-   * value is at hand or bounds have changed by adding new points.
-   * <p>
-   *
-   * The result is assigned to the property minY.
-   * <p>
-   *
-   * @see #getMinY()
-   */
-  protected void minYSearch() {
-    if (Chart2D.THREAD_DEBUG) {
-      System.out.println("trace.minYSearch, 0 locks");
-    }
-
-    synchronized (this) {
-      if (Chart2D.THREAD_DEBUG) {
-        System.out.println("trace.minYSearch, 1 locks");
-      }
-
-      double ret = Double.MAX_VALUE;
-      TracePoint2D tmpoint = null;
-      double tmp;
-      Iterator it = this.iterator();
-      while (it.hasNext()) {
-        tmpoint = (TracePoint2D) it.next();
-        if ((tmp = tmpoint.getY()) < ret) {
-          ret = tmp;
-        }
-      }
-      this.m_minY = ret;
-    }
-
   }
 
   /**
@@ -824,6 +621,13 @@ public abstract class AbstractTrace2D implements ITrace2D {
   }
 
   /**
+   * @see aw.gui.chart.ITrace2D#getPropertyChangeListeners(String)
+   */
+  public PropertyChangeListener[] getPropertyChangeListeners(final String property) {
+    return this.m_propertyChangeSupport.getPropertyChangeListeners(property);
+  }
+
+  /**
    * Returns the chart that renders this instance or null, if this trace is not
    * added to a chart.
    * <p>
@@ -894,6 +698,142 @@ public abstract class AbstractTrace2D implements ITrace2D {
   }
 
   /**
+   * Internal search for the maximum x value that is only invoked if no cached
+   * value is at hand or bounds have changed by adding new points.
+   * <p>
+   *
+   * The result is assigned to the property maxX.
+   * <p>
+   *
+   * @see #getMaxX()
+   */
+  protected void maxXSearch() {
+    if (Chart2D.THREAD_DEBUG) {
+      System.out.println("trace.maxXSearch, 0 locks");
+    }
+
+    synchronized (this) {
+      if (Chart2D.THREAD_DEBUG) {
+        System.out.println("trace.maxXSearch, 1 locks");
+      }
+      double ret = -Double.MAX_VALUE;
+      TracePoint2D tmpoint = null;
+      double tmp;
+      Iterator it = this.iterator();
+      while (it.hasNext()) {
+        tmpoint = (TracePoint2D) it.next();
+        if ((tmp = tmpoint.getX()) > ret) {
+          ret = tmp;
+        }
+      }
+      this.m_maxX = ret;
+    }
+  }
+
+  /**
+   * Internal search for the maximum y value that is only invoked if no cached
+   * value is at hand or bounds have changed by adding new points.
+   * <p>
+   *
+   * The result is assigned to the property maxY.
+   * <p>
+   *
+   * @see #getMaxY()
+   */
+  protected void maxYSearch() {
+    if (Chart2D.THREAD_DEBUG) {
+      System.out.println("trace.maxYSearch, 0 locks");
+    }
+
+    synchronized (this) {
+      if (Chart2D.THREAD_DEBUG) {
+        System.out.println("trace.maxYSearch, 1 lock");
+      }
+
+      double ret = -Double.MAX_VALUE;
+      TracePoint2D tmpoint = null;
+      double tmp;
+      Iterator it = this.iterator();
+      while (it.hasNext()) {
+        tmpoint = (TracePoint2D) it.next();
+        if ((tmp = tmpoint.getY()) > ret) {
+          ret = tmp;
+        }
+      }
+      this.m_maxY = ret;
+    }
+  }
+
+  /**
+   * Internal search for the minimum x value that is only invoked if no cached
+   * value is at hand or bounds have changed by adding new points.
+   * <p>
+   *
+   * The result is assigned to the property minX.
+   * <p>
+   *
+   * @see #getMinX()
+   */
+  protected void minXSearch() {
+    if (Chart2D.THREAD_DEBUG) {
+      System.out.println("trace.minXSearch, 0 locks");
+    }
+
+    synchronized (this) {
+      if (Chart2D.THREAD_DEBUG) {
+        System.out.println("trace.minXSearch, 1 locks");
+      }
+
+      double ret = Double.MAX_VALUE;
+      TracePoint2D tmpoint = null;
+      double tmp;
+      Iterator it = this.iterator();
+      while (it.hasNext()) {
+        tmpoint = (TracePoint2D) it.next();
+        if ((tmp = tmpoint.getX()) < ret) {
+          ret = tmp;
+        }
+      }
+      this.m_minX = ret;
+    }
+  }
+
+  /**
+   * Internal search for the minimum y value that is only invoked if no cached
+   * value is at hand or bounds have changed by adding new points.
+   * <p>
+   *
+   * The result is assigned to the property minY.
+   * <p>
+   *
+   * @see #getMinY()
+   */
+  protected void minYSearch() {
+    if (Chart2D.THREAD_DEBUG) {
+      System.out.println("trace.minYSearch, 0 locks");
+    }
+
+    synchronized (this) {
+      if (Chart2D.THREAD_DEBUG) {
+        System.out.println("trace.minYSearch, 1 locks");
+      }
+
+      double ret = Double.MAX_VALUE;
+      TracePoint2D tmpoint = null;
+      double tmp;
+      Iterator it = this.iterator();
+      while (it.hasNext()) {
+        tmpoint = (TracePoint2D) it.next();
+        if ((tmp = tmpoint.getY()) < ret) {
+          ret = tmp;
+        }
+      }
+      this.m_minY = ret;
+    }
+
+  }
+
+  /**
    * Changes the internal state to empty to allow that the caching of bounds is
    * cleared and delegates the call to {@link  #removeAllPointsInternal()}.
    * <p>
@@ -931,6 +871,79 @@ public abstract class AbstractTrace2D implements ITrace2D {
   protected abstract void removeAllPointsInternal();
 
   /**
+   * <p>
+   * Remove the given point from this <code>ITrace2D</code>.
+   * </p>
+   * <p>
+   * This implementation performs caching of minimum and maximum values for x
+   * and y and the delegates to
+   * <code>{@link #removePointInternal(TracePoint2D)}</code> that has to
+   * perform the "real" add remove operation.
+   * </p>
+   * <p>
+   * Property change events are fired as described in method
+   * <code>{@link #firePointRemoved(TracePoint2D)}</code>.
+   * </p>
+   *
+   * @param point
+   *          the <code>TracePoint2D</code> to remove.
+   *
+   * @return true if the removal suceeded, false else: this could be that the
+   *         given point was not contained.
+   *
+   * @see #firePointChanged(TracePoint2D, boolean)
+   */
+  public boolean removePoint(final TracePoint2D point) {
+    synchronized (this.m_renderer) {
+      if (Chart2D.THREAD_DEBUG) {
+
+        System.out.println("removePoint, 0 locks");
+      }
+      synchronized (this) {
+        if (Chart2D.THREAD_DEBUG) {
+          System.out.println("removePoint, 1 lock");
+        }
+        boolean success = this.removePointInternal(point);
+        if (success) {
+          this.firePointRemoved(point);
+        }
+        return success;
+
+      }
+    }
+  }
+
+  /**
+   * <p>
+   * Override this template method for the custom remove operation that depends
+   * on the internal storage the implementation.
+   * </p>
+   * <p>
+   * No property change events have to be fired by default. If this method
+   * returns <code>true</code> the outer logic of the calling method
+   * <code>{@link #removePoint(TracePoint2D)}</code> will perform bound checks
+   * for the new point and fire property changes for the properties
+   * <code>{@link ITrace2D#PROPERTY_MAX_X}</code>,
+   * <code>{@link ITrace2D#PROPERTY_MIN_X}</code>,
+   * <code>{@link ITrace2D#PROPERTY_MAX_Y}</code> and
+   * <code>{@link ITrace2D#PROPERTY_MIN_Y}</code>.
+   * </p>
+   * <p>
+   * In special cases - when additional modifications to the internal set of
+   * points take place (e.g. a further point get added) this method should
+   * return false (regardless wether the old point was really removed or not)
+   * and perform bound checks and fire the property changes as mentioned above
+   * "manually".
+   * </p>
+   *
+   * @param point
+   *          the point to remove.
+   *
+   * @return true if the given point was removed or false if not.
+   */
+  protected abstract boolean removePointInternal(final TracePoint2D point);
+
+  /**
    * @see aw.gui.chart.ITrace2D#removePropertyChangeListener(java.beans.PropertyChangeListener)
    */
   public void removePropertyChangeListener(final PropertyChangeListener listener) {
@@ -947,10 +960,25 @@ public abstract class AbstractTrace2D implements ITrace2D {
   }
 
   /**
-   * @see aw.gui.chart.ITrace2D#getPropertyChangeListeners(String)
+   * Removes the given trace painter if an instance of the same class is
+   * contained and more painters are remaining.
+   * <p>
+   *
+   * @param painter
+   *          the painter to remove.
+   *
+   * @return true if a painter of the same class as the given painter was
+   *         removed.
    */
-  public PropertyChangeListener[] getPropertyChangeListeners(final String property) {
-    return this.m_propertyChangeSupport.getPropertyChangeListeners(property);
+  public boolean removeTracePainter(final ITracePainter painter) {
+    boolean result = false;
+    if (this.m_tracePainters.size() > 1) {
+      result = this.m_tracePainters.remove(painter);
+    } else {
+      // nop: if not contained operation will not be successful, if contained
+      // not allowed.
+    }
+    return result;
   }
 
   /**
@@ -980,16 +1008,22 @@ public abstract class AbstractTrace2D implements ITrace2D {
    * Sets the descriptive name for this trace.
    * <p>
    *
+   * If the given argument is null or consists of whitespaces only nothing will
+   * be changed.
+   * <p>
+   *
    * @param name
    *          the descriptive name for this trace.
    *
    * @see aw.gui.chart.ITrace2D#setName(java.lang.String)
    */
   public final void setName(final String name) {
-    String oldValue = this.m_name;
-    this.m_name = name;
-    if (!this.m_name.equals(oldValue)) {
-      this.firePropertyChange(PROPERTY_NAME, oldValue, this.m_name);
+    if (!StringUtil.isEmpty(name)) {
+      String oldValue = this.m_name;
+      this.m_name = name;
+      if (!this.m_name.equals(oldValue)) {
+        this.firePropertyChange(PROPERTY_NAME, oldValue, this.m_name);
+      }
     }
   }
 
@@ -1050,6 +1084,22 @@ public abstract class AbstractTrace2D implements ITrace2D {
     }
   }
 
+  /** The internal lists of the painters to use. */
+  private Set m_tracePainters = new TreeSet();
+
+  /**
+   * Returns true if the given painter is contained in this compound painter.
+   * <p>
+   *
+   * @param painter
+   *          the painter to check wether it is contained.
+   *
+   * @return true if the given painter is contained in this compound painter.
+   */
+  public boolean containsTracePainter(final ITracePainter painter) {
+    return this.m_tracePainters.contains(painter);
+  }
+
   /**
    * <p>
    * Set the visible property of this instance.
@@ -1070,6 +1120,23 @@ public abstract class AbstractTrace2D implements ITrace2D {
     if (oldValue != this.m_visible) {
       this.firePropertyChange(PROPERTY_VISIBLE, new Boolean(oldValue), new Boolean(this.m_visible));
     }
+  }
+
+  /**
+   * Replaces all internal trace painters by the new one.
+   * <p>
+   *
+   * @param painter
+   *          the new sole painter to use.
+   *
+   * @return the <code>Set&lt;{@link ITracePainter}&gt;</code> that was used
+   *         before.
+   */
+  public Set setTracePainter(final ITracePainter painter) {
+    Set result = this.m_tracePainters;
+    this.m_tracePainters = new TreeSet();
+    this.m_tracePainters.add(painter);
+    return result;
   }
 
   /**
@@ -1114,6 +1181,14 @@ public abstract class AbstractTrace2D implements ITrace2D {
   }
 
   /**
+   * @see aw.gui.chart.ITrace2D#getTracePainters()
+   */
+  public final Set getTracePainters() {
+
+    return this.m_tracePainters;
+  }
+
+  /**
    * <p>
    * Returns <code>{@link #getName()}.</code>
    * </p>
@@ -1122,23 +1197,5 @@ public abstract class AbstractTrace2D implements ITrace2D {
    */
   public String toString() {
     return this.getName();
-  }
-
-  /**
-   * @return Returns the tracePainter.
-   */
-  public ITracePainter getTracePainter() {
-    return this.m_tracePainter;
-  }
-
-  /**
-   * Sets the trace painter that will render this trace.
-   * <p>
-   *
-   * @param tracePainter
-   *          the trace painter that will render this trace.
-   */
-  public void setTracePainter(final ITracePainter tracePainter) {
-    this.m_tracePainter = tracePainter;
   }
 }

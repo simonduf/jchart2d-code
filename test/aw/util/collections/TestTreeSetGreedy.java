@@ -3,19 +3,19 @@
  *  TestTreeSetGreedy.java  jchart2d
  *  Copyright (C) Achim Westermann, created on 16.05.2005, 18:58:11
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -75,7 +75,7 @@ public class TestTreeSetGreedy extends TestCase {
   }
 
   /**
-   * Add two distinct {@link IComparableProperty}elements with equal comparable
+   * Add two distinct {@link IComparableProperty} elements with equal comparable
    * and ensure size is 2.
    *
    */
@@ -167,7 +167,7 @@ public class TestTreeSetGreedy extends TestCase {
   }
 
   /**
-   * Add two distinct {@link IComparableProperty}elements with equal
+   * Add two distinct {@link IComparableProperty} elements with equal
    * comparable, remove them and ensure size is 0.
    *
    */
@@ -356,7 +356,7 @@ public class TestTreeSetGreedy extends TestCase {
    * Starting 20 Threads that will remove and add inital equal elements (with an
    * internal comparableProperty of {@link ITrace2D#ZINDEX_MAX}) each 50 times
    * with arbitrary sleep times. Each Thread will ensure that it's own
-   * {@link IComparableProperty}will be removed from the {@link TreeSetGreedy}
+   * {@link IComparableProperty} will be removed from the {@link TreeSetGreedy}
    * after removing it and assert this by calling the remove call a 2nd time and
    * looking for the returned boolean. The main Thread will wait until all
    * Threads have terminated.

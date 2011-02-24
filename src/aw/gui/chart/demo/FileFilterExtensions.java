@@ -4,19 +4,19 @@
  *  filters files by their extension.
  *  Copyright (C) Achim Westermann, created on 01.07.2004, 12:18:29
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -43,8 +43,8 @@ import javax.swing.filechooser.FileSystemView;
  * the dot.
  * </p>
  * <p>
- * This class (all all {@link javax.swing.filechooser.FileFilter}is most often
- * used to configure {@link javax.swing.JFileChooser}dialogs. Therefore it
+ * This class (all all {@link javax.swing.filechooser.FileFilter} is most often
+ * used to configure {@link javax.swing.JFileChooser} dialogs. Therefore it
  * accepts all directories to allow browsing.
  * </p>
  * <h3>Example usage:</h3>
@@ -165,7 +165,7 @@ public final class FileFilterExtensions extends FileFilter implements INameFilte
     boolean isURL = false;
     try {
       // try, if URL (expensive):
-      URL test = new URL(urlstring);
+      new URL(urlstring);
       isURL = true;
     } catch (MalformedURLException e) {
       // nop.
@@ -205,7 +205,7 @@ public final class FileFilterExtensions extends FileFilter implements INameFilte
 
   /**
    * Needed for {@link #isDirectory(String)}: We cannot use
-   * {@link System#getProperty(java.lang.String)}to determine file separators
+   * {@link System#getProperty(java.lang.String)} to determine file separators
    * in applet context. That would possibly throw an SecurityAccessException.
    * <p>
    *

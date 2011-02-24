@@ -2,19 +2,19 @@
  * TracePoint2D, a tuned Point2D.Double for use with ITrace2D- implementations.
  * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -50,20 +50,14 @@ import java.awt.geom.Point2D;
  * A TracePoint2D will inform it's listener of type <code>ITrace</code> on
  * changes of the internal values.
  * </p>
- *
+ * 
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
- *
- * @version $Revision: 1.11 $
+ * 
+ * @version $Revision: 1.13 $
  */
 public class TracePoint2D extends Point2D.Double implements Comparable, java.io.Serializable,
     Cloneable {
-
-  /**
-   * Allows <code>ITrace2D</code> to construct <code>ALL_POINTS_CHANGED</code>
-   * to call the no- arg cons only one time.
-   */
-  private static boolean inited;
 
   /**
    * Generated <code>serialVersionUID</code>.
@@ -73,7 +67,7 @@ public class TracePoint2D extends Point2D.Double implements Comparable, java.io.
   /**
    * The reference to the listening <code>ITrace</code> who owns this point.
    * <p>
-   *
+   * 
    * A trace point should be contained only in one trace!
    * <p>
    */
@@ -98,10 +92,10 @@ public class TracePoint2D extends Point2D.Double implements Comparable, java.io.
   /**
    * Construct a TracePoint2D whose coords are initalized to (x,y).
    * <p>
-   *
+   * 
    * @param x
    *          the x value to use.
-   *
+   * 
    * @param y
    *          the y value to use.
    */
@@ -118,12 +112,12 @@ public class TracePoint2D extends Point2D.Double implements Comparable, java.io.
    * <code>pointChanged(Point2D.Double e)</code> on the instance this
    * tracepoint belongs to.
    * </p>
-   *
+   * 
    * @param listener
    *          the listener to use.
-   *
+   * 
    * @deprecated the argument ITrace2D is not necessary now as the new basic
-   *             implememtnation {@link AbstractTrace2D}will add itself as a
+   *             implememtnation {@link AbstractTrace2D} will add itself as a
    *             listener: replace this usage before version 1.2.
    */
   public TracePoint2D(final ITrace2D listener) {
@@ -139,20 +133,20 @@ public class TracePoint2D extends Point2D.Double implements Comparable, java.io.
    * <code>pointChanged(Point2D.Double e)</code> on the instance this
    * tracepoint belongs to.
    * </p>
-   *
+   * 
    * @param listener
    *          the listener to use.
-   *
+   * 
    * @param x
    *          the x value to use.
-   *
+   * 
    * @param y
    *          the y value to use.
-   *
+   * 
    * @deprecated the argument ITrace2D is not necessary now as the new basic
-   *             implememtnation {@link AbstractTrace2D}will add itself as a
+   *             implememtnation {@link AbstractTrace2D} will add itself as a
    *             listener: replace this usage before version 1.2.
-   *
+   * 
    */
   public TracePoint2D(final ITrace2D listener, final double x, final double y) {
     super(x, y);
@@ -171,18 +165,18 @@ public class TracePoint2D extends Point2D.Double implements Comparable, java.io.
   }
 
   /**
-   * Compares to {@link TracePoint2D}instances by their x value in ascending
+   * Compares to {@link TracePoint2D} instances by their x value in ascending
    * order.
    * <p>
-   *
+   * 
    * @param obj
    *          the point to compare to this instance.
-   *
+   * 
    * @return -1 if the given point has a higher x value, 0 if it has the same
    *         value or 1 if it has a lower x value.
-   *
+   * 
    * @see Comparable#compareTo(java.lang.Object)
-   *
+   * 
    * @throws ClassCastException
    *           if the given instance is not of this type.
    */
@@ -220,9 +214,9 @@ public class TracePoint2D extends Point2D.Double implements Comparable, java.io.
    * <p>
    * Allows <code>ITrace2D</code> instances to register (or deregister)
    * themselves with this point to receive (or stop receiving) change
-   * information via {@link ITrace2D#firePointChanged(TracePoint2D)}events.
+   * information via {@link ITrace2D#firePointChanged(TracePoint2D)} events.
    * </p>
-   *
+   * 
    * @param listener
    *          The instance that will be informed about changes or null to
    *          deregister.
@@ -240,7 +234,7 @@ public class TracePoint2D extends Point2D.Double implements Comparable, java.io.
    * <code>{@link AbstractTrace2D#firePointChanged(TracePoint2D, boolean)}</code>
    * (with argument true).
    * </p>
-   *
+   * 
    * @param x
    *          the new x-coordinate for this point.
    * @param y

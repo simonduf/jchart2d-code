@@ -2,19 +2,19 @@
  *  Unit.java, base class for units in jchart2d.
  *  Copyright (C) Achim Westermann, created on 12.05.2005, 20:11:17
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -29,7 +29,7 @@ package aw.util.units;
  *
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.6 $
  *
  * @see aw.util.units.UnitFactory
  *
@@ -43,7 +43,7 @@ public abstract class Unit extends Object {
   protected int m_decimals = 2;
 
   /**
-   * The factor a result of {@link #getValue(double)}had to be multiplied with
+   * The factor a result of {@link #getValue(double)} had to be multiplied with
    * if the real (unitless) value has to be calculated.
    */
   protected double m_factor;
@@ -61,7 +61,7 @@ public abstract class Unit extends Object {
   protected Unit m_nextHigherUnit;
 
   /**
-   * The short unit name of this unit a result of {@link #getValue(double)}has
+   * The short unit name of this unit a result of {@link #getValue(double)} has
    * to be related with to know the this result is displayed in a unit.
    * <p>
    */
@@ -71,8 +71,8 @@ public abstract class Unit extends Object {
    * Protected constructor to ensure package access only.
    * <p>
    *
-   * Use {@link UnitFactory#getInstance()}and
-   * {@link UnitFactory#getUnit(double, UnitSystem)}too obtain a proper unit.
+   * Use {@link UnitFactory#getInstance()} and
+   * {@link UnitFactory#getUnit(double, UnitSystem)} to obtain a proper unit.
    * <p>
    *
    */
@@ -82,18 +82,18 @@ public abstract class Unit extends Object {
 
   /**
    * Returns the number of decimals that should be be taken into account if the
-   * method {@link #getValue(double)}is invoked (rounding).
+   * method {@link #getValue(double)} is invoked (rounding).
    * <p>
    *
    * @return the number of decimals that should be be taken into account if the
-   *         method {@link #getValue(double)}is invoked (rounding).
+   *         method {@link #getValue(double)} is invoked (rounding).
    */
   public int getDecimals() {
     return this.m_decimals;
   }
 
   /**
-   * Returns the factor a result of {@link #getValue(double)}had to be
+   * Returns the factor a result of {@link #getValue(double)} had to be
    * multiplied with if the real (unitless) value has to be calculated.
    * <p>
    *
@@ -101,7 +101,7 @@ public abstract class Unit extends Object {
    * "safety by desing" so do never set this value.
    * <p>
    *
-   * @return the factor a result of {@link #getValue(double)}had to be
+   * @return the factor a result of {@link #getValue(double)} had to be
    *         multiplied with if the real (unitless) value has to be calculated.
    */
   public double getFactor() {
@@ -164,12 +164,12 @@ public abstract class Unit extends Object {
 
   /**
    * Retunrns the short unit name of this unit a result of
-   * {@link #getValue(double)}has to be related with to know the this result is
+   * {@link #getValue(double)} has to be related with to know the this result is
    * displayed in a unit.
    * <p>
    *
    * @return the short unit name of this unit a result of
-   *         {@link #getValue(double)}has to be related with to know the this
+   *         {@link #getValue(double)} has to be related with to know the this
    *         result is displayed in a unit.
    *         <p>
    */
@@ -210,12 +210,12 @@ public abstract class Unit extends Object {
 
   /**
    * Define how many decimals should be taken into account if the method
-   * {@link #getValue(double)}is invoked (rounding).
+   * {@link #getValue(double)} is invoked (rounding).
    * <p>
    *
    * @param aftercomma
    *          the number of decimals that should be taken into account if the
-   *          method {@link #getValue(double)}is invoked (rounding)
+   *          method {@link #getValue(double)} is invoked (rounding)
    */
   public void setDecimals(final int aftercomma) {
     if (aftercomma >= 0) {

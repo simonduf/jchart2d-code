@@ -3,19 +3,19 @@
  *  TestStaticCollectorChart.java  jchart2d
  *  Copyright (C) Achim Westermann, created on 23.04.2005, 08:21:12
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -32,7 +32,9 @@ import java.io.InputStream;
 import javax.swing.JFrame;
 
 import junit.framework.TestCase;
+import aw.gui.chart.Chart2D;
 import aw.gui.chart.ITrace2D;
+import aw.gui.chart.RangePolicyForcedPoint;
 import aw.gui.chart.Trace2DSimple;
 import aw.gui.chart.io.AbstractStaticDataCollector;
 import aw.gui.chart.io.PropertyFileStaticDataCollector;
@@ -43,7 +45,7 @@ import aw.gui.chart.io.PropertyFileStaticDataCollector;
 public class TestStaticCollectorChart extends TestCase {
 
   /**
-   * Tests {@link StaticCollectorChart}with data from test1.properties.
+   * Tests {@link StaticCollectorChart} with data from test1.properties.
    * <p>
    *
    * @throws IOException
@@ -58,7 +60,7 @@ public class TestStaticCollectorChart extends TestCase {
   }
 
   /**
-   * Tests {@link StaticCollectorChart}with data from test2.properties.
+   * Tests {@link StaticCollectorChart} with data from test2.properties.
    * <p>
    *
    * @throws IOException
@@ -76,7 +78,7 @@ public class TestStaticCollectorChart extends TestCase {
   }
 
   /**
-   * Tests {@link StaticCollectorChart}with data from test2.properties.
+   * Tests {@link StaticCollectorChart} with data from test2.properties.
    * <p>
    *
    * @throws IOException
@@ -90,6 +92,25 @@ public class TestStaticCollectorChart extends TestCase {
     StaticCollectorChart chart = new StaticCollectorChart(collector);
     // Adapt the decimal formatting for this data set.
     show(chart);
+  }
+
+  /**
+   * Tests {@link StaticCollectorChart} with data from test2.properties.
+   * <p>
+   *
+   * @throws IOException
+   *           if sth. goes wrong.
+   */
+  public final void testStaticCollectorChart7() throws IOException {
+    InputStream stream = this.getClass().getResourceAsStream("test7.properties");
+    ITrace2D trace = new Trace2DSimple();
+    trace.setColor(Color.RED);
+    AbstractStaticDataCollector collector = new PropertyFileStaticDataCollector(trace, stream);
+    StaticCollectorChart collectorchart = new StaticCollectorChart(collector);
+    Chart2D chart = collectorchart.getChart();
+    chart.getAxisX().setRangePolicy(new RangePolicyForcedPoint(0));
+    chart.getAxisY().setRangePolicy(new RangePolicyForcedPoint(0));
+    show(collectorchart);
   }
 
   /**
@@ -119,8 +140,7 @@ public class TestStaticCollectorChart extends TestCase {
     }
   }
 
-
-  public static void main(String[]args) throws IOException{
+  public static void main(String[] args) throws IOException {
     TestStaticCollectorChart test = new TestStaticCollectorChart();
     test.testStaticCollectorChart2();
   }

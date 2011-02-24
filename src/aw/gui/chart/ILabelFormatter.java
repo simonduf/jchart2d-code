@@ -3,19 +3,19 @@
  *  ILabelFormatter.java  jchart2d
  *  Copyright (C) Achim Westermann, created on 20.04.2005, 09:45:59
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -28,7 +28,7 @@ import aw.util.units.Unit;
 /**
  * <p>
  * An interface used by Axis to format labels and determine the maximum width
- * for the lables.
+ * for the labels.
  * </p>
  * <p>
  * In order to get as much labels as possible on the Chart2D's axes, an Axis
@@ -40,13 +40,13 @@ import aw.util.units.Unit;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.11 $
  */
 public interface ILabelFormatter {
 
   /**
    * <p>
-   * Provide a String for the value. Subclasses should override the lable
+   * Provide a String for the value. Subclasses should override the label
    * formatting here. The raw value is passed here to allow a general treatment.
    * Transformations of this raw value should be done here (e.g. division by
    * multiples of 1000 for scientific unit system display, date formatting,...).
@@ -122,7 +122,7 @@ public interface ILabelFormatter {
   public Unit getUnit();
 
   /**
-   * Callback method invoked by the corresponding {@link Axis}upon start of a
+   * Callback method invoked by the corresponding {@link Axis} upon start of a
    * paint iteration of the {@link Chart2D}.
    * <p>
    *

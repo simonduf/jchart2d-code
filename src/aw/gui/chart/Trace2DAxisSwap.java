@@ -2,19 +2,19 @@
  *  Trace2DAxisSwap.java  jchart2d
  *  Copyright (C) Achim Westermann, created on 20.04.2005, 09:06:33
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -26,6 +26,7 @@ import java.awt.Color;
 import java.awt.Stroke;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * <p>
@@ -41,7 +42,7 @@ import java.util.Iterator;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.13 $
  */
 public class Trace2DAxisSwap implements ITrace2D {
   /** The delagate instance to decorate with axis swapping. */
@@ -86,6 +87,13 @@ public class Trace2DAxisSwap implements ITrace2D {
   public void addPropertyChangeListener(final String propertyName,
       final PropertyChangeListener listener) {
     this.m_delegate.addPropertyChangeListener(propertyName, listener);
+  }
+
+  /**
+   * @see aw.gui.chart.ITrace2D#addTracePainter(aw.gui.chart.ITracePainter)
+   */
+  public boolean addTracePainter(final ITracePainter painter) {
+    return this.m_delegate.addTracePainter(painter);
   }
 
   /**
@@ -194,10 +202,11 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
-   * @see aw.gui.chart.ITrace2D#getTracePainter()
+   *
+   * @see aw.gui.chart.ITrace2D#getTracePainters()
    */
-  public ITracePainter getTracePainter() {
-    return this.m_delegate.getTracePainter();
+  public Set getTracePainters() {
+    return this.m_delegate.getTracePainters();
   }
 
   /**
@@ -266,6 +275,13 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
+   * @see aw.gui.chart.ITrace2D#removeTracePainter(aw.gui.chart.ITracePainter)
+   */
+  public boolean removeTracePainter(final ITracePainter painter) {
+    return this.m_delegate.removeTracePainter(painter);
+  }
+
+  /**
    * @see aw.gui.chart.ITrace2D#setColor(java.awt.Color)
    */
   public void setColor(final Color color) {
@@ -309,10 +325,11 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
+   *
    * @see aw.gui.chart.ITrace2D#setTracePainter(aw.gui.chart.ITracePainter)
    */
-  public void setTracePainter(final ITracePainter painter) {
-    this.m_delegate.setTracePainter(painter);
+  public Set setTracePainter(final ITracePainter painter) {
+    return this.m_delegate.setTracePainter(painter);
   }
 
   /**

@@ -21,6 +21,8 @@
  */
 package aw.gui.chart.demo;
 
+import java.awt.Color;
+
 import aw.gui.chart.ITrace2D;
 import aw.gui.chart.Trace2DSimple;
 
@@ -28,29 +30,36 @@ import aw.gui.chart.Trace2DSimple;
  * <p>
  * TODO Write a comment ending with '.'
  * </p>
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- *
- * @version  $Revision: 1.2 $
- *
+ * 
+ * @version $Revision: 1.3 $
+ * 
  */
 public class DefaultDisplayTest extends AbstractDisplayTest {
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see aw.gui.chart.demo.AbstractDisplayTest#createTrace()
    */
   protected ITrace2D createTrace() {
-    return new Trace2DSimple();
+    ITrace2D result = new Trace2DSimple();
+    result.setColor(Color.RED);
+    return result;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see aw.gui.chart.demo.AbstractDisplayTest#configure(aw.gui.chart.demo.StaticCollectorChart)
    */
   protected void configure(StaticCollectorChart chart) {
     // nop
   }
 
-//  public void defaultDisplayTest() throws IOException {
-//    displayTest();
-//  }
+  // public void defaultDisplayTest() throws IOException {
+  // displayTest();
+  // }
 
 }

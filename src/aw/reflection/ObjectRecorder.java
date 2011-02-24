@@ -1,20 +1,20 @@
-/**
+/*
  * ObjectRecorder, a class that takes records of an objects state using reflection.
  * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de.
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -39,36 +39,36 @@ import aw.util.collections.RingBufferArrayFast;
  * The <code>ObjectRecorder</code> takes records(inspections) of an objects
  * state using reflection and accessibility- framework.
  * <p>
- *
+ * 
  * It's strategy is to: <br>
- *
+ * 
  * <pre>
  *  - try to set any field accessible.
  *  - try to get the value of the field.
  *  - if not suceed: try to invoke a bean- conform getter.
  *  - if NoSuchMethod, it's useless (no implementation of MagicClazz here).
  *  </pre>
- *
+ * 
  * <p>
- *
+ * 
  * Furthermore the <code>ObjectRecorder</code> has a history - size (buffer)
  * and an adjustable distance between each inspection.
  * <p>
- *
+ * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
- *
- * @version $Revision: 1.4 $
+ * 
+ * @version $Revision: 1.7 $
  */
 public class ObjectRecorder extends Thread {
 
   /**
    * Data container for the inspection of the internal intance.
    * <p>
-   *
+   * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   *
-   *
-   * @version $Revision: 1.4 $
+   * 
+   * 
+   * @version $Revision: 1.7 $
    */
   public final class ObjectInspection {
     /** Timestamp of the inspection. */
@@ -80,7 +80,7 @@ public class ObjectRecorder extends Thread {
     /**
      * Creates an instance linked to the outer recorder.
      * <p>
-     *
+     * 
      */
     private ObjectInspection() {
       this.m_time = new java.util.Date().getTime();
@@ -90,7 +90,7 @@ public class ObjectRecorder extends Thread {
     /**
      * Adds an inspected value to this inpsection.
      * <p>
-     *
+     * 
      * @param value
      *          an inspected value of this inpsection.
      */
@@ -101,12 +101,12 @@ public class ObjectRecorder extends Thread {
     /**
      * Get the value for the attribute at the given index.
      * <p>
-     *
+     * 
      * @param index
      *          the index of the inspected value according to the order it was
      *          found on the instance by {@link Class#getDeclaredFields()}.
      *          <p>
-     *
+     * 
      * @return the value for the attribute at the given index.
      */
     public Object get(final int index) {
@@ -116,7 +116,7 @@ public class ObjectRecorder extends Thread {
     /**
      * Returns the timestamp in ms of this inspection.
      * <p>
-     *
+     * 
      * @return the timestamp in ms of this inspection.
      */
     public long getTime() {
@@ -126,24 +126,24 @@ public class ObjectRecorder extends Thread {
     /**
      * Removes the inspected value from this inspection.
      * <p>
-     *
+     * 
      * The value is identified by means of
      * {@link Object#equals(java.lang.Object)}.
      * <p>
-     *
+     * 
      * @param value
      *          the inspected value from this inspection.
      */
-    private void remove(final Object value) {
+    protected void remove(final Object value) {
       this.m_values.remove(value);
     }
 
     /**
      * Returns a pretty print of this inspection.
      * <p>
-     *
+     * 
      * @return a pretty print of this inspection.
-     *
+     * 
      * @see java.lang.Object#toString()
      */
     public String toString() {
@@ -151,7 +151,6 @@ public class ObjectRecorder extends Thread {
       ret.append("-----------------\n");
       ret.append("Inspected: ").append(ObjectRecorder.this.getInspected().toString()).append("\n");
       ret.append("time:      ").append(this.m_time).append("\n");
-      Field[] field = ObjectRecorder.this.m_fields;
       for (int i = ObjectRecorder.this.m_fields.length - 1; i >= 0; i--) {
         ret.append(ObjectRecorder.this.m_fields[i].getName()).append(": ").append(
             this.m_values.get(i).toString()).append("\n");
@@ -184,10 +183,10 @@ public class ObjectRecorder extends Thread {
    * Creates an instance that will inspect the given Object in the given time
    * interval.
    * <p>
-   *
+   * 
    * @param toinspect
    *          the instance to inspect.
-   *
+   * 
    * @param interval
    *          the interval of inspection in ms.
    */
@@ -203,7 +202,7 @@ public class ObjectRecorder extends Thread {
    * Adds a change listener that will be informed about new recordings of the
    * inpected instances.
    * <p>
-   *
+   * 
    * @param x
    *          the change listener that will be informed about new recordings of
    *          the inpected instances.
@@ -217,7 +216,7 @@ public class ObjectRecorder extends Thread {
   /**
    * Informs the listeners about a change of this instance.
    * <p>
-   *
+   * 
    */
   protected void fireChange() {
     ChangeEvent ce = new ChangeEvent(this);
@@ -232,17 +231,17 @@ public class ObjectRecorder extends Thread {
    * The History returned by this Method represents the past of the field
    * specified by attributeName. It starts from low index with the newest values
    * taken from the inspected Object and ends with the oldest.
-   *
+   * 
    * @param attributeName
    *          field name of the internal instance to inspect.
-   *
+   * 
    * @return An array filled with TimeStampedValues that represent the past of
    *         the last inspections of the field with attributeName.
-   *
+   * 
    * @throws NoSuchAttributeException
    *           if the attribute / field described by the given argument does not
    *           exist on the internal Object to instpect.
-   *
+   * 
    * @see ObjectRecorder#getInspected()
    */
   public TimeStampedValue[] getAttributeHistory(final String attributeName)
@@ -276,7 +275,7 @@ public class ObjectRecorder extends Thread {
   /**
    * Returns the names of the fields to inspect.
    * <p>
-   *
+   * 
    * @return the names of the fields to inspect.
    */
   public String[] getAttributeNames() {
@@ -291,7 +290,7 @@ public class ObjectRecorder extends Thread {
   /**
    * Returns the inspected instance.
    * <p>
-   *
+   * 
    * @return the inspected instance.
    */
   public Object getInspected() {
@@ -302,16 +301,16 @@ public class ObjectRecorder extends Thread {
    * Returns the last recoreded value taken from the given field along with the
    * timestamp identifying the time this value was recored.
    * <p>
-   *
+   * 
    * @param fieldname
    *          the field whose value was recorded.
-   *
+   * 
    * @return the last recoreded value taken from the given field along with the
    *         timestamp identifying the time this value was recored.
-   *
+   * 
    * @throws NoSuchAttributeException
    *           if no such field exists on the Object to inspect.
-   *
+   * 
    */
   public TimeStampedValue getLastValue(final String fieldname) throws NoSuchAttributeException {
     // search for the field
@@ -331,12 +330,13 @@ public class ObjectRecorder extends Thread {
   }
 
   /**
-   * Returns the internal fifo buffer that stores the {@link ObjectRecorder.ObjectInspection}
-   * instances that have been done.
+   * Returns the internal fifo buffer that stores the
+   * {@link ObjectRecorder.ObjectInspection} instances that have been done.
    * <p>
-   *
-   * @return the internal fifo buffer that stores the {@link ObjectRecorder.ObjectInspection}
-   *         instances that have been done.
+   * 
+   * @return the internal fifo buffer that stores the
+   *         {@link ObjectRecorder.ObjectInspection} instances that have been
+   *         done.
    */
   public IRingBuffer getRingBuffer() {
     return this.m_buffer;
@@ -399,7 +399,7 @@ public class ObjectRecorder extends Thread {
   /**
    * Removes the given listener for changes of the inpsected instance.
    * <p>
-   *
+   * 
    * @param x
    *          the listener to remove.
    */
@@ -408,7 +408,7 @@ public class ObjectRecorder extends Thread {
   }
 
   /**
-   *
+   * 
    * @see java.lang.Runnable#run()
    */
   public void run() {
@@ -426,10 +426,10 @@ public class ObjectRecorder extends Thread {
    * Define the amount of recorded states of the Object to inspect that remain
    * in memory.
    * <p>
-   *
+   * 
    * Default value is 100.
    * <p>
-   *
+   * 
    * @param length
    *          the amount of recorded states of the Object to inspect that remain
    *          in memory.
@@ -441,10 +441,10 @@ public class ObjectRecorder extends Thread {
   /**
    * Sets the interval for inpection of the instance to inspect in ms.
    * <p>
-   *
+   * 
    * @param sleeptime
    *          the interval for inpection of the instance to inspect in ms.
-   *
+   * 
    * @see ObjectRecorder#ObjectRecorder(Object, long)
    */
   public void setInterval(final long sleeptime) {

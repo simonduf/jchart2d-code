@@ -2,19 +2,19 @@
  *  Unit.java, singleton for caching and accessing UnitSystems.
  *  Copyright (C) Achim Westermann, created on 12.05.2005, 20:11:17
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -36,7 +36,7 @@ import java.util.Iterator;
  *
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.7 $
  *
  * @see aw.util.units.UnitSystem
  *
@@ -51,7 +51,7 @@ public final class UnitFactory extends Object {
    * {@link Unit#getValue(double)}.
    */
   public static final Unit UNCHANGED = new UnitUnchanged();
-  /** Cache for {@link UnitSystem}instances. */
+  /** Cache for {@link UnitSystem} instances. */
   private static final Map UNITSYSTEMS = new HashMap();
 
   /**
@@ -114,14 +114,14 @@ public final class UnitFactory extends Object {
   }
 
   /**
-   * Returns a list of all different {@link Unit}instances available in the
+   * Returns a list of all different {@link Unit} instances available in the
    * given unit system.
    * <p>
    *
    * @param unitsystem
    *          the unit system of interest.
    *
-   * @return a list of all different {@link Unit}instances available in the
+   * @return a list of all different {@link Unit} instances available in the
    *         given unit system.
    */
   public List getUnits(final UnitSystem unitsystem) {
@@ -141,7 +141,7 @@ public final class UnitFactory extends Object {
    * @param units
    *          the unit system to initialize.
    *
-   * @return the list of {@link Unit}instances of the given unit system.
+   * @return the list of {@link Unit} instances of the given unit system.
    */
   private List initUnitSystem(final UnitSystem units) {
     List choice = new LinkedList();

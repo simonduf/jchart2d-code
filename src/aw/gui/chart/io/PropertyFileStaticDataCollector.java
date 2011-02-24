@@ -1,8 +1,25 @@
 /*
- * Created on 09.10.2005
+ *  PropertyFileStaticDataCollector, a collector fpr data 
+ *  to display in static charts.
+ *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ *  If you modify or optimize the code in a useful way please let me know.
+ *  Achim.Westermann@gmx.de
+ *
  */
 package aw.gui.chart.io;
 
@@ -21,7 +38,7 @@ import aw.gui.chart.TracePoint2D;
 
 /**
  * Data collector that collects data in form of
- * {@link aw.gui.chart.TracePoint2D}instances from a property file (
+ * {@link aw.gui.chart.TracePoint2D} instances from a property file (
  * {@link java.util.Properties}).
  * <p>
  *
@@ -30,8 +47,8 @@ import aw.gui.chart.TracePoint2D;
 public class PropertyFileStaticDataCollector extends AbstractStaticDataCollector {
 
   /**
-   * The input stream in {@link java.util.Properties}format where
-   * {@link aw.gui.chart.TracePoint2D}are parsed from.
+   * The input stream in {@link java.util.Properties} format where
+   * {@link aw.gui.chart.TracePoint2D} are parsed from.
    * <p>
    */
   private InputStream m_source;
@@ -44,8 +61,8 @@ public class PropertyFileStaticDataCollector extends AbstractStaticDataCollector
    *          the target trace to add data to.
    *
    * @param propertyFileStream
-   *          the stream of the file in the {@link java.util.Properties}format
-   *          where {@link aw.gui.chart.TracePoint2D}instances (key is x, value
+   *          the stream of the file in the {@link java.util.Properties} format
+   *          where {@link aw.gui.chart.TracePoint2D} instances (key is x, value
    *          is y) is parsed from.
    */
   public PropertyFileStaticDataCollector(final ITrace2D trace, final InputStream propertyFileStream) {

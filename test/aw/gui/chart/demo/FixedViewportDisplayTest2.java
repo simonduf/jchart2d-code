@@ -21,14 +21,13 @@
  */
 package aw.gui.chart.demo;
 
+import java.awt.Color;
 import java.io.IOException;
 
 import aw.gui.chart.Axis;
 import aw.gui.chart.ITrace2D;
-import aw.gui.chart.ITracePainter;
 import aw.gui.chart.RangePolicyFixedViewport;
 import aw.gui.chart.Trace2DSimple;
-import aw.gui.chart.TracePainterCompound;
 import aw.gui.chart.TracePainterDisc;
 import aw.gui.chart.TracePainterLine;
 import aw.util.Range;
@@ -40,7 +39,7 @@ import aw.util.Range;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.7 $
  *
  */
 public class FixedViewportDisplayTest2 extends AbstractDisplayTest {
@@ -52,8 +51,9 @@ public class FixedViewportDisplayTest2 extends AbstractDisplayTest {
    */
   protected ITrace2D createTrace() {
     ITrace2D result = new Trace2DSimple();
-    result.setTracePainter(new TracePainterCompound(new ITracePainter[] {
-        new TracePainterDisc(), new TracePainterLine()}));
+    result.setTracePainter(new TracePainterDisc());
+    result.addTracePainter(new TracePainterLine());
+    result.setColor(Color.RED);
     return result;
   }
 
@@ -64,11 +64,12 @@ public class FixedViewportDisplayTest2 extends AbstractDisplayTest {
    */
   protected void configure(StaticCollectorChart chart) {
     Axis axis = chart.getChart().getAxisX();
-    axis.setRangePolicy(new RangePolicyFixedViewport(new Range(0, 7.5)));
+    axis.setRangePolicy(new RangePolicyFixedViewport(new Range(0, 100)));
     axis = chart.getChart().getAxisY();
-    axis.setRangePolicy(new RangePolicyFixedViewport(new Range(0, 7.5)));
+    axis.setRangePolicy(new RangePolicyFixedViewport(new Range(-40, 40)));
   }
-
+ 
+  
   public static void main(String[] args) throws IOException, InterruptedException {
     FixedViewportDisplayTest2 test = new FixedViewportDisplayTest2();
     try {

@@ -1,20 +1,20 @@
 /*
- * TracePainterFill.java,  <enter purpose here>.
- * Copyright (C) 2005  Achim Westermann, Achim.Westermann@gmx.de
+ *  TracePainterFill.java,  <enter purpose here>.
+ *  Copyright (C) 2005  Achim Westermann, Achim.Westermann@gmx.de
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -41,10 +41,10 @@ import java.util.List;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.8 $
  *
  */
-public class TracePainterFill implements ITracePainter {
+public class TracePainterFill extends AbstractTracePainter {
 
   /**
    * Stores the corresponding chart to know the coordinate roots for closing the
@@ -52,27 +52,7 @@ public class TracePainterFill implements ITracePainter {
    */
   private Chart2D m_chart;
 
-  /**
-   * Stores the last grapcics sent to
-   * {@link #paintPoint(int, int, int, int, Graphics2D)}to allow painting
-   * polygon at the end of the paint iteration.
-   */
 
-  private Graphics2D m_graphics;
-
-  /**
-   * Stores the last x coordinate that was sent to
-   * {@link #paintPoint(int, int, int, int, Graphics2D)}to allow closing the
-   * polygon.
-   */
-  private int m_lastX;
-
-  /**
-   * Stores the last y coordinate that was sent to
-   * {@link #paintPoint(int, int, int, int, Graphics2D)}to allow closing the
-   * polygon.
-   */
-  private int m_lastY;
 
   /** The list of x coordinates collected in one paint iteration. */
   private List m_xPoints;
@@ -105,7 +85,7 @@ public class TracePainterFill implements ITracePainter {
   public void endPaintIteration() {
     if (this.m_graphics != null) {
 
-      int[] x = new int[this.m_xPoints.size() + 2];
+      int[] x = new int[this.m_xPoints.size() + 3];
       Iterator it = this.m_xPoints.iterator();
       int count = 0;
       while (it.hasNext()) {
@@ -115,8 +95,10 @@ public class TracePainterFill implements ITracePainter {
       x[count] = this.m_lastX; //
       // step down (or up) to the y=0 for the last value (in y)
       x[count + 1] = this.m_lastX;
+      // step back to startx,starty (root)
+      x[count + 2] = this.m_chart.getXChartStart();
 
-      int[] y = new int[this.m_yPoints.size() + 2];
+      int[] y = new int[this.m_yPoints.size() + 3];
       it = this.m_yPoints.iterator();
       count = 0;
       while (it.hasNext()) {
@@ -126,6 +108,8 @@ public class TracePainterFill implements ITracePainter {
       y[count] = this.m_lastY;
       // step down (or up) to the y=0 for the last value (in y)
       y[count + 1] = this.m_chart.getYChartStart();
+      // step back to startx,starty (root)
+      y[count + 2] = this.m_chart.getYChartStart();
 
       this.m_graphics.fillPolygon(x, y, x.length);
     }

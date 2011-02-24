@@ -1,3 +1,26 @@
+/*
+ *  MinimalStaticChart.java of project jchart2d, a demonstration 
+ *  of the minimal code to set up a chart with static data. 
+ *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ *  If you modify or optimize the code in a useful way please let me know.
+ *  Achim.Westermann@gmx.de
+ *
+ */
 package aw.gui.chart.demo;
 
 import java.awt.BorderLayout;
@@ -36,7 +59,7 @@ import aw.gui.chart.layout.ChartPanel;
  *
  * @author Martin Rojo (modified)
  *
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public final class MinimalStaticChart extends JPanel {
   /**

@@ -3,19 +3,19 @@
  *  StaticChartDiscs.java, rendering demo of jchart2d.
  *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -26,7 +26,6 @@ package aw.gui.chart.demo;
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Random;
 
 import javax.swing.JFrame;
 
@@ -42,7 +41,7 @@ import aw.gui.chart.layout.ChartPanel;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.4 $
  *
  */
 public final class StaticChartDiscs {
@@ -66,14 +65,11 @@ public final class StaticChartDiscs {
     double count = 0;
     double value;
     double place = 0;
-    Random random = new Random();
     for (int i = 120; i >= 0; i--) {
       count += 1.0;
       place += 1.0;
-      // trace.addPoint(i,random.nextDouble()*10.0+i);
       value = Math.random() * count * 10;
       trace.addPoint(place, value);
-      System.out.println(value);
     }
     // Add the trace to the chart:
     chart.addTrace(trace);

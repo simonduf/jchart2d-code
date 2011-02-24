@@ -32,6 +32,7 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -48,7 +49,6 @@ import aw.gui.chart.ILabelFormatter;
 import aw.gui.chart.ILabelPainter;
 import aw.gui.chart.IRangePolicy;
 import aw.gui.chart.ITrace2D;
-import aw.gui.chart.ITracePainter;
 import aw.gui.chart.io.PropertyFileStaticDataCollector;
 import aw.util.Range;
 import aw.util.units.Unit;
@@ -60,7 +60,7 @@ import aw.util.units.Unit;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  *
  */
 public abstract class AbstractDisplayTest extends TestCase {
@@ -84,7 +84,8 @@ public abstract class AbstractDisplayTest extends TestCase {
       in = AbstractDisplayTest.class.getResourceAsStream("test" + count + ".properties");
       if (in == null) {
         foundData = false;
-      } else {
+      }
+      else {
         foundData = true;
         trace = createTrace();
         chart = new StaticCollectorChart(new PropertyFileStaticDataCollector(trace, in));
@@ -245,21 +246,22 @@ public abstract class AbstractDisplayTest extends TestCase {
     result.append("  Traces:\n");
     Iterator itTraces = chart.getTraces().iterator();
     ITrace2D trace;
-    ITracePainter tracePainter;
     Stroke stroke;
     while (itTraces.hasNext()) {
       trace = (ITrace2D) itTraces.next();
       result.append("    ").append(trace.getClass().getName()).append(":\n");
-      result.append("      x-range: [").append(trace.getMinX()).append(",").append(trace.getMaxX())
-          .append("]\n");
-      result.append("      y-range: [").append(trace.getMinY()).append(",").append(trace.getMaxY())
-          .append("]\n");
+      result.append("      x-range: [").append(trace.getMinX()).append(",").append(trace.getMaxX()).append("]\n");
+      result.append("      y-range: [").append(trace.getMinY()).append(",").append(trace.getMaxY()).append("]\n");
       result.append("      Color: ").append(trace.getColor()).append("\n");
       result.append("      Label: ").append(trace.getLable()).append("\n");
       result.append("      Visible: ").append(trace.getVisible()).append("\n");
       result.append("      Z-index: ").append(trace.getZIndex()).append("\n");
-      tracePainter = trace.getTracePainter();
-      result.append("      TracePainter: ").append(tracePainter.getClass().getName()).append("\n");
+      result.append("      TracePainters: \n");
+      Set painters = trace.getTracePainters();
+      Iterator itPainters = painters.iterator();
+      while (itPainters.hasNext()) {
+        result.append("        ").append(itPainters.next().getClass().getName()).append("\n");
+      }
       stroke = trace.getStroke();
       result.append("       Stroke: ").append(stroke.getClass().getName()).append("\n");
     }

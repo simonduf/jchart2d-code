@@ -5,5 +5,6 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="lib" path="ext/build/junit.jar"/>
 	<classpathentry kind="lib" path="ext/build/proguard.jar"/>
+	<classpathentry kind="lib" path="ext/infovis.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

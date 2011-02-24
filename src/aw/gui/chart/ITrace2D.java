@@ -2,19 +2,19 @@
  * ITrace2D, the interface for all traces used by the Chart2D.
  * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -24,12 +24,13 @@ package aw.gui.chart;
 import java.awt.Color;
 import java.awt.Stroke;
 import java.beans.PropertyChangeListener;
+import java.util.Set;
 
 import aw.util.collections.IComparableProperty;
 
 /**
  * An interface used by <code>Chart2D</code>. ITrace2D contains the values to
- * display, the color for displaying and a suitable lable. It may be seen as a
+ * display, the color for displaying and a suitable label. It may be seen as a
  * trace of the <code>Chart2D</code> that displays it. <br>
  * Implementations may be optimized for different use- cases: <br>
  * RingBuffers for fast changing data to keep the amount of tracepoints and
@@ -48,13 +49,13 @@ import aw.util.collections.IComparableProperty;
  * yet.
  * </p>
  * <p>
- * {@link java.lang.Comparable}should be implemented by using the internal
- * property zIndex (see {@link #getZIndex()},{@link #setZIndex(Integer)}).
+ * {@link java.lang.Comparable} should be implemented by using the internal
+ * property zIndex (see {@link #getZIndex()}, {@link #setZIndex(Integer)}).
  * </p>
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.15 $
  */
 public interface ITrace2D extends IComparableProperty {
 
@@ -237,7 +238,7 @@ public interface ITrace2D extends IComparableProperty {
   /**
    * <p>
    * Callback method for the <code>Chart2D</code> that returns a
-   * <code>String</code> describing the lable of the <code>ITrace2D</code>
+   * <code>String</code> describing the label of the <code>ITrace2D</code>
    * that will be displayed below the drawing area of the <code>Chart2D</code>.
    * </p>
    * <p>
@@ -253,14 +254,14 @@ public interface ITrace2D extends IComparableProperty {
 
   /**
    * <p>
-   * Returns the maximum amount of {@link TracePoint2D}instances that may be
+   * Returns the maximum amount of {@link TracePoint2D} instances that may be
    * added. For implementations that limit the maximum amount this is a
    * reasonable amount. Non-limiting implementations should return
    * {@link Integer#MAX_VALUE}. This allows to detect the unlimitedness. Of
    * course no implementation could store that amount of points.
    * </p>
    *
-   * @return The maximum amount of {@link TracePoint2D}instances that may be
+   * @return The maximum amount of {@link TracePoint2D} instances that may be
    *         added.
    *
    */
@@ -356,7 +357,7 @@ public interface ITrace2D extends IComparableProperty {
   public Chart2D getRenderer();
 
   /**
-   * @return The amount of {@link TracePoint2D}instances currently contained.
+   * @return The amount of {@link TracePoint2D} instances currently contained.
    */
   public int getSize();
 
@@ -368,12 +369,14 @@ public interface ITrace2D extends IComparableProperty {
   Stroke getStroke();
 
   /**
-   * Returns the painter that will be used to paint this trace.
+   * Returns the <code>Set&lt;{@link ITracePainter}&gt;</code> that will be
+   * used to paint this trace.
    * <p>
    *
-   * @return the painter that will be used to paint this trace.
+   * @return the <code>Set&lt;{@link ITracePainter}&gt;</code> that will be
+   *         used to paint this trace.
    */
-  public ITracePainter getTracePainter();
+  public Set getTracePainters();
 
   /**
    * @return true if this instance should be rendered.
@@ -428,7 +431,7 @@ public interface ITrace2D extends IComparableProperty {
   java.util.Iterator iterator();
 
   /**
-   * Removes all internal <code>TracePoint2D</code>.{@link #isEmpty()}will
+   * Removes all internal <code>TracePoint2D</code>.{@link #isEmpty()} will
    * return true afterwards.
    *
    */
@@ -511,19 +514,19 @@ public interface ITrace2D extends IComparableProperty {
   public void setPhysicalUnits(final String xunit, final String yunit);
 
   /**
-   * This is a callback from {@link Chart2D#addTrace(ITrace2D)}and must not be
+   * This is a callback from {@link Chart2D#addTrace(ITrace2D)} and must not be
    * invoked from elswhere (needed for synchronization). Not the best design to
    * put this to an interface, but Char2D should handle this interface only.
    *
    * @param renderer
    *          The renderer to set.
    */
-  void setRenderer(Chart2D renderer);
+  public void setRenderer(Chart2D renderer);
 
   /**
    * Allows to specify the rendering of the ITrace2D. This Stroke will be
-   * assigned to the {@link java.awt.Graphics2D}by the rendering
-   * {@link Chart2D}when painting this instance.
+   * assigned to the {@link java.awt.Graphics2D} by the rendering
+   * {@link Chart2D} when painting this instance.
    * <p>
    *
    * @param stroke
@@ -533,13 +536,29 @@ public interface ITrace2D extends IComparableProperty {
   void setStroke(Stroke stroke);
 
   /**
-   * Sets the painter that will be used to paint this trace.
+   * Replaces all internal trace painters by the new one.
    * <p>
    *
    * @param painter
-   *          the painter that will be used to paint this trace.
+   *          the new sole painter to use.
+   *
+   * @return the <code>Set&lt;{@link ITracePainter}&gt;</code> that was used
+   *         before.
    */
-  public void setTracePainter(ITracePainter painter);
+  public Set setTracePainter(ITracePainter painter);
+
+  /**
+   * Removes the given trace painter, if it's class is contained and if more
+   * painters are remaining.
+   * <p>
+   *
+   * @param painter
+   *          the trace painter to remove.
+   *
+   * @return true if a trace painter of the class of the given argument was
+   *         removed.
+   */
+  public boolean removeTracePainter(final ITracePainter painter);
 
   /**
    * Set the visibility. If argument is false, this instance will not be
@@ -571,4 +590,20 @@ public interface ITrace2D extends IComparableProperty {
    *
    */
   public void setZIndex(Integer zIndex);
+
+  /**
+   * Adds the given trace painter to the internal set of trace painters.
+   * <p>
+   *
+   * It will be the last painter to paint (most forward).
+   * <p>
+   *
+   * @param painter
+   *          the painter to add for rendering this trace.
+   *
+   * @return true if the painter was added (class of instance not contained
+   *         before).
+   */
+  public boolean addTracePainter(ITracePainter painter);
+
 }

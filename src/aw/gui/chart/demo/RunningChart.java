@@ -1,20 +1,20 @@
-/**
+/*
  * RunningChart, a test for the Chart2D.
  * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- *
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the Free
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -39,7 +39,7 @@ import aw.reflection.ObjRecorder2Trace2DAdapter;
 import aw.util.Range;
 
 /**
- *
+ * 
  * A test for the <code>Chart2D</code> that constantly adds new tracepoints to
  * a <code> Trace2DLtd</code>. Mainly the runtime- scaling is interesting.
  * <p>
@@ -48,21 +48,21 @@ import aw.util.Range;
  * <i>aw.reflection </i> and called <code>ObjRecorder2Trace2DAdaptor</code>(5
  * letters under the limit!).
  * <p>
- *
+ * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'> Achim Westermann </a>
- *
- * @version $Revision: 1.10 $
+ * 
+ * @version $Revision: 1.12 $
  */
 public class RunningChart extends JFrame {
   /**
    * Helper class that holds an internal number that is randomly modified by a
    * Thread.
    * <p>
-   *
+   * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   *
-   *
-   * @version $Revision: 1.10 $
+   * 
+   * 
+   * @version $Revision: 1.12 $
    */
   static class RandomBumper extends Thread {
     /** Streches or compresses the grade of jumping of the internal number. */
@@ -80,10 +80,10 @@ public class RunningChart extends JFrame {
     /**
      * Creates an instance.
      * <p>
-     *
+     * 
      * @param plusminus
      *          probability to increase or decrease the number each step.
-     *
+     * 
      * @param factor
      *          affects the amplitude of the number (severity of jumps).
      */
@@ -130,7 +130,7 @@ public class RunningChart extends JFrame {
   /**
    * Main entry.
    * <p>
-   *
+   * 
    * @param args
    *          ignored.
    */
@@ -156,8 +156,7 @@ public class RunningChart extends JFrame {
     wnd.setSize(700, 210);
     wnd.setResizable(true);
     wnd.setVisible(true);
-    ObjRecorder2Trace2DAdapter adapter = new ObjRecorder2Trace2DAdapter(data, new RandomBumper(0.5,
-        1000), "m_number", 100);
+    new ObjRecorder2Trace2DAdapter(data, new RandomBumper(0.5, 1000), "m_number", 100);
   }
 
   /** The chart to use. */
@@ -167,10 +166,10 @@ public class RunningChart extends JFrame {
    * Creates an instance that will dynamically paint on the chart to a trace
    * with the given label.
    * <p>
-   *
+   * 
    * @param chart
    *          the chart to use.
-   *
+   * 
    * @param label
    *          the name of the trace too display.
    */

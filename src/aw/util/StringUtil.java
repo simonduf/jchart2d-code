@@ -2,19 +2,19 @@
  *  StringUtil, utility class for string operations.
  *  Copyright (C) Achim Westermann, created on 09.09.2004, 12:38:21
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -34,7 +34,7 @@ import java.util.List;
  *
  * @author Achim.Westermann@gmx.de
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.5 $
  */
 public final class StringUtil {
   /** Singleton instance. */
@@ -186,7 +186,26 @@ public final class StringUtil {
   }
 
   /**
-   * Returns the maximum length of a {@link Object#toString()}result in
+   * Returns true if the argument is null or consists of whitespaces only.
+   * <p>
+   *
+   * @param test
+   *          the <code>String</code> to test.
+   *
+   * @return true if the argument is null or consists of whitespaces only.
+   */
+  public static boolean isEmpty(final String test) {
+    boolean result;
+    if (test == null) {
+      result = true;
+    } else {
+      result = test.trim().length() == 0;
+    }
+    return result;
+  }
+
+  /**
+   * Returns the maximum length of a {@link Object#toString()} result in
    * characters within the given List.
    * <p>
    *
@@ -202,7 +221,7 @@ public final class StringUtil {
    *
    * @param objects
    *          the <code>List&lt;Object&gt;</code> to inspect for the maximum
-   *          lenght of a {@link Object#toString()}result.
+   *          lenght of a {@link Object#toString()} result.
    *
    * @return The length of the longest String - representation of an Object in
    *         the List <b>or 0 if objects was null or of size 0. </b>

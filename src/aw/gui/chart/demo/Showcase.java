@@ -3,19 +3,19 @@
  *  Showcase.java  jchart2d
  *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -69,7 +69,7 @@ import aw.util.Range;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.14 $
  *
  */
 public final class Showcase extends Applet {
@@ -81,7 +81,7 @@ public final class Showcase extends Applet {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    *
    *
-   * @version $Revision: 1.11 $
+   * @version $Revision: 1.14 $
    */
   final class ControlPanel extends JPanel {
     /**
@@ -146,7 +146,7 @@ public final class Showcase extends Applet {
       stretch.add(this.m_startStop);
       stretch.add(Box.createHorizontalGlue());
       stretch.add(this.m_clear);
-      if (m_snapshot != null) {
+      if (this.m_snapshot != null) {
         // for applet usage snapshot is null!
         stretch.add(Box.createHorizontalGlue());
         stretch.add(this.m_snapshot);
@@ -166,7 +166,7 @@ public final class Showcase extends Applet {
       this.m_amountPointsSlider = new JSlider(10, 410);
       this.m_amountPointsSlider.setBackground(Color.WHITE);
       // find the value of max points:
-      int maxPoints = Showcase.this.m_trace.getMaxSize();
+      int maxPoints = Showcase.this.getTrace().getMaxSize();
       this.m_amountPointsSlider.setValue(maxPoints);
       this.m_amountPointsSlider.setMajorTickSpacing(40);
       this.m_amountPointsSlider.setMinorTickSpacing(20);
@@ -181,7 +181,7 @@ public final class Showcase extends Applet {
           // Only if not currently dragged...
           if (!source.getValueIsAdjusting()) {
             int value = source.getValue();
-            Showcase.this.m_trace.setMaxSize(value);
+            Showcase.this.getTrace().setMaxSize(value);
           }
         }
       });
@@ -219,7 +219,7 @@ public final class Showcase extends Applet {
        * <p>
        *
        * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-       * @version $Revision: 1.11 $
+       * @version $Revision: 1.14 $
        */
       final class ColorItem extends Color {
         /**
@@ -267,9 +267,8 @@ public final class Showcase extends Applet {
 
       this.m_colorChooser.addActionListener(new ActionListener() {
         public void actionPerformed(final ActionEvent ae) {
-          System.out.println("JComboBox colorChooser actionPerformed()");
           Color color = (Color) ((JComboBox) ae.getSource()).getSelectedItem();
-          Showcase.this.m_trace.setColor(color);
+          Showcase.this.getTrace().setColor(color);
         }
       });
       this.m_colorChooser.setSelectedIndex(10);
@@ -286,7 +285,7 @@ public final class Showcase extends Applet {
       // Latency slider:
       this.m_latencyTimeSlider = new JSlider(10, 210);
       this.m_latencyTimeSlider.setBackground(Color.WHITE);
-      this.m_latencyTimeSlider.setValue((int) Showcase.this.m_collector.getLatency());
+      this.m_latencyTimeSlider.setValue((int) Showcase.this.getCollector().getLatency());
       this.m_latencyTimeSlider.setMajorTickSpacing(50);
       this.m_latencyTimeSlider.setMinorTickSpacing(10);
       this.m_latencyTimeSlider.setSnapToTicks(true);
@@ -302,7 +301,7 @@ public final class Showcase extends Applet {
           // Only if not currently dragged...
           if (!source.getValueIsAdjusting()) {
             int value = source.getValue();
-            Showcase.this.m_collector.setLatency(value);
+            Showcase.this.getCollector().setLatency(value);
           }
         }
       });
@@ -323,7 +322,7 @@ public final class Showcase extends Applet {
         this.m_snapshot.addActionListener(new ActionListener() {
           public void actionPerformed(final ActionEvent e) {
             // Immediately get the image:
-            BufferedImage img = Showcase.this.m_chart.snapShot();
+            BufferedImage img = Showcase.this.getChart().snapShot();
             // clear file filters (uncool API)
 
             FileFilter[] farr = Showcase.ControlPanel.this.m_filechooser.getChoosableFileFilters();
@@ -381,7 +380,7 @@ public final class Showcase extends Applet {
       this.m_startStop.addActionListener(new ActionListener() {
         public void actionPerformed(final ActionEvent e) {
           JButton source = (JButton) e.getSource();
-          if (Showcase.this.m_collector.isRunning()) {
+          if (Showcase.this.getCollector().isRunning()) {
             Showcase.this.stopData();
             source.setText("start");
           } else {
@@ -425,13 +424,13 @@ public final class Showcase extends Applet {
   }
 
   /** The char to use. */
-  Chart2D m_chart;
+  private Chart2D m_chart;
 
   /** The data collector to use. */
-  AbstractDataCollector m_collector;
+  private AbstractDataCollector m_collector;
 
   /** The trace to use. */
-  Trace2DLtd m_trace;
+  private Trace2DLtd m_trace;
 
   /**
    * Defcon.
@@ -446,7 +445,37 @@ public final class Showcase extends Applet {
    * <p>
    */
   public synchronized void clearTrace() {
-    this.m_trace.removeAllPoints();
+    this.getTrace().removeAllPoints();
+  }
+
+  /**
+   * Returns the chart.
+   * <p>
+   *
+   * @return the chart to use.
+   */
+  public Chart2D getChart() {
+    return this.m_chart;
+  }
+
+  /**
+   * Returns the collector to use.
+   * <p>
+   *
+   * @return the collector to use.
+   */
+  public AbstractDataCollector getCollector() {
+    return this.m_collector;
+  }
+
+  /**
+   * Returns the trace.
+   * <p>
+   *
+   * @return the trace.
+   */
+  public Trace2DLtd getTrace() {
+    return this.m_trace;
   }
 
   /**
@@ -454,25 +483,73 @@ public final class Showcase extends Applet {
    */
   public void init() {
     super.init();
-    this.m_chart = new Chart2D();
+    Chart2D chart = new Chart2D();
+    this.setChart(chart);
     this.setSize(new Dimension(400, 500));
-    this.m_chart.setGridX(true);
-    this.m_chart.setGridY(true);
-    this.m_chart.getAxisY().setRangePolicy(new RangePolicyMinimumViewport(new Range(-20, +20)));
-    this.m_chart.setGridColor(Color.LIGHT_GRAY);
-    this.m_trace = new Trace2DLtd(100);
-    this.m_trace.setName("random");
-    this.m_trace.setPhysicalUnits("Milliseconds", "random value");
-    this.m_trace.setColor(Color.RED);
-    this.m_chart.addTrace(this.m_trace);
-    this.m_collector = new RandomDataCollectorOffset(this.m_trace, 1000);
+    chart.setGridX(true);
+    chart.setGridY(true);
+    chart.getAxisY().setRangePolicy(new RangePolicyMinimumViewport(new Range(-20, +20)));
+    chart.setGridColor(Color.LIGHT_GRAY);
+    this.setTrace(new Trace2DLtd(100));
+    this.getTrace().setName("random");
+    this.getTrace().setPhysicalUnits("Milliseconds", "random value");
+    this.getTrace().setColor(Color.RED);
+    chart.addTrace(this.getTrace());
     Container content = this;
     content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-    ChartPanel chartpanel = new ChartPanel(this.m_chart);
+    ChartPanel chartpanel = new ChartPanel(chart);
     content.add(chartpanel);
     content.addPropertyChangeListener(chartpanel);
+    this.setCollector(new RandomDataCollectorOffset(this.getTrace(), 50));
     content.add(new ControlPanel());
-    this.m_collector = new RandomDataCollectorOffset(this.m_trace, 50);
+  }
+
+  /**
+   * Sets the chart to use.
+   * <p>
+   *
+   * I would never code this but applets won't access private members and
+   * Checkstyle does not accept non-private members.
+   * <p>
+   *
+   * So it is only accepted if the member is null. Don't try calling.
+   * <p>
+   *
+   * @param chart2D
+   *          the chart to use.
+   */
+  public void setChart(final Chart2D chart2D) {
+    if (this.m_chart == null) {
+      this.m_chart = chart2D;
+    }
+  }
+
+  /**
+   * Sets the collector to use.
+   * <p>
+   *
+   * @param collector
+   *          the collector to use.
+   */
+  private void setCollector(final RandomDataCollectorOffset collector) {
+    this.m_collector = collector;
+  }
+
+  /**
+   * Sets the trace to use.
+   * <p>
+   *
+   * This will do nothing if the internal trace has been set before and is only
+   * intended for the applet which needs public members or setters.
+   * <p>
+   *
+   * @param trace
+   *          the trace to use.
+   */
+  public void setTrace(final Trace2DLtd trace) {
+    if (this.m_trace == null) {
+      this.m_trace = trace;
+    }
   }
 
   /**
@@ -481,8 +558,8 @@ public final class Showcase extends Applet {
    *
    */
   public synchronized void startData() {
-    if (!this.m_collector.isRunning()) {
-      this.m_collector.start();
+    if (!this.getCollector().isRunning()) {
+      this.getCollector().start();
     }
   }
 
@@ -492,8 +569,8 @@ public final class Showcase extends Applet {
    * <p>
    */
   public synchronized void stopData() {
-    if (this.m_collector.isRunning()) {
-      this.m_collector.stop();
+    if (this.getCollector().isRunning()) {
+      this.getCollector().stop();
     }
   }
 }

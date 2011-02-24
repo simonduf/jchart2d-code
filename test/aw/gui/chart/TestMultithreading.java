@@ -3,19 +3,19 @@
  *  TestMultithreading.java  jchart2d
  *  Copyright (C) Achim Westermann, created on 10.05.2005, 21:33:24
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -43,7 +43,6 @@ public class TestMultithreading extends TestCase {
   protected WeakHashMap weakMap;
 
   protected List producers;
-
 
   // test configuration
   protected final static int PRODUCER_AMOUNT = 10;
@@ -76,7 +75,7 @@ public class TestMultithreading extends TestCase {
     for (int add = PRODUCER_AMOUNT; add > 0; add--) {
       this.producers.add(new Producer(PRODUCER_ADD_POINT_AMOUNT, PRODUCER_SLEEPRANGE));
     }
-    this.trace = (ITrace2D)TRACE_CLASS.newInstance();
+    this.trace = (ITrace2D) TRACE_CLASS.newInstance();
     this.chart.addTrace(trace);
   }
 
@@ -155,16 +154,15 @@ public class TestMultithreading extends TestCase {
   }
 
   void report() {
-    long keys = weakMap.size();
+    long keys = this.weakMap.size();
     System.out.println("Points remaining in the weakMap: " + keys);
     System.out.println("System.runFinalization()... ");
     System.runFinalization();
     System.out.println("System.gc()... ");
     System.gc();
-    keys = weakMap.size();
     System.out.println("Points remaining in the weakMap: " + keys);
     keys = 0;
-    Iterator it = weakMap.keySet().iterator();
+    Iterator it = this.weakMap.keySet().iterator();
     while (it.hasNext()) {
       keys++;
       System.out.println("Point " + it.next().toString() + " was not dropped.");
@@ -177,12 +175,24 @@ public class TestMultithreading extends TestCase {
   // Worker classes
   // ////////////////////////////
 
+  /**
+   * Thread implementation that adds random points to the trace of the outer
+   * classes's chart and takes a random sleep time between 0 and a constructor
+   * given value between two add operations.
+   * <p>
+   *
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   *
+   */
   class Producer extends Thread {
-    private long toAdd;
+    /** The amount of points to add before termination. */
+    private long m_toAdd;
 
-    private long sleepRange;
+    /** The maximum sleep time between two add operations. */
+    private long m_sleepRange;
 
-    private boolean stop = false;
+    /** Flag to allow stopping this Thread from outside. */
+    private boolean m_stop = false;
 
     /**
      * <p>
@@ -191,56 +201,86 @@ public class TestMultithreading extends TestCase {
      * </p>
      *
      * @param toAdd
-     *          the amount of points to add
+     *          the amount of points to add.
+     *
      * @param sleepRange
      *          the maxium time in milliseconds the Thread will sleep between
-     *          two points added
+     *          two points added.
+     *
      */
-    Producer(long toAdd, long sleepRange) {
-      this.toAdd = toAdd;
-      this.sleepRange = sleepRange;
+    Producer(final long toAdd, final long sleepRange) {
+      this.m_toAdd = toAdd;
+      this.m_sleepRange = sleepRange;
     }
 
+    /**
+     * Does the job.
+     * <p>
+     */
     public void run() {
       TracePoint2D point;
-      while (this.toAdd > 0 && !this.stop) {
+      while (this.m_toAdd > 0 && !this.m_stop) {
         try {
-          sleep((long) (Math.random() * this.sleepRange));
+          sleep((long) (Math.random() * this.m_sleepRange));
         } catch (InterruptedException e) {
           e.printStackTrace();
-          this.stop = true;
+          this.m_stop = true;
         }
-        if (this.toAdd % 10 == 0) {
-          System.out.println('[' + this.getName() + "] adding point... " + this.toAdd + " to go...");
+        if (this.m_toAdd % 10 == 0) {
+          System.out.println('[' + this.getName() + "] adding point... " + this.m_toAdd + " to go...");
         }
-        point = new TracePoint2D(toAdd, toAdd);
+        point = new TracePoint2D(this.m_toAdd, this.m_toAdd);
         TestMultithreading.this.weakMap.put(point, point.toString());
         TestMultithreading.this.trace.addPoint(point);
-        this.toAdd--;
+        this.m_toAdd--;
       }
     }
   }
 
+  /**
+   * Thread that invokes paint operations with a mock graphics context (thus
+   * consumes pending unscaled points) interrupted by a sleep between 0 and a
+   * configurable amount of milliseconds.
+   * <p>
+   *
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   *
+   */
   class Consumer extends Thread {
-    private long sleepRange;
 
-    Consumer(long sleepRange) {
-      this.sleepRange = sleepRange;
+    /** The maximum sleep time between two paint operations. */
+    private long m_sleepRange;
+
+    /**
+     * Creates an instance that mock-paints the chart every
+     * <code>0 ..  sleeprange</code> ms.
+     * <p>
+     *
+     * @param sleepRange
+     *          the maximum sleep range between two rendering operations.
+     */
+    Consumer(final long sleepRange) {
+      this.m_sleepRange = sleepRange;
     }
 
-    private boolean stop = false;
+    /** Flag to allow termination from outside. */
+    private boolean m_stop = false;
 
+    /**
+     * Do the job.
+     * <p>
+     */
     public void run() {
       MockGraphics2D mockGraphics = new MockGraphics2D();
-      while (!(this.stop || TestMultithreading.this.isAllProducersFinished())) {
+      while (!(this.m_stop || TestMultithreading.this.isAllProducersFinished())) {
         try {
-          sleep((long) (Math.random() * this.sleepRange));
+          sleep((long) (Math.random() * this.m_sleepRange));
         } catch (InterruptedException e) {
           e.printStackTrace();
-          this.stop = true;
+          this.m_stop = true;
         }
         System.out.println('[' + this.getClass().getName() + "] painting...");
-        chart.paint(mockGraphics);
+        TestMultithreading.this.chart.paint(mockGraphics);
       }
     }
 

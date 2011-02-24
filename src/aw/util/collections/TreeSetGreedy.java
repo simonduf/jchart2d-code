@@ -2,19 +2,19 @@
  *  TreeSetGreedy.java, special container for managing z-Indexes of traces in jchart2d.
  *  Copyright (C) Achim Westermann, created on 12.05.2005, 20:11:17
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -32,17 +32,17 @@ import java.util.TreeSet;
 /**
  * A <code>Set</code> that will always successfully add new instances and
  * guarantee that all the "<em>Comparable properties</em>" of the contained
- * {@link aw.util.collections.IComparableProperty}instances will build a set
+ * {@link aw.util.collections.IComparableProperty} instances will build a set
  * (no duplicates).
  * <p>
- * Although the interface of {@link java.util.Set}is preserved and allows
+ * Although the interface of {@link java.util.Set} is preserved and allows
  * adding any <code>Object</code> <b>only
- * {@link aw.util.collections.IComparableProperty}instances may be added to
+ * {@link aw.util.collections.IComparableProperty} instances may be added to
  * <code>TreeSetGreedy</code> </b> because it uses a proprietary
  * {@link java.util.Comparator}.
  * <p>
  * The added <code>IComparableProperty</code> instances with the lowest
- * {@link java.lang.Number}property (see
+ * {@link java.lang.Number} property (see
  * {@link aw.util.collections.IComparableProperty#getComparableProperty()})
  * will be returned first from the retrievable <code>Iterator</code>
  * <p>
@@ -53,9 +53,9 @@ import java.util.TreeSet;
  * necessary to remove the instance before outside modification and later on add
  * it again.
  * <p>
- *
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
+ * 
  */
 public class TreeSetGreedy extends TreeSet implements Set {
 
@@ -67,22 +67,22 @@ public class TreeSetGreedy extends TreeSet implements Set {
    * Note that the given <code>Set</code> has to be the instance this
    * <code>Comparator</code> has to be set to later. This is necessary to
    * fulfill the contract declared for method {@link #compare(Object, Object)}.
-   * Therefore direct after creation the internal member {@link #m_delegate}has
+   * Therefore direct after creation the internal member {@link #m_delegate} has
    * to be set from outside.
    * <p>
-   * A {@link java.util.Set}that is sorted by this <code>Comparator</code>
+   * A {@link java.util.Set} that is sorted by this <code>Comparator</code>
    * has to be obtained by the call: <br>
-   *
+   * 
    * <pre>
    * NumberPropertyComparator comparator = new NumberPropertyComparator();
    * Set set = new TreeSet(comparator);
    * NumberPropertyComparator.delegate = set;
    * </pre>
-   *
+   * 
    * <p>
-   *
+   * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   *
+   * 
    */
   private static final class NumberPropertyComparator implements Comparator {
     /** Reference to the corresponding <code>TreeSetGreedy</code>. */
@@ -95,7 +95,7 @@ public class TreeSetGreedy extends TreeSet implements Set {
     private IComparableProperty m_resort = null;
 
     /**
-     * Compares two Objects by casting them to {@link IComparableProperty}and
+     * Compares two Objects by casting them to {@link IComparableProperty} and
      * using their {@link  IComparableProperty#getComparableProperty()}
      * property.
      * <p>
@@ -104,7 +104,7 @@ public class TreeSetGreedy extends TreeSet implements Set {
      * <p>
      * For two instances that are judged equal (equal z-index) the first
      * argument is decided to stay, the second instance gets assigned a higher
-     * {@link IComparableProperty#setComparableProperty(Number)}by one, then is
+     * {@link IComparableProperty#setComparableProperty(Number)} by one, then is
      * removed from the <code>Set</code> it is working for and added anew thus
      * getting the next index order.
      * <p>
@@ -113,19 +113,19 @@ public class TreeSetGreedy extends TreeSet implements Set {
      * instance is added (never returns 0), all instances have a different
      * values and the newest added instances definetely get their chosen value.
      * <p>
-     *
+     * 
      * @param o1
      *          the first instance for comparison.
-     *
+     * 
      * @param o2
      *          the second instance for comparison.
-     *
+     * 
      * @throws ClassCastException
      *           if one of the given arguments does not implement
      *           {@link IComparableProperty}
-     *
+     * 
      * @return -1 if o1 is first, 0, if both are equal and +1 if o1 comes last.
-     *
+     * 
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
     public int compare(final Object o1, final Object o2) throws ClassCastException {
@@ -156,10 +156,10 @@ public class TreeSetGreedy extends TreeSet implements Set {
     /**
      * Creates a new number of the correct type increased by 1.
      * <p>
-     *
+     * 
      * @param n
      *          the number to increase.
-     *
+     * 
      * @return a new number of the correct type increased by 1.
      */
     private Number createIncreasedNumber(final Number n) {
@@ -219,10 +219,10 @@ public class TreeSetGreedy extends TreeSet implements Set {
   /**
    * Internally adds the given instance.
    * <p>
-   *
+   * 
    * @param o
    *          the instance to add.
-   *
+   * 
    * @return true if the instance was added.
    */
   private boolean addInternal(final Object o) {
@@ -252,29 +252,27 @@ public class TreeSetGreedy extends TreeSet implements Set {
    * order.
    * <p>
    * An example of the procedure:
-   *
+   * 
    * <pre>
    *  [0, 10, 11, 22] -> [0,1,2,3]
    * </pre>
-   *
+   * 
    * <p>
    * This method allows to avoid exceeding bounds (e.g. between {
-   * {@link aw.gui.chart.ITrace2D#Z_INDEX_MIN}and
+   * {@link aw.gui.chart.ITrace2D#Z_INDEX_MIN} and
    * {@link aw.gui.chart.ITrace2D#ZINDEX_MAX}) and allows that changes of the
    * comparable properties always have an effect. If in the example above the
    * 2nd instance would increase it's property by one from 10 to 11 nothing
    * would happen to the order.
    * <p>
-   *
+   * 
    */
   private void packComparableProperties() {
     Iterator it = this.iterator();
     IComparableProperty prop;
     int i = 0;
-    int tmp;
     while (it.hasNext()) {
       prop = (IComparableProperty) it.next();
-      tmp = prop.getComparableProperty().intValue();
       prop.setComparableProperty(new Integer(i));
       i++;
     }

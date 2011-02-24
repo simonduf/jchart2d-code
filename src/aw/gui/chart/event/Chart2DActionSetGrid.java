@@ -2,19 +2,19 @@
  *  Chart2DActionSetGrid, action to enable / disable display of the grid of the chart.
  *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -39,7 +39,7 @@ import aw.gui.chart.Chart2D;
  * <b>This action only may be assigned to a
  * {@link javax.swing.JCheckBoxMenuItem}</b> <br>
  * The <em>source</em> <code>Object</code> of <code>ActionEvent</code>
- * that is received in {@link #actionPerformed(ActionEvent)}is casted to this
+ * that is received in {@link #actionPerformed(ActionEvent)} is casted to this
  * type to get the boolean state. If this <code>Action</code> is used with
  * other <code>JComponent</code> instances <code>ClassCastExceptions</code>
  * will be thrown!
@@ -47,7 +47,7 @@ import aw.gui.chart.Chart2D;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  */
 public class Chart2DActionSetGrid extends AChart2DAction {
 
@@ -64,7 +64,7 @@ public class Chart2DActionSetGrid extends AChart2DAction {
    *          the target the action will work on.
    * @param description
    *          the descriptive <code>String</code> that will be displayed by
-   *          {@link javax.swing.AbstractButton}subclasses that get this
+   *          {@link javax.swing.AbstractButton} subclasses that get this
    *          <code>Action</code> assigned (
    *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    *

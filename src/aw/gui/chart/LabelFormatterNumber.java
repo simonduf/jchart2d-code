@@ -3,19 +3,19 @@
  *  LabelFormatterNumber.java  jchart2d
  *  Copyright (C) Achim Westermann, created on 20.04.2005, 22:34:16
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ * 
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ * 
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
@@ -35,8 +35,8 @@ import aw.util.Range;
  * <p>
  * To avoid loss of precision please choose a sufficient resolution for your
  * constructor given NumberFormat. Example: If you add new
- * {@link aw.gui.chart.TracePoint2D}instances to the
- * {@link aw.gui.chart.Chart2D}every second, prefer using a NumberFormat that
+ * {@link aw.gui.chart.TracePoint2D} instances to the
+ * {@link aw.gui.chart.Chart2D} every second, prefer using a NumberFormat that
  * at least formats the seconds like (e.g.):
  *
  * <pre>
@@ -47,7 +47,7 @@ import aw.util.Range;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.12 $
  */
 public class LabelFormatterNumber extends AbstractLabelFormatter implements ILabelFormatter {
 
