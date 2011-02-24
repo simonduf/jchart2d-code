@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="jchart2d" default="build">
+	<description>
+	 A swing-widget for precise visualisation of charts.
+	</description>
+
+<!-- General Properties -->
+    
+    <property name="project.name" value="jchart2d" />
+	<property name="libdir" value="${basedir}/ext" />
+	<property name="builddir" value="${basedir}/bin" />
+	<property name="sourcedir" value="${basedir}/src" />
+	
+
+<!-- General paths & filesets. -->	
+
+    <path description="Directory paths of project" id="sourcedirs" >    
+<!--		
+		<pathelement location="util/collections"/>	
+-->
+    </path>
+    
+    <path description="Classpath of project" id="classpath">
+    	<pathelement path="${builddir}"/>
+    	<fileset refid="externalJars" />
+    </path>
+    
+
+    <fileset description="Source files of project" dir="${sourcedir}" id="sourcefiles">	
+		<include name="**/*.java"/> 
+	</fileset>    
+	
+    <fileset description="Compiled classfiles of project" dir="${builddir}" id="classfiles">
+		<include name="**/*.class"/>
+	</fileset>    
+    
+    <!-- 
+    These files will be shipped in the nseAnnealing package 
+   	by extracting them to the project's basedir, befor the 
+   	whole project is packed into a jar. 
+   	See the rule integrateJars
+   	-->
+    <fileset dir="${libdir}" id="externalJars" description="External library jar files that will be shipped with this *.jar distribution.">
+    	<include name="**/*.jar"/>
+    </fileset>
+    
+    <!-- compile the java sources -->
+
+	<target name="init" >
+		<tstamp/>
+	    <mkdir dir="${builddir}" />
+	    <mkdir dir="${libdir}" />
+	    <mkdir dir="${sourcedir}" />
+	</target>
+	
+    <target name="build" depends="init,integrate.jars"> 
+    	<javac 
+    		srcdir="${sourcedir}"  
+    		fork="true"
+    	  	debug="true" 
+    	  	destdir="${builddir}"			
+    	  >
+    		<classpath refid="classpath"/>		
+		</javac>
+    </target>
+    
+    <target name="integrate.jars"> 
+		<copy file="${basedir}/gpl.txt" toDir="${builddir}"/>
+		<unjar dest="${builddir}">
+			<fileset refid="externalJars"/>
+		</unjar>
+		<!-- remove potentially contained sourcefiles -->
+		 <delete includeEmptyDirs="false">
+    		<fileset dir="${builddir}">
+    			<exclude name="**/*.class" />
+    		</fileset>
+  		</delete>
+    </target>
+        
+    <!-- Create the jar file for command line parsing support -->
+    <target name="makejarBinaryDebug" depends="delete.classfiles,build">
+    	<echo level="warning" message="jbuzzer.RemovableLogging.debug should be true to avoid that the compiler removes all logging code!" />
+    	<jar destfile="${project.name}_debug_bin.jar" basedir="${builddir}" manifest="manifest.mf" >
+			<include name="**/*.class"/>
+    		<!-- This is for jl0.4.jar resource files -->
+			<include name="**/*.ser"/>
+    		<!-- This is for javasound service provider interface files -->
+    		<include name="**/services/**"/>
+    		<!-- Readme.txt or gpl.txt -->
+    		<include name="**/*.txt"/>
+    		<exclude name="**/*audiotest/**" />
+    		<exclude name="**/*jsxtest/**" />
+    	</jar>
+    </target>
+    
+    <target name="makejarBinary" depends="delete.classfiles,build">
+    	<echo level="warning" message="jbuzzer.RemovableLogging.debug has to be set to false or ClassNotFoundExceptions will be thrown!" />
+    	<jar destfile="${project.name}_bin.jar" basedir="${builddir}" manifest="manifest.mf" >
+			<include name="**/*.class"/>
+    		<!-- This is for jl0.4.jar resource files -->
+			<include name="**/*.ser"/>
+    		<!-- This is for javasound service provider interface files -->
+    		<include name="**/services/**"/>
+    		<!-- Readme.txt or gpl.txt -->
+    		<include name="**/*.txt"/>
+    		<exclude name="**/*audiotest/**" />
+    		<exclude name="**/*jsxtest/**" />
+    		<exclude name="**/*org/apache/log4j/**" />
+    	</jar>
+    </target>
+   
+    <!-- Dependency only for ensuring validity -->
+    <target name="makezipEclipseProject" depends="build">
+    	<zip destfile="${project.name}_eclipse_project.zip" basedir="${basedir}/.." >
+			<include name="${project.name}/**/*.java"/>
+			<include name="${project.name}/**/*.txt"/>
+			<include name="${project.name}/ext/**/*.jar"/>
+			<include name="${project.name}/.classpath"/>
+			<include name="${project.name}/.project"/>
+			<include name="${project.name}/**/*.xml"/>
+			<include name="${project.name}/manifest.mf"/>
+			<exclude name="${project.name}/jbuzzer*.jar"/>
+			<exclude name="${project.name}/bin/**" />
+			<exclude name="${project.name}/doc/**" />
+    	</zip>
+    </target>
+
+    <target name="javadoc" depends="build">
+    	<mkdir dir="${basedir}/doc" />
+        <javadoc destdir="${basedir}/doc" access="public" use="false"
+            notree="false" nonavbar="false" noindex="false" 
+            splitindex="true" Author="true" version="true"
+            nodeprecatedlist="false" nodeprecated="false"       
+            doctitle="jchart2d API documentation"
+            windowtitle="jchart2d API documentation"
+            Verbose="true"
+       	>
+       		<classpath refid="classpath"/>
+       		<bottom><![CDATA[<i>Copyright &#169; 2003 GLPL, All Rights Footloose.</i>]]></bottom>
+        	<fileset refid="sourcefiles"/>
+       		<link offline="false" href="http://java.sun.com/j2se/1.4.2/docs/api/" />
+       		<link offline="false" href="http://logging.apache.org/log4j/docs/api/" packagelistLoc="http://logging.apache.org/log4j/docs/api/package-list" />
+        </javadoc>
+    </target>
+
+	<!-- remove all classfiles (except antlr sources) and the jar file-->
+    <target name="delete.classfiles">
+    	<delete verbose="true" failonerror="false">
+    		<fileset refid="classfiles"/>
+    		<fileset dir="${basedir}">
+    			<include name="${project.name}.jar"/>
+    		</fileset>
+    	</delete>
+    </target>
+    
+    
+    <target name="delete.doc">
+    	<description>Delete the generated documentation.</description>
+    	<delete includeEmptyDirs="true" verbose="true" >
+    		<fileset dir="${basedir}">
+    			<include name="doc/**/*"/>
+    			<!-- Also delete the zip file with the doc! -->
+    			<include name="${project.name}doc.zip" />
+    		</fileset>
+    	</delete>
+    </target>
+    
+    <target name="delete.local" depends="delete.classfiles,delete.doc" > 
+    	<description> 
+    		Delete only the local generated files. This target is intended to 
+    		be used before the project is checked in into the cmvc. 
+    	</description>
+    </target> 
+    	
+    <!-- 
+    	Hard rebuild: scrubbing all classfiles and the generated *.java files of antlr before 
+    	invoking compilation. 
+    -->
+    <target name="rebuild" depends="delete.classfiles,build" />
+
+    
+</project>
