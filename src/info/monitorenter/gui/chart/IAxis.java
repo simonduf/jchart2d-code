@@ -27,6 +27,7 @@ import info.monitorenter.util.Range;
 
 import java.awt.Graphics2D;
 import java.beans.PropertyChangeListener;
+import java.io.Serializable;
 
 /**
  * Interface for an axis of the {@link info.monitorenter.gui.chart.Chart2D}.
@@ -35,23 +36,33 @@ import java.beans.PropertyChangeListener;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.23 $
  */
-public interface IAxis {
+public interface IAxis extends Serializable {
+
   /**
-   * Constant for a {@link java.beans.PropertyChangeEvent} of the paint grid
+   * Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the paint grid
    * flag.
    */
-  public static final String PROPERTY_PAINTGRID = "axis.paintgrid";
+  public static final String PROPERTY_PAINTGRID = "IAxis.PROPERTY_PAINTGRID";
 
-  /** Constant for a {@link java.beans.PropertyChangeEvent} of the range policy. */
-  public static final String PROPERTY_RANGEPOLICY = "axis.rangepolicy";
+  /** Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the range policy. */
+  public static final String PROPERTY_RANGEPOLICY = "IAxis.PROPERTY_RANGEPOLICY";
+
+  /** Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the title String. */
+  public static final String PROPERTY_TITLE = "IAxis.PROPERTY_TITLE";
+
+  /** Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the <code>{@link IAxisTitlePainter}</code>. */
+  public static final String PROPERTY_TITLEPAINTER = "IAxis.PROPERTY_TITLEPAINTER";
+
+  /** Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the title font. */
+  public static final String PROPERTY_TITLEFONT = "IAxis.PROPERTY_TITLEFONT";
 
   /**
    * Constant for a {@link java.beans.PropertyChangeEvent} of the label
    * formatter.
    */
-  public static final String PROPERTY_LABELFORMATTER = "axis.labelformatter";
+  public static final String PROPERTY_LABELFORMATTER = "IAxis.PROPERTY_LABELFORMATTER";
 
   /**
    * Transforms the given pixel value (which has to be a awt value like
@@ -82,6 +93,25 @@ public interface IAxis {
   public int translateValueToPx(final double value);
 
   /**
+   * Transforms an arbitrary value distance in value space into the
+   * corresponding awt pixel distance value for the chart.
+   * <p>
+   * 
+   * Compared to <code>{@link #translateValueToPx(double)}</code> the given
+   * value is not interpreted to be an absolute point within the value bounds (a
+   * data point) but just taken as a distance in value space. The same goes for
+   * the result: It is not an absolute pixel coordinate of the chart but just
+   * the corresponding distance in pixel.
+   * <p>
+   * 
+   * @param distance
+   *          a chart data distance.
+   * 
+   * @return the awt pixel value distance corresponding to the chart data value distance.
+   */
+  public int translateRelativeValueToPx(final double distance);
+
+  /**
    * Scales all <code>{@link ITrace2D}</code> instances in the dimension
    * represented by this axis.
    * <p>
@@ -103,18 +133,6 @@ public interface IAxis {
    *          the trace to scale.
    */
   public void scaleTrace(final ITrace2D trace);
-
-  /**
-   * Allows the chart to register itself with the axix.
-   * <p>
-   * 
-   * This is intended for <code>Chart2D</code> only!.
-   * <p>
-   * 
-   * @param chart
-   *          the chart to register itself with this axis.
-   */
-  //public void setChart(Chart2D chart);
 
   /**
    * Sets the title of this axis will be painted by the
@@ -180,23 +198,46 @@ public interface IAxis {
    * <tr>
    * <td><code>{@link info.monitorenter.gui.chart.IAxis#PROPERTY_RANGEPOLICY}</code></td>
    * <td><code>{@link IAxis}</code> that changed</td>
-   * <td><code>{@link IRangePolicy}</code>, the old value</td>
-   * <td><code>{@link IRangePolicy}</code>, the new value</td>
+   * <td><code>{@link IRangePolicy}</code>, the old value.</td>
+   * <td><code>{@link IRangePolicy}</code>, the new value.</td>
    * </tr>
    * <tr>
    * <td><code>{@link info.monitorenter.gui.chart.IAxis#PROPERTY_PAINTGRID}</code></td>
    * <td><code>{@link IAxis}</code> that changed</td>
-   * <td><code>{@link Boolean}</code>, the old value</td>
-   * <td><code>{@link Boolean}</code>, the new value</td>
+   * <td><code>{@link Boolean}</code>, the old value.</td>
+   * <td><code>{@link Boolean}</code>, the new value.</td>
    * </tr>
    * <tr>
    * <td><code>{@link info.monitorenter.gui.chart.IAxis#PROPERTY_LABELFORMATTER}</code></td>
    * <td><code>{@link IAxis}</code> that changed</td>
    * <td><code>{@link IAxisLabelFormatter}</code>, the old value or null if
    * there was no formatter before. </td>
-   * <td><code>{@link IAxisLabelFormatter}</code>, the new value</td>
+   * <td><code>{@link IAxisLabelFormatter}</code>, the new value.</td>
    * </tr>
+   * <tr>
+   * <td><code>{@link info.monitorenter.gui.chart.IAxis#PROPERTY_TITLE}</code></td>
+   * <td><code>{@link IAxis}</code> that changed</td>
+   * <td><code>{@link String}</code>, the old value or null if
+   * there was no title before. </td>
+   * <td><code>{@link String}</code>, the new value.</td>
+   * </tr>
+   * <tr>
+   * <td><code>{@link info.monitorenter.gui.chart.IAxis#PROPERTY_TITLEPAINTER}</code></td>
+   * <td><code>{@link IAxis}</code> that changed</td>
+   * <td><code>{@link IAxisTitlePainter}</code>, the old value or null if
+   * there was no title painter  before. </td>
+   * <td><code>{@link IAxisTitlePainter}</code>, the new value.</td>
+   * </tr>
+   * <tr>
+   * <td><code>{@link info.monitorenter.gui.chart.IAxis#PROPERTY_TITLEFONT}</code></td>
+   * <td><code>{@link IAxis}</code> that changed</td>
+   * <td><code>{@link java.awt.Font}</code>, the old value or null if
+   * there was no title font before. </td>
+   * <td><code>{@link java.awt.Font}</code>, the new value.</td>
+   * </tr>
+   * 
    * </table>
+   * <p>
    * 
    * @param propertyName
    *          the property to be informed about changes.

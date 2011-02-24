@@ -1,5 +1,7 @@
 /*
- *  RangePanel.java of project jchart2d
+ *  TwoStringsChooserPanel.java of project jchart2d, a panel that allows 
+ *  to input two <code>Strings</code> via 
+ *  normal javax.swing.JTextField instances. 
  *  Copyright (c) 2007 Achim Westermann, created on 09:50:20.
  *
  *  This library is free software; you can redistribute it and/or
@@ -31,19 +33,15 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 /**
- * A panel that allows to choose a range from a special
- * {@link javax.swing.JSlider} with two sliders (dual Slider).
- * <p>
- * Credits go to the infovis project of Jean Daniel Fekete for the dual slider
- * comopenent: <a href="http://ivtk.sourceforge.net/"
- * target="_blank">http://ivtk.sourceforge.net/</a>.
+ * A panel that allows to input two <code>Strings</code> via 
+ * normal 
+ * <code>{@link javax.swing.JTextField}</code>. 
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.5 $
  */
-public class TwoStringsChooserPanel
-    extends JPanel {
+public class TwoStringsChooserPanel extends JPanel {
 
   /** Input text field for the first value to configure. * */
   private JTextField m_value1;
@@ -76,7 +74,7 @@ public class TwoStringsChooserPanel
     super();
 
     // complex layout needed for ensuring that
-    // both labes are displayed vertically stacked but
+    // both labels are displayed vertically stacked but
     // with the same distance to their text fields regardless
     // of their label width:
     this.setLayout(new GridBagLayout());

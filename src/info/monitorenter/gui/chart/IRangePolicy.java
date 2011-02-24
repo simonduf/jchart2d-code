@@ -26,6 +26,7 @@ package info.monitorenter.gui.chart;
 import info.monitorenter.util.Range;
 
 import java.beans.PropertyChangeListener;
+import java.io.Serializable;
 
 /**
  * An interface that allows an axis to be plugged with a range policy.
@@ -72,11 +73,11 @@ import java.beans.PropertyChangeListener;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  * 
  * @see info.monitorenter.gui.chart.axis.AAxis
  */
-public interface IRangePolicy {
+public interface IRangePolicy extends Serializable {
   /**
    * The property key defining a change of the <code>min</code> or the
    * <code>max</code> property.

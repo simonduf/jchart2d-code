@@ -24,21 +24,23 @@ package info.monitorenter.gui.chart.rangepolicies;
 import info.monitorenter.util.Range;
 
 /**
- * <p>
  * Range policy implementation that will force a viewport that only shows the
  * highest values that are in the range of maximum - x.
- * </p>
+ * <p>
  * 
  * @author zoola
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  * 
  */
 public final class RangePolicyHighestValues
     extends ARangePolicy {
 
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 3966377720997931343L;
+  
   /** The value range for the highest values to show. */
   private double m_highestValueRangeToShow;
 

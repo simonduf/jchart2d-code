@@ -22,7 +22,7 @@
  */
 package info.monitorenter.gui.chart;
 
-import info.monitorenter.gui.chart.errorbars.ErrorBarValue;
+import info.monitorenter.gui.chart.errorbars.ErrorBarPixel;
 
 import java.beans.PropertyChangeListener;
 import java.util.Set;
@@ -39,7 +39,7 @@ import javax.swing.JComponent;
  * configureable
  * <code>{@link info.monitorenter.gui.chart.IErrorBarPainter}</code> instances
  * that will be provided with configured
- * <code>{@link info.monitorenter.gui.chart.IErrorBarValue}</code> instances.
+ * <code>{@link info.monitorenter.gui.chart.IErrorBarPixel}</code> instances.
  * <p>
  * 
  * <h3>Property Change events</h3>
@@ -91,7 +91,7 @@ import javax.swing.JComponent;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.11 $
  */
 public interface IErrorBarPolicy extends ITracePainter {
   /**
@@ -139,18 +139,17 @@ public interface IErrorBarPolicy extends ITracePainter {
    * render and the configuration of this instance.
    * <p>
    * 
-   * @param absoluteX
-   *          the x value to render an error bar for.
+   * @param xPixel
+   *          the x value in pixel to render an error bar for.
    * 
-   * @param absoluteY
-   *          the y value to render an error bar for.
+   * @param yPixel
+   *          the y value in pixel to render an error bar for.
    * 
    * @param errorBar
    *          an error bar to use: This is for design reasons as internally this
    *          method is used too with a reused instance.
    */
-  public void calculateErrorBar(final double absoluteX, final double absoluteY,
-      final ErrorBarValue errorBar);
+  public void calculateErrorBar(final int xPixel, final int yPixel, final ErrorBarPixel errorBar);
 
   /**
    * This is fired whenever the internal set of error bar painters changes.
@@ -333,4 +332,29 @@ public interface IErrorBarPolicy extends ITracePainter {
    */
   public JComponent getCustomConfigurator();
 
+  /**
+   * Returns the relative x error (value domain) that is added to / subtracted from the values
+   * to display.
+   * <p>
+   * 
+   * @param xValue
+   *          the absolute x value (not pixel) to get the error for.
+   * 
+   * @return the relative x error in value domain that is added to / subtracted from the values
+   *         to display.
+   */
+  public double getXError(final double xValue);
+
+  /**
+   * Returns the relative y error (value domain) that is added to / subtracted from the values
+   * to display.
+   * <p>
+   * 
+   * @param yValue
+   *          the absolute y value (not pixel) to get the error for.
+   * 
+   * @return the relative y error in value domain that is added to / subtracted from the values
+   *         to display.
+   */
+  public double getYError(final double yValue);
 }

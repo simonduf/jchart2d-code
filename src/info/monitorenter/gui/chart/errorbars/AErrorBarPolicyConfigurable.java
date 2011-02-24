@@ -46,19 +46,19 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * 
  * Implementations have to implement the methods <br>
  * <code>
- * {@link #internalGetNegativeXError(double, double)}<br/>
- * {@link #internalGetNegativeYError(double, double)}<br/>
- * {@link #internalGetPositiveXError(double, double)}<br/>
- * {@link #internalGetPositiveYError(double, double)}<br/>
+ * {@link #internalGetNegativeXError(int, int)}<br/>
+ * {@link #internalGetNegativeYError(int, int)}<br/>
+ * {@link #internalGetPositiveXError(int, int)}<br/>
+ * {@link #internalGetPositiveYError(int, int)}<br/>
  * </code>.
  * <p>
  * Please see the class description of
- * {@link info.monitorenter.gui.chart.IErrorBarValue} for details.
+ * {@link info.monitorenter.gui.chart.IErrorBarPixel} for details.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.17 $
  */
 public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
     PropertyChangeListener {
@@ -102,8 +102,7 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
   private ErrorBarPixel m_reusedErrorBarPixel = new ErrorBarPixel(null);
 
   /** Internal shared error bar value instance to save Object allocation. */
-  private ErrorBarValue m_reusedErrorBarValue;
-
+  // private ErrorBarValue m_reusedErrorBarValue;
   /** Flag that controls display of negative errors in x dimension. */
   private boolean m_showNegativeXErrors;
 
@@ -124,8 +123,8 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    * <p>
    */
   public AErrorBarPolicyConfigurable() {
-    this.m_reusedErrorBarValue = new ErrorBarValue();
-    this.m_reusedErrorBarPixel.setValue(this.m_reusedErrorBarValue);
+    // this.m_reusedErrorBarValue = new ErrorBarValue();
+    // this.m_reusedErrorBarPixel.setValue(this.m_reusedErrorBarValue);
   }
 
   /**
@@ -161,24 +160,24 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IErrorBarPolicy#calculateErrorBar(double,
-   *      double, info.monitorenter.gui.chart.errorbars.ErrorBarValue)
+   * @see info.monitorenter.gui.chart.IErrorBarPolicy#calculateErrorBar(int,
+   *      int, info.monitorenter.gui.chart.errorbars.ErrorBarPixel)
    */
-  public final void calculateErrorBar(final double absoluteX, final double absoluteY,
-      final ErrorBarValue errorBar) {
+  public final void calculateErrorBar(final int xPixel, final int yPixel,
+      final ErrorBarPixel errorBar) {
     errorBar.clear();
 
     if (this.m_showNegativeXErrors) {
-      errorBar.setNegativeXError(this.internalGetNegativeXError(absoluteX, absoluteY));
+      errorBar.setNegativeXErrorPixel(this.internalGetNegativeXError(xPixel, yPixel));
     }
     if (this.m_showNegativeYErrors) {
-      errorBar.setNegativeYError(this.internalGetNegativeYError(absoluteX, absoluteY));
+      errorBar.setNegativeYErrorPixel(this.internalGetNegativeYError(xPixel, yPixel));
     }
     if (this.m_showPositiveXErrors) {
-      errorBar.setPositiveXError(this.internalGetPositiveXError(absoluteX, absoluteY));
+      errorBar.setPositiveXErrorPixel(this.internalGetPositiveXError(xPixel, yPixel));
     }
     if (this.m_showPositiveYErrors) {
-      errorBar.setPositiveYError(this.internalGetPositiveYError(absoluteX, absoluteY));
+      errorBar.setPositiveYErrorPixel(this.internalGetPositiveYError(xPixel, yPixel));
     }
   }
 
@@ -202,9 +201,7 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    */
   public void endPaintIteration(final Graphics2D g2d) {
     if (g2d != null) {
-      this.calculateErrorBar(this.m_trace.getRenderer().getAxisX().translatePxToValue(
-          this.getPreviousX()), this.m_trace.getRenderer().getAxisY().translatePxToValue(
-          this.getPreviousY()), this.m_reusedErrorBarValue);
+      this.calculateErrorBar(this.getPreviousX(), this.getPreviousY(), this.m_reusedErrorBarPixel);
       Iterator it = this.m_errorBarPainters.iterator();
       IErrorBarPainter painter;
       while (it.hasNext()) {
@@ -306,68 +303,68 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
   }
 
   /**
-   * Internally compute the negative x error for the given point as an absolute
+   * Internally compute the negative x error for the given point as a pixel
    * value (not relative to the the origin value).
    * <p>
    * 
-   * @param absoluteX
-   *          the x value for the error to render.
+   * @param xPixel
+   *          the x value in pixel for the error to render.
    * 
-   * @param absoluteY
-   *          the y value for the error to render.
+   * @param yPixel
+   *          the y value in pixel for the error to render.
    * 
-   * @return the negative x error for the given point as an absolute value (not
-   *         relative to the the origin value).
+   * @return the negative x error in pixel for the given point as an absolute
+   *         value (not relative to the the origin value).
    */
-  protected abstract double internalGetNegativeXError(double absoluteX, double absoluteY);
+  protected abstract int internalGetNegativeXError(final int xPixel, final int yPixel);
 
   /**
-   * Internally compute the negative y error for the given point as an absolute
+   * Internally compute the negative y error for the given point as a pixel
    * value (not relative to the the origin value).
    * <p>
    * 
-   * @param absoluteX
-   *          the x value for the error to render.
+   * @param xPixel
+   *          the x value in pixel for the error to render.
    * 
-   * @param absoluteY
-   *          the y value for the error to render.
+   * @param yPixel
+   *          the y value in pixel for the error to render.
    * 
-   * @return the negative y error for the given point as an absolute value (not
-   *         relative to the the origin value).
+   * @return the negative y error in pixel for the given point as an absolute
+   *         value (not relative to the the origin value).
    */
-  protected abstract double internalGetNegativeYError(double absoluteX, double absoluteY);
+  protected abstract int internalGetNegativeYError(final int xPixel, final int yPixel);
 
   /**
-   * Internally compute the positive x error for the given point as an absolute
-   * value (not relative to the the origin value).
+   * Internally compute the positive x error in pixel for the given point as an
+   * absolute value (not relative to the the origin value).
    * <p>
    * 
-   * @param absoluteX
-   *          the x value for the error to render.
+   * @param xPixel
+   *          the x value in pixel for the error to render.
    * 
-   * @param absoluteY
-   *          the y value for the error to render.
+   * @param yPixel
+   *          the y value in pixel for the error to render.
    * 
-   * @return the positive x error for the given point as an absolute value (not
-   *         relative to the the origin value).
+   * @return the positive x error in pixel for the given point as an absolute
+   *         value (not relative to the the origin value).
    */
-  protected abstract double internalGetPositiveXError(double absoluteX, double absoluteY);
+  protected abstract int internalGetPositiveXError(final int xPixel, final int yPixel);
 
   /**
-   * Internally compute the positive y error for the given point as an absolute
-   * value (not relative to the the origin value).
+   * Internally compute the positive y error in pixel for the given point as an
+   * absolute value (not relative to the the origin value).
    * <p>
    * 
-   * @param absoluteX
+   * @param xPixel
    *          the x coordinate in pixel for the error to render.
    * 
-   * @param absoluteY
+   * @param yPixel
    *          the y coordinate in pixel for the error to render.
    * 
-   * @return the positive y error for the given point as an absolute value (not
-   *         relative to the the origin value).
+   * @return the positive y error in pixel for the given point as an absolute
+   *         value (not relative to the the origin value).
    */
-  protected abstract double internalGetPositiveYError(final double absoluteY, final double absoluteX);
+  protected abstract int internalGetPositiveYError(final int xPixel, final int yPixel);
 
   /**
    * @see info.monitorenter.gui.chart.IErrorBarPolicy#isShowNegativeXErrors()
@@ -403,9 +400,8 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
       final int nextY, final Graphics2D g) {
-    this.calculateErrorBar(this.m_trace.getRenderer().getAxisX().translatePxToValue(absoluteX),
-        this.m_trace.getRenderer().getAxisY().translatePxToValue(absoluteY),
-        this.m_reusedErrorBarValue);
+
+    this.calculateErrorBar(absoluteX, absoluteY, this.m_reusedErrorBarPixel);
     Iterator it = this.m_errorBarPainters.iterator();
     IErrorBarPainter painter;
     while (it.hasNext()) {
@@ -428,7 +424,7 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy,
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
   public void propertyChange(final PropertyChangeEvent evt) {
-     this.firePropertyChange(PROPERTY_CONFIGURATION, evt.getOldValue(), evt.getNewValue());
+    this.firePropertyChange(PROPERTY_CONFIGURATION, evt.getOldValue(), evt.getNewValue());
   }
 
   /**

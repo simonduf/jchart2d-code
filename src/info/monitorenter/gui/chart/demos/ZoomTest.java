@@ -46,7 +46,7 @@ import javax.swing.JFrame;
  * 
  * @author Alessio Sambarino (Contributor)
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class ZoomTest extends JFrame {
 
@@ -122,7 +122,7 @@ public class ZoomTest extends JFrame {
     // Add all points, as it is static
     Random random = new Random();
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 100; i < 200; i++) {
       trace.addPoint(i, random.nextDouble() * 10.0 + i);
     }
 

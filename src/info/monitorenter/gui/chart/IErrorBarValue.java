@@ -1,6 +1,6 @@
 /*
  *  IErrorBarValue.java of project jchart2d, interface for an error bar. 
- *  Copyright (c) 2007 Achim Westermann, created on 06.08.2006 13:42:31.
+ *  Copyright 2006 (C) Achim Westermann, created on 06.08.2006 13:42:31.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ package info.monitorenter.gui.chart;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.1 $
  */
 public interface IErrorBarValue {
 

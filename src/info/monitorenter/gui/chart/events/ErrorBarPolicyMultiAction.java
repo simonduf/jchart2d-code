@@ -42,7 +42,7 @@ import javax.swing.JMenuItem;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public final class ErrorBarPolicyMultiAction
     extends ATrace2DActionErrorBarPolicy {
@@ -134,7 +134,7 @@ public final class ErrorBarPolicyMultiAction
     String text = menu.getText();
     if (text.equals("+")) {
       // add action:
-      menu.remove(item);
+   
       JMenuItem removeItem;
       JMenuItem editItem;
       // add a new JMenuItem to the remove menu and to the edit menu:
@@ -147,15 +147,33 @@ public final class ErrorBarPolicyMultiAction
         removeItem = new JMenuItem(this);
         editItem = new JMenuItem(this);
       }
-      this.m_removeMenu.add(removeItem);
-      this.m_editMenu.add(editItem);
+     
 
       // do the adding to the model:
       this.m_addAction.actionPerformed(e);
       // also open the edit screen for the new error bar policy:
       this.m_editAction.actionPerformed(e);
+      // this has to be done after actionPerformed because parent frame search will hit 
+      // null else as action is triggered by add menu:
+      menu.remove(item);
+      this.m_removeMenu.add(removeItem);
+      this.m_editMenu.add(editItem);
     } else if (text.equals("-")) {
       // remove action:
+
+      // add an add menu item:
+      JMenuItem addItem;
+      if (item instanceof LayoutFactory.PropertyChangeMenuItem) {
+        addItem = new LayoutFactory.PropertyChangeMenuItem(
+            ((LayoutFactory.PropertyChangeMenuItem) item).getUIAdaptee(), this);
+      } else {
+        addItem = new JMenuItem(this);
+      }
+      this.m_addMenu.add(addItem);
+
+      this.m_removeAction.actionPerformed(e);
+      // this has to be done after actionPerformed because parent frame search will hit 
+      // null else as action is triggered by add menu:
       menu.remove(item);
       // remove also the edit menu, this is a bit trickier:
       String menuItemText = item.getText();
@@ -170,18 +188,6 @@ public final class ErrorBarPolicyMultiAction
           }
         }
       }
-
-      // add an add menu item:
-      JMenuItem addItem;
-      if (item instanceof LayoutFactory.PropertyChangeMenuItem) {
-        addItem = new LayoutFactory.PropertyChangeMenuItem(
-            ((LayoutFactory.PropertyChangeMenuItem) item).getUIAdaptee(), this);
-      } else {
-        addItem = new JMenuItem(this);
-      }
-      this.m_addMenu.add(addItem);
-
-      this.m_removeAction.actionPerformed(e);
 
     } else {
       this.m_editAction.actionPerformed(e);

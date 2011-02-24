@@ -27,18 +27,20 @@ import info.monitorenter.gui.chart.pointpainters.PointPainterLine;
 import java.awt.Graphics2D;
 
 /**
- * <p>
  * A trace painter that renders a trace by lines.
- * </p>
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  * 
  */
 public class TracePainterLine
     extends ATracePainter {
 
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -3310431930065989648L;
+  
   /** The implementation for rendering the point as a line. */
   private IPointPainter m_pointPainter;
 

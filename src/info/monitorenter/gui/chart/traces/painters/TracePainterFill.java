@@ -44,11 +44,14 @@ import java.util.List;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  * 
  */
 public class TracePainterFill
     extends ATracePainter {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -7194158082574997539L;
 
   /**
    * Stores the corresponding chart to know the coordinate roots for closing the

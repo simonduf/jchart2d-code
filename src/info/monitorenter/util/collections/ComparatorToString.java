@@ -22,6 +22,7 @@
  */
 package info.monitorenter.util.collections;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
@@ -31,9 +32,12 @@ import java.util.Comparator;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
-public final class ComparatorToString implements Comparator {
+public final class ComparatorToString implements Comparator, Serializable {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 3682328616684815036L;
 
   /**
    * Defcon.

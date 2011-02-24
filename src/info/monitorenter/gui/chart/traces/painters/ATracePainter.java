@@ -30,7 +30,7 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  * 
  */
 public abstract class ATracePainter implements info.monitorenter.gui.chart.ITracePainter {
@@ -97,7 +97,11 @@ public abstract class ATracePainter implements info.monitorenter.gui.chart.ITrac
    * @see java.lang.Object#equals(java.lang.Object)
    */
   public boolean equals(final Object obj) {
-    return this.getClass() == obj.getClass();
+    boolean result = false;
+    if (obj != null) {
+      result = (this.getClass() == obj.getClass());
+    }
+    return result;
   }
 
   /**
@@ -170,7 +174,5 @@ public abstract class ATracePainter implements info.monitorenter.gui.chart.ITrac
   public void startPaintIteration(final Graphics2D g2d) {
     // nop
   }
-  
-  
-  
+
 }

@@ -25,13 +25,14 @@ package info.monitorenter.gui.chart;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.beans.PropertyChangeListener;
+import java.io.Serializable;
 
 /**
  * Interface for a renderer of error bars.
  * <p>
  * It contains a similar method to
  * {@link info.monitorenter.gui.chart.ITracePainter#paintPoint(int, int, int, int, Graphics2D)}
- * with an additional {@link info.monitorenter.gui.chart.IErrorBarValue} for
+ * with an additional {@link info.monitorenter.gui.chart.IErrorBarPixel} for
  * getting information about the error to render.
  * <p>
  * 
@@ -56,9 +57,9 @@ import java.beans.PropertyChangeListener;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.15 $
  */
-public interface IErrorBarPainter {
+public interface IErrorBarPainter extends Serializable {
 
   /**
    * Facace interface for accessing a connection segment of
@@ -72,9 +73,9 @@ public interface IErrorBarPainter {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.13 $
+   * @version $Revision: 1.15 $
    */
-  public interface ISegment {
+  public interface ISegment extends Serializable {
     /**
      * Registers the given property change listener to receive
      * <code>{@link java.beans.PropertyChangeEvent}</code> instances upon a
@@ -435,7 +436,7 @@ public interface IErrorBarPainter {
    * @param g
    *          the graphic context to paint on.
    * 
-   * @see IErrorBarValue
+   * @see IErrorBarPixel
    */
   public void paintErrorBar(final int absoluteX, final int absoluteY, final Graphics2D g,
       final IErrorBarPixel errorBar);

@@ -31,25 +31,32 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * Has the behaviour of <code>Trace2DReplacing</code> and an additional
- * features: <br>
+ * Has the behaviour of <code>Trace2DReplacing</code> and additional features.
+ * <p>
  * <ul>
  * <li>All traceoints added whose x- values are not already contained are added
  * to the internal Tree ordered by growing x-values. Therefore it is guaranteed
  * that the tracepoints will be sorted in ascending order of x- values at any
  * time.</li>
- * </UL>
+ * </ul>
+ * <p>
  * 
  * Because sorted insertion of a List causes n! index- operations (
  * <code>get(int i)</code>) additional to the comparisons this class does not
  * extend <code>Trace2DSimple</code> which uses a List. Instead a
  * <code>TreeSet </code> is used.
+ * <p>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
-public class Trace2DSorted extends ATrace2D implements ITrace2D {
+public class Trace2DSorted
+    extends ATrace2D implements ITrace2D {
+  
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -3518797764292132652L;
+  
   /** The sorted set of points. */
   protected SortedSet m_points = new TreeSet();
 

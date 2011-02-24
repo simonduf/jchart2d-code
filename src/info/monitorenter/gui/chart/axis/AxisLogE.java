@@ -47,10 +47,13 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.9 $
  */
 public class AxisLogE
     extends AAxisTransformation {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 1839309514449455729L;
 
   /**
    * Creates an instance that uses a {@link LabelFormatterSimple} for formatting
@@ -61,7 +64,7 @@ public class AxisLogE
   public AxisLogE() {
     super(new LabelFormatterSimple());
   }
-  
+
   /**
    * Creates an instance that will the given label formatter for formatting
    * labels.
@@ -113,7 +116,7 @@ public class AxisLogE
           if (trace.iterator().hasNext()) {
             // Illegal value for transformation defined by a point added:
             throw new IllegalArgumentException(this.getClass().getName()
-                + " must not be used with values < 1!");
+                + " must not be used with values < 1 :(" + toTransform + ")!");
           }
         }
         // No illegal point: everything was empty

@@ -53,6 +53,10 @@ import java.util.Set;
  * property zIndex (see {@link #getZIndex()}, {@link #setZIndex(Integer)}).
  * <p>
  * <h3>Property Change events</h3>
+ * The following <code>{@link java.beans.PropertyChangeEvent}</code> may be fired to 
+ * <code>{@link PropertyChangeListener}</code> instances that register themselves 
+ * with <code>{@link #addPropertyChangeListener(String, PropertyChangeListener)}</code>.
+ * 
  * <table border="0">
  * <tr>
  * <th><code>getPropertyName()</code></th>
@@ -171,7 +175,7 @@ import java.util.Set;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.18 $
  */
 public interface ITrace2D extends IComparableProperty, PropertyChangeListener {
 

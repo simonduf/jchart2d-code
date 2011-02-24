@@ -45,7 +45,7 @@ import javax.swing.UIManager;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final class Trace2DActionRemove
     extends ATrace2DAction {
@@ -82,17 +82,19 @@ public final class Trace2DActionRemove
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   public void actionPerformed(final ActionEvent e) {
-    Chart2D chart = this.m_trace.getRenderer();
-    if (chart != null) {
-      if (this.m_trace != null) {
+    if (this.m_trace != null) {
+      Chart2D chart = this.m_trace.getRenderer();
+      if (chart != null) {
+
         chart.removeTrace(this.m_trace);
         this.m_trace = null;
+
+      } else {
+        // make the trace gcable... this is not mandatory as
+        // the whole menu will be dropped from above and make
+        // everything gcable when trace is removed.
+        this.m_trace = null;
       }
-    } else {
-      // make the trace gcable... this is not mandatory as
-      // the whole menu will be dropped from above and make
-      // everything gcable when trace is removed.
-      this.m_trace = null;
     }
   }
 

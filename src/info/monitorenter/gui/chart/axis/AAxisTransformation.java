@@ -41,9 +41,10 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.20 $
  */
-public abstract class AAxisTransformation extends AAxis {
+public abstract class AAxisTransformation
+    extends AAxis {
 
   /**
    * 
@@ -54,7 +55,8 @@ public abstract class AAxisTransformation extends AAxis {
    * 
    * @see Chart2D#getAxisX()
    */
-  public final class XDataAccessor extends AAxis.XDataAccessor {
+  public final class XDataAccessor
+      extends AAxis.XDataAccessor {
 
     /**
      * Creates an instance that accesses the given chart's x axis.
@@ -85,15 +87,15 @@ public abstract class AAxisTransformation extends AAxis {
           try {
             result = (transform(absolute) - range.getMin());
             result = result / scaler;
-            if (result == Double.NaN || Double.isInfinite(result)) {
+            if (Double.isNaN(result) || Double.isInfinite(result)) {
               result = 0;
             }
           } catch (IllegalArgumentException e) {
             long tstamp = System.currentTimeMillis();
             if (tstamp - AAxisTransformation.this.m_outputErrorTstamp > AAxisTransformation.OUTPUT_ERROR_THRESHHOLD) {
-              System.out.println(e.getLocalizedMessage()); 
+              System.out.println(e.getLocalizedMessage());
               AAxisTransformation.this.m_outputErrorTstamp = tstamp;
-            } 
+            }
             result = 0;
           }
           point.m_scaledX = result;
@@ -112,7 +114,8 @@ public abstract class AAxisTransformation extends AAxis {
    * @see Chart2D#getAxisY()
    */
 
-  public final class YDataAccessor extends AAxis.YDataAccessor {
+  public final class YDataAccessor
+      extends AAxis.YDataAccessor {
 
     /**
      * Creates an instance that accesses the y axis of the given chart.
@@ -141,7 +144,7 @@ public abstract class AAxisTransformation extends AAxis {
           try {
             result = (transform(absolute) - range.getMin());
             result = result / scaler;
-            if (result == Double.NaN || Double.isInfinite(result)) {
+            if (Double.isNaN(result) || Double.isInfinite(result)) {
               result = 0;
             }
           } catch (IllegalArgumentException e) {
@@ -248,7 +251,7 @@ public abstract class AAxisTransformation extends AAxis {
       result = (transform(absolute) - range.getMin());
       double scaler = range.getExtent();
       result = result / scaler;
-      if (result == Double.NaN || Double.isInfinite(result)) {
+      if (Double.isNaN(result) || Double.isInfinite(result)) {
         result = 0;
       }
     } catch (IllegalArgumentException e) {
@@ -295,14 +298,14 @@ public abstract class AAxisTransformation extends AAxis {
    * @see info.monitorenter.gui.chart.axis.AAxis#translatePxToValue(int)
    */
   public double translatePxToValue(final int pixel) {
-    return this.transform(this.m_accessor.translatePxToValue(pixel));
+    return this.untransform(this.m_accessor.translatePxToValue(pixel));
   }
 
   /**
    * @see info.monitorenter.gui.chart.axis.AAxis#translateValueToPx(double)
    */
   public int translateValueToPx(final double value) {
-    return (int) this.untransform(this.m_accessor.translateValueToPx(value));
+    return (int) this.transform(this.m_accessor.translateValueToPx(value));
   }
 
   /**

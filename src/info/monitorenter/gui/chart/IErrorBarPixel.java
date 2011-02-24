@@ -33,7 +33,7 @@ package info.monitorenter.gui.chart;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public interface IErrorBarPixel {
 
@@ -74,4 +74,12 @@ public interface IErrorBarPixel {
    * @return the positive error in Y dimension or {@link #ERROR_PIXEL_NONE}.
    */
   public int getPositiveYErrorPixel();
+
+  /**
+   * Returns the corresponding trace for this error bar.
+   * <p>
+   * 
+   * @return the corresponding trace for this error bar.
+   */
+  public ITrace2D getTrace();
 }

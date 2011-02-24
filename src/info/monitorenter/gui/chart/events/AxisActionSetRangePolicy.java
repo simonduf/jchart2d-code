@@ -44,7 +44,7 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class AxisActionSetRangePolicy
     extends AAxisAction {
@@ -58,7 +58,7 @@ public class AxisActionSetRangePolicy
    * The range policy to set to the axis upon invocation of
    * {@link #actionPerformed(ActionEvent)}.
    */
-  private IRangePolicy m_rangePolicy;
+  private final transient IRangePolicy m_rangePolicy;
 
   /**
    * Create an <code>Action</code> that accesses the axis, identifies itself

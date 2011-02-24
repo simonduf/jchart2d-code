@@ -32,12 +32,15 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  * 
  */
 public class TracePainterDisc
     extends ATracePainter {
 
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 8919406018882664083L;
+  
   /** The implementation for rendering the point as a disc. */
   private PointPainterDisc m_pointPainter;
 

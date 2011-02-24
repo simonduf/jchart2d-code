@@ -37,7 +37,7 @@ import java.beans.PropertyChangeEvent;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public final class Trace2DActionSetStroke extends ATrace2DAction {
 
@@ -49,7 +49,7 @@ public final class Trace2DActionSetStroke extends ATrace2DAction {
   /**
    * The stroke to set.
    */
-  private Stroke m_stroke;
+  private final transient Stroke m_stroke;
 
   /**
    * Create an <code>Action</code> that accesses the trace and identifies

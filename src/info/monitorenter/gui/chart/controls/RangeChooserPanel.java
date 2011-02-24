@@ -51,7 +51,7 @@ import javax.swing.event.ChangeListener;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class RangeChooserPanel extends JPanel {
 
@@ -72,7 +72,7 @@ public class RangeChooserPanel extends JPanel {
    * 
    * @param range
    *          defines the bounds of the current selection and the extension of
-   *          these that is choosable.
+   *          these that is chooseable.
    */
   public RangeChooserPanel(final Range range) {
 

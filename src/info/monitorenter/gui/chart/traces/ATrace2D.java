@@ -24,11 +24,9 @@ package info.monitorenter.gui.chart.traces;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IErrorBarPolicy;
-import info.monitorenter.gui.chart.IErrorBarValue;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.TracePoint2D;
-import info.monitorenter.gui.chart.errorbars.ErrorBarValue;
 import info.monitorenter.gui.chart.traces.painters.TracePainterPolyline;
 import info.monitorenter.util.StringUtil;
 
@@ -59,7 +57,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.31 $
+ * @version $Revision: 1.41 $
  */
 public abstract class ATrace2D implements ITrace2D {
 
@@ -109,7 +107,7 @@ public abstract class ATrace2D implements ITrace2D {
    * Cached maximum x value with error bar extension for performance
    * improvement.
    */
-  protected double m_maxXErrorBar = -IErrorBarValue.ERROR_VALUE_NONE;
+  protected double m_maxXErrorBar = -Double.MAX_VALUE;
 
   /**
    * Cached maximum y value for performance improvement.
@@ -120,7 +118,7 @@ public abstract class ATrace2D implements ITrace2D {
    * Cached maximum y value with error bar extension for performance
    * improvement.
    */
-  protected double m_maxYErrorBar = -IErrorBarValue.ERROR_VALUE_NONE;
+  protected double m_maxYErrorBar = -Double.MAX_VALUE;
 
   /**
    * Cached minimum x value for performance improvement.
@@ -131,7 +129,7 @@ public abstract class ATrace2D implements ITrace2D {
    * Cached minimum x value with error bar extension for performance
    * improvement.
    */
-  protected double m_minXErrorBar = IErrorBarValue.ERROR_VALUE_NONE;
+  protected double m_minXErrorBar = Double.MAX_VALUE;
 
   /**
    * Cached minimum y value for performance improvement.
@@ -142,7 +140,7 @@ public abstract class ATrace2D implements ITrace2D {
    * Cached minimum y value with error bar extension for performance
    * improvement.
    */
-  protected double m_minYErrorBar = IErrorBarValue.ERROR_VALUE_NONE;
+  protected double m_minYErrorBar = Double.MAX_VALUE;
 
   /**
    * The name property.
@@ -171,9 +169,6 @@ public abstract class ATrace2D implements ITrace2D {
    * synchronization.
    */
   protected Object m_renderer = new Object();
-
-  /** Internal shared error bar instance to save Object allocation. */
-  private ErrorBarValue m_reusedErrorBar = new ErrorBarValue();
 
   /**
    * The stroke property.
@@ -255,13 +250,11 @@ public abstract class ATrace2D implements ITrace2D {
   }
 
   /**
-   * <p>
    * Add a point to this trace.
-   * </p>
    * <p>
    * Prefer calling <code>{@link #addPoint(TracePoint2D)}</code> for better
    * performance (avoid one invokevirtual for delegation).
-   * </p>
+   * <p>
    * 
    * @param x
    *          the x coordinate of the new point.
@@ -287,8 +280,10 @@ public abstract class ATrace2D implements ITrace2D {
    * <p>
    * 
    * @see #firePointChanged(TracePoint2D, int)
+   * 
    * @param p
    *          the <code>TracePoint2D</code> to add.
+   * 
    * @return true if the operation was successful, false else.
    * 
    */
@@ -298,6 +293,10 @@ public abstract class ATrace2D implements ITrace2D {
     }
     synchronized (this.m_renderer) {
       if (Chart2D.DEBUG_THREADING) {
+        if (!(this.m_renderer instanceof Chart2D)) {
+          throw new RuntimeException(
+              "Call chart.setTrace(trace) first before adding points or you might run into deadlocks!");
+        }
         System.out.println("addPoint, 1 lock");
       }
       synchronized (this) {
@@ -306,16 +305,22 @@ public abstract class ATrace2D implements ITrace2D {
         }
         boolean accepted = this.addPointInternal(p);
         if (this.m_firsttime) {
-          this.m_maxX = p.getX();
-          this.m_minX = this.m_maxX;
-          this.m_maxY = p.getY();
-          this.m_minY = this.m_maxY;
-          // fires property changes for max/min x/y:
-          this.expandErrorBarBounds();
+          // MAX events / members are done already from the
+          // firePointAdded()->firePointChanged() method,
+          // this is only the special case that a new point also marks the
+          // minimum.
+          this.m_minX = p.getX();
+          this.m_minY = p.getY();
+          Double zero = new Double(0);
+          this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, zero, new Double(this.m_minX));
+          this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, zero, new Double(this.m_minY));
 
           this.m_firsttime = false;
         }
         if (accepted) {
+          // fires property changes for max/min x/y:
+          this.expandErrorBarBounds();
+          // min max bounds exceeded?
           this.firePointAdded(p);
           p.setListener(this);
           // inform computing traces:
@@ -410,8 +415,8 @@ public abstract class ATrace2D implements ITrace2D {
               this.firePropertyChange(PROPERTY_MAX_X, this, new Double(this.getMaxX()));
             }
           } else {
-            if (this.m_maxXErrorBar != -IErrorBarValue.ERROR_VALUE_NONE) {
-              this.m_maxXErrorBar = -IErrorBarValue.ERROR_VALUE_NONE;
+            if (this.m_maxXErrorBar != -Double.MAX_VALUE) {
+              this.m_maxXErrorBar = -Double.MAX_VALUE;
               this.firePropertyChange(PROPERTY_MAX_X, this, new Double(this.getMaxX()));
             }
           }
@@ -421,8 +426,8 @@ public abstract class ATrace2D implements ITrace2D {
               this.firePropertyChange(PROPERTY_MAX_Y, this, new Double(this.getMaxY()));
             }
           } else {
-            if (this.m_maxYErrorBar != -IErrorBarValue.ERROR_VALUE_NONE) {
-              this.m_maxYErrorBar = -IErrorBarValue.ERROR_VALUE_NONE;
+            if (this.m_maxYErrorBar != -Double.MAX_VALUE) {
+              this.m_maxYErrorBar = -Double.MAX_VALUE;
               this.firePropertyChange(PROPERTY_MAX_Y, this, new Double(this.getMaxY()));
             }
           }
@@ -432,8 +437,8 @@ public abstract class ATrace2D implements ITrace2D {
               this.firePropertyChange(PROPERTY_MIN_X, this, new Double(this.getMinX()));
             }
           } else {
-            if (this.m_minXErrorBar != IErrorBarValue.ERROR_VALUE_NONE) {
-              this.m_minXErrorBar = IErrorBarValue.ERROR_VALUE_NONE;
+            if (this.m_minXErrorBar != Double.MAX_VALUE) {
+              this.m_minXErrorBar = Double.MAX_VALUE;
               this.firePropertyChange(PROPERTY_MIN_X, this, new Double(this.getMinX()));
             }
           }
@@ -443,8 +448,8 @@ public abstract class ATrace2D implements ITrace2D {
               this.firePropertyChange(PROPERTY_MIN_Y, this, new Double(this.getMinY()));
             }
           } else {
-            if (this.m_minYErrorBar != IErrorBarValue.ERROR_VALUE_NONE) {
-              this.m_minYErrorBar = IErrorBarValue.ERROR_VALUE_NONE;
+            if (this.m_minYErrorBar != Double.MAX_VALUE) {
+              this.m_minYErrorBar = Double.MAX_VALUE;
               this.firePropertyChange(PROPERTY_MIN_Y, this, new Double(this.getMinY()));
             }
           }
@@ -465,7 +470,7 @@ public abstract class ATrace2D implements ITrace2D {
   private boolean expandMaxXErrorBarBounds() {
     Chart2D chart = this.getRenderer();
     boolean change = false;
-    double errorBarMaxXCollect = -IErrorBarValue.ERROR_VALUE_NONE;
+    double errorBarMaxXCollect = -Double.MAX_VALUE;
     if (chart != null) {
       Iterator itErrorBarPolicies = this.getErrorBarPolicies().iterator();
       IErrorBarPolicy erroBarPolicy;
@@ -474,16 +479,18 @@ public abstract class ATrace2D implements ITrace2D {
         erroBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
         if (erroBarPolicy.isShowPositiveXErrors()) {
           // was it turned on?
-          erroBarPolicy.calculateErrorBar(this.m_maxX, 0, this.m_reusedErrorBar);
-          errorBarMaxX = this.m_reusedErrorBar.getPositiveXError();
+          errorBarMaxX = erroBarPolicy.getXError(this.m_maxX);
           if (errorBarMaxX > errorBarMaxXCollect) {
             errorBarMaxXCollect = errorBarMaxX;
           }
         }
       }
     }
-    change = this.m_maxXErrorBar != errorBarMaxXCollect;
-    this.m_maxXErrorBar = errorBarMaxXCollect;
+    double absoluteMax = errorBarMaxXCollect + this.m_maxX;
+    change = this.m_maxXErrorBar != absoluteMax;
+    if (change) {
+      this.m_maxXErrorBar = absoluteMax;
+    }
     return change;
   }
 
@@ -499,7 +506,7 @@ public abstract class ATrace2D implements ITrace2D {
   private boolean expandMaxYErrorBarBounds() {
     Chart2D chart = this.getRenderer();
     boolean change = false;
-    double errorBarMaxYCollect = -IErrorBarValue.ERROR_VALUE_NONE;
+    double errorBarMaxYCollect = -Double.MAX_VALUE;
     if (chart != null) {
       Iterator itErrorBarPolicies = this.getErrorBarPolicies().iterator();
       IErrorBarPolicy erroBarPolicy;
@@ -507,16 +514,18 @@ public abstract class ATrace2D implements ITrace2D {
       while (itErrorBarPolicies.hasNext()) {
         erroBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
         if (erroBarPolicy.isShowPositiveYErrors()) {
-          erroBarPolicy.calculateErrorBar(0, this.m_maxY, this.m_reusedErrorBar);
-          errorBarMaxY = this.m_reusedErrorBar.getPositiveYError();
+          errorBarMaxY = erroBarPolicy.getYError(this.m_maxY);
           if (errorBarMaxY > errorBarMaxYCollect) {
             errorBarMaxYCollect = errorBarMaxY;
           }
         }
       }
     }
-    change = this.m_maxYErrorBar != errorBarMaxYCollect;
-    this.m_maxYErrorBar = errorBarMaxYCollect;
+    double absoluteMax = errorBarMaxYCollect + this.m_maxY;
+    change = this.m_maxYErrorBar != absoluteMax;
+    if (change) {
+      this.m_maxYErrorBar = absoluteMax;
+    }
     return change;
 
   }
@@ -533,24 +542,26 @@ public abstract class ATrace2D implements ITrace2D {
   private boolean expandMinXErrorBarBounds() {
     Chart2D chart = this.getRenderer();
     boolean change = false;
-    double errorBarMinXCollect = IErrorBarValue.ERROR_VALUE_NONE;
+    double errorBarMinXCollect = -Double.MAX_VALUE;
     if (chart != null) {
       Iterator itErrorBarPolicies = this.getErrorBarPolicies().iterator();
       IErrorBarPolicy erroBarPolicy;
-      double errorBarMinX = Double.MAX_VALUE;
+      double errorBarMinX = -Double.MAX_VALUE;
       while (itErrorBarPolicies.hasNext()) {
         erroBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
         if (erroBarPolicy.isShowNegativeXErrors()) {
-          erroBarPolicy.calculateErrorBar(this.m_minX, 0, this.m_reusedErrorBar);
-          errorBarMinX = this.m_reusedErrorBar.getNegativeXError();
-          if (errorBarMinX < errorBarMinXCollect) {
+          errorBarMinX = erroBarPolicy.getXError(this.m_minX);
+          if (errorBarMinX > errorBarMinXCollect) {
             errorBarMinXCollect = errorBarMinX;
           }
         }
       }
     }
-    change = this.m_minXErrorBar != errorBarMinXCollect;
-    this.m_minXErrorBar = errorBarMinXCollect;
+    double absoluteMin = this.m_minX - errorBarMinXCollect;
+    change = this.m_minXErrorBar != absoluteMin;
+    if (change) {
+      this.m_minXErrorBar = absoluteMin;
+    }
     return change;
   }
 
@@ -566,25 +577,27 @@ public abstract class ATrace2D implements ITrace2D {
   private boolean expandMinYErrorBarBounds() {
     Chart2D chart = this.getRenderer();
     boolean change = false;
-    double errorBarMinYCollect = IErrorBarValue.ERROR_VALUE_NONE;
+    double errorBarMinYCollect = -Double.MAX_VALUE;
     if (chart != null) {
       Iterator itErrorBarPolicies = this.getErrorBarPolicies().iterator();
       IErrorBarPolicy erroBarPolicy;
-      double errorBarMinY = Double.MAX_VALUE;
+      double errorBarMinY = -Double.MAX_VALUE;
       while (itErrorBarPolicies.hasNext()) {
         erroBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
         if (erroBarPolicy.isShowNegativeYErrors()) {
           // calculate the error
-          erroBarPolicy.calculateErrorBar(0, this.m_minY, this.m_reusedErrorBar);
-          errorBarMinY = this.m_reusedErrorBar.getNegativeYError();
-          if (errorBarMinY < errorBarMinYCollect) {
+          errorBarMinY = erroBarPolicy.getYError(this.m_minY);
+          if (errorBarMinY > errorBarMinYCollect) {
             errorBarMinYCollect = errorBarMinY;
           }
         }
       }
     }
-    change = this.m_minYErrorBar != errorBarMinYCollect;
-    this.m_minYErrorBar = errorBarMinYCollect;
+    double absoluteMin = this.m_minY - errorBarMinYCollect;
+    change = this.m_minYErrorBar != absoluteMin;
+    if (change) {
+      this.m_minYErrorBar = absoluteMin;
+    }
     return change;
   }
 
@@ -595,7 +608,7 @@ public abstract class ATrace2D implements ITrace2D {
    * @throws Throwable
    *           if sth. goes wrong.
    */
-  public void finalize() throws Throwable {
+  protected void finalize() throws Throwable {
     super.finalize();
     ATrace2D.instanceCount--;
   }
@@ -653,91 +666,98 @@ public abstract class ATrace2D implements ITrace2D {
   public void firePointChanged(final TracePoint2D changed, final int state) {
     double tmpx = changed.getX();
     double tmpy = changed.getY();
-    // for a changed point all cases (new extremum as for added case, other
-    // point
-    // becomes extremum as the change point was one like in removed case) have
-    // to be tested. Additionally we have to fire a changd point event.
-    if (((TracePoint2D.STATE_ADDED | TracePoint2D.STATE_CHANGED) & state) != 0) {
-      // add or change
-      if (tmpx > this.m_maxX) {
-        this.m_maxX = tmpx;
-        synchronized (this.m_renderer) {
-          synchronized (this) {
+    synchronized (this.m_renderer) {
+      synchronized (this) {
+        // for a changed point all cases (new extremum as for added case, other
+        // point becomes extremum as the change point was one like in removed
+        // case) have
+        // to be tested. Additionally we have to fire a changd point event.
+        if (TracePoint2D.STATE_ADDED == state) {
+          // add
+          if (tmpx > this.m_maxX) {
+            this.m_maxX = tmpx;
             this.expandMaxXErrorBarBounds();
             this.firePropertyChange(PROPERTY_MAX_X, null, new Double(this.m_maxX));
-          }
-        }
-      } else if (tmpx < this.m_minX) {
-        this.m_minX = tmpx;
-        synchronized (this.m_renderer) {
-          synchronized (this) {
+          } else if (tmpx < this.m_minX) {
+            this.m_minX = tmpx;
             this.expandMinXErrorBarBounds();
             this.firePropertyChange(PROPERTY_MIN_X, null, new Double(this.m_minX));
           }
-        }
-      }
-      if (tmpy > this.m_maxY) {
-        this.m_maxY = tmpy;
-        synchronized (this.m_renderer) {
-          synchronized (this) {
+          if (tmpy > this.m_maxY) {
+            this.m_maxY = tmpy;
             this.expandMaxYErrorBarBounds();
             this.firePropertyChange(PROPERTY_MAX_Y, null, new Double(this.m_maxY));
-          }
-        }
-      } else if (tmpy < this.m_minY) {
-        this.m_minY = tmpy;
-        synchronized (this.m_renderer) {
-          synchronized (this) {
+          } else if (tmpy < this.m_minY) {
+            this.m_minY = tmpy;
             this.expandMinYErrorBarBounds();
             this.firePropertyChange(PROPERTY_MIN_Y, null, new Double(this.m_minY));
           }
         }
-      }
-    }
-    if (((TracePoint2D.STATE_REMOVED | TracePoint2D.STATE_CHANGED) & state) != 0) {
-      // removal or change: care for extrema (<=, >=)
-      if (tmpx >= this.m_maxX) {
-        tmpx = this.m_maxX;
-        synchronized (this.m_renderer) {
-          synchronized (this) {
+        if (TracePoint2D.STATE_REMOVED == state) {
+          // removal: care for extrema (<=, >=)
+          if (tmpx >= this.m_maxX) {
+            tmpx = this.m_maxX;
             this.maxXSearch();
             this.firePropertyChange(PROPERTY_MAX_X, new Double(tmpx), new Double(this.m_maxX));
-          }
-        }
-      } else if (tmpx <= this.m_minX) {
-        tmpx = this.m_minX;
-        synchronized (this.m_renderer) {
-          synchronized (this) {
+          } else if (tmpx <= this.m_minX) {
+            tmpx = this.m_minX;
             this.minXSearch();
             this.firePropertyChange(PROPERTY_MIN_X, new Double(tmpx), new Double(this.m_minX));
           }
-        }
-      }
-      if (tmpy >= this.m_maxY) {
-        tmpy = this.m_maxY;
-        synchronized (this.m_renderer) {
-          synchronized (this) {
+          if (tmpy >= this.m_maxY) {
+            tmpy = this.m_maxY;
             this.maxYSearch();
             this.firePropertyChange(PROPERTY_MAX_Y, new Double(tmpy), new Double(this.m_maxY));
-          }
-        }
-      } else if (tmpy <= this.m_minY) {
-        tmpy = this.m_minY;
-        synchronized (this.m_renderer) {
-          synchronized (this) {
+          } else if (tmpy <= this.m_minY) {
+            tmpy = this.m_minY;
             this.minYSearch();
             this.firePropertyChange(PROPERTY_MIN_Y, new Double(tmpy), new Double(this.m_minY));
           }
+          if (this.getSize() == 0) {
+            this.m_firsttime = true;
+          }
         }
-      }
-      if (this.getSize() == 0) {
-        this.m_firsttime = true;
-      }
-    }
-    if (state == TracePoint2D.STATE_CHANGED) {
-      synchronized (this.m_renderer) {
-        synchronized (this) {
-
+        if (state == TracePoint2D.STATE_CHANGED) {
+          if (tmpx < this.m_maxX) {
+            final double oldMaxX = this.m_maxX;
+            this.maxXSearch();
+            this.firePropertyChange(PROPERTY_MAX_X, new Double(oldMaxX), new Double(this.m_maxX));
+          } else if (tmpx > this.m_maxX) {
+            final double oldMaxX = this.m_maxX;
+            this.m_maxX = tmpx;
+            this.expandMaxXErrorBarBounds();
+            this.firePropertyChange(PROPERTY_MAX_X, new Double(oldMaxX), new Double(this.m_maxX));
+          }
+          if (tmpx > this.m_minX) {
+            final double oldMinX = this.m_minX;
+            this.minXSearch();
+            this.firePropertyChange(PROPERTY_MIN_X, new Double(oldMinX), new Double(this.m_minX));
+          } else if (tmpx < this.m_minX) {
+            final double oldMinX = this.m_minX;
+            this.m_minX = tmpx;
+            this.expandMinXErrorBarBounds();
+            this.firePropertyChange(PROPERTY_MIN_X, new Double(oldMinX), new Double(this.m_minX));
+          }
+          if (tmpy < this.m_maxY) {
+            final double oldMaxY = this.m_maxY;
+            this.maxYSearch();
+            this.firePropertyChange(PROPERTY_MAX_Y, new Double(oldMaxY), new Double(this.m_maxY));
+          } else if (tmpy > this.m_maxY) {
+            final double oldMaxY = this.m_maxY;
+            this.m_maxY = tmpy;
+            this.expandMaxYErrorBarBounds();
+            this.firePropertyChange(PROPERTY_MAX_Y, new Double(oldMaxY), new Double(this.m_maxY));
+          }
+          if (tmpy > this.m_minY) {
+            final double oldMinY = this.m_minY;
+            this.minYSearch();
+            this.firePropertyChange(PROPERTY_MIN_Y, new Double(oldMinY), new Double(this.m_minY));
+          } else if (tmpy < this.m_minY) {
+            final double oldMinY = this.m_minY;
+            this.m_minY = tmpy;
+            this.expandMinYErrorBarBounds();
+            this.firePropertyChange(PROPERTY_MIN_Y, new Double(oldMinY), new Double(this.m_minY));
+          }
           this.firePropertyChange(PROPERTY_POINT_CHANGED, null, changed);
         }
       }
@@ -863,7 +883,7 @@ public abstract class ATrace2D implements ITrace2D {
     } else if (!StringUtil.isEmpty(physunit)) {
       name = new StringBuffer("unnamed").append(" ").append(physunit).toString();
     }
-    return name.toString();
+    return name;
   }
 
   /**
@@ -873,11 +893,15 @@ public abstract class ATrace2D implements ITrace2D {
    * @return the original maximum x- value ignoring the offsetX.
    */
   public final double getMaxX() {
-    double result = this.m_maxX;
-    if (this.m_maxXErrorBar != -IErrorBarValue.ERROR_VALUE_NONE) {
-      result = this.m_maxXErrorBar;
+    synchronized (this.m_renderer) {
+      synchronized (this) {
+        double result = this.m_maxX;
+        if (this.m_maxXErrorBar != -Double.MAX_VALUE) {
+          result = this.m_maxXErrorBar;
+        }
+        return result;
+      }
     }
-    return result;
   }
 
   /**
@@ -888,11 +912,15 @@ public abstract class ATrace2D implements ITrace2D {
    */
 
   public final double getMaxY() {
-    double result = this.m_maxY;
-    if (this.m_maxYErrorBar != -IErrorBarValue.ERROR_VALUE_NONE) {
-      result = this.m_maxYErrorBar;
+    synchronized (this.m_renderer) {
+      synchronized (this) {
+        double result = this.m_maxY;
+        if (this.m_maxYErrorBar != -Double.MAX_VALUE) {
+          result = this.m_maxYErrorBar;
+        }
+        return result;
+      }
     }
-    return result;
   }
 
   /**
@@ -902,11 +930,15 @@ public abstract class ATrace2D implements ITrace2D {
    * @return the original minimum x- value ignoring the offsetX.
    */
   public final double getMinX() {
-    double result = this.m_minX;
-    if (this.m_minXErrorBar != IErrorBarValue.ERROR_VALUE_NONE) {
-      result = this.m_minXErrorBar;
+    synchronized (this.m_renderer) {
+      synchronized (this) {
+        double result = this.m_minX;
+        if (this.m_minXErrorBar != Double.MAX_VALUE) {
+          result = this.m_minXErrorBar;
+        }
+        return result;
+      }
     }
-    return result;
   }
 
   /**
@@ -916,11 +948,15 @@ public abstract class ATrace2D implements ITrace2D {
    * @return the original minimum y- value ignoring the offsetY.
    */
   public final double getMinY() {
-    double result = this.m_minY;
-    if (this.m_minYErrorBar != IErrorBarValue.ERROR_VALUE_NONE) {
-      result = this.m_minYErrorBar;
+    synchronized (this.m_renderer) {
+      synchronized (this) {
+        double result = this.m_minY;
+        if (this.m_minYErrorBar != Double.MAX_VALUE) {
+          result = this.m_minYErrorBar;
+        }
+        return result;
+      }
     }
-    return result;
   }
 
   /**

@@ -42,8 +42,6 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import javax.swing.JPanel;
@@ -183,102 +181,10 @@ import javax.swing.JToolTip;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.66 $
+ * @version $Revision: 1.73 $
  */
 
-public class Chart2D
-    extends JPanel implements PropertyChangeListener {
-
-  /**
-   * The adapting paint Thread. It adapts its frequency of invoking
-   * {@link java.awt.Component#repaint()} depending on the amount of points
-   * added since it's last cycle (recorded by
-   * {@link Chart2D#propertyChange(PropertyChangeEvent)} and an additional check
-   * if bounds have changed since last paint operation.
-   * <p>
-   * It also triggers (re-)scaling of (within {@link Chart2D#paint(Graphics)})
-   * of the {@link TracePoint2D} instances in the contained {@link ITrace2D}
-   * instances.
-   * <p>
-   * The speed adaption depends on the internal constants {@link #MIN_SLEEP} and
-   * {@link #MAX_SLEEP}. Increasing speed is factorial (amount of new points
-   * times 2), decreasing is fixed by 10 ms (if no new points are there).
-   * <p>
-   * 
-   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   */
-  final class Painter
-      extends Thread {
-
-    /** The maximum sleep time between to paint invocations. */
-    static final long MAX_SLEEP = 10000;
-
-    /** The minimum sleep time between to paint invocations. */
-    static final long MIN_SLEEP = 50;
-
-    /**
-     * Dynamically adapts to the update speed of data. Calculated in run().
-     */
-    private long m_sleepTime = Chart2D.Painter.MIN_SLEEP;
-
-    /** Hide constructor. */
-    private Painter() {
-      // nop
-    }
-
-    /**
-     * @see java.lang.Runnable#run()
-     */
-    public void run() {
-      try {
-        while (!this.isInterrupted()) {
-          sleep(this.m_sleepTime);
-          // Calculation of sleeptime:
-          // has to be done before repaint, as paint removes
-          // pending changes! But after sleep, as in that time
-          // most new points will be added.
-          if (Chart2D.DEBUG_THREADING) {
-            System.out.println("Painter (" + Thread.currentThread().getName() + "), 0 locks");
-          }
-
-          synchronized (Chart2D.this) {
-            if (Chart2D.DEBUG_THREADING) {
-              System.out.println("Painter (" + Thread.currentThread().getName() + "), 1 lock");
-            }
-            boolean dirtyScaling = Chart2D.this.isDirtyScaling();
-            if (!dirtyScaling && Chart2D.this.m_unscaledPoints.size() == 0
-                && Chart2D.this.isNeedsRepaint()) {
-              // lazy slow down:
-              if (this.m_sleepTime < Chart2D.Painter.MAX_SLEEP) {
-                this.m_sleepTime += 10;
-              }
-            } else {
-              // fast speed-up:
-              this.m_sleepTime = Math.max(this.m_sleepTime
-                  - (Chart2D.this.m_unscaledPoints.size() * 2), Chart2D.Painter.MIN_SLEEP);
-              if (Chart2D.DEBUG_THREADING) {
-                System.out.println("Painter (" + Thread.currentThread().getName()
-                    + "), invoking paint.");
-              }
-
-              Chart2D.this.repaint();
-            }
-          }
-          if (Chart2D.DEBUG_THREADING) {
-            System.out.println("Painter (" + Thread.currentThread().getName() + "), left lock");
-          }
-        }
-
-      } catch (InterruptedException ie) {
-        /*
-         * This is the case, if call to interrupt() came while Thread was
-         * sleeping.
-         */
-        ie.printStackTrace(System.err);
-
-      }
-    }
-  }
+public class Chart2D extends JPanel implements PropertyChangeListener {
 
   /** Speaking names for axis constants - used for debugging only. */
   public static final String[] AXIX_CONSTANT_NAMES = new String[] {"dummy", "X", "Y", "X,Y" };
@@ -416,11 +322,8 @@ public class Chart2D
   /** The internal label painter for this chart. */
   private IAxisTickPainter m_axisTickPainter;
 
-  /** Internal Thread that manages adaptive painting speed. */
-  private Painter m_painter = new Painter();
-
   /**
-   * Flag that decides wether labels for traces are painted below the chart.
+   * Flag that decides whether labels for traces are painted below the chart.
    */
   private boolean m_paintLabels = true;
 
@@ -441,17 +344,6 @@ public class Chart2D
    * <code>ITrace2d</code> instanes to paint.
    */
   private TreeSetGreedy m_traces = new TreeSetGreedy();
-
-  /**
-   * An internal counter that is increased for every bound property change event
-   * received from traces.
-   * <p>
-   * It is reset whenever the painting Thread triggers a repaint and used to
-   * calculate the new time it will sleep until starting the next paint
-   * operation.
-   * <p>
-   */
-  protected List m_unscaledPoints = new LinkedList();
 
   /**
    * The end x pixel coordinate of the chart.
@@ -532,23 +424,30 @@ public class Chart2D
   private Range m_yRangePreviousScaling = new Range(0, 0);
 
   /**
-   * Flag used to signal the <code>{@link Chart2D.Painter}</code> that painting is
-   * dirty.
-   * <p>
-   * This is used to tell the <code>Painter</code> that a repaint has to be
-   * done if sth. has changed that is not related to bound changes (@link
-   * {@link Chart2D#isDirtyScaling()}).
-   * <p>
-   */
-  private boolean m_needsRepaint = false;
-
-  /**
    * Creates a new chart.
    * <p>
    */
   public Chart2D() {
-    this.setAxisX(new AxisLinear());
-    this.setAxisY(new AxisLinear());
+    AAxis axisX = new AxisLinear();
+    // add me as listener, later on this state will be copied in setAxis.. 
+    axisX.addPropertyChangeListener(IAxis.PROPERTY_LABELFORMATTER, this);
+    axisX.addPropertyChangeListener(IAxis.PROPERTY_PAINTGRID, this);
+    axisX.addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, this);
+    axisX.addPropertyChangeListener(IAxis.PROPERTY_TITLE, this);
+    axisX.addPropertyChangeListener(IAxis.PROPERTY_TITLEFONT, this);
+    axisX.addPropertyChangeListener(IAxis.PROPERTY_TITLEPAINTER, this);
+    this.setAxisX(axisX);
+
+    AAxis axisY = new AxisLinear();
+    // add me as listener, later on this state will be copied in setAxis.. 
+    axisY.addPropertyChangeListener(IAxis.PROPERTY_LABELFORMATTER, this);
+    axisY.addPropertyChangeListener(IAxis.PROPERTY_PAINTGRID, this);
+    axisY.addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, this);
+    axisY.addPropertyChangeListener(IAxis.PROPERTY_TITLE, this);
+    axisY.addPropertyChangeListener(IAxis.PROPERTY_TITLEFONT, this);
+    axisY.addPropertyChangeListener(IAxis.PROPERTY_TITLEPAINTER, this);
+    this.setAxisY(axisY);
+    
     this.setAxisTickPainter(new AxisTickPainterDefault());
 
     Font dflt = this.getFont();
@@ -560,9 +459,6 @@ public class Chart2D
     // one initial call to paint for side effect computations
     // potentially needed from outside (m_XstartChart...):
     this.repaint();
-    // don't continue when application stops.
-    this.m_painter.setDaemon(true);
-    this.m_painter.start();
 
     // set a custom cursor:
     this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
@@ -720,7 +616,7 @@ public class Chart2D
   }
 
   /**
-   * Destroys the chart by stopping the internal painter thread.
+   * Destroys the chart.
    * <p>
    * This method is only of interest if you have an application that dynamically
    * adds and removes charts. So if you use the same Chart2D object(s) during
@@ -738,9 +634,6 @@ public class Chart2D
       this.m_axisX = null;
       this.m_axisY = null;
       this.m_traces = null;
-      this.m_unscaledPoints = null;
-      this.m_painter.interrupt();
-      this.m_painter = null;
     }
   }
 
@@ -754,7 +647,7 @@ public class Chart2D
    * @throws Throwable
    *           if a finalizer of a superclass fails.
    */
-  public void finalize() throws Throwable {
+  protected void finalize() throws Throwable {
     super.finalize();
     this.destroy();
   }
@@ -1063,7 +956,7 @@ public class Chart2D
    * 
    * @return the x coordinate of the chart's right edge in px.
    */
-  public final int getXChartEnd() {
+  public synchronized final int getXChartEnd() {
     return this.m_xChartEnd;
   }
 
@@ -1073,7 +966,7 @@ public class Chart2D
    * 
    * @return Returns the x coordinate of the chart's left edge in px.
    */
-  public int getXChartStart() {
+  public synchronized int getXChartStart() {
     return this.m_xChartStart;
   }
 
@@ -1088,7 +981,7 @@ public class Chart2D
    * @return The y coordinate of the upper edge of the chart's display area in
    *         px.
    */
-  public final int getYChartEnd() {
+  public synchronized final int getYChartEnd() {
     return this.m_yChartEnd;
   }
 
@@ -1102,7 +995,7 @@ public class Chart2D
    * 
    * @return Returns the y coordinate of the chart's lower edge in px.
    */
-  public int getYChartStart() {
+  public synchronized int getYChartStart() {
     return this.m_yChartStart;
   }
 
@@ -1312,7 +1205,6 @@ public class Chart2D
    */
   public synchronized void paint(final Graphics g) {
 
-    this.setNeedsRepaint(false);
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("paint, 1 lock");
     }
@@ -1419,29 +1311,26 @@ public class Chart2D
               // entering the visible bounds: interpolate from old point
               // to new point
               oldpoint = interpolateVisible(oldpoint, newpoint);
-              tmpx = this.m_xChartStart + (int) (newpoint.m_scaledX * rangex);
-              tmpy = this.m_yChartStart - (int) (newpoint.m_scaledY * rangey);
-              oldtmpx = this.m_xChartStart + (int) (oldpoint.m_scaledX * rangex);
-              oldtmpy = this.m_yChartStart - (int) (oldpoint.m_scaledY * rangey);
+              tmpx = this.m_xChartStart + (int) Math.round(newpoint.m_scaledX * rangex);
+              tmpy = this.m_yChartStart - (int) Math.round(newpoint.m_scaledY * rangey);
+              oldtmpx = this.m_xChartStart + (int) Math.round(oldpoint.m_scaledX * rangex);
+              oldtmpy = this.m_yChartStart - (int) Math.round(oldpoint.m_scaledY * rangey);
               this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, false, tmpdata, g2d);
-              this.paintErrorBars(tmpdata, oldtmpx, oldtmpy, tmpx, tmpy, g2d);
             } else if (!newpointVisible && oldpointVisible) {
               // leaving the visible bounds:
               tmppt = (TracePoint2D) newpoint.clone();
               newpoint = interpolateVisible(newpoint, oldpoint);
-              tmpx = this.m_xChartStart + (int) (newpoint.m_scaledX * rangex);
-              tmpy = this.m_yChartStart - (int) (newpoint.m_scaledY * rangey);
+              tmpx = this.m_xChartStart + (int) Math.round(newpoint.m_scaledX * rangex);
+              tmpy = this.m_yChartStart - (int) Math.round(newpoint.m_scaledY * rangey);
               itTracePainters = tmpdata.getTracePainters().iterator();
               this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, tmpdata, g2d);
-              this.paintErrorBars(tmpdata, oldtmpx, oldtmpy, tmpx, tmpy, g2d);
               // restore for next loop start:
               newpoint = tmppt;
             } else {
               // staying in the visible bounds: just paint
-              tmpx = this.m_xChartStart + (int) (newpoint.m_scaledX * rangex);
-              tmpy = this.m_yChartStart - (int) (newpoint.m_scaledY * rangey);
+              tmpx = this.m_xChartStart + (int) Math.round(newpoint.m_scaledX * rangex);
+              tmpy = this.m_yChartStart - (int) Math.round(newpoint.m_scaledY * rangey);
               this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, false, tmpdata, g2d);
-              this.paintErrorBars(tmpdata, oldtmpx, oldtmpy, tmpx, tmpy, g2d);
             }
           }
           itTracePainters = tmpdata.getTracePainters().iterator();
@@ -1569,16 +1458,25 @@ public class Chart2D
    * 
    * @param g2d
    *          the graphics context to use.
+   * 
+   * @param discontinue
+   *          if a discontinuation has been taken place and all potential cached
+   *          points by an <code>{@link ITracePainter}</code> (done for
+   *          polyline performance boost) have to be drawn immediately before
+   *          starting a new point caching.
+   * 
    */
   private void paintErrorBars(final ITrace2D trace, final int oldtmpx, final int oldtmpy,
-      final int tmpx, final int tmpy, final Graphics2D g2d) {
+      final int tmpx, final int tmpy, final Graphics2D g2d, final boolean discontinue) {
     IErrorBarPolicy errorBarPolicy;
     Iterator itTraceErrorBarPolicies = trace.getErrorBarPolicies().iterator();
     while (itTraceErrorBarPolicies.hasNext()) {
       errorBarPolicy = (IErrorBarPolicy) itTraceErrorBarPolicies.next();
       errorBarPolicy.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, g2d);
+      if (discontinue) {
+        errorBarPolicy.discontinue(g2d);
+      }
     }
-
   }
 
   /**
@@ -1617,16 +1515,14 @@ public class Chart2D
    * 
    * @param discontinue
    *          if a discontinuation has been taken place and all potential cached
-   *          points by an {@link ITracePainter} (done for polyline performance
-   *          boost) have to be drawn immediately before starting a new point
-   *          caching.
+   *          points by an <code>{@link ITracePainter}</code> (done for
+   *          polyline performance boost) have to be drawn immediately before
+   *          starting a new point caching.
    */
   private final void paintPoint(final int xPxOld, final int yPxOld, final int xPxNew,
       final int yPxNew, final boolean discontinue, final ITrace2D trace, final Graphics2D g2d) {
     Iterator itTracePainters;
-    Iterator itTraceErrorBarPolicies;
     ITracePainter tracePainter;
-    IErrorBarPolicy errorBarPolicy;
     itTracePainters = trace.getTracePainters().iterator();
     while (itTracePainters.hasNext()) {
       tracePainter = (ITracePainter) itTracePainters.next();
@@ -1635,15 +1531,7 @@ public class Chart2D
         tracePainter.discontinue(g2d);
       }
     }
-    itTraceErrorBarPolicies = trace.getErrorBarPolicies().iterator();
-    while (itTraceErrorBarPolicies.hasNext()) {
-      errorBarPolicy = (IErrorBarPolicy) itTraceErrorBarPolicies.next();
-      errorBarPolicy.paintPoint(xPxOld, yPxOld, xPxNew, yPxNew, g2d);
-      if (discontinue) {
-        errorBarPolicy.discontinue(g2d);
-      }
-    }
-
+    this.paintErrorBars(trace, xPxOld, yPxOld, xPxNew, yPxNew, g2d, discontinue);
   }
 
   /**
@@ -1706,6 +1594,14 @@ public class Chart2D
   }
 
   /**
+   * Chart - wide constant for the ms to give a repaint operation time for
+   * collecting several repaint requests into one (performance vs. update
+   * speed).
+   * <p>
+   */
+  public static final int REPAINT_LATENCY = 200;
+
+  /**
    * <p>
    * Called from
    * {@link info.monitorenter.gui.chart.traces.ATrace2D#setZIndex(Integer)} to
@@ -1737,6 +1633,8 @@ public class Chart2D
         System.out.println("propertyChange (" + Thread.currentThread().getName() + "), 1 lock");
       }
       String property = evt.getPropertyName();
+      // System.out.println(Chart2D.class.getName() + "propertyChange(" +
+      // property + ")");
       double value;
       // first the bound changes:
       if (property.equals(ITrace2D.PROPERTY_MAX_X)) {
@@ -1792,14 +1690,11 @@ public class Chart2D
           this.m_ymin = this.findMinY();
         }
       } else if (property.equals(IRangePolicy.PROPERTY_RANGE)) {
-        // TODO: Maybe interrupt Painter to get quick result on screen?
-        this.setNeedsRepaint(true);
+        // nop
       } else if (property.equals(IRangePolicy.PROPERTY_RANGE_MAX)) {
-        // TODO: Maybe interrupt Painter to get quick result on screen?
-        this.setNeedsRepaint(true);
+        // nop
       } else if (property.equals(IRangePolicy.PROPERTY_RANGE_MIN)) {
-        // TODO: Maybe interrupt Painter to get quick result on screen?
-        this.setNeedsRepaint(true);
+        // nop
       } else if (property.equals(ITrace2D.PROPERTY_TRACEPOINT)) {
         // now points added or removed -> rescale!
         if (Chart2D.DEBUG_SCALING) {
@@ -1810,7 +1705,7 @@ public class Chart2D
         // added or removed?
         // we only care about added points (rescaling is our task)
         if (oldPt == null) {
-          this.m_unscaledPoints.add(newPt);
+          this.scalePoint(newPt, Chart2D.X_Y);
         }
       } else if (property.equals(ITrace2D.PROPERTY_VISIBLE)) {
         // invisible traces don't count for max and min, so
@@ -1828,45 +1723,45 @@ public class Chart2D
         this.m_axisX.scaleTrace(trace);
         this.m_axisY.scaleTrace(trace);
 
-        // TODO: Maybe interrupt Painter to get quick result on screen?
-        this.setNeedsRepaint(true);
       } else if (property.equals(ITrace2D.PROPERTY_STROKE)) {
         // TODO: perhaps react more fine grained for the following events:
         // just repaint the trace without all the paint code (scaling,
         // axis,...).
         // But: These property changes are triggered by humans and occur
         // very seldom. Huge work non-l&f performance improvement.
-        // TODO: Maybe interrupt Painter to get quick result on screen?
-        this.setNeedsRepaint(true);
       } else if (property.equals(ITrace2D.PROPERTY_PAINTERS)) {
-        // TODO: Maybe interrupt Painter to get quick result on screen?
-        this.setNeedsRepaint(true);
+        // nop
       } else if (property.equals(ITrace2D.PROPERTY_COLOR)) {
-        // TODO: Maybe interrupt Painter to get quick result on screen?
-        this.setNeedsRepaint(true);
+        // nop
       } else if (property.equals(ITrace2D.PROPERTY_NAME)) {
-        // TODO: Maybe interrupt Painter to get quick result on screen?
-        this.setNeedsRepaint(true);
+        // nop
       } else if (property.equals(ITrace2D.PROPERTY_ERRORBARPOLICY)) {
-        // TODO: Maybe interrupt Painter to get quick result on screen?
-        this.setNeedsRepaint(true);
+        // nop
       } else if (property.equals(ITrace2D.PROPERTY_ERRORBARPOLICY_CONFIGURATION)) {
-        // TODO: Maybe interrupt Painter to get quick result on screen?
-        this.setNeedsRepaint(true);
+        // nop
       } else if (property.equals(IAxis.PROPERTY_LABELFORMATTER)) {
         // TODO: Maybe only repaint the axis? Much complicated work vs.
         // occassional user interaction.
-        // TODO: Maybe interrupt Painter to get quick result on screen?
-        this.setNeedsRepaint(true);
       } else if (property.equals(IAxisLabelFormatter.PROPERTY_FORMATCHANGE)) {
-        // TODO: Maybe interrupt Painter to get quick result on screen?
-        this.setNeedsRepaint(true);
+        // nop
       } else if (property.equals(ITrace2D.PROPERTY_POINT_CHANGED)) {
         TracePoint2D changed = (TracePoint2D) evt.getNewValue();
         this.scalePoint(changed, Chart2D.X_Y);
-        // TODO: Maybe interrupt Painter to get quick result on screen?
-        this.setNeedsRepaint(true);
+      } else if (property.equals(IAxis.PROPERTY_LABELFORMATTER)) {
+        // nop
+      } else if (property.equals(IAxis.PROPERTY_PAINTGRID)) {
+        // nop
+      } else if (property.equals(IAxis.PROPERTY_RANGEPOLICY)) {
+        // nop
+      } else if (property.equals(IAxis.PROPERTY_TITLE)) {
+        // nop
+        System.out.println(property);
+      } else if (property.equals(IAxis.PROPERTY_TITLEFONT)) {
+        // nop
+      } else if (property.equals(IAxis.PROPERTY_TITLEPAINTER)) {
+        // nop
       }
+      this.repaint(Chart2D.REPAINT_LATENCY);
     }
   }
 
@@ -1921,8 +1816,6 @@ public class Chart2D
       this.m_ymax = this.findMaxY();
       this.m_ymin = this.findMinY();
 
-      // TODO: Maybe interrupt Painter to get quick result on screen?
-      this.setNeedsRepaint(true);
     }
     this.firePropertyChange(Chart2D.PROPERTY_ADD_REMOVE_TRACE, points, null);
   }
@@ -1977,10 +1870,9 @@ public class Chart2D
     axisX.replace(old);
     this.m_axisX = axisX;
     axisX.setChart(this, Chart2D.X);
-    this.firePropertyChange(Chart2D.PROPERTY_AXIS_X, old, this.m_axisX);
-    // TODO: Maybe interrupt Painter to get quick result on screen?
-    this.setNeedsRepaint(true);
 
+    this.firePropertyChange(Chart2D.PROPERTY_AXIS_X, old, this.m_axisX);
+    this.repaint(Chart2D.REPAINT_LATENCY);
   }
 
   /**
@@ -1997,8 +1889,7 @@ public class Chart2D
     this.m_axisY = axisY;
     axisY.setChart(this, Chart2D.Y);
     this.firePropertyChange(Chart2D.PROPERTY_AXIS_Y, old, this.m_axisY);
-    // TODO: Maybe interrupt Painter to get quick result on screen?
-    this.setNeedsRepaint(true);
+    this.repaint(Chart2D.REPAINT_LATENCY);
   }
 
   /**
@@ -2034,8 +1925,7 @@ public class Chart2D
       if (!old.equals(this.m_gridcolor)) {
         this.firePropertyChange(Chart2D.PROPERTY_GRID_COLOR, old, this.m_gridcolor);
       }
-      // TODO: Maybe interrupt Painter to get quick result on screen?
-      this.setNeedsRepaint(true);
+      this.repaint(Chart2D.REPAINT_LATENCY);
     }
   }
 
@@ -2065,22 +1955,7 @@ public class Chart2D
     if (change) {
       this.firePropertyChange(Chart2D.PROPERTY_PAINTLABELS, new Boolean(!paintLabels), new Boolean(
           paintLabels));
-      // TODO: Maybe interrupt Painter to get quick result on screen?
-      this.setNeedsRepaint(true);
-    }
-  }
-
-  /**
-   * @see java.awt.Component#repaint(long)
-   */
-  public void repaint(final long tm) {
-    if (Chart2D.DEBUG_THREADING) {
-      if (Thread.currentThread() != this.m_painter) {
-        System.out.println("Chart2D.repaint(long) triggered by non - painter: ");
-        throw new RuntimeException(
-            "Repaint must not be called by anyone else than the Painter Thread.");
-      }
-      super.repaint(tm);
+      this.repaint(Chart2D.REPAINT_LATENCY);
     }
   }
 
@@ -2278,16 +2153,6 @@ public class Chart2D
           System.out.println("updateScaling: No scaling was performend.");
         }
       }
-
-      // scale new point - regardless wether bounds have changed or not:
-      Iterator itNewPoints = this.m_unscaledPoints.iterator();
-      TracePoint2D newPoint;
-      while (itNewPoints.hasNext()) {
-        newPoint = (TracePoint2D) itNewPoints.next();
-        this.scalePoint(newPoint, Chart2D.X_Y);
-        itNewPoints.remove();
-      }
-
     }
 
     // reset equality
@@ -2300,25 +2165,4 @@ public class Chart2D
 
   }
 
-  /**
-   * Returns true if the chart has to painted anew.
-   * <p>
-   * 
-   * @return true if the chart has to painted anew..
-   */
-  private final boolean isNeedsRepaint() {
-    return this.m_needsRepaint;
-  }
-
-  /**
-   * Singal the <code>{@link Painter}</code> that painting has to be done
-   * again or not.
-   * <p>
-   * 
-   * @param needsRepaint
-   *          the needsRepaint to set
-   */
-  private final void setNeedsRepaint(final boolean needsRepaint) {
-    this.m_needsRepaint = needsRepaint;
-  }
 }

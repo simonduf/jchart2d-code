@@ -33,9 +33,12 @@ import info.monitorenter.gui.chart.IPointPainter;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class PointPainterDisc implements IPointPainter {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -6317473632026920774L;
 
   /** The diameter of the discs to paint. */
   private int m_discSize;

@@ -43,7 +43,7 @@ import javax.swing.JTextField;
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class ChartCoordinateView extends JPanel {
 
@@ -62,11 +62,11 @@ public class ChartCoordinateView extends JPanel {
   private JTextField m_yView;
 
   /**
-   * Handle to the mouse listenert that is registered to the chart component.
+   * Handle to the mouse listener that is registered to the chart component.
    * Needed to remove it from the chart when this component dies.
    * <p>
    */
-  private MouseMotionListener m_mouseListener;
+  private transient MouseMotionListener m_mouseListener;
 
   /**
    * Creates an component that will contain two text fields that display the
@@ -148,11 +148,8 @@ public class ChartCoordinateView extends JPanel {
    *           if sth. goes wrong in superclasses finalize.
    * @see java.lang.Object#finalize()
    */
-  public void finalize() throws Throwable {
+  protected void finalize() throws Throwable {
     super.finalize();
     this.m_chart2D.removeMouseMotionListener(this.m_mouseListener);
-    this.m_chart2D = null;
-    this.m_xView = null;
-    this.m_yView = null;
   }
 }

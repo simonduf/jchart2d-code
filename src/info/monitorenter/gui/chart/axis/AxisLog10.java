@@ -47,10 +47,13 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.9 $
  */
 public class AxisLog10
     extends AAxisTransformation {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -1783172443489534956L;
 
   /**
    * Creates an instance that uses a {@link LabelFormatterSimple} for formatting
@@ -122,7 +125,7 @@ public class AxisLog10
     }
     // TODO: change this to Math.log10 as soon as java 1.5 is used:
     double result = Math.log(toTransform) / Math.log(10);
-    if (result == Double.POSITIVE_INFINITY) {
+    if (Double.isInfinite(result)) {
       result = Double.MAX_VALUE;
     }
     return result;

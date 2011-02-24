@@ -32,6 +32,7 @@ import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.pointpainters.PointPainterLine;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.test.ATestChartOperations;
+import info.monitorenter.gui.chart.traces.Trace2DLtdSorted;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.util.Range;
 
@@ -52,7 +53,7 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.18 $
  */
 public class TestChartOperationsVisual
     extends ATestChartOperations {
@@ -71,7 +72,8 @@ public class TestChartOperationsVisual
     suite.addTest(new TestChartOperationsVisual("testRemoveAllPoints"));
     suite.addTest(new TestChartOperationsVisual("testAddPoint"));
     suite.addTest(new TestChartOperationsVisual("testSetStroke"));
-    suite.addTest(new TestChartOperationsVisual("testSetName"));
+    suite.addTest(new TestChartOperationsVisual("testSetTraceName"));
+    suite.addTest(new TestChartOperationsVisual("testSetTraceNameEmptyTrace"));
     suite.addTest(new TestChartOperationsVisual("testSetRangePolicyX"));
     suite
         .addTest(new TestChartOperationsVisual("testAxisLabelFormatterNumberFormatSetNumberFormat"));
@@ -79,7 +81,9 @@ public class TestChartOperationsVisual
     suite.addTest(new TestChartOperationsVisual("testTraceSetErrorBarPolicy"));
     suite.addTest(new TestChartOperationsVisual("testIErrorBarPainterSetStartPointPainter"));
     suite.addTest(new TestChartOperationsVisual("testZoom"));
-
+    suite.addTest(new TestChartOperationsVisual("testDeadLockAddPointThread"));
+    suite.addTest(new TestChartOperationsVisual("testTracePointSetLocation"));
+    
     return suite;
   }
 
@@ -238,6 +242,40 @@ public class TestChartOperationsVisual
   }
 
   /**
+   * Invokes
+   * <code>{@link TracePoint2D#setLocation(java.awt.geom.Point2D)}</code> on
+   * an extremum point to move away from the extremum.
+   * <p>
+   */
+  public void testTracePointSetLocation() {
+    ATestChartOperations.AChartOperation operation = new AChartOperation(
+        "TracePoint2D.setLocation(x,y)") {
+      /** An extremum point that is shifted away from this extremum. */
+      private TracePoint2D m_extremum;
+
+      public Object action(final Chart2D chart) {
+        this.m_extremum.setLocation(4, -1);
+        return null;
+      }
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#createTrace()
+       */
+      public ITrace2D createTrace() {
+        ITrace2D result = new Trace2DLtdSorted();
+        this.m_extremum = new TracePoint2D(10, 10);
+        result.addPoint(new TracePoint2D(2, 3));
+        result.addPoint(new TracePoint2D(3, 2));
+        result.addPoint(new TracePoint2D(5, 7));
+        result.addPoint(this.m_extremum);
+        return result;
+      }
+    };
+    this.setTestOperation(operation);
+
+  }
+
+  /**
    * Removes all points of the trace and prompts for visual judgement.
    * <p>
    */
@@ -258,11 +296,37 @@ public class TestChartOperationsVisual
    * Sets a new name to the trace and prompts for visual judgement.
    * <p>
    */
-  public void testSetName() {
+  public void testSetTraceName() {
     ATestChartOperations.AChartOperation operation = new AChartOperation(
         "trace.setName(\"Iphigenie\")") {
       public Object action(final Chart2D chart) {
         TestChartOperationsVisual.this.m_trace.setName("Iphigenie");
+        return null;
+      }
+    };
+    this.setTestOperation(operation);
+  }
+
+  /**
+   * Sets a new name to an empty trace and prompts for visual judgement.
+   * <p>
+   */
+  public void testSetTraceNameEmptyTrace() {
+    ATestChartOperations.AChartOperation operation = new AChartOperation(
+        "trace.setName(\"Tauris\") on empty trace") {
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#createTrace()
+       */
+      public ITrace2D createTrace() {
+
+        ITrace2D result = new Trace2DLtdSorted();
+        result.setName("Lola");
+        return result;
+      }
+
+      public Object action(final Chart2D chart) {
+        TestChartOperationsVisual.this.m_trace.setName("Tauris");
         return null;
       }
     };
@@ -371,4 +435,59 @@ public class TestChartOperationsVisual
     this.setTestOperation(operation);
   }
 
+  /**
+   * Tests if creating a chart with one Thread and adding points from another
+   * results in deadlocks.
+   * <p>
+   * 
+   */
+  public void testDeadLockAddPointThread() {
+    ATestChartOperations.AChartOperation operation = new AChartOperation(
+
+    "add points from another Thread") {
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#createChartInstance()
+       */
+      public Chart2D createChartInstance() {
+
+        return new Chart2D();
+      }
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#createTrace()
+       */
+      public ITrace2D createTrace() {
+        ITrace2D trace = new Trace2DSimple();
+        return trace;
+      }
+
+      public Object action(final Chart2D chart) {
+        Thread t = new Thread(new Runnable() {
+          public void run() {
+            ITrace2D trace = (ITrace2D) chart.getTraces().iterator().next();
+            for (int i = 100; i < 200; i++) {
+              trace.addPoint(i, (Math.random() + 1.0) * i);
+              try {
+                Thread.sleep(100);
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+              }
+            }
+          }
+        });
+        t.setDaemon(true);
+        t.start();
+        // wait for termination:
+        while (t.isAlive()) {
+          try {
+            Thread.sleep(1000);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
+        }
+        return null;
+      }
+    };
+    this.setTestOperation(operation);
+  }
 }

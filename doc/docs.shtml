@@ -5,7 +5,7 @@
   by the generic footer via a "document.write(update);" - script.
  -->
  <script language="javascript">
-  var update="06/01/2006";
+  var update="016/09/2007";
  </script>
  <body id="docs">
   <div id="wrapper">
@@ -31,7 +31,7 @@
        <br>
        <a href="/docs/javadoc/index.html" target="blank">Browse javadoc</a>
        <br>
-       <a href="http://prdownloads.sourceforge.net/jchart2d/jchart2d-doc-2.0.0.zip?download" target="_blank">Download javadoc</a> (.zip format)
+       <a href="http://prdownloads.sourceforge.net/jchart2d/jchart2d-doc-2.2.0.zip?download" target="_blank">Download javadoc</a> (.zip format)
       </p>
      </div>     
     <!-- End of contents div -->

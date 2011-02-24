@@ -59,7 +59,7 @@ public class Range implements Serializable {
    *          the upper bound for the range.
    */
   public Range(final double min, final double max) {
-    if (min == Double.NaN) {
+    if (Double.isNaN(min)) {
       throw new IllegalArgumentException("Cannot work on Double.NaN for min.");
     }
     MathUtil.assertDouble(min);

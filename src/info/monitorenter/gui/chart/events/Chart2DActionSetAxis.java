@@ -35,7 +35,7 @@ import java.beans.PropertyChangeEvent;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public final class Chart2DActionSetAxis
     extends AChart2DAction {
@@ -54,7 +54,7 @@ public final class Chart2DActionSetAxis
   private final int m_axisTarget;
 
   /** The axis implementation to use. */
-  private final AAxis m_axis;
+  private final transient AAxis m_axis;
 
   /**
    * Create an <code>Action</code> that accesses the trace and identifies

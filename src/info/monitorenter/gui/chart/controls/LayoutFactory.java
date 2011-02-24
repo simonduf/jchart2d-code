@@ -36,6 +36,8 @@ import info.monitorenter.gui.chart.errorbars.ErrorBarPolicyRelative;
 import info.monitorenter.gui.chart.events.AxisActionSetGrid;
 import info.monitorenter.gui.chart.events.AxisActionSetRange;
 import info.monitorenter.gui.chart.events.AxisActionSetRangePolicy;
+import info.monitorenter.gui.chart.events.AxisActionSetTitle;
+import info.monitorenter.gui.chart.events.AxisActionSetTitleFont;
 import info.monitorenter.gui.chart.events.Chart2DActionSaveImageSingleton;
 import info.monitorenter.gui.chart.events.Chart2DActionSetAxis;
 import info.monitorenter.gui.chart.events.Chart2DActionSetCustomGridColorSingleton;
@@ -73,6 +75,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -105,7 +108,7 @@ import javax.swing.JRadioButtonMenuItem;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.23 $
+ * @version $Revision: 1.26 $
  */
 public final class LayoutFactory {
 
@@ -225,7 +228,7 @@ public final class LayoutFactory {
      * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
      * 
      * 
-     * @version $Revision: 1.23 $
+     * @version $Revision: 1.26 $
      */
     private final class JMenuOrderingAction
         extends AbstractAction {
@@ -687,6 +690,13 @@ public final class LayoutFactory {
     private static final long serialVersionUID = 3690196534012752439L;
 
     /**
+     * Weak reference (suspicion of cyclic reference) to the
+     * <code>{@link JComponent}</code> that is used to adapt basic UI
+     * properties to.
+     */
+    private WeakReference m_component;
+
+    /**
      * Creates an instance with the given name that listens to the components
      * background color, foreground color and font.
      * <p>
@@ -702,13 +712,6 @@ public final class LayoutFactory {
       new BasicPropertyAdaptSupport(this, component);
       this.m_component = new WeakReference(component);
     }
-
-    /**
-     * Weak reference (suspicion of cyclic reference) to the
-     * <code>{@link JComponent}</code> that is used to adapt basic UI
-     * properties to.
-     */
-    private WeakReference m_component;
 
     /**
      * Returns the adaptee this menu item adapts basic UI properties to if still
@@ -1002,6 +1005,24 @@ public final class LayoutFactory {
   }
 
   /**
+   * Helper that returns the system fonts in the given point size.
+   * 
+   * @param pointSize
+   *          the size for the fonts to return.
+   * 
+   * @return the system fonts in the given point size
+   */
+  private static Font[] getSystemFonts(final float pointSize) {
+
+    Font[] result = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
+    // set to bigger size:
+    for (int i = result.length - 1; i > -1; i--) {
+      result[i] = result[i].deriveFont(pointSize);
+    }
+    return result;
+  }
+
+  /**
    * Boolean flag that controls showing the show grid menu item for the x axis.
    */
   private boolean m_showAxisXGridMenu = true;
@@ -1014,6 +1035,12 @@ public final class LayoutFactory {
    * item on the x axis.
    */
   private boolean m_showAxisXRangePolicyMenu = true;
+
+  /**
+   * Boolean flag that controls showing the title settings submenu for the x
+   * axis.
+   */
+  private boolean m_showAxisXTitleMenu = true;
 
   /** Boolean flag that turns on showing the x axis type menu. */
   private boolean m_showAxisXTypeMenu = true;
@@ -1032,6 +1059,12 @@ public final class LayoutFactory {
    */
   private boolean m_showAxisYRangePolicyMenu = true;
 
+  /**
+   * Boolean flag that controls showing the title settings submenu for the y
+   * axis.
+   */
+  private boolean m_showAxisYTitleMenu = true;
+
   /** Boolean flag that turns on showing the y axis type menu. */
   private boolean m_showAxisYTypeMenu = true;
 
@@ -1041,6 +1074,9 @@ public final class LayoutFactory {
   /** Boolean flag that turns on showing the chart foreground color menu. */
   private boolean m_showChartForegroundMenu = true;
 
+  /** Boolean flag that controls showing the error bar wizard menu for traces. */
+  private boolean m_showErrorBarWizardMenu = true;
+
   /** Boolean flag that turns on showing the grid color menu. */
   private boolean m_showGridColorMenu = true;
 
@@ -1049,9 +1085,6 @@ public final class LayoutFactory {
 
   /** Boolean flag that controls showing the remove trace menu for traces. */
   private boolean m_showRemoveTraceMenu = false;
-
-  /** Boolean flag that controls showing the error bar wizard menu for traces. */
-  private boolean m_showErrorBarWizardMenu = true;
 
   /** Boolean flag that controls showing the save to image menu item. */
   private boolean m_showSaveImageMenu = true;
@@ -1162,6 +1195,10 @@ public final class LayoutFactory {
         item = new JMenuItem(new AxisActionSetRange(chart, "Range", axisDimension));
       }
       axisMenuItem.add(item);
+    }
+    if ((this.m_showAxisXTitleMenu && axisDimension == Chart2D.X)
+        || (this.m_showAxisYTitleMenu && axisDimension == Chart2D.Y)) {
+      axisMenuItem.add(createAxisTitleMenu(chart, axis, axisDimension, adaptUI2Chart));
     }
 
     if ((this.m_showAxisXGridMenu && axisDimension == Chart2D.X) || this.m_showAxisYGridMenu
@@ -1289,6 +1326,74 @@ public final class LayoutFactory {
       buttonGroup.setSelected(item.getModel(), true);
     }
     return axisRangePolicy;
+  }
+
+  /**
+   * Creates a menu for settings related to the axis title of the axis of the
+   * given chart that will be identified by argument <code>axisDimension</code>.
+   * <p>
+   * 
+   * @param axis
+   *          the axis to control.
+   * 
+   * @param axisDimension
+   *          Identifies which dimension the axis controls in the chart: either
+   *          {@link Chart2D#X} or {@link Chart2D#Y}
+   * 
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * 
+   * @param chart
+   *          the component to adapt the UI of this menu if adaption is
+   *          requested.
+   * 
+   * @return a menu for settings related to the axis title of the axis of the
+   *         given chart that will be identified by argument
+   *         <code>axisDimension</code>.
+   */
+  public JMenu createAxisTitleMenu(final Chart2D chart, final IAxis axis, final int axisDimension,
+      final boolean adaptUI2Chart) {
+    // Axis title -> Axis title text
+    JMenu axisTitle;
+    if (adaptUI2Chart) {
+      axisTitle = new PropertyChangeMenu(chart, "Title");
+    } else {
+      axisTitle = new JMenu("Title");
+    }
+
+    JMenuItem item;
+    if (adaptUI2Chart) {
+      item = new PropertyChangeMenuItem(chart,
+          new AxisActionSetTitle(chart, "Title", axisDimension));
+    } else {
+      item = new JMenuItem(new AxisActionSetTitle(chart, "Title", axisDimension));
+    }
+    axisTitle.add(item);
+
+    // Axis title -> Axis title font
+    JMenu axisTitleFont;
+    if (adaptUI2Chart) {
+      axisTitleFont = new PropertyChangeMenu(chart, "Font");
+    } else {
+      axisTitleFont = new JMenu("Font");
+    }
+
+    Font[] fonts = getSystemFonts(14f);
+    for (int i = fonts.length - 1; i > -1; i--) {
+      if (adaptUI2Chart) {
+        item = new OrderingCheckBoxPropertyChangeMenuItem(chart, new AxisActionSetTitleFont(chart,
+            fonts[i].getName(), axisDimension, fonts[i]), axisTitleFont, false);
+      } else {
+        item = new OrderingCheckBoxMenuItem(new AxisActionSetTitleFont(chart, fonts[i].getName(),
+            axisDimension, fonts[i]), axisTitleFont, false);
+      }
+      item.setFont(fonts[i]);
+      axisTitleFont.add(item);
+    }
+    axisTitle.add(axisTitleFont);
+
+    return axisTitle;
   }
 
   /**
@@ -1562,6 +1667,141 @@ public final class LayoutFactory {
     trace.addPropertyChangeListener(ITrace2D.PROPERTY_PHYSICALUNITS, ret);
     chart.addPropertyChangeListener(Chart2D.PROPERTY_FONT, ret);
     return ret;
+  }
+
+  /**
+   * Creates a menu for showing the wizard for the
+   * <code>{@link IErrorBarPolicy}</code> instances of the given trace.
+   * <p>
+   * 
+   * @param chart
+   *          needed to adapt the basic ui properties to (font, foreground
+   *          color, background color).
+   * 
+   * @param trace
+   *          the trace to show the error bar wizards of.
+   * 
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properies (font,
+   *          foreground and background color) to the given chart.
+   * 
+   * @return a menu that offers to show the
+   *         {@link info.monitorenter.gui.chart.controls.errorbarwizard.ErrorBarWizard}
+   *         dialogs for the given trace.
+   */
+  public JMenu createErrorBarWizardMenu(final Chart2D chart, final ITrace2D trace,
+      final boolean adaptUI2Chart) {
+    JMenuItem item;
+    // the edit error bar policy menu
+    JMenu errorBarMenu;
+    if (adaptUI2Chart) {
+      errorBarMenu = new PropertyChangeMenu(chart, "error bar policies");
+    } else {
+      errorBarMenu = new JMenu("error bar policies");
+    }
+
+    // the add action items (allow to add all error bar policies
+    // that are not configured at the moment):
+    JMenu errorBarAddMenu;
+
+    if (adaptUI2Chart) {
+      errorBarAddMenu = new PropertyChangeMenu(chart, "+");
+    } else {
+      errorBarAddMenu = new JMenu("+");
+    }
+    errorBarMenu.add(errorBarAddMenu);
+
+    // the remove action items (allow to remove all error bar policies
+    // that are configured at the moment):
+    JMenu errorBarRemoveMenu;
+
+    if (adaptUI2Chart) {
+      errorBarRemoveMenu = new PropertyChangeMenu(chart, "-");
+    } else {
+      errorBarRemoveMenu = new JMenu("-");
+    }
+    errorBarMenu.add(errorBarRemoveMenu);
+
+    // the edit action items (allow to edit all error bar policies
+    // that are configured at the moment):
+    JMenu erroBarEditMenu;
+    if (adaptUI2Chart) {
+      erroBarEditMenu = new PropertyChangeMenu(chart, "edit");
+    } else {
+      erroBarEditMenu = new JMenu("edit");
+    }
+    errorBarMenu.add(erroBarEditMenu);
+
+    // creating groups for the special add / remove item
+    // handling:
+    List group1 = new LinkedList();
+    group1.add(erroBarEditMenu);
+    group1.add(errorBarRemoveMenu);
+    List group2 = new LinkedList();
+    group2.add(errorBarAddMenu);
+
+    // set of all error bar policies available, needed for finding
+    // addable / removable error bar policies.
+    Set allErrorBarPolicies = new TreeSet();
+    allErrorBarPolicies.add(new ErrorBarPolicyRelative(0.02, 0.02));
+    allErrorBarPolicies.add(new ErrorBarPolicyAbsoluteSummation(4, 4));
+
+    // the edit action items (show wizard for existing error bar policies):
+    Set errorBarPolicies = trace.getErrorBarPolicies();
+    Iterator itErrorBarPolicies = errorBarPolicies.iterator();
+    IErrorBarPolicy errorBarPolicy;
+    while (itErrorBarPolicies.hasNext()) {
+      errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
+      if (adaptUI2Chart) {
+        item = new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(trace,
+            errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
+            errorBarRemoveMenu, erroBarEditMenu));
+      } else {
+        item = new JMenuItem(new ErrorBarPolicyMultiAction(trace, errorBarPolicy.getClass()
+            .getName(), errorBarPolicy, errorBarAddMenu, errorBarRemoveMenu, erroBarEditMenu));
+      }
+      erroBarEditMenu.add(item);
+    }
+
+    // find the error bar policies to add:
+    Set addableErrorBarPolicies = new TreeSet(allErrorBarPolicies);
+    itErrorBarPolicies = errorBarPolicies.iterator();
+    while (itErrorBarPolicies.hasNext()) {
+      addableErrorBarPolicies.remove(itErrorBarPolicies.next());
+    }
+    // now add them:
+    itErrorBarPolicies = addableErrorBarPolicies.iterator();
+
+    while (itErrorBarPolicies.hasNext()) {
+      errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
+      if (adaptUI2Chart) {
+        errorBarAddMenu.add(new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(trace,
+            errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
+            errorBarRemoveMenu, erroBarEditMenu)));
+
+      } else {
+        errorBarAddMenu.add(new JMenuItem(new ErrorBarPolicyMultiAction(trace, errorBarPolicy
+            .getClass().getName(), errorBarPolicy, errorBarAddMenu, errorBarRemoveMenu,
+            erroBarEditMenu)));
+      }
+    }
+
+    // the error bar policies to remove
+    itErrorBarPolicies = errorBarPolicies.iterator();
+    while (itErrorBarPolicies.hasNext()) {
+      errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
+      if (adaptUI2Chart) {
+        errorBarRemoveMenu.add(new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(
+            trace, errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
+            errorBarRemoveMenu, erroBarEditMenu)));
+      } else {
+        errorBarRemoveMenu.add(new JMenuItem(new ErrorBarPolicyMultiAction(trace, errorBarPolicy
+            .getClass().getName(), errorBarPolicy, errorBarAddMenu, errorBarRemoveMenu,
+            erroBarEditMenu)));
+      }
+    }
+
+    return errorBarMenu;
   }
 
   /**
@@ -2098,142 +2338,6 @@ public final class LayoutFactory {
     }
 
     return painterMenu;
-  }
-
-  /**
-   * Creates a menu for showing the wizard for the
-   * <code>{@link IErrorBarPolicy}</code> instances of the given trace.
-   * <p>
-   * 
-   * @param chart
-   *          needed to adapt the basic ui properties to (font, foreground
-   *          color, background color).
-   * 
-   * @param trace
-   *          the trace to show the error bar wizards of.
-   * 
-   * @param adaptUI2Chart
-   *          if true the menu will adapt it's basic UI properies (font,
-   *          foreground and background color) to the given chart.
-   * 
-   * @return a menu that offers to show the
-   *         {@link info.monitorenter.gui.chart.controls.errorbarwizard.ErrorBarWizard}
-   *         dialogs for the given trace.
-   */
-  public JMenu createErrorBarWizardMenu(final Chart2D chart, final ITrace2D trace,
-      final boolean adaptUI2Chart) {
-    JMenuItem item;
-    // the edit error bar policy menu
-    JMenu errorBarMenu;
-    if (adaptUI2Chart) {
-      errorBarMenu = new PropertyChangeMenu(chart, "error bar policies");
-    } else {
-      errorBarMenu = new JMenu("error bar policies");
-    }
-
-    // the add action items (allow to add all error bar policies
-    // that are not configured at the moment):
-    JMenu errorBarAddMenu;
-
-    if (adaptUI2Chart) {
-      errorBarAddMenu = new PropertyChangeMenu(chart, "+");
-    } else {
-      errorBarAddMenu = new JMenu("+");
-    }
-    errorBarMenu.add(errorBarAddMenu);
-
-    // the remove action items (allow to remove all error bar policies
-    // that are configured at the moment):
-    JMenu errorBarRemoveMenu;
-
-    if (adaptUI2Chart) {
-      errorBarRemoveMenu = new PropertyChangeMenu(chart, "-");
-    } else {
-      errorBarRemoveMenu = new JMenu("-");
-    }
-    errorBarMenu.add(errorBarRemoveMenu);
-
-    // the edit action items (allow to edit all error bar policies 
-    // that are configured at the moment): 
-    JMenu erroBarEditMenu;
-    if (adaptUI2Chart) {
-      erroBarEditMenu = new PropertyChangeMenu(chart, "edit");
-    } else {
-      erroBarEditMenu = new JMenu("edit");
-    }
-    errorBarMenu.add(erroBarEditMenu);
- 
-    
-    // creating groups for the special add / remove item
-    // handling:
-    List group1 = new LinkedList();
-    group1.add(erroBarEditMenu);
-    group1.add(errorBarRemoveMenu);
-    List group2 = new LinkedList();
-    group2.add(errorBarAddMenu);
-
-    // set of all error bar policies available, needed for finding
-    // addable / removable error bar policies.
-    Set allErrorBarPolicies = new TreeSet();
-    allErrorBarPolicies.add(new ErrorBarPolicyRelative(0.02, 0.02));
-    allErrorBarPolicies.add(new ErrorBarPolicyAbsoluteSummation(4, 4));
-
-    // the edit action items (show wizard for existing error bar policies):
-    Set errorBarPolicies = trace.getErrorBarPolicies();
-    Iterator itErrorBarPolicies = errorBarPolicies.iterator();
-    IErrorBarPolicy errorBarPolicy;
-    while (itErrorBarPolicies.hasNext()) {
-      errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
-      if (adaptUI2Chart) {
-        item = new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(trace,
-            errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
-            errorBarRemoveMenu, erroBarEditMenu));
-      } else {
-        item = new JMenuItem(new ErrorBarPolicyMultiAction(trace, errorBarPolicy.getClass()
-            .getName(), errorBarPolicy, errorBarAddMenu, errorBarRemoveMenu, erroBarEditMenu));
-      }
-      erroBarEditMenu.add(item);
-    }
-
-    // find the error bar policies to add:
-    Set addableErrorBarPolicies = new TreeSet(allErrorBarPolicies);
-    itErrorBarPolicies = errorBarPolicies.iterator();
-    while (itErrorBarPolicies.hasNext()) {
-      addableErrorBarPolicies.remove(itErrorBarPolicies.next());
-    }
-    // now add them:
-    itErrorBarPolicies = addableErrorBarPolicies.iterator();
-
-    while (itErrorBarPolicies.hasNext()) {
-      errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
-      if (adaptUI2Chart) {
-        errorBarAddMenu.add(new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(trace,
-            errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
-            errorBarRemoveMenu, erroBarEditMenu)));
-
-      } else {
-        errorBarAddMenu.add(new JMenuItem(new ErrorBarPolicyMultiAction(trace, errorBarPolicy
-            .getClass().getName(), errorBarPolicy, errorBarAddMenu, errorBarRemoveMenu,
-            erroBarEditMenu)));
-      }
-    }
-
-    // the error bar policies to remove
-    itErrorBarPolicies = errorBarPolicies.iterator();
-    while (itErrorBarPolicies.hasNext()) {
-      errorBarPolicy = (IErrorBarPolicy) itErrorBarPolicies.next();
-      if (adaptUI2Chart) {
-        errorBarRemoveMenu.add(new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(
-            trace, errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
-            errorBarRemoveMenu, erroBarEditMenu)));
-      } else {
-        errorBarRemoveMenu.add(new JMenuItem(new ErrorBarPolicyMultiAction(trace, errorBarPolicy
-            .getClass().getName(), errorBarPolicy, errorBarAddMenu, errorBarRemoveMenu,
-            erroBarEditMenu)));
-      }
-    }
-
-    return errorBarMenu;
   }
 
   /**

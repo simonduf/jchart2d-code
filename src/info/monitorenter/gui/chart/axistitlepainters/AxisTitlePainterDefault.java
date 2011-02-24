@@ -32,6 +32,9 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 /**
  * An <code>{@link IAxisTitlePainter}</code> implementation that will render
@@ -44,12 +47,38 @@ import java.awt.geom.Rectangle2D;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.6 $
  */
 public class AxisTitlePainterDefault implements IAxisTitlePainter {
 
+  /** Internal support for property change management.*/
+  private PropertyChangeSupport m_propertyChangeSupport = new PropertyChangeSupport(this);
+
   /** the font to use for painting the title. */
   private Font m_titleFont;
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxisTitlePainter#addPropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)
+   */
+  public void addPropertyChangeListener(final String propertyName,
+      final PropertyChangeListener listener) {
+    this.m_propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxisTitlePainter#getPropertyChangeListeners(java.lang.String)
+   */
+  public PropertyChangeListener[] getPropertyChangeListeners(final String propertyName) {
+    return this.m_propertyChangeSupport.getPropertyChangeListeners(propertyName);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxisTitlePainter#removePropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)
+   */
+  public void removePropertyChangeListener(final String property,
+      final PropertyChangeListener listener) {
+    this.m_propertyChangeSupport.removePropertyChangeListener(property, listener);
+  }
 
   /**
    * Defcon.
@@ -151,7 +180,7 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
         int startX = chart.getXChartStart();
         int endX = chart.getXChartEnd();
         double xspace = bounds.getWidth();
-        int titleStartX = (int) ((endX - startX) / 2 - xspace / 2);
+        int titleStartX = (int) ((endX - startX) / 2.0 - xspace / 2.0);
         int xTickAndLabelHeight = chart.getAxisTickPainter().getMajorTickLength();
         if (chart.isPaintLabels()) {
           xTickAndLabelHeight += chart.getFontMetrics(chart.getFont()).getHeight();
@@ -162,7 +191,7 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
         int startY = chart.getYChartStart();
         int endY = chart.getYChartEnd();
         double yspace = bounds.getWidth();
-        int titleStartY = (int) ((startY - endY) / 2 + yspace / 2);
+        int titleStartY = (int) ((startY - endY) / 2.0 + yspace / 2.0);
         AffineTransform tr = g.getTransform();
         AffineTransform at = AffineTransform.getTranslateInstance(10, titleStartY);
         at.rotate(-Math.PI / 2);
@@ -185,6 +214,9 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
    * @see info.monitorenter.gui.chart.IAxisTitlePainter#setTitleFont(java.awt.Font)
    */
   public final void setTitleFont(final Font titleFont) {
+    PropertyChangeEvent evt = new PropertyChangeEvent(this, IAxisTitlePainter.PROPERTY_TITLEFONT,
+        this.m_titleFont, titleFont);
     this.m_titleFont = titleFont;
+    this.m_propertyChangeSupport.firePropertyChange(evt);
   }
 }

@@ -28,14 +28,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
- * <p>
  * A basic <code>{@link info.monitorenter.gui.chart.ITrace2D}</code>
  * implementation that stores the internal
  * <code>{@link info.monitorenter.gui.chart.TracePoint2D}</code> instances in
  * a <code>{@link java.util.List}</code>.
- * </p>
- * <p>
- * </p>
  * <p>
  * This class has the following behaviour: <br>
  * <ul>
@@ -46,14 +42,18 @@ import java.util.LinkedList;
  * it is ok - the old point may remain. (no bijective assigement of X and Y)
  * </li>
  * </ul>
- * </p>
+ * <p>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.7 $
  */
-public class Trace2DSimple extends ATrace2D implements ITrace2D {
+public class Trace2DSimple
+    extends ATrace2D implements ITrace2D {
 
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -132333501493433766L;
+  
   /** Internal List &lt;ITracePoint2D&gt;. */
   protected LinkedList m_points = new LinkedList();
 

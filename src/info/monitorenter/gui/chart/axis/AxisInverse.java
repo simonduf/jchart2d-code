@@ -47,11 +47,14 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  *         (adaption for core)
  * 
- * @version $Revision: 1.6 $
+ * @version $Revision: 1.9 $
  */
 
 public class AxisInverse
     extends AAxis {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -1688970969107347292L;
 
   /**
    * 
@@ -91,7 +94,7 @@ public class AxisInverse
           point = (TracePoint2D) itPoints.next();
           double absolute = point.getX();
           double result = 1 - ((absolute - range.getMin()) / scaler);
-          if (result == Double.NaN || Double.isInfinite(result)) {
+          if (Double.isNaN(result) || Double.isInfinite(result)) {
             result = 0;
           }
           point.m_scaledX = result;
@@ -102,7 +105,7 @@ public class AxisInverse
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translatePxToValue(int)
      */
-    protected double translatePxToValue(final int pixel) {
+    public double translatePxToValue(final int pixel) {
       double result = 0;
 
       // relate to the offset:
@@ -122,7 +125,7 @@ public class AxisInverse
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateValueToPx(double)
      */
-    protected int translateValueToPx(final double value) {
+    public int translateValueToPx(final double value) {
 
       int result = 0;
       // first normalize to [00.0..1.0]
@@ -142,6 +145,7 @@ public class AxisInverse
     }
 
   }
+
   /**
    * Accesses the y axis of the {@link Chart2D}.
    * <p>
@@ -178,7 +182,7 @@ public class AxisInverse
           point = (TracePoint2D) itPoints.next();
           double absolute = point.getY();
           double result = 1 - ((absolute - range.getMin()) / scaler);
-          if (result == Double.NaN || Double.isInfinite(result)) {
+          if (Double.isNaN(result) || Double.isInfinite(result)) {
             result = 0;
           }
           point.m_scaledY = result;
@@ -189,7 +193,7 @@ public class AxisInverse
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translatePxToValue(int)
      */
-    protected double translatePxToValue(final int pixel) {
+    public double translatePxToValue(final int pixel) {
       double result = 0;
       // invert, as awt px are higher the lower the chart value is:
       double px = this.m_chart.getYChartStart() - pixel;
@@ -208,7 +212,7 @@ public class AxisInverse
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateValueToPx(double)
      */
-    protected int translateValueToPx(final double value) {
+    public int translateValueToPx(final double value) {
       int result = 0;
       // first normalize to [00.0..1.0]
       double valueNormalized;
@@ -220,11 +224,11 @@ public class AxisInverse
       if (rangeY == 0) {
         // return null
       } else {
-        result = (int) (this.m_chart.getYChartStart() - valueNormalized * rangeY);
+        result = (int) Math.round(this.m_chart.getYChartStart() - valueNormalized * rangeY);
       }
       return result;
     }
-  } 
+  }
 
   /**
    * Defcon.
@@ -237,10 +241,10 @@ public class AxisInverse
   /**
    * Constructor that uses the given label formatter for formatting labels.
    * <p>
-   *
+   * 
    * @param formatter
    *          needed for formatting labels of this axis.
-   *
+   * 
    */
   public AxisInverse(final IAxisLabelFormatter formatter) {
     super(formatter);
@@ -293,7 +297,7 @@ public class AxisInverse
     Range range = this.getRange();
     double scalerX = range.getExtent();
     double result = 1 - ((absolute - range.getMin()) / scalerX);
-    if (result == Double.NaN || Double.isInfinite(result)) {
+    if (Double.isNaN(result) || Double.isInfinite(result)) {
       result = 0;
     }
     return result;

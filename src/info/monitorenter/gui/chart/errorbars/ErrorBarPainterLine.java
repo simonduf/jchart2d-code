@@ -31,10 +31,13 @@ import info.monitorenter.gui.chart.pointpainters.PointPainterLine;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public class ErrorBarPainterLine
     extends ErrorBarPainter {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -7877672177550520292L;
 
   /**
    * Defcon.

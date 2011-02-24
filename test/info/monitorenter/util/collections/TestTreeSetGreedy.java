@@ -51,10 +51,13 @@ public class TestTreeSetGreedy
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.4 $
+   * @version $Revision: 1.5 $
    */
   final class Element implements IComparableProperty {
 
+    /** Generated <code>serialVersionUID</code>. */
+    private static final long serialVersionUID = -615304987571740852L;
+    
     /** The internal comparable. */
     private Number m_compare = new Integer(ITrace2D.ZINDEX_MAX);
 
@@ -467,7 +470,7 @@ public class TestTreeSetGreedy
      * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
      * 
      * 
-     * @version $Revision: 1.4 $
+     * @version $Revision: 1.5 $
      */
     class TreeSetGreedyAddRemover
         extends Thread {

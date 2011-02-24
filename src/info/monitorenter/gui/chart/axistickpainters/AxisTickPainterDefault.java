@@ -34,10 +34,13 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  * 
  */
 public class AxisTickPainterDefault implements IAxisTickPainter {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 4182009686170740710L;
 
   /** The length of a major tick in pixel. */
   private static final int MAJOR_TICK_LENGTH = 5;

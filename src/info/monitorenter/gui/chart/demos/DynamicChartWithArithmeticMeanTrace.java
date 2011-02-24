@@ -33,6 +33,7 @@ import info.monitorenter.gui.chart.labelformatters.LabelFormatterDate;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.gui.chart.traces.computing.Trace2DArithmeticMean;
 import info.monitorenter.gui.chart.traces.painters.TracePainterDisc;
+import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
@@ -67,12 +68,12 @@ public final class DynamicChartWithArithmeticMeanTrace {
 
     // Create an ITrace:
     // Note that dynamic charts need limited amount of values!!!
-    ITrace2D trace = new Trace2DLtd(200);
+    ITrace2D trace = new Trace2DLtd(600);
     trace.setColor(Color.RED);
     trace.setTracePainter(new TracePainterDisc(4));
 
     // Create an arithmetic mean trace.
-    ITrace2D traceArithmeticMean = new Trace2DArithmeticMean(20);
+    ITrace2D traceArithmeticMean = new Trace2DArithmeticMean(200);
     // hook it to the initial trace:
     trace.addComputingTrace(traceArithmeticMean);
 
@@ -86,7 +87,7 @@ public final class DynamicChartWithArithmeticMeanTrace {
     // Create a frame.
     JFrame frame = new JFrame("DynamicChart with arithmetic mean");
     // add the chart to the frame:
-    frame.getContentPane().add(chart);
+    frame.getContentPane().add(new ChartPanel(chart));
     frame.setSize(600, 300);
     // Enable the termination button [cross on the upper right edge]:
     frame.addWindowListener(new WindowAdapter() {

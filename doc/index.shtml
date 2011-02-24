@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-  var update="2/2/2005";
+  var update="16/09/2007";
  </script>
  <body id="home" >
   <div id="wrapper">
@@ -53,7 +53,7 @@
     
     <h2>Latest News</h2>
      <p>
-      The news are exported as a daily cronjob, so it might take a day before changes 
+      The news are exported as a weekly cronjob, so it might take a day before changes 
       are reflected.<br>
       Last retrieval:  <!--#flastmod file="./projnews.cache" -->.
      </p>

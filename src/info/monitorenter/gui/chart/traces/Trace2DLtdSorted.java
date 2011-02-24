@@ -38,10 +38,13 @@ import info.monitorenter.gui.chart.TracePoint2D;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public class Trace2DLtdSorted extends Trace2DSorted {
 
+  /** Generated <code>serialVersionUID</code>. */
+  
+  private static final long serialVersionUID = 427790610937808181L;
   /** The maximum amount of points that will be shown. */
   protected int m_maxsize;
 

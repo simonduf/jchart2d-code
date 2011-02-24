@@ -21,6 +21,9 @@
  *
  */
 package info.monitorenter.util.collections;
+
+import java.io.Serializable;
+
 /**
  * An interface that allows implementors to let themselves be compared by a
  * <code>Comparable</code> {@link java.lang.Number} instance that may be
@@ -47,11 +50,11 @@ package info.monitorenter.util.collections;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  *
  */
 
-public interface IComparableProperty {
+public interface IComparableProperty extends Serializable {
 
   /**
    * Returns a {@link Number} this instance wants to be compared by.

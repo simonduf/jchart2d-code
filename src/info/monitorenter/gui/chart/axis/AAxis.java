@@ -61,9 +61,20 @@ import java.util.LinkedList;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.23 $
+ * @version $Revision: 1.28 $
  */
-public abstract class AAxis implements IAxis {
+public abstract class AAxis implements IAxis, PropertyChangeListener {
+
+  /**
+   * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+   */
+  public final void propertyChange(final PropertyChangeEvent evt) {
+    if (IAxisTitlePainter.PROPERTY_TITLEFONT.equals(evt.getPropertyName())) {
+      this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this,
+          IAxis.PROPERTY_TITLEFONT, evt.getOldValue(), evt.getNewValue()));
+    }
+  }
+
   /**
    * An internal connector class that will connect the axis to the a Chart2D.
    * <p>
@@ -332,7 +343,7 @@ public abstract class AAxis implements IAxis {
      * 
      * @param mouseEvent
      *          a mouse event that has been fired on this component.
-     *          
+     * 
      * @return the translation of the mouse event coordinates of the given mouse
      *         event to the value within the chart for the dimension covered by
      *         this axis (x or y) or null if no calculations could be performed
@@ -362,7 +373,7 @@ public abstract class AAxis implements IAxis {
      * 
      * @return the awt pixel value transformed to the chart value.
      */
-    protected abstract double translatePxToValue(final int pixel);
+    public abstract double translatePxToValue(final int pixel);
 
     /**
      * Transforms the given chart data value into the corresponding awt pixel
@@ -377,7 +388,27 @@ public abstract class AAxis implements IAxis {
      * 
      * @return the awt pixel value corresponding to the chart data value.
      */
-    protected abstract int translateValueToPx(final double value);
+    public abstract int translateValueToPx(final double value);
+
+    /**
+     * Transforms an arbitrary value distance in value space into the
+     * corresponding awt pixel distance value for the chart.
+     * <p>
+     * 
+     * Compared to <code>{@link #translateValueToPx(double)}</code> the given
+     * value is not interpreted to be an absolute point within the value bounds
+     * (a data point) but just taken as a distance in value space. The same goes
+     * for the result: It is not an absolute pixel coordinate of the chart but
+     * just the corresponding distance in pixel.
+     * <p>
+     * 
+     * @param distance
+     *          a value distance.
+     * 
+     * @return the awt pixel distance corresponding to the chart data value
+     *         distance.
+     */
+    public abstract int translateRelativeValueToPx(final double distance);
   }
 
   /**
@@ -551,7 +582,7 @@ public abstract class AAxis implements IAxis {
           point = (TracePoint2D) itPoints.next();
           double absolute = point.getX();
           double result = (absolute - range.getMin()) / scaler;
-          if (result == Double.NaN || Double.isInfinite(result)) {
+          if (Double.isNaN(result) || Double.isInfinite(result)) {
             result = 0;
           }
           point.m_scaledX = result;
@@ -580,7 +611,7 @@ public abstract class AAxis implements IAxis {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translatePxToValue(int)
      */
-    protected double translatePxToValue(final int pixel) {
+    public double translatePxToValue(final int pixel) {
       double result = 0;
       // relate to the offset:
       double px = pixel - this.m_chart.getXChartStart();
@@ -599,7 +630,7 @@ public abstract class AAxis implements IAxis {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateValueToPx(double)
      */
-    protected int translateValueToPx(final double value) {
+    public int translateValueToPx(final double value) {
       int result = 0;
       // first normalize to [00.0..1.0]
       double valueNormalized;
@@ -616,13 +647,35 @@ public abstract class AAxis implements IAxis {
       }
       return result;
     }
+
+    /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateRelativeValueToPx(double)
+     */
+    public int translateRelativeValueToPx(final double distance) {
+      int result = 0;
+      // first normalize to [00.0..1.0]
+      double valueNormalized;
+      // the same as AAxis.this.getRange().getExtend()
+      double valueRange = this.getMax() - this.getMin();
+      valueNormalized = distance / valueRange;
+      // no expand into the pixelspace:
+      int rangeX = this.m_chart.getXChartEnd() - this.m_chart.getXChartStart();
+      if (rangeX == 0) {
+        // return null
+      } else {
+        double tmpResult = valueNormalized * rangeX;
+        result = (int) Math.round(tmpResult);
+      }
+      return result;
+    }
+
   }
 
   /**
    * Accesses the y axis of the {@link Chart2D}.
    * <p>
    * 
-   * @see AAxis#setAccessor(AChart2DDataAccessor)
+   * @see AAxis#setAccessor(info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor)
    * 
    * @see Chart2D#getAxisY()
    */
@@ -788,7 +841,7 @@ public abstract class AAxis implements IAxis {
           point = (TracePoint2D) itPoints.next();
           double absolute = point.getY();
           double result = (absolute - range.getMin()) / scaler;
-          if (result == Double.NaN || Double.isInfinite(result)) {
+          if (Double.isNaN(result) || Double.isInfinite(result)) {
             result = 0;
           }
           point.m_scaledY = result;
@@ -818,7 +871,7 @@ public abstract class AAxis implements IAxis {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translatePxToValue(int)
      */
-    protected double translatePxToValue(final int pixel) {
+    public double translatePxToValue(final int pixel) {
       double result = 0;
       // invert, as awt px are higher the lower the chart value is:
       double px = this.m_chart.getYChartStart() - pixel;
@@ -837,22 +890,43 @@ public abstract class AAxis implements IAxis {
     /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateValueToPx(double)
      */
-    protected int translateValueToPx(final double value) {
+    public int translateValueToPx(final double value) {
       int result = 0;
       // first normalize to [00.0..1.0]
       double valueNormalized;
       // the same as AAxis.this.getRange().getExtend()
       double valueRange = this.getMax() - this.getMin();
       valueNormalized = (value - this.getMin()) / valueRange;
-      // no expand into the pixelspace:
+      // now expand into the pixelspace:
       int rangeY = this.m_chart.getYChartStart() - this.m_chart.getYChartEnd();
       if (rangeY == 0) {
         // return null
       } else {
-        result = (int) (this.m_chart.getYChartStart() - valueNormalized * rangeY);
+        result = (int) Math.round(this.m_chart.getYChartStart() - valueNormalized * rangeY);
       }
       return result;
     }
+
+    /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateRelativeValueToPx(double)
+     */
+    public int translateRelativeValueToPx(final double distance) {
+      int result = 0;
+      // first normalize to [00.0..1.0]
+      double valueNormalized;
+      // the same as AAxis.this.getRange().getExtend()
+      double valueRange = this.getMax() - this.getMin();
+      valueNormalized = distance / valueRange;
+      // now expand into the pixelspace:
+      int rangeY = this.m_chart.getYChartStart() - this.m_chart.getYChartEnd();
+      if (rangeY == 0) {
+        // return null
+      } else {
+        result = (int) Math.round(valueNormalized * rangeY);
+      }
+      return result;
+    }
+
   }
 
   /** Debugging flag for sysouts. */
@@ -920,7 +994,7 @@ public abstract class AAxis implements IAxis {
    * The painter of the title of this axis, by default
    * <code>{@link AxisTitlePainterDefault}</code>.
    */
-  private IAxisTitlePainter m_titlePainter = new AxisTitlePainterDefault();
+  private IAxisTitlePainter m_titlePainter;
 
   /**
    * Default constructor that uses a {@link LabelFormatterAutoUnits} for
@@ -943,6 +1017,7 @@ public abstract class AAxis implements IAxis {
   public AAxis(final IAxisLabelFormatter formatter) {
     this.m_propertyChangeSupport = new PropertyChangeSupport(this);
     this.setFormatter(formatter);
+    this.setTitlePainter(new AxisTitlePainterDefault());
 
   }
 
@@ -1380,7 +1455,7 @@ public abstract class AAxis implements IAxis {
   public void replace(final IAxis axis) {
     if (axis != null) {
 
-      // No go for listeners:
+      // Now go for listeners:
       // TODO: keep in track with evolving IAxis properties!
       PropertyChangeListener[] propertyChangeListeners = axis
           .getPropertyChangeListeners(IAxis.PROPERTY_PAINTGRID);
@@ -1454,7 +1529,7 @@ public abstract class AAxis implements IAxis {
     double majorDistance = Math.abs(value - majorRound);
 
     double majorMinorRelation = minorDistance / majorDistance;
-    if (majorMinorRelation == Double.NaN) {
+    if (Double.isNaN(majorMinorRelation)) {
       majorMinorRelation = 1.0;
     }
 
@@ -1631,14 +1706,11 @@ public abstract class AAxis implements IAxis {
     boolean oldValue = this.m_paintGrid;
     this.m_paintGrid = grid;
     if (oldValue != grid) {
-
-      Chart2D chart2D = this.getAccessor().getChart();
       if (grid) {
         this.setPaintScale(true);
       }
       this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this,
-          IAxis.PROPERTY_PAINTGRID, new Boolean(oldValue), new Boolean(this.m_paintGrid)));
-      chart2D.repaint(200);
+          IAxis.PROPERTY_PAINTGRID, new Boolean(oldValue), Boolean.valueOf(this.m_paintGrid)));
     }
   }
 
@@ -1719,6 +1791,8 @@ public abstract class AAxis implements IAxis {
   public final String setTitle(final String title) {
     String result = this.m_title;
     this.m_title = title;
+    this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this,
+        IAxis.PROPERTY_TITLE, result, title));
     return result;
   }
 
@@ -1731,7 +1805,17 @@ public abstract class AAxis implements IAxis {
    */
   public final IAxisTitlePainter setTitlePainter(final IAxisTitlePainter painter) {
     IAxisTitlePainter result = this.m_titlePainter;
+    if (result != null) {
+      // remove me as listener:
+      result.removePropertyChangeListener(IAxisTitlePainter.PROPERTY_TITLEFONT, this);
+    }
     this.m_titlePainter = painter;
+    if (this.m_titlePainter != null) {
+      // remove me as listener:
+      this.m_titlePainter.addPropertyChangeListener(IAxisTitlePainter.PROPERTY_TITLEFONT, this);
+    }
+    this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this,
+        IAxis.PROPERTY_TITLEPAINTER, result, painter));
     return result;
   }
 
@@ -1772,6 +1856,13 @@ public abstract class AAxis implements IAxis {
    */
   public int translateValueToPx(final double value) {
     return this.m_accessor.translateValueToPx(value);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#translateRelativeValueToPx(double)
+   */
+  public int translateRelativeValueToPx(final double distance) {
+    return this.m_accessor.translateRelativeValueToPx(distance);
   }
 
 }

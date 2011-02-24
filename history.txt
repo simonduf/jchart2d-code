@@ -1,7 +1,7 @@
 /*
  * File   : $Source: /cvsroot/jchart2d/jchart2d/history.txt,v $
- * Date   : $Date: 2007/09/16 08:25:09 $
- * Version: $Revision: 1.113 $
+ * Date   : $Date: 2007/10/23 06:16:48 $
+ * Version: $Revision: 1.125 $
  *
  * This file is part of jchart2d -
  * the Open Source real time charting library.
@@ -21,6 +21,31 @@ Legend:
 o API change that requires refactoring. 
   Note that refactoring of protected code intended for library 
   internal details will not be listed.
+
+
+jchart2d-2.2.1 - October, 22nd, 2007
+
+* Fixed bug that prevented repainting when points are added / changed 
+  that do not change bounds and no UI interaction has taken place. 
+! Removed internal Painter Thread for faster UI updates and increased stability. 
+* Fixed unreported bug with error bars exceeding drawing area in zoomed mode 
+  of ZoomableChart.   
+* Fixed bug related to zooming with ZoomableChart that uses at least one 
+  AxisTransformation subtype (reported and fixed by Andrea Plotegher). 
+* Fixed performance bug: Each error bar was painted / calculated twice per frame. 
+* Fixed bug with wrong errorbars when using AAxisTransformation subclasses as axis. 
+  This was a serious rounding issue and is fixed by a redesign: Transformation of 
+  pixel to value and to pixel again for error bars was dropped, so performance 
+  has increased too. 
+! Switched to proguard version 4.0: Binary distribution is a bit smaller. 
+! Added test case for bug report #1803342: Deadlock into Chard2D.paint: Succeeds. 
+! Started to use findbugs. 
+* Fixed bug #1814786: Lowering maximum via TracePoint2D.setLocation fails 
+  by contribution of Gerald Struck (tankex). 
+* Fixed unreported bug with modal dialogs dropping behind if main window 
+  is minimized and then maximized again. 
+! New UI action for setting titles of axis. 
+! New UI action for setting title fonts of axis. 
 
 jchart2d-2.2.0 - September, 16th, 2007
 

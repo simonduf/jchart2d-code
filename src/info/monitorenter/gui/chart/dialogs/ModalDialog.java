@@ -39,8 +39,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 
 /**
  * Class for modal dialogs with ok and cancel buttons.
@@ -59,12 +60,43 @@ import javax.swing.JPanel;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class ModalDialog
     extends JDialog {
+  
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 6915311633181971117L;
+
+  /**
+   * Finds the frame of the given component that may be contained in a
+   * <code>{@link JDialog}</code> with support for modal dialogs that are
+   * launched from <code>{@link JPopupMenu}</code> instances.
+   * <p>
+   * This also works for nested <code>{@link javax.swing.JMenu}</code> /
+   * <code>{@link javax.swing.JMenuItem}</code> trees. 
+   * <p>
+   * 
+   * @param component
+   *          the component to find the master the JFrame of.
+   *          
+   * @return the frame of the given component that may be contained in a
+   *         <code>{@link JDialog}</code> with support for modal dialogs that
+   *         are launched from <code>{@link JPopupMenu}</code> instances.
+   */
+  public static JFrame getFrame(final Component component) {
+
+    Component comp = component;
+    if (comp instanceof JFrame) {
+      return (JFrame) comp;
+    }
+    if (component instanceof JPopupMenu) {
+      comp = ((JPopupMenu) component).getInvoker();
+    } else {
+      comp = component.getParent();
+    }
+    return getFrame(comp);
+  }
 
   /** The ui controls and model to interact with. */
   private JComponent m_chooserPanel;
@@ -88,9 +120,19 @@ public class ModalDialog
    */
   public ModalDialog(final Component dialogParent, final String title,
       final JComponent controlComponent) {
-    super(JOptionPane.getFrameForComponent(dialogParent), title, true);
+    super(getFrame(dialogParent), title, true);
     this.m_chooserPanel = controlComponent;
 
+    // Frame parent = getFrame(dialogParent);
+    // parent.addWindowStateListener(new WindowStateListener() {
+    // public void windowStateChanged(final WindowEvent e) {
+    // System.out.println("State of window " + e.getSource() + " changed: " +
+    // e);
+    //
+    // }
+    // }
+    //
+    // );
     Container contentPane = this.getContentPane();
     contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
     contentPane.add(this.m_chooserPanel);
@@ -102,6 +144,7 @@ public class ModalDialog
         w.setVisible(false);
       }
     });
+    // Close this Modal dialog:
     this.addComponentListener(new ComponentAdapter() {
       public void componentHidden(final ComponentEvent e) {
         Window w = (Window) e.getComponent();

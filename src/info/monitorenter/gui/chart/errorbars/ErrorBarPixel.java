@@ -1,6 +1,5 @@
 /*
- *  ErrorBarPixel.java of project jchart2d, an implementation that 
- *  transform error bar values to pixels.
+ *  ErrorBarPixel.java of project jchart2d, a plain data container implementation. 
  *  Copyright (c) 2007 Achim Westermann, created on 02.10.2006 08:21:35.
  *
  *  This library is free software; you can redistribute it and/or
@@ -23,41 +22,30 @@
 package info.monitorenter.gui.chart.errorbars;
 
 import info.monitorenter.gui.chart.IErrorBarPixel;
-import info.monitorenter.gui.chart.IErrorBarValue;
 import info.monitorenter.gui.chart.ITrace2D;
 
 /**
- * Implementation that works upon delegating getters to a wrapped
- * {@link info.monitorenter.gui.chart.IErrorBarValue} enriched by transformation
- * methods from value domain to pixel domain.
- * <p>
- * For performance reason it is not recommended to create a new instance for
- * each error bar value to transform but reuse this instance and invoke the
- * setter for the error bar value.
+ * Straight forward dumb data container implementation.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.4 $
  */
 public class ErrorBarPixel implements IErrorBarPixel {
 
-  /**
-   * Creates a trace that transform the wrapped {@link IErrorBarValue} (which is
-   * still null after this instantiation) based upon the chart of the given
-   * trace.
-   * <p>
-   * 
-   * @param trace
-   *          required for transformation.
-   * 
-   * @see #setTrace(ITrace2D)
-   * @see #setValue(IErrorBarValue)
-   */
-  protected ErrorBarPixel(final ITrace2D trace) {
-    this.m_trace = trace;
-  }
+  /** The negative x error in pixel. */
+  private int m_negativeXErrorPixel = ERROR_PIXEL_NONE;
+
+  /** The negative y error in pixel. */
+  private int m_negativeYErrorPixel = ERROR_PIXEL_NONE;
+
+  /** The positive x error in pixel. */
+  private int m_positiveXErrorPixel = ERROR_PIXEL_NONE;
+
+  /** The positive y error in pixel. */
+  private int m_positiveYErrorPixel = ERROR_PIXEL_NONE;
 
   /**
    * The trace the corresponding
@@ -69,62 +57,110 @@ public class ErrorBarPixel implements IErrorBarPixel {
    */
   private ITrace2D m_trace;
 
-  /** The value to transform. */
-  private IErrorBarValue m_value;
+  /**
+   * Creates an instance backed by the given trace. 
+   * <p>
+   * 
+   * @param trace
+   *          required for transformation.
+   * 
+   * @see #setTrace(ITrace2D)
+   */
+  public ErrorBarPixel(final ITrace2D trace) {
+    this.m_trace = trace;
+  }
+
+  /**
+   * Convenience method for clearing this error bar making it available for new
+   * configuration.
+   * <p>
+   * All errors are set to {@link #ERROR_PIXEL_NONE} afterwards.
+   * <p>
+   */
+  public void clear() {
+    this.m_negativeXErrorPixel = ERROR_PIXEL_NONE;
+    this.m_negativeYErrorPixel = ERROR_PIXEL_NONE;
+    this.m_positiveXErrorPixel = ERROR_PIXEL_NONE;
+    this.m_positiveYErrorPixel = ERROR_PIXEL_NONE;
+  }
 
   /**
    * @see info.monitorenter.gui.chart.IErrorBarPixel#getNegativeXErrorPixel()
    */
   public int getNegativeXErrorPixel() {
-    int result = ERROR_PIXEL_NONE;
-    double value = this.m_value.getNegativeXError();
-    if (value != IErrorBarValue.ERROR_VALUE_NONE) {
-      result = this.m_trace.getRenderer().getAxisX().translateValueToPx(value);
-    }
-    return result;
+    return this.m_negativeXErrorPixel;
   }
 
   /**
    * @see info.monitorenter.gui.chart.IErrorBarPixel#getNegativeYErrorPixel()
    */
   public int getNegativeYErrorPixel() {
-    int result = ERROR_PIXEL_NONE;
-    double value = this.m_value.getNegativeYError();
-    if (value != IErrorBarValue.ERROR_VALUE_NONE) {
-      result = this.m_trace.getRenderer().getAxisY().translateValueToPx(value);
-    }
-    return result;
+    return this.m_negativeYErrorPixel;
   }
 
   /**
    * @see info.monitorenter.gui.chart.IErrorBarPixel#getPositiveXErrorPixel()
    */
   public int getPositiveXErrorPixel() {
-    int result = ERROR_PIXEL_NONE;
-    double value = this.m_value.getPositiveXError();
-    if (value != IErrorBarValue.ERROR_VALUE_NONE) {
-      result = this.m_trace.getRenderer().getAxisX().translateValueToPx(value);
-    }
-    return result;
+    return this.m_positiveXErrorPixel;
   }
 
   /**
    * @see info.monitorenter.gui.chart.IErrorBarPixel#getPositiveYErrorPixel()
    */
   public int getPositiveYErrorPixel() {
-    int result = ERROR_PIXEL_NONE;
-    double value = this.m_value.getPositiveYError();
-    if (value != IErrorBarValue.ERROR_VALUE_NONE) {
-      result = this.m_trace.getRenderer().getAxisY().translateValueToPx(value);
-    }
-    return result;
+    return this.m_positiveYErrorPixel;
   }
 
   /**
-   * @return the trace.
+   * @see info.monitorenter.gui.chart.IErrorBarPixel#getTrace()
    */
-  protected final ITrace2D getTrace() {
+  public final ITrace2D getTrace() {
     return this.m_trace;
+  }
+
+  /**
+   * Intended for {@link AErrorBarPolicyConfigurable} only.
+   * <p>
+   * 
+   * @param negativeXError
+   *          The negativeXError in pixel to set.
+   */
+  protected final void setNegativeXErrorPixel(final int negativeXError) {
+    this.m_negativeXErrorPixel = negativeXError;
+  }
+
+  /**
+   * Intended for {@link AErrorBarPolicyConfigurable} only.
+   * <p>
+   * 
+   * @param negativeYError
+   *          The negativeYError in pixel to set.
+   */
+  protected final void setNegativeYErrorPixel(final int negativeYError) {
+    this.m_negativeYErrorPixel = negativeYError;
+  }
+
+  /**
+   * Intended for {@link AErrorBarPolicyConfigurable} only.
+   * <p>
+   * 
+   * @param positiveXError
+   *          The positiveXError in pixel to set.
+   */
+  protected final void setPositiveXErrorPixel(final int positiveXError) {
+    this.m_positiveXErrorPixel = positiveXError;
+  }
+
+  /**
+   * Intended for {@link AErrorBarPolicyConfigurable} only.
+   * <p>
+   * 
+   * @param positiveYError
+   *          The positiveYError in pixel to set.
+   */
+  protected final void setPositiveYErrorPixel(final int positiveYError) {
+    this.m_positiveYErrorPixel = positiveYError;
   }
 
   /**
@@ -135,18 +171,4 @@ public class ErrorBarPixel implements IErrorBarPixel {
     this.m_trace = trace;
   }
 
-  /**
-   * @return the value.
-   */
-  protected final IErrorBarValue getValue() {
-    return this.m_value;
-  }
-
-  /**
-   * @param value
-   *          The value to set.
-   */
-  protected final void setValue(final IErrorBarValue value) {
-    this.m_value = value;
-  }
 }

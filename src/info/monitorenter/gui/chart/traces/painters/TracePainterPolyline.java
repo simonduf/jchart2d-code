@@ -38,11 +38,14 @@ import java.util.List;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  * 
  */
 public class TracePainterPolyline
     extends ATracePainter {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 142122979535173974L;
 
   /** The list of x coordinates collected in one paint iteration. */
   private List m_xPoints;

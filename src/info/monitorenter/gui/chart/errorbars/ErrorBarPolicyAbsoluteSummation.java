@@ -47,10 +47,13 @@ import javax.swing.event.ChangeListener;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.7 $
  */
 public class ErrorBarPolicyAbsoluteSummation
     extends AErrorBarPolicyConfigurable {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 256014145931710475L;
 
   /** The absolute x error to add. */
   private double m_xError = 4;
@@ -106,7 +109,7 @@ public class ErrorBarPolicyAbsoluteSummation
     panel.add(xErrorLable, gbc);
 
     SpinnerModel numberXModel = new SpinnerNumberModel(ErrorBarPolicyAbsoluteSummation.this
-        .getXError(), 0, 10000, 10);
+        .getXError(0), 0, 10000, 10);
     JSpinner xErrorSelector = new JSpinner(numberXModel);
 
     gbc.gridx = 1;
@@ -128,11 +131,11 @@ public class ErrorBarPolicyAbsoluteSummation
     gbc.gridx = 0;
     gbc.gridy = 1;
     gbc.gridheight = 1;
-    
+
     panel.add(yErrorLable, gbc);
 
     SpinnerModel numberYModel = new SpinnerNumberModel(ErrorBarPolicyAbsoluteSummation.this
-        .getYError(), 0, 10000, 10);
+        .getYError(0), 0, 10000, 10);
     JSpinner yErrorSelector = new JSpinner(numberYModel);
 
     gbc.gridx = 1;
@@ -163,59 +166,53 @@ public class ErrorBarPolicyAbsoluteSummation
   }
 
   /**
-   * Returns the absolute x error that is added to / subtracted from the values
-   * to display.
-   * <p>
-   * 
-   * @return the absolute x error that is added to / subtracted from the values
-   *         to display.
+   * @see info.monitorenter.gui.chart.IErrorBarPolicy#getXError(double)
    */
-  public final double getXError() {
+  public final double getXError(final double xValue) {
     return this.m_xError;
   }
 
   /**
-   * Returns the absolute y error that is added to / subtracted from the values
-   * to display.
-   * <p>
-   * 
-   * @return the absolute y error that is added to / subtracted from the values
-   *         to display.
+   * @see info.monitorenter.gui.chart.IErrorBarPolicy#getYError(double)
    */
-  public final double getYError() {
+  public final double getYError(final double yValue) {
     return this.m_yError;
   }
 
   /**
-   * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeXError(double,
-   *      double)
+   * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeXError(int,
+   *      int)
    */
-  protected double internalGetNegativeXError(final double absoluteX, final double absoluteY) {
-    return absoluteX - this.m_xError;
+  protected int internalGetNegativeXError(final int xPixel, final int yPixel) {
+    return xPixel
+        - this.getTrace().getRenderer().getAxisX().translateRelativeValueToPx(this.m_xError);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeYError(double,
-   *      double)
+   * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeYError(int,
+   *      int)
    */
-  protected double internalGetNegativeYError(final double absoluteX, final double absoluteY) {
-    return absoluteY - this.m_yError;
+  protected int internalGetNegativeYError(final int xPixel, final int yPixel) {
+    return yPixel
+        + this.getTrace().getRenderer().getAxisY().translateRelativeValueToPx(this.m_yError);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetPositiveXError(double,
-   *      double)
+   * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetPositiveXError(int,
+   *      int)
    */
-  protected double internalGetPositiveXError(final double absoluteX, final double absoluteY) {
-    return this.m_xError + absoluteX;
+  protected int internalGetPositiveXError(final int xPixel, final int yPixel) {
+    return xPixel
+        + this.getTrace().getRenderer().getAxisX().translateRelativeValueToPx(this.m_xError);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetPositiveYError(double,
-   *      double)
+   * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetPositiveYError(int,
+   *      int)
    */
-  protected double internalGetPositiveYError(final double absoluteX, final double absoluteY) {
-    return this.m_yError + absoluteY;
+  protected int internalGetPositiveYError(final int xPixel, final int yPixel) {
+    return yPixel
+        - (this.getTrace().getRenderer().getAxisY().translateRelativeValueToPx(this.m_yError));
   }
 
   /**

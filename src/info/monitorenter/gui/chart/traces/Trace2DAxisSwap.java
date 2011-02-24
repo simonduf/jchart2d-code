@@ -46,10 +46,13 @@ import java.util.Set;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class Trace2DAxisSwap implements ITrace2D {
 
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -5987864541853522562L;
+  
   /** The delagate instance to decorate with axis swapping. */
   private ITrace2D m_delegate;
 

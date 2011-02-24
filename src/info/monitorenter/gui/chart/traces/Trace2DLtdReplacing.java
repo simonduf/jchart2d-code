@@ -40,9 +40,13 @@ import java.util.Iterator;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westerman </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public class Trace2DLtdReplacing extends Trace2DLtd {
+  
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -6048361222161598032L;
+
   /**
    * Constructs a <code>Trace2DLtdReplacing</code> with a default buffer size
    * of 100.

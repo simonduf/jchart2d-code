@@ -33,10 +33,13 @@ import info.monitorenter.util.Range;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.15 $
  */
 public class AxisLinear
     extends AAxis {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 4725336592625669661L;
 
   /**
    * Defcon.
@@ -80,7 +83,7 @@ public class AxisLinear
     Range range = this.getRange();
     double scalerX = range.getExtent();
     double result = (absolute - range.getMin()) / scalerX;
-    if (result == Double.NaN || Double.isInfinite(result)) {
+    if (Double.isNaN(result) || Double.isInfinite(result)) {
       result = 0;
     }
     return result;

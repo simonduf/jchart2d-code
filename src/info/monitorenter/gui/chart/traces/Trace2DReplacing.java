@@ -26,8 +26,9 @@ import info.monitorenter.gui.chart.TracePoint2D;
 
 
 /**
- * Has the behaviour of <code>Trace2DBijective</code> and an additional
- * features: <br>
+ * Has the behaviour of <code>Trace2DBijective</code> and additional
+ * features.<p>
+ * 
  * <ul>
  * <li>All tracepoints that are added are stored unchanged in a LinkedList.
  * </li>
@@ -36,15 +37,19 @@ import info.monitorenter.gui.chart.TracePoint2D;
  * <li>If a tracepoint is inserted whose x - value already exists in the List,
  * the old tracepoint with that value will be replaced by the new tracepoint.
  * </li>
- * </UL>
+ * </ul>
+ * <p>
  * 
  * @see Trace2DBijective
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class Trace2DReplacing extends Trace2DSimple {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 858570477289251003L;
 
   /**
    * Defcon.

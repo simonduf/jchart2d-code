@@ -83,7 +83,8 @@ public final class FileFilterExtensions
    */
   public FileFilterExtensions(final String[] extensionsWithoutDot) throws IllegalArgumentException {
     this.verify(extensionsWithoutDot);
-    this.m_extensions = extensionsWithoutDot;
+    this.m_extensions = new String[extensionsWithoutDot.length];
+    System.arraycopy(extensionsWithoutDot, 0, this.m_extensions, 0, extensionsWithoutDot.length);
     this.m_isWindows = this.isWindows();
   }
 

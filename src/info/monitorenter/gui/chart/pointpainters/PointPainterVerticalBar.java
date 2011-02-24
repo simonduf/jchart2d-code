@@ -36,10 +36,13 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  * 
  */
 public class PointPainterVerticalBar implements IPointPainter {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 659897369391828199L;
 
   /**
    * Stores the corresponding chart to know the coordinate roots for closing the

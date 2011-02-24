@@ -47,9 +47,12 @@ import java.util.Iterator;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class Trace2DLtd extends ATrace2D implements ITrace2D {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -6664475237146326176L;
 
   /**
    * Prooves that synchronizing from outside is necessary for multithreaded use.

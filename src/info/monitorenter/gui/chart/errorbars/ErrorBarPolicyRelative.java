@@ -52,10 +52,13 @@ import javax.swing.event.ChangeListener;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.11 $
  */
 public class ErrorBarPolicyRelative
     extends AErrorBarPolicyConfigurable {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 1031825382468141565L;
 
   /** The relative x error to render. */
   private double m_relativeXError = 0.02;
@@ -187,13 +190,19 @@ public class ErrorBarPolicyRelative
   }
 
   /**
-   * @return the relative x Error.
+   * Returns the relative x error between 0 and 1.
+   * <p>
+   * 
+   * @return the relative x error.
    */
   public final double getRelativeXError() {
     return this.m_relativeXError;
   }
 
   /**
+   * Returns the relative y error between 0 and 1.
+   * <p>
+   * 
    * @return the relative y Error.
    */
   public final double getRelativeYError() {
@@ -201,35 +210,48 @@ public class ErrorBarPolicyRelative
   }
 
   /**
-   * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeXError(double,
-   *      double)
+   * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeXError(int,
+   *      int)
    */
-  protected double internalGetNegativeXError(final double absoluteX, final double absoluteY) {
-    return (1.0 - this.m_relativeXError) * absoluteX;
+  protected int internalGetNegativeXError(final int xPixel, final int yPixel) {
+    double error = (xPixel - this.getTrace().getRenderer().getXChartStart())
+        * this.m_relativeXError;
+    int result = (int) Math.round(xPixel - error);
+    return result;
   }
 
   /**
-   * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeYError(double,
-   *      double)
+   * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetNegativeYError(int,
+   *      int)
    */
-  protected double internalGetNegativeYError(final double absoluteX, final double absoluteY) {
-    return (1.0 - this.m_relativeYError) * absoluteY;
+  protected int internalGetNegativeYError(final int xPixel, final int yPixel) {
+    int error = (int) Math.round((this.getTrace().getRenderer().getYChartStart() - yPixel)
+        * this.m_relativeYError);
+    return yPixel + error;
+
   }
 
   /**
-   * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetPositiveXError(double,
-   *      double)
+   * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetPositiveXError(int,
+   *      int)
    */
-  protected double internalGetPositiveXError(final double absoluteX, final double absoluteY) {
-    return (1.0 + this.m_relativeXError) * absoluteX;
+  protected int internalGetPositiveXError(final int xPixel, final int yPixel) {
+    double error = (xPixel - this.getTrace().getRenderer().getXChartStart())
+        * this.m_relativeXError;
+    int result = (int) Math.round(xPixel + error);
+    return result;
   }
 
   /**
-   * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetPositiveYError(double,
-   *      double)
+   * @see info.monitorenter.gui.chart.errorbars.AErrorBarPolicyConfigurable#internalGetPositiveYError(int,
+   *      int)
    */
-  protected double internalGetPositiveYError(final double absoluteX, final double absoluteY) {
-    return (1.0 + this.m_relativeYError) * absoluteY;
+  protected int internalGetPositiveYError(final int xPixel, final int yPixel) {
+    // y pixel are bigger the lower the value is, so inversion
+    // is neede here:
+    int error = (int) Math.round((this.getTrace().getRenderer().getYChartStart() - yPixel)
+        * this.m_relativeYError);
+    return yPixel - error;
   }
 
   /**
@@ -277,10 +299,24 @@ public class ErrorBarPolicyRelative
       throw new IllegalArgumentException("Given relative error (" + relativeYError
           + ")has to be between 0.0 and 1.0.");
     }
-    boolean change = this.m_relativeXError != relativeYError;
+    boolean change = this.m_relativeYError != relativeYError;
     if (change) {
       this.m_relativeYError = relativeYError;
       this.firePropertyChange(PROPERTY_CONFIGURATION, null, null);
     }
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IErrorBarPolicy#getXError(double)
+   */
+  public final double getXError(final double xValue) {
+    return this.m_relativeXError * xValue;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IErrorBarPolicy#getYError(double)
+   */
+  public final double getYError(final double yValue) {
+    return this.m_relativeYError * yValue;
   }
 }

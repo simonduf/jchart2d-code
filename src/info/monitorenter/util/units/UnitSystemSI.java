@@ -34,7 +34,7 @@ package info.monitorenter.util.units;
  *
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public final class UnitSystemSI implements IUnitSystem {
 
@@ -72,6 +72,9 @@ public final class UnitSystemSI implements IUnitSystem {
    * @see info.monitorenter.util.units.IUnitSystem#getUnits()
    */
   public Class[] getUnits() {
-    return UnitSystemSI.UNITS;
+    int len = UnitSystemSI.UNITS.length;
+    Class[] result = new Class[len];
+    System.arraycopy(UnitSystemSI.UNITS, 0, result, 0, len);
+    return result;
   }
 }

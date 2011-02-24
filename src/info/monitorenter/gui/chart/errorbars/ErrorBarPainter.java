@@ -24,6 +24,7 @@
  */
 package info.monitorenter.gui.chart.errorbars;
 
+import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IErrorBarPainter;
 import info.monitorenter.gui.chart.IErrorBarPixel;
 import info.monitorenter.gui.chart.IPointPainter;
@@ -46,21 +47,26 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * Property change events are fired as described in method
  * <code>{@link info.monitorenter.gui.chart.IErrorBarPainter#addPropertyChangeListener(String, PropertyChangeListener) }</code>.
  * Note that adding property change listeners to the nested access facades of
- * type <code>{@link info.monitorenter.gui.chart.IErrorBarPainter.ISegment}</code> accessible via
- * <code>getXXXSegment()</code> methods will fire the corresponding events for
- * listeners of this instance (as they delegate the calls) while they fire
- * events for properties defined in
- * <code>{@link info.monitorenter.gui.chart.IErrorBarPainter.ISegment}</code> too. If you register for
- * events of this instance and for the retrieved segments you will receive two
+ * type
+ * <code>{@link info.monitorenter.gui.chart.IErrorBarPainter.ISegment}</code>
+ * accessible via <code>getXXXSegment()</code> methods will fire the
+ * corresponding events for listeners of this instance (as they delegate the
+ * calls) while they fire events for properties defined in
+ * <code>{@link info.monitorenter.gui.chart.IErrorBarPainter.ISegment}</code>
+ * too. If you register for events of this instance and for the retrieved
+ * segments you will receive two
  * <code>{@link PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)}</code>
  * for the same value changed.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.12 $
  */
 public class ErrorBarPainter implements IErrorBarPainter {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -4978322492200966266L;
 
   /** The color for the segment. */
   private Color m_connectionColor;
@@ -94,7 +100,7 @@ public class ErrorBarPainter implements IErrorBarPainter {
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * 
    * 
-   * @version $Revision: 1.10 $
+   * @version $Revision: 1.12 $
    */
   private abstract class ASegment implements ISegment {
 
@@ -130,6 +136,9 @@ public class ErrorBarPainter implements IErrorBarPainter {
    * <p>
    */
   private final ISegment m_segmentConnection = new ASegment() {
+
+    /** Generated <code>serialVersionUID</code>. */
+    private static final long serialVersionUID = 2582262217019921050L;
 
     /**
      * @see info.monitorenter.gui.chart.IErrorBarPainter.ISegment#getColor()
@@ -191,6 +200,9 @@ public class ErrorBarPainter implements IErrorBarPainter {
    * <p>
    */
   private final ISegment m_segmentEnd = new ASegment() {
+    /** Generated <code>serialVersionUID</code>. */
+    private static final long serialVersionUID = -5655272957651523988L;
+
     /**
      * @see info.monitorenter.gui.chart.IErrorBarPainter.ISegment#getColor()
      */
@@ -246,6 +258,9 @@ public class ErrorBarPainter implements IErrorBarPainter {
    * <p>
    */
   private final ISegment m_segmentStart = new ASegment() {
+
+    /** Generated <code>serialVersionUID</code>. */
+    private static final long serialVersionUID = -1547300597027982211L;
 
     /**
      * @see info.monitorenter.gui.chart.IErrorBarPainter.ISegment#getColor()
@@ -418,47 +433,107 @@ public class ErrorBarPainter implements IErrorBarPainter {
    */
   public void paintErrorBar(final int absoluteX, final int absoluteY, final Graphics2D g,
       final IErrorBarPixel errorBar) {
+
+    Chart2D chart = errorBar.getTrace().getRenderer();
+    // If some range policy is used that restricts the viewport ensure,
+    // that we don't paint offscreen:
+    int xStart = chart.getXChartStart();
+    int xEnd = chart.getXChartEnd();
+    int yStart = chart.getYChartStart();
+    int yEnd = chart.getYChartEnd();
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+    // x1
+    if (absoluteX < xStart) {
+      x1 = xStart;
+    } else {
+      x1 = absoluteX;
+    }
+    if (absoluteX > xEnd) {
+      x1 = xEnd;
+    } else {
+      x1 = absoluteX;
+    }
+
+    // y1
+    if (absoluteY > yStart) {
+      y1 = yStart;
+    } else {
+      y1 = absoluteY;
+    }
+    if (absoluteY < yEnd) {
+      y1 = yEnd;
+    } else {
+      y1 = absoluteY;
+    }
+
     // negative x error:
     int error = errorBar.getNegativeXErrorPixel();
     if (error != IErrorBarPixel.ERROR_PIXEL_NONE) {
-
-      this.paintErrorBarPart(absoluteX, absoluteY, error, absoluteY, this.m_connectionPainter,
-          this.m_connectionColor, g);
-      this.paintErrorBarPart(absoluteX, absoluteY, error, absoluteY, this.m_startPointPainter,
-          this.m_startPointColor, g);
-      this.paintErrorBarPart(error, absoluteY, absoluteX, absoluteY, this.m_endPointPainter,
-          this.m_endPointColor, g);
+      y2 = y1;
+      if (error < xStart) {
+        x2 = xStart;
+      } else {
+        x2 = error;
+      }
+      this.paintErrorBarPart(x1, y1, x2, y2, this.m_connectionPainter, this.m_connectionColor, g);
+      this.paintErrorBarPart(x1, y1, x2, y2, this.m_startPointPainter, this.m_startPointColor, g);
+      // don't paint end point if bounds were exceeded:
+      if (x2 == error) {
+        this.paintErrorBarPart(x2, y1, x1, y1, this.m_endPointPainter, this.m_endPointColor, g);
+      }
     }
     // positive x error:
     error = errorBar.getPositiveXErrorPixel();
     if (error != IErrorBarPixel.ERROR_PIXEL_NONE) {
-      this.paintErrorBarPart(absoluteX, absoluteY, error, absoluteY, this.m_connectionPainter,
-          this.m_connectionColor, g);
-      this.paintErrorBarPart(absoluteX, absoluteY, error, absoluteY, this.m_startPointPainter,
-          this.m_startPointColor, g);
-      this.paintErrorBarPart(error, absoluteY, absoluteX, absoluteX, this.m_endPointPainter,
-          this.m_endPointColor, g);
+      y2 = y1;
+      if (error > xEnd) {
+        x2 = xEnd;
+      } else {
+        x2 = error;
+      }
+
+      this.paintErrorBarPart(x1, y1, x2, y2, this.m_connectionPainter, this.m_connectionColor, g);
+      this.paintErrorBarPart(x1, y1, x2, y2, this.m_startPointPainter, this.m_startPointColor, g);
+      // don't paint end point if bounds were exceeded:
+      if (x2 == error) {
+        this.paintErrorBarPart(x2, y1, x1, y1, this.m_endPointPainter, this.m_endPointColor, g);
+      }
     }
 
     // negative y error:
     error = errorBar.getNegativeYErrorPixel();
     if (error != IErrorBarPixel.ERROR_PIXEL_NONE) {
-      this.paintErrorBarPart(absoluteX, absoluteY, absoluteX, error, this.m_connectionPainter,
-          this.m_connectionColor, g);
-      this.paintErrorBarPart(absoluteX, absoluteY, absoluteX, (int) error,
-          this.m_startPointPainter, this.m_startPointColor, g);
-      this.paintErrorBarPart(absoluteX, (int) error, absoluteX, absoluteY, this.m_endPointPainter,
-          this.m_endPointColor, g);
+      x2 = x1;
+      if (error > yStart) {
+        y2 = yStart;
+      } else {
+        y2 = error;
+      }
+      this.paintErrorBarPart(x1, y1, x2, y2, this.m_connectionPainter, this.m_connectionColor, g);
+      this.paintErrorBarPart(x1, y1, x2, y2, this.m_startPointPainter, this.m_startPointColor, g);
+      // don't paint end point if bounds were exceeded:
+      if (y2 == error) {
+        this.paintErrorBarPart(x1, y2, x1, y1, this.m_endPointPainter, this.m_endPointColor, g);
+      }
     }
     // positive y error:
     error = errorBar.getPositiveYErrorPixel();
     if (error != IErrorBarPixel.ERROR_PIXEL_NONE) {
-      this.paintErrorBarPart(absoluteX, absoluteY, absoluteX, error, this.m_connectionPainter,
-          this.m_connectionColor, g);
-      this.paintErrorBarPart(absoluteX, absoluteY, absoluteX, error, this.m_startPointPainter,
-          this.m_startPointColor, g);
-      this.paintErrorBarPart(absoluteX, (int) error, absoluteX, absoluteY, this.m_endPointPainter,
-          this.m_endPointColor, g);
+      x2 = x1;
+      if (error < yEnd) {
+        y2 = yEnd;
+      } else {
+        y2 = error;
+      }
+      this.paintErrorBarPart(x1, y1, x2, y2, this.m_connectionPainter, this.m_connectionColor, g);
+      this.paintErrorBarPart(x1, y1, x2, y2, this.m_startPointPainter, this.m_startPointColor, g);
+      // don't paint end point if bounds were exceeded:
+      if (y2 == error) {
+        this.paintErrorBarPart(x1, y2, x1, y1, this.m_endPointPainter, this.m_endPointColor, g);
+      }
     }
   }
 

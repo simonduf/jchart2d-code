@@ -23,6 +23,7 @@
 package info.monitorenter.gui.chart;
 
 import java.awt.Graphics2D;
+import java.io.Serializable;
 
 /**
  * Generic interface for instances that have to render a point in pixel
@@ -40,9 +41,9 @@ import java.awt.Graphics2D;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
-public interface IPointPainter {
+public interface IPointPainter extends Serializable {
   /**
    * Paint the point given by absolute coordinates on the given graphic context.
    * <p>

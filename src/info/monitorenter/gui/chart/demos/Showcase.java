@@ -63,11 +63,11 @@ import javax.swing.event.ChangeListener;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  * 
  */
 public final class Showcase
-    extends JApplet {
+    extends JApplet { 
 
   /**
    * Panel with controls for the chart.
@@ -76,7 +76,7 @@ public final class Showcase
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.7 $
+   * @version $Revision: 1.8 $
    */
   final class ControlPanel
       extends JPanel {
@@ -207,7 +207,7 @@ public final class Showcase
        * <p>
        * 
        * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-       * @version $Revision: 1.7 $
+       * @version $Revision: 1.8 $
        */
       final class ColorItem
           extends Color {

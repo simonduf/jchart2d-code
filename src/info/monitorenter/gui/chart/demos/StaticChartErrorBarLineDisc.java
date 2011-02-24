@@ -55,7 +55,7 @@ import javax.swing.JPanel;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  */
 public final class StaticChartErrorBarLineDisc
     extends JPanel {
@@ -119,7 +119,7 @@ public final class StaticChartErrorBarLineDisc
 
     // Add all points, as it is static:
     for (double i = 2; i < 40; i++) {
-      trace.addPoint(i, Math.random() * i + i * 10);
+      trace.addPoint(i * 100, Math.random() * i + i * 10);
     }
     // Add the trace to the chart:
     chart.addTrace(trace);

@@ -22,6 +22,7 @@
  */
 package info.monitorenter.util.collections;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Comparator;
@@ -69,7 +70,10 @@ public class TreeSetGreedy
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    */
-  private static final class NumberPropertyComparator implements Comparator {
+  private static final class NumberPropertyComparator implements Comparator, Serializable {
+
+    /** Generated <code>serialVersionUID</code>. */
+    private static final long serialVersionUID = 2279828650090806643L;
 
     /**
      * Defcon.
@@ -169,11 +173,11 @@ public class TreeSetGreedy
         return new Long(n.longValue() + 1);
       } else if (c == BigDecimal.class) {
         BigDecimal bd = new BigDecimal(n.toString());
-        bd.add(new BigDecimal(1));
+        bd = bd.add(new BigDecimal(1));
         return bd;
       } else {
         BigInteger bi = new BigInteger(n.toString());
-        bi.add(new BigInteger("1"));
+        bi = bi.add(new BigInteger("1"));
         return bi;
 
       }
@@ -227,7 +231,7 @@ public class TreeSetGreedy
       }
       // do it after add and see a StackOverflowError.
       // then puzzle some hours why this happens... ;-)
-      success = this.addInternal(resort);
+      this.addInternal(resort);
     }
     return ret;
   }

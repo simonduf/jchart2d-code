@@ -24,17 +24,19 @@ package info.monitorenter.gui.chart.rangepolicies;
 import info.monitorenter.util.Range;
 
 /**
- * <p>
  * A range policy that forces the chart always to display the constructor given
  * point regardless of the actual bounds of the traces within the chart.
- * </p>
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  * 
  */
 public final class RangePolicyForcedPoint extends RangePolicyMinimumViewport {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 5676959746627361093L;
 
   /**
    * Creates a range policy that ensures zero to be visible.

@@ -52,13 +52,16 @@ import java.util.List;
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  * 
  * @since 7.0.0
  * 
  */
 public class Trace2DArithmeticMean
     extends ATrace2D {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -4365986306182830082L;
 
   /** The buffer for the points about to be merged. */
   private IRingBuffer m_pointBuffer;

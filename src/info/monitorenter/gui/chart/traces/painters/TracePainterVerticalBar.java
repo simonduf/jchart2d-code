@@ -37,12 +37,15 @@ import java.awt.Graphics2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.5 $
+ * @version $Revision: 1.6 $
  * 
  */
 public class TracePainterVerticalBar
     extends ATracePainter {
 
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 6151930248938945671L;
+  
   /** The implementation for rendering the point as a vertical bar. */
   private PointPainterVerticalBar m_pointPainter;
 

@@ -11,7 +11,7 @@
     <property name="builddir" value="${basedir}/bin" />
     <property name="sourcedir" value="${basedir}/src" />
     <property name="sourcedir.test" value="${basedir}/test" />
-    <property name="project.version" value="2.2.0" />
+    <property name="project.version" value="2.2.1" />
 
     <!-- Taskdefs -->
     <!--
@@ -142,15 +142,15 @@
                   verbose="true"
                   ignorewarnings="true"
                   printmapping="true"
-                  allowaccessmodification="false">
+                  allowaccessmodification="false"
+                  optimize="false">
             <libraryjar>
                 <pathelement path="${java.home}/lib/rt.jar" />
-                <fileset refid="allJars" />
             </libraryjar>
             <!--
               caution: The name attribut value has to be the same expression
                       as the  destfile of the makejar- target [depend].
-                     -->
+            -->
             <injar name="${basedir}/${project.name}-${project.version}.jar" />
             <outjar name="${basedir}/${project.name}-${project.version}-shrinked.jar" />
             <!-- Filter -->
@@ -163,8 +163,7 @@
                 <constructor />
             </keep>
             <keep access="public"
-                  name="info.monitorenter.gui.chart.errorbars.A*">
-                <method access="protected" name="*" />
+                  name="info.monitorenter.gui.chart.errorbars.**">
                 <constructor />
             </keep>
             <keep access="public"
@@ -174,19 +173,31 @@
             <keep name="info.monitorenter.gui.chart.traces.*">
                 <constructor />
             </keep>
+            <!-- keep all IAxis implementations -->
+            <keep name="info.monitorenter.gui.chart.axis.*">
+            </keep>
             <!-- keep all getters and setters of classes that are preserved -->
             <keepclassmembers>
                 <method name="get*" />
                 <method name="set*" />
                 <method name="is*" />
             </keepclassmembers>
+            <!-- Since version 4.0 of proguard Exceptions have to be kept -->
+            <keepattribute />
+            <!--          
+            <keepattribute name="Exceptions" />
+            <keepattribute name="Deprecated" />
+            <keepattribute name="Sourcefile" />
+            <keepattribute name="LocalVariableTable" />
+            <keepattribute name="LocalVariableTypeTable" />
+            <keepattribute name="InnerClasses" />
+            -->
         </proguard>
         <!-- Delete big jar and rename shrinked to that name. -->
         <delete file="${basedir}/${project.name}-${project.version}.jar" />
         <move tofile="${basedir}/${project.name}-${project.version}.jar"
               file="${basedir}/${project.name}-${project.version}-shrinked.jar" />
     </target>
-
 
     <target name="makejarApplet" depends="makejarFat">
         <description>
@@ -213,6 +224,9 @@
             <keep access="public"
                   name="info.monitorenter.gui.chart.demos.Showcase">
                 <method access="public" name="init" />
+            </keep>
+            <keep access="public"
+                  name="info.monitorenter.gui.chart.errorbars.ErrorBarPolicy*">
             </keep>
         </proguard>
         <signjar jar="${basedir}/${project.name}-applet.jar"
@@ -264,7 +278,7 @@
                  docencoding="UTF-8">
             <classpath refid="classpath" />
             <bottom>
-                <![CDATA[<i>Copyright &#169; 2001 - 2006 <a href="http://www.opensource.org/licenses/lgpl-license.php" target="_blank">LGPL</a>, All Rights Footloose.</i>]]></bottom>
+                <![CDATA[<i>Copyright &#169; 2001 - 2007 <a href="http://www.opensource.org/licenses/lgpl-license.php" target="_blank">LGPL</a>, All Rights Footloose.</i>]]></bottom>
         <fileset refid="sourcefiles" />
         <link offline="false"
               href="http://java.sun.com/j2se/1.5.0/docs/api/"

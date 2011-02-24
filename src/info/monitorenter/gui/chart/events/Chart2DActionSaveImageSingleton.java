@@ -58,10 +58,9 @@ import javax.swing.filechooser.FileFilter;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
-public final class Chart2DActionSaveImageSingleton
-    extends AChart2DAction {
+public final class Chart2DActionSaveImageSingleton extends AChart2DAction {
   /**
    * Generated <code>serial version UID</code>.
    * <p>
@@ -81,7 +80,13 @@ public final class Chart2DActionSaveImageSingleton
    */
   private static Map instances = new HashMap();
 
-  /** Creates a key for the component for internal storage. */
+  /** 
+   * Creates a key for the component for internal storage.<p>
+   * 
+   *  @param chart the chart to generate the storage key for. 
+   *  
+   *  @return a storage key unique for the given chart instance. 
+   */
   private static String key(final Chart2D chart) {
     return chart.getClass().getName() + chart.hashCode();
   }

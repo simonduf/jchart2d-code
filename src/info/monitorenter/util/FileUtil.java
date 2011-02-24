@@ -46,7 +46,7 @@ import java.util.StringTokenizer;
  * <code>{@link #getInstance()}</code>.
  * <p>
  * 
- * @author Achim Westermann 
+ * @author Achim Westermann
  * 
  * @version 1.1
  */
@@ -73,8 +73,8 @@ public final class FileUtil
    * @param path
    *          the absolute file path you want the mere file name of.
    * 
-   * @return the <code>{@link java.util.Map.Entry}</code> consisting of path information
-   *         and file name.
+   * @return the <code>{@link java.util.Map.Entry}</code> consisting of path
+   *         information and file name.
    */
   public static Map.Entry cutDirectoryInformation(final java.net.URL path) {
     Map.Entry ret = null;
@@ -132,8 +132,8 @@ public final class FileUtil
    * @param path
    *          the absolute file path you want the mere file name of.
    * 
-   * @return the <code>{@link java.util.Map.Entry}</code> consisting of path information
-   *         and file name.
+   * @return the <code>{@link java.util.Map.Entry}</code> consisting of path
+   *         information and file name.
    */
   public static Map.Entry cutDirectoryInformation(final String path) {
     StringBuffer dir = new StringBuffer();
@@ -367,20 +367,35 @@ public final class FileUtil
   public static boolean isEqual(final File document, final Charset a, final Charset b)
       throws IOException {
     boolean ret = true;
-    InputStreamReader aReader = new InputStreamReader(new FileInputStream(document), a);
-    InputStreamReader bReader = new InputStreamReader(new FileInputStream(document), b);
-    int readA = -1;
-    int readB = -1;
-    do {
-      readA = aReader.read();
-      readB = bReader.read();
-      if (readA != readB) {
-        // also the case, if one is at the end earlier...
-        ret = false;
-        break;
+    FileInputStream aIn = null;
+    FileInputStream bIn = null;
+    InputStreamReader aReader = null;
+    InputStreamReader bReader = null;
+    try {
+      aIn = new FileInputStream(document);
+      bIn = new FileInputStream(document);
+      aReader = new InputStreamReader(aIn, a);
+      bReader = new InputStreamReader(bIn, b);
+      int readA = -1;
+      int readB = -1;
+      do {
+        readA = aReader.read();
+        readB = bReader.read();
+        if (readA != readB) {
+          // also the case, if one is at the end earlier...
+          ret = false;
+          break;
+        }
+      } while (readA != -1 && readB != -1);
+      return ret;
+    } finally {
+      if (aReader != null) {
+        aReader.close();
       }
-    } while (readA != -1 && readB != -1);
-    return ret;
+      if (bReader != null) {
+        bReader.close();
+      }
+    }
   }
 
   /**
@@ -466,8 +481,12 @@ public final class FileUtil
       return;
     }
     // real file
+    FileInputStream inStream = null;
+    BufferedInputStream in = null;
+    FileWriter out = null;
     try {
-      BufferedInputStream in = new BufferedInputStream(new FileInputStream(f), 1024);
+      inStream = new FileInputStream(f);
+      in = new BufferedInputStream(inStream, 1024);
       StringBuffer result = new StringBuffer();
       int tmpread;
       while ((tmpread = in.read()) != -1) {
@@ -495,13 +514,28 @@ public final class FileUtil
       // delete original file and write it new from tmpfile.
       f.delete();
       f.createNewFile();
-      FileWriter out = new FileWriter(f);
+      out = new FileWriter(f);
       out.write(result.toString());
-      out.flush();
     } catch (FileNotFoundException e) {
       // does never happen.
     } catch (IOException g) {
       g.printStackTrace(System.err);
+    } finally {
+      if (in != null) {
+        try {
+          in.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+      if (out != null) {
+        try {
+          out.flush();
+          out.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
     }
   }
 
@@ -525,7 +559,7 @@ public final class FileUtil
    *          in bytes
    * 
    * @param locale
-   *          the locale to translate the result to (e.g. in France they us 
+   *          the locale to translate the result to (e.g. in France they us
    * 
    * @return the formatted filesize to Bytes, KB, MB or GB depending on the
    *         given value.
