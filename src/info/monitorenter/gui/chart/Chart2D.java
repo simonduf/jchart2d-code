@@ -94,7 +94,7 @@ import javax.swing.Timer;
  * <li>If no scaling is chosen, no grids will be painted. See:
  * <code>{@link IAxis#setPaintScale(boolean)}</code> This allows saving of many
  * computations.
- * <li>The distance of the scalepoints is always big enough to display the
+ * <li>The distance of the scale points is always big enough to display the
  * labels fully without overwriting each other.</li>
  * </ul>
  * <p>
