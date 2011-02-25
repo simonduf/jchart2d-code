@@ -453,6 +453,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
      */
     public String getToolTipText(final Chart2D chart, final MouseEvent me) {
       // NONE implementation (defined by this enum type).
+    	int i = 0;
       return null;
     }
 
