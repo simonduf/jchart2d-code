@@ -1,6 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
+<<<<<<< HEAD
   var update="02/06/2010";
  </script>
  <body id="applet">
@@ -62,3 +63,100 @@
   <!-- End of wrapper div -->
  </body>
 </html>
+=======
+<<<<<<< OURS
+  var update="02/06/2010";
+ </script>
+ <body id="applet">
+  <div id="wrapper">
+   <div id="main">
+    <!-- Header -->
+    <!--#include virtual="./header.shtml" -->
+
+    
+    <!--#include virtual="./navigation.shtml" -->
+    <!-- Navigation -->
+    <div id="content">
+     
+       <h2>Demo Applet</h2>
+      <p>
+       This is a demo applet that shows a dynamic chart along with all recent 
+       UI controls available. It prints summations of 
+       random values [positive or negative] on the y axis and a timestamp on the x axis. 
+       The y-axis has been forced to always show the range between -20 and +20. 
+      </p>
+      <p> 
+       A message about an invalid digital signature will pop up. The applet uses a filechooser to 
+       allow you saving a snapshot image to a location on your harddisk of your choice. 
+       So the applet had to be signed. Please understand that I cannot to afford to pay a 
+       CERTIFICATE AUTHORITY ("Trusted Third Party") organization to verify the signature. 
+      </p>
+      <p>
+       The amount of points as well as the period in which a new point is added may be 
+       chosen. The sliders allow values that should cause a high cpu load or weird labeling. 
+       This is intended and allows to experiment with the effect of configuration and to 
+       find good settings. The sourcecode may be viewed through the 
+       <a target="_blank" href="http://jchart2d.cvs.sourceforge.net/jchart2d/jchart2d/src/info/monitorenter/gui/chart/demos/Showcase.java?view=markup">cvs web-access</a> 
+=======
+  var update="05/21/2006";
+ </script>
+ <body id="applet">
+  <div id="wrapper">
+   <div id="main">
+    <!-- Header -->
+    <!--#include virtual="./header.shtml" -->
+
+    
+    <!--#include virtual="./navigation.shtml" -->
+    <!-- Navigation -->
+    <div id="content">
+     
+       <h2>Demo Applet</h2>
+      <p>
+       This is a simple applet that shows a dynamic chart. It prints summations of 
+       random values [positive or negative] on the y axis and a timestamp on the x axis. 
+       The y-axis has been forced to always show the range between -20 and +20. 
+      </p>
+      <p> 
+       A message about an invalid digital signature will pop up. The applet uses a filechooser to 
+       allow you saving a snapshot image to a location on your harddisk of your choice. 
+       So the applet had to be signed. Please understand that I cannot to afford to pay a 
+       CERTIFICATE AUTHORITY ("Trusted Third Party") organization to verify the signature. 
+      </p>
+      <p>
+       The amount of points as well as the period in which a new point is added may be 
+       chosen. The sliders allow values that should cause a high cpu load or weird labeling. 
+       This is intended and allows to experiment with the effect of configuration and to 
+       find good settings. The sourcecode may be viewed through the 
+       <a target="_blank" href="http://cvs.sourceforge.net/viewcvs.py/jchart2d/jchart2d/src/info/monitorenter/gui/chart/demos/Showcase.java?rev=1.2&view=markup">cvs web-access</a> 
+>>>>>>> THEIRS
+       of sourceforge. 
+      </p>
+      <p> 
+       <applet code="info.monitorenter.gui.chart.demos.Showcase.class" width="600" height="500" codebase="./lib/" archive="jchart2d-applet.jar">
+        Ooops, you need a java plugin to show the applet. It's worth the short installation, 
+        you will be able to see many other important applets (e.g. http://www.map24.de is a killer app for 
+        your browser). <br>
+        Download and install the Java Runtime Environment (includes the plugin): 
+        <a target="_blank" href="http://java.sun.com/j2se/1.4.2/download.html">Download J2SE JRE </a>. 
+        Choose the <b>JRE</b> which is smaller, the SDK is only needed for developers. 
+       
+       </applet>
+       <!-- This does not work for internet explorer 6.0. Don't know why, it doesn't tell on the console... -->
+       <!--
+       <object classid="java:info.monitorenter.gui.chart.demos.Showcase.class" codetype="application/java-vm" codebase="./lib/" archive="jchart2d-applet.jar" width="600" height="400">
+       </object>
+       -->
+      </p>
+     
+    </div>
+    <!-- End of contents div -->
+    <!-- The counter -->
+    <!--#include virtual="./footer.shtml" -->
+   </div>
+   <!-- End of main div -->
+  </div>	
+  <!-- End of wrapper div -->
+ </body>
+</html>
+>>>>>>> refs/heads/master
