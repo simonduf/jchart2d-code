@@ -1,6 +1,7 @@
 /*
- *  Unit.java, singleton for caching and accessing UnitSystems.
- *  Copyright (C) Achim Westermann, created on 12.05.2005, 20:11:17
+ *  UnitFactory.java, Singleton that caches instances of whole unit- systems 
+ *  and provides you with the matching unit for a maximum value.
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,11 +24,10 @@
 
 package info.monitorenter.util.units;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * Singleton that caches instances of whole unit- systems and provides you with
@@ -36,12 +36,13 @@ import java.util.Iterator;
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.10 $
  * 
  * @see info.monitorenter.util.units.IUnitSystem
  * 
  */
-public final class UnitFactory extends Object {
+public final class UnitFactory
+    extends Object {
 
   /** Singleton instance. */
   private static UnitFactory instance;
@@ -52,8 +53,8 @@ public final class UnitFactory extends Object {
    */
   public static final AUnit UNCHANGED = new UnitUnchanged();
 
-  /** Cache for {@link UnitSystem} instances. */
-  private static final Map UNITSYSTEMS = new HashMap();
+  /** Cache for {@link IUnitSystem} instances. */
+  private static final Map<String, List<AUnit>> UNITSYSTEMS = new HashMap<String, List<AUnit>>();
 
   /**
    * Singleton retrieval method.
@@ -85,36 +86,34 @@ public final class UnitFactory extends Object {
    * 
    * 
    * @param absoluteMax
-   *          the absolute maximum value that has to be put into relation to the
-   *          unit to retrieve.
+   *            the absolute maximum value that has to be put into relation to
+   *            the unit to retrieve.
    * @param units
-   *          the UnitSystem to use.
+   *            the UnitSystem to use.
    * @return the unit for the given argument absolute max.
    */
   public AUnit getUnit(final double absoluteMax, final IUnitSystem units) {
-    List choice;
-    // lazy initialisation
-    choice = (List) UnitFactory.UNITSYSTEMS.get(units.getClass().getName());
+    AUnit result = UnitFactory.UNCHANGED;
+    List<AUnit> choice;
+    // lazy initialization
+    choice = UnitFactory.UNITSYSTEMS.get(units.getClass().getName());
     if (choice == null) {
       choice = this.initUnitSystem(units);
     }
+
+    // in case we are below the lowest unit (absoluteMax < peek.getFactor() of
+    // the first) start from the lowest unit.
+    result = choice.get(0);
     // Now to find the right unit.
-    Iterator it = choice.iterator();
-    AUnit ret = null, old = null;
-    if (it.hasNext()) {
-      old = (AUnit) it.next();
-      while (it.hasNext()) {
-        ret = (AUnit) it.next();
-        if (absoluteMax < (ret.getFactor())) {
-          return old;
-        }
-        old = ret;
+    for (AUnit peek : choice) {
+      if (absoluteMax < (peek.getFactor())) {
+        // return the previous unit iterated in case we hit the ceiling:
+        break;
       }
-      // highest unit available
-      return old;
+      result = peek;
     }
-    // no clue
-    return UnitFactory.UNCHANGED;
+    // highest unit available
+    return result;
   }
 
   /**
@@ -123,14 +122,14 @@ public final class UnitFactory extends Object {
    * <p>
    * 
    * @param unitsystem
-   *          the unit system of interest.
+   *            the unit system of interest.
    * 
    * @return a list of all different {@link AUnit} instances available in the
    *         given unit system.
    */
-  public List getUnits(final IUnitSystem unitsystem) {
-    List choice = (List) UnitFactory.UNITSYSTEMS.get(unitsystem.getClass().getName());
-    // lazy initialisation
+  public List<AUnit> getUnits(final IUnitSystem unitsystem) {
+    List<AUnit> choice = UnitFactory.UNITSYSTEMS.get(unitsystem.getClass().getName());
+    // lazy initialization
     if (choice == null) {
       choice = this.initUnitSystem(unitsystem);
     }
@@ -143,14 +142,15 @@ public final class UnitFactory extends Object {
    * <p>
    * 
    * @param units
-   *          the unit system to initialize.
+   *            the unit system to initialize.
    * 
-   * @return the list of {@link Unit} instances of the given unit system.
+   * @return the list of {@link AUnit} instances of the given unit system.
    */
-  private List initUnitSystem(final IUnitSystem units) {
-    List choice = new LinkedList();
-    Class[] clazzs = units.getUnits();
-    AUnit unit = null, previous = null;
+  private List<AUnit> initUnitSystem(final IUnitSystem units) {
+    List<AUnit> choice = new LinkedList<AUnit>();
+    Class<?>[] clazzs = units.getUnits();
+    AUnit unit = null;
+    AUnit previous = null;
     for (int i = 0; i < clazzs.length; i++) {
       if (!AUnit.class.isAssignableFrom(clazzs[i])) {
         System.err.println("UnitFactory: wrong class " + clazzs[i].getName() + " delivered by "
@@ -160,12 +160,10 @@ public final class UnitFactory extends Object {
         try {
           unit = (AUnit) clazzs[i].newInstance();
           choice.add(unit);
-          if (previous == null) {
-            previous = unit;
-          } else {
+          if (previous != null) {
             previous.m_nextHigherUnit = unit;
+            unit.m_nexLowerUnit = previous;
           }
-          unit.m_nexLowerUnit = previous;
           previous = unit;
         } catch (InstantiationException e) {
           System.err.println("UnitFactory encountered problems by instantiation of "
@@ -175,16 +173,16 @@ public final class UnitFactory extends Object {
         }
       }
     }
-    unit.m_nextHigherUnit = unit;
     // hardcoded minsearch sort:
-    double tmpfactori, tmpfactorj;
+    double tmpfactori;
+    double tmpfactorj;
     int min;
     int stop = choice.size();
     for (int i = 0; i < stop - 1; i++) {
       min = i;
-      tmpfactori = ((AUnit) choice.get(i)).getFactor();
+      tmpfactori = choice.get(i).getFactor();
       for (int j = i + 1; j < stop; j++) {
-        tmpfactorj = ((AUnit) choice.get(j)).getFactor();
+        tmpfactorj = choice.get(j).getFactor();
         if (tmpfactorj < tmpfactori) {
           tmpfactori = tmpfactorj;
           min = j;

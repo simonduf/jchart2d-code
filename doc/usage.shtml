@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-  var update="06/21/2006";
+  var update="12/02/2011";
  </script>
  <body id="usage">
   <div id="wrapper">
@@ -24,7 +24,7 @@
      <p>
       Before you start you might want to take a look at JChart2D's realtime performance. 
       This may be done on the <a href="./applet.shtml">applet</a> page or by downloading the 
-      binary jar file, let's say <em>jchart2d-1.02.bin.jar</em>
+      binary jar file, let's say <em>jchart2d-3.2.0.jar</em>
       <ol>
        <li>
        Download the file to a directory &lt;dir&gt;. 
@@ -47,14 +47,21 @@
      <p>
       Now go to &lt;dir&gt; via the "cd" command and type. 
       <blockquote>
-       java -jar jchart2d_bin.jar
+       java -jar jchart2d-3.2.0.jar 
       </blockquote>
-      The running chart example starts. 
+      The showcase example chart starts. 
+     </p>
+     <p>
+      The Showcase application allows to interact with the data collection (start/stop) and 
+      to save the Chart2D's graphics to an image file in a format that is supported by your 
+      Java Runtime Environment. 
+      The sourcecode may be viewed from cvs  
+      <a target="_blank" href="http://jchart2d.cvs.sourceforge.net/jchart2d/jchart2d/src/info/monitorenter/gui/chart/demos/Showcase.java?view=markup">here</a>.
      </p>
      <p>
       Another example with multithreaded traces may be viewed by typing: 
       <blockquote>
-       java -cp jchart2d_bin.jar info.monitorenter.gui.chart.demo.MultiTracing
+       java -cp jchart2d-3.2.0.jar info.monitorenter.gui.chart.demos.MultiTracing
       </blockquote>
       You may resize the window and see how the scaling takes advantage of more space. 
       The command looks different to the first. This is because the first command tells 
@@ -63,15 +70,16 @@
       tells plain-forward which class to start. 
      </p>
      <p>
-      The Showcase application allows to interact with the data collection (start/stop) and 
-      to save the Chart2D's graphics to an image file in a format that is supported by your 
-      Java Runtime Environment. Start it with: 
-      <blockquote>
-       java -cp jchart2d-1.1.2.jar info.monitorenter.gui.chart.demo.Showcase
-      </blockquote>
-      Remember to replace the version number (1.1.2 here) with your version. It is available 
-      since version 1.03. The sourcecode may be viewed from cvs  
-      <a target="_blank" href="http://cvs.sourceforge.net/viewcvs.py/jchart2d/jchart2d/src/info/monitorenter/gui/chart/demos/Showcase.java?rev=1.1&view=markup">here</a>.
+     If you want to use all features of JChart2D enabled (e.g. eps export) you have to include all libraries (*.jar files) from the 
+     binary distribution zip file in the class path of the java process. <br/>
+     For Windows type:  
+     <blockquote>
+       java -cp jchart2d-3.2.0.jar;xmlgraphics-commons-1.3.1.jar;jide-oss-2.9.7.jar info.monitorenter.gui.chart.demos.MultiTracing
+     </blockquote> 
+     For Linux type: 
+     <blockquote>
+       java -cp jchart2d-3.2.0.jar:jxmlgraphics-commons-1.3.1.jar:jide-oss-2.9.7.jar info.monitorenter.gui.chart.demos.MultiTracing
+     </blockquote> 
      </p>
      
      <h3>Design</h3>
@@ -93,10 +101,12 @@
       display size. <br>
       A trace itself may only be contained in one chart [caused by synchronization requirements]. 
       It has it's own color, name and 
-      policy of ordering the points that are added to it. More attributes are planned - 
-      especially a trace renderer would allow to change the graphical representation 
-      of the data points.<br>
-      The interaction needed for rendering is a chain: The applicatioin code that 
+      policy of ordering the points that are added to it.  
+      It even has a trace painter that allows different graphical representation 
+      of the data points. By default a trace painter that interconnects the 
+      data points with lines is used but dots, circles and filled polygon 
+      is currently supported. <br>
+      The interaction needed for rendering is a chain: The application code that 
       uses the API just adds a point to a trace. The trace then notifies it's chart 
       that it has changed. The chart then keeps this change in mind and will rescale and 
       repaint in the next painting cycle. Nothing more has to be done at runtime by the user code 
@@ -143,7 +153,7 @@
 	 
 	 <p>
 	  <h4>TracePoint2D</h4>
-	  A simple datatype that contains the two double values that define a location in a two dimensional 
+	  A simple data type that contains the two double values that define a location in a two dimensional 
 	  coordinate system. Instances are created by the application code, that uses the JChart2D API. 
 	  The Chart2D uses two package friendly members to cache values scaled between 0.0 and 1.0. It is possible to 
 	  alter the values inside [setLocation(double,double)] which will notify the corresponding ITrace 
@@ -160,7 +170,7 @@
       For playing around with the demo code provided I recommend to use an IDE like 
       <a href="http://eclipse.org" target="_blank">eclipse</a>. Download the binary distribution 
       in form of a jar file here: 
-      <a href="http://sourceforge.net/project/showfiles.php?group_id=50440&package_id=44150&release_id=83079" target="_blank">JChart2D binaries</a>. 
+      <a href="http://prdownloads.sourceforge.net/jchart2d/jchart2d-3.2.0.jar?download" target="_blank">jchart2d-3.2.0.jar</a>. 
       Put this jar file into the classpath of your IDE. Under eclipse this is done by copying 
       the file in your eclipse workspace/&lt;projectname&gt; directory and then choosing: 
       <PRE>
@@ -176,7 +186,7 @@
      
      <p>
       <pre class="code">
-package info.monitorenter.gui.chart.demo;
+package info.monitorenter.gui.chart.demos;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -197,13 +207,13 @@ public class MinimalStaticChart {
     Chart2D chart = new Chart2D();
 <span class="comment">    // Create an ITrace: </span>
     ITrace2D trace = new Trace2DSimple(); 
+<span class="comment">    // Add the trace to the chart. This has to be done before adding points (deadlock prevention): </span>
+    chart.addTrace(trace);    
 <span class="comment">    // Add all points, as it is static: </span>
     Random random = new Random();
     for(int i=100;i>=0;i--){
       trace.addPoint(i,random.nextDouble()*10.0+i);
     }
-<span class="comment">    // Add the trace to the chart: </span>
-    chart.addTrace(trace);    
 <span class="comment">    // Make it visible:
     // Create a frame.</span>
     JFrame frame = new JFrame("MinimalStaticChart");
@@ -218,7 +228,7 @@ public class MinimalStaticChart {
           }
         }
       );
-    frame.show();
+    frame.setVisible(true);
   }
 }
        
@@ -251,17 +261,19 @@ public class MinimalStaticChart {
      </p>
      <p>
       <pre class="code">
-package info.monitorenter.chart.demos;
+package info.monitorenter.gui.chart.demos;
+
+import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.io.ADataCollector;
+import info.monitorenter.gui.chart.io.RandomDataCollectorOffset;
+import info.monitorenter.gui.chart.traces.Trace2DLtd;
 
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
 import javax.swing.JFrame;
-import info.monitorenter.gui.chart.io.AbstractDataCollector;
-import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.io.RandomDataCollector;
-import info.monitorenter.gui.chart.traces.Trace2DLtd;
 
 public class MinimalDynamicChart {
   private MinimalDynamicChart() {
@@ -276,7 +288,7 @@ public class MinimalDynamicChart {
     ITrace2D trace = new Trace2DLtd(200); 
     trace.setColor(Color.RED);
  
-<span class="comment">    // Add the trace to the chart: </span>
+<span class="comment">    // Add the trace to the chart. This has to be done before adding points (deadlock prevention): </span>
     chart.addTrace(trace);
     
 <span class="comment">    // Make it visible:
@@ -293,9 +305,9 @@ public class MinimalDynamicChart {
           }
         }
       );
-    frame.show(); 
+    frame.setVisible(true); 
 <span class="comment">    // Every 50 milliseconds a new value is collected. </span>
-    AbstractDataCollector collector = new RandomDataCollector(trace,50);
+   ADataCollector collector = new RandomDataCollectorOffset(trace, 100);
 <span class="comment">    // Start an internal Thread that adds the values: </span>
     collector.start();
   }

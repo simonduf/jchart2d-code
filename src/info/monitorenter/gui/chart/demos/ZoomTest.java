@@ -1,7 +1,7 @@
 /*
  *  ZoomTest.java of project jchart2d, demonstration of a zoom-enabled 
  *  chart. 
- *  Copyright 2006 (C) Achim Westermann, created on 23:59:21.
+ *  Copyright 2007 - 2011 (C) Achim Westermann, created on 23:59:21.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,10 +22,12 @@
  */
 package info.monitorenter.gui.chart.demos;
 
+import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ZoomableChart;
-import info.monitorenter.gui.chart.layout.ChartPanel;
+import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
+import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -35,7 +37,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -45,10 +46,10 @@ import javax.swing.JFrame;
  * <p>
  * 
  * @author Alessio Sambarino (Contributor)
- * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.17 $
  */
-public class ZoomTest extends JFrame {
+public class ZoomTest
+    extends JFrame {
 
   /**
    * Action adapter for zoomAllButton.
@@ -59,12 +60,12 @@ public class ZoomTest extends JFrame {
     private ZoomableChart m_zoomableChart;
 
     /**
-     * Creates an instance that will reset zooming on the given zoomable chart
-     * upon the triggered action.
+     * Creates an instance that will reset zooming on the given zoomable chart upon the triggered
+     * action.
      * <p>
      * 
      * @param chart
-     *          the target to reset zoomin on.
+     *            the target to reset zooming on.
      */
     public ZoomAllAdapter(final ZoomableChart chart) {
       this.m_zoomableChart = chart;
@@ -79,11 +80,17 @@ public class ZoomTest extends JFrame {
   }
 
   /**
+   * Generated <code>serial version UID</code>.
+   * <p>
+   */
+  private static final long serialVersionUID = -2249660781499017221L;
+
+  /**
    * Main startup method.
    * <p>
    * 
    * @param args
-   *          ignored.
+   *            ignored.
    */
   public static void main(final String[] args) {
 
@@ -102,7 +109,7 @@ public class ZoomTest extends JFrame {
 
     super("ZoomTest");
 
-    Container c = getContentPane();
+    Container c = this.getContentPane();
     c.setLayout(new BorderLayout());
 
     // Create a chart
@@ -110,18 +117,33 @@ public class ZoomTest extends JFrame {
 
     // Create ITrace
     ITrace2D trace = new Trace2DSimple("Trace");
+    chart.addTrace(trace);
     trace.setColor(Color.RED);
     trace.setStroke(new BasicStroke(2));
 
     // Add all points, as it is static
-    Random random = new Random();
+    trace.addPoint(0, 0);
+    trace.addPoint(1, 1);
+    trace.addPoint(2, 1);
+    trace.addPoint(3, 2);
+    trace.addPoint(4, 1);
+    trace.addPoint(5, 0);
 
-    for (int i = 0; i < 100; i++) {
-      trace.addPoint(i, random.nextDouble() * 10.0 + i);
-    }
-
-    // Add the trace to the chart
+    
+    trace = new Trace2DSimple();
     chart.addTrace(trace);
+    trace.addPoint(0, 3);
+    trace.addPoint(1, 2);
+    trace.addPoint(2, 2);
+    trace.addPoint(3, 0);
+    trace.addPoint(4, -1);
+    trace.addPoint(5, 1);
+    trace.setColor(Color.BLUE);
+
+    // Tool tips and highlighting: Both modes point out the neares trace point to the cursor: 
+    chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
+    trace.setPointHighlighter(new PointPainterDisc(10));
+    chart.enablePointHighlighting(true);
 
     // Add chart to the pane
     c.add(new ChartPanel(chart));
@@ -134,7 +156,11 @@ public class ZoomTest extends JFrame {
     c.add(zoomAllButton, BorderLayout.NORTH);
 
     // Enable the termination button:
-    addWindowListener(new WindowAdapter() {
+    this.addWindowListener(new WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent e) {
         System.exit(0);
       }

@@ -1,7 +1,7 @@
 /*
  *
  *  StaticChartDiscs.java, rendering demo of jchart2d.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -25,9 +25,9 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.layout.ChartPanel;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.traces.painters.TracePainterDisc;
+import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
@@ -42,7 +42,7 @@ import javax.swing.JFrame;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.6 $
  * 
  */
 public final class StaticChartDiscs {
@@ -60,6 +60,8 @@ public final class StaticChartDiscs {
 
     // Create an ITrace:
     ITrace2D trace = new Trace2DSimple();
+    // Add the trace to the chart:
+    chart.addTrace(trace);
     trace.setTracePainter(new TracePainterDisc());
     trace.setColor(Color.DARK_GRAY);
     // Add all points, as it is static:
@@ -72,8 +74,6 @@ public final class StaticChartDiscs {
       value = Math.random() * count * 10;
       trace.addPoint(place, value);
     }
-    // Add the trace to the chart:
-    chart.addTrace(trace);
 
     // Make it visible:
     // Create a frame.
@@ -83,6 +83,10 @@ public final class StaticChartDiscs {
     frame.setSize(400, 300);
     // Enable the termination button [cross on the upper right edge]:
     frame.addWindowListener(new WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent e) {
         System.exit(0);
       }

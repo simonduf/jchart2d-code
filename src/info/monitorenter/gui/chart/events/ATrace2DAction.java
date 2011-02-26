@@ -1,6 +1,6 @@
 /*
  *  ATrace2DAction.java, base for actions to trigger on traces.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2004 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -29,21 +29,23 @@ import info.monitorenter.gui.chart.ITrace2D;
 import javax.swing.AbstractAction;
 
 /**
- * <p>
  * The base class that connects triggered actions with an {@link ITrace2D}
  * instance.
- * </p>
  * <p>
- * Every subclass may delegate it's constructor-given <code>ITrace2D</code>
- * instance as protected member <code>trace</code>.
- * </p>
+ * Every subclass may access it's constructor-given <code>ITrace2D</code>
+ * instance as protected member <code>m_trace</code>.
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.6 $
  * 
  */
 public abstract class ATrace2DAction extends AbstractAction implements PropertyChangeListener {
+  
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = 374572347443757594L;
+ 
   /** The trace to trigger the action upon. */
   protected ITrace2D m_trace;
 

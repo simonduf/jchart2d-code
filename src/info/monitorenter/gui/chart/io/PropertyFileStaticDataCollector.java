@@ -1,7 +1,7 @@
 /*
- *  PropertyFileStaticDataCollector, a collector fpr data 
+ *  PropertyFileStaticDataCollector, a collector for data 
  *  to display in static charts.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2004 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,21 +24,22 @@
 package info.monitorenter.gui.chart.io;
 
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.TracePoint2D;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Data collector that collects data in form of
- * {@link info.monitorenter.gui.chart.TracePoint2D} instances from a property
+ * {@link info.monitorenter.gui.chart.ITracePoint2D} instances from a property
  * file ( {@link java.util.Properties}).
  * <p>
  * 
@@ -58,12 +59,12 @@ public class PropertyFileStaticDataCollector extends AStaticDataCollector {
    * <p>
    * 
    * @param trace
-   *          the target trace to add data to.
+   *            the target trace to add data to.
    * 
    * @param propertyFileStream
-   *          the stream of the file in the {@link java.util.Properties} format
-   *          where {@link info.monitorenter.gui.chart.TracePoint2D} instances
-   *          (key is x, value is y) is parsed from.
+   *            the stream of the file in the {@link java.util.Properties}
+   *            format where {@link info.monitorenter.gui.chart.TracePoint2D}
+   *            instances (key is x, value is y) is parsed from.
    */
   public PropertyFileStaticDataCollector(final ITrace2D trace, final InputStream propertyFileStream) {
     super(trace);
@@ -73,21 +74,20 @@ public class PropertyFileStaticDataCollector extends AStaticDataCollector {
   /**
    * @see info.monitorenter.gui.chart.io.AStaticDataCollector#collectData()
    */
+  @Override
   public void collectData() throws FileNotFoundException, IOException {
     Properties props = new Properties();
     props.load(this.m_source);
-    Map.Entry entry;
-    Iterator it = props.entrySet().iterator();
-    List sortList = new LinkedList();
-    while (it.hasNext()) {
-      entry = (Map.Entry) it.next();
+    Set<Map.Entry<Object, Object>> entries =  props.entrySet();
+    List<ITracePoint2D> sortList = new LinkedList<ITracePoint2D>();
+    for (Map.Entry<Object, Object> entry : entries) {
       sortList.add(new TracePoint2D(Double.parseDouble((String) entry.getKey()), Double
           .parseDouble((String) entry.getValue())));
+
     }
     Collections.sort(sortList);
-    it = sortList.iterator();
-    while (it.hasNext()) {
-      m_trace.addPoint((TracePoint2D) it.next());
+    for (ITracePoint2D point : sortList) {
+      this.m_trace.addPoint(point);
     }
   }
 }

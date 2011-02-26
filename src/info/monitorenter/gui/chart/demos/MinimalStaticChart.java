@@ -1,7 +1,7 @@
 /*
  *  MinimalStaticChart.java of project jchart2d, a demonstration 
  *  of the minimal code to set up a chart with static data. 
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -25,8 +25,8 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.layout.ChartPanel;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
+import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -37,25 +37,15 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
- * Title: AdvancedStaticChart
+ * Title: MinimalStaticChart
  * <p>
  * 
- * Description: A chart to test labels. This chart uses a
- * <code>{@link info.monitorenter.gui.chart.labelformatters.LabelFormatterNumber}</code>
- * that formats to whole integer numbers. No same labels should appear.
+ * Description: A minimal example for rendering a static chart.
  * <p>
  * 
- * Copyright: sample code taken from http://jchart2d.sourceforge.net/usage.shtml
- * <p>
+ * @author Achim Westermann
  * 
- * Company: Infotility
- * <p>
- * 
- * @author Achim Westermann (original)
- * 
- * @author Martin Rojo (modified)
- * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.15 $
  */
 public final class MinimalStaticChart extends JPanel {
   /**
@@ -75,11 +65,15 @@ public final class MinimalStaticChart extends JPanel {
       JFrame frame = new JFrame("SampleChart");
       frame.getContentPane().add(new MinimalStaticChart());
       frame.addWindowListener(new WindowAdapter() {
+        /**
+         * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+         */
+        @Override
         public void windowClosing(final WindowEvent e) {
           System.exit(0);
         }
       });
-      frame.setSize(600, 600);
+      frame.setSize(300, 300);
       frame.setLocation(i % 3 * 200, i / 3 * 100);
       frame.setVisible(true);
     }
@@ -95,17 +89,19 @@ public final class MinimalStaticChart extends JPanel {
     // Create an ITrace:
     // Note that dynamic charts need limited amount of values!!!
     // ITrace2D trace = new Trace2DLtd(200);
-    // 3/11/-5 , let's try something else too:
     ITrace2D trace = new Trace2DSimple();
     trace.setColor(Color.RED);
 
-    // Add all points, as it is static:
-    double time = System.currentTimeMillis();
-    for (int i = 0; i < 100; i++) {
-      trace.addPoint(time + i, i * 1000);
-    }
     // Add the trace to the chart:
     chart.addTrace(trace);
+
+    // Add all points, as it is static:
+    double time = System.currentTimeMillis();
+    for (int i = 0; i < 120; i++) {
+      trace.addPoint(time + 1000 * 60 * i, i);
+    }
+
+    chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
 
     // Make it visible:
     this.add(new ChartPanel(chart), BorderLayout.CENTER);

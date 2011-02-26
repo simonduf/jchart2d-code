@@ -1,6 +1,6 @@
 /*
  *  ComparatorToString.java  jchart2d
- *  Copyright (C) Achim Westermann, created on 30.05.2005, 20:14:59
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,27 +22,39 @@
  */
 package info.monitorenter.util.collections;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
  * A <code>Comparator</code> that compares the given Objects by their
  * {@link java.lang.Object#toString()} value.
  * <p>
- *
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
- * @version $Revision: 1.1 $
+ * 
+ * @param <T> the type to compare by <code>{@link Object#toString()}</code>.
+ * @version $Revision: 1.7 $
  */
-public final class ComparatorToString implements Comparator {
+public final class ComparatorToString<T> implements Comparator<T>, Serializable {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 3682328616684815036L;
+
+  /**
+   * Defcon.
+   * <p>
+   */
+  public ComparatorToString() {
+    // nop
+  }
 
   /**
    * Compares both Objects by their {@link Object#toString()} presentation.
-   * <p> * @version $Revision: 1.1 $
-
-   *
+   * <p>
+   * 
    * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
    */
-  public int compare(final Object o1, final Object o2) throws IllegalArgumentException {
+  public int compare(final T o1, final T o2) throws IllegalArgumentException {
     if (o1 == null) {
       throw new IllegalArgumentException("Argument 1 must not be null");
     }

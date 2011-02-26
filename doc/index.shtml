@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-  var update="2/2/2005";
+  var update="06/19/2010";
  </script>
  <body id="home" >
   <div id="wrapper">
@@ -16,7 +16,7 @@
  
     <h2>What is JChart2D?</h2>
     <p>
-     JChart2D is an minimalistic charting library published under the OSI approved 
+     JChart2D is an minimalistic realtime charting library published under the OSI approved 
      <a target="_blank" href="http://www.gnu.org/copyleft/lesser.txt">GNU LESSER GENERAL PUBLIC LICENSE</a>.
      It is designed for displaying multiple traces consisting of tracepoints. 
      JChart2D is centered around a single configureable swing widget: the Chart2D. 
@@ -29,17 +29,16 @@
     <h2>Why yet another charting library?</h2>
     <p>
      Many open source charting libraries are available. One list may be found at 
-     <a href="http://www.par.univie.ac.at/project/askalon/visualization/links.html" target="blank">http://www.par.univie.ac.at/project/askalon/visualization/links.html</a> 
-     (Askalon itself provides a big charting library). <br/>
-     For finding a library that fits your need a look 
-     <a href="http://www.java2s.com/Code/Java/Chart/CatalogChart.htm" target="_blank">http://www.java2s.com/Code/Java/Chart/CatalogChart.htm</a>
-     could be helpful too.
+     <a href="http://java-source.net/open-source/charting-and-reporting" target="blank">http://java-source.net/open-source/charting-and-reporting</a><br/>
+     Especially for the web in recent years many beautiful solutions based upon javascript / flash / sgml have 
+     been created. Some are listed here:  
+     <a href="http://www.webappers.com/category/components/charts/" target="_blank">http://www.webappers.com/category/components/charts/</a>
     </p> 
     <p>
      These solutions differ in purpose and ease of use. Some are especially intended 
      for business charting and therefore allow a lot of visual configuration and nice 
      designs. To state it in one sentence: JChart2D is intended for engineering tasks 
-     and not for presentations. It's speciality is run time - dynamic precise display of 
+     and not for presentations. It's specialty is run time - dynamic precise display of 
      data with a minimal configuration overhead. 
     </p>
     
@@ -47,13 +46,13 @@
     <p>
      Everybody may use JChart2D for free. Personally I would be very unhappy 
      if it would be used within a "homeland security" and "war on terrorism" 
-     company. Even if it would be a techical honour to JChart2D as warfare 
+     company. Even if it would be a technical honor to JChart2D as warfare 
      requires high precision and engineering qualities. 
     </p> 
     
     <h2>Latest News</h2>
      <p>
-      The news are exported as a daily cronjob, so it might take a day before changes 
+      The news are exported as a weekly cronjob, so it might take a day before changes 
       are reflected.<br>
       Last retrieval:  <!--#flastmod file="./projnews.cache" -->.
      </p>

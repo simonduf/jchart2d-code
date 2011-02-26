@@ -1,7 +1,8 @@
 /*
  *
- *  RandomDataCollector.java  jchart2d
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 15:04:16
+ *  RandomDataCollector.java  of project jchart2d, collects random data for 
+ *  demo purposes. 
+ *  Copyright (C) 2004 - 2011 Achim Westermann, created on 10.12.2004, 15:04:16
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,25 +25,27 @@
 package info.monitorenter.gui.chart.io;
 
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.TracePoint2D;
 
 
 /**
+ * A proof of concept dummy implementation for the supertype.
  * <p>
- * A proof of concept dummy implementation for the supertype. Only collects
- * random values with timestamp on the x axis. The timestamp is related to the
- * time when this instance is instantiated to make it a lower value (offset to
- * start). implementation for exact timestamps that may be formatted with
- * java.text.DateFormat instances.
- * </p>
- *
+ * 
+ * Only collects random values with timestamp on the x axis. The timestamp is
+ * related to the time when this instance is instantiated to make it a lower
+ * value (offset to start). implementation for exact timestamps that may be
+ * formatted with java.text.DateFormat instances.
+ * <p>
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
- * @version $Revision: 1.2 $
+ * 
+ * @version $Revision: 1.9 $
  */
 public class RandomDataCollectorOffset extends ADataCollector {
 
-  /** The start tiime of this collector. */
+  /** The start time of this collector. */
   private long m_starttime = System.currentTimeMillis();
 
   /** The last y value added. */
@@ -52,10 +55,10 @@ public class RandomDataCollectorOffset extends ADataCollector {
    * Creates a collector that collectes every latency ms a point and adds it to
    * the trace.
    * <p>
-   *
+   * 
    * @param trace
    *          the trace to add points to.
-   *
+   * 
    * @param latency
    *          the interval for collection of points.
    */
@@ -66,7 +69,8 @@ public class RandomDataCollectorOffset extends ADataCollector {
   /**
    * @see ADataCollector#collectData()
    */
-  public TracePoint2D collectData() {
+  @Override
+  public ITracePoint2D collectData() {
     double rand = Math.random();
     boolean add = (rand >= 0.5) ? true : false;
     this.m_y = (add) ? this.m_y + Math.random() : this.m_y - Math.random();

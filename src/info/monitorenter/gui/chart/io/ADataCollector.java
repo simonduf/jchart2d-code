@@ -1,5 +1,5 @@
 /*
- * AbstractDataCollector.java jchart2d Copyright (C) Achim Westermann, created
+ * AbstractDataCollector.java jchart2d Copyright (C) 2004 - 2011 Achim Westermann, created
  * on 10.12.2004, 14:48:09 
  * 
  *  This library is free software; you can redistribute it and/or
@@ -22,11 +22,11 @@
 package info.monitorenter.gui.chart.io;
 
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 
 
 /**
- * A simple Runnable that contiuously collects data every latency time period
+ * A simple Runnable that continuously collects data every latency time period
  * and adds it to the internal ITrace2D instance.
  * <p>
  * Extend from this class and override the method {@link #collectData()}.
@@ -35,7 +35,7 @@ import info.monitorenter.gui.chart.TracePoint2D;
  * 
  * <pre>
  *       Chart2D chart = new Chart2D();
- *       ITrace2D trace = &lt;initializatioin&gt;
+ *       ITrace2D trace = &lt;initialization&gt;
  *       chart.addTrace(trace);
  *       // Put the chart in your UI...
  *       // ...
@@ -49,11 +49,12 @@ import info.monitorenter.gui.chart.TracePoint2D;
  * throw an exception as it would allow several Threads to run a collector. Use
  * the {@link #start()} instead.
  * <p>
- * rabbel rabbel.
+ * <b>Always connect the trace to a chart first before starting the collector for that trace!</b>
+ * (deadlock prevention will raise an exception else).
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.11 $
  */
 public abstract class ADataCollector implements Runnable {
 
@@ -104,14 +105,15 @@ public abstract class ADataCollector implements Runnable {
    * longer than the latency time that desired refresh rate will not be reached.
    * </p>
    * 
-   * @return the colleted point.
+   * @return the collected point.
    */
-  public abstract TracePoint2D collectData();
+  public abstract ITracePoint2D collectData();
 
   /**
    * @see java.lang.Object#finalize()
    */
-  public void finalize() throws Throwable {
+  @Override
+  protected void finalize() throws Throwable {
     super.finalize();
     this.stop();
   }
@@ -157,7 +159,7 @@ public abstract class ADataCollector implements Runnable {
     this.m_isRunning = true;
     long lasttime;
     this.m_stop = false;
-    TracePoint2D point;
+    ITracePoint2D point;
     while (!this.m_stop) {
       lasttime = System.currentTimeMillis();
       point = this.collectData();
@@ -216,9 +218,7 @@ public abstract class ADataCollector implements Runnable {
   }
 
   /**
-   * <p>
    * Stops this Thread. Data collection will end when finished the current loop.
-   * </p>
    * <p>
    * Note that your application may
    * <ol>
@@ -229,7 +229,7 @@ public abstract class ADataCollector implements Runnable {
    * 1) a limited buffer or a 2) unlimited buffer. This behaviour will of course
    * not appear if the data is not read from a queue where it has to be removed
    * from.
-   * </p>
+   * <p>
    */
   public void stop() {
     this.m_stop = true;

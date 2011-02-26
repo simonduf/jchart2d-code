@@ -1,7 +1,7 @@
 /*
  *  AxisLog10.java of project jchart2d, Axis implementation with log  base 10 
  *  display.
- *  Copyright 2006 (C) Achim Westermann, created on 20:33:13.
+ *  Copyright (c) 2007 - 2011 Achim Westermann, created on 20:33:13.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,14 +23,15 @@
  */
 package info.monitorenter.gui.chart.axis;
 
+import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 
 import java.util.Iterator;
 
 /**
- * An {@link info.monitorenter.gui.chart.AAxis} with log base 10 scaled display
- * of values.
+ * An {@link info.monitorenter.gui.chart.axis.AAxis} with log base 10 scaled
+ * display of values.
  * <p>
  * <h2>Caution</h2>
  * This will not work with negative values (Double.NaN is computed for log of
@@ -46,9 +47,12 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.15 $
  */
 public class AxisLog10 extends AAxisTransformation {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -1783172443489534956L;
 
   /**
    * Creates an instance that uses a {@link LabelFormatterSimple} for formatting
@@ -58,6 +62,18 @@ public class AxisLog10 extends AAxisTransformation {
    */
   public AxisLog10() {
     super(new LabelFormatterSimple());
+  }
+
+  /**
+   * Constructor that uses the given label formatter for formatting labels.
+   * <p>
+   * 
+   * @param formatter
+   *          needed for formatting labels of this axis.
+   * 
+   */
+  public AxisLog10(final IAxisLabelFormatter formatter) {
+    super(formatter);
   }
 
   /**
@@ -78,6 +94,7 @@ public class AxisLog10 extends AAxisTransformation {
    * 
    * @return log base 10 for the given value.
    */
+  @Override
   protected double transform(final double in) {
 
     double toTransform = in;
@@ -89,13 +106,16 @@ public class AxisLog10 extends AAxisTransformation {
     if (toTransform < 1) {
       // allow to transform the input for empty traces or all traces with empty
       // points:
-      Iterator itTraces = this.m_accessor.getChart().getTraces().iterator();
+      if(this.m_accessor == null ) {
+        throw new IllegalStateException("Connect this axis ("+this.getAxisTitle().getTitle()+") to a chart first before doing this operation.");
+      }
+      Iterator<ITrace2D> itTraces = this.m_accessor.getChart().getTraces().iterator();
       if (!itTraces.hasNext()) {
         toTransform = 1.0;
       } else {
         ITrace2D trace;
         while (itTraces.hasNext()) {
-          trace = (ITrace2D) itTraces.next();
+          trace = itTraces.next();
           if (trace.iterator().hasNext()) {
             // Illegal value for transformation defined by a point added:
             throw new IllegalArgumentException(this.getClass().getName()
@@ -108,7 +128,7 @@ public class AxisLog10 extends AAxisTransformation {
     }
     // TODO: change this to Math.log10 as soon as java 1.5 is used:
     double result = Math.log(toTransform) / Math.log(10);
-    if (result == Double.POSITIVE_INFINITY) {
+    if (Double.isInfinite(result)) {
       result = Double.MAX_VALUE;
     }
     return result;
@@ -117,6 +137,7 @@ public class AxisLog10 extends AAxisTransformation {
   /**
    * @see AAxisTransformation#untransform(double)
    */
+  @Override
   protected double untransform(final double in) {
     return Math.pow(10, in);
   }

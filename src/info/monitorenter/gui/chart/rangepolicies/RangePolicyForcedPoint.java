@@ -1,6 +1,6 @@
 /*
  * RangePolicyFixedViewport.java,  <enter purpose here>.
- * Copyright (C) 2006  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2004 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,17 +24,19 @@ package info.monitorenter.gui.chart.rangepolicies;
 import info.monitorenter.util.Range;
 
 /**
- * <p>
  * A range policy that forces the chart always to display the constructor given
  * point regardless of the actual bounds of the traces within the chart.
- * </p>
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.8 $
  * 
  */
 public final class RangePolicyForcedPoint extends RangePolicyMinimumViewport {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 5676959746627361093L;
 
   /**
    * Creates a range policy that ensures zero to be visible.
@@ -57,6 +59,17 @@ public final class RangePolicyForcedPoint extends RangePolicyMinimumViewport {
   }
 
   /**
+   * Sets the point to ensure to be visible.
+   * <p>
+   * 
+   * @param point
+   *          the point to ensure to be visible.
+   */
+  public void setPoint(final double point) {
+    super.setRange(new Range(point, point));
+  }
+
+  /**
    * This method is an invariant of the super class contract: only the minimum
    * value of the given range is used to enforce visibility.
    * <p>
@@ -70,6 +83,7 @@ public final class RangePolicyForcedPoint extends RangePolicyMinimumViewport {
    *          and
    *          {@link info.monitorenter.gui.chart.IRangePolicy#getMax(double, double)}.
    */
+  @Override
   public void setRange(final Range range) {
     double min = range.getMin();
     if (min != range.getMax()) {
@@ -77,16 +91,5 @@ public final class RangePolicyForcedPoint extends RangePolicyMinimumViewport {
     } else {
       super.setRange(range);
     }
-  }
-
-  /**
-   * Sets the point to ensure to be visible.
-   * <p>
-   * 
-   * @param point
-   *          the point to ensure to be visible.
-   */
-  public void setPoint(final double point) {
-    super.setRange(new Range(point, point));
   }
 }

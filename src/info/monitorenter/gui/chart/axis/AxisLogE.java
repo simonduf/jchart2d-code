@@ -1,6 +1,6 @@
 /*
  *  AxisLogE.java of project jchart2d, Axis implementation with log display.
- *  Copyright 2006 (C) Achim Westermann, created on 20:33:13.
+ *  Copyright (c) 2007 - 2011 Achim Westermann, created on 20:33:13.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,13 +22,14 @@
  */
 package info.monitorenter.gui.chart.axis;
 
+import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 
 import java.util.Iterator;
 
 /**
- * An {@link info.monitorenter.gui.chart.AAxis} with log scaled display of
+ * An {@link info.monitorenter.gui.chart.axis.AAxis} with log scaled display of
  * values.
  * <p>
  * 
@@ -46,9 +47,12 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.13 $
  */
 public class AxisLogE extends AAxisTransformation {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 1839309514449455729L;
 
   /**
    * Creates an instance that uses a {@link LabelFormatterSimple} for formatting
@@ -58,6 +62,19 @@ public class AxisLogE extends AAxisTransformation {
    */
   public AxisLogE() {
     super(new LabelFormatterSimple());
+  }
+
+  /**
+   * Creates an instance that will the given label formatter for formatting
+   * labels.
+   * <p>
+   * 
+   * @param formatter
+   *          needed for formatting labels of this axis.
+   * 
+   */
+  public AxisLogE(final IAxisLabelFormatter formatter) {
+    super(formatter);
   }
 
   /**
@@ -78,6 +95,7 @@ public class AxisLogE extends AAxisTransformation {
    * 
    * @return log base 10 for the given value.
    */
+  @Override
   protected double transform(final double in) {
     double toTransform = in;
     // Starting from 1 downwards the transformation of this value becomes
@@ -88,17 +106,17 @@ public class AxisLogE extends AAxisTransformation {
     if (toTransform < 1) {
       // allow to transform the input for empty traces or all traces with empty
       // points:
-      Iterator itTraces = this.m_accessor.getChart().getTraces().iterator();
+      Iterator<ITrace2D> itTraces = this.m_accessor.getChart().getTraces().iterator();
       if (!itTraces.hasNext()) {
         toTransform = 1.0;
       } else {
         ITrace2D trace;
         while (itTraces.hasNext()) {
-          trace = (ITrace2D) itTraces.next();
+          trace = itTraces.next();
           if (trace.iterator().hasNext()) {
             // Illegal value for transformation defined by a point added:
             throw new IllegalArgumentException(this.getClass().getName()
-                + " must not be used with values < 1!");
+                + " must not be used with values < 1 :(" + toTransform + ")!");
           }
         }
         // No illegal point: everything was empty
@@ -116,6 +134,7 @@ public class AxisLogE extends AAxisTransformation {
   /**
    * @see AAxisTransformation#untransform(double)
    */
+  @Override
   protected double untransform(final double in) {
     return Math.pow(Math.E, in);
   }

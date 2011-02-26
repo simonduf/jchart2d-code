@@ -1,6 +1,6 @@
 /*
  *  AxisActionSetRange.java of project jchart2d
- *  Copyright 2006 (C) Achim Westermann, created on 20:30:06.
+ *  Copyright (c) 2007 - 2011 Achim Westermann, created on 20:30:06.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,26 +22,55 @@
  */
 package info.monitorenter.gui.chart.events;
 
+import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
-import info.monitorenter.gui.chart.dialogs.DialogRange;
-import info.monitorenter.gui.chart.layout.controls.RangeChooserPanel;
+import info.monitorenter.gui.chart.controls.RangeChooserPanel;
+import info.monitorenter.gui.chart.dialogs.ModalDialog;
 
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 
 /**
  * <code>Action</code> that sets the range of an
- * {@link info.monitorenter.gui.chart.AAxis} of a chart ({@link info.monitorenter.gui.chart.Chart2D})
- * that will be used by it's viewport (
- * {@link info.monitorenter.gui.chart.AAxis#setRangePolicy(info.monitorenter.gui.chart.IRangePolicy)})
- * by showing a modal range chooser.
+ * {@link info.monitorenter.gui.chart.axis.AAxis} of a chart (
+ * {@link info.monitorenter.gui.chart.Chart2D}) that will be used by it's
+ * viewport (
+ * {@link info.monitorenter.gui.chart.axis.AAxis#setRangePolicy(info.monitorenter.gui.chart.IRangePolicy)}
+ * ) by showing a modal range chooser.
+ * <p>
+ * 
+ * This only works if the bislider.jar file is in the classpath.
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.12 $
  */
 public class AxisActionSetRange extends AAxisAction {
+
+  /**
+   * Flag set whenever the proper jar file (apache-xmlgraphics-commons) is in
+   * the classpath.
+   */
+  public static final boolean RANGE_CHOOSER_SUPPORTED;
+
+  static {
+    Class< ? > test = null;
+    try {
+      // Do a fake operation that will not be inlined by the compiler:
+      test = Class.forName("com.visutools.nav.bislider.BiSlider");
+
+    } catch (Throwable ncde) {
+      // nop
+    } finally {
+      if (test != null) {
+        RANGE_CHOOSER_SUPPORTED = true;
+      } else {
+        RANGE_CHOOSER_SUPPORTED = false;
+      }
+    }
+  }
 
   /**
    * Generated <code>serialVersionUID</code>.
@@ -49,11 +78,16 @@ public class AxisActionSetRange extends AAxisAction {
   private static final long serialVersionUID = 3258694286479406393L;
 
   /**
-   * Create an <code>Action</code> that sets the range of the given axis.
+   * Create an <code>Action</code> that accesses the chart's axis by argument
+   * <code>axis</code> and identifies itself with the given action String.
    * <p>
    * 
+   * @param chart
+   *          the owner of the axis to trigger actions upon.
+   * 
    * @param axis
-   *          the target the action will work on.
+   *          needed to identify the axis of the chart: one of {@link Chart2D#X}
+   *          , {@link Chart2D#Y}.
    * 
    * @param description
    *          the descriptive <code>String</code> that will be displayed by
@@ -61,8 +95,11 @@ public class AxisActionSetRange extends AAxisAction {
    *          <code>Action</code> assigned (
    *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    */
-  public AxisActionSetRange(final IAxis axis, final String description) {
-    super(axis, description);
+  public AxisActionSetRange(final Chart2D chart, final String description, final int axis) {
+    super(chart, description, axis);
+    if (!RANGE_CHOOSER_SUPPORTED) {
+      this.setEnabled(false);
+    }
   }
 
   /**
@@ -70,17 +107,21 @@ public class AxisActionSetRange extends AAxisAction {
    */
   public void actionPerformed(final ActionEvent e) {
 
-    RangeChooserPanel rangePanel = new RangeChooserPanel(this.m_axis.getRangePolicy().getRange());
-    DialogRange dialog = new DialogRange(this.m_axis.getAccessor().getChart(), "Choose a range",
-        true, rangePanel);
+    IAxis axis = this.getAxis();
+    RangeChooserPanel rangePanel = new RangeChooserPanel(axis.getRangePolicy().getRange());
+    ModalDialog dialog = new ModalDialog(axis.getAccessor().getChart(), "Choose a range",
+        rangePanel);
     dialog.showDialog();
-    this.m_axis.setRange(rangePanel.getRange());
+    axis.setRange(rangePanel.getRange());
   }
 
   /**
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
+  @Override
   public void propertyChange(final PropertyChangeEvent evt) {
+    // will check for an axis replacement and transfer listening to the new axis if so: 
+    super.propertyChange(evt);
     // nop as this action will not be used
     // by checkbox or radio button menu items that have a state.
   }

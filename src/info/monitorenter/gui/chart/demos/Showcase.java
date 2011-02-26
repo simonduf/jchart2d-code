@@ -1,6 +1,6 @@
 /*
  *  Showcase.java, the main demo application of project jchart2d.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,13 +23,13 @@
 package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.controls.LayoutFactory;
+import info.monitorenter.gui.chart.events.Chart2DActionSaveImageSingleton;
 import info.monitorenter.gui.chart.io.ADataCollector;
-import info.monitorenter.gui.chart.io.FileFilterExtensions;
 import info.monitorenter.gui.chart.io.RandomDataCollectorOffset;
-import info.monitorenter.gui.chart.layout.ChartPanel;
-import info.monitorenter.gui.chart.layout.LayoutFactory;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyMinimumViewport;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
+import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.util.Range;
 
 import java.awt.Color;
@@ -39,15 +39,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageTypeSpecifier;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -55,14 +47,12 @@ import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.filechooser.FileFilter;
 
 /**
  * Advanced demonstration applet for jchart2d.
@@ -73,11 +63,11 @@ import javax.swing.filechooser.FileFilter;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.15 $
  * 
  */
 public final class Showcase
-    extends JApplet {
+    extends JApplet { 
 
   /**
    * Panel with controls for the chart.
@@ -86,7 +76,7 @@ public final class Showcase
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
    * 
    * 
-   * @version $Revision: 1.3 $
+   * @version $Revision: 1.15 $
    */
   final class ControlPanel
       extends JPanel {
@@ -108,14 +98,6 @@ public final class Showcase
      */
     private JComboBox m_colorChooser;
 
-    /**
-     * <p>
-     * The <code>JFileChooser</code> used to choose the location for saving
-     * snapshot images.
-     * </p>
-     */
-    private JFileChooser m_filechooser;
-
     /** The slider for choosing the speed of adding new points. */
     private JSlider m_latencyTimeSlider;
 
@@ -129,7 +111,7 @@ public final class Showcase
      * Defcon.
      * <p>
      */
-    private ControlPanel() {
+    protected ControlPanel() {
       // create the components:
       this.setBackground(Color.WHITE);
       this.createAmountPointSlider();
@@ -225,7 +207,7 @@ public final class Showcase
        * <p>
        * 
        * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-       * @version $Revision: 1.3 $
+       * @version $Revision: 1.15 $
        */
       final class ColorItem
           extends Color {
@@ -255,6 +237,7 @@ public final class Showcase
         /**
          * @see java.lang.Object#toString()
          */
+        @Override
         public String toString() {
           return this.m_name;
         }
@@ -319,61 +302,10 @@ public final class Showcase
      * <p>
      */
     private void createSnapShotButton() {
-      // the JFileChooser for saving snapshots:
-      try {
-        this.m_filechooser = new JFileChooser();
-        this.m_filechooser.setAcceptAllFileFilterUsed(false);
-        // the button for snapshot:
-        this.m_snapshot = new JButton("snapshot");
-        this.m_snapshot.setBackground(Color.WHITE);
-        this.m_snapshot.addActionListener(new ActionListener() {
-          public void actionPerformed(final ActionEvent e) {
-            // Immediately get the image:
-            BufferedImage img = Showcase.this.getChart().snapShot();
-            // clear file filters (uncool API)
-
-            FileFilter[] farr = Showcase.ControlPanel.this.m_filechooser.getChoosableFileFilters();
-            for (int i = 0; i < farr.length; i++) {
-              Showcase.ControlPanel.this.m_filechooser.removeChoosableFileFilter(farr[i]);
-            }
-            // collect capable writers by format name (API even gets worse!)
-            String[] encodings = ImageIO.getWriterFormatNames();
-            Set writers = new TreeSet();
-            ImageTypeSpecifier spec = ImageTypeSpecifier.createFromRenderedImage(img);
-            Iterator itWriters;
-            for (int i = 0; i < encodings.length; i++) {
-              itWriters = ImageIO.getImageWriters(spec, encodings[i]);
-              if (itWriters.hasNext()) {
-                writers.add(encodings[i].toLowerCase());
-              }
-            }
-            // add the file filters:
-            itWriters = writers.iterator();
-            String encoding;
-            while (itWriters.hasNext()) {
-              encoding = (String) itWriters.next();
-              Showcase.ControlPanel.this.m_filechooser
-                  .addChoosableFileFilter(new FileFilterExtensions(new String[] {encoding }));
-            }
-
-            int ret = Showcase.ControlPanel.this.m_filechooser.showSaveDialog(Showcase.this);
-            if (ret == JFileChooser.APPROVE_OPTION) {
-              File file = Showcase.ControlPanel.this.m_filechooser.getSelectedFile();
-              // get the encoding
-              encoding = Showcase.ControlPanel.this.m_filechooser.getFileFilter().getDescription()
-                  .substring(2);
-              try {
-                ImageIO.write(img, encoding, new File(file.getAbsolutePath() + "." + encoding));
-              } catch (IOException e1) {
-                e1.printStackTrace();
-              }
-            }
-          }
-        });
-      } catch (SecurityException se) {
-        // applet context
-        // grey out or leave ?
-      }
+      // the button for snapshot:
+      this.m_snapshot = new JButton(Chart2DActionSaveImageSingleton.getInstance(
+          Showcase.this.m_chart, "Save image"));
+      this.m_snapshot.setBackground(Color.WHITE);
     }
 
     /**
@@ -423,6 +355,10 @@ public final class Showcase
     frame.setSize(400, 600);
     // Enable the termination button [cross on the upper right edge]:
     frame.addWindowListener(new WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent e) {
         System.exit(0);
       }
@@ -431,10 +367,10 @@ public final class Showcase
   }
 
   /** The char to use. */
-  private Chart2D m_chart;
+  protected Chart2D m_chart;
 
   /** The data collector to use. */
-  private ADataCollector m_collector;
+  private transient ADataCollector m_collector;
 
   /** The trace to use. */
   private Trace2DLtd m_trace;
@@ -488,11 +424,12 @@ public final class Showcase
   /**
    * @see java.applet.Applet#init()
    */
+  @Override
   public void init() {
     super.init();
     Chart2D chart = new Chart2D();
     this.setChart(chart);
-    this.setSize(new Dimension(400, 500));
+    this.setSize(new Dimension(600, 500));
     this.m_chart.getAxisX().setPaintGrid(true);
     this.m_chart.getAxisY().setPaintGrid(true);
     chart.getAxisY().setRangePolicy(new RangePolicyMinimumViewport(new Range(-20, +20)));
@@ -505,9 +442,10 @@ public final class Showcase
     Container content = this.getContentPane();
     content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
     LayoutFactory factory = LayoutFactory.getInstance();
-    this.setJMenuBar(factory.createMenuBar(chart, false));
-    
     ChartPanel chartpanel = new ChartPanel(chart);
+
+    this.setJMenuBar(factory.createChartMenuBar(chartpanel, false));
+
     content.add(chartpanel);
     content.addPropertyChangeListener(chartpanel);
     this.setCollector(new RandomDataCollectorOffset(this.getTrace(), 50));
@@ -583,5 +521,4 @@ public final class Showcase
       this.getCollector().stop();
     }
   }
-
 }

@@ -1,6 +1,6 @@
 /*
  *  StringUtil, utility class for string operations.
- *  Copyright (C) Achim Westermann, created on 09.09.2004, 12:38:21
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -34,9 +34,10 @@ import java.util.List;
  * 
  * @author Achim.Westermann@gmx.de
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.10 $
  */
 public final class StringUtil {
+  
   /** Singleton instance. */
   private static StringUtil instance = null;
 
@@ -70,10 +71,10 @@ public final class StringUtil {
    * <p>
    * 
    * What is special? <br>
-   * If an Object in the given List is an Array (of Objects or primitive
-   * datatypes) reflection will be used to create a String - representation of
-   * them. The changes are reflected in the Objects that are in the given List.
-   * So keep a reference to it. If you are sure, that your List does not contain
+   * If an Object in the given List is an Array (of Objects or primitive data
+   * types) reflection will be used to create a String - representation of them.
+   * The changes are reflected in the Objects that are in the given List. So
+   * keep a reference to it. If you are sure, that your List does not contain
    * Arrays do not use this method to avoid overhead.
    * <p>
    * 
@@ -92,13 +93,13 @@ public final class StringUtil {
    *          treatment.
    * 
    */
-  public static final void arraysToString(final List objects) {
+  public static final void listOfArraysToString(final List<Object> objects) {
     if (objects == null) {
       return;
     }
     int stop = objects.size();
     for (int i = 0; i < stop; i++) {
-      objects.add(i, arrayToString(objects.remove(i)));
+      objects.add(i, StringUtil.arrayToString(objects.remove(i)));
     }
   }
 
@@ -106,15 +107,35 @@ public final class StringUtil {
    * If the given Object is no Array, it's toString - method is invoked.
    * Primitive type - Arrays and Object - Arrays are introspected using
    * java.lang.reflect.Array. Convention for creation fo String -
+   * representation: <p>
+   * 
+   * @see StringUtil#arrayToString(Object, String)
+   * 
+   * @param isArr
+   *          The Array to represent as String.
+   * 
+   * @return a String-representation of the Object.
+   * 
+   * 
+   */
+  public static final String arrayToString(final Object isArr) {
+    String result = StringUtil.arrayToString(isArr, ",");
+    return result;
+  }
+  
+  /**
+   * If the given Object is no Array, it's toString - method is invoked.
+   * Primitive type - Arrays and Object - Arrays are introspected using
+   * java.lang.reflect.Array. Convention for creation for String -
    * representation: <br>
    * 
    * <code>
    * // Primitive arrays: 
-   * &quot;[&quot;+isArr[0]+&quot;,&quot;+isArr[1]+.. ..+isArr[isArr.length-1]+&quot;]&quot;
+   * &quot;[&quot;+isArr[0]+&quot;&lt;separator&gt;&quot;+isArr[1]+.. ..+isArr[isArr.length-1]+&quot;]&quot;
    *     
    *     
    * //Object arrays :  
-   * &quot;[&quot;+isArr[0].toString()+&quot;,&quot;+.. ..+isArr[isArr.length-1].toString+&quot;]&quot;
+   * &quot;[&quot;+isArr[0].toString()+&quot;&lt;separator&gt;&quot;+.. ..+isArr[isArr.length-1].toString+&quot;]&quot;
    * // Two or three - dimensional Arrays are not supported
    * //(should be reflected in a special output method, e.g.as a field)
    * 
@@ -122,57 +143,61 @@ public final class StringUtil {
    * toString()
    * </code>
    * 
+   * @param separator put in-between each array element in the resulting string. 
+   * 
    * @param isArr
    *          The Array to represent as String.
    * 
-   * @return a String-represetation of the Object.
+   * @return a String-representation of the Object.
    * 
    * 
    */
-  public static final String arrayToString(final Object isArr) {
+  public static final String arrayToString(final Object isArr, final String separator) {
+    String result;
     if (isArr == null) {
-      return "null";
-    }
-    Object element;
-    StringBuffer tmp = new StringBuffer();
-    try {
-      int length = Array.getLength(isArr);
-      tmp.append("[");
-      for (int i = 0; i < length; i++) {
-        element = Array.get(isArr, i);
-        if (element == null) {
-          tmp.append("null");
-        } else {
-          tmp.append(element.toString());
+      result = "null";
+    } else {
+      Object element;
+      StringBuffer tmp = new StringBuffer();
+      try {
+        int length = Array.getLength(isArr);
+        tmp.append("[");
+        for (int i = 0; i < length; i++) {
+          element = Array.get(isArr, i);
+          if (element == null) {
+            tmp.append("null");
+          } else {
+            tmp.append(element.toString());
+          }
+          if (i < length - 1) {
+            tmp.append(separator);
+          }
         }
-        if (i < length - 1) {
-          tmp.append(",");
-        }
-      }
-      tmp.append("]");
-    } catch (ArrayIndexOutOfBoundsException bound) {
-      // programming mistake or bad Array.getLength(obj).
-      tmp.append("]");
-      return tmp.toString();
+        tmp.append("]");
+        result = tmp.toString();
+      } catch (ArrayIndexOutOfBoundsException bound) {
+        // programming mistake or bad Array.getLength(obj).
+        tmp.append("]");
+        result = tmp.toString();
 
-    } catch (IllegalArgumentException noarr) {
-      return isArr.toString();
+      } catch (IllegalArgumentException noarr) {
+        result = isArr.toString();
+      }
     }
-    return tmp.toString();
+    return result;
   }
 
   /**
-   * Returns the system - dependant line separator.
+   * Returns the system - dependent line separator.
    * <p>
    * 
    * Only call this method once (not in a loop) and keep the result.
    * <p>
    * 
-   * @return the system - dependant line separator.
+   * @return the system - dependent line separator.
    */
   public static String getNewLine() {
-    return (String) java.security.AccessController
-        .doPrivileged(new sun.security.action.GetPropertyAction("line.separator"));
+    return  System.getProperty("line.separator");
   }
 
   /**
@@ -181,7 +206,8 @@ public final class StringUtil {
    * 
    * This method is useless for now as all methods are static. It may be used in
    * future if VM-global configuration will be put to the state of the instance.
-   * <p>#
+   * <p>
+   * #
    * 
    * @return the singleton instance of this class.
    */
@@ -222,33 +248,37 @@ public final class StringUtil {
    * 
    * <pre>
    *        Primitive Arrays : as performed by this classes @see #ArrayToString.
-   *        Object Arrays    :  as performed by this classes @see #ArrayToString
-   *        other Objects    :  toString()  (as performed by this classes @see #ArrayToString).
+   *        Object Arrays    : as performed by this classes @see #ArrayToString
+   *        other Objects    : toString()  (as performed by this classes @see #ArrayToString).
    * </pre>
    * 
    * @param objects
    *          the <code>List&lt;Object&gt;</code> to inspect for the maximum
-   *          lenght of a {@link Object#toString()} result.
+   *          length of a {@link Object#toString()} result.
    * 
    * @return The length of the longest String - representation of an Object in
    *         the List <b>or 0 if objects was null or of size 0. </b>
    */
-  public static final int longestStringRepresentation(final List objects) {
+  public static final int longestStringRepresentation(final List<Object> objects) {
+    int result;
     if (objects == null) {
-      return 0;
-    }
-    int maxsize = 0, tint = 0;
-    String tmp;
-    int stop = objects.size();
-    for (int i = 0; i < stop; i++) {
-      tmp = arrayToString(objects.get(i));
-      tint = tmp.length();
-      if (tint > maxsize) {
-        maxsize = tint;
+      result = 0;
+    } else {
+      int maxsize = 0;
+      int tint = 0;
+      String tmp;
+      int stop = objects.size();
+      for (int i = 0; i < stop; i++) {
+        tmp = StringUtil.arrayToString(objects.get(i));
+        tint = tmp.length();
+        if (tint > maxsize) {
+          maxsize = tint;
+        }
       }
+      // maximum size known.
+      result = maxsize;
     }
-    // maxsize known.
-    return maxsize;
+    return result;
   }
 
   /**
@@ -273,7 +303,7 @@ public final class StringUtil {
           + ") is smaller than s.length(" + oldlen + ") : " + s);
     } else {
       int tofill = length - oldlen;
-      result = appendSpaces(s, tofill);
+      result = StringUtil.appendSpaces(s, tofill);
     }
     return result;
   }
@@ -281,7 +311,7 @@ public final class StringUtil {
   /**
    * Modifies the given LinkedList by getting it's Objects and replace them by
    * their toString() - representation concatenated with the necessary amount of
-   * whitespaces that every String in the List will have the same amount of
+   * white spaces that every String in the List will have the same amount of
    * characters.
    * <p>
    * 
@@ -290,8 +320,8 @@ public final class StringUtil {
    * <li>You have got an AbstractList or subclass containing Objects you do not
    * know.</li>
    * <li>You want to transform all Elements in the List to Strings.</li>
-   * <li>There might be Array's in the Object (whose toString method will
-   * return only their hashcode).</li>
+   * <li>There might be Array's in the Object (whose toString method will return
+   * only their hashcode).</li>
    * </ul>
    * <p>
    * 
@@ -317,15 +347,16 @@ public final class StringUtil {
    *          contains the Objects to replace by their toString()
    *          representation.
    */
-  public static final void toLongestString(final List objects) {
+  public static final void toLongestString(final List<Object> objects) {
     if (objects == null) {
       return;
     }
-    int maxsize = 0, tint = 0;
+    int maxsize = 0;
+    int tint = 0;
     String tmp;
     int stop = objects.size();
     for (int i = 0; i < stop; i++) {
-      arrayToString(objects.get(i));
+      StringUtil.arrayToString(objects.get(i));
       tmp = (String) objects.get(i);
       tint = tmp.length();
       if (tint > maxsize) {
@@ -333,9 +364,9 @@ public final class StringUtil {
       }
       objects.add(i, tmp);
     }
-    // maxsize known.
+    // maximum size known.
     for (int i = 0; i < stop; i++) {
-      objects.add(i, setSize((String) objects.remove(i), maxsize));
+      objects.add(i, StringUtil.setSize((String) objects.remove(i), maxsize));
     }
   }
 

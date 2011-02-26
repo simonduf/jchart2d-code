@@ -1,7 +1,7 @@
 /*
  * Trace2DLtdReplcacing, an array- based fast implementation of an ITrace2D
  * that only allows a single tracepoint with a certain x- value.
- * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2004 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,30 +22,31 @@
  */
 package info.monitorenter.gui.chart.traces;
 
-
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.util.Iterator;
 
 /**
- * In addition to the <code> Trace2DLtd</code> this class offers the guarantee
- * only to allow a single tracepoint with a certain x- value. If a new
- * tracepoint is added whose x- value is already contained, the new tracepoints
- * values will get assigned to the certain old tracepoint respecting the fact
- * that only an additional changed y- value occurs. <br>
- * The <code>add</code> methods increase complexity to factor n but some event -
- * handling may be saved (no change of x and y). <br>
- * Tracepoints with x- values not contained before will be appended to the end
- * of the internal data- structure. <br>
+ * In addition to the <code> Trace2DLtd</code> this class offers the guarantee only to allow a
+ * single tracepoint with a certain x- value. If a new tracepoint is added whose x- value is already
+ * contained, the new tracepoints values will get assigned to the certain old tracepoint respecting
+ * the fact that only an additional changed y- value occurs. <br>
+ * The <code>add</code> methods increase complexity to factor n but some event - handling may be
+ * saved (no change of x and y). <br>
+ * Tracepoints with x- values not contained before will be appended to the end of the internal data-
+ * structure. <br>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westerman </a>
- * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.16 $
  */
-public class Trace2DLtdReplacing extends Trace2DLtd {
+public class Trace2DLtdReplacing
+    extends Trace2DLtd {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -6048361222161598032L;
+
   /**
-   * Constructs a <code>Trace2DLtdReplacing</code> with a default buffer size
-   * of 100.
+   * Constructs a <code>Trace2DLtdReplacing</code> with a default buffer size of 100.
    */
   public Trace2DLtdReplacing() {
     this(100);
@@ -56,21 +57,26 @@ public class Trace2DLtdReplacing extends Trace2DLtd {
    * <p>
    * 
    * @param bufsize
-   *          the maximum amount of points that will be displayed.
+   *            the maximum amount of points that will be displayed.
    */
   public Trace2DLtdReplacing(final int bufsize) {
     super(bufsize);
   }
 
   /**
-   * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.TracePoint2D)
+   * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.ITracePoint2D)
    */
-  public boolean addPointInternal(final TracePoint2D p) {
-    TracePoint2D tmp;
-    double tmpx, tmpy;
-    Iterator it = this.m_buffer.iteratorF2L();
+  @Override
+  protected boolean addPointInternal(final ITracePoint2D p) {
+    boolean result = false;
+    boolean located = false;
+    ITracePoint2D tmp;
+    double tmpx;
+    double tmpy;
+    Iterator<ITracePoint2D> it = this.m_buffer.iteratorF2L();
     while (it.hasNext()) {
-      tmp = (TracePoint2D) it.next();
+      
+      tmp = it.next();
       tmpx = tmp.getX();
       if (tmpx == p.getX()) {
         tmpy = p.getY();
@@ -78,10 +84,14 @@ public class Trace2DLtdReplacing extends Trace2DLtd {
           // performs bound checks and fires property changes
           tmp.setLocation(tmpx, tmpy);
           // don't need bound checks of calling addPoint.
-          return false;
+          located = true;
         }
       }
     }
-    return super.addPointInternal(p);
+    if (!located) {
+      // no matching point was found and shifted:
+      result = super.addPointInternal(p);
+    }
+    return result;
   }
 }

@@ -2,6 +2,8 @@
  *  TraceTester, an incredible old but remarkable weird visual test for 
  *  the automatic scaling routines of jchart2d.
  * 
+ * Copyright (c) 2007 - 2011  Achim Westermann, Achim.Westermann@gmx.de
+ *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
  *  License as published by the Free Software Foundation; either
@@ -24,6 +26,7 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.TracePoint2D;
 import info.monitorenter.gui.chart.traces.Trace2DBijective;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
@@ -38,20 +41,19 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
-
 /**
- * A testclass that steps through all <code>ITrace2D</code> implementations
- * and adds random or "half- random" <code>TracePoint2D</code> -instances.
+ * A test class that steps through all <code>ITrace2D</code> implementations and
+ * adds random or "half- random" <code>TracePoint2D</code> -instances.
  * <p>
- *
+ * 
  * You may see, that not all <code>ITrace2D</code> implementations work as
  * proposed (Trace2DLimitedReplacing). This will be fixed.
  * <p>
- *
+ * 
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
- *
- * @version $Revision: 1.1 $
+ * 
+ * @version $Revision: 1.8 $
  */
 public final class TraceTester {
 
@@ -61,19 +63,20 @@ public final class TraceTester {
    * Unlike random points half random points are not totally random samples
    * within the given bounds but repeat the same x value 10 times.
    * <p>
-   *
+   * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   *
-   *
-   * @version $Revision: 1.1 $
+   * 
+   * 
+   * @version $Revision: 1.8 $
    */
   static class HalfRandomPoints extends TraceTester.RandomPoints {
 
     /** The old x value. */
     private double m_oldx = 0;
+
     /**
      * Defines how often the same x value is returned from subsequent calls to
-     * {@link #nextPoint(ITrace2D)}.
+     * {@link #nextPoint()}.
      */
     private double m_samexcount = 0;
 
@@ -81,29 +84,30 @@ public final class TraceTester {
      * Creates a half random point generator that will create random points
      * within ([minx..minx+maxx], [miny..miny+maxy]).
      * <p>
-     *
+     * 
      * @param minx
      *          the lower x bound for points to generate.
-     *
+     * 
      * @param maxx
      *          the x range for points to generate.
-     *
+     * 
      * @param miny
      *          the lower y bound for points to generate.
-     *
+     * 
      * @param maxy
      *          the y range for points to generate.
-     *
+     * 
      */
     HalfRandomPoints(final int minx, final int maxx, final int miny, final int maxy) {
       super(minx, maxx, miny, maxy);
-      this.m_oldx = (maxx - minx) / 2;
+      this.m_oldx = (maxx - minx) / 2.0;
     }
 
     /**
-     * @see info.monitorenter.gui.chart.demo.TraceTester.RandomPoints#nextPoint()
+     * @see info.monitorenter.gui.chart.demos.TraceTester.RandomPoints#nextPoint()
      */
-    public TracePoint2D nextPoint() {
+    @Override
+    public ITracePoint2D nextPoint() {
       if (this.m_samexcount == 10) {
         this.m_samexcount = 0;
         this.m_oldx = this.m_rand.nextDouble() * this.m_xrange + this.m_xmin;
@@ -116,10 +120,10 @@ public final class TraceTester {
   /**
    * Helper that creates random points.
    * <p>
-   *
+   * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   *
-   * @version $Revision: 1.1 $
+   * 
+   * @version $Revision: 1.8 $
    */
   private static class RandomPoints {
     /** Used for randomization. */
@@ -141,19 +145,19 @@ public final class TraceTester {
      * Creates a random point generator that will create random points within
      * ([minx..minx+maxx], [miny..miny+maxy]).
      * <p>
-     *
+     * 
      * @param minx
      *          the lower x bound for points to generate.
-     *
+     * 
      * @param maxx
      *          the x range for points to generate.
-     *
+     * 
      * @param miny
      *          the lower y bound for points to generate.
-     *
+     * 
      * @param maxy
      *          the y range for points to generate.
-     *
+     * 
      */
     RandomPoints(final int minx, final int maxx, final int miny, final int maxy) {
       if (minx >= maxx) {
@@ -171,10 +175,10 @@ public final class TraceTester {
     /**
      * Returns the next random point.
      * <p>
-     *
+     * 
      * @return the next random point.
      */
-    public TracePoint2D nextPoint() {
+    public ITracePoint2D nextPoint() {
       return new TracePoint2D(this.m_rand.nextDouble() * this.m_xrange + this.m_xmin, this.m_rand
           .nextDouble()
           * this.m_yrange + this.m_ymin);
@@ -185,20 +189,25 @@ public final class TraceTester {
   /**
    * Main entry.
    * <p>
-   *
+   * 
    * @param args
    *          ignored.
    */
+  @SuppressWarnings("unchecked")
   public static void main(final String[] args) {
     try {
-      Class[] traces = new Class[] {Trace2DSimple.class, Trace2DBijective.class,
-          Trace2DReplacing.class, Trace2DSorted.class, Trace2DLtd.class, Trace2DLtdReplacing.class,
-          Trace2DLtdSorted.class };
+      Class< ? extends ITrace2D>[] traces = new Class[] {Trace2DSimple.class,
+          Trace2DBijective.class, Trace2DReplacing.class, Trace2DSorted.class, Trace2DLtd.class,
+          Trace2DLtdReplacing.class, Trace2DLtdSorted.class };
       RandomPoints rand = new RandomPoints(0, 3, 0, 3);
 
       Chart2D test = new Chart2D();
       JFrame frame = new JFrame("TraceTester");
       frame.addWindowListener(new WindowAdapter() {
+        /**
+         * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+         */
+        @Override
         public void windowClosing(final WindowEvent e) {
           System.exit(0);
         }
@@ -210,7 +219,7 @@ public final class TraceTester {
       frame.setVisible(true);
       ITrace2D current = null;
       for (int i = 0; i < traces.length; i++) {
-        current = (ITrace2D) traces[i].newInstance();
+        current = traces[i].newInstance();
         test.addTrace(current);
         frame.setTitle("TraceTester: full-random, current: " + traces[i].getName());
 
@@ -223,7 +232,7 @@ public final class TraceTester {
       }
       rand = new HalfRandomPoints(0, 3, 0, 3);
       for (int i = 0; i < traces.length; i++) {
-        current = (ITrace2D) traces[i].newInstance();
+        current = traces[i].newInstance();
         test.addTrace(current);
         frame.setTitle("TraceTester: repeating x 10 times, current: " + traces[i].getName());
 

@@ -1,6 +1,6 @@
 /*
  *  Trace2DSimple, a list- based simple implementation of a ITrace2D.
- *  Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2011 Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -19,25 +19,22 @@
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
  */
-
 package info.monitorenter.gui.chart.traces;
 
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
+ * A basic <code>{@link info.monitorenter.gui.chart.ITrace2D}</code>
+ * implementation that stores the internal
+ * <code>{@link info.monitorenter.gui.chart.TracePoint2D}</code> instances in
+ * a <code>{@link java.util.List}</code>.
  * <p>
- * A basic <code>{@link info.monitorenter.gui.chart.ITrace2D}</code> implementation that
- * stores the internal <code>{@link info.monitorenter.gui.chart.TracePoint2D}</code>
- * instances in a <code>{@link java.util.List}</code>.
- * </p>
- * <p>
- * </p>
- * <p>
- * This class has the following behaviour: <br>
+ * This class has the following behavior: <br>
  * <ul>
  * <li>All tracepoints that are added are stored unchanged in a LinkedList.
  * </li>
@@ -46,16 +43,20 @@ import java.util.LinkedList;
  * it is ok - the old point may remain. (no bijective assigement of X and Y)
  * </li>
  * </ul>
- * </p>
+ * <p>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.16 $
  */
-public class Trace2DSimple extends ATrace2D implements ITrace2D {
+public class Trace2DSimple
+    extends ATrace2D implements ITrace2D {
 
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -132333501493433766L;
+  
   /** Internal List &lt;ITracePoint2D&gt;. */
-  protected LinkedList m_points = new LinkedList();
+  protected List<ITracePoint2D> m_points = new LinkedList<ITracePoint2D>();
 
   /**
    * Creates an empty trace.
@@ -77,9 +78,10 @@ public class Trace2DSimple extends ATrace2D implements ITrace2D {
   }
 
   /**
-   * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.TracePoint2D)
+   * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.ITracePoint2D)
    */
-  protected boolean addPointInternal(final TracePoint2D p) {
+  @Override
+  protected boolean addPointInternal(final ITracePoint2D p) {
     this.m_points.add(p);
     return true;
   }
@@ -108,22 +110,28 @@ public class Trace2DSimple extends ATrace2D implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#iterator()
    */
-  public Iterator iterator() {
+  public Iterator<ITracePoint2D> iterator() {
     return this.m_points.iterator();
   }
 
   /**
    * @see ATrace2D#removeAllPointsInternal()
    */
-  public final void removeAllPointsInternal() {
+  @Override
+  protected final void removeAllPointsInternal() {
     this.m_points.clear();
   }
 
   /**
-   * @see ATrace2D#removePointInternal(info.monitorenter.gui.chart.TracePoint2D)
+   * @see ATrace2D#removePointInternal(info.monitorenter.gui.chart.ITracePoint2D)
    */
-  protected boolean removePointInternal(final TracePoint2D point) {
-    return this.m_points.remove(point);
+  @Override
+  protected ITracePoint2D removePointInternal(final ITracePoint2D point) {
+    ITracePoint2D result = null;
+    if (this.m_points.remove(point)) {
+      result = point;
+    }
+    return result;
   }
 
 }

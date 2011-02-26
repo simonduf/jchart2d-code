@@ -1,6 +1,8 @@
 /*
- * RangePolicyFixedViewport.java,  <enter purpose here>.
- * Copyright (C) 2006  Achim Westermann, Achim.Westermann@gmx.de
+ * RangePolicyFixedViewport.java,  a range policy that forces the chart 
+ * only to display the bounds of the internal range regardless of 
+ * the actual bounds of the traces within the chart.
+ * Copyright (c) 2004 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,18 +26,21 @@ package info.monitorenter.gui.chart.rangepolicies;
 import info.monitorenter.util.Range;
 
 /**
- * <p>
  * A range policy that forces the chart only to display the bounds of the
  * internal range regardless of the actual bounds of the traces within the
  * chart.
- * </p>
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.6 $
  * 
  */
 public final class RangePolicyFixedViewport extends ARangePolicy {
+  
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 4403327213232041577L;
+
   /**
    * Creates a range policy with an unconfigured range ({@link Range#RANGE_UNBOUNDED}).
    * <p>

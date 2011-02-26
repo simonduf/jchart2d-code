@@ -1,6 +1,6 @@
 /*
  *  JComponentActionSetForeground, action for setting a foreground color to a JComponent.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2004 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@
 package info.monitorenter.gui.chart.events;
 
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.layout.LayoutFactory.PropertyChangeCheckBoxMenuItem;
+import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -32,15 +32,14 @@ import java.beans.PropertyChangeEvent;
 import javax.swing.JComponent;
 
 /**
- * <p>
  * Performs the action of setting the foreground color (
  * {@link javax.swing.JComponent#setForeground(java.awt.Color)}} of a
  * <code>JComponent</code>.
- * </p>
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.6 $
  */
 public final class JComponentActionSetForeground extends AJComponentAction {
 
@@ -74,7 +73,7 @@ public final class JComponentActionSetForeground extends AJComponentAction {
       final Color color) {
     super(component, colorName);
     this.m_color = color;
-    component.addPropertyChangeListener(Chart2D.PROPERTY_BACKGROUND_COLOR, this);
+    component.addPropertyChangeListener(Chart2D.PROPERTY_FOREGROUND_COLOR, this);
   }
 
   /**

@@ -1,7 +1,6 @@
 /*
- *
- *  IRangePolicy.java  jchart2d
- *  Copyright (C) Achim Westermann, created on 20.04.2005, 10:23:32
+ *  IRangePolicy.java of project jchart2d. Interface for viewport policies. 
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -26,30 +25,90 @@ package info.monitorenter.gui.chart;
 import info.monitorenter.util.Range;
 
 import java.beans.PropertyChangeListener;
-
+import java.io.Serializable;
 
 /**
- * <p>
  * An interface that allows an axis to be plugged with a range policy.
- * </p>
  * <p>
  * Implementations may limit the range of the underlying Chart2D's data
  * (clipping / zooming), increase it (void space offset), guarantee a minimum
  * viewport... .
- * </p>
+ * <p>
+ * 
+ * <h3>Property Change events</h3>
+ * <p>
+ * <table border="0">
+ * <tr>
+ * <th><code>property</code></th>
+ * <th><code>oldValue</code></th>
+ * <th><code>newValue</code></th>
+ * <th>occurrence</th>
+ * </tr>
+ * <tr>
+ * <td><code>{@link #PROPERTY_RANGE}</code></td>
+ * <td><code>{@link info.monitorenter.util.Range}</code> that changed</td>
+ * <td><code>{@link info.monitorenter.util.Range}</code>, the new value</td>
+ * <td>Fired if any bound of the range changed (min or max).</td>
+ * </tr>
+ * <tr>
+ * <tr>
+ * <td><code>{@link #PROPERTY_RANGE_MAX}</code></td>
+ * <td><code>{@link java.lang.Double}</code>, the old max value of the
+ * range. </td>
+ * <td><code>{@link info.monitorenter.util.Range}</code>, the new max value
+ * of the range. </td>
+ * <td></td>
+ * </tr>
+ * <tr>
+ * <td><code>{@link #PROPERTY_RANGE_MIN}</code></td>
+ * <td><code>{@link java.lang.Double}</code>, the old min value of the
+ * range. </td>
+ * <td><code>{@link info.monitorenter.util.Range}</code>, the new min value
+ * of the range. </td>
+ * <td></td>
+ * </tr>
+ * </table>
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.9 $
  * 
- * @see info.monitorenter.gui.chart.AAxis
+ * @see info.monitorenter.gui.chart.axis.AAxis
  */
-public interface IRangePolicy {
+public interface IRangePolicy extends Serializable {
   /**
+   * The property key defining a change of the <code>min</code> or the
+   * <code>max</code> property.
    * <p>
+   * Use in combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   * <p>
+   */
+  public static final String PROPERTY_RANGE = "IRangePolicy.PROPERTY_RANGE";
+
+  /**
+   * The property key defining the <code>max</code> property.
+   * <p>
+   * Use in combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   * <p>
+   */
+  public static final String PROPERTY_RANGE_MAX = "IRangePolicy.PROPERTY_RANGE";
+
+  /**
+   * The property key defining the <code>min</code> property.
+   * <p>
+   * Use in combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   * <p>
+   */
+  public static final String PROPERTY_RANGE_MIN = "IRangePolicy.PROPERTY_RANGE";
+
+  /**
    * Registers a property change listener that will be informed about changes of
    * the property identified by the given <code>propertyName</code>.
-   * </p>
+   * <p>
    * 
    * @param propertyName
    *          the name of the property the listener is interested in
@@ -64,7 +123,7 @@ public interface IRangePolicy {
 
   /**
    * Define the upper bound of the Chart2D's value range. Depends on the
-   * {@link AAxis} this instance is bound to.
+   * {@link info.monitorenter.gui.chart.axis.AAxis} this instance is bound to.
    * 
    * @param chartMin
    *          the minimum value of the connected Chart2D that may / should be
@@ -81,7 +140,7 @@ public interface IRangePolicy {
 
   /**
    * Define the lower bound of the Chart2D's value range. Depends on the
-   * {@link AAxis} this instance is bound to.
+   * {@link info.monitorenter.gui.chart.axis.AAxis} this instance is bound to.
    * 
    * @param chartMin
    *          the minimum value of the connected Chart2D that may / should be
@@ -118,18 +177,18 @@ public interface IRangePolicy {
   public Range getRange();
 
   /**
-   * <p>
    * Deregisters a property change listener that has been registerd for
-   * listening on all properties.
-   * </p>
+   * listening on the given property.
+   * <p>
    * 
    * @param listener
    *          a listener that will only be informed if the property identified
    *          by the argument <code>propertyName</code> changes
    * 
-   * 
+   * @param property
+   *          the property the listener was registered to.
    */
-  public void removePropertyChangeListener(PropertyChangeListener listener);
+  public void removePropertyChangeListener(PropertyChangeListener listener, final String property);
 
   /**
    * <p>

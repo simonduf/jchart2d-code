@@ -1,7 +1,6 @@
 /*
- *
  *  MinimalStaticChart.java  jchart2d
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,18 +22,18 @@
  */
 package info.monitorenter.gui.chart.demos;
 
-import info.monitorenter.gui.chart.AAxis;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.io.ADataCollector;
 import info.monitorenter.gui.chart.io.RandomDataCollectorTimeStamped;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterDate;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterNumber;
-import info.monitorenter.gui.chart.layout.ChartPanel;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyMinimumViewport;
 import info.monitorenter.gui.chart.traces.Trace2DAxisSwap;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
+import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.util.Range;
 
 import java.awt.BasicStroke;
@@ -48,23 +47,22 @@ import java.text.SimpleDateFormat;
 
 import javax.swing.JFrame;
 
-
 /**
  * <p>
  * An example that introduces some more advanced features of jchart2d.
  * </p>
- *
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- *
- * @version $Revision: 1.1 $
- *
+ * 
+ * @version $Revision: 1.11 $
+ * 
  */
 public final class AdvancedDynamicChart {
 
   /**
    * Creates a new JFrame and adds a chart that uses advanced features.
    * <p>
-   *
+   * 
    * @param args
    *          command line arguments, unused.
    */
@@ -81,7 +79,7 @@ public final class AdvancedDynamicChart {
 
     // Set a date formatter:
     yAxis.setFormatter(new LabelFormatterDate(new SimpleDateFormat("HH:mm:ss")));
-    chart.setAxisY(yAxis);
+    chart.setAxisYLeft(yAxis, 0);
 
     // set a number formatter to get rid of the unnecessary ".0" prefixes for
     // the X-Axis:
@@ -93,7 +91,7 @@ public final class AdvancedDynamicChart {
     format.setMaximumIntegerDigits(3);
     xAxis.setFormatter(new LabelFormatterNumber(format));
 
-    chart.setAxisX(xAxis);
+    chart.setAxisXBottom(xAxis, 0);
     // Try a range policy:
     // This must not be invoked before the Axis is connected to a Chart2D
     // (chart.setXAxis...)
@@ -101,13 +99,13 @@ public final class AdvancedDynamicChart {
     // Create an ITrace:
     // Note that dynamic charts need limited amount of values!!!
 
-    ITrace2D trace = new Trace2DLtd(20);
+    ITrace2D trace = new Trace2DLtd(400);
     trace.setColor(Color.RED);
 
     // set a stroke (pattern to render the trace)
     Stroke stroke = new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10.0f,
     // dash pattern, dash limit
-        new float[]{15f, 10f }, 5f);
+        new float[] {15f, 10f }, 5f);
     trace.setStroke(stroke);
 
     // Add the trace to the chart:
@@ -121,6 +119,10 @@ public final class AdvancedDynamicChart {
     frame.setSize(400, 300);
     // Enable the termination button [cross on the upper right edge]:
     frame.addWindowListener(new WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent e) {
         System.exit(0);
       }
@@ -128,8 +130,7 @@ public final class AdvancedDynamicChart {
     frame.setVisible(true);
     // Every 500 milliseconds a new value is collected.
     // The AxisSwap changes x and y data. Just a proof of concept.
-    ADataCollector collector = new RandomDataCollectorTimeStamped(
-        new Trace2DAxisSwap(trace), 500);
+    ADataCollector collector = new RandomDataCollectorTimeStamped(new Trace2DAxisSwap(trace), 50);
     collector.start();
   }
 

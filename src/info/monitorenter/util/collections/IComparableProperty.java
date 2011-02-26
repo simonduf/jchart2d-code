@@ -1,6 +1,6 @@
 /*
  *  IComparableProperty.java allows an instance to be compared by a member.
- *  Copyright (C) Achim Westermann, created on 30.05.2005, 20:14:59
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,9 @@
  *
  */
 package info.monitorenter.util.collections;
+
+import java.io.Serializable;
+
 /**
  * An interface that allows implementors to let themselves be compared by a
  * <code>Comparable</code> {@link java.lang.Number} instance that may be
@@ -30,7 +33,7 @@ package info.monitorenter.util.collections;
  * take every new element by shifting the order of the contained operations with
  * an operation that modifies their comparable <code>Number</code>.
  * <p>
- * Note that the methods {@link #getComparableProperty()()} and
+ * Note that the methods {@link #getComparableProperty()} and
  * {@link #setComparableProperty(Number)} have to be linked to the same member
  * or source of data (if more advanced) in a way that:
  * <p>
@@ -47,11 +50,11 @@ package info.monitorenter.util.collections;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.6 $
  *
  */
 
-public interface IComparableProperty {
+public interface IComparableProperty extends Serializable {
 
   /**
    * Returns a {@link Number} this instance wants to be compared by.
@@ -68,7 +71,7 @@ public interface IComparableProperty {
    *
    * Note that a <code>ComparableProperty</code> has to allow by contract that
    * it's <code>Number</code> property it lays open to be compared by has to
-   * be modifyable from outside!
+   * be modifiable from outside!
    * <p>
    *
    * @param n

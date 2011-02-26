@@ -1,7 +1,7 @@
 /*
  * Trace2DBijective, a list- based implementation of a ITrace2D that only
  *  allows a single occurance of a certain x- value.
- * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2004 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,8 +23,7 @@
 
 package info.monitorenter.gui.chart.traces;
 
-
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.util.Iterator;
 
@@ -54,26 +53,34 @@ import java.util.Iterator;
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.15 $
  */
-public class Trace2DBijective extends Trace2DSimple {
+public class Trace2DBijective
+    extends Trace2DSimple {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 2913093358404794473L;
 
   /**
    * Defcon of this stateless instance.
    */
   public Trace2DBijective() {
+    // nop
   }
 
   /**
-   * @see ATrace2D#addPointInternal(info.monitorenter.gui.chart.TracePoint2D)
+   * @see info.monitorenter.gui.chart.traces.Trace2DSimple#addPointInternal(info.monitorenter.gui.chart.ITracePoint2D)
    */
-  public boolean addPointInternal(final TracePoint2D p) {
+  @Override
+  protected boolean addPointInternal(final ITracePoint2D p) {
+    boolean result = false;
     double px = p.getX();
     synchronized (this) {
-      Iterator it = this.m_points.iterator();
-      TracePoint2D tmp = null, removed = null;
+      Iterator<ITracePoint2D> it = this.m_points.iterator();
+      ITracePoint2D tmp = null;
+      ITracePoint2D removed = null;
       while (it.hasNext()) {
-        tmp = (TracePoint2D) it.next();
+        tmp = it.next();
         if (tmp.getX() == px) {
           it.remove();
           removed = tmp;
@@ -82,10 +89,11 @@ public class Trace2DBijective extends Trace2DSimple {
       }
       if (removed != null) {
         this.removePoint(removed);
-        // dont use bound check routines of calling addPoint.
-        return false;
+        // don't use bound check routines of calling addPoint.
+        result = false;
       }
-      return super.addPointInternal(p);
+      result = super.addPointInternal(p);
     }
+    return result;
   }
 }

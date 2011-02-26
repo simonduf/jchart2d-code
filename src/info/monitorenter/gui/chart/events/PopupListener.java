@@ -1,6 +1,6 @@
 /*
  *  PopupListener, general purpose popup trigger that connects JPopupMenus to mouse events.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2004 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,8 @@ package info.monitorenter.gui.chart.events;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JPopupMenu;
 
@@ -31,9 +33,8 @@ import javax.swing.JPopupMenu;
  * A general purpose <code>PopupListener</code>.
  * <p>
  * It is used to connect <code>JPopupMenu</code> instances with the components
- * retrieved from the factory methods (e.g.
- * {@link info.monitorenter.gui.chart.layout.LayoutFactory#createContextMenuLable
- * (info.monitorenter.gui.chart.Chart2D)}).
+ * retrieved from factory methods (of factory
+ * {@link info.monitorenter.gui.chart.controls.LayoutFactory}).
  * <p>
  * 
  * Note that instances have to be registered as a listener on components via
@@ -43,11 +44,37 @@ import javax.swing.JPopupMenu;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.10 $
  */
 public final class PopupListener extends MouseAdapter {
+  /**
+   * Needed for looking up the listener when the popup menu is found: Especially
+   * this listener records the mouse events while popup - triggered actions
+   * cannot access the location of the popup because it is invisible when the
+   * action is triggered.
+   */
+  private static Map<JPopupMenu, PopupListener> listenerLookup = new HashMap<JPopupMenu, PopupListener>();
+
+  /**
+   * Returns the listener for the given popup or null, if there is no listener
+   * for that popup.
+   * <p>
+   * 
+   * @param popup
+   *          the popup to search the listener for.
+   * 
+   * @return the listener for the given popup or null, if there is no listener
+   *         for that popup.
+   */
+  public static PopupListener lookup(final JPopupMenu popup) {
+    return PopupListener.listenerLookup.get(popup);
+  }
+
   /** The popup to open. */
   private JPopupMenu m_popup;
+
+  /** Reference to the last mouse event that triggered a popup. */
+  private MouseEvent m_lastPopupMouseEvent;
 
   /**
    * Creates an instance that will show the given popup upon a right mouse click
@@ -64,20 +91,24 @@ public final class PopupListener extends MouseAdapter {
    */
   public PopupListener(final JPopupMenu popup) {
     this.m_popup = popup;
+    PopupListener.listenerLookup.put(popup, this);
   }
 
   /**
-   * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+   * Returns the lastPopupMouseEvent.
+   * <p>
+   * 
+   * @return the lastPopupMouseEvent
    */
-  public void mousePressed(final MouseEvent me) {
-    this.maybeShopwPopup(me);
+  public final MouseEvent getLastPopupMouseEvent() {
+    return this.m_lastPopupMouseEvent;
   }
 
   /**
-   * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+   * @return the popup menu.
    */
-  public void mouseReleased(final MouseEvent me) {
-    this.maybeShopwPopup(me);
+  public final JPopupMenu getPopup() {
+    return this.m_popup;
   }
 
   /**
@@ -92,14 +123,25 @@ public final class PopupListener extends MouseAdapter {
    */
   private void maybeShopwPopup(final MouseEvent me) {
     if (me.isPopupTrigger()) {
+      this.m_lastPopupMouseEvent = me;
       this.m_popup.show(me.getComponent(), me.getX(), me.getY());
+
     }
   }
 
   /**
-   * @return the popup menue.
+   * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
    */
-  public final JPopupMenu getPopup() {
-    return this.m_popup;
+  @Override
+  public void mousePressed(final MouseEvent me) {
+    this.maybeShopwPopup(me);
+  }
+
+  /**
+   * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+   */
+  @Override
+  public void mouseReleased(final MouseEvent me) {
+    this.maybeShopwPopup(me);
   }
 }

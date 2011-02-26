@@ -1,6 +1,6 @@
 /*
  *  Trace2DAxisSwap.java  jchart2d
- *  Copyright (C) Achim Westermann, created on 20.04.2005, 09:06:33
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,42 +23,45 @@
 package info.monitorenter.gui.chart.traces;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IErrorBarPolicy;
+import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.awt.Color;
 import java.awt.Stroke;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
 import java.util.Set;
 
 /**
- * <p>
  * A delegator / proxy that delegates all calls to an internal constructor-given
  * ITrace2d and swaps the data of the added Point2D instances.
- * </p>
  * <p>
  * x values become y values and vice versa. Performance is bad, as unnecessary
  * instances are created (each TracePoint2D is instantiated twice) so this
  * instance is for debugging / testing purposes only.
- * 
- * </p>
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.34 $
  */
-public class Trace2DAxisSwap implements ITrace2D {
-  /** The delagate instance to decorate with axis swapping. */
-  private ITrace2D m_delegate;
+public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -5987864541853522562L;
+
+  /** The delegate instance to decorate with axis swapping. */
+  private final ITrace2D m_delegate;
 
   /**
    * Creates an instance that will swap the axis of the given delegate.
    * <p>
    * 
    * @param trace
-   *          the delagate instance to decorate with axis swapping.
+   *          the delegate instance to decorate with axis swapping.
    */
   public Trace2DAxisSwap(final ITrace2D trace) {
     if (trace == null) {
@@ -72,17 +75,38 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#addPoint(double, double)
+   * @see info.monitorenter.gui.chart.ITrace2D#addComputingTrace(info.monitorenter.gui.chart.ITrace2D)
    */
-  public boolean addPoint(final double x, final double y) {
-    return this.addPoint(new TracePoint2D(x, y));
+  public void addComputingTrace(final ITrace2D trace) {
+    this.m_delegate.addComputingTrace(trace);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#addPoint(info.monitorenter.gui.chart.TracePoint2D)
+   * @see info.monitorenter.gui.chart.ITrace2D#addErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
    */
-  public boolean addPoint(final TracePoint2D p) {
-    return this.m_delegate.addPoint(new TracePoint2D(p.getY(), p.getX()));
+  public boolean addErrorBarPolicy(final IErrorBarPolicy< ? > errorBarPolicy) {
+    return this.m_delegate.addErrorBarPolicy(errorBarPolicy);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#addPoint(double, double)
+   */
+  public boolean addPoint(final double x, final double y) {
+    final ITracePoint2D p = this.getRenderer().getTracePointProvider().createTracePoint(x, y);
+    return this.addPoint(p);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#addPoint(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  public boolean addPoint(final ITracePoint2D p) {
+    final ITracePoint2D swap = (ITracePoint2D) p.clone();
+    swap.setLocation(p.getY(), p.getX());
+    return this.m_delegate.addPoint(swap);
+  }
+
+  public boolean addPointHighlighter(final IPointPainter< ? > highlighter) {
+    return this.m_delegate.addPointHighlighter(highlighter);
   }
 
   /**
@@ -97,22 +121,58 @@ public class Trace2DAxisSwap implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#addTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
-  public boolean addTracePainter(final ITracePainter painter) {
+  public boolean addTracePainter(final ITracePainter< ? > painter) {
     return this.m_delegate.addTracePainter(painter);
+  }
+
+  /**
+   * @param o
+   *          the trace to compare to.
+   * @return see interface.
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  public int compareTo(final ITrace2D o) {
+    return this.m_delegate.compareTo(o);
   }
 
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#containsTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
-  public boolean containsTracePainter(final ITracePainter painter) {
+  public boolean containsTracePainter(final ITracePainter< ? > painter) {
     return this.m_delegate.containsTracePainter(painter);
   }
 
   /**
    * @see java.lang.Object#equals(java.lang.Object)
    */
+  @Override
   public boolean equals(final Object obj) {
-    return this.m_delegate.equals(obj);
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final Trace2DAxisSwap other = (Trace2DAxisSwap) obj;
+    if (this.m_delegate == null) {
+      if (other.m_delegate != null) {
+        return false;
+      }
+    } else if (!this.m_delegate.equals(other.m_delegate)) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(info.monitorenter.gui.chart.ITracePoint2D,
+   *      int)
+   */
+  public void firePointChanged(final ITracePoint2D changed, final int state) {
+    this.m_delegate.firePointChanged(changed, state);
   }
 
   /**
@@ -123,17 +183,24 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.util.collections.IComparableProperty#getComparableProperty()
+   * @see info.monitorenter.gui.chart.ITrace2D#getErrorBarPolicies()
    */
-  public Number getComparableProperty() {
-    return this.m_delegate.getComparableProperty();
+  public Set<IErrorBarPolicy< ? >> getErrorBarPolicies() {
+    return this.m_delegate.getErrorBarPolicies();
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#getLable()
+   * @see info.monitorenter.gui.chart.ITrace2D#getHasErrorBars()
    */
-  public String getLable() {
-    return this.m_delegate.getLable();
+  public boolean getHasErrorBars() {
+    return this.m_delegate.getHasErrorBars();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getLabel()
+   */
+  public String getLabel() {
+    return this.m_delegate.getLabel();
   }
 
   /**
@@ -179,10 +246,44 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getNearestPointEuclid(double,
+   *      double)
+   */
+  public DistancePoint getNearestPointEuclid(final double x, final double y) {
+    return this.m_delegate.getNearestPointEuclid(x, y);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getNearestPointManhattan(double,
+   *      double)
+   */
+  public DistancePoint getNearestPointManhattan(final double x, final double y) {
+    return this.m_delegate.getNearestPointManhattan(x, y);
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#getPhysicalUnits()
    */
   public String getPhysicalUnits() {
     return this.m_delegate.getPhysicalUnits();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getPhysicalUnitsX()
+   */
+  public String getPhysicalUnitsX() {
+    return this.m_delegate.getPhysicalUnitsX();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getPhysicalUnitsY()
+   */
+  public String getPhysicalUnitsY() {
+    return this.m_delegate.getPhysicalUnitsY();
+  }
+
+  public Set<IPointPainter< ? >> getPointHighlighters() {
+    return this.m_delegate.getPointHighlighters();
   }
 
   /**
@@ -214,18 +315,10 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
-   * 
    * @see info.monitorenter.gui.chart.ITrace2D#getTracePainters()
    */
-  public Set getTracePainters() {
+  public Set<ITracePainter< ? >> getTracePainters() {
     return this.m_delegate.getTracePainters();
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.ITrace2D#isVisible()
-   */
-  public boolean isVisible() {
-    return this.m_delegate.isVisible();
   }
 
   /**
@@ -238,8 +331,12 @@ public class Trace2DAxisSwap implements ITrace2D {
   /**
    * @see java.lang.Object#hashCode()
    */
+  @Override
   public int hashCode() {
-    return this.m_delegate.hashCode();
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((this.m_delegate == null) ? 0 : this.m_delegate.hashCode());
+    return result;
   }
 
   /**
@@ -250,10 +347,31 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#isVisible()
+   */
+  public boolean isVisible() {
+    return this.m_delegate.isVisible();
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#iterator()
    */
-  public Iterator iterator() {
+  public Iterator<ITracePoint2D> iterator() {
     return this.m_delegate.iterator();
+  }
+
+  /**
+   * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+   */
+  public void propertyChange(final PropertyChangeEvent evt) {
+    this.m_delegate.propertyChange(evt);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#removeAllPointHighlighters()
+   */
+  public Set<IPointPainter< ? >> removeAllPointHighlighters() {
+    return this.m_delegate.removeAllPointHighlighters();
   }
 
   /**
@@ -264,10 +382,28 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#removePoint(info.monitorenter.gui.chart.TracePoint2D)
+   * @see info.monitorenter.gui.chart.ITrace2D#removeComputingTrace(info.monitorenter.gui.chart.ITrace2D)
    */
-  public boolean removePoint(final TracePoint2D point) {
+  public boolean removeComputingTrace(final ITrace2D trace) {
+    return this.m_delegate.removeComputingTrace(trace);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#removeErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
+   */
+  public boolean removeErrorBarPolicy(final IErrorBarPolicy< ? > errorBarPolicy) {
+    return this.m_delegate.removeErrorBarPolicy(errorBarPolicy);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#removePoint(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  public boolean removePoint(final ITracePoint2D point) {
     return this.m_delegate.removePoint(point);
+  }
+
+  public boolean removePointHighlighter(final IPointPainter< ? > highlighter) {
+    return this.m_delegate.removePointHighlighter(highlighter);
   }
 
   /**
@@ -289,7 +425,7 @@ public class Trace2DAxisSwap implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#removeTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
-  public boolean removeTracePainter(final ITracePainter painter) {
+  public boolean removeTracePainter(final ITracePainter< ? > painter) {
     return this.m_delegate.removeTracePainter(painter);
   }
 
@@ -301,10 +437,10 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.util.collections.IComparableProperty#setComparableProperty(java.lang.Number)
+   * @see info.monitorenter.gui.chart.ITrace2D#setErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
    */
-  public void setComparableProperty(final Number n) {
-    this.m_delegate.setComparableProperty(n);
+  public Set<IErrorBarPolicy< ? >> setErrorBarPolicy(final IErrorBarPolicy< ? > errorBarPolicy) {
+    return this.m_delegate.setErrorBarPolicy(errorBarPolicy);
   }
 
   /**
@@ -322,6 +458,10 @@ public class Trace2DAxisSwap implements ITrace2D {
     this.m_delegate.setPhysicalUnits(xunit, yunit);
   }
 
+  public Set<IPointPainter< ? >> setPointHighlighter(final IPointPainter< ? > highlighter) {
+    return this.m_delegate.setPointHighlighter(highlighter);
+  }
+
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#setRenderer(info.monitorenter.gui.chart.Chart2D)
    */
@@ -337,10 +477,9 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
-   * 
    * @see info.monitorenter.gui.chart.ITrace2D#setTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
-  public Set setTracePainter(final ITracePainter painter) {
+  public Set<ITracePainter< ? >> setTracePainter(final ITracePainter< ? > painter) {
     return this.m_delegate.setTracePainter(painter);
   }
 
@@ -359,9 +498,46 @@ public class Trace2DAxisSwap implements ITrace2D {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsErrorBars()
+   */
+  public boolean showsErrorBars() {
+    return this.m_delegate.showsErrorBars();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsNegativeXErrorBars()
+   */
+  public boolean showsNegativeXErrorBars() {
+    return this.m_delegate.showsNegativeXErrorBars();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsNegativeYErrorBars()
+   */
+  public boolean showsNegativeYErrorBars() {
+    return this.m_delegate.showsNegativeYErrorBars();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsPositiveXErrorBars()
+   */
+  public boolean showsPositiveXErrorBars() {
+    return this.m_delegate.showsPositiveXErrorBars();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsPositiveYErrorBars()
+   */
+  public boolean showsPositiveYErrorBars() {
+    return this.m_delegate.showsPositiveYErrorBars();
+  }
+
+  /**
    * @see java.lang.Object#toString()
    */
+  @Override
   public String toString() {
     return this.m_delegate.toString();
   }
+
 }

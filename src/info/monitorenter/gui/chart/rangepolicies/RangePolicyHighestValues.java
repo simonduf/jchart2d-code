@@ -1,6 +1,6 @@
 /*
- * RangePolicyHighestValues.java,  <enter purpose here>.
- * Copyright (C) 2006  Achim Westermann, Achim.Westermann@gmx.de
+ * RangePolicyHighestValues.java,  points only the highest given values given. 
+ * Copyright (c) 2007 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,26 +24,28 @@ package info.monitorenter.gui.chart.rangepolicies;
 import info.monitorenter.util.Range;
 
 /**
- * <p>
  * Range policy implementation that will force a viewport that only shows the
  * highest values that are in the range of maximum - x.
- * </p>
+ * <p>
  * 
  * @author zoola
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.8 $
  * 
  */
 public final class RangePolicyHighestValues extends ARangePolicy {
 
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 3966377720997931343L;
+
   /** The value range for the highest values to show. */
-  private double m_highestValueRangeToShow;
+  private final double m_highestValueRangeToShow;
 
   /**
-   * Creates a range policy with an unconfigured range ({@link Range#RANGE_UNBOUNDED})
-   * that will show the 50 hightest values.
+   * Creates a range policy with an unconfigured range (
+   * {@link Range#RANGE_UNBOUNDED}) that will show the 50 hightest values.
    * <p>
    */
   public RangePolicyHighestValues() {
@@ -51,9 +53,13 @@ public final class RangePolicyHighestValues extends ARangePolicy {
   }
 
   /**
-   * Creates a range policy with an unconfigured range ({@link Range#RANGE_UNBOUNDED})
-   * that will show the given amount of highest values.
+   * Creates a range policy with an unconfigured range (
+   * {@link Range#RANGE_UNBOUNDED}) that will show the given amount of highest
+   * values.
    * <p>
+   * 
+   * @param amountHighestValues
+   *          the amount of highest values to show.
    */
   public RangePolicyHighestValues(final int amountHighestValues) {
     super();
@@ -74,6 +80,28 @@ public final class RangePolicyHighestValues extends ARangePolicy {
   public RangePolicyHighestValues(final Range range, final double highestValueRangeToShow) {
     super(range);
     this.m_highestValueRangeToShow = highestValueRangeToShow;
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final RangePolicyHighestValues other = (RangePolicyHighestValues) obj;
+    if (Double.doubleToLongBits(this.m_highestValueRangeToShow) != Double
+        .doubleToLongBits(other.m_highestValueRangeToShow)) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -115,6 +143,19 @@ public final class RangePolicyHighestValues extends ARangePolicy {
    */
   public double getMin(final double chartMin, final double chartMax) {
     return Math.max(chartMax - this.m_highestValueRangeToShow, chartMin);
+  }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    long temp;
+    temp = Double.doubleToLongBits(this.m_highestValueRangeToShow);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    return result;
   }
 
 }

@@ -1,6 +1,6 @@
 /*
  *  AxisActionSetRangePolicy.java of project jchart2d
- *  Copyright 2006 (C) Achim Westermann, created on 00:13:29.
+ *  Copyright (c) 2007 - 2011 Achim Westermann, created on 00:13:29.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,9 +22,11 @@
  */
 package info.monitorenter.gui.chart.events;
 
+import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.IRangePolicy;
-import info.monitorenter.gui.chart.layout.LayoutFactory.PropertyChangeCheckBoxMenuItem;
+import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem;
+import info.monitorenter.util.Range;
 
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -32,7 +34,7 @@ import java.beans.PropertyChangeEvent;
 /**
  * Action that sets a constructor given
  * {@link info.monitorenter.gui.chart.IRangePolicy} to a constructor given
- * {@link info.monitorenter.gui.chart.AAxis}.
+ * {@link info.monitorenter.gui.chart.axis.AAxis}.
  * <p>
  * 
  * <h2>Warning</h2>
@@ -41,9 +43,10 @@ import java.beans.PropertyChangeEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.16 $
  */
-public class AxisActionSetRangePolicy extends AAxisAction {
+public class AxisActionSetRangePolicy
+    extends AAxisAction {
 
   /**
    * Generated <code>serial version UID</code>.
@@ -54,16 +57,24 @@ public class AxisActionSetRangePolicy extends AAxisAction {
    * The range policy to set to the axis upon invocation of
    * {@link #actionPerformed(ActionEvent)}.
    */
-  private IRangePolicy m_rangePolicy;
+  private final transient IRangePolicy m_rangePolicy;
 
   /**
    * Create an <code>Action</code> that accesses the axis, identifies itself
    * with the given action String and sets the given
    * {@link info.monitorenter.gui.chart.IRangePolicy} to the axis upon
    * selection.
+   * <p>
+   * 
+   * @param chart
+   *          the owner of the axis to trigger actions upon.
    * 
    * @param axis
-   *          the target the action will work on.
+   *          needed to identify the axis of the chart: one of {@link Chart2D#X},
+   *          {@link Chart2D#Y}.
+   * 
+   * @param rangePolicy
+   *          the range policy to set oon the axis.
    * 
    * @param description
    *          the descriptive <code>String</code> that will be displayed by
@@ -71,15 +82,12 @@ public class AxisActionSetRangePolicy extends AAxisAction {
    *          <code>Action</code> assigned (
    *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
    * 
-   * @param rangePolicy
-   *          The range policy to set to the axis upon invocation of
-   *          {@link #actionPerformed(ActionEvent)}.
    */
-  public AxisActionSetRangePolicy(final IAxis axis, final String description,
+  public AxisActionSetRangePolicy(final Chart2D chart, final String description, final int axis,
       final IRangePolicy rangePolicy) {
-    super(axis, description);
+    super(chart, description, axis);
     this.m_rangePolicy = rangePolicy;
-    axis.addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, this);
+    this.getAxis().addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, this);
 
   }
 
@@ -87,17 +95,28 @@ public class AxisActionSetRangePolicy extends AAxisAction {
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   public void actionPerformed(final ActionEvent e) {
-    this.m_axis.setRangePolicy(this.m_rangePolicy);
+    // initially configure the range to show all data (in case a fixed
+    // view port is used):
+    IAxis axis = this.getAxis();
+    Range actualRange = new Range(axis.getMinValue(), axis.getMaxValue());
+    this.m_rangePolicy.setRange(actualRange);
+    this.m_rangePolicy.setRange(actualRange);
+    this.getAxis().setRangePolicy(this.m_rangePolicy);
   }
 
   /**
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
+  @Override
   public void propertyChange(final PropertyChangeEvent evt) {
+    // will check for an axis replacement and transfer listening to the new axis if so: 
+    super.propertyChange(evt);
+    
     String property = evt.getPropertyName();
     if (property.equals(IAxis.PROPERTY_RANGEPOLICY)) {
-      Class rangepolicyClass = evt.getNewValue().getClass();
-      Boolean oldValue, newValue;
+      Class< ? > rangepolicyClass = evt.getNewValue().getClass();
+      Boolean oldValue;
+      Boolean newValue;
       if (rangepolicyClass == this.m_rangePolicy.getClass()) {
         oldValue = new Boolean(false);
         newValue = new Boolean(true);

@@ -1,6 +1,6 @@
 /*
  *  Trace2DReplacing, a list- based implementation of a ITrace2D.
- *  Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2011 Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,12 +22,13 @@
 
 package info.monitorenter.gui.chart.traces;
 
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 
 
 /**
- * Has the behaviour of <code>Trace2DBijective</code> and an additional
- * features: <br>
+ * Has the behavior of <code>Trace2DBijective</code> and additional
+ * features.<p>
+ * 
  * <ul>
  * <li>All tracepoints that are added are stored unchanged in a LinkedList.
  * </li>
@@ -36,15 +37,19 @@ import info.monitorenter.gui.chart.TracePoint2D;
  * <li>If a tracepoint is inserted whose x - value already exists in the List,
  * the old tracepoint with that value will be replaced by the new tracepoint.
  * </li>
- * </UL>
+ * </ul>
+ * <p>
  * 
  * @see Trace2DBijective
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  * 
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.12 $
  */
 public class Trace2DReplacing extends Trace2DSimple {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 858570477289251003L;
 
   /**
    * Defcon.
@@ -66,22 +71,25 @@ public class Trace2DReplacing extends Trace2DSimple {
    * @return true if the point wathe maximum amount of points that will be
    *         showns successfully added.
    */
-  public boolean addPointInternal(final TracePoint2D p) {
+  @Override
+  public boolean addPointInternal(final ITracePoint2D p) {
+    boolean result = true;
     int index = -1;
-    TracePoint2D old;
+    ITracePoint2D old;
     index = this.m_points.indexOf(p);
     if (index != -1) {
       // already contained.
-      old = (TracePoint2D) this.m_points.get(index);
+      old = this.m_points.get(index);
       // fires property changes with bound checks
       old.setLocation(old.getX(), p.getY());
       // we don't need further bound checks and property change events from
       // calling
       // addPoint method.
-      return false;
+      result = false;
     } else {
       this.m_points.add(p);
-      return true;
+      result = true;
     }
+    return result;
   }
 }

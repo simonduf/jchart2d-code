@@ -1,6 +1,6 @@
 /*
  *  Trace2DDebugger.java  jchart2d
- *  Copyright (C) Achim Westermann, created on 04.03.2005, 12:33:48
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,58 +23,55 @@
 package info.monitorenter.gui.chart.traces;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IErrorBarPolicy;
+import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.util.Range;
 
 import java.awt.Color;
 import java.awt.Stroke;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;
 import java.util.Set;
 
 /**
- * <p>
  * A decorator for any ITrace2D implementation. Useful if your chart looks
  * unexpected and the problem may be related to the data that is added. It
  * prints every point added to the console.
- * </p>
- * <p>
  * <p>
  * Use it by decorating the ITrace2D you normally use:
  * 
  * <pre>
- * 
- * 
- *    // Create a chart:
- *    Chart2D chart = new Chart2D();
- *    // Create an ITrace:
- *    &lt;b&gt;ITrace2D trace = new Trace2DDebugger(new Trace2DSimple());
- *    // add data...
- *    ...
- *    //
- *    chart.addTrace(trace);
- * 
- * 
+ *      // Create a chart:
+ *      Chart2D chart = new Chart2D();
+ *      // Create an ITrace:
+ *      &lt;b&gt;ITrace2D trace = new Trace2DDebugger(new Trace2DSimple());
+ *      // add data...
+ *      ...
+ *      //
+ *      chart.addTrace(trace);
  * </pre>
  * 
- * </p>
  * <p>
  * One can use {@link #setXRange(Range)},{@link #setYRange(Range)} to let this
  * instance throw an Exception if bounds for legal data are exceeded.
- * </p>
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.34 $
  */
 public class Trace2DDebugger implements ITrace2D {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = -3016496113269676817L;
 
   /**
    * The instance to debug.
    */
-  private ITrace2D m_delegate;
+  private final ITrace2D m_delegate;
 
   /**
    * The valid range for x values. If a point breaks these bounds an
@@ -89,7 +86,7 @@ public class Trace2DDebugger implements ITrace2D {
   private Range m_yRange = new Range(-Double.MAX_VALUE, +Double.MAX_VALUE);
 
   /**
-   * Creates an inistance to debug the given trace for valid points added.
+   * Creates an instance to debug the given trace for valid points added.
    * <p>
    * 
    * @param debug
@@ -103,27 +100,33 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @param debug
-   *          The ITrace to debug.
+   * @see info.monitorenter.gui.chart.ITrace2D#addComputingTrace(info.monitorenter.gui.chart.ITrace2D)
    */
+  public void addComputingTrace(final ITrace2D trace) {
+    this.m_delegate.addComputingTrace(trace);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#addErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
+   */
+  public boolean addErrorBarPolicy(final IErrorBarPolicy< ? > errorBarPolicy) {
+    return this.m_delegate.addErrorBarPolicy(errorBarPolicy);
+  }
 
   /**
    * @see ITrace2D#addPoint(double, double)
    */
   public boolean addPoint(final double x, final double y) {
-    TracePoint2D p = new TracePoint2D(x, y);
+    final ITracePoint2D p = this.getRenderer().getTracePointProvider().createTracePoint(x, y);
     return this.addPoint(p);
   }
 
-  // /////////////////////////////////
-  // Proxy methods
-
   /**
-   * @see ITrace2D#addPoint(TracePoint2D)
+   * @see ITrace2D#addPoint(ITracePoint2D)
    */
-  public boolean addPoint(final TracePoint2D p) {
-    double x = p.getX();
-    double y = p.getY();
+  public boolean addPoint(final ITracePoint2D p) {
+    final double x = p.getX();
+    final double y = p.getY();
     if (!this.m_xRange.isContained(x)) {
       throw new IllegalArgumentException(p.toString() + " is not within the valid x-range "
           + this.m_xRange.toString());
@@ -133,6 +136,10 @@ public class Trace2DDebugger implements ITrace2D {
           + this.m_xRange.toString());
     }
     return this.m_delegate.addPoint(p);
+  }
+
+  public boolean addPointHighlighter(final IPointPainter< ? > highlighter) {
+    return this.m_delegate.addPointHighlighter(highlighter);
   }
 
   /**
@@ -146,22 +153,80 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#addTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
-  public boolean addTracePainter(final ITracePainter painter) {
+  public boolean addTracePainter(final ITracePainter< ? > painter) {
     return this.m_delegate.addTracePainter(painter);
   }
 
   /**
+   * @param debug
+   *          The ITrace to debug.
+   */
+
+  /**
+   * @param o
+   *          the trace to compare to.
+   * @return see interface.
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  public int compareTo(final ITrace2D o) {
+    return this.m_delegate.compareTo(o);
+  }
+
+  // /////////////////////////////////
+  // Proxy methods
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#containsTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
-  public boolean containsTracePainter(final ITracePainter painter) {
+  public boolean containsTracePainter(final ITracePainter< ? > painter) {
     return this.m_delegate.containsTracePainter(painter);
   }
 
   /**
    * @see java.lang.Object#equals(java.lang.Object)
    */
+  @Override
   public boolean equals(final Object obj) {
-    return this.m_delegate.equals(obj);
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final Trace2DDebugger other = (Trace2DDebugger) obj;
+    if (this.m_delegate == null) {
+      if (other.m_delegate != null) {
+        return false;
+      }
+    } else if (!this.m_delegate.equals(other.m_delegate)) {
+      return false;
+    }
+    if (this.m_xRange == null) {
+      if (other.m_xRange != null) {
+        return false;
+      }
+    } else if (!this.m_xRange.equals(other.m_xRange)) {
+      return false;
+    }
+    if (this.m_yRange == null) {
+      if (other.m_yRange != null) {
+        return false;
+      }
+    } else if (!this.m_yRange.equals(other.m_yRange)) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(info.monitorenter.gui.chart.ITracePoint2D,
+   *      int)
+   */
+  public void firePointChanged(final ITracePoint2D changed, final int state) {
+    this.m_delegate.firePointChanged(changed, state);
   }
 
   /**
@@ -172,24 +237,24 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.util.collections.IComparableProperty#getComparableProperty()
+   * @see info.monitorenter.gui.chart.ITrace2D#getErrorBarPolicies()
    */
-  public Number getComparableProperty() {
-    return this.m_delegate.getComparableProperty();
+  public Set<IErrorBarPolicy< ? >> getErrorBarPolicies() {
+    return this.m_delegate.getErrorBarPolicies();
   }
 
   /**
-   * @see ITrace2D#isVisible()
+   * @see info.monitorenter.gui.chart.ITrace2D#getHasErrorBars()
    */
-  public boolean getisible() {
-    return this.m_delegate.isVisible();
+  public boolean getHasErrorBars() {
+    return this.m_delegate.getHasErrorBars();
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#getLable()
+   * @see info.monitorenter.gui.chart.ITrace2D#getLabel()
    */
-  public String getLable() {
-    return this.m_delegate.getLable();
+  public String getLabel() {
+    return this.m_delegate.getLabel();
   }
 
   /**
@@ -235,11 +300,44 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * 
+   * @see info.monitorenter.gui.chart.ITrace2D#getNearestPointEuclid(double,
+   *      double)
+   */
+  public DistancePoint getNearestPointEuclid(final double x, final double y) {
+    return this.m_delegate.getNearestPointEuclid(x, y);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getNearestPointManhattan(double,
+   *      double)
+   */
+  public DistancePoint getNearestPointManhattan(final double x, final double y) {
+    return this.m_delegate.getNearestPointManhattan(x, y);
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#getPhysicalUnits()
    */
   public String getPhysicalUnits() {
     return this.m_delegate.getPhysicalUnits();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getPhysicalUnitsX()
+   */
+  public String getPhysicalUnitsX() {
+    return this.m_delegate.getPhysicalUnitsX();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getPhysicalUnitsY()
+   */
+  public String getPhysicalUnitsY() {
+    return this.m_delegate.getPhysicalUnitsY();
+  }
+
+  public Set<IPointPainter< ? >> getPointHighlighters() {
+    return this.m_delegate.getPointHighlighters();
   }
 
   /**
@@ -273,15 +371,8 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#getTracePainters()
    */
-  public final Set getTracePainters() {
+  public final Set<ITracePainter< ? >> getTracePainters() {
     return this.m_delegate.getTracePainters();
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.ITrace2D#isVisible()
-   */
-  public boolean isVisible() {
-    return this.m_delegate.isVisible();
   }
 
   /**
@@ -314,8 +405,14 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see java.lang.Object#hashCode()
    */
+  @Override
   public int hashCode() {
-    return this.m_delegate.hashCode();
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((this.m_delegate == null) ? 0 : this.m_delegate.hashCode());
+    result = prime * result + ((this.m_xRange == null) ? 0 : this.m_xRange.hashCode());
+    result = prime * result + ((this.m_yRange == null) ? 0 : this.m_yRange.hashCode());
+    return result;
   }
 
   /**
@@ -326,10 +423,31 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#isVisible()
+   */
+  public boolean isVisible() {
+    return this.m_delegate.isVisible();
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#iterator()
    */
-  public Iterator iterator() {
+  public Iterator<ITracePoint2D> iterator() {
     return this.m_delegate.iterator();
+  }
+
+  /**
+   * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+   */
+  public void propertyChange(final PropertyChangeEvent evt) {
+    this.m_delegate.propertyChange(evt);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#removeAllPointHighlighters()
+   */
+  public Set<IPointPainter< ? >> removeAllPointHighlighters() {
+    return this.m_delegate.removeAllPointHighlighters();
   }
 
   /**
@@ -340,10 +458,28 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#removePoint(info.monitorenter.gui.chart.TracePoint2D)
+   * @see info.monitorenter.gui.chart.ITrace2D#removeComputingTrace(info.monitorenter.gui.chart.ITrace2D)
    */
-  public boolean removePoint(final TracePoint2D point) {
+  public boolean removeComputingTrace(final ITrace2D trace) {
+    return this.m_delegate.removeComputingTrace(trace);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#removeErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
+   */
+  public boolean removeErrorBarPolicy(final IErrorBarPolicy< ? > errorBarPolicy) {
+    return this.m_delegate.removeErrorBarPolicy(errorBarPolicy);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#removePoint(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  public boolean removePoint(final ITracePoint2D point) {
     return this.m_delegate.removePoint(point);
+  }
+
+  public boolean removePointHighlighter(final IPointPainter< ? > highlighter) {
+    return this.m_delegate.removePointHighlighter(highlighter);
   }
 
   /**
@@ -365,7 +501,7 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#removeTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
-  public boolean removeTracePainter(final ITracePainter painter) {
+  public boolean removeTracePainter(final ITracePainter< ? > painter) {
     return this.m_delegate.removeTracePainter(painter);
   }
 
@@ -377,10 +513,10 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.util.collections.IComparableProperty#setComparableProperty(java.lang.Number)
+   * @see info.monitorenter.gui.chart.ITrace2D#setErrorBarPolicy(info.monitorenter.gui.chart.IErrorBarPolicy)
    */
-  public void setComparableProperty(final Number n) {
-    this.m_delegate.setComparableProperty(n);
+  public Set<IErrorBarPolicy< ? >> setErrorBarPolicy(final IErrorBarPolicy< ? > errorBarPolicy) {
+    return this.m_delegate.setErrorBarPolicy(errorBarPolicy);
   }
 
   /**
@@ -398,6 +534,10 @@ public class Trace2DDebugger implements ITrace2D {
     this.m_delegate.setPhysicalUnits(xunit, yunit);
   }
 
+  public Set<IPointPainter< ? >> setPointHighlighter(final IPointPainter< ? > highlighter) {
+    return this.m_delegate.setPointHighlighter(highlighter);
+  }
+
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#setRenderer(info.monitorenter.gui.chart.Chart2D)
    */
@@ -413,10 +553,9 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * 
    * @see info.monitorenter.gui.chart.ITrace2D#setTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
-  public final Set setTracePainter(final ITracePainter painter) {
+  public final Set<ITracePainter< ? >> setTracePainter(final ITracePainter< ? > painter) {
     return this.m_delegate.setTracePainter(painter);
   }
 
@@ -465,9 +604,46 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsErrorBars()
+   */
+  public boolean showsErrorBars() {
+    return this.m_delegate.showsErrorBars();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsNegativeXErrorBars()
+   */
+  public boolean showsNegativeXErrorBars() {
+    return this.m_delegate.showsNegativeXErrorBars();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsNegativeYErrorBars()
+   */
+  public boolean showsNegativeYErrorBars() {
+    return this.m_delegate.showsNegativeYErrorBars();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsPositiveXErrorBars()
+   */
+  public boolean showsPositiveXErrorBars() {
+    return this.m_delegate.showsPositiveXErrorBars();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#showsPositiveYErrorBars()
+   */
+  public boolean showsPositiveYErrorBars() {
+    return this.m_delegate.showsPositiveYErrorBars();
+  }
+
+  /**
    * @see java.lang.Object#toString()
    */
+  @Override
   public String toString() {
     return this.m_delegate.toString();
   }
+
 }

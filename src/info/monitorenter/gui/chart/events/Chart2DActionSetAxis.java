@@ -1,6 +1,6 @@
 /*
  *  Chart2DActionSetAxis, action for setting an axis implementation of the chart.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -22,9 +22,9 @@
  */
 package info.monitorenter.gui.chart.events;
 
-import info.monitorenter.gui.chart.AAxis;
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.layout.LayoutFactory.PropertyChangeCheckBoxMenuItem;
+import info.monitorenter.gui.chart.axis.AAxis;
+import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem;
 
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -35,9 +35,16 @@ import java.beans.PropertyChangeEvent;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.10 $
  */
-public final class Chart2DActionSetAxis extends AChart2DAction {
+public final class Chart2DActionSetAxis
+    extends AChart2DAction {
+
+  /**
+   * Generated <code>serial version UID</code>.
+   * <p>
+   */
+  private static final long serialVersionUID = 2385589123139195036L;
 
   /**
    * Identifies where to set the axis on the chart. Either {@link Chart2D#X} or
@@ -47,7 +54,7 @@ public final class Chart2DActionSetAxis extends AChart2DAction {
   private final int m_axisTarget;
 
   /** The axis implementation to use. */
-  private final AAxis m_axis;
+  private final transient AAxis m_axis;
 
   /**
    * Create an <code>Action</code> that accesses the trace and identifies
@@ -55,20 +62,20 @@ public final class Chart2DActionSetAxis extends AChart2DAction {
    * <p>
    * 
    * @param chart
-   *          the target the action will work on.
+   *            the target the action will work on.
    * 
    * @param axis
-   *          the axis implementation to use.
+   *            the axis implementation to use.
    * 
    * @param description
-   *          the description of this action to show in the UI.
+   *            the description of this action to show in the UI.
    * 
    * @param axisTarget
-   *          Identifies where to set the axis on the chart: either
-   *          {@link Chart2D#X} or {@link Chart2D#Y}
+   *            Identifies where to set the axis on the chart: either
+   *            {@link Chart2D#X} or {@link Chart2D#Y}
    * 
    * @throws IllegalArgumentException
-   *           if the axis argument is invalid.
+   *             if the axis argument is invalid.
    */
   public Chart2DActionSetAxis(final Chart2D chart, final AAxis axis, final String description,
       final int axisTarget) throws IllegalArgumentException {
@@ -89,11 +96,11 @@ public final class Chart2DActionSetAxis extends AChart2DAction {
   public void actionPerformed(final ActionEvent e) {
     switch (this.m_axisTarget) {
       case Chart2D.X:
-        this.m_chart.setAxisX(this.m_axis);
+        this.m_chart.setAxisXBottom(this.m_axis,0);
         break;
 
       case Chart2D.Y:
-        this.m_chart.setAxisY(this.m_axis);
+        this.m_chart.setAxisYLeft(this.m_axis,0);
         break;
 
       default:
@@ -107,29 +114,33 @@ public final class Chart2DActionSetAxis extends AChart2DAction {
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
   public void propertyChange(final PropertyChangeEvent evt) {
-    if (evt.getPropertyName().equals(Chart2D.PROPERTY_AXIS_X) && this.m_axisTarget == Chart2D.X) {
 
-      Class axisClass = evt.getNewValue().getClass();
-      if (this.m_axis.getClass() == axisClass) {
-        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED,
-            new Boolean(false), new Boolean(true));
-      } else {
-        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED,
-            new Boolean(true), new Boolean(false));
+    if (evt.getPropertyName().equals(Chart2D.PROPERTY_AXIS_X) && this.m_axisTarget == Chart2D.X) {
+      // Is this a remove event? We only care for add:
+      if (evt.getNewValue() != null) {
+        Class< ? > axisClass = evt.getNewValue().getClass();
+        if (this.m_axis.getClass() == axisClass) {
+          this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, new Boolean(
+              false), new Boolean(true));
+        } else {
+          this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, new Boolean(
+              true), new Boolean(false));
+        }
       }
     } else if (evt.getPropertyName().equals(Chart2D.PROPERTY_AXIS_Y)
         && this.m_axisTarget == Chart2D.Y) {
+      // Is this a remove event? We only care for add:
+      if (evt.getNewValue() != null) {
 
-      Class axisClass = evt.getNewValue().getClass();
-      if (this.m_axis.getClass() == axisClass) {
-        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED,
-            new Boolean(false), new Boolean(true));
-      } else {
-        this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED,
-            new Boolean(true), new Boolean(false));
+        Class< ? > axisClass = evt.getNewValue().getClass();
+        if (this.m_axis.getClass() == axisClass) {
+          this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, new Boolean(
+              false), new Boolean(true));
+        } else {
+          this.firePropertyChange(PropertyChangeCheckBoxMenuItem.PROPERTY_SELECTED, new Boolean(
+              true), new Boolean(false));
+        }
       }
     }
-
   }
-
 }

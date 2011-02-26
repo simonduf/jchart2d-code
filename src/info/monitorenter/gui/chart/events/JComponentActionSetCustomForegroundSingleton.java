@@ -1,7 +1,7 @@
 /*
  *  JComponentActionSetCustomForegroundSingleton, 
  *  singleton action to set a custom foreground color of a JComponent.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@
 package info.monitorenter.gui.chart.events;
 
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.layout.LayoutFactory.PropertyChangeCheckBoxMenuItem;
+import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -47,10 +47,9 @@ import javax.swing.JComponent;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.8 $
  */
-public final class JComponentActionSetCustomForegroundSingleton
-    extends AJComponentAction {
+public final class JComponentActionSetCustomForegroundSingleton extends AJComponentAction {
 
   /**
    * Generated serial version ID.
@@ -64,35 +63,13 @@ public final class JComponentActionSetCustomForegroundSingleton
   private Color m_lastChosenColor;
 
   /**
-   * Create an <code>Action</code> that accesses the trace and identifies
-   * itself with the given action String.
-   * <p>
-   * 
-   * @param component
-   *          the target the action will work on.
-   * 
-   * @param description
-   *          the descriptive <code>String</code> that will be displayed by
-   *          {@link javax.swing.AbstractButton} subclasses that get this
-   *          <code>Action</code> assigned (
-   *          {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
-   */
-  private JComponentActionSetCustomForegroundSingleton(final JComponent component,
-      final String description) {
-    super(component, description);
-    component.addPropertyChangeListener(Chart2D.PROPERTY_FOREGROUND_COLOR, this);
-  }
-
-  /**
    * Map for instances.
    */
-  private static Map instances = new HashMap();
+  private static Map<String, JComponentActionSetCustomForegroundSingleton> instances;
 
-  /** Creates a key for the component for internal storage. */
-  private static String key(final JComponent component) {
-    return component.getClass().getName() + component.hashCode();
+  static {
+    JComponentActionSetCustomForegroundSingleton.instances = new HashMap<String, JComponentActionSetCustomForegroundSingleton>();
   }
-
   /**
    * Returns the single instance for the given component, potentially creating
    * it.
@@ -103,24 +80,56 @@ public final class JComponentActionSetCustomForegroundSingleton
    * <p>
    * 
    * @param component
-   *          the component to get the instance for (works as key).
+   *            the component to get the instance for (works as key).
    * 
    * @param description
-   *          the description to use (ignored if instance for component has been
-   *          created before).
+   *            the description to use (ignored if instance for component has
+   *            been created before).
    * 
    * @return the single instance for the given component.
    */
   public static JComponentActionSetCustomForegroundSingleton getInstance(
       final JComponent component, final String description) {
-    JComponentActionSetCustomForegroundSingleton result = 
-      (JComponentActionSetCustomForegroundSingleton) JComponentActionSetCustomForegroundSingleton.instances
-        .get(key(component));
+    JComponentActionSetCustomForegroundSingleton result = JComponentActionSetCustomForegroundSingleton.instances
+        .get(JComponentActionSetCustomForegroundSingleton.key(component));
     if (result == null) {
       result = new JComponentActionSetCustomForegroundSingleton(component, description);
-      JComponentActionSetCustomForegroundSingleton.instances.put(key(component), result);
+      JComponentActionSetCustomForegroundSingleton.instances.put(
+          JComponentActionSetCustomForegroundSingleton.key(component), result);
     }
     return result;
+  }
+
+  /**
+   * Creates a key for the component for internal storage.
+   * 
+   * @param component
+   *            the component for the internal storage key to compute.
+   * 
+   * @return a key for the component for internal storage.
+   */
+  private static String key(final JComponent component) {
+    return component.getClass().getName() + component.hashCode();
+  }
+
+  /**
+   * Create an <code>Action</code> that accesses the trace and identifies
+   * itself with the given action String.
+   * <p>
+   * 
+   * @param component
+   *            the target the action will work on.
+   * 
+   * @param description
+   *            the descriptive <code>String</code> that will be displayed by
+   *            {@link javax.swing.AbstractButton} subclasses that get this
+   *            <code>Action</code> assigned (
+   *            {@link javax.swing.AbstractButton#setAction(javax.swing.Action)}).
+   */
+  private JComponentActionSetCustomForegroundSingleton(final JComponent component,
+      final String description) {
+    super(component, description);
+    component.addPropertyChangeListener(Chart2D.PROPERTY_FOREGROUND_COLOR, this);
   }
 
   /**

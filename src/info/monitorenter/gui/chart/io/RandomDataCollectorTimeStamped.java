@@ -1,7 +1,8 @@
 /*
  *
- *  RandomDataCollectorTimeStamped.java  jchart2d
- *  Copyright (C) Achim Westermann, created on 20.03.2005, 16:59:10
+ *  RandomDataCollectorTimeStamped.java  of project jchart2d, collects time stamped 
+ *  random data for demo purposes. 
+ *  Copyright (C) 2005 - 2011 Achim Westermann, created on 20.03.2005, 16:59:10
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,7 +25,9 @@
 package info.monitorenter.gui.chart.io;
 
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.TracePoint2D;
+
 
 
 /**
@@ -34,7 +37,7 @@ import info.monitorenter.gui.chart.TracePoint2D;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.9 $
  */
 public class RandomDataCollectorTimeStamped extends ADataCollector {
 
@@ -59,10 +62,11 @@ public class RandomDataCollectorTimeStamped extends ADataCollector {
   /**
    * @see ADataCollector#collectData()
    */
-  public TracePoint2D collectData() {
+  @Override
+  public ITracePoint2D collectData() {
     double rand = Math.random();
     boolean add = (rand >= 0.5) ? true : false;
     this.m_y = (add) ? this.m_y + Math.random() : this.m_y - Math.random();
-    return new TracePoint2D((double) System.currentTimeMillis(), this.m_y);
+    return new TracePoint2D(System.currentTimeMillis(), this.m_y);
   }
 }

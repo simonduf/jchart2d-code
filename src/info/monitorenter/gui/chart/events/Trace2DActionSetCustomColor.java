@@ -1,7 +1,7 @@
 /*
  *  Trace2DActionSetCustomColor, action to set a custom (runtime chosen) 
  *  color to a ITrace2D.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2004 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,7 @@
 package info.monitorenter.gui.chart.events;
 
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.layout.LayoutFactory.PropertyChangeCheckBoxMenuItem;
+import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -40,7 +40,7 @@ import javax.swing.JColorChooser;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.5 $
  */
 public final class Trace2DActionSetCustomColor extends ATrace2DAction {
 

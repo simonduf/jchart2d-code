@@ -1,6 +1,6 @@
 /*
- *
- *  TestTreeSetGreedy.java  jchart2d
+ *  TestTreeSetGreedy.java of project jchart2d - Junit test case 
+ *  for class TreeSetGreedy. 
  *  Copyright (C) Achim Westermann, created on 16.05.2005, 18:58:11
  *
  *  This library is free software; you can redistribute it and/or
@@ -28,282 +28,151 @@ import info.monitorenter.gui.chart.ITrace2D;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import junit.framework.Assert;
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /**
+ * Junit test case for class <code>{@link TreeSetGreedy}</code>.
+ * <p>
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  */
-public class TestTreeSetGreedy extends TestCase {
-
-  private TreeSetGreedy test;
+public class TestTreeSetGreedy
+    extends TestCase {
 
   /**
-   * @param arg0
-   *          the name of the <code>TestCase</code>.
+   * Helper class for adding as element to the tested
+   * <code>{@link TreeSetGreedy}</code>.
+   * <p>
+   * 
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
+   * 
+   * 
+   * @version $Revision: 1.8 $
    */
-  public TestTreeSetGreedy(String arg0) {
-    super(arg0);
+  final class Element implements IComparableProperty {
+
+    /** Generated <code>serialVersionUID</code>. */
+    private static final long serialVersionUID = -615304987571740852L;
+    
+    /** The internal comparable. */
+    private Number m_compare = new Integer(ITrace2D.ZINDEX_MAX);
+
+    /**
+     * Defcon.
+     * <p>
+     */
+    public Element() {
+      super();
+    }
+
+    /**
+     * @see info.monitorenter.util.collections.IComparableProperty#getComparableProperty()
+     */
+    public Number getComparableProperty() {
+      return this.m_compare;
+    }
+
+    /**
+     * @see info.monitorenter.util.collections.IComparableProperty#setComparableProperty(java.lang.Number)
+     */
+    public void setComparableProperty(final Number n) {
+      this.m_compare = n;
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+      StringBuffer ret = new StringBuffer(this.m_compare.toString());
+      return ret.toString();
+    }
   }
 
-  /*
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
+
+    TestSuite suite = new TestSuite();
+    suite.setName(TestTreeSetGreedy.class.getName());
+
+    suite.addTest(new TestTreeSetGreedy("testAdd"));
+    suite.addTest(new TestTreeSetGreedy("testAdd10RemoveCenter"));
+    suite.addTest(new TestTreeSetGreedy("testAddEqual10"));
+    suite.addTest(new TestTreeSetGreedy("testAddEqual2"));
+    suite.addTest(new TestTreeSetGreedy("testAddEqual3"));
+    suite.addTest(new TestTreeSetGreedy("testAddEqual5"));
+    suite.addTest(new TestTreeSetGreedy("testAddIdentical2"));
+    suite.addTest(new TestTreeSetGreedy("testAddRemoveEqual10"));
+    suite.addTest(new TestTreeSetGreedy("testAddRemoveEqual2"));
+    suite.addTest(new TestTreeSetGreedy("testAddRemoveEqual3"));
+    suite.addTest(new TestTreeSetGreedy("testAddRemoveEqual5"));
+    suite.addTest(new TestTreeSetGreedy("testMultiThreadingAddRemove"));
+
+    return suite;
+  }
+
+  /** The instance to test. */
+  protected TreeSetGreedy<IComparableProperty> m_test;
+
+  /**
+   * Creates an instance with the given name.
+   * <p>
+   * 
+   * @param testName
+   *          the name of the test case.
+   */
+  public TestTreeSetGreedy(final String testName) {
+    super(testName);
+  }
+
+  /**
    * @see junit.framework.TestCase#setUp()
    */
+  @Override
   protected void setUp() throws Exception {
     super.setUp();
-    this.test = new TreeSetGreedy();
+    this.m_test = new TreeSetGreedy<IComparableProperty>();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
+  /**
    * @see junit.framework.TestCase#tearDown()
    */
+  @Override
   protected void tearDown() throws Exception {
     super.tearDown();
-    this.test = null;
+    this.m_test = null;
   }
 
   /**
    * Add an element and ensure size is 1.
+   * <p>
    * 
    */
-  public void estAdd() {
-    assertNotNull(this.test);
+  public void testAdd() {
+    Assert.assertNotNull(this.m_test);
 
-    this.test.add(new Element());
-    assertEquals(1, this.test.size());
-  }
-
-  /**
-   * Add two distinct {@link IComparableProperty} elements with equal comparable
-   * and ensure size is 2.
-   * 
-   */
-  public void testAddEqual2() {
-    assertNotNull(this.test);
-    IComparableProperty e1 = new Element();
-    IComparableProperty e2 = new Element();
-
-    this.test.add(e1);
-    this.test.add(e2);
-    System.out.println("testAddEqual2");
-    System.out.println(test);
-    assertEquals(this.test.size(), 2);
-  }
-
-  /**
-   * Add 1,1,1 and test, wether all numbers are different.
-   * 
-   */
-  public void testAddEqual3() {
-    assertNotNull(this.test);
-    IComparableProperty e1 = new Element();
-    IComparableProperty e2 = new Element();
-    IComparableProperty e3 = new Element();
-
-    this.test.add(e1);
-    this.test.add(e2);
-    this.test.add(e3);
-
-    System.out.println("testAddEqual3");
-    System.out.println(test);
-    assertEquals(3, this.test.size());
-  }
-
-  /**
-   * Add 1,1,1,1,1 and test, wether all numbers are different.
-   * 
-   */
-  public void testAddEqual5() {
-    assertNotNull(this.test);
-    IComparableProperty e1 = new Element();
-    IComparableProperty e2 = new Element();
-    IComparableProperty e3 = new Element();
-    IComparableProperty e4 = new Element();
-    IComparableProperty e5 = new Element();
-
-    this.test.add(e1);
-    this.test.add(e2);
-    this.test.add(e3);
-    this.test.add(e4);
-    this.test.add(e5);
-
-    System.out.println("testAddEqual5");
-    System.out.println(test);
-    assertEquals(5, this.test.size());
-  }
-
-  /**
-   * Add 1,1,1,1,1 and test, wether all numbers are different.
-   * 
-   */
-  public void testAddEqual10() {
-    assertNotNull(this.test);
-    IComparableProperty e1 = new Element();
-    IComparableProperty e2 = new Element();
-    IComparableProperty e3 = new Element();
-    IComparableProperty e4 = new Element();
-    IComparableProperty e5 = new Element();
-    IComparableProperty e6 = new Element();
-    IComparableProperty e7 = new Element();
-    IComparableProperty e8 = new Element();
-    IComparableProperty e9 = new Element();
-    IComparableProperty e10 = new Element();
-
-    this.test.add(e1);
-    this.test.add(e2);
-    this.test.add(e3);
-    this.test.add(e4);
-    this.test.add(e5);
-    this.test.add(e6);
-    this.test.add(e7);
-    this.test.add(e8);
-    this.test.add(e9);
-    this.test.add(e10);
-
-    System.out.println("testAddEqual10");
-    System.out.println(test);
-    assertEquals(10, this.test.size());
-  }
-
-  /**
-   * Add two distinct {@link IComparableProperty} elements with equal
-   * comparable, remove them and ensure size is 0.
-   * 
-   */
-  public void testAddRemoveEqual2() {
-    assertNotNull(this.test);
-    IComparableProperty e1 = new Element();
-    IComparableProperty e2 = new Element();
-
-    // add
-    this.test.add(e1);
-    this.test.add(e2);
-
-    // remove
-    this.test.remove(e1);
-    this.test.remove(e2);
-
-    System.out.println("testAddRemoveEqual2");
-    System.out.println(test);
-
-    assertEquals("Unexpected remaining elements: " + test, this.test.size(), 0);
-  }
-
-  /**
-   * Add 1,1,1, remove then and ensure that zero elements remain.
-   * 
-   */
-  public void estAddRemoveEqual3() {
-    assertNotNull(this.test);
-    IComparableProperty e1 = new Element();
-    IComparableProperty e2 = new Element();
-    IComparableProperty e3 = new Element();
-
-    // add
-    this.test.add(e1);
-    this.test.add(e2);
-    this.test.add(e3);
-
-    // remove
-    this.test.remove(e1);
-    this.test.remove(e2);
-    this.test.remove(e3);
-
-    System.out.println("testAddRemoveEqual3");
-    System.out.println(test);
-
-    assertEquals("Unexpected remaining elements: " + test, this.test.size(), 0);
-  }
-
-  /**
-   * Add 1,1,1,1,1, remove them and ensure that no elements remain.
-   * 
-   */
-  public void testAddRemoveEqual5() {
-    assertNotNull(this.test);
-    IComparableProperty e1 = new Element();
-    IComparableProperty e2 = new Element();
-    IComparableProperty e3 = new Element();
-    IComparableProperty e4 = new Element();
-    IComparableProperty e5 = new Element();
-
-    // add
-    this.test.add(e1);
-    this.test.add(e2);
-    this.test.add(e3);
-    this.test.add(e4);
-    this.test.add(e5);
-
-    // remove
-    this.test.remove(e1);
-    this.test.remove(e2);
-    this.test.remove(e3);
-    this.test.remove(e4);
-    this.test.remove(e5);
-
-    System.out.println("testAddRemoveEqual5");
-    System.out.println(test);
-
-    assertEquals("Unexpected remaining elements: " + test, this.test.size(), 0);
-  }
-
-  /**
-   * Add 1,1,1,1,1,1,1,1,1,1, remove them and ensure that no elements remain.
-   * 
-   */
-  public void testAddRemoveEqual10() {
-    assertNotNull(this.test);
-    IComparableProperty e1 = new Element();
-    IComparableProperty e2 = new Element();
-    IComparableProperty e3 = new Element();
-    IComparableProperty e4 = new Element();
-    IComparableProperty e5 = new Element();
-    IComparableProperty e6 = new Element();
-    IComparableProperty e7 = new Element();
-    IComparableProperty e8 = new Element();
-    IComparableProperty e9 = new Element();
-    IComparableProperty e10 = new Element();
-
-    // add
-    this.test.add(e1);
-    this.test.add(e2);
-    this.test.add(e3);
-    this.test.add(e4);
-    this.test.add(e5);
-    this.test.add(e6);
-    this.test.add(e7);
-    this.test.add(e8);
-    this.test.add(e9);
-    this.test.add(e10);
-
-    // remove
-    this.test.remove(e1);
-    this.test.remove(e2);
-    this.test.remove(e3);
-    this.test.remove(e4);
-    this.test.remove(e5);
-    this.test.remove(e6);
-    this.test.remove(e7);
-    this.test.remove(e8);
-    this.test.remove(e9);
-    this.test.remove(e10);
-
-    System.out.println("testAddRemoveEqual10");
-    System.out.println(test);
-
-    assertEquals("Unexpected remaining elements: " + test, this.test.size(), 0);
+    this.m_test.add(new Element());
+    Assert.assertEquals(1, this.m_test.size());
   }
 
   /**
    * Add 1,1,1,1 and remove one element that is in the center of the order
    * (assuming that they will get different numbers due to correct add
    * mechanism).
+   * <p>
    * 
    */
   public void testAdd10RemoveCenter() {
-    assertNotNull(this.test);
+    Assert.assertNotNull(this.m_test);
     IComparableProperty e1 = new Element();
     IComparableProperty e2 = new Element();
     IComparableProperty e3 = new Element();
@@ -316,41 +185,270 @@ public class TestTreeSetGreedy extends TestCase {
     IComparableProperty e10 = new Element();
 
     // add
-    this.test.add(e1);
-    this.test.add(e2);
-    this.test.add(e3);
-    this.test.add(e4);
-    this.test.add(e5);
-    this.test.add(e6);
-    this.test.add(e7);
-    this.test.add(e8);
-    this.test.add(e9);
-    this.test.add(e10);
+    this.m_test.add(e1);
+    this.m_test.add(e2);
+    this.m_test.add(e3);
+    this.m_test.add(e4);
+    this.m_test.add(e5);
+    this.m_test.add(e6);
+    this.m_test.add(e7);
+    this.m_test.add(e8);
+    this.m_test.add(e9);
+    this.m_test.add(e10);
 
     // remove
 
-    this.test.remove(e6);
+    this.m_test.remove(e6);
 
     System.out.println("testAdd10RemoveCenter");
-    System.out.println(test);
+    System.out.println(this.m_test);
 
-    assertEquals("Unexpected size: " + test, this.test.size(), 9);
+    Assert.assertEquals("Unexpected size: " + this.m_test, this.m_test.size(), 9);
+  }
+
+  /**
+   * Add 1,1,1,1,1 and test, wether all numbers are different.
+   * <p>
+   * 
+   */
+  public void testAddEqual10() {
+    Assert.assertNotNull(this.m_test);
+    IComparableProperty e1 = new Element();
+    IComparableProperty e2 = new Element();
+    IComparableProperty e3 = new Element();
+    IComparableProperty e4 = new Element();
+    IComparableProperty e5 = new Element();
+    IComparableProperty e6 = new Element();
+    IComparableProperty e7 = new Element();
+    IComparableProperty e8 = new Element();
+    IComparableProperty e9 = new Element();
+    IComparableProperty e10 = new Element();
+
+    this.m_test.add(e1);
+    this.m_test.add(e2);
+    this.m_test.add(e3);
+    this.m_test.add(e4);
+    this.m_test.add(e5);
+    this.m_test.add(e6);
+    this.m_test.add(e7);
+    this.m_test.add(e8);
+    this.m_test.add(e9);
+    this.m_test.add(e10);
+
+    System.out.println("testAddEqual10");
+    System.out.println(this.m_test);
+    Assert.assertEquals(10, this.m_test.size());
+  }
+
+  /**
+   * Add two distinct <code>{@link IComparableProperty}</code> elements with
+   * equal comparable and ensure size is 2.
+   * <p>
+   * 
+   */
+  public void testAddEqual2() {
+    Assert.assertNotNull(this.m_test);
+    IComparableProperty e1 = new Element();
+    IComparableProperty e2 = new Element();
+
+    this.m_test.add(e1);
+    this.m_test.add(e2);
+    System.out.println("testAddEqual2");
+    System.out.println(this.m_test);
+    Assert.assertEquals(this.m_test.size(), 2);
+  }
+
+  /**
+   * Add 1,1,1 and test, wether all numbers are different.
+   * <p>
+   */
+  public void testAddEqual3() {
+    Assert.assertNotNull(this.m_test);
+    IComparableProperty e1 = new Element();
+    IComparableProperty e2 = new Element();
+    IComparableProperty e3 = new Element();
+
+    this.m_test.add(e1);
+    this.m_test.add(e2);
+    this.m_test.add(e3);
+
+    System.out.println("testAddEqual3");
+    System.out.println(this.m_test);
+    Assert.assertEquals(3, this.m_test.size());
+  }
+
+  /**
+   * Add 1,1,1,1,1 and test, wether all numbers are different.
+   * <p>
+   * 
+   */
+  public void testAddEqual5() {
+    Assert.assertNotNull(this.m_test);
+    IComparableProperty e1 = new Element();
+    IComparableProperty e2 = new Element();
+    IComparableProperty e3 = new Element();
+    IComparableProperty e4 = new Element();
+    IComparableProperty e5 = new Element();
+
+    this.m_test.add(e1);
+    this.m_test.add(e2);
+    this.m_test.add(e3);
+    this.m_test.add(e4);
+    this.m_test.add(e5);
+
+    System.out.println("testAddEqual5");
+    System.out.println(this.m_test);
+    Assert.assertEquals(5, this.m_test.size());
   }
 
   /**
    * Add two identical elements and ensure that the 2nd operation fails.
+   * <p>
    * 
    */
   public void testAddIdentical2() {
-    assertNotNull(this.test);
+    Assert.assertNotNull(this.m_test);
     IComparableProperty e1 = new Element();
 
-    this.test.add(e1);
-    boolean success = this.test.add(e1);
+    this.m_test.add(e1);
+    boolean success = this.m_test.add(e1);
     System.out.println("testAddIdentical");
-    System.out.println(test);
-    assertFalse(success);
+    System.out.println(this.m_test);
+    Assert.assertFalse(success);
 
+  }
+
+  /**
+   * Add 1,1,1,1,1,1,1,1,1,1, remove them and ensure that no elements remain.
+   * <p>
+   * 
+   */
+  public void testAddRemoveEqual10() {
+    Assert.assertNotNull(this.m_test);
+    IComparableProperty e1 = new Element();
+    IComparableProperty e2 = new Element();
+    IComparableProperty e3 = new Element();
+    IComparableProperty e4 = new Element();
+    IComparableProperty e5 = new Element();
+    IComparableProperty e6 = new Element();
+    IComparableProperty e7 = new Element();
+    IComparableProperty e8 = new Element();
+    IComparableProperty e9 = new Element();
+    IComparableProperty e10 = new Element();
+
+    // add
+    this.m_test.add(e1);
+    this.m_test.add(e2);
+    this.m_test.add(e3);
+    this.m_test.add(e4);
+    this.m_test.add(e5);
+    this.m_test.add(e6);
+    this.m_test.add(e7);
+    this.m_test.add(e8);
+    this.m_test.add(e9);
+    this.m_test.add(e10);
+
+    // remove
+    this.m_test.remove(e1);
+    this.m_test.remove(e2);
+    this.m_test.remove(e3);
+    this.m_test.remove(e4);
+    this.m_test.remove(e5);
+    this.m_test.remove(e6);
+    this.m_test.remove(e7);
+    this.m_test.remove(e8);
+    this.m_test.remove(e9);
+    this.m_test.remove(e10);
+
+    System.out.println("testAddRemoveEqual10");
+    System.out.println(this.m_test);
+
+    Assert.assertEquals("Unexpected remaining elements: " + this.m_test, this.m_test.size(), 0);
+  }
+
+  /**
+   * Add two distinct <code>{@link IComparableProperty}</code> elements with
+   * equal comparable, remove them and ensure size is 0.
+   * <p>
+   * 
+   */
+  public void testAddRemoveEqual2() {
+    Assert.assertNotNull(this.m_test);
+    IComparableProperty e1 = new Element();
+    IComparableProperty e2 = new Element();
+
+    // add
+    this.m_test.add(e1);
+    this.m_test.add(e2);
+
+    // remove
+    this.m_test.remove(e1);
+    this.m_test.remove(e2);
+
+    System.out.println("testAddRemoveEqual2");
+    System.out.println(this.m_test);
+
+    Assert.assertEquals("Unexpected remaining elements: " + this.m_test, this.m_test.size(), 0);
+  }
+
+  /**
+   * Add 1,1,1, remove then and ensure that zero elements remain.
+   * <p>
+   * 
+   */
+  public void testAddRemoveEqual3() {
+    Assert.assertNotNull(this.m_test);
+    IComparableProperty e1 = new Element();
+    IComparableProperty e2 = new Element();
+    IComparableProperty e3 = new Element();
+
+    // add
+    this.m_test.add(e1);
+    this.m_test.add(e2);
+    this.m_test.add(e3);
+
+    // remove
+    this.m_test.remove(e1);
+    this.m_test.remove(e2);
+    this.m_test.remove(e3);
+
+    System.out.println("testAddRemoveEqual3");
+    System.out.println(this.m_test);
+
+    Assert.assertEquals("Unexpected remaining elements: " + this.m_test, this.m_test.size(), 0);
+  }
+
+  /**
+   * Add 1,1,1,1,1, remove them and ensure that no elements remain.
+   * <p>
+   * 
+   */
+  public void testAddRemoveEqual5() {
+    Assert.assertNotNull(this.m_test);
+    IComparableProperty e1 = new Element();
+    IComparableProperty e2 = new Element();
+    IComparableProperty e3 = new Element();
+    IComparableProperty e4 = new Element();
+    IComparableProperty e5 = new Element();
+
+    // add
+    this.m_test.add(e1);
+    this.m_test.add(e2);
+    this.m_test.add(e3);
+    this.m_test.add(e4);
+    this.m_test.add(e5);
+
+    // remove
+    this.m_test.remove(e1);
+    this.m_test.remove(e2);
+    this.m_test.remove(e3);
+    this.m_test.remove(e4);
+    this.m_test.remove(e5);
+
+    System.out.println("testAddRemoveEqual5");
+    System.out.println(this.m_test);
+
+    Assert.assertEquals("Unexpected remaining elements: " + this.m_test, this.m_test.size(), 0);
   }
 
   /**
@@ -366,56 +464,87 @@ public class TestTreeSetGreedy extends TestCase {
    */
   public void testMultiThreadingAddRemove() {
 
-    class TreeSetGreedyAddRemover extends Thread {
+    /**
+     * Helper class that iteratively adds an element, asserts that the operation
+     * was successful and then removes it again and asserts again that removing
+     * was successful.
+     * <p>
+     * 
+     * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
+     * 
+     * 
+     * @version $Revision: 1.8 $
+     */
+    class TreeSetGreedyAddRemover
+        extends Thread {
+
+      /** Amount of instances to use concurrently. */
       public static final int INSTANCES = 30;
 
-      public static final int ITERATIONS = 20;
+      /** Amount of maximum sleep time between add / remove cycles in ms. */
+      protected static final int MAX_SLEEP = 2000;
 
-      public static final int MAX_SLEEP = 2000;
+      /** Element to add / remove. */
+      private IComparableProperty m_element = new Element();
 
-      private Exception failure = null;
+      /** Exception caught. */
+      protected Exception m_failure = null;
 
-      private IComparableProperty element = new Element();
+      /** Amount of add / remove cycles per instance. */
+      private final int m_iterations = 20;
 
-      private boolean stop = false;
+      /** Flag to stop this Thread at a checked codepoint. */
+      protected boolean m_stop = false;
 
+      /**
+       * Defcon.
+       * <p>
+       */
+      public TreeSetGreedyAddRemover() {
+        super();
+      }
+
+      /**
+       * @see java.lang.Thread#run()
+       */
+      @Override
       public void run() {
         boolean success = false;
         long sleep;
-        for (int i = 0; i < ITERATIONS && !this.stop; i++) {
+        for (int i = 0; i < this.m_iterations && !this.m_stop; i++) {
           try {
-            System.out.println(this.getName() + " adding: " + this.element);
-            success = TestTreeSetGreedy.this.test.add(this.element);
+            System.out.println(this.getName() + " adding: " + this.m_element);
+            success = TestTreeSetGreedy.this.m_test.add(this.m_element);
             try {
-              assertTrue("Add operation unsuccessful!", success);
+              Assert.assertTrue("Add operation unsuccessful!", success);
             } catch (Exception fail) {
               fail.printStackTrace(System.err);
-              this.failure = fail;
+              this.m_failure = fail;
             }
-            sleep = (long) (Math.random() * MAX_SLEEP);
+            sleep = (long) (Math.random() * TreeSetGreedyAddRemover.MAX_SLEEP);
             System.out.println(this.getName() + " sleeping for : " + sleep + " ms.");
-            sleep(sleep);
-            System.out.println(this.getName() + " removing: " + this.element);
-            success = TestTreeSetGreedy.this.test.remove(this.element);
+            Thread.sleep(sleep);
+            System.out.println(this.getName() + " removing: " + this.m_element);
+            success = TestTreeSetGreedy.this.m_test.remove(this.m_element);
             try {
-              assertTrue("Remove operation unsuccessful!", success);
+              Assert.assertTrue("Remove operation unsuccessful!", success);
             } catch (Exception fail) {
               fail.printStackTrace(System.err);
-              this.failure = fail;
+              this.m_failure = fail;
             }
-            success = TestTreeSetGreedy.this.test.remove(this.element);
+            success = TestTreeSetGreedy.this.m_test.remove(this.m_element);
             try {
               // avoid ConcurrentModificationException for toString() of test:
-              assertFalse("A remove operation of my own removed element was successful! ", success);
+              Assert.assertFalse("A remove operation of my own removed element was successful! ", success);
             } catch (Exception fail) {
               fail.printStackTrace(System.err);
-              this.failure = fail;
+              this.m_failure = fail;
             }
           } catch (InterruptedException e) {
-            TestTreeSetGreedy.fail("Caught an InterruptedExcetpion: " + e.toString());
+            Assert.fail("Caught an InterruptedExcetpion: " + e.toString());
           } catch (Exception fail) {
             fail.printStackTrace(System.err);
-            this.failure = fail;
+            this.m_failure = fail;
           }
 
         }
@@ -438,11 +567,11 @@ public class TestTreeSetGreedy extends TestCase {
     while (!allFinished) {
       allFinished = true;
       for (int i = 0; i < TreeSetGreedyAddRemover.INSTANCES; i++) {
-        if (threads[i].failure != null) {
+        if (threads[i].m_failure != null) {
           // clean output: stop threads, wait for them to finish and then fail.
-          Exception failure = threads[i].failure;
+          Exception failure = threads[i].m_failure;
           for (int j = 0; j < TreeSetGreedyAddRemover.INSTANCES; j++) {
-            threads[j].stop = true;
+            threads[j].m_stop = true;
           }
           try {
             Thread.sleep(TreeSetGreedyAddRemover.MAX_SLEEP + 1000);
@@ -455,45 +584,17 @@ public class TestTreeSetGreedy extends TestCase {
           failure.printStackTrace(tracePrint);
           tracePrint.flush();
           tracePrint.close();
-          fail(trace.toString());
+          Assert.fail(trace.toString());
         }
         allFinished &= !threads[i].isAlive();
       }
       try {
         Thread.sleep(400);
       } catch (InterruptedException e) {
-        TestTreeSetGreedy.fail("Caught an InterruptedExcetpion: " + e.toString());
+        Assert.fail("Caught an InterruptedExcetpion: " + e.toString());
       }
     }
     System.out.println("testMultiThreadingAddRemove() finished.");
 
-  }
-
-  final class Element implements IComparableProperty {
-
-    private Number compare = new Integer(ITrace2D.ZINDEX_MAX);
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see info.monitorenter.util.collections.IComparableProperty#getComparableProperty()
-     */
-    public Number getComparableProperty() {
-      return this.compare;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see info.monitorenter.util.collections.IComparableProperty#setComparableProperty(java.lang.Number)
-     */
-    public void setComparableProperty(Number n) {
-      this.compare = n;
-    }
-
-    public String toString() {
-      StringBuffer ret = new StringBuffer(this.compare.toString());
-      return ret.toString();
-    }
   }
 }

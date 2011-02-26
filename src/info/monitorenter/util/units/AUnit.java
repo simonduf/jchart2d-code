@@ -1,6 +1,6 @@
 /*
- *  Unit.java, base class for units in jchart2d.
- *  Copyright (C) Achim Westermann, created on 12.05.2005, 20:11:17
+ *  AUnit.java, base class for units in jchart2d.
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,13 +23,15 @@
 
 package info.monitorenter.util.units;
 
+import java.io.Serializable;
+
 /**
  * A unit.
  * <p>
  *
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.10 $
  *
  * @see info.monitorenter.util.units.UnitFactory
  *
@@ -37,7 +39,56 @@ package info.monitorenter.util.units;
  *
  * @see info.monitorenter.util.units.UnitSystemSI
  */
-public abstract class AUnit extends Object {
+public abstract class AUnit extends Object implements Serializable {
+
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = -8890511971185813347L;
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + this.m_decimals;
+    long temp;
+    temp = Double.doubleToLongBits(this.m_factor);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    result = prime * result + ((this.m_unitName == null) ? 0 : this.m_unitName.hashCode());
+    return result;
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    AUnit other = (AUnit) obj;
+    if (this.m_decimals != other.m_decimals) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.m_factor) != Double.doubleToLongBits(other.m_factor)) {
+      return false;
+    }
+    if (this.m_unitName == null) {
+      if (other.m_unitName != null) {
+        return false;
+      }
+    } else if (!this.m_unitName.equals(other.m_unitName)) {
+      return false;
+    }
+    return true;
+  }
 
   /** Decimals for rounding. */
   protected int m_decimals = 2;
@@ -124,7 +175,7 @@ public abstract class AUnit extends Object {
    *
    */
   public String getLabel(final double value) {
-    return new StringBuffer().append(round(value / this.m_factor)).append(" ").append(
+    return new StringBuffer().append(this.round(value / this.m_factor)).append(" ").append(
         this.m_unitName).toString();
   }
 
@@ -150,7 +201,7 @@ public abstract class AUnit extends Object {
    * {@link IUnitSystem}.
    * <p>
    *
-   * If this is already the greates unit, this will be returned so add
+   * If this is already the greatest unit, this will be returned so add
    * <code>unit == unit.getNextHigherUnit()</code> as the termination criteria
    * in loops to search for the greatest unit (to avoid endless loops).
    * <p>
@@ -192,7 +243,7 @@ public abstract class AUnit extends Object {
    *         decimals.
    */
   public double getValue(final double value) {
-    return round(value / this.m_factor);
+    return this.round(value / this.m_factor);
   }
 
   /**
@@ -232,6 +283,7 @@ public abstract class AUnit extends Object {
    *         if desired.
    *
    */
+  @Override
   public String toString() {
     return this.getUnitName();
   }

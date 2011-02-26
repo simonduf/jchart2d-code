@@ -1,6 +1,6 @@
 /*
  *  Trace2DActionAddRemoveTracePainter, action to set a ITracePainter on an ITrace2D.
- *  Copyright (C) Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,27 +24,27 @@ package info.monitorenter.gui.chart.events;
 
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
-import info.monitorenter.gui.chart.layout.LayoutFactory.PropertyChangeCheckBoxMenuItem;
+import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem;
 
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 
-import javax.swing.JCheckBoxMenuItem;
+import javax.swing.AbstractButton;
 
 /**
  * <code>Action</code> that adds or removes constructor-given
  * {@link info.monitorenter.gui.chart.ITracePainter} to the corresponding trace.
  * <p>
- * This action only works in combination with {@link java.awt.CheckboxMenuItem}
- * instances that send themselve as the event object to the
- * {@link java.awt.event.ActionEvent}(
- * {@link java.util.EventObject#getSource()}).
+ * This action only works in combination with {@link AbstractButton}
+ * instances that send themselves as the event object to the
+ * {@link java.awt.event.ActionEvent}( {@link java.util.EventObject#getSource()}
+ * ) because <code>{@link AbstractButton#isSelected()}</code> is needed for state check.
  * <p>
  * 
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.8 $
  */
 public final class Trace2DActionAddRemoveTracePainter extends ATrace2DAction {
 
@@ -56,11 +56,11 @@ public final class Trace2DActionAddRemoveTracePainter extends ATrace2DAction {
   /**
    * The stroke to set.
    */
-  private ITracePainter m_tracePainter;
+  private ITracePainter< ? > m_tracePainter;
 
   /**
-   * Create an <code>Action</code> that accesses the trace and identifies
-   * itself with the given action String.
+   * Create an <code>Action</code> that accesses the trace and identifies itself
+   * with the given action String.
    * <p>
    * 
    * @param trace
@@ -76,7 +76,7 @@ public final class Trace2DActionAddRemoveTracePainter extends ATrace2DAction {
    *          the painter to add / remove from the trace.
    */
   public Trace2DActionAddRemoveTracePainter(final ITrace2D trace, final String description,
-      final ITracePainter painter) {
+      final ITracePainter< ? > painter) {
     super(trace, description);
     this.m_tracePainter = painter;
     trace.addPropertyChangeListener(ITrace2D.PROPERTY_PAINTERS, this);
@@ -86,8 +86,8 @@ public final class Trace2DActionAddRemoveTracePainter extends ATrace2DAction {
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
   public void actionPerformed(final ActionEvent e) {
-    JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
-    boolean state = item.getState();
+    AbstractButton item = (AbstractButton) e.getSource();
+    boolean state = item.isSelected();
     if (state) {
       this.m_trace.addTracePainter(this.m_tracePainter);
     } else {
@@ -98,7 +98,7 @@ public final class Trace2DActionAddRemoveTracePainter extends ATrace2DAction {
         // rewind state as this could not be done:
         // contract for ITrace2D is, that at least one renderer should be
         // defined!
-        item.setState(true);
+        item.setSelected(true);
         item.invalidate();
         item.repaint();
       }
@@ -111,8 +111,8 @@ public final class Trace2DActionAddRemoveTracePainter extends ATrace2DAction {
   public void propertyChange(final PropertyChangeEvent evt) {
     String property = evt.getPropertyName();
     if (property.equals(ITrace2D.PROPERTY_PAINTERS)) {
-      ITracePainter oldValue = (ITracePainter) evt.getOldValue();
-      ITracePainter newValue = (ITracePainter) evt.getNewValue();
+      ITracePainter< ? > oldValue = (ITracePainter< ? >) evt.getOldValue();
+      ITracePainter< ? > newValue = (ITracePainter< ? >) evt.getNewValue();
       // added or removed?
       if (oldValue == null) {
         // added

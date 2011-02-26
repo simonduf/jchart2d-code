@@ -1,6 +1,6 @@
 /*
  * MultiTracing, a demo testing the thread- safetiness of the Chart2D.
- * Copyright (C) 2002  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2007 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,9 +23,9 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.layout.ChartPanel;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyMinimumViewport;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
+import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.util.Range;
 
 import java.awt.BorderLayout;
@@ -36,7 +36,6 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
-
 /**
  * <p>
  * An example that tests the ability of multithreaded use of a single
@@ -44,16 +43,16 @@ import javax.swing.JFrame;
  * single point to the chart and go to a sleep. After having painted the whole
  * trace, each Thread sleeps for a random time, removes it's trace, sleeps for
  * another random time and starts again. <br>
- * To be true: the data for the <code>TracePoint</code> instances is computed
- * a single time at startup.
+ * To be true: the data for the <code>TracePoint</code> instances is computed a
+ * single time at startup.
  * </p>
  * <p>
  * This test may blow your CPU. I am currently working on an AMD Athlon 1200,
  * 512 MB RAM so I did not get these problems.
  * </p>
- *
- * @version $Revision: 1.1 $
- *
+ * 
+ * @version $Revision: 1.13 $
+ * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  */
 
@@ -63,11 +62,11 @@ public final class MultiTracing extends JFrame {
    * sleep breaks and then removes it. It then goes to sleep and starts this
    * cycle anew.
    * <p>
-   *
+   * 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   *
-   *
-   * @version $Revision: 1.1 $
+   * 
+   * 
+   * @version $Revision: 1.13 $
    */
   static final class AddPaintRemoveThread extends Thread {
 
@@ -87,16 +86,16 @@ public final class MultiTracing extends JFrame {
      * Creates an instance that paints data to the trace that is added to the
      * chart.
      * <p>
-     *
+     * 
      * @param chart
      *          the chart to use.
-     *
+     * 
      * @param trace
      *          the trace to add points to.
-     *
+     * 
      * @param data
      *          the y values of the points to add.
-     *
+     * 
      * @param sleep
      *          the length of the sleep break between painting points in ms.
      */
@@ -112,45 +111,52 @@ public final class MultiTracing extends JFrame {
     /**
      * @see java.lang.Runnable#run()
      */
+    @Override
     public void run() {
+      try {
 
-      while (true) {
+        while (true) {
 
-        this.m_innnerChart.addTrace(this.m_trace);
-        for (int i = 0; i < this.m_data.length; i++) {
-          if (DEBUG) {
-            System.out.println(this.getName() + " adding point to " + this.m_trace.getName());
+          if (Chart2D.DEBUG_THREADING) {
+            System.out.println(this.getName() + "(" + Thread.currentThread().getName()
+                + ") adding trace.");
           }
-          this.m_trace.addPoint(i, this.m_data[i]);
+          this.m_innnerChart.addTrace(this.m_trace);
+          for (int i = 0; i < this.m_data.length; i++) {
+            if (Chart2D.DEBUG_THREADING) {
+              System.out.println("Thread "+ this.getName() + " adding point to " + this.m_trace.getName());
+            }
+            this.m_trace.addPoint(i, this.m_data[i]);
+            try {
+              Thread.sleep(this.m_sleep);
+            } catch (InterruptedException e) {
+              e.printStackTrace(System.err);
+            }
+
+          }
           try {
-            Thread.sleep(this.m_sleep);
+            Thread.sleep((long) (Math.random() * this.m_sleep));
           } catch (InterruptedException e) {
             e.printStackTrace(System.err);
           }
+          if (Chart2D.DEBUG_THREADING) {
+            System.out.println(this.getName() + "(" + Thread.currentThread().getName()
+                + ") removing trace.");
+          }
+          this.m_innnerChart.removeTrace(this.m_trace);
+          this.m_trace.removeAllPoints();
 
+          try {
+            Thread.sleep((long) (Math.random() * this.m_sleep));
+          } catch (InterruptedException e) {
+            e.printStackTrace(System.err);
+          }
         }
-        try {
-          Thread.sleep((long) (Math.random() * this.m_sleep));
-        } catch (InterruptedException e) {
-          e.printStackTrace(System.err);
-        }
-        if (DEBUG) {
-          System.out.println(this.getName() + " removing trace.");
-        }
-        this.m_innnerChart.removeTrace(this.m_trace);
-        this.m_trace.removeAllPoints();
-
-        try {
-          Thread.sleep((long) (Math.random() * this.m_sleep));
-        } catch (InterruptedException e) {
-          e.printStackTrace(System.err);
-        }
+      } catch (Throwable f) {
+        f.printStackTrace(System.err);
       }
     }
   }
-
-  /** Debugging switch. */
-  private static final boolean DEBUG = false;
 
   /**
    * Generated <code>serialVersionUID</code>.
@@ -161,37 +167,9 @@ public final class MultiTracing extends JFrame {
   private static final int SLEEP = 100;
 
   /**
-   * Helper method that generates random data for display.
-   * <p>
-   *
-   * @param data
-   *          will be filled with random y and ascending x values.
-   *
-   * @return the range of the generated data.
-   */
-  private static Range getRange(final double[][] data) {
-    double min = Double.MAX_VALUE;
-    double max = Double.MIN_VALUE;
-    double tmp;
-    for (int i = data.length - 1; i >= 0; i--) {
-      for (int j = data[i].length - 1; j >= 0; j--) {
-        tmp = data[i][j];
-        if (tmp > max) {
-          max = tmp;
-        }
-        if (tmp < min) {
-          min = tmp;
-        }
-      }
-    }
-
-    return new Range(min, max);
-  }
-
-  /**
    * Main entry.
    * <p>
-   *
+   * 
    * @param args
    *          ignored.
    */
@@ -239,8 +217,8 @@ public final class MultiTracing extends JFrame {
     }
 
     final MultiTracing wnd = new MultiTracing();
-    wnd.setForceXRange(new Range(0, data[0].length + 10));
-    wnd.setForceYRange(getRange(data));
+    // wnd.setForceXRange(new Range(0, data[0].length + 10));
+    // wnd.setForceYRange(MultiTracing.getRange(data));
     wnd.setLocation(100, 300);
     wnd.setSize(800, 300);
     wnd.setResizable(true);
@@ -259,7 +237,7 @@ public final class MultiTracing extends JFrame {
     // third Thread:
     trace = new Trace2DSimple();
     trace.setColor(Color.blue);
-    new AddPaintRemoveThread(wnd.m_chart, trace, data[2], (long) (MultiTracing.SLEEP * 2)).start();
+    new AddPaintRemoveThread(wnd.m_chart, trace, data[2], (MultiTracing.SLEEP * 2)).start();
 
     // fourth Thread:
     trace = new Trace2DSimple();
@@ -269,7 +247,7 @@ public final class MultiTracing extends JFrame {
     // fifth Thread:
     trace = new Trace2DSimple();
     trace.setColor(Color.black);
-    new AddPaintRemoveThread(wnd.m_chart, trace, data[4], (long) (MultiTracing.SLEEP * 3)).start();
+    new AddPaintRemoveThread(wnd.m_chart, trace, data[4], (MultiTracing.SLEEP * 3)).start();
     // sixth Thread:
     trace = new Trace2DSimple();
     trace.setColor(Color.white);
@@ -290,12 +268,16 @@ public final class MultiTracing extends JFrame {
     this.m_chart.setBackground(Color.lightGray);
     this.m_chart.setGridColor(new Color(0xDD, 0xDD, 0xDD));
     // add WindowListener
-    addWindowListener(new WindowAdapter() {
+    this.addWindowListener(new WindowAdapter() {
+      /**
+       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+       */
+      @Override
       public void windowClosing(final WindowEvent e) {
         System.exit(0);
       }
     });
-    Container contentPane = getContentPane();
+    Container contentPane = this.getContentPane();
     contentPane.setLayout(new BorderLayout());
     contentPane.add(new ChartPanel(this.m_chart), BorderLayout.CENTER);
   }
@@ -304,7 +286,7 @@ public final class MultiTracing extends JFrame {
    * Enforces to display a certain visible x range that will be expanded if
    * traces in the chart have higher or lower values.
    * <p>
-   *
+   * 
    * @param forceXRange
    *          the range that at least has to be kept visible.
    */
@@ -316,7 +298,7 @@ public final class MultiTracing extends JFrame {
    * Enforces to display a certain visible x range that will be expanded if
    * traces in the chart have higher or lower values.
    * <p>
-   *
+   * 
    * @param forceYRange
    *          the range that at least has to be kept visible.
    */

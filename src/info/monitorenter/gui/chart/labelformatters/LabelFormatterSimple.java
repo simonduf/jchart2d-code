@@ -1,7 +1,7 @@
 /*
  *
- *  LableFormatterSimple.java  jchart2d
- *  Copyright (C) Achim Westermann, created on 20.04.2005, 09:54:15
+ *  LabelFormatterSimple.java of project jchart2d. The most simple label formatter. 
+ *  Copyright (C) 2005 - 2011 Achim Westermann, created on 20.04.2005, 09:54:15
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,22 +23,25 @@
  */
 package info.monitorenter.gui.chart.labelformatters;
 
-import info.monitorenter.gui.chart.ILabelFormatter;
+import info.monitorenter.gui.chart.IAxisLabelFormatter;
 
 import java.text.DecimalFormat;
 
 /**
- * <p>
  * An IlabelFormatter implementation that just returns
  * <code>String.valueOf(value)</code>.
- * </p>
+ * <p>
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.10 $
  *
  */
-public final class LabelFormatterSimple extends LabelFormatterNumber implements ILabelFormatter {
+public final class LabelFormatterSimple extends LabelFormatterNumber implements IAxisLabelFormatter {
+
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 432931329620546628L;
+
   /**
    * Default constructor that limits the internal maximum fraction digits to 2
    * and the maximum integer digits to 16.
@@ -46,9 +49,9 @@ public final class LabelFormatterSimple extends LabelFormatterNumber implements 
    *
    */
   public LabelFormatterSimple() {
-    super(new DecimalFormat("#"));
-    this.m_nf.setMaximumFractionDigits(2);
-    this.m_nf.setMaximumIntegerDigits(16);
+    super(new DecimalFormat("#.#"));
+    this.m_numberFormat.setMaximumFractionDigits(4);
+    this.m_numberFormat.setMaximumIntegerDigits(16);
   }
 
 }

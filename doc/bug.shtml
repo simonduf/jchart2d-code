@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-  var update="01/09/2004";
+  var update="09/01/2004";
  </script>
  <body id="bug">
   <div id="wrapper">

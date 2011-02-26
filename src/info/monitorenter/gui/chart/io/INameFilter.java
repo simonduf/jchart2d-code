@@ -1,7 +1,7 @@
 /*
  *
- *  INameFilter.java  jbuzzer
- *  Copyright (C) Achim Westermann, created on 03.07.2004, 22:18:53
+ *  INameFilter.java  of project jchart2d, a filter working with URLs instead of just Files. 
+ *  Copyright (C) 2004 - 2011 Achim Westermann, created on 03.07.2004, 22:18:53
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,22 +24,20 @@
 package info.monitorenter.gui.chart.io;
 
 /**
- * <p>
  * A story on the side: There are:
  * <ul>
  * <li>{@link java.io.FileFilter}
  * <li>{@link java.io.FilenameFilter}
  * <li>{@link javax.swing.filechooser.FileFilter}
  * </ul>
- * </p>
  * <p>
- * Dumb all over hein. Well here's another one. Because we cannot stick to File
+ * Dumb all over hein? Well here's another one. Because we cannot stick to File
  * instances when working with URL's .
- * </p>
+ * <p>
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.3 $
  *
  */
 public interface INameFilter {

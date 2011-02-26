@@ -2,6 +2,8 @@
  * AbstractRangePolicy.java of project jchart2d,  A default superclass for chart viewport 
  * implementations that adds support for setting and getting ranges.
  * 
+ * Copyright (c) 2007 - 2011  Achim Westermann, Achim.Westermann@gmx.de
+ *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
  *  License as published by the Free Software Foundation; either
@@ -31,88 +33,27 @@ import java.beans.PropertyChangeSupport;
 import javax.swing.event.SwingPropertyChangeSupport;
 
 /**
- * <p>
  * A default superclass for IRangePolicy implementations that adds support for
  * setting and getting ranges.
- * </p>
  * <p>
  * Should be used by any implementation that really works on the data of ranges
  * (not unbounded ranges). Subclasses should access the internal member range or
  * use {@link #getRange()}.
- * </p>
- * <h3>Property Change events</h3>
- * <p>
- * <table border="0">
- * <tr>
- * <th><code>property</code></th>
- * <th><code>oldValue</code></th>
- * <th><code>newValue</code></th>
- * <th>occurance</th>
- * </tr>
- * <tr>
- * <td><code>{@link #PROPERTY_RANGE}</code></td>
- * <td><code>{@link info.monitorenter.util.Range}</code> that changed</td>
- * <td><code>{@link info.monitorenter.util.Range}</code>, the new value</td>
- * <td>Fired if any bound of the range changed (min or max).</td>
- * </tr>
- * <tr>
- * <tr>
- * <td><code>{@link #PROPERTY_RANGE_MAX}</code></td>
- * <td><code>{@link java.lang.Double}</code>, the old max value of the
- * range. </td>
- * <td><code>{@link info.monitorenter.util.Range}</code>, the new max value
- * of the range. </td>
- * <td></td>
- * </tr>
- * <tr>
- * <td><code>{@link #PROPERTY_RANGE_MIN}</code></td>
- * <td><code>{@link java.lang.Double}</code>, the old min value of the
- * range. </td>
- * <td><code>{@link info.monitorenter.util.Range}</code>, the new min value
- * of the range. </td>
- * <td></td>
- * </tr>
- * </table>
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.8 $
  */
 public abstract class ARangePolicy implements IRangePolicy {
-  /**
-   * The property key defining the <code>max</code> property.
-   * <p>
-   * Use in combination with
-   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
-   * <p>
-   */
-  public static final String PROPERTY_RANGE_MAX = "rangepolicy.rangemax";
 
-  /**
-   * The property key defining a change of the <code>min</code> or the
-   * <code>max</code> property.
-   * <p>
-   * Use in combination with
-   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
-   * <p>
-   */
-  public static final String PROPERTY_RANGE = "rangepolicy.range";
-
-  /**
-   * The property key defining the <code>min</code> property.
-   * <p>
-   * Use in combination with
-   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
-   * <p>
-   */
-  public static final String PROPERTY_RANGE_MIN = "rangepolicy.rangemin";
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = 1895087230983658166L;
 
   /**
    * The instance that add support for firing <code>PropertyChangeEvents</code>
    * and maintaining <code>PropertyChangeListeners</code>.
    * {@link PropertyChangeListener} instances.
    */
-
   protected PropertyChangeSupport m_propertyChangeSupport = new SwingPropertyChangeSupport(this);
 
   /**
@@ -124,7 +65,8 @@ public abstract class ARangePolicy implements IRangePolicy {
   private Range m_range;
 
   /**
-   * Creates a range policy with an unconfigured range ({@link Range#RANGE_UNBOUNDED}).
+   * Creates a range policy with an unconfigured range (
+   * {@link Range#RANGE_UNBOUNDED}).
    * <p>
    * 
    */
@@ -161,13 +103,44 @@ public abstract class ARangePolicy implements IRangePolicy {
   }
 
   /**
-   * <p>
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (this.getClass() != obj.getClass()) {
+      return false;
+    }
+    final ARangePolicy other = (ARangePolicy) obj;
+    if (this.m_propertyChangeSupport == null) {
+      if (other.m_propertyChangeSupport != null) {
+        return false;
+      }
+    } else if (!this.m_propertyChangeSupport.equals(other.m_propertyChangeSupport)) {
+      return false;
+    }
+    if (this.m_range == null) {
+      if (other.m_range != null) {
+        return false;
+      }
+    } else if (!this.m_range.equals(other.m_range)) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Fires a property change event to the registered listeners.
-   * </p>
+   * <p>
    * 
    * @param property
-   *          one of the <code>PROPERTY_XXX</code> constants defined in
-   *          <code>{@link info.monitorenter.gui.chart.ITrace2D}</code>.
+   *          one of the <code>PROPERTY_XXX</code> constants defined in <code>
+   *          {@link info.monitorenter.gui.chart.ITrace2D}</code>.
    * 
    * @param oldvalue
    *          the old value of the property.
@@ -184,7 +157,7 @@ public abstract class ARangePolicy implements IRangePolicy {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#getPropertyChangeListeners(String)
+   * @see info.monitorenter.gui.chart.IRangePolicy#getPropertyChangeListeners(java.lang.String)
    */
   public PropertyChangeListener[] getPropertyChangeListeners(final String property) {
     return this.m_propertyChangeSupport.getPropertyChangeListeners(property);
@@ -204,14 +177,29 @@ public abstract class ARangePolicy implements IRangePolicy {
   }
 
   /**
-   * @see java.beans.PropertyChangeSupport#removePropertyChangeListener(java.beans.PropertyChangeListener)
+   * @see java.lang.Object#hashCode()
    */
-  public void removePropertyChangeListener(final PropertyChangeListener listener) {
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result
+        + ((this.m_propertyChangeSupport == null) ? 0 : this.m_propertyChangeSupport.hashCode());
+    result = prime * result + ((this.m_range == null) ? 0 : this.m_range.hashCode());
+    return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IRangePolicy#removePropertyChangeListener(java.beans.PropertyChangeListener,
+   *      java.lang.String)
+   */
+  public void removePropertyChangeListener(final PropertyChangeListener listener,
+      final String property) {
     this.m_propertyChangeSupport.removePropertyChangeListener(listener);
   }
 
   /**
-   * @see java.beans.PropertyChangeSupport#removePropertyChangeListener(java.lang.String,
+   * @see info.monitorenter.gui.chart.IRangePolicy#removePropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
   public void removePropertyChangeListener(final String property,
@@ -230,19 +218,19 @@ public abstract class ARangePolicy implements IRangePolicy {
    *          {@link IRangePolicy#getMax(double, double)}.
    */
   public void setRange(final Range range) {
-    double oldMin = this.m_range.getMin();
-    double oldMax = this.m_range.getMax();
-    Range oldRange = this.m_range;
-    boolean minchanged = range.getMin() != oldMin;
-    boolean maxchanged = range.getMax() != oldMax;
+    final double oldMin = this.m_range.getMin();
+    final double oldMax = this.m_range.getMax();
+    final Range oldRange = this.m_range;
+    final boolean minchanged = range.getMin() != oldMin;
+    final boolean maxchanged = range.getMax() != oldMax;
     this.m_range = range;
     if (minchanged && maxchanged) {
-      this.firePropertyChange(ARangePolicy.PROPERTY_RANGE, oldRange, this.m_range);
+      this.firePropertyChange(IRangePolicy.PROPERTY_RANGE, oldRange, this.m_range);
     } else if (minchanged) {
-      this.firePropertyChange(ARangePolicy.PROPERTY_RANGE_MIN, new Double(oldMin), new Double(range
+      this.firePropertyChange(IRangePolicy.PROPERTY_RANGE_MIN, new Double(oldMin), new Double(range
           .getMin()));
     } else if (maxchanged) {
-      this.firePropertyChange(ARangePolicy.PROPERTY_RANGE_MAX, new Double(oldMax), new Double(range
+      this.firePropertyChange(IRangePolicy.PROPERTY_RANGE_MAX, new Double(oldMax), new Double(range
           .getMax()));
     }
 

@@ -1,6 +1,6 @@
 /*
  *  UnitGiga.java, unit for giga prefix.
- *  Copyright (C) Achim Westermann, created on 12.05.2005, 20:11:17
+ *  Copyright (C) 2004 - 2011 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -36,9 +36,13 @@ package info.monitorenter.util.units;
  *
  * @author <a href='mailto:Achim.Westermann@gmx.de'>Achim Westermann </a>
  *
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.4 $
  */
 public final class UnitGiga extends AUnit {
+  
+  /** Generated <code>serialVersionUID</code>. */
+  private static final long serialVersionUID = 3682164215556469359L;
+
   /**
    * Defcon.
    * <p>

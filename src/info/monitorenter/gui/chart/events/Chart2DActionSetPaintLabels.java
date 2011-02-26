@@ -1,6 +1,6 @@
 /*
  *  AxisActionSetPaintLabels.java of project jchart2d.
- *  Copyright 2006 (C) Achim Westermann, created on 00:13:29.
+ *  Copyright (c) 2007 - 2011 Achim Westermann, created on 00:13:29.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@
 package info.monitorenter.gui.chart.events;
 
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.layout.LayoutFactory.PropertyChangeCheckBoxMenuItem;
+import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem;
 
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -37,7 +37,7 @@ import javax.swing.JCheckBoxMenuItem;
  * <p>
  * 
  * This action is not used by the context menu labels of
- * {@link info.monitorenter.gui.chart.layout.ChartPanel} because that instance
+ * {@link info.monitorenter.gui.chart.views.ChartPanel} because that instance
  * deactivates this feature in order to use a custom {@link javax.swing.JLabel}
  * that triggers a popup menu for trace controls.
  * <p>
@@ -52,9 +52,16 @@ import javax.swing.JCheckBoxMenuItem;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.8 $
  */
-public class Chart2DActionSetPaintLabels extends AChart2DAction {
+public class Chart2DActionSetPaintLabels
+    extends AChart2DAction {
+
+  /**
+   * Generated <code>serial version UID</code>.
+   * <p>
+   */
+  private static final long serialVersionUID = 2032168563789294815L;
 
   /**
    * Create an <code>Action</code> that accesses the axis, identifies itself

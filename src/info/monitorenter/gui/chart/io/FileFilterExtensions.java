@@ -2,7 +2,7 @@
  *
  *  FileFilterExtensions.java, a FileFilter implementation that
  *  filters files by their extension.
- *  Copyright (C) Achim Westermann, created on 01.07.2004, 12:18:29
+ *  Copyright (C) 2004 - 2011 Achim Westermann, created on 01.07.2004, 12:18:29
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -63,7 +63,8 @@ import javax.swing.filechooser.FileSystemView;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de>Achim Westermann </a>
  */
-public final class FileFilterExtensions extends FileFilter implements INameFilter {
+public final class FileFilterExtensions
+    extends FileFilter implements INameFilter {
   /** Filename extensions to filter for. */
   private String[] m_extensions;
 
@@ -75,35 +76,44 @@ public final class FileFilterExtensions extends FileFilter implements INameFilte
    * <p>
    * 
    * @param extensionsWithoutDot
-   *          A String[] containing extension strings without the dot like:
-   *          <nobr><code>new String[]{"bat","txt","dict"}</code> </nobr>.
+   *            A String[] containing extension strings without the dot like:
+   *            <nobr><code>new String[]{"bat","txt","dict"}</code> </nobr>.
    * @throws IllegalArgumentException
-   *           if the given extensions are inivalid.
+   *             if the given extensions are inivalid.
    */
   public FileFilterExtensions(final String[] extensionsWithoutDot) throws IllegalArgumentException {
     this.verify(extensionsWithoutDot);
-    this.m_extensions = extensionsWithoutDot;
+    this.m_extensions = new String[extensionsWithoutDot.length];
+    System.arraycopy(extensionsWithoutDot, 0, this.m_extensions, 0, extensionsWithoutDot.length);
     this.m_isWindows = this.isWindows();
   }
 
   /**
-   * @see java.io.FileFilter#accept(java.io.File)
+   * @see javax.swing.filechooser.FileFilter#accept(java.io.File)
    */
+  @Override
   public boolean accept(final File pathname) {
+    boolean result;
     if (pathname.isDirectory()) {
-      return true;
+      result = true;
+    } else {
+      result = this.acceptNoDirectory(pathname.getAbsolutePath());
     }
-    return acceptNoDirectory(pathname.getAbsolutePath());
+    return result;
   }
 
   /**
    * @see INameFilter#accept(String)
    */
   public boolean accept(final String urlstring) {
-    if (isDirectory(urlstring)) {
-      return true;
+    boolean result;
+    if (this.isDirectory(urlstring)) {
+      result = true;
+    } else {
+
+      result = this.acceptNoDirectory(urlstring);
     }
-    return acceptNoDirectory(urlstring);
+    return result;
   }
 
   /**
@@ -111,7 +121,7 @@ public final class FileFilterExtensions extends FileFilter implements INameFilte
    * <p>
    * 
    * @param noDirFileNoURL
-   *          the path to the file.
+   *            the path to the file.
    * @return true if the file denoted by the given path is accepted.
    */
   private boolean acceptNoDirectory(final String noDirFileNoURL) {
@@ -137,6 +147,7 @@ public final class FileFilterExtensions extends FileFilter implements INameFilte
   /**
    * @see javax.swing.filechooser.FileFilter#getDescription()
    */
+  @Override
   public String getDescription() {
     StringBuffer ret = new StringBuffer();
     int len = this.m_extensions.length;
@@ -154,7 +165,7 @@ public final class FileFilterExtensions extends FileFilter implements INameFilte
    * <p>
    * 
    * @param urlstring
-   *          the url format String pointing to a file.
+   *            the url format String pointing to a file.
    * @return true if the given String denotes a directory.
    */
   private boolean isDirectory(final String urlstring) {
@@ -225,9 +236,9 @@ public final class FileFilterExtensions extends FileFilter implements INameFilte
    * <p>
    * 
    * @param extensions
-   *          The array with the Strings of extensions.
+   *            The array with the Strings of extensions.
    * @throws IllegalArgumentException
-   *           If a String of the array is null or contains a dot ('.').
+   *             If a String of the array is null or contains a dot ('.').
    */
   private void verify(final String[] extensions) throws IllegalArgumentException {
     String current;
