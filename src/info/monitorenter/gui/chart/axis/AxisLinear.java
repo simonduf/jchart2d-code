@@ -93,12 +93,10 @@ public class AxisLinear extends AAxis {
    * @see info.monitorenter.gui.chart.IAxis#getScaledValue(double)
    */
   public double getScaledValue(final double absolute) {
+    // No NaN prevention: we want it for discontinuation!
     Range range = this.getRange();
     double scalerX = range.getExtent();
     double result = (absolute - range.getMin()) / scalerX;
-    if (!MathUtil.isDouble(result)) {
-      result = 0;
-    }
     return result;
   }
 }

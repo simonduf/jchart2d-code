@@ -215,14 +215,8 @@ public abstract class ATracePainter implements
    */
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
       final int nextY, final Graphics g, final ITracePoint2D original) {
-    if (!Double.isNaN(original.getY()) && !Double.isNaN(original.getX())
-        && !Double.isNaN(this.getPreviousPoint().getY())
-        && !Double.isNaN(this.getPreviousPoint().getX())) {
-      this.m_previousX = nextX;
-      this.m_previousY = nextY;
-    } else {
-      this.discontinue(g);
-    }
+    this.m_previousX = nextX;
+    this.m_previousY = nextY;
     this.m_previousPoint = original;
   }
 

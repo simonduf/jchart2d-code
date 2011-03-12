@@ -33,6 +33,7 @@ import info.monitorenter.gui.chart.pointpainters.PointPainterLine;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.test.ATestChartOperations;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
+import info.monitorenter.gui.chart.traces.Trace2DLtdReplacing;
 import info.monitorenter.gui.chart.traces.Trace2DLtdSorted;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.util.Range;
@@ -571,7 +572,7 @@ public class TestChartOperationsVisual extends ATestChartOperations {
     ATestChartOperations.AChartOperation operation = new AChartOperation("Inserting a discontinuation: Trace should be split afterwards!") {
 
       /**
-       * Creates a <code>{@link Trace2DLtdSorted}</code>.
+       * Creates a <code>{@link Trace2DLtdReplacing}</code>.
        * <p>
        * 
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation
@@ -584,11 +585,21 @@ public class TestChartOperationsVisual extends ATestChartOperations {
       }
 
       /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#fillTrace(info.monitorenter.gui.chart.ITrace2D)
+       */
+      @Override
+      public void fillTrace(ITrace2D trace) {
+        for(int i=0;i<10;i++){
+          trace.addPoint(i,(Math.random()+1.0)*i);
+        }
+      }
+
+      /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
        */
       public Object action(final Chart2D chart) {
         ITrace2D trace = chart.getTraces().first();
-        trace.addPoint(50, Double.NaN);
+        trace.addPoint(5, Double.NaN);
         return null;
       }
     };
@@ -842,8 +853,7 @@ public class TestChartOperationsVisual extends ATestChartOperations {
        * Overridden to have an empty array returned and be in control to which
        * axes the traces are added in
        * 
-       * <code>{@link info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#preCondition(Chart2D)} </code>
-       * .
+       * <code>{@link info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#preCondition(Chart2D)}</code>
        * <p>
        * 
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#createTraces()

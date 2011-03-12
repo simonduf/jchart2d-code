@@ -41,7 +41,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
-import java.awt.print.PageFormat; 
+import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
@@ -453,7 +453,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
      */
     public String getToolTipText(final Chart2D chart, final MouseEvent me) {
       // NONE implementation (defined by this enum type).
-    	int i = 0;
+      int i = 0;
       return null;
     }
 
@@ -2667,8 +2667,9 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     if (point == null) {
       result = false;
     } else {
-      result = !(point.getScaledX() > 1.0 || point.getScaledX() < 0.0 || point.getScaledY() > 1.0 || point
-          .getScaledY() < 0.0);
+      result = !(Double.isNaN(point.getScaledX()) || Double.isNaN(point.getScaledY()))
+          && !(point.getScaledX() > 1.0 || point.getScaledX() < 0.0 || point.getScaledY() > 1.0 || point
+              .getScaledY() < 0.0);
     }
     return result;
   }
@@ -2795,7 +2796,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     }
     this.updateScaling(false);
     // will be used in several iterations.
-    ITrace2D tmpdata;
+    ITrace2D trace;
     Iterator<ITrace2D> traceIt;
     // painting trace labels
     this.negociateXChart(g);
@@ -2838,19 +2839,19 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       oldpoint = null;
       newpoint = null;
       count++;
-      tmpdata = traceIt.next();
-      if (tmpdata.isVisible()) {
-        synchronized (tmpdata) {
+      trace = traceIt.next();
+      if (trace.isVisible()) {
+        synchronized (trace) {
           if (Chart2D.DEBUG_THREADING) {
             System.out.println("Chart2D.paintComponent(" + Thread.currentThread().getName()
-                + "), 2 locks (lock on trace " + tmpdata.getName() + ")");
+                + "), 2 locks (lock on trace " + trace.getName() + ")");
           }
-          boolean hasErrorBars = tmpdata.getHasErrorBars();
+          boolean hasErrorBars = trace.getHasErrorBars();
           if (g2d != null) {
-            g2d.setStroke(tmpdata.getStroke());
+            g2d.setStroke(trace.getStroke());
           }
-          g.setColor(tmpdata.getColor());
-          Set<ITracePainter< ? >> tracePainters = tmpdata.getTracePainters();
+          g.setColor(trace.getColor());
+          Set<ITracePainter< ? >> tracePainters = trace.getTracePainters();
           itTracePainters = tracePainters.iterator();
           tracePainter = null;
           while (itTracePainters.hasNext()) {
@@ -2859,14 +2860,14 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
           }
           if (hasErrorBars) {
             errorBarPolicy = null;
-            Set<IErrorBarPolicy< ? >> errorBarPolicies = tmpdata.getErrorBarPolicies();
+            Set<IErrorBarPolicy< ? >> errorBarPolicies = trace.getErrorBarPolicies();
             itTraceErrorBarPolicies = errorBarPolicies.iterator();
             while (itTraceErrorBarPolicies.hasNext()) {
               errorBarPolicy = itTraceErrorBarPolicies.next();
               errorBarPolicy.startPaintIteration(g);
             }
           }
-          Iterator<ITracePoint2D> pointIt = tmpdata.iterator();
+          Iterator<ITracePoint2D> pointIt = trace.iterator();
           boolean newpointVisible = false;
           boolean oldpointVisible = false;
           while (pointIt.hasNext()) {
@@ -2876,7 +2877,38 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
             newpoint = pointIt.next();
             newpointVisible = this.isVisible(newpoint);
             oldpointVisible = this.isVisible(oldpoint);
-            if (!newpointVisible && !oldpointVisible) {
+
+            /*
+             * Special case: if we have NaN just don't interpolate anything or
+             * paint but just continue (and give a signal to trace painters to
+             * discontinue which is neccessary for implementations that paint
+             * polylines and must not accumulate polylines that have a
+             * discontinuation within):
+             */
+            boolean isNaNNewpoint = Double.isNaN(newpoint.getX()) || Double.isNaN(newpoint.getY());
+            boolean isNanOldpoint;
+            if (oldpoint == null) {
+              isNanOldpoint = false;
+            } else {
+              isNanOldpoint = Double.isNaN(oldpoint.getX()) || Double.isNaN(oldpoint.getY());
+            }
+            if (isNaNNewpoint || isNanOldpoint) {
+              /*
+               * Only discontinue when entering NaN space as calls to it for
+               * subsequent NaN values would repeat the same polyline paint of
+               * the last valid point in TracePainterPolyline (senseless).
+               */
+              if (!(isNanOldpoint) && (isNaNNewpoint)) {
+                for (ITracePainter< ? > painter : trace.getTracePainters()) {
+                  painter.discontinue(g2d);
+                }
+              }
+              if (!isNaNNewpoint) {
+                tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
+                tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
+
+              }
+            } else if (!newpointVisible && !oldpointVisible) {
               // save for next loop:
               tmppt = (ITracePoint2D) newpoint.clone();
               int tmptmpx = tmpx;
@@ -2896,7 +2928,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
               if (this.hasChartIntersection(oldpoint, newpoint)) {
                 // don't use error bars for interpolated points that do not
                 // intersect the chart's viewport!
-                this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, tmpdata, g, newpoint, false);
+                this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, trace, g, newpoint, false);
               }
               // restore for next loop start:
               newpoint = tmppt;
@@ -2911,7 +2943,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
               oldtmpx = this.m_xChartStart + (int) Math.round(oldpoint.getScaledX() * rangex);
               oldtmpy = this.m_yChartStart - (int) Math.round(oldpoint.getScaledY() * rangey);
               // don't use error bars for interpolated points!
-              this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, tmpdata, g, newpoint, false);
+              this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, trace, g, newpoint, false);
             } else if (!newpointVisible && oldpointVisible) {
               // leaving the visible bounds:
               tmppt = (ITracePoint2D) newpoint.clone();
@@ -2919,24 +2951,24 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
               tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
               tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
               // don't use error bars for interpolated points!
-              this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, tmpdata, g, newpoint, false);
+              this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, trace, g, newpoint, false);
               // restore for next loop start:
               newpoint = tmppt;
             } else {
               // staying in the visible bounds: just paint
               tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
               tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
-              this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, false, tmpdata, g, newpoint,
-                  hasErrorBars);
+              this
+                  .paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, false, trace, g, newpoint, hasErrorBars);
             }
           }
-          itTracePainters = tmpdata.getTracePainters().iterator();
+          itTracePainters = trace.getTracePainters().iterator();
           while (itTracePainters.hasNext()) {
             tracePainter = itTracePainters.next();
             tracePainter.endPaintIteration(g);
           }
           if (hasErrorBars) {
-            itTraceErrorBarPolicies = tmpdata.getErrorBarPolicies().iterator();
+            itTraceErrorBarPolicies = trace.getErrorBarPolicies().iterator();
             while (itTraceErrorBarPolicies.hasNext()) {
               errorBarPolicy = itTraceErrorBarPolicies.next();
               errorBarPolicy.endPaintIteration(g);
@@ -2946,7 +2978,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       }
       if (Chart2D.DEBUG_THREADING) {
         System.out.println("paint(" + Thread.currentThread().getName() + "), left lock on trace "
-            + tmpdata.getName());
+            + trace.getName());
       }
     }
     if (g2d != null) {
