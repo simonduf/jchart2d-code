@@ -78,6 +78,7 @@ jchart2d-3.2.1 - <month>, <day>, <year>
 * Fixed possible deadlock when adding many traces at startup and paint of Chart2D is already invoked before finish of adding all traces. 
 * Fixed bug #3164863: LabelFormatter does not chooses femto range for very small values ( < 10^-16).
 * Fixed bug #3116413: Zooming a horizontal line in-between two points leaves chart empty.
+* Re-fixed feature #2582509: Adding a NaN point will insert a discontinuation in the corresponding trace. 
 o Renamed info.monitorenter.MathUtil to info.monitorenter.util.math.MathUtil.
 o Renamed info.monitorenter.math.IntegerReusable to info.monitorenter.math.IntegerMutable. 
 o Simplified API: dropped interface IPointHighlighter. Use IPointPainter wherever you used IPointHighlighter before. 
