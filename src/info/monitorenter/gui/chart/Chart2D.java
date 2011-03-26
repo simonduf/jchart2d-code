@@ -2424,8 +2424,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     // if x1 >= xmax && x2 >= xmax
     // Caution: getX() and getY() will always return 0.0 by now as we don't
     // backtrace values from interpolated points!
-    result = !(oldpoint.getScaledX() == newpoint.getScaledX() || oldpoint.getScaledY() == newpoint
-        .getScaledY());
+    result = oldpoint.getScaledX() != newpoint.getScaledX() || oldpoint.getScaledY() != newpoint
+        .getScaledY();
     return result;
   }
 
