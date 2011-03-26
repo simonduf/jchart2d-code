@@ -1,11 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-<<<<<<< HEAD
   var update="09/01/2004";
-=======
-  var update="01/09/2004";
->>>>>>> branch 'refs/heads/master' of ssh://achimwestermann@jchart2d.git.sourceforge.net/gitroot/jchart2d/jchart2d
  </script>
  <body id="bug">
   <div id="wrapper">
