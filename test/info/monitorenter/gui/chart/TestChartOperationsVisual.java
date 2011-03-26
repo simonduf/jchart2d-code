@@ -1,27 +1,4 @@
-/*
- *  TestChartOperationsVisual.java of project jchart2d, test case 
- *  for visually testing operations of the jchart2d API.
- *  Copyright 2007 (C) Achim Westermann, created on 04.03.2007 11:12:01.
- *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
- *
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
- *
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA*
- *  If you modify or optimize the code in a useful way please let me know.
- *  Achim.Westermann@gmx.de
- *
- */
 package info.monitorenter.gui.chart;
-
 import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.errorbars.ErrorBarPainter;
@@ -33,6 +10,7 @@ import info.monitorenter.gui.chart.pointpainters.PointPainterLine;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.test.ATestChartOperations;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
+import info.monitorenter.gui.chart.traces.Trace2DLtdReplacing;
 import info.monitorenter.gui.chart.traces.Trace2DLtdSorted;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.util.Range;
@@ -47,7 +25,6 @@ import java.util.SortedSet;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-
 /**
  * Visual test of operations upon the chart with basic ui for human judgement of
  * success or failure.
@@ -71,27 +48,28 @@ public class TestChartOperationsVisual extends ATestChartOperations {
     TestSuite suite = new TestSuite();
     suite.setName(TestChartOperationsVisual.class.getName());
 
-    suite.addTest(new TestChartOperationsVisual("testRemoveAllPoints"));
-    suite.addTest(new TestChartOperationsVisual("testRemoveAllTraces"));
-    suite.addTest(new TestChartOperationsVisual("testAddPoint"));
-    suite.addTest(new TestChartOperationsVisual("testSetStroke"));
-    suite.addTest(new TestChartOperationsVisual("testSetTraceName"));
-    suite.addTest(new TestChartOperationsVisual("testSetTraceNameEmptyTrace"));
-    suite.addTest(new TestChartOperationsVisual("testSetRangePolicyX"));
-    suite
-        .addTest(new TestChartOperationsVisual("testAxisLabelFormatterNumberFormatSetNumberFormat"));
-    suite.addTest(new TestChartOperationsVisual("testAxisSetLabelFormatter"));
-    suite.addTest(new TestChartOperationsVisual("testTraceSetErrorBarPolicy"));
-    suite.addTest(new TestChartOperationsVisual("testIErrorBarPainterSetStartPointPainter"));
-    suite.addTest(new TestChartOperationsVisual("testZoom"));
-    suite.addTest(new TestChartOperationsVisual("testDeadLockAddPointThread"));
-    suite.addTest(new TestChartOperationsVisual("testTracePointSetLocation"));
-    suite.addTest(new TestChartOperationsVisual("testSetNullTraceTitle"));
-    suite.addTest(new TestChartOperationsVisual("testSetEmptyTraceTitle"));
-    suite.addTest(new TestChartOperationsVisual("testSetTraceTitleOnEmptyTitleTrace"));
-    suite.addTest(new TestChartOperationsVisual("testAddRemoveTrace"));
-    suite.addTest(new TestChartOperationsVisual("testSetZIndex"));
-    suite.addTest(new TestChartOperationsVisual("testRemoveTraceForBug2891801"));
+//    suite.addTest(new TestChartOperationsVisual("testRemoveAllPoints"));
+//    suite.addTest(new TestChartOperationsVisual("testRemoveAllTraces"));
+//    suite.addTest(new TestChartOperationsVisual("testAddPoint"));
+//    suite.addTest(new TestChartOperationsVisual("testSetStroke"));
+//    suite.addTest(new TestChartOperationsVisual("testSetTraceName"));
+//    suite.addTest(new TestChartOperationsVisual("testSetTraceNameEmptyTrace"));
+//    suite.addTest(new TestChartOperationsVisual("testSetRangePolicyX"));
+//    suite
+//        .addTest(new TestChartOperationsVisual("testAxisLabelFormatterNumberFormatSetNumberFormat"));
+//    suite.addTest(new TestChartOperationsVisual("testAxisSetLabelFormatter"));
+//    suite.addTest(new TestChartOperationsVisual("testTraceSetErrorBarPolicy"));
+//    suite.addTest(new TestChartOperationsVisual("testIErrorBarPainterSetStartPointPainter"));
+//    suite.addTest(new TestChartOperationsVisual("testZoom"));
+//    suite.addTest(new TestChartOperationsVisual("testDeadLockAddPointThread"));
+//    suite.addTest(new TestChartOperationsVisual("testTracePointSetLocation"));
+//    suite.addTest(new TestChartOperationsVisual("testSetNullTraceTitle"));
+//    suite.addTest(new TestChartOperationsVisual("testSetEmptyTraceTitle"));
+//    suite.addTest(new TestChartOperationsVisual("testSetTraceTitleOnEmptyTitleTrace"));
+//    suite.addTest(new TestChartOperationsVisual("testAddRemoveTrace"));
+//    suite.addTest(new TestChartOperationsVisual("testSetZIndex"));
+//    suite.addTest(new TestChartOperationsVisual("testRemoveTraceForBug2891801"));
+    suite.addTest(new TestChartOperationsVisual("testAddDiscontinuation"));
     return suite;
   }
 
@@ -309,7 +287,8 @@ public class TestChartOperationsVisual extends ATestChartOperations {
   }
 
   /**
-   * Invokes <code>{@link IErrorBarPainter#setStartPointPainter(IPointPainterConfigurableUI)}
+   * Invokes
+   * <code>{@link IErrorBarPainter#setStartPointPainter(IPointPainterConfigurableUI)}
    * </code> with a <code>{@link PointPainterDisc}</code>.
    * <p>
    */
@@ -322,7 +301,7 @@ public class TestChartOperationsVisual extends ATestChartOperations {
        */
       public Object action(final Chart2D chart) {
         ITrace2D trace = chart.getTraces().iterator().next();
-        IErrorBarPolicy<?> errorBarPolicy = trace.getErrorBarPolicies().iterator().next();
+        IErrorBarPolicy< ? > errorBarPolicy = trace.getErrorBarPolicies().iterator().next();
         IErrorBarPainter errorBarPainter = errorBarPolicy.getErrorBarPainters().iterator().next();
         errorBarPainter.setStartPointPainter(new PointPainterDisc(12));
         return null;
@@ -336,12 +315,13 @@ public class TestChartOperationsVisual extends ATestChartOperations {
         super.preCondition(chart);
         ITrace2D trace = chart.getTraces().iterator().next();
         // create an error bar policy and configure it
-        IErrorBarPolicy<?> errorBarPolicy = new ErrorBarPolicyRelative(0.2, 0.2);
+        IErrorBarPolicy< ? > errorBarPolicy = new ErrorBarPolicyRelative(0.2, 0.2);
         errorBarPolicy.setShowNegativeYErrors(true);
         errorBarPolicy.setShowPositiveYErrors(true);
         // errorBarPolicy.setShowNegativeXErrors(true);
         // errorBarPolicy.setShowPositiveXErrors(true);
-        // configure how error bars are rendered with an error bar painter:
+        // configure how error bars are rendered with an error bar
+        // painter:
         IErrorBarPainter errorBarPainter = new ErrorBarPainter();
         errorBarPainter.setEndPointPainter(new PointPainterDisc());
         errorBarPainter.setEndPointColor(Color.GRAY);
@@ -445,13 +425,12 @@ public class TestChartOperationsVisual extends ATestChartOperations {
    */
   public void testSetRangePolicyX() {
     ATestChartOperations.AChartOperation operation = new AChartOperation(
-        "chart.getAxisX().setRangePolicy( "
-            + "new RangePolicyFixedViewport(new Range(20, 30)))") {
+        "chart.getAxisX().setRangePolicy( " + "new RangePolicyFixedViewport(new Range(20, 30)))") {
       /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
        */
       public Object action(final Chart2D chart) {
-        IRangePolicy rangePolicy = new RangePolicyFixedViewport(new Range(20,30));
+        IRangePolicy rangePolicy = new RangePolicyFixedViewport(new Range(20, 30));
         chart.getAxisX().setRangePolicy(rangePolicy);
         return null;
       }
@@ -535,7 +514,8 @@ public class TestChartOperationsVisual extends ATestChartOperations {
    * <p>
    */
   public void testSetTraceTitleOnEmptyTitleTrace() {
-    ATestChartOperations.AChartOperation operation = new AChartOperation("trace.setName(\"foobar\")") {
+    ATestChartOperations.AChartOperation operation = new AChartOperation(
+        "trace.setName(\"foobar\")") {
       /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
        */
@@ -555,6 +535,50 @@ public class TestChartOperationsVisual extends ATestChartOperations {
         trace.setName("");
       }
 
+    };
+    this.setTestOperation(operation);
+  }
+
+  /**
+   * Inserts a new TracePoint with an y value <code>{@link Double#NaN}</code> to
+   * a sorted trace to get a discontinued trace.
+   * <p>
+   */
+  public void testAddDiscontinuation() {
+    ATestChartOperations.AChartOperation operation = new AChartOperation("Inserting a discontinuation: Trace should be split afterwards!") {
+
+      /**
+       * Creates a <code>{@link Trace2DLtdReplacing}</code>.
+       * <p>
+       * 
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation
+       *      #createTraces()
+       */
+      @Override
+      public ITrace2D[] createTraces() {
+        ITrace2D sortedTrace = new Trace2DLtdSorted(500);
+        return new ITrace2D[] {sortedTrace };
+      }
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#fillTrace(info.monitorenter.gui.chart.ITrace2D)
+       */
+      @Override
+      public void fillTrace(ITrace2D trace) {
+        for(int i=0;i<10;i++){
+          trace.addPoint(i,(Math.random()+1.0)*i);
+        }
+        super.fillTrace(trace);
+      }
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
+      public Object action(final Chart2D chart) {
+        ITrace2D trace = chart.getTraces().first();
+        trace.addPoint(5, Double.NaN);
+        return null;
+      }
     };
     this.setTestOperation(operation);
   }
@@ -646,8 +670,8 @@ public class TestChartOperationsVisual extends ATestChartOperations {
       @Override
       public ITrace2D[] createTraces() {
         ITrace2D result = new Trace2DLtdSorted();
-        return new ITrace2D[]{result};
-      
+        return new ITrace2D[] {result };
+
       }
 
       @Override
@@ -658,8 +682,7 @@ public class TestChartOperationsVisual extends ATestChartOperations {
         trace.addPoint(new TracePoint2D(5, 7));
         trace.addPoint(this.m_extremum);
       }
-      
-      
+
     };
     this.setTestOperation(operation);
 
@@ -680,12 +703,13 @@ public class TestChartOperationsVisual extends ATestChartOperations {
       public Object action(final Chart2D chart) {
         ITrace2D trace = chart.getTraces().iterator().next();
         // create an error bar policy and configure it
-        IErrorBarPolicy<?>errorBarPolicy = new ErrorBarPolicyRelative(0.2, 0.2);
+        IErrorBarPolicy< ? > errorBarPolicy = new ErrorBarPolicyRelative(0.2, 0.2);
         errorBarPolicy.setShowNegativeYErrors(true);
         errorBarPolicy.setShowPositiveYErrors(true);
         // errorBarPolicy.setShowNegativeXErrors(true);
         // errorBarPolicy.setShowPositiveXErrors(true);
-        // configure how error bars are rendered with an error bar painter:
+        // configure how error bars are rendered with an error bar
+        // painter:
         IErrorBarPainter errorBarPainter = new ErrorBarPainter();
         errorBarPainter.setEndPointPainter(new PointPainterDisc());
         errorBarPainter.setEndPointColor(Color.GRAY);
@@ -735,10 +759,12 @@ public class TestChartOperationsVisual extends ATestChartOperations {
     };
     this.setTestOperation(operation);
   }
-  
+
   /**
-   * Test the following procedure from bug report: 
-   * https://sourceforge.net/tracker/?func=detail&aid=2891801&group_id=50440&atid=459734.<p>
+   * Test the following procedure from bug report:
+   * https://sourceforge.net/tracker
+   * /?func=detail&aid=2891801&group_id=50440&atid=459734.
+   * <p>
    * <ol>
    * <li>Add a chart.</li>
    * <li>Add a first trace on a first Y axis.</li>
@@ -750,10 +776,12 @@ public class TestChartOperationsVisual extends ATestChartOperations {
    * <p>
    */
   public void testRemoveTraceForBug2891801() {
-    ATestChartOperations.AChartOperation operation = new AChartOperation("testRemoveTraceForBug2891801"){
+    ATestChartOperations.AChartOperation operation = new AChartOperation(
+        "testRemoveTraceForBug2891801") {
 
       /** The trace to check remove on. **/
-      private ITrace2D m_trace4; 
+      private ITrace2D m_trace4;
+
       /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#preCondition(info.monitorenter.gui.chart.Chart2D)
        */
@@ -774,41 +802,42 @@ public class TestChartOperationsVisual extends ATestChartOperations {
         IAxis xAxis = chart.getAxisX();
         ITrace2D trace1 = new Trace2DLtd();
         trace1.setColor(Color.BLUE);
-        chart.addTrace(trace1,xAxis, axisY1);
+        chart.addTrace(trace1, xAxis, axisY1);
         this.fillTrace(trace1);
 
         // trace2
         ITrace2D trace2 = new Trace2DLtd();
         trace2.setColor(Color.RED);
-        chart.addTrace(trace2,xAxis, axisY2);
+        chart.addTrace(trace2, xAxis, axisY2);
         this.fillTrace(trace2);
-        
+
         // trace3
         ITrace2D trace3 = new Trace2DLtd();
         trace3.setColor(Color.BLACK);
-        chart.addTrace(trace3,xAxis, axisY3);
+        chart.addTrace(trace3, xAxis, axisY3);
         this.fillTrace(trace3);
-  
+
         // trace4 to axis1
         ITrace2D trace4 = new Trace2DLtd();
         trace4.setColor(Color.MAGENTA);
         trace4.setStroke(new BasicStroke(3f));
-        chart.addTrace(trace4,xAxis, axisY1);
+        chart.addTrace(trace4, xAxis, axisY1);
         this.fillTrace(trace4);
         this.m_trace4 = trace4;
       }
 
       /**
-       * Overridden to have an empty array returned and be in control to which axes the traces 
-       * are added in <code>{@link info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#preCondition(Chart2D)} </code>.
+       * Overridden to have an empty array returned and be in control to which
+       * axes the traces are added in
+       * 
+       * <code>{@link info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#preCondition(Chart2D)}</code>
        * <p>
        * 
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#createTraces()
        */
       @Override
       public ITrace2D[] createTraces() {
-        ITrace2D[]result = new ITrace2D[]{
-        };
+        ITrace2D[] result = new ITrace2D[] {};
         return result;
       }
 
