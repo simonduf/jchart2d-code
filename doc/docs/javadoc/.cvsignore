@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 index-files
 info
 help-doc.html
@@ -17,3 +18,9 @@ overview-tree.html
 overview-summary.html
 package-list
 infovis
+=======
+*.html
+package-list
+index-files
+info
+>>>>>>> branch 'refs/heads/master' of ssh://achimwestermann@jchart2d.git.sourceforge.net/gitroot/jchart2d/jchart2d
