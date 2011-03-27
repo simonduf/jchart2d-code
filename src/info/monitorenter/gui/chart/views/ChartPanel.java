@@ -94,243 +94,259 @@ import javax.swing.JPanel;
  */
 public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
 
-  /**
-   * Generated <code>serialVersionUID</code>.
-   */
-  private static final long serialVersionUID = 3905801963714197560L;
+	/**
+	 * Generated <code>serialVersionUID</code>.
+	 */
+	private static final long serialVersionUID = 3905801963714197560L;
 
-  /**
-   * Main enbtry for demo app.
-   * <p>
-   * 
-   * @param args
-   *          ignored.
-   */
-  public static void main(final String[] args) {
-    // some data:
-    final double[] data = new double[100];
-    for (int i = 0; i < 100; i++) {
-      data[i] = Math.random() * i + 1;
-    }
-    final JFrame frame = new JFrame("ChartPanel demo");
-    final Chart2D chart = new Chart2D();
-    // trace 1
-    final ITrace2D trace1 = new Trace2DLtd(100);
-    trace1.setName("Trace 1");
+	/**
+	 * Main enbtry for demo app.
+	 * <p>
+	 * 
+	 * @param args
+	 *            ignored.
+	 */
+	public static void main(final String[] args) {
+		// some data:
+		final double[] data = new double[100];
+		for (int i = 0; i < 100; i++) {
+			data[i] = Math.random() * i + 1;
+		}
+		final JFrame frame = new JFrame("ChartPanel demo");
+		final Chart2D chart = new Chart2D();
+		// trace 1
+		final ITrace2D trace1 = new Trace2DLtd(100);
+		trace1.setName("Trace 1");
 
-    // AbstractDataCollector collector1 = new
-    // RandomDataCollectorOffset(trace1,500);
-    // trace2
-    final ITrace2D trace2 = new Trace2DLtd(100);
-    trace2.setName("Trace 2");
-    // add to chart
-    chart.addTrace(trace1);
-    chart.addTrace(trace2);
-    // AbstractDataCollector collector2 = new
-    // RandomDataCollectorOffset(trace2,500);
-    for (int i = 0; i < 100; i++) {
-      trace1.addPoint(i + 2, data[i]);
-      trace2.addPoint(i + 2, 100 - data[i]);
-    }
+		// AbstractDataCollector collector1 = new
+		// RandomDataCollectorOffset(trace1,500);
+		// trace2
+		final ITrace2D trace2 = new Trace2DLtd(100);
+		trace2.setName("Trace 2");
+		// add to chart
+		chart.addTrace(trace1);
+		chart.addTrace(trace2);
+		// AbstractDataCollector collector2 = new
+		// RandomDataCollectorOffset(trace2,500);
+		for (int i = 0; i < 100; i++) {
+			trace1.addPoint(i + 2, data[i]);
+			trace2.addPoint(i + 2, 100 - data[i]);
+		}
 
-    final ChartPanel cPanel = new ChartPanel(chart);
-    frame.getContentPane().add(cPanel);
-    frame.setSize(new Dimension(400, 600));
-    frame.addWindowListener(new WindowAdapter() {
-      /**
-       * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
-       */
-      @Override
-      public void windowClosing(final WindowEvent w) {
-        System.exit(0);
-      }
+		final ChartPanel cPanel = new ChartPanel(chart);
+		frame.getContentPane().add(cPanel);
+		frame.setSize(new Dimension(400, 600));
+		frame.addWindowListener(new WindowAdapter() {
+			/**
+			 * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+			 */
+			@Override
+			public void windowClosing(final WindowEvent w) {
+				System.exit(0);
+			}
 
-    });
-    frame.setJMenuBar(LayoutFactory.getInstance().createChartMenuBar(cPanel, false));
-    frame.setVisible(true);
-  }
+		});
+		frame.setJMenuBar(LayoutFactory.getInstance().createChartMenuBar(
+				cPanel, false));
+		frame.setVisible(true);
+	}
 
-  /** The annotation creator factory for this panel. */
-  private IAnnotationCreator m_annotationCreator = AnnotationCreatorBubble.getInstance();
+	/** The annotation creator factory for this panel. */
+	private IAnnotationCreator m_annotationCreator = AnnotationCreatorBubble
+			.getInstance();
 
-  /** The decorated chart. */
-  private final Chart2D m_chart;
+	/** The decorated chart. */
+	private final Chart2D m_chart;
 
-  /**
-   * <p>
-   * An internal panel for the labels of the traces that uses a
-   * {@link FlowLayout}.
-   * </p>
-   * 
-   */
-  protected JPanel m_labelPanel;
+	/**
+	 * <p>
+	 * An internal panel for the labels of the traces that uses a
+	 * {@link FlowLayout}.
+	 * </p>
+	 * 
+	 */
+	protected JPanel m_labelPanel;
 
-  /**
-   * Creates an instance that decorates the given chart with controls in form of
-   * popup menus.
-   * <p>
-   * 
-   * @param chart
-   *          A configured Chart2D instance that will be displayed and
-   *          controlled by this panel.
-   */
-  public ChartPanel(final Chart2D chart) {
-    super();
-    this.m_chart = chart;
-    this.setBackground(chart.getBackground());
-    // we paint our own labels
-    chart.setPaintLabels(false);
-    // get the layout factory for popup menues:
-    final LayoutFactory factory = LayoutFactory.getInstance();
+	/**
+	 * Creates an instance that decorates the given chart with controls in form
+	 * of popup menus.
+	 * <p>
+	 * 
+	 * @param chart
+	 *            A configured Chart2D instance that will be displayed and
+	 *            controlled by this panel.
+	 */
+	public ChartPanel(final Chart2D chart) {
+		super();
+		this.m_chart = chart;
+		this.setBackground(chart.getBackground());
+		// we paint our own labels
+		chart.setPaintLabels(false);
+		// get the layout factory for popup menues:
+		final LayoutFactory factory = LayoutFactory.getInstance();
 
-    factory.createChartPopupMenu(this, true);
+		factory.createChartPopupMenu(this, true);
 
-    // layout
-    this.setLayout(new BorderLayout());
-    this.add(chart, BorderLayout.CENTER);
-    // initial Labels
-    // put to a flow layout panel
-    this.m_labelPanel = new JPanel();
-    this.m_labelPanel.setFont(chart.getFont());
-    this.m_labelPanel.setLayout(new FlowLayoutCorrectMinimumSize(FlowLayout.LEFT));
-    this.m_labelPanel.setBackground(chart.getBackground());
-    JLabel label;
-    for (final ITrace2D trace : chart) {
-      label = factory.createTraceContextMenuLabel(chart, trace, true);
-      if (label != null) {
-        this.m_labelPanel.add(label);
-      }
-      // In case trace.getLabel() becomes empty hide the corresponding menu
-      // label via listeners!
-      trace.addPropertyChangeListener(ITrace2D.PROPERTY_PHYSICALUNITS, this);
-      trace.addPropertyChangeListener(ITrace2D.PROPERTY_NAME, this);
-    }
-    this.add(this.m_labelPanel, BorderLayout.SOUTH);
-    chart.addPropertyChangeListener(Chart2D.PROPERTY_BACKGROUND_COLOR, this);
-    // listen to new traces and deleted ones:
-    final List<IAxis> allAxes = chart.getAxes();
-    for (final IAxis currentAxis : allAxes) {
-      currentAxis.addPropertyChangeListener(IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
-    }
-    // a bit tricky: stay in touch with removed / added traces in case axes are
-    // changed in the chart: use the axis property change event to update me as
-    // a listener:
-    chart.addPropertyChangeListener(Chart2D.PROPERTY_AXIS_X, this);
-    chart.addPropertyChangeListener(Chart2D.PROPERTY_AXIS_Y, this);
-  }
+		// layout
+		this.setLayout(new BorderLayout());
+		this.add(chart, BorderLayout.CENTER);
+		// initial Labels
+		// put to a flow layout panel
+		this.m_labelPanel = new JPanel();
+		this.m_labelPanel.setFont(chart.getFont());
+		this.m_labelPanel.setLayout(new FlowLayoutCorrectMinimumSize(
+				FlowLayout.LEFT));
+		this.m_labelPanel.setBackground(chart.getBackground());
+		JLabel label;
+		for (final ITrace2D trace : chart) {
+			label = factory.createTraceContextMenuLabel(chart, trace, true);
+			if (label != null) {
+				this.m_labelPanel.add(label);
+			}
+			// In case trace.getLabel() becomes empty hide the corresponding
+			// menu
+			// label via listeners!
+			trace.addPropertyChangeListener(ITrace2D.PROPERTY_PHYSICALUNITS,
+					this);
+			trace.addPropertyChangeListener(ITrace2D.PROPERTY_NAME, this);
+		}
+		this.add(this.m_labelPanel, BorderLayout.SOUTH);
+		chart
+				.addPropertyChangeListener(Chart2D.PROPERTY_BACKGROUND_COLOR,
+						this);
+		// listen to new traces and deleted ones:
+		final List<IAxis> allAxes = chart.getAxes();
+		for (final IAxis currentAxis : allAxes) {
+			currentAxis.addPropertyChangeListener(
+					IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
+		}
+		// a bit tricky: stay in touch with removed / added traces in case axes
+		// are
+		// changed in the chart: use the axis property change event to update me
+		// as
+		// a listener:
+		chart.addPropertyChangeListener(Chart2D.PROPERTY_AXIS_X, this);
+		chart.addPropertyChangeListener(Chart2D.PROPERTY_AXIS_Y, this);
+	}
 
-  /**
-   * Internal helper that returns whether a label for the given trace is already
-   * contained in the internal label panel.
-   * <p>
-   * 
-   * This is needed because an addTrace(ITrace2D) call on the Chart2D is
-   * delegated to two axes thus resulting in two events per added trace: We have
-   * to avoid adding duplicate labels!
-   * <p>
-   * 
-   * @param tracetoAdd
-   *          the trace to check whether a label for it is already contained in
-   *          the internal label panel.
-   * 
-   * @return true if a label for the given trace is already contained in the
-   *         internal label panel.
-   */
-  private boolean containsTraceLabel(final ITrace2D tracetoAdd) {
-    boolean result = false;
-    final Component[] traceLabels = this.m_labelPanel.getComponents();
-    JLabel label;
-    final String labelName = tracetoAdd.getLabel();
-    for (int i = traceLabels.length - 1; i >= 0; i--) {
-      label = (JLabel) traceLabels[i];
-      if (labelName.equals(label.getText())) {
-        result = true;
-        break;
-      }
-    }
-    return result;
-  }
+	/**
+	 * Internal helper that returns whether a label for the given trace is
+	 * already contained in the internal label panel.
+	 * <p>
+	 * 
+	 * This is needed because an addTrace(ITrace2D) call on the Chart2D is
+	 * delegated to two axes thus resulting in two events per added trace: We
+	 * have to avoid adding duplicate labels!
+	 * <p>
+	 * 
+	 * @param tracetoAdd
+	 *            the trace to check whether a label for it is already contained
+	 *            in the internal label panel.
+	 * 
+	 * @return true if a label for the given trace is already contained in the
+	 *         internal label panel.
+	 */
+	private boolean containsTraceLabel(final ITrace2D tracetoAdd) {
+		boolean result = false;
+		final Component[] traceLabels = this.m_labelPanel.getComponents();
+		JLabel label;
+		final String labelName = tracetoAdd.getLabel();
+		for (int i = traceLabels.length - 1; i >= 0; i--) {
+			label = (JLabel) traceLabels[i];
+			if (labelName.equals(label.getText())) {
+				result = true;
+				break;
+			}
+		}
+		return result;
+	}
 
-  /**
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (this.getClass() != obj.getClass()) {
-      return false;
-    }
-    final ChartPanel other = (ChartPanel) obj;
-    if (this.m_annotationCreator == null) {
-      if (other.m_annotationCreator != null) {
-        return false;
-      }
-    } else if (!this.m_annotationCreator.equals(other.m_annotationCreator)) {
-      return false;
-    }
-    if (this.m_chart == null) {
-      if (other.m_chart != null) {
-        return false;
-      }
-    } else if (!this.m_chart.equals(other.m_chart)) {
-      return false;
-    }
-    if (this.m_labelPanel == null) {
-      if (other.m_labelPanel != null) {
-        return false;
-      }
-    } else if (!this.m_labelPanel.equals(other.m_labelPanel)) {
-      return false;
-    }
-    return true;
-  }
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		final ChartPanel other = (ChartPanel) obj;
+		if (this.m_annotationCreator == null) {
+			if (other.m_annotationCreator != null) {
+				return false;
+			}
+		} else if (!this.m_annotationCreator.equals(other.m_annotationCreator)) {
+			return false;
+		}
+		if (this.m_chart == null) {
+			if (other.m_chart != null) {
+				return false;
+			}
+		} else if (!this.m_chart.equals(other.m_chart)) {
+			return false;
+		}
+		if (this.m_labelPanel == null) {
+			if (other.m_labelPanel != null) {
+				return false;
+			}
+		} else if (!this.m_labelPanel.equals(other.m_labelPanel)) {
+			return false;
+		}
+		return true;
+	}
 
-  /**
-   * Returns the annotationCreator.
-   * <p>
-   * 
-   * @return the annotationCreator
-   */
-  public final IAnnotationCreator getAnnotationCreator() {
-    return this.m_annotationCreator;
-  }
+	/**
+	 * Returns the annotationCreator.
+	 * <p>
+	 * 
+	 * @return the annotationCreator
+	 */
+	public final IAnnotationCreator getAnnotationCreator() {
+		return this.m_annotationCreator;
+	}
 
-  /**
-   * Returns the chart.
-   * <p>
-   * 
-   * @return the chart
-   */
-  public final Chart2D getChart() {
-    return this.m_chart;
-  }
+	/**
+	 * Returns the chart.
+	 * <p>
+	 * 
+	 * @return the chart
+	 */
+	public final Chart2D getChart() {
+		return this.m_chart;
+	}
 
-  /**
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result
-        + ((this.m_annotationCreator == null) ? 0 : this.m_annotationCreator.hashCode());
-    result = prime * result + ((this.m_chart == null) ? 0 : this.m_chart.hashCode());
-    result = prime * result + ((this.m_labelPanel == null) ? 0 : this.m_labelPanel.hashCode());
-    return result;
-  }
+	/**
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((this.m_annotationCreator == null) ? 0
+						: this.m_annotationCreator.hashCode());
+		result = prime * result
+				+ ((this.m_chart == null) ? 0 : this.m_chart.hashCode());
+		result = prime
+				* result
+				+ ((this.m_labelPanel == null) ? 0 : this.m_labelPanel
+						.hashCode());
+		return result;
+	}
 
-  /**
-   * Listens for property "background" of the <code>Chart2D</code> instance that
-   * is contained in this component and sets the background color.
-   * <p>
-   * 
-   * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-   */
+	/**
+	 * Listens for property "background" of the <code>Chart2D</code> instance
+	 * that is contained in this component and sets the background color.
+	 * <p>
+	 * 
+	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+	 */
 	public void propertyChange(final PropertyChangeEvent evt) {
 		final String prop = evt.getPropertyName();
 		if (prop.equals(Chart2D.PROPERTY_BACKGROUND_COLOR)) {
@@ -386,6 +402,9 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
 						}
 					}
 				}
+			} else {
+				throw new IllegalArgumentException(
+						"Bad property change event for add / remove trace.");
 			}
 		} else if (prop.equals(Chart2D.PROPERTY_AXIS_X)
 				|| prop.equals(Chart2D.PROPERTY_AXIS_Y)) {
@@ -440,21 +459,19 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
 					}
 				}
 			}
-		} else {
-			throw new IllegalArgumentException(
-					"Bad property change event for add / remove trace.");
 		}
 
 	}
 
-  /**
-   * Sets the annotationCreator.
-   * <p>
-   * 
-   * @param annotationCreator
-   *          the annotationCreator to set
-   */
-  public final void setAnnotationCreator(final IAnnotationCreator annotationCreator) {
-    this.m_annotationCreator = annotationCreator;
-  }
+	/**
+	 * Sets the annotationCreator.
+	 * <p>
+	 * 
+	 * @param annotationCreator
+	 *            the annotationCreator to set
+	 */
+	public final void setAnnotationCreator(
+			final IAnnotationCreator annotationCreator) {
+		this.m_annotationCreator = annotationCreator;
+	}
 }
