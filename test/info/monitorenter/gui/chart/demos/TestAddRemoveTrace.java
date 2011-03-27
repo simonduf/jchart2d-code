@@ -27,6 +27,8 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 
+import java.awt.Dimension;
+
 import javax.swing.JFrame;
 
 import junit.framework.Test;
@@ -89,6 +91,7 @@ public final class TestAddRemoveTrace
   public void testAddRemoveTrace() throws InterruptedException {
 
     JFrame frame = new JFrame(this.getClass().getName());
+    frame.setSize(new Dimension(400,400));
     Chart2D chart = new Chart2D();
     ITrace2D trace = new Trace2DLtd();
     chart.addTrace(trace);
