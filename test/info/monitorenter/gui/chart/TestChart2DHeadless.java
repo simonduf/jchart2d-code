@@ -103,7 +103,9 @@ public class TestChart2DHeadless
     WeakHashMap<Chart2D, ? > chartMap = new WeakHashMap<Chart2D, Object>();
     for (int i = 0; i < 50; i++) {
       chart = new Chart2D();
+      System.out.print("Creating really big trace (100000)...");
       trace = new Trace2DLtd(100000);
+      System.out.println("    done!");
       chart.addTrace(trace);
       chartMap.put(chart, null);
       chart.destroy();
