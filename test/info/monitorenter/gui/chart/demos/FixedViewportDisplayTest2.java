@@ -22,6 +22,7 @@
  */
 package info.monitorenter.gui.chart.demos;
 
+import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
@@ -132,7 +133,9 @@ public class FixedViewportDisplayTest2
    */
   @Override
   protected ITrace2D createTrace() {
+	  Chart2D dummyChart = new Chart2D();
     ITrace2D result = new Trace2DSimple();
+    dummyChart.addTrace(result);
     result.setTracePainter(new TracePainterDisc());
     result.addTracePainter(new TracePainterLine());
     result.setColor(Color.RED);
