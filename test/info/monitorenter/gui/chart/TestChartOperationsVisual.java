@@ -669,7 +669,7 @@ public class TestChartOperationsVisual extends ATestChartOperations {
 				for (ITrace2D trace : chart.getTraces()) {
 					trace.setColor(colors[count % 2]);
 					trace.setStroke(new BasicStroke(8));
-					trace.setZIndex(new Integer(i));
+					trace.setZIndex(new Integer(count));
 					count++;
 				}
 			}
