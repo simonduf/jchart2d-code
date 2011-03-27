@@ -89,10 +89,10 @@ public final class TestAddRemoveTrace
    *           if sleeping is interrupted.
    */
   public void testAddRemoveTrace() throws InterruptedException {
-
     JFrame frame = new JFrame(this.getClass().getName());
-    frame.setSize(new Dimension(400,400));
+    Dimension size = new Dimension(400,400);
     Chart2D chart = new Chart2D();
+    chart.setPreferredSize(size);
     ITrace2D trace = new Trace2DLtd();
     chart.addTrace(trace);
     chart.removeTrace(trace);
