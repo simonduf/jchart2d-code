@@ -141,6 +141,7 @@ public class TestStaticCollectorChart extends TestCase {
   public final void testStaticCollectorChart1() throws IOException {
     InputStream stream = this.getClass().getResourceAsStream("test1.properties");
     ITrace2D trace = new Trace2DSimple();
+    trace.setColor(Color.BLUE);
     AStaticDataCollector collector = new PropertyFileStaticDataCollector(trace, stream);
     StaticCollectorChart chart = new StaticCollectorChart(collector);
     this.show(chart);
@@ -156,6 +157,7 @@ public class TestStaticCollectorChart extends TestCase {
   public final void testStaticCollectorChart2() throws IOException {
     InputStream stream = this.getClass().getResourceAsStream("test2.properties");
     ITrace2D trace = new Trace2DSimple();
+    trace.setColor(Color.BLUE);
     AStaticDataCollector collector = new PropertyFileStaticDataCollector(trace, stream);
     StaticCollectorChart chart = new StaticCollectorChart(collector);
     // Adapt the decimal formatting for this data set.
