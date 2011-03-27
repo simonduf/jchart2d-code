@@ -46,10 +46,6 @@ public final class AllTests {
     TestSuite suite = new TestSuite("Test for info.monitorenter.gui.chart.demo");
     // $JUnit-BEGIN$
     suite.addTest(TestStaticCollectorChart.suite());
-    suite.addTest(DefaultDisplayTest.suite());
-    suite.addTest(FixedViewportDisplayTest2.suite());
-    suite.addTest(FixedViewportDisplayTest1.suite());
-    suite.addTest(TestRangePolicyHighestValues.suite());
     suite.addTest(TestAddRemoveTrace.suite());
     suite.addTest(LabelSpacingTestChart.suite());
     // $JUnit-END$
