@@ -64,7 +64,7 @@ public final class LogAxisChart {
     chart.setAxisYLeft(new AxisLogE(), 0);
 
     // Create an ITrace:
-    ITrace2D trace = new Trace2DSimple();
+    ITrace2D trace = new Trace2DSimple("exponential");
     // Add the trace to the chart:
     chart.addTrace(trace);
     // configure trace:
@@ -75,7 +75,7 @@ public final class LogAxisChart {
       trace.addPoint(i, Math.exp(i));
     }
     
-    ITrace2D trace2 = new Trace2DLtd();
+    ITrace2D trace2 = new Trace2DLtd("linear");
     trace2.setTracePainter(new TracePainterDisc());
     trace2.setColor(Color.BLUE);
     chart.addTrace(trace2);

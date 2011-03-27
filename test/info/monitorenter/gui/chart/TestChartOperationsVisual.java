@@ -48,27 +48,27 @@ public class TestChartOperationsVisual extends ATestChartOperations {
     TestSuite suite = new TestSuite();
     suite.setName(TestChartOperationsVisual.class.getName());
 
-//    suite.addTest(new TestChartOperationsVisual("testRemoveAllPoints"));
-//    suite.addTest(new TestChartOperationsVisual("testRemoveAllTraces"));
-//    suite.addTest(new TestChartOperationsVisual("testAddPoint"));
-//    suite.addTest(new TestChartOperationsVisual("testSetStroke"));
-//    suite.addTest(new TestChartOperationsVisual("testSetTraceName"));
-//    suite.addTest(new TestChartOperationsVisual("testSetTraceNameEmptyTrace"));
-//    suite.addTest(new TestChartOperationsVisual("testSetRangePolicyX"));
-//    suite
-//        .addTest(new TestChartOperationsVisual("testAxisLabelFormatterNumberFormatSetNumberFormat"));
-//    suite.addTest(new TestChartOperationsVisual("testAxisSetLabelFormatter"));
-//    suite.addTest(new TestChartOperationsVisual("testTraceSetErrorBarPolicy"));
-//    suite.addTest(new TestChartOperationsVisual("testIErrorBarPainterSetStartPointPainter"));
-//    suite.addTest(new TestChartOperationsVisual("testZoom"));
-//    suite.addTest(new TestChartOperationsVisual("testDeadLockAddPointThread"));
-//    suite.addTest(new TestChartOperationsVisual("testTracePointSetLocation"));
-//    suite.addTest(new TestChartOperationsVisual("testSetNullTraceTitle"));
-//    suite.addTest(new TestChartOperationsVisual("testSetEmptyTraceTitle"));
-//    suite.addTest(new TestChartOperationsVisual("testSetTraceTitleOnEmptyTitleTrace"));
-//    suite.addTest(new TestChartOperationsVisual("testAddRemoveTrace"));
-//    suite.addTest(new TestChartOperationsVisual("testSetZIndex"));
-//    suite.addTest(new TestChartOperationsVisual("testRemoveTraceForBug2891801"));
+    suite.addTest(new TestChartOperationsVisual("testRemoveAllPoints"));
+    suite.addTest(new TestChartOperationsVisual("testRemoveAllTraces"));
+    suite.addTest(new TestChartOperationsVisual("testAddPoint"));
+    suite.addTest(new TestChartOperationsVisual("testSetStroke"));
+    suite.addTest(new TestChartOperationsVisual("testSetTraceName"));
+    suite.addTest(new TestChartOperationsVisual("testSetTraceNameEmptyTrace"));
+    suite.addTest(new TestChartOperationsVisual("testSetRangePolicyX"));
+    suite
+        .addTest(new TestChartOperationsVisual("testAxisLabelFormatterNumberFormatSetNumberFormat"));
+    suite.addTest(new TestChartOperationsVisual("testAxisSetLabelFormatter"));
+    suite.addTest(new TestChartOperationsVisual("testTraceSetErrorBarPolicy"));
+    suite.addTest(new TestChartOperationsVisual("testIErrorBarPainterSetStartPointPainter"));
+    suite.addTest(new TestChartOperationsVisual("testZoom"));
+    suite.addTest(new TestChartOperationsVisual("testDeadLockAddPointThread"));
+    suite.addTest(new TestChartOperationsVisual("testTracePointSetLocation"));
+    suite.addTest(new TestChartOperationsVisual("testSetNullTraceTitle"));
+    suite.addTest(new TestChartOperationsVisual("testSetEmptyTraceTitle"));
+    suite.addTest(new TestChartOperationsVisual("testSetTraceTitleOnEmptyTitleTrace"));
+    suite.addTest(new TestChartOperationsVisual("testAddRemoveTrace"));
+    suite.addTest(new TestChartOperationsVisual("testSetZIndex"));
+    suite.addTest(new TestChartOperationsVisual("testRemoveTraceForBug2891801"));
     suite.addTest(new TestChartOperationsVisual("testAddDiscontinuation"));
     return suite;
   }

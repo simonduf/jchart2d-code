@@ -331,104 +331,121 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
    * 
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
-  public void propertyChange(final PropertyChangeEvent evt) {
-    final String prop = evt.getPropertyName();
-    if (prop.equals(Chart2D.PROPERTY_BACKGROUND_COLOR)) {
-      final Color color = (Color) evt.getNewValue();
-      this.setBackground(color);
-      this.m_labelPanel.setBackground(color);
-    } else if (prop.equals(IAxis.PROPERTY_ADD_REMOVE_TRACE)) {
-      /*
-       * This event is fired from the axis implementations, an
-       * addTrace(ITrace2D) call on the Chart2D is delegated to two axes thus
-       * resulting in two events per added trace: We have to avoid adding
-       * duplicate labels!
-       */
-      final ITrace2D oldTrace = (ITrace2D) evt.getOldValue();
-      final ITrace2D newTrace = (ITrace2D) evt.getNewValue();
-      JLabel label;
-      if ((oldTrace == null) && (newTrace != null)) {
-        if (!this.containsTraceLabel(newTrace)) {
-          label = LayoutFactory.getInstance().createTraceContextMenuLabel(this.m_chart, newTrace,
-              true);
-          if (label != null) {
-            this.m_labelPanel.add(label);
-            this.invalidate();
-            this.m_labelPanel.invalidate();
-            this.validateTree();
-            this.m_labelPanel.doLayout();
-          }
-        }
-      } else if ((oldTrace != null) && (newTrace == null)) {
-        // search for label:
-        final String labelName = oldTrace.getLabel();
-        if (!StringUtil.isEmpty(labelName)) {
-          final Component[] labels = (this.m_labelPanel.getComponents());
-          for (final Component label2 : labels) {
-            if (((JLabel) label2).getText().equals(labelName)) {
-              this.m_labelPanel.remove(label2);
-              this.m_chart.removePropertyChangeListener((PropertyChangeListener) label2);
-              oldTrace.removePropertyChangeListener((PropertyChangeListener) label2);
-              // clear the popup menu listeners too:
-              final MouseListener[] mouseListeners = label2.getMouseListeners();
-              for (final MouseListener mouseListener2 : mouseListeners) {
-                label2.removeMouseListener(mouseListener2);
-              }
-              this.m_labelPanel.doLayout();
-              this.doLayout();
-              break;
-            }
-          }
-        }
-      } else if (prop.equals(Chart2D.PROPERTY_AXIS_X) || prop.equals(Chart2D.PROPERTY_AXIS_Y)) {
-        final IAxis newAxis = (IAxis) evt.getNewValue();
-        final IAxis oldAxis = (IAxis) evt.getOldValue();
-        if (oldAxis != null) {
-          oldAxis.removePropertyChangeListener(IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
-        }
-        if (newAxis != null) {
-          newAxis.addPropertyChangeListener(IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
-        }
-      } else if (prop.equals(ITrace2D.PROPERTY_LABEL)) {
-        final ITrace2D trace = (ITrace2D) evt.getSource();
-        final String oldLabel = (String) evt.getOldValue();
-        final String newLabel = (String) evt.getNewValue();
+	public void propertyChange(final PropertyChangeEvent evt) {
+		final String prop = evt.getPropertyName();
+		if (prop.equals(Chart2D.PROPERTY_BACKGROUND_COLOR)) {
+			final Color color = (Color) evt.getNewValue();
+			this.setBackground(color);
+			this.m_labelPanel.setBackground(color);
+		} else if (prop.equals(IAxis.PROPERTY_ADD_REMOVE_TRACE)) {
+			/*
+			 * This event is fired from the axis implementations, an
+			 * addTrace(ITrace2D) call on the Chart2D is delegated to two axes
+			 * thus resulting in two events per added trace: We have to avoid
+			 * adding duplicate labels!
+			 */
+			final ITrace2D oldTrace = (ITrace2D) evt.getOldValue();
+			final ITrace2D newTrace = (ITrace2D) evt.getNewValue();
+			JLabel label;
+			if ((oldTrace == null) && (newTrace != null)) {
+				if (!this.containsTraceLabel(newTrace)) {
+					label = LayoutFactory.getInstance()
+							.createTraceContextMenuLabel(this.m_chart,
+									newTrace, true);
+					if (label != null) {
+						this.m_labelPanel.add(label);
+						this.invalidate();
+						this.m_labelPanel.invalidate();
+						this.validateTree();
+						this.m_labelPanel.doLayout();
+					}
+				}
 
-        if ((!StringUtil.isEmpty(oldLabel)) && (StringUtil.isEmpty(newLabel))) {
-          final Component[] labels = (this.m_labelPanel.getComponents());
-          for (final Component label2 : labels) {
-            if (((JLabel) label2).getText().equals(oldLabel)) {
-              this.m_labelPanel.remove(label2);
-              this.m_chart.removePropertyChangeListener((PropertyChangeListener) label2);
-              trace.removePropertyChangeListener((PropertyChangeListener) label2);
-              // clear the popup menu listeners too:
-              final MouseListener[] mouseListeners = label2.getMouseListeners();
-              for (final MouseListener mouseListener2 : mouseListeners) {
-                label2.removeMouseListener(mouseListener2);
-              }
-              this.m_labelPanel.doLayout();
-              this.doLayout();
-              break;
-            }
-          }
-        } else if ((StringUtil.isEmpty(oldLabel)) && (!StringUtil.isEmpty(newLabel))) {
-          if (!this.containsTraceLabel(newTrace)) {
-            label = LayoutFactory.getInstance().createTraceContextMenuLabel(this.m_chart, newTrace,
-                true);
-            if (label != null) {
-              this.m_labelPanel.add(label);
-              this.invalidate();
-              this.m_labelPanel.invalidate();
-              this.validateTree();
-              this.m_labelPanel.doLayout();
-            }
-          }
-        }
-      } else {
-        throw new IllegalArgumentException("Bad property change event for add / remove trace.");
-      }
-    }
-  }
+			} else if ((oldTrace != null) && (newTrace == null)) {
+				// search for label:
+				final String labelName = oldTrace.getLabel();
+				if (!StringUtil.isEmpty(labelName)) {
+					final Component[] labels = (this.m_labelPanel
+							.getComponents());
+					for (final Component label2 : labels) {
+						if (((JLabel) label2).getText().equals(labelName)) {
+							this.m_labelPanel.remove(label2);
+							this.m_chart
+									.removePropertyChangeListener((PropertyChangeListener) label2);
+							oldTrace
+									.removePropertyChangeListener((PropertyChangeListener) label2);
+							// clear the popup menu listeners too:
+							final MouseListener[] mouseListeners = label2
+									.getMouseListeners();
+							for (final MouseListener mouseListener2 : mouseListeners) {
+								label2.removeMouseListener(mouseListener2);
+							}
+							this.m_labelPanel.doLayout();
+							this.doLayout();
+							break;
+						}
+					}
+				}
+			}
+		} else if (prop.equals(Chart2D.PROPERTY_AXIS_X)
+				|| prop.equals(Chart2D.PROPERTY_AXIS_Y)) {
+			final IAxis newAxis = (IAxis) evt.getNewValue();
+			final IAxis oldAxis = (IAxis) evt.getOldValue();
+			if (oldAxis != null) {
+				oldAxis.removePropertyChangeListener(
+						IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
+			}
+			if (newAxis != null) {
+				newAxis.addPropertyChangeListener(
+						IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
+			}
+		} else if (prop.equals(ITrace2D.PROPERTY_LABEL)) {
+			final ITrace2D trace = (ITrace2D) evt.getSource();
+			final String oldLabel = (String) evt.getOldValue();
+			final String newLabel = (String) evt.getNewValue();
+			JLabel label;
+			if ((!StringUtil.isEmpty(oldLabel))
+					&& (StringUtil.isEmpty(newLabel))) {
+				final Component[] labels = (this.m_labelPanel.getComponents());
+				for (final Component label2 : labels) {
+					if (((JLabel) label2).getText().equals(oldLabel)) {
+						this.m_labelPanel.remove(label2);
+						this.m_chart
+								.removePropertyChangeListener((PropertyChangeListener) label2);
+						trace
+								.removePropertyChangeListener((PropertyChangeListener) label2);
+						// clear the popup menu listeners too:
+						final MouseListener[] mouseListeners = label2
+								.getMouseListeners();
+						for (final MouseListener mouseListener2 : mouseListeners) {
+							label2.removeMouseListener(mouseListener2);
+						}
+						this.m_labelPanel.doLayout();
+						this.doLayout();
+						break;
+					}
+				}
+			} else if ((StringUtil.isEmpty(oldLabel))
+					&& (!StringUtil.isEmpty(newLabel))) {
+				if (!this.containsTraceLabel(trace)) {
+					label = LayoutFactory.getInstance()
+							.createTraceContextMenuLabel(this.m_chart, trace,
+									true);
+					if (label != null) {
+						this.m_labelPanel.add(label);
+						this.invalidate();
+						this.m_labelPanel.invalidate();
+						this.validateTree();
+						this.m_labelPanel.doLayout();
+					}
+				}
+			}
+		} else {
+			throw new IllegalArgumentException(
+					"Bad property change event for add / remove trace.");
+		}
+
+	}
 
   /**
    * Sets the annotationCreator.

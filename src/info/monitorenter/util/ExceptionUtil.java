@@ -47,7 +47,7 @@ public final class ExceptionUtil {
    * This method is useless for now as all methods are static. It may be used in
    * future if VM-global configuration will be put to the state of the instance.
    * <p>
-   * #
+   * 
    * 
    * @return the singleton instance of this class.
    */
