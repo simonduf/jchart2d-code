@@ -148,7 +148,7 @@ public class AntialiasingChart extends JFrame {
     data.setTracePainter(dotPainter);
     chart.addTrace(data);
 
-    AntialiasingChart wnd = new AntialiasingChart(chart, "RunningChart");
+    AntialiasingChart wnd = new AntialiasingChart(chart, "AntialiasingChart");
     chart.getAxisX().setPaintGrid(true);
     chart.getAxisX().setStartMajorTick(false);
     chart.getAxisY().setPaintGrid(true);
