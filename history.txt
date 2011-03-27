@@ -80,7 +80,7 @@ jchart2d-3.2.1 - <month>, <day>, <year>
 o Renamed info.monitorenter.MathUtil to info.monitorenter.util.math.MathUtil.
 o Renamed info.monitorenter.math.IntegerReusable to info.monitorenter.math.IntegerMutable. 
 o Simplified API: dropped interface IPointHighlighter. Use IPointPainter wherever you used IPointHighlighter before. 
-o Simplified API: dropped class APointHighlighter. Extend APointPainter wherever you used APointPainter before. 
+o Simplified API: dropped class APointHighlighter. Extend APointPainter wherever you used APointHighlighter before. 
 o Simplified API: dropped class PointHighlighterConfigurable. Use the raw PointPainter argument from it's constructor instead. 
   Example: "new PointPainterConfigurable(new PointPainterDisc(20), true)" -> "new PointPainterDisc(20)" 
 o To prevent deadlocks at startup now every trace has to be first added to a chart before: adding points, setting point highlighters, setting error bar policies to the trace. 
