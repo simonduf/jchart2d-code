@@ -22,6 +22,7 @@
  */
 package info.monitorenter.gui.chart.traces;
 
+import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.TracePoint2D;
@@ -78,8 +79,10 @@ public class TestTrace2DLtd
    * 
    */
   public void testMemoryLeak() {
+	  Chart2D dummyChart = new Chart2D();
     int traceSize = 10;
     ITrace2D trace = new Trace2DLtd(traceSize);
+    dummyChart.addTrace(trace);
     long max = 1000000;
     long percentModulo = max / 20;
     System.out.println("Adding " + max + " points to a Trace2DLtd and a WeakHashMap...");
