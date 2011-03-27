@@ -118,6 +118,7 @@ public class TestChart2DHeadless
     System.runFinalization();
     System.gc();
     try {
+    	System.out.println("Please wait 10 seconds...");
       Thread.sleep(10000);
     } catch (InterruptedException e) {
       e.printStackTrace();
@@ -125,6 +126,7 @@ public class TestChart2DHeadless
     System.runFinalization();
     System.gc();
     try {
+    	System.out.println("Please wait another 10 seconds...");
       Thread.sleep(10000);
     } catch (InterruptedException e) {
       e.printStackTrace();
