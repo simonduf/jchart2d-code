@@ -194,7 +194,7 @@ public class TestChartPanel extends TestCase {
 		System.out.println("After chart.setBackground(Color):");
 		System.out.println("chart.propertyChangeListeners().length: "
 				+ propertyChangeListeners.length);
-		Assert.assertTrue(after < before);
+		Assert.assertTrue("",after < before);
 
 		// reporting / analysis
 		Map<Class<?>, Integer> classes2count = new HashMap<Class<?>, Integer>();
