@@ -148,7 +148,7 @@ public static Integer increment(final Integer value) {
 	if(value != null) {
 		ival = value.intValue();
 	} 
-	result = Integer.valueOf(ival++);
+	result = Integer.valueOf(ival+1);
 	return result;
 }
 
