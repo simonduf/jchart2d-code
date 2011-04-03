@@ -123,15 +123,31 @@ public final class MathUtil {
  * fast calculations are required.
  * <p>
  * 
+ * <b>Warning</b>: Never do the following: 
+ * <code>
+ *  Integer count = new Integer(6);
+ * 	MathUtil.increment(count);
+ *  // don't expect count now carries 6.
+ * </code>
+ * Integers are immutable. Write: 
+ * <code>
+ *  Integer count = new Integer(6);
+ * 	count = MathUtil.increment(count);
+ * </code>
+ * 
+ * <p>
  * @param value
- *            the value to increase.
+ *            the value to increase, if null is used a new instance will be initialized with value 0 and incremented.
  * 
  * @return a (potentially new by the means of <code>
  *         {@link Integer#valueOf(int)}</code>) value increased by one.
  */
 public static Integer increment(final Integer value) {
 	Integer result;
-	int ival = value.intValue();
+	int ival = 0;
+	if(value != null) {
+		ival = value.intValue();
+	} 
 	result = Integer.valueOf(ival++);
 	return result;
 }
