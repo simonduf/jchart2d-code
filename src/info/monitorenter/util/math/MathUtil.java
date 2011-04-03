@@ -115,25 +115,47 @@ public final class MathUtil {
   }
 
   /**
-   * Tests that the given double is not invalid for calculation.
-   * <p>
-   * It must not be one of:
-   * <ul>
-   * <li> {@link Double#NaN}</li>
-   * <li> {@link Double#NEGATIVE_INFINITY}</li>
-   * <li> {@link Double#POSITIVE_INFINITY}</li>
-   * </ul>
-   * <p>
-   * 
-   * @param d
-   *          the double to test.
-   * 
-   * @return true if the given double is valid for calculation (not infinite or
-   *         NaN).
-   */
-  public static boolean isDouble(final double d) {
-    return !(Double.isInfinite(d) || Double.isNaN(d));
-  }
+ * Raises the given integer by one (bad performance).
+ * <p>
+ * 
+ * <b>Warning</b>: Only use this for testing code or prototypes as a new
+ * instance might be created for each call. Use primitive data types when
+ * fast calculations are required.
+ * <p>
+ * 
+ * @param value
+ *            the value to increase.
+ * 
+ * @return a (potentially new by the means of <code>
+ *         {@link Integer#valueOf(int)}</code>) value increased by one.
+ */
+public static Integer increment(final Integer value) {
+	Integer result;
+	int ival = value.intValue();
+	result = Integer.valueOf(ival++);
+	return result;
+}
+
+	/**
+	   * Tests that the given double is not invalid for calculation.
+	   * <p>
+	   * It must not be one of:
+	   * <ul>
+	   * <li> {@link Double#NaN}</li>
+	   * <li> {@link Double#NEGATIVE_INFINITY}</li>
+	   * <li> {@link Double#POSITIVE_INFINITY}</li>
+	   * </ul>
+	   * <p>
+	   * 
+	   * @param d
+	   *          the double to test.
+	   * 
+	   * @return true if the given double is valid for calculation (not infinite or
+	   *         NaN).
+	   */
+	  public static boolean isDouble(final double d) {
+	    return !(Double.isInfinite(d) || Double.isNaN(d));
+	  }
 
   /**
    * Avoids creation from outside for singleton support.
