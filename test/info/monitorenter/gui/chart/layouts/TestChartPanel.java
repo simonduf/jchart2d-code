@@ -24,9 +24,11 @@ package info.monitorenter.gui.chart.layouts;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.controls.LayoutFactory;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.views.ChartPanel;
+import info.monitorenter.util.math.MathUtil;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -35,6 +37,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -71,7 +74,7 @@ public class TestChartPanel extends TestCase {
 	public static void main(final String[] args) throws Exception {
 		TestChartPanel test = new TestChartPanel(TestChartPanel.class.getName());
 		test.setUp();
-		test.testMemoryLeak();
+		test.testMemoryLeakAddRemoveTrace();
 		test.tearDown();
 	}
 
@@ -155,13 +158,19 @@ public class TestChartPanel extends TestCase {
 	 * <p>
 	 * 
 	 */
-	public void testMemoryLeak() {
+	public void testMemoryLeakAddRemoveTrace() {
 		Chart2D chart = new Chart2D();
 		ChartPanel chartPanel = new ChartPanel(chart);
+		PropertyChangeListener[] propertyChangeListeners = chart
+				.getPropertyChangeListeners();
+		Map<String, Integer> listeners2CountBeforeAddTrace = TestChartPanel
+				.getPropertyChangeListenerStatisticsForChartPerProperty(chart);
+		
+		Map<Class<?>, Integer>listenerTypes2CountBeforeAddTrace = getPropertyChangeListenerStatisticsForChartPerListenerInstance(chart);
 		// this call is for fooling checkstyle (unused local variable):
 		chartPanel.setEnabled(false);
 		ITrace2D trace;
-		for (int i = 0; i < 500; i++) {
+		for (int i = 0; i < 100; i++) {
 			System.out.print("Adding big trace " + i + " (16383 points)...");
 			trace = new Trace2DLtd(16383);
 			chart.addTrace(trace);
@@ -173,6 +182,9 @@ public class TestChartPanel extends TestCase {
 					System.gc();
 					System.runFinalization();
 					System.out.println("    done!");
+					System.out
+							.println("chart.getPropertyChangeListeners().length: "
+									+ chart.getPropertyChangeListeners().length);
 				}
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -181,61 +193,56 @@ public class TestChartPanel extends TestCase {
 			chart.removeTrace(trace);
 		}
 
-		PropertyChangeListener[] propertyChangeListeners = chart
-				.getPropertyChangeListeners();
-		int before = propertyChangeListeners.length;
-		System.out.println("Before chart.setBackground(Color):");
-		System.out.println("chart.propertyChangeListeners().length: " + before);
 		System.runFinalization();
 		System.gc();
 		chart.setBackground(Color.LIGHT_GRAY);
 		propertyChangeListeners = chart.getPropertyChangeListeners();
-		int after = propertyChangeListeners.length;
-		System.out.println("After chart.setBackground(Color):");
-		System.out.println("chart.propertyChangeListeners().length: "
-				+ propertyChangeListeners.length);
-		Assert.assertTrue("",after < before);
 
 		// reporting / analysis
-		Map<Class<?>, Integer> classes2count = new HashMap<Class<?>, Integer>();
-		Map<String, Integer> props2count = new HashMap<String, Integer>();
-		Integer count;
-		Class<?> clazz;
-		String property;
-		for (int i = propertyChangeListeners.length - 1; i >= 0; i--) {
-			System.out.println(propertyChangeListeners[i].getClass().getName());
-			clazz = propertyChangeListeners[i].getClass();
-			// count the properties:
-			if (clazz == PropertyChangeListenerProxy.class) {
-				property = ((PropertyChangeListenerProxy) propertyChangeListeners[i])
-						.getPropertyName();
-				count = props2count.get(property);
-				if (count == null) {
-					count = new Integer(1);
-				} else {
-					count = new Integer(count.intValue() + 1);
-				}
-				props2count.put(property, count);
-			}
-			count = null;
-			// count the listener classes:
-			count = classes2count.get(clazz);
-			if (count == null) {
-				count = new Integer(1);
-			} else {
-				count = new Integer(count.intValue() + 1);
-			}
-			classes2count.put(clazz, count);
-		}
+		Map<String, Integer> listeners2CountAfterAddTrace = TestChartPanel
+				.getPropertyChangeListenerStatisticsForChartPerProperty(chart);
+		Map<Class<?>, Integer>listenerTypes2CountAfterAddTrace = getPropertyChangeListenerStatisticsForChartPerListenerInstance(chart);
 
-		for (Map.Entry<Class<?>, Integer> entry : classes2count.entrySet()) {
-			System.out.println((entry.getKey()).getName() + " : "
-					+ entry.getValue());
-		}
 		System.out.println();
-		for (Map.Entry<String, Integer> entry : props2count.entrySet()) {
+		System.out.println("Before add trace:");
+		for (Map.Entry<String, Integer> entry : listeners2CountBeforeAddTrace
+				.entrySet()) {
 			System.out.println(entry.getKey() + " : " + entry.getValue());
 		}
+
+		System.out.println();
+		System.out.println("After add trace:");
+		for (Map.Entry<String, Integer> entry : listeners2CountAfterAddTrace
+				.entrySet()) {
+			System.out.println(entry.getKey() + " : " + entry.getValue());
+		}
+
+		/*
+		 * Now compare the set of listeners before and  after adding and removing the traces.
+		 */
+		Set<String> distinctListenedPropertiesBeforeAddRemoveTrace = listeners2CountBeforeAddTrace.keySet();
+		Set<String> distinctListenedPropertiesAfterAddRemoveTrace = listeners2CountBeforeAddTrace.keySet();
+		for(String propertyBefore: distinctListenedPropertiesBeforeAddRemoveTrace){
+			assertTrue("Property "+propertyBefore+" was listened on (on the chart) before adding and removing a trace, but not afterwards." , distinctListenedPropertiesAfterAddRemoveTrace.contains(propertyBefore));
+		}
+		for(String propertyAfter : distinctListenedPropertiesAfterAddRemoveTrace){
+			assertTrue("Property "+propertyAfter+" is listened on (on the chart) after adding and removing a trace, but not before." , distinctListenedPropertiesBeforeAddRemoveTrace.contains(propertyAfter));
+		}
+		/*
+		 * Now compare the amount of listeners for every property before and
+		 * after adding and removing the traces.
+		 */
+		Integer amountBefore,amountAfter;
+		for(String property:distinctListenedPropertiesBeforeAddRemoveTrace) {
+			amountBefore = listeners2CountBeforeAddTrace.get(property);
+			amountAfter = listeners2CountAfterAddTrace.get(property);
+			assertEquals(
+					"The amount of listeners on property "
+							+ property
+							+ " on the chart before adding and removing traces is not equal.",
+					amountBefore, amountAfter);
+		}
+		chart.destroy();
 	}
 
 	/**
@@ -266,6 +273,111 @@ public class TestChartPanel extends TestCase {
 		}
 		frame.setVisible(false);
 		frame.dispose();
+	}
+
+	/**
+	 * Helper method that analyzes the
+	 * <code>{@link PropertyChangeListener}</code> instances of a given chart:
+	 * it returns a map that contains the property to listen on (key) along with
+	 * the count of listeners of that property (value).
+	 * <p>
+	 * This may be used to find out, if the amount of listeners on a certain
+	 * property increases in-between invocation of a method that affects the
+	 * chart.
+	 * <p>
+	 * 
+	 * @param chart
+	 *            the chart to analyze the listeners of.
+	 * 
+	 * @return a map that contains the property to listen on (key) along with
+	 *         the count of listeners of that property (value).
+	 */
+	private static Map<String, Integer> getPropertyChangeListenerStatisticsForChartPerProperty(
+			final Chart2D chart) {
+		Class<?> clazz;
+		Integer count;
+		PropertyChangeListener[] propertyChangeListeners = chart
+				.getPropertyChangeListeners();
+		String property;
+		Map<String, Integer> props2count = new HashMap<String, Integer>();
+
+		for (int i = propertyChangeListeners.length - 1; i >= 0; i--) {
+			clazz = propertyChangeListeners[i].getClass();
+			// count the properties:
+			if (propertyChangeListeners[i] instanceof PropertyChangeListenerProxy) {
+				property = ((PropertyChangeListenerProxy) propertyChangeListeners[i])
+						.getPropertyName();
+				count = props2count.get(property);
+				count = MathUtil.increment(count);
+				props2count.put(property, count);
+			} else if (clazz == LayoutFactory.BasicPropertyAdaptSupport.class) {
+				/*
+				 * TODO: very unstable code as implicit knowledge is used: We
+				 * know which events BasicPropertyAdaptSupport listens for.
+				 */
+				String[] props = new String[] {
+						Chart2D.PROPERTY_BACKGROUND_COLOR,
+						Chart2D.PROPERTY_FONT,
+						Chart2D.PROPERTY_FOREGROUND_COLOR };
+				for (String prop : props) {
+					count = props2count.get(prop);
+					count = MathUtil.increment(count);
+					props2count.put(prop, count);
+
+				}
+			} else {
+				fail("Unhandeled propert change listener instance in chart: "
+						+ propertyChangeListeners[i].getClass().getName());
+			}
+
+		}
+
+		return props2count;
+
+	}
+
+	/**
+	 * Helper method that analyzes the
+	 * <code>{@link PropertyChangeListener}</code> instances of a given chart:
+	 * it returns a map that contains listener <code>{@link Class}</code>(key)
+	 * along with the count of instances registered on the given chart (value).
+	 * <p>
+	 * This may be used to find out the implementation class that messes up, if
+	 * the amount of listeners of that type increases in-between invocation of a
+	 * method that affects the chart.
+	 * <p>
+	 * 
+	 * @param chart
+	 *            the chart to analyze the listeners of.
+	 * 
+	 * @return a map that contains listener <code>{@link Class}</code>(key)
+	 *         along with the count of instances registered on the given chart
+	 *         (value).
+	 */
+	private static Map<Class<?>, Integer> getPropertyChangeListenerStatisticsForChartPerListenerInstance(
+			final Chart2D chart) {
+		Class<?> clazz;
+		Integer count;
+		PropertyChangeListener[] propertyChangeListeners = chart
+				.getPropertyChangeListeners();
+		Map<Class<?>, Integer> classes2count = new HashMap<Class<?>, Integer>();
+
+		for (int i = propertyChangeListeners.length - 1; i >= 0; i--) {
+			clazz = propertyChangeListeners[i].getClass();
+			count = null;
+			// count the listener classes:
+			count = classes2count.get(clazz);
+			count = MathUtil.increment(count);
+			classes2count.put(clazz, count);
+		}
+
+		for (Map.Entry<Class<?>, Integer> entry : classes2count.entrySet()) {
+			System.out.println((entry.getKey()).getName() + " : "
+					+ entry.getValue());
+		}
+
+		return classes2count;
+
 	}
 
 }
