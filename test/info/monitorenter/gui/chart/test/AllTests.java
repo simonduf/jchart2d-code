@@ -49,10 +49,12 @@ public final class AllTests {
     TestSuite suite = new TestSuite("JChart2d complete tests");
 
     suite.addTest(info.monitorenter.gui.chart.AllTests.suite());
-    suite.addTest(info.monitorenter.gui.chart.traces.AllTests.suite());
     suite.addTest(info.monitorenter.gui.chart.axis.AllTests.suite());
     suite.addTest(info.monitorenter.gui.chart.demos.AllTests.suite());
+    suite.addTest(info.monitorenter.gui.chart.errorbars.AllTests.suite());
+    suite.addTest(info.monitorenter.gui.chart.labelformatters.AllTests.suite());
     suite.addTest(info.monitorenter.gui.chart.layouts.AllTests.suite());
+    suite.addTest(info.monitorenter.gui.chart.traces.AllTests.suite());
     suite.addTest(info.monitorenter.util.collections.AllTests.suite());
 
     TestSetup wrapper = new TestSetup(suite) {
