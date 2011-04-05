@@ -2747,7 +2747,7 @@ public final class LayoutFactory {
       }
       ret.addMouseListener(new PopupListener(popup));
       // The label itself should always look like the trace
-      // foreground and contain the propert name.
+      // foreground and contain the proper name.
       trace.addPropertyChangeListener(ITrace2D.PROPERTY_COLOR, ret);
       trace.addPropertyChangeListener(ITrace2D.PROPERTY_NAME, ret);
       trace.addPropertyChangeListener(ITrace2D.PROPERTY_PHYSICALUNITS, ret);
