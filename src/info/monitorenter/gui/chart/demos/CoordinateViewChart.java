@@ -103,11 +103,11 @@ public class CoordinateViewChart extends JFrame {
 
     ChartCoordinateView viewChartValue = new ChartCoordinateView(this.m_chart);
     // listen for basic propery changes of the chart:
-    new LayoutFactory.BasicPropertyAdaptSupport(viewChartValue, this.m_chart);
+    new LayoutFactory.BasicPropertyAdaptSupport(viewChartValue, this.m_chart,LayoutFactory.BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
 
     Container contentPane = this.getContentPane();
     contentPane.setLayout(new GridBagLayout());
-    new LayoutFactory.BasicPropertyAdaptSupport(contentPane, this.m_chart);
+    new LayoutFactory.BasicPropertyAdaptSupport(contentPane, this.m_chart,LayoutFactory.BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
 
     // chart: use space
     GridBagConstraints gbc = new GridBagConstraints();

@@ -28,6 +28,7 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.annotations.IAnnotationCreator;
 import info.monitorenter.gui.chart.annotations.bubble.AnnotationCreatorBubble;
 import info.monitorenter.gui.chart.controls.LayoutFactory;
+import info.monitorenter.gui.chart.events.PopupListener;
 import info.monitorenter.gui.chart.layouts.FlowLayoutCorrectMinimumSize;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.util.StringUtil;
@@ -47,6 +48,7 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
 /**
@@ -94,6 +96,7 @@ import javax.swing.JPanel;
  */
 public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
 
+	
 	/**
 	 * Generated <code>serialVersionUID</code>.
 	 */
@@ -204,27 +207,24 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
 				this.m_labelPanel.add(label);
 			}
 			// In case trace.getLabel() becomes empty hide the corresponding
-			// menu
-			// label via listeners!
+			// menu label via listeners!
 			trace.addPropertyChangeListener(ITrace2D.PROPERTY_PHYSICALUNITS,
 					this);
 			trace.addPropertyChangeListener(ITrace2D.PROPERTY_NAME, this);
 		}
 		this.add(this.m_labelPanel, BorderLayout.SOUTH);
 		chart
-				.addPropertyChangeListener(Chart2D.PROPERTY_BACKGROUND_COLOR,
+				.addPropertyChangeListener("background",
 						this);
 		// listen to new traces and deleted ones:
-		final List<IAxis> allAxes = chart.getAxes();
-		for (final IAxis currentAxis : allAxes) {
-			currentAxis.addPropertyChangeListener(
-					IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
-		}
-		// a bit tricky: stay in touch with removed / added traces in case axes
-		// are
-		// changed in the chart: use the axis property change event to update me
-		// as
-		// a listener:
+		chart
+				.addPropertyChangeListener(Chart2D.PROPERTY_ADD_REMOVE_TRACE,
+						this);
+		/*
+		 * a bit tricky: stay in touch with removed / added traces in case axes
+		 * are changed in the chart: use the axis property change event to
+		 * update me as a listener:
+		 */
 		chart.addPropertyChangeListener(Chart2D.PROPERTY_AXIS_X, this);
 		chart.addPropertyChangeListener(Chart2D.PROPERTY_AXIS_Y, this);
 	}
@@ -349,17 +349,11 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
 	 */
 	public void propertyChange(final PropertyChangeEvent evt) {
 		final String prop = evt.getPropertyName();
-		if (prop.equals(Chart2D.PROPERTY_BACKGROUND_COLOR)) {
+		if (prop.equals("background")) {
 			final Color color = (Color) evt.getNewValue();
 			this.setBackground(color);
 			this.m_labelPanel.setBackground(color);
-		} else if (prop.equals(IAxis.PROPERTY_ADD_REMOVE_TRACE)) {
-			/*
-			 * This event is fired from the axis implementations, an
-			 * addTrace(ITrace2D) call on the Chart2D is delegated to two axes
-			 * thus resulting in two events per added trace: We have to avoid
-			 * adding duplicate labels!
-			 */
+		} else if (prop.equals(Chart2D.PROPERTY_ADD_REMOVE_TRACE)) {
 			final ITrace2D oldTrace = (ITrace2D) evt.getOldValue();
 			final ITrace2D newTrace = (ITrace2D) evt.getNewValue();
 			JLabel label;
@@ -385,20 +379,7 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
 							.getComponents());
 					for (final Component label2 : labels) {
 						if (((JLabel) label2).getText().equals(labelName)) {
-							this.m_labelPanel.remove(label2);
-							this.m_chart
-									.removePropertyChangeListener((PropertyChangeListener) label2);
-							oldTrace
-									.removePropertyChangeListener((PropertyChangeListener) label2);
-							// clear the popup menu listeners too:
-							final MouseListener[] mouseListeners = label2
-									.getMouseListeners();
-							for (final MouseListener mouseListener2 : mouseListeners) {
-								label2.removeMouseListener(mouseListener2);
-							}
-							this.m_labelPanel.doLayout();
-							this.doLayout();
-							break;
+							this.disposeTraceLabel((JLabel) label2, oldTrace);
 						}
 					}
 				}
@@ -412,13 +393,14 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
 			final IAxis oldAxis = (IAxis) evt.getOldValue();
 			if (oldAxis != null) {
 				oldAxis.removePropertyChangeListener(
-						IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
+						Chart2D.PROPERTY_ADD_REMOVE_TRACE, this);
 			}
 			if (newAxis != null) {
 				newAxis.addPropertyChangeListener(
-						IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
+						Chart2D.PROPERTY_ADD_REMOVE_TRACE, this);
 			}
 		} else if (prop.equals(ITrace2D.PROPERTY_LABEL)) {
+			
 			final ITrace2D trace = (ITrace2D) evt.getSource();
 			final String oldLabel = (String) evt.getOldValue();
 			final String newLabel = (String) evt.getNewValue();
@@ -428,20 +410,7 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
 				final Component[] labels = (this.m_labelPanel.getComponents());
 				for (final Component label2 : labels) {
 					if (((JLabel) label2).getText().equals(oldLabel)) {
-						this.m_labelPanel.remove(label2);
-						this.m_chart
-								.removePropertyChangeListener((PropertyChangeListener) label2);
-						trace
-								.removePropertyChangeListener((PropertyChangeListener) label2);
-						// clear the popup menu listeners too:
-						final MouseListener[] mouseListeners = label2
-								.getMouseListeners();
-						for (final MouseListener mouseListener2 : mouseListeners) {
-							label2.removeMouseListener(mouseListener2);
-						}
-						this.m_labelPanel.doLayout();
-						this.doLayout();
-						break;
+						((JLabel)label2).setText("<unnamed>");
 					}
 				}
 			} else if ((StringUtil.isEmpty(oldLabel))
@@ -460,7 +429,43 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Makes the given trace label garbage collectable and removes all menu entries of the 
+	 * menu of the popup menu attachted to it as listeners on the chart object graph.<p>
+	 * 
+	 *  @see LayoutFactory#createTraceContextMenuLabel(Chart2D, ITrace2D, boolean) 
+	 *  
+	 *  @param owner the owner of the label. 
+	 *  
+	 * @param label the label to wipe out. 
+	 */
+	private void disposeTraceLabel(final JLabel label, final ITrace2D owner) {
+		/*
+		 * We have to check if we have to remove and dispose the old label. 
+		 * The old label is connected with a JLabel (standing for the old trace) 
+		 * that holds many references and is referenced to many other instances that have to be cleared to make the whole menu 
+		 * for the old label disposable (see <code>{@link LayoutFactory#createTraceContextMenuLabel(Chart2D, ITrace2D, boolean)}</code>):
+		 * 
+		 *  Referred as listener on the chart for font.
+		 *  Referred as listener on the trace for foreground,name and physicalunits. 
+		 *  The JLabel itself has a popup menu with many items that are registered on the chart for properties like background, foreground. 
+		 */
+	  PropertyChangeListener listenerLabel = (PropertyChangeListener)label;
+		this.m_labelPanel.remove(label);
+		// clear the popup menu listeners:
+		final MouseListener[] mouseListeners = label
+				.getMouseListeners();
+		for (final MouseListener mouseListener2 : mouseListeners) {
+			this.removeMouseListener(mouseListener2);
+		}
+		owner.removePropertyChangeListener(ITrace2D.PROPERTY_COLOR, listenerLabel);
+		owner.removePropertyChangeListener(ITrace2D.PROPERTY_NAME, listenerLabel);
+		owner.removePropertyChangeListener(ITrace2D.PROPERTY_PHYSICALUNITS, listenerLabel);
 
+		this.m_labelPanel.doLayout();
+		this.doLayout();
 	}
 
 	/**

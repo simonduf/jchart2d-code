@@ -78,6 +78,10 @@ jchart2d-3.2.1 - <month>, <day>, <year>
 * Fixed possible deadlock when adding many traces at startup and paint of Chart2D is already invoked before finish of adding all traces. 
 * Fixed bug #3164863: LabelFormatter does not chooses femto range for very small values ( < 10^-16).
 * Fixed unreported bug: ChartPanel looses trace labels when setting a new axis. 
+* Wiped out duplicate property change events for basic awt properties "font", "background" and "foreground" of Chart2D.
+* Let Chart2D relay the event event IAxis.PROPERTY_ADD_REMOVE_TRACE to it's outside listeners: This was documented in javadoc and 
+  made sense as outside users don't want to interact with internal object models. Register for this event via: 
+  chart.addPropertyChangeListener(Chart2D.PROPERTY_ADD_REMOVE_TRACE, this).
 o Renamed info.monitorenter.MathUtil to info.monitorenter.util.math.MathUtil.
 o Renamed info.monitorenter.math.IntegerReusable to info.monitorenter.math.IntegerMutable. 
 o Simplified API: dropped interface IPointHighlighter. Use IPointPainter wherever you used IPointHighlighter before. 
@@ -85,6 +89,8 @@ o Simplified API: dropped class APointHighlighter. Extend APointPainter wherever
 o Simplified API: dropped class PointHighlighterConfigurable. Use the raw PointPainter argument from it's constructor instead. 
   Example: "new PointPainterConfigurable(new PointPainterDisc(20), true)" -> "new PointPainterDisc(20)" 
 o To prevent deadlocks at startup now every trace has to be first added to a chart before: adding points, setting point highlighters, setting error bar policies to the trace. 
+o If a trace label (the combination of property name and property physical units) is set to null or "" the ChartPanel will show an <unnamed> label that still allows
+  to access the right-click context menu entry for various trace configurations. 
 
 jchart2d-3.2.0 - June, 2nd, 2010
 

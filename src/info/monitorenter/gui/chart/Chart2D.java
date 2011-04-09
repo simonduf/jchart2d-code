@@ -211,6 +211,18 @@ import javax.swing.Timer;
  * <td>if a change of the grid color occurs.</td>
  * </tr>
  * <tr>
+ * <td>{@link #PROPERTY_ADD_REMOVE_TRACE}</td>
+ * <td>{@link Chart2D}</td>
+ * <td>{@link ITrace2D}</td>
+ * <td>{@link ITrace2D}</td>
+ * <td>
+ * 	If a change of the traces occurs. 
+ * 	If the old value is null a new trace has been added. 
+ *  If the new value is null, oldvalue trace has been removed.
+ *  If both are null this is a bug. 	
+ * </td>
+ * </tr>
+ * <tr>
  * <td>{@link #PROPERTY_PAINTLABELS}</td>
  * <td>{@link Chart2D}</td>
  * <td>{@link java.lang.Boolean}</td>
@@ -604,7 +616,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * clarification of the String that is related to that property.
    * <p>
    */
-  public static final String PROPERTY_BACKGROUND_COLOR = "Chart2D.PROPERTY_BACKGROUND_COLOR";
+  public static final String PROPERTY_BACKGROUND_COLOR = "background";
 
   /**
    * The bean property <code>constant</code> identifying a change of the font. <br/>
@@ -617,7 +629,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * clarification of the String that is related to that property.
    * <p>
    */
-  public static final String PROPERTY_FONT = "Chart2D.PROPERTY_FONT";
+  public static final String PROPERTY_FONT = "font";
 
   /**
    * The bean property <code>constant</code> identifying a change of the
@@ -630,7 +642,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * clarification of the String that is related to that property.
    * <p>
    */
-  public static final String PROPERTY_FOREGROUND_COLOR = "Chart2D.PROPERTY_FOREGROUND_COLOR";
+  public static final String PROPERTY_FOREGROUND_COLOR = "foreground";
 
   /**
    * The bean property <code>constant</code> identifying a change of the grid
@@ -642,6 +654,14 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    */
   public static final String PROPERTY_GRID_COLOR = "Chart2D.PROPERTY_GRID_COLOR";
 
+  /**
+   * The bean property <code>constant</code> identifying a change of traces.
+   * <p>
+   * Use this constant to register a {@link java.beans.PropertyChangeListener}
+   * with the <code>Chart2D</code>.
+   * <p>
+   */
+  public static final String PROPERTY_ADD_REMOVE_TRACE = IAxis.PROPERTY_ADD_REMOVE_TRACE;
   /**
    * The bean property <code>constant</code> identifying a change of the paint
    * labels flag.
@@ -1297,6 +1317,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @param yAxis
    *          the y axis responsible for the scale of this trace - it has to be
    *          contained in this chart or an exception will be thrown.
+   *          
    * @see IAxis#PROPERTY_ADD_REMOVE_TRACE
    */
   public final void addTrace(final ITrace2D points, final IAxis xAxis, final IAxis yAxis) {
@@ -1356,6 +1377,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
             this.listenToTrace(points);
             int amountOfHighlighters = points.getPointHighlighters().size();
             this.trackHighlightingEnablement(amountOfHighlighters);
+            this.firePropertyChange(IAxis.PROPERTY_ADD_REMOVE_TRACE, null, points);
           }
         }
         if (Chart2D.DEBUG_THREADING) {
@@ -3267,7 +3289,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
          * occassional user interaction.
          */
       } else if (property.equals(IAxis.PROPERTY_ADD_REMOVE_TRACE)) {
-        // repaint definetely!
+    	 /*
+    	  * Relay the event as outsiders don't want to deal with internals (listen to axes to be informed whenever a trace was added). 
+    	  * Also:  repaint definetely!
+    	  */
+    	  this.firePropertyChange(IAxis.PROPERTY_ADD_REMOVE_TRACE, evt.getOldValue(), evt.getNewValue());
       } else if (property.equals(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED)) {
         int highlightersAddedOrRemoved = 0;
         if (evt.getOldValue() != null) {
@@ -3341,7 +3367,6 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       axisTraces = currentAxis.removeAllTraces();
       axisTraces.clear();
     }
-
     return result;
 
   }
@@ -3881,25 +3906,6 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     return old;
   }
 
-  /**
-   * @see java.awt.Component#setBackground(java.awt.Color)
-   */
-  @Override
-  public void setBackground(final Color bg) {
-    Color old = this.getBackground();
-    super.setBackground(bg);
-    this.firePropertyChange(Chart2D.PROPERTY_BACKGROUND_COLOR, old, bg);
-  }
-
-  /**
-   * @see java.awt.Component#setForeground(java.awt.Color)
-   */
-  @Override
-  public void setForeground(final Color fg) {
-    Color old = this.getForeground();
-    super.setForeground(fg);
-    this.firePropertyChange(Chart2D.PROPERTY_FOREGROUND_COLOR, old, fg);
-  }
 
   /**
    * Set the grid color to use.

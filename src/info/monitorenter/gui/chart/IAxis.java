@@ -370,7 +370,7 @@ public interface IAxis extends Serializable {
    * <p>
    * See the class description for property change events fired.
    */
-  public static final String PROPERTY_ADD_REMOVE_TRACE = "ITrace2D.PROPERTY_ADD_REMOVE_TRACE";
+  public static final String PROPERTY_ADD_REMOVE_TRACE = "IAxis.PROPERTY_ADD_REMOVE_TRACE";
 
   /**
    * Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the

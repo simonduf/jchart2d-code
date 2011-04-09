@@ -104,6 +104,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -131,22 +132,209 @@ import javax.swing.JRadioButtonMenuItem;
  * @version $Revision: 1.58 $
  */
 public final class LayoutFactory {
+    
+      
 
-  /**
-   * Implementation for a <code>PropertyChangeListener</code> that adpapts a
-   * wrapped <code>JComponent</code> to the following properties.
-   * <p>
-   * <ul>
-   * <li>background color</li>
-   * <li>foreground color (text)</li>
-   * <li>font</li>
-   * </ul>
-   * <p>
-   * 
-   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   */
+
+	/**
+	 * Implementation for a <code>PropertyChangeListener</code> that adapts a
+	 * wrapped <code>JComponent</code> to the following properties.
+	 * <p>
+	 * <ul>
+	 * <li>background color ("background")</li>
+	 * <li>foreground color (text color:"foreground")</li>
+	 * <li>font ("font")</li>
+	 * </ul>
+	 * <p>
+	 * 
+	 * An instance will add itself as a
+	 * <code>{@link PropertyChangeListener}</code> via
+	 * <code>{@link Component#addPropertyChangeListener(PropertyChangeListener)}</code>
+	 * on the component to adapt to.
+	 * <p>
+	 * However components should also be able to send property changes that make
+	 * instances of this class garbage - collectable by removing them as a
+	 * property change listener from them. The constructor given values mark
+	 * those property changes that will cause instances of this class to remove
+	 * themselves as a property change listener from the component listened to.
+	 * These properties may be configured in glue code (as components are
+	 * generic and should not be hard coded for tasks that are hooked to them).
+	 * <p>
+	 * 
+	 * 
+	 * 
+	 * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+	 */
   public static class BasicPropertyAdaptSupport implements PropertyChangeListener {
+    
+    /**
+     * Used to decide when to stop listening on the component (adaptee).<p>
+     */
+    private final IRemoveAsListenerFromComponentCondition m_stopListeningControl;
+    /**
+     * Interface to handle the removal of the
+     * <code>{@link BasicPropertyAdaptSupport}</code> as a property change event
+     * listener. It decides which property change events of the component should
+     * be able to control removal from it as a property change listener and
+     * especially if the property change event sent qualifies for removal.
+     * <p>
+     * 
+     * This is needed to avoid a memory- and performance leak due to remaining
+     * listeners in the components listened to.
+     * <p>
+     * 
+     * 
+     * 
+     * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+     * 
+     */
+    public static interface IRemoveAsListenerFromComponentCondition {
+      /**
+       * Returns true if the calling
+       * <code>{@link BasicPropertyAdaptSupport}</code> should return itself as
+       * a listener from the <code>{@link Component}</code> it listens to.
+       * <p>
+       * 
+       * @param event
+       *          the event received by the <code>
+       *          {@link BasicPropertyAdaptSupport}</code> sent from the
+       *          component listened to.
+       * 
+       * @return true if the calling <code>{@link BasicPropertyAdaptSupport}
+       *         </code> should return itself as a listener from the <code>
+       *         {@link Component}</code> it listens to.
+       */
+      public boolean isRemoveMeAsListenerComponentEvent(final PropertyChangeEvent event);
 
+      /**
+       * Property change properties sent by the component that will cause
+       * instances of this class to remove themselves as a property change
+       * listener from the component listened to.
+       * <p>
+       * 
+       * @return property change properties sent by the component that will
+       *         cause instances of this class to remove themselves as a
+       *         property change listener from the component listened to.
+       */
+      public Set<String> getPropertyChangePropertiesToListenForRemovalOn();
+
+    }
+	 /**
+	  * Implementation based on the event <code>{@link Chart2D#PROPERTY_ADD_REMOVE_TRACE}</code> sent with an 
+	  * old value <code>{@link ITrace2D}</code>  that has to be matched.<p>
+	  *  
+	  *
+	  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+	 *
+	  */
+    public static class RemoveAsListenerFromComponentIfTraceIsDropped implements
+        IRemoveAsListenerFromComponentCondition {
+      /**
+       * Hard coded properties that the <code>{@link Chart2D}</code> will send
+       * to let the <code>{@link  BasicPropertyAdaptSupport}</code> instances
+       * remove themselves as listeners from the chart whenever received and the
+       * new value is null.
+       * <p>
+       */
+      private static final Set<String> PROPERTIES_SENT_BY_CHART2D_TO_REMOVE_BASICPROPERTYADAPTSUPPORT_AS_LISTENER_ON_CHART = new TreeSet<String>();
+      static {
+        PROPERTIES_SENT_BY_CHART2D_TO_REMOVE_BASICPROPERTYADAPTSUPPORT_AS_LISTENER_ON_CHART
+            .add(Chart2D.PROPERTY_ADD_REMOVE_TRACE);
+      }
+
+      /**
+       * The trace to watch for removal to decide if we judge the calling
+       * <code>{@link BasicPropertyAdaptSupport}</code> to be removed as a
+       * listener from it's component.
+       * <p>
+       */
+      private final ITrace2D m_traceToWatchForRemoval;
+
+      public RemoveAsListenerFromComponentIfTraceIsDropped(final ITrace2D quitIfRemoved) {
+        this.m_traceToWatchForRemoval = quitIfRemoved;
+      }
+
+      /**
+       * @see info.monitorenter.gui.chart.controls.LayoutFactory.BasicPropertyAdaptSupport.IRemoveAsListenerFromComponentCondition#getPropertyChangePropertiesToListenForRemovalOn()
+       */
+      public Set<String> getPropertyChangePropertiesToListenForRemovalOn() {
+        return PROPERTIES_SENT_BY_CHART2D_TO_REMOVE_BASICPROPERTYADAPTSUPPORT_AS_LISTENER_ON_CHART;
+      }
+
+      /**
+       * @see info.monitorenter.gui.chart.controls.LayoutFactory.BasicPropertyAdaptSupport.IRemoveAsListenerFromComponentCondition#isRemoveMeAsListenerComponentEvent(java.beans.PropertyChangeEvent)
+       */
+      public boolean isRemoveMeAsListenerComponentEvent(PropertyChangeEvent event) {
+        boolean result = false;
+        String property = event.getPropertyName();
+        // unstable as the set may change and we expect
+        // Chart2D.PROPERTY_ADD_REMOVE_TRACE:
+        if (PROPERTIES_SENT_BY_CHART2D_TO_REMOVE_BASICPROPERTYADAPTSUPPORT_AS_LISTENER_ON_CHART
+            .contains(property)) {
+          ITrace2D oldTrace = (ITrace2D) event.getOldValue();
+          if (oldTrace == this.m_traceToWatchForRemoval) {
+            result = true;
+          }
+        }
+        return result;
+      }
+    }
+
+    /**
+     * Implementation dummy that never will decide to remove the calling <code>{@link BasicPropertyAdaptSupport}</code>  to be removed. 
+     * <p>
+     * This is useful e.g. for menu entries related to the chart itself (<code>{@link LayoutFactory#createChartPopupMenu(ChartPanel, boolean)}</code>) 
+     * where there is no known case that the chart could be removed but other application objects could still hold a listener reference to these 
+     * <code>{@link BasicPropertyAdaptSupport}</code> instances.
+     * <p>
+     **/
+    public static class RemoveAsListenerFromComponentNever implements
+    IRemoveAsListenerFromComponentCondition {
+
+      /** Singleton instance. */
+      private static IRemoveAsListenerFromComponentCondition INSTANCE;
+      
+      /**
+       * Singleton retrieval.<p>
+       * 
+       * @return the sole instance in this VM.
+       */
+      public static IRemoveAsListenerFromComponentCondition getInstance() {
+        if(INSTANCE == null) {
+          INSTANCE = new RemoveAsListenerFromComponentNever();
+        }
+        return INSTANCE;
+      }
+      
+      private RemoveAsListenerFromComponentNever() {
+        // singleton constructor;
+      }
+      /**
+       * Never!<p>
+       * 
+       * @see info.monitorenter.gui.chart.controls.LayoutFactory.BasicPropertyAdaptSupport.IRemoveAsListenerFromComponentCondition#getPropertyChangePropertiesToListenForRemovalOn()
+       */
+      public Set<String> getPropertyChangePropertiesToListenForRemovalOn() {
+        return Collections.emptySet();
+      }
+
+      /**
+       * Implementation dummy that never will decide to remove the calling <code>{@link BasicPropertyAdaptSupport}</code>  to be removed. 
+       * <p>
+       * This is useful e.g. for menu entries related to the chart itself (<code>{@link LayoutFactory#createChartPopupMenu(ChartPanel, boolean)}</code>) 
+       * where there is no known case that the chart could be removed but other application objects could still hold a listener reference to these 
+       * <code>{@link BasicPropertyAdaptSupport}</code> instances.
+       * <p>
+       * 
+       * @see info.monitorenter.gui.chart.controls.LayoutFactory.BasicPropertyAdaptSupport.IRemoveAsListenerFromComponentCondition#isRemoveMeAsListenerComponentEvent(java.beans.PropertyChangeEvent)
+       */
+      public boolean isRemoveMeAsListenerComponentEvent(PropertyChangeEvent event) {
+        return false;
+      }
+      
+      
+    }
+    
     /**
      * The component to whose properties the delegate adapts to.
      * <p>
@@ -159,20 +347,32 @@ public final class LayoutFactory {
     protected WeakReference<Component> m_delegate;
 
     /**
+     * Creates an instance that will listen to basic properties
+     * ("font","foreground","background") on the given component and install
+     * those on the delegate component.
+     * <p>
+     * 
      * @param delegate
      *          The component to adapt the properties on.
+     * 
      * @param adaptee
      *          The peer component delegate will be adapted to.
+     * 
+     * @param quitListeningControl
+     *          Used to decide when to stop listening on the component (adaptee).
      */
-    public BasicPropertyAdaptSupport(final Component delegate, final Component adaptee) {
+    public BasicPropertyAdaptSupport(final Component delegate, final Component adaptee, final  IRemoveAsListenerFromComponentCondition quitListeningControl) {
       this.m_delegate = new WeakReference<Component>(delegate);
       this.m_adaptee = adaptee;
+      this.m_stopListeningControl = quitListeningControl;
+      // initial adaption:
       delegate.setFont(adaptee.getFont());
       delegate.setBackground(adaptee.getBackground());
       delegate.setForeground(adaptee.getForeground());
-      adaptee.addPropertyChangeListener(this);
+      // register for future adaptions:
+      this.startListening();
     }
-
+   
     /**
      * Removes the listener for basic property changes from the component to
      * adapt to.
@@ -184,7 +384,6 @@ public final class LayoutFactory {
     @Override
     protected void finalize() throws Throwable {
       super.finalize();
-      this.m_adaptee.removePropertyChangeListener(this);
     }
 
     /**
@@ -195,29 +394,56 @@ public final class LayoutFactory {
       Object reference = this.m_delegate.get();
       if (reference != null) {
         Component component = (Component) reference;
-        if (prop.equals(Chart2D.PROPERTY_BACKGROUND_COLOR)) {
+        if (prop.equals("foreground")) {
           Color color = (Color) evt.getNewValue();
           Color foreground = component.getForeground();
-          if (color.equals(foreground)) {
-            component.setForeground(component.getBackground());
+          if (!color.equals(foreground)) {
+            component.setForeground(color);
           }
           component.setBackground(color);
           component.repaint();
-        } else if (prop.equals(Chart2D.PROPERTY_FONT)) {
+        } else if (prop.equals("font")) {
           Font font = (Font) evt.getNewValue();
           component.setFont(font);
-        } else if (prop.equals(Chart2D.PROPERTY_FOREGROUND_COLOR)) {
+        } else if (prop.equals("background")) {
           Color color = (Color) evt.getNewValue();
           Color background = component.getBackground();
-          if (color.equals(background)) {
-            component.setBackground(component.getForeground());
+          if (!color.equals(background)) {
+            component.setBackground(color);
           }
-          component.setForeground(color);
+        } else {
+          /*
+           * These events will be received for all properties that the used 
+           * stopListeningControl returned from its list of properties to listen on for stop listening: 
+           */
+          if (this.m_stopListeningControl.isRemoveMeAsListenerComponentEvent(evt)) {
+            this.stopListening();
+          }
         }
       } else {
-        // if no more components to adapt, remove myself as a listener
-        // to avoid mem-leak in listener list:
-        ((Component) evt.getSource()).removePropertyChangeListener(this);
+        /*
+         *  If no more components to adapt, remove myself as a listener to make me garbage collectable and avoid mem- and performance-leak in listener list:
+         */
+    	  this.stopListening();
+      }
+    }
+
+    private void startListening() {
+      this.m_adaptee.addPropertyChangeListener("foreground", this);
+      this.m_adaptee.addPropertyChangeListener("background", this);
+      this.m_adaptee.addPropertyChangeListener("font", this);
+      // register for unregistering (avoid mem- and performance- leak): 
+      for(String removeAsListenerProperty:this.m_stopListeningControl.getPropertyChangePropertiesToListenForRemovalOn()){
+        this.m_adaptee.addPropertyChangeListener(removeAsListenerProperty, this);
+      }
+    }
+    
+    private void stopListening() {
+      this.m_adaptee.removePropertyChangeListener("font", this);
+      this.m_adaptee.removePropertyChangeListener("background", this);
+      this.m_adaptee.removePropertyChangeListener("foreground", this);
+      for (String property : this.m_stopListeningControl.getPropertyChangePropertiesToListenForRemovalOn()) {
+        this.m_adaptee.removePropertyChangeListener(property, this);
       }
     }
   }
@@ -378,7 +604,7 @@ public final class LayoutFactory {
 
     /**
      * Creates an instance that will trigger the given action upon checkbox
-     * selection / unselection and order itself in the given menu as described
+     * selection / de-selection and order itself in the given menu as described
      * in the class comment.
      * <p>
      * 
@@ -403,7 +629,7 @@ public final class LayoutFactory {
   }
 
   /**
-   * A checkbox menu item that will change it's order in the known {@link JMenu}
+   * A check box menu item that will change it's order in the known {@link JMenu}
    * it is contained in whenever it's state changes (see superclass) and
    * additionally adapt basic UI properties font, foreground color, background
    * color to the constructor given component.
@@ -420,25 +646,33 @@ public final class LayoutFactory {
 
     /**
      * Creates an instance that will adapt it's own basic UI properties to the
-     * given component, trigger the given action upon checkbox selection /
-     * deselection and order itself in the given menu as described in the class
+     * given component, trigger the given action upon check box selection /
+     * de-selection and order itself in the given menu as described in the class
      * comment.
      * <p>
      * 
      * @param component
      *          the component to adapt basic UI properties to.
+     * 
      * @param action
      *          the action to trigger.
+     * 
      * @param container
      *          the instance this menu item is contained in.
+     * 
      * @param checked
-     *          the initial state of the checkbox.
+     *          the initial state of the check box.
+     * 
+     * @param quitListeningOnBasicPropertyChangesControl
+     *          used to decide when to stop listening on the component (adaptee)
+     *          for basic property changes.
+     * 
      * @see LayoutFactory.PropertyChangeCheckBoxMenuItem
      */
     public OrderingCheckBoxPropertyChangeMenuItem(final JComponent component, final Action action,
-        final JMenu container, final boolean checked) {
+        final JMenu container, final boolean checked,final  BasicPropertyAdaptSupport.IRemoveAsListenerFromComponentCondition quitListeningOnBasicPropertyChangesControl) {
       super(action, container, checked);
-      new BasicPropertyAdaptSupport(this, component);
+      new BasicPropertyAdaptSupport(this, component, quitListeningOnBasicPropertyChangesControl);
     }
 
   }
@@ -485,17 +719,23 @@ public final class LayoutFactory {
      * 
      * @param component
      *          The component to whose basic UI properties this item will adapt.
+     *          
      * @param action
      *          The <code>Action</code> to trigger when this item is clicked.
+     *          
      * @param checked
-     *          the inital state of the checkbox.
+     *          the initial state of the check box.
+     *          
+     * @param quitListeningOnBasicPropertyChangesControl
+     *          used to decide when to stop listening on the component (adaptee)
+     *          for basic property changes.
      */
     public PropertyChangeCheckBoxMenuItem(final JComponent component, final Action action,
-        final boolean checked) {
+        final boolean checked,BasicPropertyAdaptSupport.IRemoveAsListenerFromComponentCondition quitListeningOnBasicPropertyChangesControl) {
       // invokes setAction
       super(action);
       this.setState(checked);
-      new BasicPropertyAdaptSupport(this, component);
+      new BasicPropertyAdaptSupport(this, component, quitListeningOnBasicPropertyChangesControl);
     }
 
     /**
@@ -506,11 +746,16 @@ public final class LayoutFactory {
      * 
      * @param component
      *          The component to whose basic UI properties this item will adapt.
+     *          
      * @param checked
-     *          the inital state of the checkbox.
+     *          the initial state of the check box.
+     *          
+     * @param quitListeningOnBasicPropertyChangesControl
+     *          used to decide when to stop listening on the component (adaptee)
+     *          for basic property changes.
      */
-    protected PropertyChangeCheckBoxMenuItem(final JComponent component, final boolean checked) {
-      this(component, null, checked);
+    protected PropertyChangeCheckBoxMenuItem(final JComponent component, final boolean checked,BasicPropertyAdaptSupport.IRemoveAsListenerFromComponentCondition quitListeningOnBasicPropertyChangesControl) {
+      this(component, null, checked,quitListeningOnBasicPropertyChangesControl);
     }
 
     /**
@@ -545,9 +790,13 @@ public final class LayoutFactory {
     /**
      * @param component
      *          The component to whose background color this item will adapt.
+     *          
+     * @param quitListeningOnBasicPropertyChangesControl
+     *          used to decide when to stop listening on the component (adaptee)
+     *          for basic property changes.
      */
-    public PropertyChangeJMenuBar(final JComponent component) {
-      new BasicPropertyAdaptSupport(this, component);
+    public PropertyChangeJMenuBar(final JComponent component,BasicPropertyAdaptSupport.IRemoveAsListenerFromComponentCondition quitListeningOnBasicPropertyChangesControl) {
+      new BasicPropertyAdaptSupport(this, component, quitListeningOnBasicPropertyChangesControl);
     }
   }
 
@@ -580,21 +829,6 @@ public final class LayoutFactory {
      */
     private static final long serialVersionUID = 3933408706693522564L;
 
-    // /**
-    // * Internal constructor that should not be used unless
-    // * {@link javax.swing.AbstractButton#setAction(javax.swing.Action)} is
-    // * invoked afterwards on this instance (else NPE!).
-    // * <p>
-    // *
-    // * @param component
-    // * The component to whose basic UI properties this item will adapt.
-    // */
-    // protected PropertyChangeJRadioButtonMenuItem(final JComponent
-    // component)
-    // {
-    // this(component, null);
-    // }
-
     /**
      * Creates an instance with the given name that listens to the components
      * background color, foreground color and font.
@@ -606,18 +840,23 @@ public final class LayoutFactory {
      * 
      * @param component
      *          The component to whose basic UI properties this item will adapt.
+     *          
      * @param action
      *          The <code>Action</code> to trigger when this item is clicked.
+     *          
      * @param selected
      *          if true this radio button will be initially selected.
+     *          
+     * @param quitListeningOnBasicPropertyChangesControl
+     *          used to decide when to stop listening on the component (adaptee)
+     *          for basic property changes.
      */
     public PropertyChangeJRadioButtonMenuItem(final JComponent component, final Action action,
-        final boolean selected) {
+        final boolean selected,BasicPropertyAdaptSupport.IRemoveAsListenerFromComponentCondition quitListeningOnBasicPropertyChangesControl) {
       // invokes setAction
       super(action);
       this.setSelected(selected);
-      new BasicPropertyAdaptSupport(this, component);
-
+      new BasicPropertyAdaptSupport(this, component,quitListeningOnBasicPropertyChangesControl);
     }
 
     /**
@@ -654,10 +893,15 @@ public final class LayoutFactory {
      * 
      * @param name
      *          The name to display.
+     *          
      * @param component
      *          The component to whose background color this item will adapt.
+     *          
+     * @param quitListeningOnBasicPropertyChangesControl
+     *          used to decide when to stop listening on the component (adaptee)
+     *          for basic property changes.
      */
-    public PropertyChangeMenu(final JComponent component, final String name) {
+    public PropertyChangeMenu(final JComponent component, final String name,BasicPropertyAdaptSupport.IRemoveAsListenerFromComponentCondition quitListeningOnBasicPropertyChangesControl) {
       super(name);
       /*
        * For java 1.5 menus that are submenus don't use background color in
@@ -665,7 +909,7 @@ public final class LayoutFactory {
        * workaround:
        */
       this.setOpaque(true);
-      new BasicPropertyAdaptSupport(this, component);
+      new BasicPropertyAdaptSupport(this, component,quitListeningOnBasicPropertyChangesControl);
 
     }
   }
@@ -699,12 +943,17 @@ public final class LayoutFactory {
      * 
      * @param component
      *          The component to whose background color this item will adapt.
+     *          
      * @param action
      *          The <code>Action</code> to trigger when this item is clicked.
+     *          
+     * @param quitListeningOnBasicPropertyChangesControl
+     *          used to decide when to stop listening on the component (adaptee)
+     *          for basic property changes.
      */
-    public PropertyChangeMenuItem(final JComponent component, final Action action) {
+    public PropertyChangeMenuItem(final JComponent component, final Action action,BasicPropertyAdaptSupport.IRemoveAsListenerFromComponentCondition quitListeningOnBasicPropertyChangesControl) {
       super(action);
-      new BasicPropertyAdaptSupport(this, component);
+      new BasicPropertyAdaptSupport(this, component,quitListeningOnBasicPropertyChangesControl);
       this.m_component = new WeakReference<JComponent>(component);
     }
 
@@ -740,9 +989,13 @@ public final class LayoutFactory {
     /**
      * @param component
      *          The component to whose background color this item will adapt.
+     *          
+     * @param quitListeningOnBasicPropertyChangesControl
+     *          used to decide when to stop listening on the component (adaptee)
+     *          for basic property changes.
      */
-    public PropertyChangePopupMenu(final JComponent component) {
-      new BasicPropertyAdaptSupport(this, component);
+    public PropertyChangePopupMenu(final JComponent component, BasicPropertyAdaptSupport.IRemoveAsListenerFromComponentCondition quitListeningOnBasicPropertyChangesControl) {
+      new BasicPropertyAdaptSupport(this, component,quitListeningOnBasicPropertyChangesControl);
     }
   }
 
@@ -785,8 +1038,9 @@ public final class LayoutFactory {
      * 
      * @param action
      *          The <code>Action</code> to trigger when this item is clicked.
+     *          
      * @param state
-     *          the initial state of the checkbox.
+     *          the initial state of the check box.
      */
     public SelectionAdaptJCheckBoxMenuItem(final Action action, final boolean state) {
       // invokes setAction
@@ -933,11 +1187,16 @@ public final class LayoutFactory {
      * Creates a label with the given name.
      * <p>
      * 
-     * @param name
-     *          the name of the label.
+     * @param trace
+     *          the trace the label corresponds to.
      */
-    public TraceJLabel(final String name) {
-      super(name);
+    public TraceJLabel(final ITrace2D trace) {
+      super(trace.getLabel());
+      new BasicPropertyAdaptSupport(
+          this,
+          trace.getRenderer(),
+          new LayoutFactory.BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(
+              trace));
     }
 
     /**
@@ -1185,9 +1444,9 @@ public final class LayoutFactory {
     JMenuItem item;
     Chart2D chart = chartPanel.getChart();
     if (adaptUI2Chart) {
-      result = new PropertyChangeMenu(chart, "Annotate");
+      result = new PropertyChangeMenu(chart, "Annotate",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
       item = new PropertyChangeMenuItem(chart, new ChartPanelActionAddAnnotation(chartPanel,
-          "Annotation 1"));
+          "Annotation 1"),BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
       result.add(item);
     } else {
       result = new JMenu("Annotate");
@@ -1206,7 +1465,7 @@ public final class LayoutFactory {
     ButtonGroup buttonGroup = new ButtonGroup();
     JMenu formatterMenu;
     if (adaptUI2Chart) {
-      formatterMenu = new PropertyChangeMenu(chart, "Label formatter");
+      formatterMenu = new PropertyChangeMenu(chart, "Label formatter",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       formatterMenu = new JMenu("Label formatter");
     }
@@ -1215,7 +1474,8 @@ public final class LayoutFactory {
      */
     JMenu numberMenu;
     if (adaptUI2Chart) {
-      numberMenu = new PropertyChangeMenu(chart, "Numbers");
+      numberMenu = new PropertyChangeMenu(chart, "Numbers",
+          BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       numberMenu = new JMenu("Numbers");
     }
@@ -1232,7 +1492,7 @@ public final class LayoutFactory {
         axisDimension, formatter);
     selected = formatter.equals(presetFormatter);
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
     }
@@ -1244,7 +1504,7 @@ public final class LayoutFactory {
     action = new AxisActionSetFormatter(chart, "1 fraction digit", axisDimension, formatter);
     selected = formatter.equals(presetFormatter);
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
     }
@@ -1256,7 +1516,7 @@ public final class LayoutFactory {
     action = new AxisActionSetFormatter(chart, "2 fraction digits", axisDimension, formatter);
     selected = formatter.equals(presetFormatter);
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
     }
@@ -1269,7 +1529,7 @@ public final class LayoutFactory {
 
     JMenu dateMenu;
     if (adaptUI2Chart) {
-      dateMenu = new PropertyChangeMenu(chart, "Date/Time");
+      dateMenu = new PropertyChangeMenu(chart, "Date/Time",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       dateMenu = new JMenu("Date/Time");
     }
@@ -1282,7 +1542,7 @@ public final class LayoutFactory {
     action = new AxisActionSetFormatter(chart, "Date (short)", axisDimension, formatter);
     selected = formatter.equals(presetFormatter);
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
     }
@@ -1295,7 +1555,7 @@ public final class LayoutFactory {
     action = new AxisActionSetFormatter(chart, "Date (medium)", axisDimension, formatter);
     selected = formatter.equals(presetFormatter);
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
     }
@@ -1308,7 +1568,7 @@ public final class LayoutFactory {
     action = new AxisActionSetFormatter(chart, "Date (long)", axisDimension, formatter);
     selected = formatter.equals(presetFormatter);
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
     }
@@ -1322,7 +1582,7 @@ public final class LayoutFactory {
     action = new AxisActionSetFormatter(chart, "Date & Time (short)", axisDimension, formatter);
     selected = formatter.equals(presetFormatter);
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
     }
@@ -1335,7 +1595,7 @@ public final class LayoutFactory {
     action = new AxisActionSetFormatter(chart, "Date & Time (medium)", axisDimension, formatter);
     selected = formatter.equals(presetFormatter);
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
     }
@@ -1348,7 +1608,7 @@ public final class LayoutFactory {
     action = new AxisActionSetFormatter(chart, "Date & Time (long)", axisDimension, formatter);
     selected = formatter.equals(presetFormatter);
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
     }
@@ -1362,7 +1622,7 @@ public final class LayoutFactory {
         axisDimension, formatter);
     selected = formatter.equals(presetFormatter);
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
     }
@@ -1375,7 +1635,7 @@ public final class LayoutFactory {
     action = new AxisActionSetFormatter(chart, "Percent", axisDimension, formatter);
     selected = formatter.equals(presetFormatter);
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
     }
@@ -1389,7 +1649,7 @@ public final class LayoutFactory {
         axisDimension, formatter);
     selected = formatter.equals(presetFormatter);
     if (adaptUI2Chart) {
-      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected);
+      item = new PropertyChangeJRadioButtonMenuItem(chart, action, selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(action, selected);
     }
@@ -1423,7 +1683,7 @@ public final class LayoutFactory {
     // axis submenu
     JMenuItem axisMenuItem;
     if (adaptUI2Chart) {
-      axisMenuItem = new PropertyChangeMenu(chart, "Axis" + axis.getAccessor().toString());
+      axisMenuItem = new PropertyChangeMenu(chart, "Axis" + axis.getAccessor().toString(),BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       axisMenuItem = new JMenu("Axis" + axis.getAccessor().toString());
     }
@@ -1445,7 +1705,7 @@ public final class LayoutFactory {
       if (adaptUI2Chart) {
 
         item = new PropertyChangeMenuItem(chart, new AxisActionSetRange(chart, "Range",
-            axisDimension));
+            axisDimension),BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
       } else {
         item = new JMenuItem(new AxisActionSetRange(chart, "Range", axisDimension));
       }
@@ -1486,7 +1746,7 @@ public final class LayoutFactory {
     // Axis -> Range policy submenu
     JMenu axisRangePolicy;
     if (adaptUI2Chart) {
-      axisRangePolicy = new PropertyChangeMenu(chart, "Range policy");
+      axisRangePolicy = new PropertyChangeMenu(chart, "Range policy",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       axisRangePolicy = new JMenu("Range policy");
     }
@@ -1498,7 +1758,7 @@ public final class LayoutFactory {
     boolean selected = rangePolicyClass == RangePolicyFixedViewport.class;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(chart,
-          "Fixed viewport", axis.getDimension(), new RangePolicyFixedViewport()), selected);
+          "Fixed viewport", axis.getDimension(), new RangePolicyFixedViewport()), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(chart,
           "Fixed viewport", axis.getDimension(), new RangePolicyFixedViewport()), selected);
@@ -1511,7 +1771,7 @@ public final class LayoutFactory {
     selected = rangePolicyClass == RangePolicyUnbounded.class;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(chart,
-          "Minimum viewport", axis.getDimension(), new RangePolicyUnbounded()), selected);
+          "Minimum viewport", axis.getDimension(), new RangePolicyUnbounded()), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(chart,
           "Minimum viewport", axis.getDimension(), new RangePolicyUnbounded()), selected);
@@ -1524,7 +1784,7 @@ public final class LayoutFactory {
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(chart,
           "Minimum viewport with range", axis.getDimension(), new RangePolicyMinimumViewport(
-              new Range(10, 10))), selected);
+              new Range(10, 10))), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(chart,
           "Minimum viewport with range", axis.getDimension(), new RangePolicyMinimumViewport(
@@ -1537,7 +1797,7 @@ public final class LayoutFactory {
     selected = rangePolicyClass == RangePolicyForcedPoint.class;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(chart,
-          "Ensure visible point", axis.getDimension(), new RangePolicyForcedPoint(0)), selected);
+          "Ensure visible point", axis.getDimension(), new RangePolicyForcedPoint(0)), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(chart,
           "Ensure visible point", axis.getDimension(), new RangePolicyForcedPoint(0)), selected);
@@ -1550,7 +1810,7 @@ public final class LayoutFactory {
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new AxisActionSetRangePolicy(chart,
           "Highest points within max-50 to max.", axis.getDimension(),
-          new RangePolicyHighestValues(50)), selected);
+          new RangePolicyHighestValues(50)), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new AxisActionSetRangePolicy(chart,
           "Highest points within max-50 to max.", axis.getDimension(),
@@ -1587,7 +1847,7 @@ public final class LayoutFactory {
     // Axis title -> Axis title text
     JMenu axisTitle;
     if (adaptUI2Chart) {
-      axisTitle = new PropertyChangeMenu(chart, "Title");
+      axisTitle = new PropertyChangeMenu(chart, "Title",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       axisTitle = new JMenu("Title");
     }
@@ -1595,7 +1855,7 @@ public final class LayoutFactory {
     JMenuItem item;
     if (adaptUI2Chart) {
       item = new PropertyChangeMenuItem(chart,
-          new AxisActionSetTitle(chart, "Title", axisDimension));
+          new AxisActionSetTitle(chart, "Title", axisDimension),BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new JMenuItem(new AxisActionSetTitle(chart, "Title", axisDimension));
     }
@@ -1604,7 +1864,7 @@ public final class LayoutFactory {
     // Axis title -> Axis title font
     JMenu axisTitleFont;
     if (adaptUI2Chart) {
-      axisTitleFont = new PropertyChangeMenu(chart, "Font");
+      axisTitleFont = new PropertyChangeMenu(chart, "Font",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       axisTitleFont = new JMenu("Font");
     }
@@ -1613,7 +1873,7 @@ public final class LayoutFactory {
     for (int i = fonts.length - 1; i > -1; i--) {
       if (adaptUI2Chart) {
         item = new OrderingCheckBoxPropertyChangeMenuItem(chart, new AxisActionSetTitleFont(chart,
-            fonts[i].getName(), axisDimension, fonts[i]), axisTitleFont, false);
+            fonts[i].getName(), axisDimension, fonts[i]), axisTitleFont, false,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
       } else {
         item = new OrderingCheckBoxMenuItem(new AxisActionSetTitleFont(chart, fonts[i].getName(),
             axisDimension, fonts[i]), axisTitleFont, false);
@@ -1652,7 +1912,7 @@ public final class LayoutFactory {
     // Axis -> Axis type
     JMenu axisType;
     if (adaptUI2Chart) {
-      axisType = new PropertyChangeMenu(chart, "Type");
+      axisType = new PropertyChangeMenu(chart, "Type",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       axisType = new JMenu("Type");
     }
@@ -1666,7 +1926,7 @@ public final class LayoutFactory {
     boolean selected = typeClass == AxisLinear.class;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new Chart2DActionSetAxis(chart,
-          new AxisLinear(), "Linear", axisDimension), selected);
+          new AxisLinear(), "Linear", axisDimension), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetAxis(chart,
           new AxisLinear(), "Linear", axisDimension), selected);
@@ -1677,7 +1937,7 @@ public final class LayoutFactory {
     selected = typeClass == AxisLogE.class;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new Chart2DActionSetAxis(chart,
-          new AxisLogE(), "Log E", axisDimension), selected);
+          new AxisLogE(), "Log E", axisDimension), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetAxis(chart, new AxisLogE(),
           "Log E", axisDimension), selected);
@@ -1691,7 +1951,7 @@ public final class LayoutFactory {
     selected = typeClass == AxisLog10.class;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new Chart2DActionSetAxis(chart,
-          new AxisLog10(), "Log 10", axisDimension), selected);
+          new AxisLog10(), "Log 10", axisDimension), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetAxis(chart,
           new AxisLog10(), "Log 10", axisDimension), selected);
@@ -1723,7 +1983,7 @@ public final class LayoutFactory {
     JMenuItem item;
     JMenu bgColorMenu;
     if (adaptUI2Chart) {
-      bgColorMenu = new PropertyChangeMenu(chart, "Background color");
+      bgColorMenu = new PropertyChangeMenu(chart, "Background color",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       bgColorMenu = new JMenu("Background color");
     }
@@ -1733,7 +1993,7 @@ public final class LayoutFactory {
     nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetBackground(chart,
-          "White", Color.WHITE), selected);
+          "White", Color.WHITE), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new JComponentActionSetBackground(chart,
           "White", Color.WHITE), selected);
@@ -1745,7 +2005,7 @@ public final class LayoutFactory {
     nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetBackground(chart,
-          "Gray", Color.GRAY), selected);
+          "Gray", Color.GRAY), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new JComponentActionSetBackground(chart,
           "Gray", Color.GRAY), selected);
@@ -1757,7 +2017,7 @@ public final class LayoutFactory {
     nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetBackground(chart,
-          "Light gray", Color.LIGHT_GRAY), selected);
+          "Light gray", Color.LIGHT_GRAY), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new JComponentActionSetBackground(chart,
           "Light gray", Color.LIGHT_GRAY), selected);
@@ -1769,7 +2029,7 @@ public final class LayoutFactory {
     nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetBackground(chart,
-          "Black", Color.BLACK), selected);
+          "Black", Color.BLACK), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new JComponentActionSetBackground(chart,
           "Black", Color.BLACK), selected);
@@ -1780,7 +2040,7 @@ public final class LayoutFactory {
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart,
           JComponentActionSetCustomBackgroundSingleton.getInstance(chart, "Custom Color"),
-          nonStandardColor);
+          nonStandardColor,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(JComponentActionSetCustomBackgroundSingleton
           .getInstance(chart, "Custom Color"), nonStandardColor);
@@ -1808,7 +2068,7 @@ public final class LayoutFactory {
     // Grid submenu:
     JMenu gridMenu;
     if (adaptUI2Chart) {
-      gridMenu = new PropertyChangeMenu(chart, "Grid");
+      gridMenu = new PropertyChangeMenu(chart, "Grid",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       gridMenu = new JMenu("Grid");
     }
@@ -1822,7 +2082,7 @@ public final class LayoutFactory {
       // Grid -> show x grid submenu
       if (adaptUI2Chart) {
         item = new PropertyChangeCheckBoxMenuItem(chart, new AxisActionSetGrid(chart, "Grid X",
-            Chart2D.X), chart.getAxisX().isPaintGrid());
+            Chart2D.X), chart.getAxisX().isPaintGrid(),BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
       } else {
         item = new SelectionAdaptJCheckBoxMenuItem(
             new AxisActionSetGrid(chart, "Grid X", Chart2D.X), chart.getAxisX().isPaintGrid());
@@ -1833,7 +2093,7 @@ public final class LayoutFactory {
       // Grid -> show y grid submenu
       if (adaptUI2Chart) {
         item = new PropertyChangeCheckBoxMenuItem(chart, new AxisActionSetGrid(chart, "Grid Y",
-            Chart2D.Y), chart.getAxisY().isPaintGrid());
+            Chart2D.Y), chart.getAxisY().isPaintGrid(),BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
       } else {
         item = new SelectionAdaptJCheckBoxMenuItem(
             new AxisActionSetGrid(chart, "Grid Y", Chart2D.Y), chart.getAxisX().isPaintGrid());
@@ -1865,7 +2125,7 @@ public final class LayoutFactory {
     // Tooltip submenu:
     JMenu highlightMenu;
     if (adaptUI2Chart) {
-      highlightMenu = new PropertyChangeMenu(chart, "Highlighting");
+      highlightMenu = new PropertyChangeMenu(chart, "Highlighting",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       highlightMenu = new JMenu("Highlighting");
     }
@@ -1874,7 +2134,7 @@ public final class LayoutFactory {
     JMenuItem item;
     if (adaptUI2Chart) {
       item = new PropertyChangeCheckBoxMenuItem(chart, new Chart2DActionEnableHighlighting(chart,
-          "Enable"), isEnabledHighlighting);
+          "Enable"), isEnabledHighlighting,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionEnableHighlighting(chart,
           "Enable"), isEnabledHighlighting);
@@ -1904,7 +2164,7 @@ public final class LayoutFactory {
     Chart2D chart = chartPanel.getChart();
     JMenu chartMenu;
     if (adaptUI2Chart) {
-      chartMenu = new PropertyChangeMenu(chartPanel, "Chart");
+      chartMenu = new PropertyChangeMenu(chartPanel, "Chart",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       chartMenu = new JMenu("Chart");
     }
@@ -1921,7 +2181,7 @@ public final class LayoutFactory {
 
       if (adaptUI2Chart) {
         item = new PropertyChangeCheckBoxMenuItem(chart, new Chart2DActionEnableAntialiasing(chart,
-            "Antialiasing"), chart.isUseAntialiasing());
+            "Antialiasing"), chart.isUseAntialiasing(),BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
       } else {
         item = new SelectionAdaptJCheckBoxMenuItem(new Chart2DActionEnableAntialiasing(chart,
             "Antialiasing"), chart.isUseAntialiasing());
@@ -1943,7 +2203,7 @@ public final class LayoutFactory {
       // Axis submenu:
       JMenu axisMenu;
       if (adaptUI2Chart) {
-        axisMenu = new PropertyChangeMenu(chart, "Axis");
+        axisMenu = new PropertyChangeMenu(chart, "Axis",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
       } else {
         axisMenu = new JMenu("Axis");
       }
@@ -1972,7 +2232,7 @@ public final class LayoutFactory {
     if (this.m_showPrintMenu) {
       if (adaptUI2Chart) {
         item = new PropertyChangeMenuItem(chart, Chart2DActionPrintSingleton.getInstance(chart,
-            "Print chart"));
+            "Print chart"),BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
       } else {
         item = new JMenuItem(Chart2DActionPrintSingleton.getInstance(chart, "Print chart"));
       }
@@ -1987,7 +2247,7 @@ public final class LayoutFactory {
     if (chart instanceof ZoomableChart && this.m_showZoomOutMenu) {
       if (adaptUI2Chart) {
         item = new PropertyChangeMenuItem(chart, new ZoomableChartZoomOutAction(
-            (ZoomableChart) chart, "Zoom Out"));
+            (ZoomableChart) chart, "Zoom Out"),BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
       } else {
         item = new JMenuItem(new ZoomableChartZoomOutAction((ZoomableChart) chart, "Zoom Out"));
       }
@@ -2012,7 +2272,7 @@ public final class LayoutFactory {
     JMenu chartMenu = this.createChartMenu(chartPanel, adaptUI2Chart);
     JMenuBar menubar;
     if (adaptUI2Chart) {
-      menubar = new PropertyChangeJMenuBar(chartPanel);
+      menubar = new PropertyChangeJMenuBar(chartPanel,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       menubar = new JMenuBar();
     }
@@ -2035,7 +2295,7 @@ public final class LayoutFactory {
     // fill top-level popup menu
     JPopupMenu popup;
     if (adaptUI2Chart) {
-      popup = new PropertyChangePopupMenu(chartpanel);
+      popup = new PropertyChangePopupMenu(chartpanel.getChart(),BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       popup = new JPopupMenu();
     }
@@ -2076,7 +2336,7 @@ public final class LayoutFactory {
     JMenu tooltipMenu;
     Chart2D chart = chartPanel.getChart();
     if (adaptUI2Chart) {
-      tooltipMenu = new PropertyChangeMenu(chart, "Type");
+      tooltipMenu = new PropertyChangeMenu(chart, "Type",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       tooltipMenu = new JMenu("Type");
     }
@@ -2089,7 +2349,7 @@ public final class LayoutFactory {
     boolean selected = actualType.getClass() == type.getClass();
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new ChartActionSetToolTipType(chart,
-          type.getDescription(), type), selected);
+          type.getDescription(), type), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJCheckBoxMenuItem(new ChartActionSetToolTipType(chart, type
           .getDescription(), type), selected);
@@ -2101,7 +2361,7 @@ public final class LayoutFactory {
     selected = actualType.getClass() == type.getClass();
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new ChartActionSetToolTipType(chart,
-          type.getDescription(), type), selected);
+          type.getDescription(), type), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJCheckBoxMenuItem(new ChartActionSetToolTipType(chart, type
           .getDescription(), type), selected);
@@ -2113,7 +2373,7 @@ public final class LayoutFactory {
     selected = actualType.getClass() == type.getClass();
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new ChartActionSetToolTipType(chart,
-          type.getDescription(), type), selected);
+          type.getDescription(), type), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJCheckBoxMenuItem(new ChartActionSetToolTipType(chart, type
           .getDescription(), type), selected);
@@ -2125,7 +2385,7 @@ public final class LayoutFactory {
     selected = actualType.getClass() == type.getClass();
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new ChartActionSetToolTipType(chart,
-          type.getDescription(), type), selected);
+          type.getDescription(), type), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJCheckBoxMenuItem(new ChartActionSetToolTipType(chart, type
           .getDescription(), type), selected);
@@ -2154,7 +2414,7 @@ public final class LayoutFactory {
     // Tooltip submenu:
     JMenu tooltipMenu;
     if (adaptUI2Chart) {
-      tooltipMenu = new PropertyChangeMenu(chart, "Tool tips");
+      tooltipMenu = new PropertyChangeMenu(chart, "Tool tips",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       tooltipMenu = new JMenu("Tool tips");
     }
@@ -2184,7 +2444,7 @@ public final class LayoutFactory {
     JMenu result;
     Chart2D chart = chartPanel.getChart();
     if (adaptUI2Chart) {
-      result = new PropertyChangeMenu(chart, "Highlighter");
+      result = new PropertyChangeMenu(chart, "Highlighter",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       result = new JMenu("Highlighter");
     }
@@ -2193,7 +2453,7 @@ public final class LayoutFactory {
       // Create a submenu for each trace
       JMenu traceMenu;
       if (adaptUI2Chart) {
-        traceMenu = new PropertyChangeMenu(chart, trace.getName());
+        traceMenu = new PropertyChangeMenu(chart, trace.getName(),BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
       } else {
         traceMenu = new JMenu(trace.getName());
       }
@@ -2231,7 +2491,7 @@ public final class LayoutFactory {
     // the edit error bar policy menu
     JMenu errorBarMenu;
     if (adaptUI2Chart) {
-      errorBarMenu = new PropertyChangeMenu(chart, "error bar policies");
+      errorBarMenu = new PropertyChangeMenu(chart, "error bar policies", new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       errorBarMenu = new JMenu("error bar policies");
     }
@@ -2241,7 +2501,7 @@ public final class LayoutFactory {
     JMenu errorBarAddMenu;
 
     if (adaptUI2Chart) {
-      errorBarAddMenu = new PropertyChangeMenu(chart, "+");
+      errorBarAddMenu = new PropertyChangeMenu(chart, "+", new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       errorBarAddMenu = new JMenu("+");
     }
@@ -2252,7 +2512,7 @@ public final class LayoutFactory {
     JMenu errorBarRemoveMenu;
 
     if (adaptUI2Chart) {
-      errorBarRemoveMenu = new PropertyChangeMenu(chart, "-");
+      errorBarRemoveMenu = new PropertyChangeMenu(chart, "-", new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       errorBarRemoveMenu = new JMenu("-");
     }
@@ -2262,7 +2522,7 @@ public final class LayoutFactory {
     // that are configured at the moment):
     JMenu erroBarEditMenu;
     if (adaptUI2Chart) {
-      erroBarEditMenu = new PropertyChangeMenu(chart, "edit");
+      erroBarEditMenu = new PropertyChangeMenu(chart, "edit", new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       erroBarEditMenu = new JMenu("edit");
     }
@@ -2288,7 +2548,7 @@ public final class LayoutFactory {
       if (adaptUI2Chart) {
         item = new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(trace,
             errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
-            errorBarRemoveMenu, erroBarEditMenu));
+            errorBarRemoveMenu, erroBarEditMenu), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
       } else {
         item = new JMenuItem(new ErrorBarPolicyMultiAction(trace, errorBarPolicy.getClass()
             .getName(), errorBarPolicy, errorBarAddMenu, errorBarRemoveMenu, erroBarEditMenu));
@@ -2308,7 +2568,7 @@ public final class LayoutFactory {
       if (adaptUI2Chart) {
         errorBarAddMenu.add(new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(trace,
             errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
-            errorBarRemoveMenu, erroBarEditMenu)));
+            errorBarRemoveMenu, erroBarEditMenu), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace)));
 
       } else {
         errorBarAddMenu.add(new JMenuItem(new ErrorBarPolicyMultiAction(trace, errorBarPolicy
@@ -2322,7 +2582,7 @@ public final class LayoutFactory {
       if (adaptUI2Chart) {
         errorBarRemoveMenu.add(new PropertyChangeMenuItem(chart, new ErrorBarPolicyMultiAction(
             trace, errorBarPolicy.getClass().getName(), errorBarPolicy, errorBarAddMenu,
-            errorBarRemoveMenu, erroBarEditMenu)));
+            errorBarRemoveMenu, erroBarEditMenu), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace)));
       } else {
         errorBarRemoveMenu.add(new JMenuItem(new ErrorBarPolicyMultiAction(trace, errorBarPolicy
             .getClass().getName(), errorBarPolicy, errorBarAddMenu, errorBarRemoveMenu,
@@ -2357,7 +2617,7 @@ public final class LayoutFactory {
     JMenuItem item;
     JMenu fgColorMenu;
     if (adaptUI2Chart) {
-      fgColorMenu = new PropertyChangeMenu(chart, "Foreground color");
+      fgColorMenu = new PropertyChangeMenu(chart, "Foreground color",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       fgColorMenu = new JMenu("Foreground color");
     }
@@ -2366,7 +2626,7 @@ public final class LayoutFactory {
     nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetForeground(chart,
-          "White", Color.WHITE), selected);
+          "White", Color.WHITE), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new JComponentActionSetForeground(chart,
           "White", Color.WHITE), selected);
@@ -2382,7 +2642,7 @@ public final class LayoutFactory {
     nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetForeground(
-          chartPanel.getChart(), "Gray", Color.GRAY), selected);
+          chartPanel.getChart(), "Gray", Color.GRAY), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new JComponentActionSetForeground(chart,
           "Gray", Color.GRAY), selected);
@@ -2394,7 +2654,8 @@ public final class LayoutFactory {
     nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetForeground(
-          chartPanel.getChart(), "Light gray", Color.LIGHT_GRAY), selected);
+          chartPanel.getChart(), "Light gray", Color.LIGHT_GRAY), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
+      
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new JComponentActionSetForeground(chart,
           "Light gray", Color.LIGHT_GRAY), selected);
@@ -2406,7 +2667,7 @@ public final class LayoutFactory {
     nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new JComponentActionSetForeground(chart,
-          "Black", Color.BLACK), selected);
+          "Black", Color.BLACK), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new JComponentActionSetForeground(chart,
           "Black", Color.BLACK), selected);
@@ -2418,7 +2679,7 @@ public final class LayoutFactory {
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chartPanel.getChart(),
           JComponentActionSetCustomForegroundSingleton.getInstance(chartPanel.getChart(),
-              "Custom Color"), nonStandardColor);
+              "Custom Color"), nonStandardColor,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(JComponentActionSetCustomForegroundSingleton
           .getInstance(chartPanel.getChart(), "Custom Color"), nonStandardColor);
@@ -2449,7 +2710,7 @@ public final class LayoutFactory {
 
     JMenu gridColorMenu;
     if (adaptUI2Chart) {
-      gridColorMenu = new PropertyChangeMenu(chart, "Grid color");
+      gridColorMenu = new PropertyChangeMenu(chart, "Grid color",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       gridColorMenu = new JMenu("Grid color");
     }
@@ -2458,7 +2719,7 @@ public final class LayoutFactory {
     nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new Chart2DActionSetGridColor(chart,
-          "Gray", Color.GRAY), selected);
+          "Gray", Color.GRAY), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetGridColor(chart, "Gray",
           Color.GRAY), selected);
@@ -2470,7 +2731,7 @@ public final class LayoutFactory {
     nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new Chart2DActionSetGridColor(chart,
-          "Light gray", Color.LIGHT_GRAY), selected);
+          "Light gray", Color.LIGHT_GRAY), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetGridColor(chart,
           "Light gray", Color.LIGHT_GRAY), selected);
@@ -2482,7 +2743,7 @@ public final class LayoutFactory {
     nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new Chart2DActionSetGridColor(chart,
-          "Black", Color.BLACK), selected);
+          "Black", Color.BLACK), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetGridColor(chart, "Black",
           Color.BLACK), selected);
@@ -2494,7 +2755,7 @@ public final class LayoutFactory {
     nonStandardColor &= !selected;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new Chart2DActionSetGridColor(chart,
-          "White", Color.WHITE), selected);
+          "White", Color.WHITE), selected,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetGridColor(chart, "White",
           Color.WHITE), selected);
@@ -2504,7 +2765,7 @@ public final class LayoutFactory {
 
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, Chart2DActionSetCustomGridColorSingleton
-          .getInstance(chart, "Custom"), nonStandardColor);
+          .getInstance(chart, "Custom"), nonStandardColor,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(Chart2DActionSetCustomGridColorSingleton
           .getInstance(chart, "Custom"), nonStandardColor);
@@ -2535,12 +2796,12 @@ public final class LayoutFactory {
     JMenuItem item;
     Action action = Chart2DActionSaveEpsSingletonApacheFop.getInstance(chart, "Save eps");
     if (adaptUI2Chart) {
-      result = new PropertyChangeMenu(chart, "Save");
+      result = new PropertyChangeMenu(chart, "Save",BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
       item = new PropertyChangeMenuItem(chart, Chart2DActionSaveImageSingleton.getInstance(chart,
-          "Save image"));
+          "Save image"),BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
       result.add(item);
       if (this.m_showSaveEpsMenu) {
-        item = new PropertyChangeMenuItem(chart, action);
+        item = new PropertyChangeMenuItem(chart, action,BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
       }
     } else {
       result = new JMenu("Save");
@@ -2579,13 +2840,13 @@ public final class LayoutFactory {
     // submenu for trace color
     JMenu colorMenu;
     if (adaptUI2Chart) {
-      colorMenu = new PropertyChangeMenu(chart, "Color");
+      colorMenu = new PropertyChangeMenu(chart, "Color", new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       colorMenu = new JMenu("Color");
     }
     JMenuItem item;
     if (adaptUI2Chart) {
-      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Red", Color.RED));
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Red", Color.RED), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       item = new JMenuItem(new Trace2DActionSetColor(trace, "Red", Color.RED));
     }
@@ -2593,7 +2854,7 @@ public final class LayoutFactory {
 
     if (adaptUI2Chart) {
       item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Green",
-          Color.GREEN));
+          Color.GREEN), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       item = new JMenuItem(new Trace2DActionSetColor(trace, "Green", Color.GREEN));
 
@@ -2601,14 +2862,14 @@ public final class LayoutFactory {
     colorMenu.add(item);
 
     if (adaptUI2Chart) {
-      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Blue", Color.BLUE));
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Blue", Color.BLUE), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       item = new JMenuItem(new Trace2DActionSetColor(trace, "Blue", Color.BLUE));
     }
     colorMenu.add(item);
 
     if (adaptUI2Chart) {
-      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Gray", Color.GRAY));
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Gray", Color.GRAY), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       item = new JMenuItem(new Trace2DActionSetColor(trace, "Gray", Color.GRAY));
     }
@@ -2616,14 +2877,14 @@ public final class LayoutFactory {
 
     if (adaptUI2Chart) {
       item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Magenta",
-          Color.MAGENTA));
+          Color.MAGENTA), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       item = new JMenuItem(new Trace2DActionSetColor(trace, "Magenta", Color.MAGENTA));
     }
     colorMenu.add(item);
 
     if (adaptUI2Chart) {
-      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Pink", Color.PINK));
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Pink", Color.PINK), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       item = new JMenuItem(new Trace2DActionSetColor(trace, "Pink", Color.PINK));
     }
@@ -2631,7 +2892,7 @@ public final class LayoutFactory {
 
     if (adaptUI2Chart) {
       item = new PropertyChangeMenuItem(chart, new Trace2DActionSetColor(trace, "Black",
-          Color.BLACK));
+          Color.BLACK), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       item = new JMenuItem(new Trace2DActionSetColor(trace, "Black", Color.BLACK));
     }
@@ -2639,7 +2900,7 @@ public final class LayoutFactory {
 
     if (adaptUI2Chart) {
       item = new PropertyChangeMenuItem(chart, new Trace2DActionSetCustomColor(trace, "Custom",
-          parent));
+          parent), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       item = new JMenuItem(new Trace2DActionSetCustomColor(trace, "Custom", parent));
     }
@@ -2674,10 +2935,10 @@ public final class LayoutFactory {
     String traceLabel = trace.getLabel();
     TraceJLabel ret = null;
     if (!StringUtil.isEmpty(traceLabel)) {
-      ret = new TraceJLabel(traceLabel);
+      ret = new TraceJLabel(trace);
       JMenuItem item;
       // ret.setSize(new Dimension(20, 100));
-      JPopupMenu popup = new PropertyChangePopupMenu(chart);
+      JPopupMenu popup = new PropertyChangePopupMenu(chart, new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
       // set the initial background color:
       Color background = chart.getBackground();
       ret.setBackground(background);
@@ -2687,7 +2948,7 @@ public final class LayoutFactory {
       if (this.m_showTraceVisibleMenu) {
         if (adaptUI2Chart) {
           item = new PropertyChangeCheckBoxMenuItem(chart, new Trace2DActionSetVisible(trace,
-              "Visible"), trace.isVisible());
+              "Visible"), trace.isVisible(), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
         } else {
           item = new SelectionAdaptJCheckBoxMenuItem(new Trace2DActionSetVisible(trace, "Visible"),
               trace.isVisible());
@@ -2698,7 +2959,7 @@ public final class LayoutFactory {
       // item for setName
       if (this.m_showTraceNameMenu) {
         if (adaptUI2Chart) {
-          item = new PropertyChangeMenuItem(chart, new Trace2DActionSetName(trace, "Name", chart));
+          item = new PropertyChangeMenuItem(chart, new Trace2DActionSetName(trace, "Name", chart), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
         } else {
           item = new JMenuItem(new Trace2DActionSetName(trace, "Name", chart));
         }
@@ -2708,7 +2969,7 @@ public final class LayoutFactory {
       if (this.m_showPhysicalUnitsMenu) {
         if (adaptUI2Chart) {
           item = new PropertyChangeMenuItem(chart, new Trace2DActionSetPhysicalUnits(trace,
-              "Physical Units", chart));
+              "Physical Units", chart), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
         } else {
           item = new JMenuItem(new Trace2DActionSetPhysicalUnits(trace, "Physical Units", chart));
 
@@ -2735,7 +2996,7 @@ public final class LayoutFactory {
 
       if (this.m_showRemoveTraceMenu) {
         if (adaptUI2Chart) {
-          item = new PropertyChangeMenuItem(chart, new Trace2DActionRemove(trace, "Remove"));
+          item = new PropertyChangeMenuItem(chart, new Trace2DActionRemove(trace, "Remove"), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
         } else {
           item = new JMenuItem(new Trace2DActionRemove(trace, "Remove"));
         }
@@ -2751,7 +3012,6 @@ public final class LayoutFactory {
       trace.addPropertyChangeListener(ITrace2D.PROPERTY_COLOR, ret);
       trace.addPropertyChangeListener(ITrace2D.PROPERTY_NAME, ret);
       trace.addPropertyChangeListener(ITrace2D.PROPERTY_PHYSICALUNITS, ret);
-      chart.addPropertyChangeListener(Chart2D.PROPERTY_FONT, ret);
     }
     return ret;
   }
@@ -2791,7 +3051,7 @@ public final class LayoutFactory {
       highlighter = highlighters[i];
       if (adaptUI2Chart) {
         item = new PropertyChangeCheckBoxMenuItem(trace.getRenderer(),
-            new Trace2DActionAddRemoveHighlighter(trace, highlighterNames[i], highlighter), false);
+            new Trace2DActionAddRemoveHighlighter(trace, highlighterNames[i], highlighter), false, new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
       } else {
         item = new SelectionAdaptJCheckBoxMenuItem(new Trace2DActionAddRemoveHighlighter(trace,
             highlighterNames[i], highlighter), false);
@@ -2818,7 +3078,7 @@ public final class LayoutFactory {
   private JMenuItem createTraceHighlighterMenu(final ITrace2D trace, boolean adaptUI2Chart) {
     JMenuItem result;
     if (adaptUI2Chart) {
-      result = new PropertyChangeMenu(trace.getRenderer(), "Highlighting");
+      result = new PropertyChangeMenu(trace.getRenderer(), "Highlighting", new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       result = new JMenu("Highlighting");
     }
@@ -2850,7 +3110,7 @@ public final class LayoutFactory {
     // trace painters
     JMenu painterMenu;
     if (adaptUI2Chart) {
-      painterMenu = new PropertyChangeMenu(chart, "renderer");
+      painterMenu = new PropertyChangeMenu(chart, "renderer", new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       painterMenu = new JMenu("renderer");
     }
@@ -2859,7 +3119,7 @@ public final class LayoutFactory {
     if (adaptUI2Chart) {
       item = new OrderingCheckBoxPropertyChangeMenuItem(chart,
           new Trace2DActionAddRemoveTracePainter(trace, "discs", painter), painterMenu, trace
-              .containsTracePainter(painter));
+              .containsTracePainter(painter), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       item = new OrderingCheckBoxMenuItem(new Trace2DActionAddRemoveTracePainter(trace, "discs",
           painter), painterMenu, trace.containsTracePainter(painter));
@@ -2871,7 +3131,7 @@ public final class LayoutFactory {
     if (adaptUI2Chart) {
       item = new OrderingCheckBoxPropertyChangeMenuItem(chart,
           new Trace2DActionAddRemoveTracePainter(trace, "line", painter), painterMenu, trace
-              .containsTracePainter(painter));
+              .containsTracePainter(painter), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       item = new OrderingCheckBoxMenuItem(new Trace2DActionAddRemoveTracePainter(trace, "line",
           painter), painterMenu, trace.containsTracePainter(painter));
@@ -2882,7 +3142,7 @@ public final class LayoutFactory {
     if (adaptUI2Chart) {
       item = new OrderingCheckBoxPropertyChangeMenuItem(chart,
           new Trace2DActionAddRemoveTracePainter(trace, "fill", painter), painterMenu, trace
-              .containsTracePainter(painter));
+              .containsTracePainter(painter), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       item = new OrderingCheckBoxMenuItem(new Trace2DActionAddRemoveTracePainter(trace, "fill",
           painter), painterMenu, trace.containsTracePainter(painter));
@@ -2894,7 +3154,7 @@ public final class LayoutFactory {
     if (adaptUI2Chart) {
       item = new OrderingCheckBoxPropertyChangeMenuItem(chart,
           new Trace2DActionAddRemoveTracePainter(trace, "bar", painter), painterMenu, trace
-              .containsTracePainter(painter));
+              .containsTracePainter(painter), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       item = new OrderingCheckBoxMenuItem(new Trace2DActionAddRemoveTracePainter(trace, "bar",
           painter), painterMenu, trace.containsTracePainter(painter));
@@ -2927,14 +3187,14 @@ public final class LayoutFactory {
     // strokes
     JMenu strokesMenu;
     if (adaptUI2Chart) {
-      strokesMenu = new PropertyChangeMenu(chart, "Stroke");
+      strokesMenu = new PropertyChangeMenu(chart, "Stroke", new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       strokesMenu = new JMenu("Stroke");
     }
     for (int i = 0; i < this.m_strokes.length; i++) {
       if (adaptUI2Chart) {
         item = new PropertyChangeMenuItem(chart, new Trace2DActionSetStroke(trace,
-            this.m_strokeNames[i], this.m_strokes[i]));
+            this.m_strokeNames[i], this.m_strokes[i]), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
       } else {
         item = new JMenuItem(new Trace2DActionSetStroke(trace, this.m_strokeNames[i],
             this.m_strokes[i]));
@@ -2964,14 +3224,14 @@ public final class LayoutFactory {
     // submenu for zIndex
     JMenu zIndexMenu;
     if (adaptUI2Chart) {
-      zIndexMenu = new PropertyChangeMenu(chart, "layer");
+      zIndexMenu = new PropertyChangeMenu(chart, "layer", new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       zIndexMenu = new JMenu("layer");
     }
 
     if (adaptUI2Chart) {
       item = new PropertyChangeMenuItem(chart, new Trace2DActionSetZindex(trace, "bring to front",
-          0));
+          0), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       item = new JMenuItem(new Trace2DActionSetZindex(trace, "bring to front", 0));
     }
@@ -2979,14 +3239,14 @@ public final class LayoutFactory {
 
     if (adaptUI2Chart) {
       item = new PropertyChangeMenuItem(chart, new Trace2DActionSetZindex(trace, "send to back",
-          ITrace2D.ZINDEX_MAX));
+          ITrace2D.ZINDEX_MAX), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       item = new JMenuItem(new Trace2DActionSetZindex(trace, "send to back", ITrace2D.ZINDEX_MAX));
     }
     zIndexMenu.add(item);
 
     if (adaptUI2Chart) {
-      item = new PropertyChangeMenuItem(chart, new Trace2DActionZindexDecrease(trace, "forward", 2));
+      item = new PropertyChangeMenuItem(chart, new Trace2DActionZindexDecrease(trace, "forward", 2), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       item = new JMenuItem(new Trace2DActionZindexDecrease(trace, "forward", 2));
     }
@@ -2994,7 +3254,7 @@ public final class LayoutFactory {
 
     if (adaptUI2Chart) {
       item = new PropertyChangeMenuItem(chart, new Trace2DActionZindexIncrease(trace, "backwards",
-          2));
+          2), new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(trace));
     } else {
       item = new JMenuItem(new Trace2DActionZindexIncrease(trace, "backwards", 2));
     }

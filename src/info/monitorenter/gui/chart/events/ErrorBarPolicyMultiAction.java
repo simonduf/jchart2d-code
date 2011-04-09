@@ -25,6 +25,7 @@ package info.monitorenter.gui.chart.events;
 import info.monitorenter.gui.chart.IErrorBarPolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.controls.LayoutFactory;
+import info.monitorenter.gui.chart.controls.LayoutFactory.BasicPropertyAdaptSupport;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -146,9 +147,9 @@ public final class ErrorBarPolicyMultiAction extends ATrace2DActionErrorBarPolic
       // add a new JMenuItem to the remove menu and to the edit menu:
       if (item instanceof LayoutFactory.PropertyChangeMenuItem) {
         removeItem = new LayoutFactory.PropertyChangeMenuItem(
-            ((LayoutFactory.PropertyChangeMenuItem) item).getUIAdaptee(), this);
+            ((LayoutFactory.PropertyChangeMenuItem) item).getUIAdaptee(), this, new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(this.m_trace));
         editItem = new LayoutFactory.PropertyChangeMenuItem(
-            ((LayoutFactory.PropertyChangeMenuItem) item).getUIAdaptee(), this);
+            ((LayoutFactory.PropertyChangeMenuItem) item).getUIAdaptee(), this, new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(this.m_trace));
       } else {
         removeItem = new JMenuItem(this);
         editItem = new JMenuItem(this);
@@ -171,7 +172,7 @@ public final class ErrorBarPolicyMultiAction extends ATrace2DActionErrorBarPolic
       JMenuItem addItem;
       if (item instanceof LayoutFactory.PropertyChangeMenuItem) {
         addItem = new LayoutFactory.PropertyChangeMenuItem(
-            ((LayoutFactory.PropertyChangeMenuItem) item).getUIAdaptee(), this);
+            ((LayoutFactory.PropertyChangeMenuItem) item).getUIAdaptee(), this, new BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped(this.m_trace));
       } else {
         addItem = new JMenuItem(this);
       }
