@@ -424,6 +424,10 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
     for (final MouseListener mouseListener2 : mouseListeners) {
       this.removeMouseListener(mouseListener2);
     }
+    /*
+     * Omitting this should not hinder the label from being garbage-collectable as I assume 
+     * the traces removed will not be stored in the application for later use. But it's clean to do this: 
+     */
     owner.removePropertyChangeListener(ITrace2D.PROPERTY_COLOR, listenerLabel);
     owner.removePropertyChangeListener(ITrace2D.PROPERTY_NAME, listenerLabel);
     owner.removePropertyChangeListener(ITrace2D.PROPERTY_PHYSICALUNITS, listenerLabel);
