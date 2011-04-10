@@ -49,88 +49,87 @@ import junit.framework.TestSuite;
  **/
 public class TestErrorBarsVisual extends ATestChartOperations {
 
-	/**
-	 * Constructor with the test name.
-	 * <p>
-	 * 
-	 * @param arg0
-	 *            the name of the test.
-	 */
-	public TestErrorBarsVisual(final String arg0) {
-		super(arg0);
+  /**
+   * Constructor with the test name.
+   * <p>
+   * 
+   * @param arg0
+   *          the name of the test.
+   */
+  public TestErrorBarsVisual(final String arg0) {
+    super(arg0);
 
-	}
+  }
 
-	/**
-	 * Uses <code>{@link ErrorBarPolicyAbsoluteSummation}</code> and prompts for
-	 * visual judgment.
-	 * <p>
-	 */
-	public void testErrorBarPolicyAbsoluteSummation() {
-		ATestChartOperations.AChartOperation operation = new AChartOperation(
+  /**
+   * Uses <code>{@link ErrorBarPolicyAbsoluteSummation}</code> and prompts for
+   * visual judgment.
+   * <p>
+   */
+  public void testErrorBarPolicyAbsoluteSummation() {
+    ATestChartOperations.AChartOperation operation = new AChartOperation(
 
-		ErrorBarPolicyAbsoluteSummation.class.getName()) {
-			/**
-			 * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
-			 */
-			public Object action(final Chart2D chart) {
-				// nop
-				return null;
-			}
+    "Sets ErrorBarPolicyAbsoluteSummation(0.00001, 10)") {
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
+      public Object action(final Chart2D chart) {
 
-			/**
-			 * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#createChartInstance()
-			 */
-			@Override
-			public Chart2D createChartInstance() {
+        // Create error bar policy and assign it:
+        IErrorBarPolicy< ? > errorBarPolicy = new ErrorBarPolicyAbsoluteSummation(0.00001, 10);// new_err);
+        errorBarPolicy.setShowNegativeYErrors(true);
+        errorBarPolicy.setShowPositiveYErrors(true);
+        errorBarPolicy.setShowNegativeXErrors(true);
+        errorBarPolicy.setShowPositiveXErrors(true);
+        // configure how error bars are rendered with an error bar
+        // painter:
+        IErrorBarPainter errorBarPainter = new ErrorBarPainter();
+        errorBarPainter.setEndPointPainter(new PointPainterDisc());
+        // errorBarPainter.setStartPointPainter(new PointPainterDisc());
+        errorBarPainter.setEndPointColor(Color.GREEN);
+        errorBarPainter.setConnectionPainter(new PointPainterLine());
+        errorBarPainter.setConnectionColor(Color.GREEN);
+        // add the painter to the policy
+        errorBarPolicy.setErrorBarPainter(errorBarPainter);
+        // add the policy to the trace:
+        chart.getTraces().first().setErrorBarPolicy(errorBarPolicy);
+        return null;
+      }
 
-				Chart2D result = new Chart2D();
-				return result;
-			}
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#createChartInstance()
+       */
+      @Override
+      public Chart2D createChartInstance() {
 
-			@Override
-			public ITrace2D[] createTraces() {
-				ITrace2D trace = new Trace2DSimple();
+        Chart2D result = new Chart2D();
+        return result;
+      }
 
-				// Create error bar policy and assign it:
-				IErrorBarPolicy<?> errorBarPolicy = new ErrorBarPolicyAbsoluteSummation(
-						0.00001, 1);// new_err);
-				errorBarPolicy.setShowNegativeYErrors(true);
-				errorBarPolicy.setShowPositiveYErrors(true);
-				errorBarPolicy.setShowNegativeXErrors(true);
-				errorBarPolicy.setShowPositiveXErrors(true);
-				// configure how error bars are rendered with an error bar
-				// painter:
-				IErrorBarPainter errorBarPainter = new ErrorBarPainter();
-				errorBarPainter.setEndPointPainter(new PointPainterDisc());
-				// errorBarPainter.setStartPointPainter(new PointPainterDisc());
-				errorBarPainter.setEndPointColor(Color.GREEN);
-				errorBarPainter.setConnectionPainter(new PointPainterLine());
-				errorBarPainter.setConnectionColor(Color.GREEN);
-				// add the painter to the policy
-				errorBarPolicy.setErrorBarPainter(errorBarPainter);
-				// add the policy to the trace:
-				trace.setErrorBarPolicy(errorBarPolicy);
+   
 
-				return new ITrace2D[] { trace };
-			}
-		};
-		this.setTestOperation(operation);
-	}
+      @Override
+      public ITrace2D[] createTraces() {
+        ITrace2D trace = new Trace2DSimple();
 
-	/**
-	 * Test suite for this test class.
-	 * <p>
-	 * 
-	 * @return the test suite
-	 */
-	public static Test suite() {
+        return new ITrace2D[] {trace };
+      }
+    };
+    this.setTestOperation(operation);
+  }
 
-		TestSuite suite = new TestSuite();
-		suite.setName(TestErrorBarsVisual.class.getName());
-		suite.addTest(new TestErrorBarsVisual(
-				"testErrorBarPolicyAbsoluteSummation"));
-		return suite;
-	}
+  /**
+   * Test suite for this test class.
+   * <p>
+   * 
+   * @return the test suite
+   */
+  public static Test suite() {
+
+    TestSuite suite = new TestSuite();
+    suite.setName(TestErrorBarsVisual.class.getName());
+    suite.addTest(new TestErrorBarsVisual("testErrorBarPolicyAbsoluteSummation"));
+    return suite;
+  }
 
 }

@@ -90,7 +90,7 @@ public class TestChartPanel extends TestCase {
 
 		suite.addTest(new TestChartPanel("testNoTraces"));
 		suite.addTest(new TestChartPanel("testManyTraces"));
-		suite.addTest(new TestChartPanel("testMemoryLeak"));
+		suite.addTest(new TestChartPanel("testMemoryLeakAddRemoveTrace"));
 
 		return suite;
 	}
