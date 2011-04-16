@@ -38,7 +38,7 @@ o API change that requires refactoring.
   Note that refactoring of protected code intended for library 
   internal details will not be listed.
 
-jchart2d-3.2.1 - <month>, <day>, <year>
+jchart2d-3.2.1 - April, 16th, 2011
 
 ! Added context menu entry for enabling/disabling antialiasing. 
 ! Added various context menu entries for setting label formatters to axes.
