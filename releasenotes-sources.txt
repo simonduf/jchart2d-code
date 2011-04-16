@@ -1,4 +1,4 @@
-The sources in form of an eclipse 3.5 project. 
+The sources in form of an eclipse 3.6 project. 
 
 Usage: 
  1) Dowload the desired version. 
