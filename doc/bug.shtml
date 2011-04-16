@@ -19,7 +19,7 @@
        JChart2D was not tested with all operating systems, different virtual 
        machine implementations and API use-cases. Even if I think that it runs quite stable, 
        you may discover a bug. <br>
-       If you do so, report it! Almost every new shipment of cpdetector and other projects 
+       If you do so, report it! Almost every new shipment of JChart2D and other projects 
        by me were triggered by bug reports. 
        Most often within a day or a delay to the next weekend. I made less than 10 shipments 
        for three projects.  
@@ -44,7 +44,7 @@
       <p>
        I found this statement in a newsgroup. 
         The 
-       <a target="_blank" href="http://www.opensource.org/licenses/lgpl-license.php">LGPL</a> 
+       <a target="_blank" href="http://www.opensource.org/licenses/lgpl-2.1.php">LGPL</a> 
        indeed imposes restrictions if you modify the source of this library (that modified library 
        then has to be free and under LGPL). But why would someone do that? To fix a bug or add 
        a feature. If the library itself is only used by an application the LGPL does not affect 

@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-  var update="12/02/2011";
+  var update="16/04/2011";
  </script>
  <body id="usage">
   <div id="wrapper">
@@ -24,7 +24,7 @@
      <p>
       Before you start you might want to take a look at JChart2D's realtime performance. 
       This may be done on the <a href="./applet.shtml">applet</a> page or by downloading the 
-      binary jar file, let's say <em>jchart2d-3.2.0.jar</em>
+      binary jar file, let's say <em>jchart2d-3.2.1.jar</em>
       <ol>
        <li>
        Download the file to a directory &lt;dir&gt;. 
@@ -34,7 +34,7 @@
        <li>
        Ensure, you have a java runtime environment installed. On your command window 
        type <em>"java"</em>. If unsuccessful you should download and install the Java Runtime Environment 
-       from <a target="_blank" href="http://java.sun.com/j2se/1.5.0/download.jsp">http://java.sun.com/j2se/1.5.0/download.jsp</a>. 
+       from <a target="_blank" href="https://cds.sun.com/is-bin/INTERSHOP.enfinity/WFS/CDS-CDS_Developer-Site/en_US/-/USD/ViewProductDetail-Start?ProductRef=jre-6u24-oth-JPR@CDS-CDS_Developer">https://cds.sun.com/is-bin/INTERSHOP.enfinity/WFS/CDS-CDS_Developer-Site/en_US/-/USD/ViewProductDetail-Start?ProductRef=jre-6u24-oth-JPR@CDS-CDS_Developer</a>. 
        If you don't want to start developing in Java, the <em>JRE</em> link on that page is sufficient. 
        After this procedure reopen the command window and type <em>"java"</em> again. It should 
        work. If not set the bin subdirectory of the JRE installations 
@@ -47,7 +47,7 @@
      <p>
       Now go to &lt;dir&gt; via the "cd" command and type. 
       <blockquote>
-       java -jar jchart2d-3.2.0.jar 
+       java -jar jchart2d-3.2.1.jar 
       </blockquote>
       The showcase example chart starts. 
      </p>
@@ -61,7 +61,7 @@
      <p>
       Another example with multithreaded traces may be viewed by typing: 
       <blockquote>
-       java -cp jchart2d-3.2.0.jar info.monitorenter.gui.chart.demos.MultiTracing
+       java -cp jchart2d-3.2.1.jar info.monitorenter.gui.chart.demos.MultiTracing
       </blockquote>
       You may resize the window and see how the scaling takes advantage of more space. 
       The command looks different to the first. This is because the first command tells 
@@ -74,11 +74,11 @@
      binary distribution zip file in the class path of the java process. <br/>
      For Windows type:  
      <blockquote>
-       java -cp jchart2d-3.2.0.jar;xmlgraphics-commons-1.3.1.jar;jide-oss-2.9.7.jar info.monitorenter.gui.chart.demos.MultiTracing
+       java -cp jchart2d-3.2.1.jar;xmlgraphics-commons-1.3.1.jar;jide-oss-2.9.7.jar info.monitorenter.gui.chart.demos.MultiTracing
      </blockquote> 
      For Linux type: 
      <blockquote>
-       java -cp jchart2d-3.2.0.jar:jxmlgraphics-commons-1.3.1.jar:jide-oss-2.9.7.jar info.monitorenter.gui.chart.demos.MultiTracing
+       java -cp jchart2d-3.2.1.jar:jxmlgraphics-commons-1.3.1.jar:jide-oss-2.9.7.jar info.monitorenter.gui.chart.demos.MultiTracing
      </blockquote> 
      </p>
      
@@ -170,7 +170,7 @@
       For playing around with the demo code provided I recommend to use an IDE like 
       <a href="http://eclipse.org" target="_blank">eclipse</a>. Download the binary distribution 
       in form of a jar file here: 
-      <a href="http://prdownloads.sourceforge.net/jchart2d/jchart2d-3.2.0.jar?download" target="_blank">jchart2d-3.2.0.jar</a>. 
+      <a href="http://prdownloads.sourceforge.net/jchart2d/jchart2d-3.2.1.jar?download" target="_blank">jchart2d-3.2.1.jar</a>. 
       Put this jar file into the classpath of your IDE. Under eclipse this is done by copying 
       the file in your eclipse workspace/&lt;projectname&gt; directory and then choosing: 
       <PRE>

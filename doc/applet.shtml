@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-  var update="02/06/2010";
+  var update="016/04/2011";
  </script>
  <body id="applet">
   <div id="wrapper">
@@ -32,7 +32,7 @@
        chosen. The sliders allow values that should cause a high cpu load or weird labeling. 
        This is intended and allows to experiment with the effect of configuration and to 
        find good settings. The sourcecode may be viewed through the 
-       <a target="_blank" href="http://jchart2d.cvs.sourceforge.net/jchart2d/jchart2d/src/info/monitorenter/gui/chart/demos/Showcase.java?view=markup">cvs web-access</a> 
+       <a target="_blank" href="http://jchart2d.git.sourceforge.net/git/gitweb.cgi?p=jchart2d/jchart2d;a=blob;f=src/info/monitorenter/gui/chart/demos/Showcase.java;h=6d76615f306b69565129cb9a1309283b7400b54a;hb=HEAD">git browse</a> 
        of sourceforge. 
       </p>
       <p> 
@@ -41,7 +41,7 @@
         you will be able to see many other important applets (e.g. http://www.map24.de is a killer app for 
         your browser). <br>
         Download and install the Java Runtime Environment (includes the plugin): 
-        <a target="_blank" href="http://java.sun.com/j2se/1.4.2/download.html">Download J2SE JRE </a>. 
+        <a target="_blank" href="https://cds.sun.com/is-bin/INTERSHOP.enfinity/WFS/CDS-CDS_Developer-Site/en_US/-/USD/ViewProductDetail-Start?ProductRef=jre-6u24-oth-JPR@CDS-CDS_Developer">Download J2SE JRE </a>. 
         Choose the <b>JRE</b> which is smaller, the SDK is only needed for developers. 
        
        </applet>
