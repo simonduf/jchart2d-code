@@ -75,7 +75,6 @@ jchart2d-3.2.1 - April, 16th, 2011
 * Fixed unreported issue: Trying to add points from a separate thread before a trace is added to a chart runs into silent deadlock preventing the chart from 
   becoming visible / reactive. 
 * Fixed possible deadlock when launching many threads at startup while ChartPanel is used (Container.getTreelock() issue in addTrace of Chart2D). 
-* Fixed possible deadlock when adding many traces at startup and paint of Chart2D is already invoked before finish of adding all traces. 
 * Fixed bug #3164863: LabelFormatter does not chooses femto range for very small values ( < 10^-16).
 * Fixed unreported bug: ChartPanel looses trace labels when setting a new axis. 
 * Wiped out duplicate property change events for basic awt properties "font", "background" and "foreground" of Chart2D.
