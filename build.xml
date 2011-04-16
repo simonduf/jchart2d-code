@@ -105,7 +105,7 @@
 		</antcall>
 	</target>
 
-	<target name="dist" depends="makejarBinary">
+	<target name="dist" depends="makejarBinary,makejarApplet,makezipEclipseProject,zip.javadoc">
 		<description>Creates a zip file containing the core jar file and all 3rd party libraries.</description>
 		<delete dir="${distfolder}">
 		</delete>
@@ -126,6 +126,7 @@
 			<fileset dir="${distfolder}">
 			</fileset>
 		</zip>
+		<delete dir="${distfolder}"/>
 	</target>
 
 	<target name="makejarBinary" depends="makejarFat">
@@ -246,7 +247,7 @@
 				<method access="public" name="**" />
 			</keep>
 		</proguard>
-		<!--
+	    <!--
 		<genkey alias="jchart2.sourceforge.net" storepass="password" keystore="${basedir}/.keystore" >
 		  <dname>
 		    <param name="CN" value="Achim Westermann"/>
@@ -263,7 +264,9 @@
 
 	<!-- Dependency only for ensuring validity -->
 	<target name="makezipEclipseProject" depends="build">
-		<zip destfile="${project.name}-eclipse-project-${project.version}.zip" basedir="${basedir}/.." update="false">
+		<property name="sourcezip" value="${project.name}-eclipse-project-${project.version}.zip"/>
+	    <delete file="${basedir}/${sourcezip}"/>
+		<zip destfile="${sourcezip}" basedir="${basedir}/.." update="false">
 			<include name="${project.name}/src/**/*.java" />
 			<include name="${project.name}/ext/**/*.jar" />
 			<include name="${project.name}/.classpath" />
