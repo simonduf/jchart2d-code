@@ -55,6 +55,7 @@ public class TestRingBufferArrayFast
     suite.addTest(new TestRingBufferArrayFast("testIteratorL2F"));
     suite.addTest(new TestRingBufferArrayFast("testSetBufferSize"));
     suite.addTest(new TestRingBufferArrayFast("testSize"));
+    suite.addTest(new TestRingBufferArrayFast("testHashCode"));
 
     return suite;
   }
@@ -281,6 +282,21 @@ public class TestRingBufferArrayFast
     Assert.assertEquals(1, it.next().intValue());
     Assert.assertEquals(2, it.next().intValue());
     Assert.assertFalse(it.hasNext());
+  }
+  
+  /**
+   * Test method for
+   * {@link info.monitorenter.util.collections.RingBufferArrayFast#hashCode()}.
+   * <p>
+   */
+  public void testHashCode() {
+    final IRingBuffer<Integer> buffer1 = new RingBufferArrayFast<Integer>(4);
+    for (int i = 0; i < 2; i++) {
+      buffer1.add(Integer.valueOf(i));
+    }
+    final IRingBuffer<Integer> buffer2 = buffer1;
+    buffer1.add(Integer.valueOf(3));
+    Assert.assertEquals("Hashcode is different.", buffer1.hashCode(), buffer2.hashCode());
   }
 
   /**
