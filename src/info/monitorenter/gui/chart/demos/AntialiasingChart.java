@@ -112,7 +112,7 @@ public class AntialiasingChart extends JFrame {
         }
 
         try {
-          Thread.sleep(40);
+          Thread.sleep(20);
         } catch (InterruptedException e) {
           // nop
         }

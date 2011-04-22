@@ -47,7 +47,7 @@ import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -830,7 +830,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
      * <p>
      */
     public PointHighlighter() {
-      this.m_previousHighlighted = new HashMap<ITrace2D, ITracePoint2D>();
+      this.m_previousHighlighted = new IdentityHashMap<ITrace2D, ITracePoint2D>();
       Chart2D.this.addPropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, this);
 
     }
@@ -963,8 +963,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
 
     /**
      * Attaches highlighters of the trace of the point next to the cursor and
-     * removes highlighters (potentially if they are exclusive) from the
-     * previous highlighted point.
+     * removes highlighters from the previous highlighted point.
      * <p>
      * 
      * TODO: Peek at getToolTipText invocations: Save operations in case the
@@ -977,7 +976,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       ITracePoint2D point = Chart2D.this.getPointFinder().getNearestPoint(e, Chart2D.this);
       // don't work on empty charts:
       if (point != null) {
-        if ((this.m_previousHighlighted == null) || (!point.equals(this.m_previousHighlighted))) {
+        ITracePoint2D previousHighlightedPoint = this.m_previousHighlighted.get(point.getListener());
+        if (!point.equals(previousHighlightedPoint)) {
           ITrace2D trace = point.getListener();
           // avoid duplicate or no highlighting in concurrent paint situation.
           synchronized (this) {
@@ -988,7 +988,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
               Chart2D.this.setRequestedRepaint(true);
             }
           }
-        }
+        } 
       }
     }
 

@@ -9,11 +9,6 @@
  * Copyright (c) 2002 - 2011 Achim Westermann
  */
 
-#####################################################################################
-#
-# @deprecated: THIS file is deprecated and replaces by the file readme-binaries.txt!
-#
-#####################################################################################
 Quick intro
 
 Use this library for integration of charts into your Java application. 
@@ -42,6 +37,10 @@ Legend:
 o API change that requires refactoring. 
   Note that refactoring of protected code intended for library 
   internal details will not be listed.
+  
+jchart2d-3.2.1 - month, day, year
+  
+* Fixed bug #3289727: Dynamic chart with highlighting does not clear points.
 
 jchart2d-3.2.1 - April, 16th, 2011
 

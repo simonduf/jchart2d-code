@@ -52,31 +52,8 @@
     
     <h2>Latest News</h2>
      <p>
-      The news are exported as a weekly cronjob, so it might take a day before changes 
-      are reflected.<br>
-      Last retrieval:  <!--#flastmod file="./projnews.cache" -->.
+      Please find the latest news here: <a target="_blank" href="https://sourceforge.net/news/?group_id=50440">https://sourceforge.net/news/index.php?group_id=50440</a>
      </p>
-     <div id="news" CLASS="wrapper">
-      <!--#include virtual="./projnews.cache" -->
-     </p>
-
-     
-    </div>
-    <!-- A short script to bend the links from the imported news -->
-    <script language="javascript">
-     function newsLinkTargets(){
-      var links = document.links;
-      for(var i=links.length-1;i>=0;i--){
-      	if(links[i].hostname.indexOf("jchart2d")==-1){
-      	 if(links[i].protocol == "http:"){
-          //window.alert("Bending link: "+links[i]+" with hostname: "+links[i].hostname+" and protocol: "+links[i].protocol);
-      	  links[i].target="_blank";
-      	 }
-      	}
-      }
-     }
-     window.setTimeout("newsLinkTargets()",2000);
-    </script>
     <!-- End of contents div -->
    </div>
     <!--#include virtual="./footer.shtml" -->

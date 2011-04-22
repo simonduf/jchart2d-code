@@ -287,6 +287,7 @@
 	</target>
 
 	<target name="javadoc" depends="delete.doc">
+		<delete dir="${basedir}/doc/docs/javadoc"/>
 		<mkdir dir="${basedir}/doc/docs/javadoc" />
 		<javadoc destdir="${basedir}/doc/docs/javadoc" access="protected" use="false" notree="false" nonavbar="false" noindex="false" splitindex="true" Author="true" version="true" nodeprecatedlist="false" nodeprecated="false" doctitle="JChart2D API documentation, Version ${project.version}" windowtitle="JChart2D API documentation, Version ${project.version}" Verbose="true" stylesheetfile="${basedir}/doc/docs/javadoc/jchart2d.css" charset="UTF-8" docencoding="UTF-8">
 			<classpath refid="classpath" />
