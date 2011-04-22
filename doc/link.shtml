@@ -99,6 +99,21 @@
 <h2>Software using JChart2D</h2>
 
 <table border="0">
+
+	<tr>
+		<td id="box"><a href="http://www.asemon.se/screenshots.html" rel="_blank">AseMon</a></td>
+		<td>Performance Monitor for Sybase ASE</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td id="box"><a href="http://autsys.tkk.fi/nutdac/" rel="_blank">NutDAC</a></td>
+		<td>NutDAC, a framework for creating generic real time data acquisition and control applications for embedded systems.</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
 	<tr>
 		<td id="box"><a href="http://bluetiger.bauchlandung.org/other/annea/" rel="_blank">Training of an MLP(Thomas Unterthiner)</a></td>
 		<td>Thomas Unterthiner used JChart2d in an applet for comparing different training algorithms for a Multi Layer Perceptron (neural network).</td>

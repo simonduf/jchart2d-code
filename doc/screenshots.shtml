@@ -29,6 +29,18 @@
 		<td>&nbsp;</td>
 	</tr>
 
+	<tr>
+		<td>&nbsp;</td>
+		<td><img src="./img/pp16-gui.w2000.png" width="1031px" height="600px"
+			alt="NutDAC,  a framework for creating generic real time data acquisition and control applications for embedded systems (http://autsys.tkk.fi/nutdac/)" /><br>
+		<br>
+		<font size="2">NutDAC,  a framework for creating generic real time data acquisition and control applications for embedded systems (<a target="_blank"href="http://autsys.tkk.fi/nutdac/">http://autsys.tkk.fi/nutdac/</a>)</font></td>
+		<td>&nbsp;</td>
+	</tr>
+
+	<tr id="vspacer">
+		<td colspan="3">&nbsp;</td>
+	</tr>
 
 	<tr>
 		<td>&nbsp;</td>
