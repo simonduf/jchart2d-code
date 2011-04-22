@@ -24,6 +24,9 @@ package info.monitorenter.gui.chart.axis;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxisLabelFormatter;
+import info.monitorenter.gui.chart.IAxisScalePolicy;
+import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyAutomaticBestFit;
+import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.math.MathUtil;
 
@@ -42,11 +45,14 @@ public class AxisLinear extends AAxis {
   private static final long serialVersionUID = 4725336592625669661L;
 
   /**
-   * Defcon.
+   * Creates an instance that uses a {@link LabelFormatterSimple} for formatting
+   * numbers and a {@link AxisScalePolicyAutomaticBestFit} for controlling the
+   * scale.
    * <p>
+   * 
    */
   public AxisLinear() {
-    // nop
+    this(new LabelFormatterSimple(), new AxisScalePolicyAutomaticBestFit());
   }
 
   /**
@@ -56,9 +62,11 @@ public class AxisLinear extends AAxis {
    * @param formatter
    *          needed for formatting labels of this axis.
    * 
+   * @param scalePolicy
+   *          controls the ticks/labels and their distance.
    */
-  public AxisLinear(final IAxisLabelFormatter formatter) {
-    super(formatter);
+  public AxisLinear(final IAxisLabelFormatter formatter, final IAxisScalePolicy scalePolicy) {
+    super(formatter, scalePolicy);
   }
 
   /**

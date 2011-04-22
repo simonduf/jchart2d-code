@@ -23,7 +23,9 @@
 package info.monitorenter.gui.chart.axis;
 
 import info.monitorenter.gui.chart.IAxisLabelFormatter;
+import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyAutomaticBestFit;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 
 import java.util.Iterator;
@@ -56,12 +58,12 @@ public class AxisLogE extends AAxisTransformation {
 
   /**
    * Creates an instance that uses a {@link LabelFormatterSimple} for formatting
-   * numbers.
-   * <p>
+   * numbers and a {@link AxisScalePolicyAutomaticBestFit} for controlling the scale.
+   * <p> 
    * 
    */
   public AxisLogE() {
-    super(new LabelFormatterSimple());
+    this(new LabelFormatterSimple(), new AxisScalePolicyAutomaticBestFit());
   }
 
   /**
@@ -72,9 +74,11 @@ public class AxisLogE extends AAxisTransformation {
    * @param formatter
    *          needed for formatting labels of this axis.
    * 
+   * @param scalePolicy
+   *          controls the ticks/labels and their distance.
    */
-  public AxisLogE(final IAxisLabelFormatter formatter) {
-    super(formatter);
+  public AxisLogE(final IAxisLabelFormatter formatter, final IAxisScalePolicy scalePolicy) {
+    super(formatter, scalePolicy);
   }
 
   /**
