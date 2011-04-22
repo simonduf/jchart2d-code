@@ -830,6 +830,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
      * <p>
      */
     public PointHighlighter() {
+      /*
+       * Need an identity hash map as the trace keys will change upon points added thus making them 
+       * "unfindable" in a map based on hashcode!
+       */
       this.m_previousHighlighted = new IdentityHashMap<ITrace2D, ITracePoint2D>();
       Chart2D.this.addPropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, this);
       Chart2D.this.addPropertyChangeListener(Chart2D.PROPERTY_ADD_REMOVE_TRACE,this);
