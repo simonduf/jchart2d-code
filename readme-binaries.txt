@@ -41,6 +41,7 @@ o API change that requires refactoring.
 jchart2d-3.2.1 - month, day, year
   
 * Fixed bug #3289727: Dynamic chart with highlighting does not clear points.
+* Fixed potential memory leak in case traces with highlighting enabled are removed. 
 
 jchart2d-3.2.1 - April, 16th, 2011
 
