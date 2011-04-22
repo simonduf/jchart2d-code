@@ -832,6 +832,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     public PointHighlighter() {
       this.m_previousHighlighted = new IdentityHashMap<ITrace2D, ITracePoint2D>();
       Chart2D.this.addPropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, this);
+      Chart2D.this.addPropertyChangeListener(Chart2D.PROPERTY_ADD_REMOVE_TRACE,this);
 
     }
 
@@ -1001,6 +1002,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
      * in order to re-attach the proper point highlighters to the highlighted
      * points.
      * <p>
+     * Also a hook is installed for <code>{@link Chart2D#PROPERTY_ADD_REMOVE_TRACE}</code> to clear 
+     * out a reference to a highlighted trace to make it garbage-collectable in case the trace is removed.<p>
      * 
      * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
      * @see ITrace2D#addPointHighlighter(IPointPainter)
@@ -1040,6 +1043,12 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
                     + evt
                     + ". You only have to fire this event, if a point highlighter was addded or removed.");
           }
+        }
+      } else if (Chart2D.PROPERTY_ADD_REMOVE_TRACE.equals(property)){
+        ITrace2D oldTrace2d = (ITrace2D)evt.getOldValue();
+        if(evt.getNewValue() == null) {
+          // trace was removed, so remove my potential reference: 
+          this.m_previousHighlighted.remove(oldTrace2d);
         }
       } else {
         throw new RuntimeException("Programming error: " + this.getClass().getName()
