@@ -102,11 +102,11 @@ public class AxisLogE extends AAxisTransformation {
   @Override
   protected double transform(final double in) {
     double toTransform = in;
-    // Starting from 1 downwards the transformation of this value becomes
-    // negative,
-    // lim -> 0 becomes Double.NEGATIVE_INFINITY, which
-    // causes the "while(true)" 100 % load effect.
-    // So everything is disallowed below 1.0.
+    /*
+     * Starting from 1 downwards the transformation of this value becomes
+     * negative, lim -> 0 becomes Double.NEGATIVE_INFINITY, which causes the
+     * "while(true)" 100 % load effect. So everything is disallowed below 1.0.
+     */
     if (toTransform < 1) {
       // allow to transform the input for empty traces or all traces with empty
       // points:
