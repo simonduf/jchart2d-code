@@ -161,6 +161,8 @@ public interface IAxis extends Serializable {
      * </table>
      * <p>
      * 
+     * 
+     * 
      * @param propertyName
      *          the property to be informed about changes.
      * @param listener
@@ -367,10 +369,21 @@ public interface IAxis extends Serializable {
    * Use this constant to register a {@link java.beans.PropertyChangeListener}
    * with the <code>IAxis</code>.
    * <p>
-   * See the class description for property change events fired.
+   * See {@link #addPropertyChangeListener(String, PropertyChangeListener)}  for property change events fired.
    */
   public static final String PROPERTY_ADD_REMOVE_TRACE = "IAxis.PROPERTY_ADD_REMOVE_TRACE";
 
+  /**
+   * The bean property <code>constant</code> identifying a change of the
+   * axis scale policy. 
+   * <p>
+   * Use this constant to register a {@link java.beans.PropertyChangeListener}
+   * with the <code>IAxis</code>.
+   * <p>
+   * See {@link #addPropertyChangeListener(String, PropertyChangeListener)} for property change events fired.
+   */
+  public static final String PROPERTY_AXIS_SCALE_POLICY_CHANGED = "IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED";
+  
   /**
    * Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the
    * <code>{@link IAxisTitlePainter}</code>.
@@ -440,6 +453,12 @@ public interface IAxis extends Serializable {
    * <td><code>{@link IAxisLabelFormatter}</code>, the old value or null if
    * there was no formatter before.</td>
    * <td><code>{@link IAxisLabelFormatter}</code>, the new value.</td>
+   * </tr>
+   * <tr>
+   * <td><code>{@link IAxis#PROPERTY_AXIS_SCALE_POLICY_CHANGED}</code></td>
+   * <td><code>{@link IAxis}</code> that changed</td>
+   * <td><code>{@link IAxisScalePolicy}</code>, the old value.</td>
+   * <td><code>{@link IAxisScalePolicy}</code>, the new value.</td>
    * </tr>
    * </table>
    * <p>

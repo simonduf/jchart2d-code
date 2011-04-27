@@ -216,11 +216,9 @@ import javax.swing.Timer;
  * <td>{@link ITrace2D}</td>
  * <td>{@link ITrace2D}</td>
  * <td>
- * 	If a change of the traces occurs. 
- * 	If the old value is null a new trace has been added. 
- *  If the new value is null, oldvalue trace has been removed.
- *  If both are null this is a bug. 	
- * </td>
+ * If a change of the traces occurs. If the old value is null a new trace has
+ * been added. If the new value is null, oldvalue trace has been removed. If
+ * both are null this is a bug.</td>
  * </tr>
  * <tr>
  * <td>{@link #PROPERTY_PAINTLABELS}</td>
@@ -662,6 +660,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * <p>
    */
   public static final String PROPERTY_ADD_REMOVE_TRACE = IAxis.PROPERTY_ADD_REMOVE_TRACE;
+
   /**
    * The bean property <code>constant</code> identifying a change of the paint
    * labels flag.
@@ -1317,7 +1316,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @param yAxis
    *          the y axis responsible for the scale of this trace - it has to be
    *          contained in this chart or an exception will be thrown.
-   *          
+   * 
    * @see IAxis#PROPERTY_ADD_REMOVE_TRACE
    */
   public final void addTrace(final ITrace2D points, final IAxis xAxis, final IAxis yAxis) {
@@ -2719,6 +2718,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     axis.addPropertyChangeListener(IAxis.PROPERTY_LABELFORMATTER, this);
     axis.addPropertyChangeListener(IAxis.PROPERTY_PAINTGRID, this);
     axis.addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, this);
+    axis.addPropertyChangeListener(IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED, this);
   }
 
   /**
@@ -3282,18 +3282,20 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
          * seldom. Huge work non-l&f performance improvement.
          */
       } else if (property.equals(ITrace2D.PROPERTY_COLOR)) {
-        // nop
+        // repaint
       } else if (property.equals(IAxis.PROPERTY_LABELFORMATTER)) {
         /*
          * TODO: Maybe only repaint the axis? Much complicated work vs.
          * occassional user interaction.
          */
       } else if (property.equals(IAxis.PROPERTY_ADD_REMOVE_TRACE)) {
-    	 /*
-    	  * Relay the event as outsiders don't want to deal with internals (listen to axes to be informed whenever a trace was added). 
-    	  * Also:  repaint definetely!
-    	  */
-    	  this.firePropertyChange(IAxis.PROPERTY_ADD_REMOVE_TRACE, evt.getOldValue(), evt.getNewValue());
+        /*
+         * Relay the event as outsiders don't want to deal with internals
+         * (listen to axes to be informed whenever a trace was added). Also:
+         * repaint definetely!
+         */
+        this.firePropertyChange(IAxis.PROPERTY_ADD_REMOVE_TRACE, evt.getOldValue(), evt
+            .getNewValue());
       } else if (property.equals(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED)) {
         int highlightersAddedOrRemoved = 0;
         if (evt.getOldValue() != null) {
@@ -3304,6 +3306,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         }
 
         this.trackHighlightingEnablement(highlightersAddedOrRemoved);
+      } else if (property.equals(IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED)) {
+        // repaint
+      } else {
+        throw new IllegalStateException("Received a property change event \"" + property
+            + "\" the code is not expecting (programming error).");
       }
       this.setRequestedRepaint(true);
     }
@@ -3906,7 +3913,6 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     return old;
   }
 
-
   /**
    * Set the grid color to use.
    * <p>
@@ -4263,6 +4269,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     removedAxis.removePropertyChangeListener(IAxis.PROPERTY_LABELFORMATTER, this);
     removedAxis.removePropertyChangeListener(IAxis.PROPERTY_PAINTGRID, this);
     removedAxis.removePropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, this);
+    removedAxis.removePropertyChangeListener(IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED, this);
   }
 
   /**

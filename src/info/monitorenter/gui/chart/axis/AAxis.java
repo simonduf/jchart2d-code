@@ -50,7 +50,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
@@ -92,6 +91,8 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     // TODO Event management for update painting
     IAxisScalePolicy result = this.m_axisScalePolicy;
     this.m_axisScalePolicy = axisScalePolicy;
+    this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this, IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED, result, this.m_axisScalePolicy));
+    
     return result;
   }
 
@@ -1784,7 +1785,8 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * <p>
    * 
    * @return the range corresponding to the upper and lower bound of the values
-   *         that will be displayable on this Axis of the Chart2D.
+   *         that will be visible on this Axis of the Chart2D.
+   *         
    * @see #setRangePolicy(IRangePolicy)
    */
   public final Range getRange() {
