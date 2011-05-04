@@ -85,14 +85,18 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
+   * The default used is <code>{@link AxisScalePolicyAutomaticBestFit}</code>.
+   * <p>
+   * 
    * @see info.monitorenter.gui.chart.IAxis#setAxisScalePolicy(info.monitorenter.gui.chart.IAxisScalePolicy)
    */
   public IAxisScalePolicy setAxisScalePolicy(final IAxisScalePolicy axisScalePolicy) {
     // TODO Event management for update painting
     IAxisScalePolicy result = this.m_axisScalePolicy;
     this.m_axisScalePolicy = axisScalePolicy;
-    this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this, IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED, result, this.m_axisScalePolicy));
-    
+    this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this,
+        IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED, result, this.m_axisScalePolicy));
+
     return result;
   }
 
@@ -1786,7 +1790,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * 
    * @return the range corresponding to the upper and lower bound of the values
    *         that will be visible on this Axis of the Chart2D.
-   *         
+   * 
    * @see #setRangePolicy(IRangePolicy)
    */
   public final Range getRange() {
