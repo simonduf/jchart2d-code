@@ -27,15 +27,59 @@
 package info.monitorenter.gui.chart.axis.scalepolicy;
 
 import info.monitorenter.gui.chart.IAxis;
+import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.LabeledValue;
 import info.monitorenter.gui.chart.axis.AAxis;
+import info.monitorenter.gui.chart.labelformatters.LabelFormatterNumber;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.math.MathUtil;
 
 import java.awt.Graphics;
 import java.util.LinkedList;
 import java.util.List;
+
+/**
+ * Scale policy implementation that ensures the following:
+ * <ul>
+ * <li>No label will overwrite the following label.</li>
+ * <li>No two labels will have the same value.</li>
+ * <li>Every tick will exactly show the value without rounding errors.</li>
+ * <li>Always the closest next possible tick is chosen regardless whether it is
+ * a major tick or a minor tick (subject to change in favor of major ticks)</li>
+ * </ul>
+ * <p>
+ * 
+ * While this strategy is quite comfortable and prevents visual oddities there
+ * are some consequences to it:
+ * 
+ * <ul>
+ * <li>Major ticks are not guaranteed to be shown. This is because a label of a
+ * minor tick label may need so much space that the following major tick has to
+ * be skipped (subject to change)</li>
+ * <li>Detailed control is not easy. E.g. if you want to enforce more ticks to
+ * show up you could:
+ * <ul>
+ * <li>Set an {@link LabelFormatterNumber} via
+ * {@link IAxis#setFormatter(IAxisLabelFormatter)} that formats little to no
+ * digits. But this could have both effects: More labels as the labels take less
+ * space or less labels as the value range is so little that an increased
+ * formatted value is possible only little times within that range.</li>
+ * <li>Choose major and minor ticks via
+ * {@link IAxis#setMinorTickSpacing(double)} and
+ * {@link IAxis#setMajorTickSpacing(double)}</li>
+ * </ul>
+ * </li>
+ * <li>Performance is not the best. This is because the space for a label has to
+ * be computed and pixels have to be transformed from and to the value domain.</li>
+ * </ul>
+ * <p>
+ * 
+ * 
+ * 
+ * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+ * 
+ */
 
 public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
   /**
@@ -49,8 +93,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
     final double max = Math.max(labelspacepx, formattingspace);
     return this.getLabels(max, axis);
   }
-  
-  
+
   /**
    * @see info.monitorenter.gui.chart.IAxisScalePolicy#initPaintIteration(info.monitorenter.gui.chart.IAxis)
    */
@@ -80,9 +123,8 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
       tmpPower = 1 / Math.pow(10, tmpPower);
     }
     this.m_power = tmpPower;
-    
-  }
 
+  }
 
   /**
    * Returns the labels for this axis.
@@ -94,7 +136,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
    * @param resolution
    *          the distance in the value domain of the chart that has to be at
    *          least between to labels.
-   *          
+   * 
    * @return the labels for the axis.
    */
   protected List<LabeledValue> getLabels(final double resolution, final IAxis axis) {
@@ -107,7 +149,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
       String oldLabelName = "";
       LabeledValue label;
       final double range = max - min;
-      final double tickResolution = this.roundToTicks(resolution, false, false,axis).getValue();
+      final double tickResolution = this.roundToTicks(resolution, false, false, axis).getValue();
       double value = Math.ceil(min / tickResolution) * tickResolution;
       // This was value before the patch that prevents the labels from jumping:
       // It's benefit was that the first label was not this
@@ -128,14 +170,14 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
             System.out.println("constant Label " + labelName);
           }
         }
-        label = this.roundToTicks(value, false, !firstMajorFound && axis.isStartMajorTick(),axis);
+        label = this.roundToTicks(value, false, !firstMajorFound && axis.isStartMajorTick(), axis);
 
         oldLabelName = labelName;
         labelName = label.getLabel();
         value = label.getValue();
 
         loopStop++;
-        if (firstMajorFound || !axis.isStartMajorTick()|| label.isMajorTick()) {
+        if (firstMajorFound || !axis.isStartMajorTick() || label.isMajorTick()) {
           firstMajorFound = true;
           if ((value <= max) && (value >= min)) {
             collect.add(label);
@@ -160,7 +202,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
     }
     return collect;
   }
-  
+
   /**
    * Internal rounding routine.
    * <p>
@@ -184,7 +226,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
       final boolean findMajorTick, final IAxis axis) {
     final LabeledValue ret = new LabeledValue();
 
-    final double minorTick = axis.getMinorTickSpacing()* this.m_power;
+    final double minorTick = axis.getMinorTickSpacing() * this.m_power;
     final double majorTick = axis.getMajorTickSpacing() * this.m_power;
 
     double majorRound;
@@ -233,6 +275,5 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
     ret.setValue(axis.getFormatter().parse(ret.getLabel()).doubleValue());
     return ret;
   }
-
 
 }
