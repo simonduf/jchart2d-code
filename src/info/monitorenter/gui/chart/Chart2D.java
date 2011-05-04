@@ -849,6 +849,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
      * 
      * @return true if a change took place.
      */
+    @SuppressWarnings("synthetic-access")
     public boolean setActive(boolean onoff) {
       boolean result = false;
       boolean isEnabled = Chart2D.this.isEnabledPointHighlighting();
