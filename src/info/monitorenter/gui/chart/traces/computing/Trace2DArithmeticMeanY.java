@@ -33,8 +33,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * A trace that accumulates the latest n y values added to a single point with
+ * A trace that accumulates the latest n y values added to points with
  * the arithmetic mean y value and the latest x value.
+ * <p>
+ * 
+ * This trace will not reduce the amount of n points added to one carrying the arithmetic mean but 
+ * always add a point that has the average of the recent added n points.
  * <p>
  * 
  * Please note that this trace scan be used in two modes:
@@ -56,7 +60,6 @@ import java.util.List;
  * 
  * @version $Revision: 1.4 $
  * 
- * @since 7.0.0
  * 
  */
 public class Trace2DArithmeticMeanY extends ATrace2D {

@@ -33,8 +33,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * A trace that accumulates the latest n points added to a single point with the
+ * A trace that accumulates the latest n points added to points with the
  * arithmetic mean value.
+ * <p>
+ * 
+ * This trace will not reduce the amount of n points added to one carrying the arithmetic mean but 
+ * always add a point that has the average of the recent added n points.
  * <p>
  * 
  * Please note that this trace scan be used in two modes:
