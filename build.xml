@@ -265,6 +265,7 @@
 	<target name="makezipEclipseProject" depends="build">
 		<zip destfile="${project.name}-eclipse-project-${project.version}.zip" basedir="${basedir}/.." update="false">
 			<include name="${project.name}/src/**/*.java" />
+			<include name="${project.name}/test/**/*.java" />
 			<include name="${project.name}/ext/**/*.jar" />
 			<include name="${project.name}/.classpath" />
 			<include name="${project.name}/.project" />
