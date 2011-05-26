@@ -39,7 +39,7 @@ import javax.swing.JPanel;
  * Title: MinimalStaticChart
  * <p>
  * 
- * Description: A minimal example for rendering a static chart.
+ * Description: A minimal example for rendering a static chart with a discontinuation by adding NaN.
  * <p>
  * 
  * @author Achim Westermann
