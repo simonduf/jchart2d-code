@@ -38,10 +38,11 @@ o API change that requires refactoring.
   Note that refactoring of protected code intended for library 
   internal details will not be listed.
   
-jchart2d-3.2.1 - month, day, year
+jchart2d-3.2.2 - month, day, year
   
 * Fixed bug #3289727: Dynamic chart with highlighting does not clear points.
 * Fixed potential memory leak in case traces with highlighting enabled are removed. 
+* Fixed bug #3308052: test sources missing from 3.2.1 source file download tree.
 
 jchart2d-3.2.1 - April, 16th, 2011
 
