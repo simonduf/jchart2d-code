@@ -40,38 +40,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Scale policy implementation that ensures the following:
+ * Very basic and fast scale policy implementation that ensures the following:
  * <ul>
- * <li>No label will overwrite the following label.</li>
- * <li>No two labels will have the same value.</li>
- * <li>Every tick will exactly show the value without rounding errors.</li>
- * <li>Always the closest next possible tick is chosen regardless whether it is
- * a major tick or a minor tick (subject to change in favor of major ticks)</li>
- * </ul>
- * <p>
- * 
- * While this strategy is quite comfortable and prevents visual oddities there
- * are some consequences to it:
- * 
- * <ul>
- * <li>Major ticks are not guaranteed to be shown. This is because a label of a
- * minor tick label may need so much space that the following major tick has to
- * be skipped (subject to change)</li>
- * <li>Detailed control is not easy. E.g. if you want to enforce more ticks to
- * show up you could:
- * <ul>
- * <li>Set an {@link LabelFormatterNumber} via
- * {@link IAxis#setFormatter(IAxisLabelFormatter)} that formats little to no
- * digits. But this could have both effects: More labels as the labels take less
- * space or less labels as the value range is so little that an increased
- * formatted value is possible only little times within that range.</li>
- * <li>Choose major and minor ticks via
- * {@link IAxis#setMinorTickSpacing(double)} and
- * {@link IAxis#setMajorTickSpacing(double)}</li>
- * </ul>
- * </li>
- * <li>Performance is not the best. This is because the space for a label has to
- * be computed and pixels have to be transformed from and to the value domain.</li>
+ * <li>Every scale tick is a minor or major tick of the corresponding axis.</li>
+ * <li>If a scale tick was found that matches a major and a minor tick it is judged as major tick.</li>
+ * <li>Every major tick is a multiple of minor ticks: It is not possible for the sum minor ticks to "skip" a major tick.</li>
+ * <li>There is no guarantee that the labels of ticks will overwrite each others.</li>
+ * <li>There is no guarantee that the major and minor ticks of the axis are chosen in a reasonable manner: You could get no labels at all if the values are too high or thousands of labels with a weird output.</li>
  * </ul>
  * <p>
  * 
@@ -91,7 +66,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
     final double labelspacepx = axis.getAccessor().getMinimumValueDistanceForLabels(g2d);
     final double formattingspace = axis.getFormatter().getMinimumValueShiftForChange();
     final double max = Math.max(labelspacepx, formattingspace);
-    return this.getLabels(max, axis);
+    return this.getLabels(axis);
   }
 
   /**
@@ -139,9 +114,12 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
    * 
    * @return the labels for the axis.
    */
-  protected List<LabeledValue> getLabels(final double resolution, final IAxis axis) {
+  protected List<LabeledValue> getLabels( final IAxis axis) {
     final List<LabeledValue> collect = new LinkedList<LabeledValue>();
-    if (resolution > 0) {
+    double minorTickSpacing= axis.getMinorTickSpacing();
+    double majorTickSpacing= axis.getMajorTickSpacing();
+    
+    if (minorTickSpacing > 0) {
 
       final Range domain = axis.getRange();
       final double min = domain.getMin();
@@ -149,12 +127,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
       String oldLabelName = "";
       LabeledValue label;
       final double range = max - min;
-      final double tickResolution = this.roundToTicks(resolution, false, false, axis).getValue();
-      double value = Math.ceil(min / tickResolution) * tickResolution;
-      // This was value before the patch that prevents the labels from jumping:
-      // It's benefit was that the first label was not this
-      // far from the start of data (in case startMajorTicks of axis is true):
-      // double value = min;
+      double value = this.roundToTicks(min, false, false, axis).getValue();
       String labelName = "start";
       int loopStop = 0;
       boolean firstMajorFound = false;
@@ -191,7 +164,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
             }
           }
         }
-        value += resolution;
+        value += minorTickSpacing;
       }
       final int stop = collect.size();
 
