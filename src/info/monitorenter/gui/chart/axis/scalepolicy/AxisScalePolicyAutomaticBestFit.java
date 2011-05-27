@@ -66,7 +66,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
     final double labelspacepx = axis.getAccessor().getMinimumValueDistanceForLabels(g2d);
     final double formattingspace = axis.getFormatter().getMinimumValueShiftForChange();
     final double max = Math.max(labelspacepx, formattingspace);
-    return this.getLabels(axis);
+    return this.getLabels(max, axis);
   }
 
   /**
@@ -114,12 +114,9 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
    * 
    * @return the labels for the axis.
    */
-  protected List<LabeledValue> getLabels( final IAxis axis) {
+  protected List<LabeledValue> getLabels(final double resolution, final IAxis axis) {
     final List<LabeledValue> collect = new LinkedList<LabeledValue>();
-    double minorTickSpacing= axis.getMinorTickSpacing();
-    double majorTickSpacing= axis.getMajorTickSpacing();
-    
-    if (minorTickSpacing > 0) {
+    if (resolution > 0) {
 
       final Range domain = axis.getRange();
       final double min = domain.getMin();
@@ -127,7 +124,12 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
       String oldLabelName = "";
       LabeledValue label;
       final double range = max - min;
-      double value = this.roundToTicks(min, false, false, axis).getValue();
+      final double tickResolution = this.roundToTicks(resolution, false, false, axis).getValue();
+      double value = Math.ceil(min / tickResolution) * tickResolution;
+      // This was value before the patch that prevents the labels from jumping:
+      // It's benefit was that the first label was not this
+      // far from the start of data (in case startMajorTicks of axis is true):
+      // double value = min;
       String labelName = "start";
       int loopStop = 0;
       boolean firstMajorFound = false;
@@ -164,7 +166,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
             }
           }
         }
-        value += minorTickSpacing;
+        value += resolution;
       }
       final int stop = collect.size();
 
@@ -247,6 +249,6 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
     // point the label string describes.
     ret.setValue(axis.getFormatter().parse(ret.getLabel()).doubleValue());
     return ret;
-  }
+  } 
 
 }

@@ -3268,13 +3268,14 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         System.out.println("Chart2D.propertyChange, " + evt.getPropertyName() + " ("
             + Thread.currentThread().getName() + "), 1 lock");
       }
+      // TODO: use the property change reactor idiom also used in AAxis for performance. 
       String property = evt.getPropertyName();
       if (property.equals(IRangePolicy.PROPERTY_RANGE)) {
-        // nop
+        // repaint
       } else if (property.equals(IRangePolicy.PROPERTY_RANGE_MAX)) {
-        // nop
+        // repaint
       } else if (property.equals(IRangePolicy.PROPERTY_RANGE_MIN)) {
-        // nop
+        // repaint
       } else if (property.equals(ITrace2D.PROPERTY_STROKE)) {
         /*
          * TODO: perhaps react more fine grained for the following events: just
@@ -3305,9 +3306,12 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         if (evt.getNewValue() != null) {
           highlightersAddedOrRemoved++;
         }
-
         this.trackHighlightingEnablement(highlightersAddedOrRemoved);
       } else if (property.equals(IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED)) {
+        // repaint
+      } else if (property.equals(IAxis.PROPERTY_PAINTGRID)) {
+        // repaint
+      } else if (property.equals(IAxis.PROPERTY_RANGEPOLICY)) {
         // repaint
       } else {
         throw new IllegalStateException("Received a property change event \"" + property
