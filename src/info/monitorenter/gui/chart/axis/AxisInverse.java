@@ -25,13 +25,16 @@
 package info.monitorenter.gui.chart.axis;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.IAxisLabelFormatter;
+import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.LabeledValue;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.math.MathUtil;
 
+import java.awt.Graphics;
 import java.util.Iterator;
 import java.util.List;
 
@@ -234,9 +237,12 @@ public class AxisInverse extends AAxis {
    * @param formatter
    *          needed for formatting labels of this axis.
    * 
+   * @param scalePolicy
+   *          controls the ticks/labels and their distance.
+   * 
    */
-  public AxisInverse(final IAxisLabelFormatter formatter) {
-    super(formatter);
+  public AxisInverse(final IAxisLabelFormatter formatter, final IAxisScalePolicy scalePolicy) {
+    super(formatter, scalePolicy);
   }
 
   /**
@@ -268,26 +274,26 @@ public class AxisInverse extends AAxis {
   }
 
   /**
-   * Returns the labels for this axis.
-   * <p>
-   * The labels will have at least the given argument <code>resolution</code> as
-   * distance in the value domain of the chart.
-   * <p>
-   * 
-   * @param resolution
-   *          the distance in the value domain of the chart that has to be at
-   *          least between to labels.
-   * 
-   * @return the labels for this axis.
+   * @see info.monitorenter.gui.chart.axis.AAxis#setAxisScalePolicy(info.monitorenter.gui.chart.IAxisScalePolicy)
    */
   @Override
-  protected List<LabeledValue> getLabels(final double resolution) {
+  public IAxisScalePolicy setAxisScalePolicy(final IAxisScalePolicy axisScalePolicy) {
+    return super.setAxisScalePolicy(new IAxisScalePolicy() {
 
-    List<LabeledValue> ret = super.getLabels(resolution);
-    for (LabeledValue label : ret) {
-      label.setValue(1.0 - label.getValue());
-    }
-    return ret;
+      public void initPaintIteration(IAxis axis) {
+        axisScalePolicy.initPaintIteration(axis);
+
+      }
+
+      public List<LabeledValue> getScaleValues(Graphics g2d, IAxis axis) {
+
+        List<LabeledValue> ret = axisScalePolicy.getScaleValues(g2d, axis);
+        for (LabeledValue label : ret) {
+          label.setValue(1.0 - label.getValue());
+        }
+        return ret;
+      }
+    });
   }
 
   /**

@@ -26,6 +26,7 @@ package info.monitorenter.gui.chart.axis;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxisLabelFormatter;
+import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.util.Range;
@@ -273,9 +274,12 @@ public abstract class AAxisTransformation extends AAxis {
    * 
    * @param formatter
    *          needed for formatting labels of this axis.
+   * 
+   * @param scalePolicy
+   *          controls the ticks/labels and their distance.
    */
-  public AAxisTransformation(final IAxisLabelFormatter formatter) {
-    super(formatter);
+  public AAxisTransformation(final IAxisLabelFormatter formatter, final IAxisScalePolicy scalePolicy) {
+    super(formatter, scalePolicy);
   }
 
   /**

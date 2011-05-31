@@ -40,6 +40,8 @@ o API change that requires refactoring.
   
 jchart2d-3.2.2 - month, day, year
   
+! New AxisScalePolicyManualTicks for controlling the ticks by hand. 
+! Extended IAxis to have pluggable scale policies. See IAxis.setAxisScalePolicy(IAxisScalePolicy). 
 * Fixed bug #3289727: Dynamic chart with highlighting does not clear points.
 * Fixed potential memory leak in case traces with highlighting enabled are removed. 
 * Fixed bug #3308052: test sources missing from 3.2.1 source file download tree.

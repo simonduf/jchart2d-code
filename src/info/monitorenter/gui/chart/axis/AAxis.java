@@ -25,12 +25,14 @@ package info.monitorenter.gui.chart.axis;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.IAxisLabelFormatter;
+import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.IAxisTickPainter;
 import info.monitorenter.gui.chart.IAxisTitlePainter;
 import info.monitorenter.gui.chart.IRangePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.LabeledValue;
+import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyAutomaticBestFit;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterAutoUnits;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyUnbounded;
@@ -48,7 +50,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
@@ -70,6 +71,34 @@ import java.util.TreeSet;
  * @version $Revision: 1.61 $
  */
 public abstract class AAxis implements IAxis, PropertyChangeListener {
+
+  /**
+   * Used for finding ticks with labels and controlling their value / distance.
+   */
+  private IAxisScalePolicy m_axisScalePolicy;
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#getAxisScalePolicy()
+   */
+  public IAxisScalePolicy getAxisScalePolicy() {
+    return this.m_axisScalePolicy;
+  }
+
+  /**
+   * The default used is <code>{@link AxisScalePolicyAutomaticBestFit}</code>.
+   * <p>
+   * 
+   * @see info.monitorenter.gui.chart.IAxis#setAxisScalePolicy(info.monitorenter.gui.chart.IAxisScalePolicy)
+   */
+  public IAxisScalePolicy setAxisScalePolicy(final IAxisScalePolicy axisScalePolicy) {
+    // TODO Event management for update painting
+    IAxisScalePolicy result = this.m_axisScalePolicy;
+    this.m_axisScalePolicy = axisScalePolicy;
+    this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this,
+        IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED, result, this.m_axisScalePolicy));
+
+    return result;
+  }
 
   /**
    * An internal connector class that will connect the axis to the a Chart2D.
@@ -177,7 +206,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * @return the minimum amount of increase in the value that will be needed
      *         to display all labels without overwriting each others.
      */
-    protected abstract double getMinimumValueDistanceForLabels(final Graphics g2d);
+    public abstract double getMinimumValueDistanceForLabels(final Graphics g2d);
 
     /**
      * Returns the min value of the given trace according to the dimension the
@@ -535,7 +564,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMinimumValueDistanceForLabels(java.awt.Graphics)
      */
     @Override
-    protected final double getMinimumValueDistanceForLabels(final Graphics g2d) {
+    public final double getMinimumValueDistanceForLabels(final Graphics g2d) {
 
       double result;
       final Dimension d = this.m_chart.getSize();
@@ -775,7 +804,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMinimumValueDistanceForLabels(Graphics)
      */
     @Override
-    protected final double getMinimumValueDistanceForLabels(final Graphics g2d) {
+    public final double getMinimumValueDistanceForLabels(final Graphics g2d) {
 
       double result;
       final Dimension d = this.m_chart.getSize();
@@ -939,7 +968,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /** Debugging flag for sysouts. */
-  private static final boolean DEBUG = false;
+  public static final boolean DEBUG = false;
 
   /**
    * Internal fast access to the right property change code encapsulation via
@@ -969,9 +998,9 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     AAxis.propertyReactors.put(ITrace2D.PROPERTY_ZINDEX, repaintReactor);
     AAxis.propertyReactors.put(IAxis.PROPERTY_LABELFORMATTER, repaintReactor);
     AAxis.propertyReactors.put(IAxisLabelFormatter.PROPERTY_FORMATCHANGE, repaintReactor);
-    AAxis.propertyReactors.put(IAxis.AxisTitle.PROPERTY_TITLEFONT, repaintReactor);
-    AAxis.propertyReactors.put(IAxis.AxisTitle.PROPERTY_TITLE, repaintReactor);
-    AAxis.propertyReactors.put(IAxis.AxisTitle.PROPERTY_TITLEPAINTER, repaintReactor);
+    AAxis.propertyReactors.put(AxisTitle.PROPERTY_TITLEFONT, repaintReactor);
+    AAxis.propertyReactors.put(AxisTitle.PROPERTY_TITLE, repaintReactor);
+    AAxis.propertyReactors.put(AxisTitle.PROPERTY_TITLEPAINTER, repaintReactor);
     AAxis.propertyReactors.put(ITrace2D.PROPERTY_MAX_X, new APropertyChangeReactorSynced() {
 
       /**
@@ -1253,11 +1282,6 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   /** The top y pixel coordinate of this axis. */
   private int m_pixelYTop;
 
-  /**
-   * Internally used for rounding to ticks, calculated once per paint iteration.
-   */
-  protected double m_power;
-
   /** Support for acting as a property change event producer for listeners. */
   private final PropertyChangeSupport m_propertyChangeSupport;
 
@@ -1303,7 +1327,8 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * <p>
    */
   public AAxis() {
-    this(new LabelFormatterAutoUnits(new LabelFormatterSimple()));
+    this(new LabelFormatterAutoUnits(new LabelFormatterSimple()),
+        new AxisScalePolicyAutomaticBestFit());
   }
 
   /**
@@ -1312,12 +1337,16 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * 
    * @param formatter
    *          needed for formatting labels of this axis.
+   * 
+   * @param scalePolicy
+   *          controls the ticks/labels and their distance.
    */
-  public AAxis(final IAxisLabelFormatter formatter) {
+  public AAxis(final IAxisLabelFormatter formatter, final IAxisScalePolicy scalePolicy) {
     this.m_propertyChangeSupport = new PropertyChangeSupport(this);
     this.setAxisTitle(new AxisTitle(null));
     this.m_rangePolicy = new RangePolicyUnbounded(Range.RANGE_UNBOUNDED);
     this.setFormatter(formatter);
+    this.setAxisScalePolicy(scalePolicy);
   }
 
   /**
@@ -1502,9 +1531,6 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     if (this.m_pixelYTop != other.m_pixelYTop) {
       return false;
     }
-    if (Double.doubleToLongBits(this.m_power) != Double.doubleToLongBits(other.m_power)) {
-      return false;
-    }
     if (this.m_propertyChangeSupport == null) {
       if (other.m_propertyChangeSupport != null) {
         return false;
@@ -1674,82 +1700,6 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Returns the labels for this axis.
-   * <p>
-   * The labels will have at least the given argument <code>resolution</code> as
-   * distance in the value domain of the chart.
-   * <p>
-   * 
-   * @param resolution
-   *          the distance in the value domain of the chart that has to be at
-   *          least between to labels.
-   * @return the labels for this axis.
-   */
-  protected List<LabeledValue> getLabels(final double resolution) {
-    final List<LabeledValue> collect = new LinkedList<LabeledValue>();
-    if (resolution > 0) {
-
-      final Range domain = this.getRange();
-      final double min = domain.getMin();
-      final double max = domain.getMax();
-      String oldLabelName = "";
-      LabeledValue label;
-      final double range = max - min;
-      final double tickResolution = this.roundToTicks(resolution, false, false).getValue();
-      double value = Math.ceil(min / tickResolution) * tickResolution;
-      // This was value before the patch that prevents the labels from jumping:
-      // It's benefit was that the first label was not this
-      // far from the start of data (in case startMajorTicks of axis is true):
-      // double value = min;
-      String labelName = "start";
-      int loopStop = 0;
-      boolean firstMajorFound = false;
-      // first tick, manual init
-      while ((value <= max) && (loopStop < 100)) {
-        if (loopStop == 99) {
-          if (AAxis.DEBUG) {
-            System.out.println(this.m_accessor.toString() + " axis: loop to high");
-          }
-        }
-        if (oldLabelName.equals(labelName)) {
-          if (AAxis.DEBUG) {
-            System.out.println("constant Label " + labelName);
-          }
-        }
-        label = this.roundToTicks(value, false, !firstMajorFound && this.m_startMajorTick);
-
-        oldLabelName = labelName;
-        labelName = label.getLabel();
-        value = label.getValue();
-
-        loopStop++;
-        if (firstMajorFound || !this.m_startMajorTick || label.isMajorTick()) {
-          firstMajorFound = true;
-          if ((value <= max) && (value >= min)) {
-            collect.add(label);
-          } else if (value > max) {
-            if (AAxis.DEBUG) {
-              System.out.println("Dropping label (too high) : (" + label + ")[max: " + max + "]");
-            }
-          } else if (value < min) {
-            if (AAxis.DEBUG) {
-              System.out.println("Dropping label (too low) : (" + label + ")[min: " + min + "]");
-            }
-          }
-        }
-        value += resolution;
-      }
-      final int stop = collect.size();
-
-      for (int i = 0; i < stop; i++) {
-        label = collect.get(i);
-        label.setValue((label.getValue() - min) / range);
-      }
-    }
-    return collect;
-  }
-
-  /**
    * @see info.monitorenter.gui.chart.IAxis#getMajorTickSpacing()
    */
   public double getMajorTickSpacing() {
@@ -1839,7 +1789,8 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * <p>
    * 
    * @return the range corresponding to the upper and lower bound of the values
-   *         that will be displayable on this Axis of the Chart2D.
+   *         that will be visible on this Axis of the Chart2D.
+   * 
    * @see #setRangePolicy(IRangePolicy)
    */
   public final Range getRange() {
@@ -1862,16 +1813,6 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   public IRangePolicy getRangePolicy() {
 
     return this.m_rangePolicy;
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IAxis#getScaleValues(java.awt.Graphics)
-   */
-  public List<LabeledValue> getScaleValues(final Graphics g2d) {
-    final double labelspacepx = this.m_accessor.getMinimumValueDistanceForLabels(g2d);
-    final double formattingspace = this.m_formatter.getMinimumValueShiftForChange();
-    final double max = Math.max(labelspacepx, formattingspace);
-    return this.getLabels(max);
   }
 
   /**
@@ -1961,8 +1902,6 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     result = prime * result + this.m_pixelXRight;
     result = prime * result + this.m_pixelYBottom;
     result = prime * result + this.m_pixelYTop;
-    temp = Double.doubleToLongBits(this.m_power);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
     result = prime * result
         + ((this.m_propertyChangeSupport == null) ? 0 : this.m_propertyChangeSupport.hashCode());
     result = prime * result + ((this.m_rangePolicy == null) ? 0 : this.m_rangePolicy.hashCode());
@@ -2000,34 +1939,10 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    */
   public void initPaintIteration() {
 
-    // get the powers of ten of the range, a minor Tick of 1.0 has to be
-    // able to be 100 times in a range of 100 (match 1,2,3,... instead of
-    // 10,20,30,....
-    final double range = this.getMax() - this.getMin();
-    double computeRange = range;
-    if ((range == 0) || !MathUtil.isDouble(range)) {
-      computeRange = 1;
-    }
-    double tmpPower = 0;
-    if (computeRange > 1) {
-      while (computeRange > 50) {
-        computeRange /= 10;
-        tmpPower++;
-      }
-      tmpPower = Math.pow(10, tmpPower - 1);
-
-    } else {
-      while (computeRange < 5) {
-        computeRange *= 10;
-        tmpPower++;
-      }
-
-      tmpPower = 1 / Math.pow(10, tmpPower);
-    }
-    this.m_power = tmpPower;
     // This is needed e.g. for LabelFormatterAutoUnits to choose the unit
     // according to the actual range of this paint iteration.
     this.m_formatter.initPaintIteration();
+    this.m_axisScalePolicy.initPaintIteration(this);
   }
 
   /**
@@ -2195,7 +2110,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     if (this.isPaintScale()) {
       final IAxisTickPainter tickPainter = chart.getAxisTickPainter();
       tmp = 0;
-      final List<LabeledValue> labels = this.getScaleValues(g2d);
+      final List<LabeledValue> labels = this.m_axisScalePolicy.getScaleValues(g2d, this);
 
       for (final LabeledValue label : labels) {
         tmp = xAxisStart + (int) (label.getValue() * rangexPx);
@@ -2248,7 +2163,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
       tmp = 0;
       final IAxisTickPainter tickPainter = chart.getAxisTickPainter();
       final int majorTickLength = tickPainter.getMajorTickLength();
-      final List<LabeledValue> labels = this.getScaleValues(g2d);
+      final List<LabeledValue> labels = this.m_axisScalePolicy.getScaleValues(g2d, this);
       for (final LabeledValue label : labels) {
         tmp = xAxisStart + (int) (label.getValue() * rangexPx);
         // 2nd boolean false -> is not bottom axis (top):
@@ -2298,7 +2213,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     if (this.isPaintScale()) {
       final IAxisTickPainter tickPainter = chart.getAxisTickPainter();
       final int majorTickLength = tickPainter.getMajorTickLength();
-      final List<LabeledValue> labels = this.getScaleValues(g2d);
+      final List<LabeledValue> labels = this.m_axisScalePolicy.getScaleValues(g2d, this);
       for (final LabeledValue label : labels) {
         tmp = yAxisStart - (int) (label.getValue() * rangeyPx);
 
@@ -2350,7 +2265,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     if (this.isPaintScale()) {
       // then for y- angle.
       final IAxisTickPainter tickPainter = chart.getAxisTickPainter();
-      final List<LabeledValue> labels = this.getScaleValues(g2d);
+      final List<LabeledValue> labels = this.m_axisScalePolicy.getScaleValues(g2d, this);
       final int tickWidth = tickPainter.getMajorTickLength() + 4;
       for (final LabeledValue label : labels) {
         tmp = yAxisStart - (int) (label.getValue() * rangeyPx);
@@ -2478,93 +2393,6 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Internal rounding routine.
-   * <p>
-   * Arguments are not chosen to be "understandable" or "usable" but optimized
-   * for performance.
-   * <p>
-   * The <code> findMajorTick</code> argument may be used e.g. to force labels
-   * to start from a major tick.
-   * <p>
-   * 
-   * @param value
-   *          the value to round.
-   * @param floor
-   *          if true, rounding goes to floor else to ceiling.
-   * @param findMajorTick
-   *          if true the returned value will be a major tick (which might be
-   *          fare more away from the given value than the next major tick).
-   * @return the value rounded to minor or major ticks.
-   */
-  protected LabeledValue roundToTicks(final double value, final boolean floor,
-      final boolean findMajorTick) {
-    final LabeledValue ret = new LabeledValue();
-
-    final double minorTick = this.m_minorTickSpacing * this.m_power;
-    final double majorTick = this.m_majorTickSpacing * this.m_power;
-
-    double majorRound;
-
-    if (floor) {
-      majorRound = Math.floor(value / majorTick);
-    } else {
-      majorRound = Math.ceil(value / majorTick);
-    }
-    final boolean majorZeroHit = (majorRound == 0) && (value != 0);
-    majorRound *= majorTick;
-    double minorRound;
-    if (floor) {
-      minorRound = Math.floor(value / minorTick);
-    } else {
-      minorRound = Math.ceil(value / minorTick);
-    }
-    final boolean minorZeroHit = (minorRound == 0) && (value != 0);
-    minorRound *= minorTick;
-    if (majorZeroHit || minorZeroHit) {
-      if (AAxis.DEBUG) {
-        System.out.println("zeroHit");
-      }
-    }
-
-    final double minorDistance = Math.abs(value - minorRound);
-    final double majorDistance = Math.abs(value - majorRound);
-
-    double majorMinorRelation = minorDistance / majorDistance;
-    if (Double.isNaN(majorMinorRelation)) {
-      majorMinorRelation = 1.0;
-    }
-
-    if ((majorDistance <= minorDistance) || findMajorTick) {
-      ret.setValue(majorRound);
-      ret.setMajorTick(true);
-    } else {
-      ret.setValue(minorRound);
-      ret.setMajorTick(false);
-    }
-
-    // format label string.
-    ret.setLabel(this.getFormatter().format(ret.getValue()));
-    // as formatting rounds too, reparse value so that it is exactly at the
-    // point the label string describes.
-    ret.setValue(this.getFormatter().parse(ret.getLabel()).doubleValue());
-    return ret;
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IAxis#scale()
-   */
-  public void scale() {
-    final Iterator<ITrace2D> it = this.m_traces.iterator();
-    ITrace2D trace;
-    while (it.hasNext()) {
-      trace = it.next();
-      this.scaleTrace(trace);
-    }
-    this.m_rangePreviousScaling.mimic(this.getRange());
-    this.m_needsFullRescale = false;
-  }
-
-  /**
    * Internally rescales the given <code>{@link ITracePoint2D}</code> in the
    * dimension this axis works in.
    * <p>
@@ -2590,6 +2418,20 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
             + point.getScaledY() + "]");
       }
     }
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#scale()
+   */
+  public void scale() {
+    final Iterator<ITrace2D> it = this.m_traces.iterator();
+    ITrace2D trace;
+    while (it.hasNext()) {
+      trace = it.next();
+      this.scaleTrace(trace);
+    }
+    this.m_rangePreviousScaling.mimic(this.getRange());
+    this.m_needsFullRescale = false;
   }
 
   /**

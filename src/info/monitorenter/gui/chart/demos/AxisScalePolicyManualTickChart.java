@@ -1,7 +1,7 @@
 /*
- *  MinimalStaticChartWithNanValues.java of project jchart2d, a demonstration 
- *  of the minimal code to set up a chart with static data with NaN values. 
- *  Copyright (C) 2007 - 2011 Achim Westermann.
+ *  MinimalStaticChart.java of project jchart2d, a demonstration 
+ *  of the minimal code to set up a chart with static data. 
+ *  Copyright (C) 2007 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -24,8 +24,11 @@
 package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyManualTicks;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
+import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -36,21 +39,19 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
- * Title: MinimalStaticChart
- * <p>
- * 
- * Description: A minimal example for rendering a static chart with a discontinuation by adding NaN.
+ * A minimal example for a chart that has manual configured labels/ticks by using 
+ * <code>{@link AxisScalePolicyManualTicks}</code>.
  * <p>
  * 
  * @author Achim Westermann
  * 
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.15 $
  */
-public final class MinimalStaticChartWithNanValues extends JPanel {
+public final class AxisScalePolicyManualTickChart extends JPanel {
   /**
    * Generated for <code>serialVersionUID</code>.
    */
-  private static final long serialVersionUID = 3257009847668192306L;
+  private static final long serialVersionUID = 3257009847668192307L;
 
   /**
    * Main entry.
@@ -62,7 +63,7 @@ public final class MinimalStaticChartWithNanValues extends JPanel {
   public static void main(final String[] args) {
     for (int i = 0; i < 1; i++) {
       JFrame frame = new JFrame("SampleChart");
-      frame.getContentPane().add(new MinimalStaticChartWithNanValues());
+      frame.getContentPane().add(new AxisScalePolicyManualTickChart());
       frame.addWindowListener(new WindowAdapter() {
         /**
          * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
@@ -72,7 +73,7 @@ public final class MinimalStaticChartWithNanValues extends JPanel {
           System.exit(0);
         }
       });
-      frame.setSize(600, 600);
+      frame.setSize(600, 400);
       frame.setLocation(i % 3 * 200, i / 3 * 100);
       frame.setVisible(true);
     }
@@ -81,10 +82,24 @@ public final class MinimalStaticChartWithNanValues extends JPanel {
   /**
    * Defcon.
    */
-  private MinimalStaticChartWithNanValues() {
+  private AxisScalePolicyManualTickChart() {
     this.setLayout(new BorderLayout());
     Chart2D chart = new Chart2D();
-
+    /*
+     * This does the trick to configure the ticks manually:
+     */
+    IAxis xAxis = chart.getAxisX();
+    xAxis.setAxisScalePolicy(new AxisScalePolicyManualTicks()); 
+    xAxis.setMajorTickSpacing(10);
+    xAxis.setMinorTickSpacing(1);
+    xAxis.setStartMajorTick(true);
+    
+    IAxis yAxis = chart.getAxisY();
+    yAxis.setAxisScalePolicy(new AxisScalePolicyManualTicks()); 
+    yAxis.setMajorTickSpacing(50);
+    yAxis.setMinorTickSpacing(10);
+    yAxis.setStartMajorTick(true);
+    
     // Create an ITrace:
     // Note that dynamic charts need limited amount of values!!!
     // ITrace2D trace = new Trace2DLtd(200);
@@ -95,20 +110,14 @@ public final class MinimalStaticChartWithNanValues extends JPanel {
     chart.addTrace(trace);
 
     // Add all points, as it is static:
-    trace.addPoint(0, 0);
-    trace.addPoint(1, 10);
-    trace.addPoint(2, Double.NaN);
-    trace.addPoint(3, 10);
-    trace.addPoint(4, 15);
-    trace.addPoint(5, Double.NaN);
-    trace.addPoint(6, 16);
-    trace.addPoint(7, 14);
-    trace.addPoint(8, 13);
-   
+    for (int i = 0; i <= 20; i++) {
+      trace.addPoint(i, 100.0/(i+1.0));
+    }
+
     chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
 
     // Make it visible:
-    this.add(chart, BorderLayout.CENTER);
+    this.add(new ChartPanel(chart), BorderLayout.CENTER);
 
   }
 

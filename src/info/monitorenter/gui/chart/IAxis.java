@@ -33,7 +33,6 @@ import java.awt.Graphics2D;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -161,6 +160,8 @@ public interface IAxis extends Serializable {
      * </tr>
      * </table>
      * <p>
+     * 
+     * 
      * 
      * @param propertyName
      *          the property to be informed about changes.
@@ -308,7 +309,7 @@ public interface IAxis extends Serializable {
     public final String setTitle(final String title) {
       String old = this.m_title;
       this.m_title = title;
-      this.m_propertyChangeSupport.firePropertyChange(IAxis.AxisTitle.PROPERTY_TITLE, old,
+      this.m_propertyChangeSupport.firePropertyChange(AxisTitle.PROPERTY_TITLE, old,
           this.m_title);
       return old;
     }
@@ -325,7 +326,7 @@ public interface IAxis extends Serializable {
     public void setTitleColor(final Color color) {
       Color old = this.m_titleColor;
       this.m_titleColor = color;
-      this.m_propertyChangeSupport.firePropertyChange(IAxis.AxisTitle.PROPERTY_TITLECOLOR, old,
+      this.m_propertyChangeSupport.firePropertyChange(AxisTitle.PROPERTY_TITLECOLOR, old,
           this.m_titleColor);
     }
 
@@ -339,7 +340,7 @@ public interface IAxis extends Serializable {
     public void setTitleFont(final Font font) {
       Font old = this.m_titleFont;
       this.m_titleFont = font;
-      this.m_propertyChangeSupport.firePropertyChange(IAxis.AxisTitle.PROPERTY_TITLEFONT, old,
+      this.m_propertyChangeSupport.firePropertyChange(AxisTitle.PROPERTY_TITLEFONT, old,
           this.m_titleFont);
     }
 
@@ -354,7 +355,7 @@ public interface IAxis extends Serializable {
     public final IAxisTitlePainter setTitlePainter(final IAxisTitlePainter titlePainter) {
       IAxisTitlePainter old = this.m_titlePainter;
       this.m_titlePainter = titlePainter;
-      this.m_propertyChangeSupport.firePropertyChange(IAxis.AxisTitle.PROPERTY_TITLEPAINTER, old,
+      this.m_propertyChangeSupport.firePropertyChange(AxisTitle.PROPERTY_TITLEPAINTER, old,
           this.m_titlePainter);
       return old;
     }
@@ -368,10 +369,21 @@ public interface IAxis extends Serializable {
    * Use this constant to register a {@link java.beans.PropertyChangeListener}
    * with the <code>IAxis</code>.
    * <p>
-   * See the class description for property change events fired.
+   * See {@link #addPropertyChangeListener(String, PropertyChangeListener)}  for property change events fired.
    */
   public static final String PROPERTY_ADD_REMOVE_TRACE = "IAxis.PROPERTY_ADD_REMOVE_TRACE";
 
+  /**
+   * The bean property <code>constant</code> identifying a change of the
+   * axis scale policy. 
+   * <p>
+   * Use this constant to register a {@link java.beans.PropertyChangeListener}
+   * with the <code>IAxis</code>.
+   * <p>
+   * See {@link #addPropertyChangeListener(String, PropertyChangeListener)} for property change events fired.
+   */
+  public static final String PROPERTY_AXIS_SCALE_POLICY_CHANGED = "IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED";
+  
   /**
    * Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the
    * <code>{@link IAxisTitlePainter}</code>.
@@ -441,6 +453,12 @@ public interface IAxis extends Serializable {
    * <td><code>{@link IAxisLabelFormatter}</code>, the old value or null if
    * there was no formatter before.</td>
    * <td><code>{@link IAxisLabelFormatter}</code>, the new value.</td>
+   * </tr>
+   * <tr>
+   * <td><code>{@link IAxis#PROPERTY_AXIS_SCALE_POLICY_CHANGED}</code></td>
+   * <td><code>{@link IAxis}</code> that changed</td>
+   * <td><code>{@link IAxisScalePolicy}</code>, the old value.</td>
+   * <td><code>{@link IAxisScalePolicy}</code>, the new value.</td>
    * </tr>
    * </table>
    * <p>
@@ -728,18 +746,26 @@ public interface IAxis extends Serializable {
   public abstract double getScaledValue(final double absolute);
 
   /**
-   * Returns the array of labeled values that will be used by the
-   * <code>{@link Chart2D}</code> to paint labels.
+   * Returns the axis scale policy which controls the position and distance of the ticks to draw. 
    * <p>
    * 
-   * @param g2d
-   *          Provides information about the graphic context (e.g. font
-   *          metrics).
-   * @return the labeled values that will be used by the <code>{@link Chart2D}
-   *         </code> to paint labels.
+   * @return the axis scale policy which controls the position and distance of the ticks to draw. 
    */
-  public List<LabeledValue> getScaleValues(final Graphics g2d);
-
+  public IAxisScalePolicy getAxisScalePolicy();
+  
+  /**
+   * Sets the axis scale policy which controls the position and distance of the
+   * ticks to draw.
+   * <p>
+   * 
+   * @param axisScalePolicy
+   *          the axis scale policy which controls the position and distance of
+   *          the ticks to draw to use.
+   * 
+   * @return the previous axis scale policy that was used before.
+   */
+  public IAxisScalePolicy setAxisScalePolicy(IAxisScalePolicy axisScalePolicy);
+  
   /**
    * Returns the title or <code>null</code> if there was no title configured
    * before.

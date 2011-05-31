@@ -111,6 +111,7 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
         Boolean result;
         result = this.doSynchronized(new ICodeBlock<Boolean>() {
 
+            @SuppressWarnings("synthetic-access")
             public Boolean execute() {
                 final boolean res = TracePoint2D.this.m_additionalPointPainters.add(additionalPointPainter);
                 // for interpolated points listener may be null: 
@@ -279,6 +280,7 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
     @Override
     public void setLocation(final double xValue, final double yValue) {
         this.doSynchronized(new ICodeBlock<Object>() {
+            @SuppressWarnings("synthetic-access")
             public Object execute() {
                 TracePoint2D.this.m_x = xValue;
                 TracePoint2D.this.m_y = yValue;
@@ -355,6 +357,7 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
         Boolean result;
         result = this.doSynchronized(new ICodeBlock<Boolean>() {
 
+            @SuppressWarnings("synthetic-access")
             public Boolean execute() {
                 boolean res = TracePoint2D.this.m_additionalPointPainters.remove(pointPainter);
                 if (res) {
@@ -374,6 +377,7 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
      */
     public Set<IPointPainter<?>> removeAllAdditionalPointPainters() {
         return this.doSynchronized(new ICodeBlock<Set<IPointPainter<?>>>() {
+            @SuppressWarnings("synthetic-access")
             public Set<IPointPainter<?>> execute() {
                 Set<IPointPainter<?>> result = TracePoint2D.this.m_additionalPointPainters;
                 TracePoint2D.this.m_additionalPointPainters = new LinkedHashSet<IPointPainter<?>>();

@@ -24,7 +24,9 @@
 package info.monitorenter.gui.chart.axis;
 
 import info.monitorenter.gui.chart.IAxisLabelFormatter;
+import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyAutomaticBestFit;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 
 import java.util.Iterator;
@@ -56,12 +58,13 @@ public class AxisLog10 extends AAxisTransformation {
 
   /**
    * Creates an instance that uses a {@link LabelFormatterSimple} for formatting
-   * numbers.
+   * numbers and a {@link AxisScalePolicyAutomaticBestFit} for controlling the
+   * scale.
    * <p>
    * 
    */
   public AxisLog10() {
-    super(new LabelFormatterSimple());
+    this(new LabelFormatterSimple(), new AxisScalePolicyAutomaticBestFit());
   }
 
   /**
@@ -71,9 +74,11 @@ public class AxisLog10 extends AAxisTransformation {
    * @param formatter
    *          needed for formatting labels of this axis.
    * 
+   * @param scalePolicy
+   *          controls the ticks/labels and their distance.
    */
-  public AxisLog10(final IAxisLabelFormatter formatter) {
-    super(formatter);
+  public AxisLog10(final IAxisLabelFormatter formatter, final IAxisScalePolicy scalePolicy) {
+    super(formatter, scalePolicy);
   }
 
   /**
@@ -98,16 +103,17 @@ public class AxisLog10 extends AAxisTransformation {
   protected double transform(final double in) {
 
     double toTransform = in;
-    // Starting from 1 downwards the transformation of this value becomes
-    // negative,
-    // lim -> 0 becomes Double.NEGATIVE_INFINITY, which
-    // causes the "while(true)" 100 % load effect.
-    // So everything is disallowed below 1.0.
+    /*
+     * Starting from 1 downwards the transformation of this value becomes
+     * negative, lim -> 0 becomes Double.NEGATIVE_INFINITY, which causes the
+     * "while(true)" 100 % load effect. So everything is disallowed below 1.0.
+     */
     if (toTransform < 1) {
       // allow to transform the input for empty traces or all traces with empty
       // points:
-      if(this.m_accessor == null ) {
-        throw new IllegalStateException("Connect this axis ("+this.getAxisTitle().getTitle()+") to a chart first before doing this operation.");
+      if (this.m_accessor == null) {
+        throw new IllegalStateException("Connect this axis (" + this.getAxisTitle().getTitle()
+            + ") to a chart first before doing this operation.");
       }
       Iterator<ITrace2D> itTraces = this.m_accessor.getChart().getTraces().iterator();
       if (!itTraces.hasNext()) {
