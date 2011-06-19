@@ -174,15 +174,31 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
    *          controlled by this panel.
    */
   public ChartPanel(final Chart2D chart) {
+    this(chart,true);
+  }
+  /**
+   * Creates an instance that decorates the given chart with controls in form of
+   * popup menus.
+   * <p>
+   * 
+   * @param chart
+   *          A configured Chart2D instance that will be displayed and
+   *          controlled by this panel.
+   *          
+   * @param adaptUI2Chart
+   *          if true the menu will adapt it's basic UI properties (font,
+   *          foreground and background color) to the given chart.
+   */
+  public ChartPanel(final Chart2D chart, final boolean adaptUI2Chart) {
     super();
     this.m_chart = chart;
     this.setBackground(chart.getBackground());
     // we paint our own labels
     chart.setPaintLabels(false);
-    // get the layout factory for popup menues:
+    // get the layout factory for popup menus:
     final LayoutFactory factory = LayoutFactory.getInstance();
 
-    factory.createChartPopupMenu(this, true);
+    factory.createChartPopupMenu(this, adaptUI2Chart);
 
     // layout
     this.setLayout(new BorderLayout());
@@ -210,7 +226,7 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
     chart.addPropertyChangeListener(Chart2D.PROPERTY_ADD_REMOVE_TRACE, this);
 
   }
-
+  
   /**
    * Internal helper that returns whether a label for the given trace is already
    * contained in the internal label panel.
@@ -364,7 +380,7 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
 
       final ITrace2D trace = (ITrace2D) evt.getSource();
       final String oldLabel = (String) evt.getOldValue();
-      final String newLabel = (String) evt.getNewValue();
+      final String newLabel = (String)) evt.getNewValue();
       JLabel label;
       if ((!StringUtil.isEmpty(oldLabel)) && (StringUtil.isEmpty(newLabel))) {
         final Component[] labels = (this.m_labelPanel.getComponents());
