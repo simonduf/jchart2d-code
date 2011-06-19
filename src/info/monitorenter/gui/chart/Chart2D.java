@@ -830,12 +830,12 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
      */
     public PointHighlighter() {
       /*
-       * Need an identity hash map as the trace keys will change upon points added thus making them 
-       * "unfindable" in a map based on hashcode!
+       * Need an identity hash map as the trace keys will change upon points
+       * added thus making them "unfindable" in a map based on hashcode!
        */
       this.m_previousHighlighted = new IdentityHashMap<ITrace2D, ITracePoint2D>();
       Chart2D.this.addPropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, this);
-      Chart2D.this.addPropertyChangeListener(Chart2D.PROPERTY_ADD_REMOVE_TRACE,this);
+      Chart2D.this.addPropertyChangeListener(Chart2D.PROPERTY_ADD_REMOVE_TRACE, this);
 
     }
 
@@ -981,7 +981,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       ITracePoint2D point = Chart2D.this.getPointFinder().getNearestPoint(e, Chart2D.this);
       // don't work on empty charts:
       if (point != null) {
-        ITracePoint2D previousHighlightedPoint = this.m_previousHighlighted.get(point.getListener());
+        ITracePoint2D previousHighlightedPoint = this.m_previousHighlighted
+            .get(point.getListener());
         if (!point.equals(previousHighlightedPoint)) {
           ITrace2D trace = point.getListener();
           // avoid duplicate or no highlighting in concurrent paint situation.
@@ -993,7 +994,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
               Chart2D.this.setRequestedRepaint(true);
             }
           }
-        } 
+        }
       }
     }
 
@@ -1006,8 +1007,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
      * in order to re-attach the proper point highlighters to the highlighted
      * points.
      * <p>
-     * Also a hook is installed for <code>{@link Chart2D#PROPERTY_ADD_REMOVE_TRACE}</code> to clear 
-     * out a reference to a highlighted trace to make it garbage-collectable in case the trace is removed.<p>
+     * Also a hook is installed for
+     * <code>{@link Chart2D#PROPERTY_ADD_REMOVE_TRACE}</code> to clear out a
+     * reference to a highlighted trace to make it garbage-collectable in case
+     * the trace is removed.
+     * <p>
      * 
      * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
      * @see ITrace2D#addPointHighlighter(IPointPainter)
@@ -1048,10 +1052,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
                     + ". You only have to fire this event, if a point highlighter was addded or removed.");
           }
         }
-      } else if (Chart2D.PROPERTY_ADD_REMOVE_TRACE.equals(property)){
-        ITrace2D oldTrace2d = (ITrace2D)evt.getOldValue();
-        if(evt.getNewValue() == null) {
-          // trace was removed, so remove my potential reference: 
+      } else if (Chart2D.PROPERTY_ADD_REMOVE_TRACE.equals(property)) {
+        ITrace2D oldTrace2d = (ITrace2D) evt.getOldValue();
+        if (evt.getNewValue() == null) {
+          // trace was removed, so remove my potential reference:
           this.m_previousHighlighted.remove(oldTrace2d);
         }
       } else {
@@ -1353,9 +1357,9 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     /*
      * 
      * This lock is needed to ensure a lock on the tree is acquired before a
-     * lock to the chart. Method paintComponent will also first acquire the
-     * treeLock and then has to get the lock on the chart while this code path
-     * might descend into ChartPanel where Container.getComponents() (in method
+     * lock to the chart. Method paint will also first acquire the treeLock and
+     * then has to get the lock on the chart while this code path might descend
+     * into ChartPanel where Container.getComponents() (in method
      * containsTraceLabel()) will require the tree lock after having already
      * acquired the chart lock -> deadlock between paint thread and addTrace
      * thread.
@@ -2783,16 +2787,23 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
 
   /**
    * 
-   * This method is just overridden to ensure a lock on the
-   * <code>{@link Container#getTreeLock()}</code> and then on this instance is
-   * obtained just as it has to be done in that order in
+   * This method is just overridden to ensure a lock on this instance and then a lock on 
+   * <code>{@link Container#getTreeLock()}</code> just as it has to be done in that order in
    * <code>{@link #addTrace(ITrace2D, IAxis, IAxis)}</code>.
+   * <p>
+   * 
+   * More info: This lock is needed to ensure a lock on the tree is acquired
+   * before a lock to the chart. Method addTrace has a code path that might
+   * descend into ChartPanel where Container.getComponents() (in method
+   * containsTraceLabel()) will require the tree lock after having already
+   * acquired the chart lock -> deadlock between paint thread and addTrace
+   * thread when using ChartPanel.
    * <p>
    * 
    * @see javax.swing.JComponent#paint(java.awt.Graphics)
    */
   @Override
-  public synchronized void paint(Graphics g) {
+  public void paint(Graphics g) {
     synchronized (this.getTreeLock()) {
       super.paint(g);
     }
@@ -3281,7 +3292,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         System.out.println("Chart2D.propertyChange, " + evt.getPropertyName() + " ("
             + Thread.currentThread().getName() + "), 1 lock");
       }
-      // TODO: use the property change reactor idiom also used in AAxis for performance. 
+      // TODO: use the property change reactor idiom also used in AAxis for
+      // performance.
       String property = evt.getPropertyName();
       if (property.equals(IRangePolicy.PROPERTY_RANGE)) {
         // repaint
