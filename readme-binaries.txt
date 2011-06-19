@@ -97,7 +97,12 @@ o Simplified API: dropped class PointHighlighterConfigurable. Use the raw PointP
   Example: "new PointPainterConfigurable(new PointPainterDisc(20), true)" -> "new PointPainterDisc(20)" 
 o To prevent deadlocks at startup now every trace has to be first added to a chart before: adding points, setting point highlighters, setting error bar policies to the trace. 
 o If a trace label (the combination of property name and property physical units) is set to null or "" the ChartPanel will show an <unnamed> label that still allows
-  to access the right-click context menu entry for various trace configurations. 
+  to access the right-click context menu entry for various trace configurations.
+o For users who implemented their own IToolTip that would also control which IPointHighlighter to use: 
+  Point highlighting and tool tips were a bit mixed before and are now completely separated. 
+  Management of highlighting has changed a lot. This is now all done by the inner PointHighlighter instance of the chart. You should 
+  not care for management of point highlighting. By now there is no reason to recode a IToolTip that mixes both functionalities. 
+  Have a look at info.monitorenter.gui.chart.demo.AdvancedStaticChart. 
 
 jchart2d-3.2.0 - June, 2nd, 2010
 
