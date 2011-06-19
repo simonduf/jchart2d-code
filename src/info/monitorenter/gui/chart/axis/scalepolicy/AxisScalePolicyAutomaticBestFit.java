@@ -27,11 +27,9 @@
 package info.monitorenter.gui.chart.axis.scalepolicy;
 
 import info.monitorenter.gui.chart.IAxis;
-import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.LabeledValue;
 import info.monitorenter.gui.chart.axis.AAxis;
-import info.monitorenter.gui.chart.labelformatters.LabelFormatterNumber;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.math.MathUtil;
 
