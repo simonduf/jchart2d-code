@@ -26,6 +26,7 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterDate;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
@@ -126,6 +127,11 @@ public final class AdvancedStaticChart {
 
     }
 
+    // add a border to the chart: 
+//    chart.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+    chart.setAxisXTop(new AxisLinear(new LabelFormatterDate(new SimpleDateFormat(""))), 0);
+    chart.setAxisYRight(new AxisLinear(new LabelFormatterDate(new SimpleDateFormat(" "))), 0) ;
+    
     // Make it visible:
     // Create a frame.
     JFrame frame = new JFrame("AdvancedStaticChart");

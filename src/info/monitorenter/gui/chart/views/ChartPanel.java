@@ -380,7 +380,7 @@ public class ChartPanel extends JLayeredPane implements PropertyChangeListener {
 
       final ITrace2D trace = (ITrace2D) evt.getSource();
       final String oldLabel = (String) evt.getOldValue();
-      final String newLabel = (String)) evt.getNewValue();
+      final String newLabel = (String) evt.getNewValue();
       JLabel label;
       if ((!StringUtil.isEmpty(oldLabel)) && (StringUtil.isEmpty(newLabel))) {
         final Component[] labels = (this.m_labelPanel.getComponents());

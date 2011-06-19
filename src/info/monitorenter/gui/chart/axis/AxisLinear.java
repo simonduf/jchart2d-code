@@ -62,6 +62,19 @@ public class AxisLinear extends AAxis {
    * @param formatter
    *          needed for formatting labels of this axis.
    * 
+   */
+  public AxisLinear(final IAxisLabelFormatter formatter) {
+    this(formatter, new AxisScalePolicyAutomaticBestFit());
+  }
+  
+  /**
+   * Constructor that uses the given label formatter for formatting labels along with the given 
+   * scale policy.
+   * <p>
+   * 
+   * @param formatter
+   *          needed for formatting labels of this axis.
+   * 
    * @param scalePolicy
    *          controls the ticks/labels and their distance.
    */
