@@ -28,6 +28,7 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.io.ADataCollector;
 import info.monitorenter.gui.chart.io.RandomDataCollectorOffset;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
+import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -94,7 +95,7 @@ public final class MultipleCharts {
       chart.addTrace(trace);
       // collector only may be started after the trace is connected to a chart (deadlock prevention). 
       collector.start();
-      contentPane.add(chart);
+      contentPane.add(new ChartPanel(chart));
     }
     frame.setVisible(true);
   }
