@@ -25,10 +25,13 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
+import info.monitorenter.gui.chart.IRangePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyManualTicks;
+import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.views.ChartPanel;
+import info.monitorenter.util.Range;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -99,6 +102,13 @@ public final class AxisScalePolicyManualTickChart extends JPanel {
     yAxis.setMajorTickSpacing(50);
     yAxis.setMinorTickSpacing(10);
     yAxis.setStartMajorTick(true);
+
+    // Note that AxixScalePolicyManualTicks should start with the first label with respect to the range policy:
+    IRangePolicy rangePolicyX = new RangePolicyFixedViewport(new Range(0,25));
+    xAxis.setRangePolicy(rangePolicyX);
+    
+    IRangePolicy rangePolicyY = new RangePolicyFixedViewport(new Range(0,50));
+    yAxis.setRangePolicy(rangePolicyY);
     
     // Create an ITrace:
     // Note that dynamic charts need limited amount of values!!!
@@ -110,10 +120,11 @@ public final class AxisScalePolicyManualTickChart extends JPanel {
     chart.addTrace(trace);
 
     // Add all points, as it is static:
-    for (int i = 0; i <= 20; i++) {
+    for (int i = 3; i <= 20; i++) {
       trace.addPoint(i, 100.0/(i+1.0));
     }
 
+    
     chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
 
     // Make it visible:

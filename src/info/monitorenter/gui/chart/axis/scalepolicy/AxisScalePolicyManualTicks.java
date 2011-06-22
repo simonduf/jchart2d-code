@@ -33,7 +33,6 @@ import info.monitorenter.gui.chart.LabeledValue;
 import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterNumber;
 import info.monitorenter.util.Range;
-import info.monitorenter.util.math.MathUtil;
 
 import java.awt.Graphics;
 import java.util.LinkedList;
