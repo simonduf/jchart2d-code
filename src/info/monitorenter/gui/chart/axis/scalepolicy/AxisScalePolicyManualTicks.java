@@ -139,9 +139,12 @@ public class AxisScalePolicyManualTicks implements IAxisScalePolicy {
       final double range = max - min;
       double value;
       if (axis.isStartMajorTick()) {
-        value = ((int) (min / majorTickSpacing)) * (majorTickSpacing+1);
+        value = ((int) (min / majorTickSpacing)) * (majorTickSpacing);
+        if (value < min) {
+          value += majorTickSpacing;
+        }
       } else {
-        value = ((int) (min / minorTickSpacing)) * (minorTickSpacing+1);
+        value = ((int) (min / minorTickSpacing)) * (minorTickSpacing);
       }
       String labelName = "start";
       int loopStop = 0;

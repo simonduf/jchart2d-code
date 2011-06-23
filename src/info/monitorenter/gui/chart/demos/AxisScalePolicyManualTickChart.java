@@ -104,10 +104,10 @@ public final class AxisScalePolicyManualTickChart extends JPanel {
     yAxis.setStartMajorTick(true);
 
     // Note that AxixScalePolicyManualTicks should start with the first label with respect to the range policy:
-    IRangePolicy rangePolicyX = new RangePolicyFixedViewport(new Range(0,25));
+    IRangePolicy rangePolicyX =  new RangePolicyFixedViewport( new Range( 30,100 )); 
     xAxis.setRangePolicy(rangePolicyX);
     
-    IRangePolicy rangePolicyY = new RangePolicyFixedViewport(new Range(0,50));
+    IRangePolicy rangePolicyY = new RangePolicyFixedViewport( new Range( 15,100 ));
     yAxis.setRangePolicy(rangePolicyY);
     
     // Create an ITrace:
@@ -120,8 +120,8 @@ public final class AxisScalePolicyManualTickChart extends JPanel {
     chart.addTrace(trace);
 
     // Add all points, as it is static:
-    for (int i = 3; i <= 20; i++) {
-      trace.addPoint(i, 100.0/(i+1.0));
+    for (int i = 21; i <= 40; i++) {
+      trace.addPoint(i, /*100.0/(i+1.0)*/i);
     }
 
     
