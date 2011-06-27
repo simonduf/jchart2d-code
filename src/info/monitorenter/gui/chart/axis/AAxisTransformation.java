@@ -339,10 +339,8 @@ public abstract class AAxisTransformation extends AAxis {
   }
 
   /**
-   * @deprecated replaced by {@link #scaleTrace(ITrace2D)}
    * @see info.monitorenter.gui.chart.IAxis#getScaledValue(double)
    */
-  @Deprecated
   public final double getScaledValue(final double absolute) {
     double result;
     Range range = this.getRange();
