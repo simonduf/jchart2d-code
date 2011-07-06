@@ -371,7 +371,9 @@ public abstract class AAxisTransformation extends AAxis {
    * 
    * @param in
    *          the value to transform.
+   *          
    * @return the transformed value.
+   * 
    * @throws IllegalArgumentException
    *           if scaling is impossible (due to some mathematical transformation
    *           in implementations like
