@@ -22,13 +22,18 @@
  */
 package info.monitorenter.gui.chart;
 
+import info.monitorenter.gui.chart.axis.AAxis;
+import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.events.Chart2DActionSaveImageSingleton;
+import info.monitorenter.gui.chart.labelformatters.LabelFormatterDate;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.WeakHashMap;
 
 import javax.swing.JFrame;
@@ -50,35 +55,19 @@ import junit.textui.TestRunner;
  * 
  * @version $Revision: 1.10 $
  */
-public class TestChart2DHeadless
-    extends TestCase {
+public class TestChart2DHeadless extends TestCase {
 
   /**
    * Junit test ui runner.
    * <p>
    * 
    * @param args
-   *            ignored.
+   *          ignored.
    */
   public static void main(final String[] args) {
-    TestRunner.run(TestChart2DHeadless.class);
-  }
-
-  /**
-   * Test suite for this test class.
-   * <p>
-   * 
-   * @return the test suite
-   */
-  public static Test suite() {
-
-    TestSuite suite = new TestSuite();
-    suite.setName(TestChart2DHeadless.class.getName());
-
-    // suite.addTest(new TestChart2DHeadless("testMemoryLeak"));
-    suite.addTest(new TestChart2DHeadless("testSnapshot"));
-
-    return suite;
+//    TestRunner.run(TestChart2DHeadless.class);
+    TestChart2DHeadless test = new TestChart2DHeadless("blabla");
+    test.testAddRemoveTraceAfterChangingZIndex();
   }
 
   /**
@@ -86,7 +75,7 @@ public class TestChart2DHeadless
    * <p>
    * 
    * @param testName
-   *            the name of the test.
+   *          the name of the test.
    */
   public TestChart2DHeadless(final String testName) {
     super(testName);
@@ -96,6 +85,8 @@ public class TestChart2DHeadless
    * Creates several charts, adds a trace to each of them, destroys the chart
    * and checks, if a memory leak occurs.
    * <p>
+   * 
+   * @org.junit.Test
    */
   public void testMemoryLeak() {
     Chart2D chart;
@@ -120,7 +111,7 @@ public class TestChart2DHeadless
     System.runFinalization();
     System.gc();
     try {
-    	System.out.println("Please wait 10 seconds...");
+      System.out.println("Please wait 10 seconds...");
       Thread.sleep(10000);
     } catch (InterruptedException e) {
       e.printStackTrace();
@@ -128,7 +119,7 @@ public class TestChart2DHeadless
     System.runFinalization();
     System.gc();
     try {
-    	System.out.println("Please wait another 10 seconds...");
+      System.out.println("Please wait another 10 seconds...");
       Thread.sleep(10000);
     } catch (InterruptedException e) {
       e.printStackTrace();
@@ -142,8 +133,9 @@ public class TestChart2DHeadless
    * <p>
    * 
    * @throws IOException
-   *             if sth goes wrong in I/O (saving chart, deleting test
-   *             file,...).
+   *           if sth goes wrong in I/O (saving chart, deleting test file,...).
+   * 
+   * @org.junit.Test
    * 
    */
   public void testSnapshot() throws IOException {
@@ -189,4 +181,47 @@ public class TestChart2DHeadless
     }
   }
 
+  /**
+   * Tests the policy of adding axis to charts.
+   * <p>
+   * 
+   * Checks the old formatter of the x axis and adds a new x axis with a
+   * different formatter: after the call the new axis should have the formatter
+   * of the previous axis due to the replace semantics of the
+   * {@link Chart2D#setAxisXBottom(AAxis, int)}.
+   * <p>
+   * 
+   */
+  @org.junit.Test
+  public void testSetAxis() {
+    Chart2D chart = new Chart2D();
+    IAxisLabelFormatter oldFormatter = chart.getAxisX().getFormatter();
+    AAxis axis = new AxisLinear();
+    IAxisLabelFormatter formatter = new LabelFormatterDate((SimpleDateFormat) DateFormat
+        .getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT));
+    axis.setFormatter(formatter);
+    chart.setAxisXBottom(axis, 0);
+    Assert.assertSame(oldFormatter, chart.getAxisX().getFormatter());
+  }
+
+  /**
+   * Test for bug 3352480: <br/>
+   * Removing trace after z-index has changed does not work.
+   * <p>
+   * @org.junit.Test
+   */
+  public void testAddRemoveTraceAfterChangingZIndex() {
+    Chart2D chart = new Chart2D();
+    ITrace2D trace = new Trace2DSimple();
+    chart.addTrace(trace);
+    // add some more dummy traces to test the finding of trace within a set:
+    for (int i = 0; i < 100; i++) {
+      chart.addTrace(new Trace2DSimple());
+    }
+    trace.setZIndex(new Integer(33));
+    boolean removed = chart.removeTrace(trace);
+    assertTrue("The trace was not removed after changing z-index!", removed);
+
+  }
+  
 }

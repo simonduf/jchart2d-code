@@ -41,7 +41,7 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 
 @RunWith(Suite.class)
-@SuiteClasses( { TestMultiThreadingAndTracing.class, TestChart2DSetAxis.class, TestChart2DHeadless.class,TestMultithreading.class,TestChartOperationsVisual.class})
+@SuiteClasses( { TestMultiThreadingAndTracing.class, TestChart2DHeadless.class,TestMultithreading.class,TestChartOperationsVisual.class})
 
 public final class AllTests {
 
