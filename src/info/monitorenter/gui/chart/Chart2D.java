@@ -3508,11 +3508,14 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * {@link IAxis#PROPERTY_ADD_REMOVE_TRACE} on the internal axes).
    * <p>
    * 
+   * @return true if the given trace was removed successfully, false else. 
+   * 
    * @param points
    *          the trace to remove.
    * @see IAxis#PROPERTY_ADD_REMOVE_TRACE
    */
-  public final void removeTrace(final ITrace2D points) {
+  public final boolean removeTrace(final ITrace2D points) {
+    boolean result = false;
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("removeTrace, 0 locks");
     }
@@ -3525,56 +3528,52 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         // 1) x - axes:
         Iterator<IAxis> it = this.m_axesXBottom.iterator();
         IAxis currentAxis;
-        boolean success = true;
+        boolean successRemoveX = false;
         while (it.hasNext()) {
           currentAxis = it.next();
-          success = currentAxis.removeTrace(points);
-          if (success) {
-            // can only be in one x axis
-            success = false;
+          successRemoveX = currentAxis.removeTrace(points);
+          if (successRemoveX) {
             break;
           }
         }
         // was not found in bottom x axes:
-        if (success) {
+        if (!successRemoveX) {
           it = this.m_axesXTop.iterator();
           while (it.hasNext()) {
             currentAxis = it.next();
-            success = currentAxis.removeTrace(points);
-            if (success) {
-              success = false;
+            successRemoveX = currentAxis.removeTrace(points);
+            if (successRemoveX) {
               break;
             }
           }
         }
         // 2) y - axes:
-        success = true;
+        boolean successRemoveY = false;
         it = this.m_axesYLeft.iterator();
         while (it.hasNext()) {
           currentAxis = it.next();
-          success = currentAxis.removeTrace(points);
-          if (success) {
-            success = false;
-            break;
-          }
+          successRemoveY = currentAxis.removeTrace(points);
         }
         // was not found in left y axes:
-        if (success) {
+        if (!successRemoveY) {
           it = this.m_axesYRight.iterator();
           while (it.hasNext()) {
             currentAxis = it.next();
-            success = currentAxis.removeTrace(points);
-            if (success) {
+            successRemoveY = currentAxis.removeTrace(points);
+            if (successRemoveY) {
               break;
             }
           }
         }
-        if (success) {
+        boolean success = successRemoveY && successRemoveX;
+        if (success ) {
           int amountofremovedhighlighters = points.getPointHighlighters().size();
           this.trackHighlightingEnablement(amountofremovedhighlighters);
           this.unlistenToTrace(points);
           this.setRequestedRepaint(true);
         }
+        result = success;
+        return result;
       }
     }
   }

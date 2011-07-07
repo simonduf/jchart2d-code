@@ -49,6 +49,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -1314,7 +1315,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * <code>ITrace2d</code> instances to paint with z-index ordering based on
    * <code>{@link ITrace2D#getZIndex()}</code>.
    */
-  private final TreeSet<ITrace2D> m_traces = new TreeSet<ITrace2D>();
+  private final Set<ITrace2D> m_traces = new HashSet<ITrace2D>();
 
   /**
    * True if this axis is to be painted on a chart; false to hide.
