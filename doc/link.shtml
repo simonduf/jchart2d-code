@@ -70,7 +70,7 @@
 <table border="0">
 	<tr>
 		<td id="box"><a href="http://www.jfree.org/jfreechart/index.html"
-			rel="_blank">JFreeChart</a></td>
+			target="_blank">JFreeChart</a></td>
 		<td>A free Java chart library. JFreeChart supports pie charts (2D and
 		3D), bar charts (horizontal and vertical, regular and stacked), line
 		charts, scatter plots, time series charts, high-low-open-close charts,
@@ -87,7 +87,7 @@
 
 <table border="0">
 	<tr>
-		<td id="box"><a href="http://www.cafeaulait.org/" rel="_blank">Cafe
+		<td id="box"><a href="http://www.cafeaulait.org/" target="_blank">Cafe
 		au Lait</a></td>
 		<td>Daily handpicked Java News and Resources.</td>
 	</tr>
@@ -101,49 +101,49 @@
 <table border="0">
 
 	<tr>
-		<td id="box"><a href="http://www.asetune.com/screenshots.html" rel="_blank">AseTune</a></td>
+		<td id="box"><a href="http://www.asetune.com/screenshots.html" target="_blank">AseTune</a></td>
 		<td>Performance Monitor for Sybase ASE</td>
 	</tr>
 	<tr>
 		<td colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
-		<td id="box"><a href="http://autsys.tkk.fi/nutdac/" rel="_blank">NutDAC</a></td>
+		<td id="box"><a href="http://autsys.tkk.fi/nutdac/" target="_blank">NutDAC</a></td>
 		<td>NutDAC, a framework for creating generic real time data acquisition and control applications for embedded systems.</td>
 	</tr>
 	<tr>
 		<td colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
-		<td id="box"><a href="http://bluetiger.bauchlandung.org/other/annea/" rel="_blank">Training of an MLP(Thomas Unterthiner)</a></td>
+		<td id="box"><a href="http://bluetiger.bauchlandung.org/other/annea/" target="_blank">Training of an MLP(Thomas Unterthiner)</a></td>
 		<td>Thomas Unterthiner used JChart2d in an applet for comparing different training algorithms for a Multi Layer Perceptron (neural network).</td>
 	</tr>
 	<tr>
 		<td colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
-		<td id="box"><a href="http://www.mixedmode.com/cgi-bin/main.cgi?view=jtr0view" rel="_blank">jtr0view</a></td>
+		<td id="box"><a href="http://www.mixedmode.com/cgi-bin/main.cgi?view=jtr0view" target="_blank">jtr0view</a></td>
 		<td>A Java based binary transient and dc sweep waveform viewer for displaying binary format Hspice output files (.tr0 and .sw0).</td>
 	</tr>
 	<tr>
 		<td colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
-		<td id="box"><a href="http://www.cospandesign.com/?p=124" rel="_blank">JEvalCharter by Cospan Design</a></td>
+		<td id="box"><a href="http://www.cospandesign.com/?p=124" target="_blank">JEvalCharter by Cospan Design</a></td>
 		<td>Function evaluator combined with chart output.</td>
 	</tr>
 	<tr>
 		<td colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
-		<td id="box"><a href="http://www.lionsracing.de/content/view/480/23/lang,en/" rel="_blank">Lionsracing</a></td>
+		<td id="box"><a href="http://www.lionsracing.de/content/view/480/23/lang,en/" target="_blank">Lionsracing</a></td>
 		<td>Formula student race car telemetry system (real time).</td>
 	</tr>
 	<tr>
 		<td colspan="2">&nbsp;</td>
 	</tr>
 	<tr>
-		<td id="box"><a href="http://bluetiger.bauchlandung.org/other/annea/" rel="_blank">Training Neural Networks using Evolutionary Algorithms </a></td>
+		<td id="box"><a href="http://bluetiger.bauchlandung.org/other/annea/" target="_blank">Training Neural Networks using Evolutionary Algorithms </a></td>
 		<td>Thomas Unterthiner used JChart2d in an applet for comparing different training algorithms for a Multi Layer Perceptron (neural network).</td>
 	</tr>
 	<tr>
