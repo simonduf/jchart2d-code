@@ -65,7 +65,7 @@ public class ColorMutable {
    * <p>
    * 
    * @param g
-   *          the graphics context to use.
+   *          the graphics context to use. 
    * 
    * @return the previously configured color of the graphics context or null if
    *         nothing was done.
@@ -81,6 +81,27 @@ public class ColorMutable {
     }
     return result;
   }
+  
+  /**
+   * Sets the color to the graphics context.
+   * <p>
+   * 
+   * @param g
+   *          the graphics context to use. 
+   * 
+   * @return the previously configured color of the graphics context or null if
+   *         nothing was done.
+   */
+  public synchronized Color applyColorUnconditionally(final Graphics g) {
+    Color result = null;
+    if (this.m_color != null) {
+      final Color gColor = g.getColor();
+      result = gColor;
+      g.setColor(this.m_color);
+    }
+    return result;
+  }
+  
 
   /**
    * Asserts that the given value is between 0 and 255.

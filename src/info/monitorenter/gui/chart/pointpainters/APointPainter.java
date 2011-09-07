@@ -218,7 +218,7 @@ public abstract class APointPainter<T extends IPointPainterConfigurableUI<T>> im
    *         no action was taken.
    */
   protected Color installColorFill(final Graphics g) {
-    return this.m_colorFill.applyColorIfChange(g);
+    return this.m_colorFill.applyColorUnconditionally(g);
   }
 
   /**

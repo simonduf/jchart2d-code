@@ -48,7 +48,15 @@ jchart2d-3.2.2 - month, day, year
 * Fixed bug #3289727: Dynamic chart with highlighting does not clear points.
 * Fixed potential memory leak in case traces with highlighting enabled are removed. 
 * Fixed bug #3308052: test sources missing from 3.2.1 source file download tree.
-
+* Fixed bug #3352480: Chart2D.removeTrace(ITrace2D) does not work after changing it's state (e.g. via setZindex(Integer)).
+* Fixed bug #3405539:  PointPainterDisc.setColorFill is invoked with the same color as the trace color, the disc fill will not happen. 
+  If the color is different, then fill happens.
+o Changed Chart2D method signature: 
+  public final void removeTrace(final ITrace2D points)
+  to 
+  public final boolean removeTrace(final ITrace2D points)
+  to return if removing was successful. 
+  
 jchart2d-3.2.1 - April, 16th, 2011
 
 ! Added context menu entry for enabling/disabling antialiasing. 
