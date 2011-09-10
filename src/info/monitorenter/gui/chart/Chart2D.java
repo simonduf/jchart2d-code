@@ -1418,6 +1418,9 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * Calculates the end x coordinate (right bound) in pixel of the chart to
    * draw.
    * <p>
+   * As a side effect the {@link IAxis#setPixelXLeft(int)} is set here.
+   * <p>
+   * 
    * This value depends on the current <code>{@link FontMetrics}</code> used to
    * paint the x labels and the maximum amount of characters that are used for
    * the x labels (<code>{@link IAxisLabelFormatter#getMaxAmountChars()}</code>)
@@ -1481,6 +1484,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * Calculates the start x coordinate (left bound) in pixel of the chart to
    * draw.
    * <p>
+   * As a side effect the {@link IAxis#setPixelXRight(int)} is set here.
+   * <p>
    * This value depends on the current <code>{@link FontMetrics}</code> used to
    * paint the y labels and the maximum amount of characters that are used for
    * the y labels (<code>{@link IAxisLabelFormatter#getMaxAmountChars()}</code>
@@ -1489,10 +1494,42 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * 
    * @param g2d
    *          needed for size information.
+   *          
    * @return the start x coordinate (left bound) in pixel of the chart to draw.
    */
   private int calculateXChartStart(final Graphics g2d) {
     int result = 0;
+    // reverse iteration because the most left axes are the latter ones:
+    ListIterator<IAxis> it = this.m_axesYLeft.listIterator(this.m_axesYLeft.size());
+    IAxis currentAxis;
+    while (it.hasPrevious()) {
+      currentAxis = it.previous();
+      currentAxis.setPixelXLeft(result);
+      if (currentAxis.isVisible()) {
+        result += currentAxis.getWidth(g2d);
+      }
+      currentAxis.setPixelXRight(result);
+    }
+
+    // ensure a minimum offset for e.g. when no Y axes are visible
+    return result > 0 ? result : 20;
+  }
+  
+  /**
+   * Installs the offset the the left y-axes in case this chart 
+   * is stacked / synchronized vertically via {@link #setSynchronizedXStartChart(Chart2D)}.<p>
+   * 
+   * This is only necessary for the charts whose left y axes should start more to the right than if they were 
+   * all on their own and didn't have to care for other charts.
+   * <p>
+   * 
+   * @param g2d
+   *          needed for size information.
+   *          
+   * @return the start x coordinate (left bound) in pixel of the chart to draw.
+   */
+  private int installXAxisLeftOffset(final Graphics g2d, final int offset) {
+    int result = offset;
     // reverse iteration because the most left axes are the latter ones:
     ListIterator<IAxis> it = this.m_axesYLeft.listIterator(this.m_axesYLeft.size());
     IAxis currentAxis;
@@ -1515,6 +1552,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * <p>
    * Note that y coordinates are related to the top of a frame, so a higher y
    * value marks a visual lower chart value.
+   * <p>
+   * As a side effect the {@link IAxis#setPixelYBottom(int)} is set here.
    * <p>
    * The value computed here is the maximum overhang of all y axes caused by
    * their font height of their labels or the summation of all top x axis
@@ -1575,6 +1614,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   /**
    * Calculates the start y coordinate (lower bound) in pixel of the chart to
    * draw.
+   * <p>
+   * As a side effect the {@link IAxis#setPixelYBottom(int)} is set here.
    * <p>
    * Note that y coordinates are related to the top of a frame, so a higher y
    * value marks a visual lower chart value.
@@ -2769,6 +2810,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    */
   private void negociateXChart(final Graphics g2d) {
     if (this.m_synchronizedXStartChart != null) {
+      int myXChartStart = this.calculateXChartStart(g2d);
+      int otherXChartStart = this.m_synchronizedXStartChart
+      .calculateXChartStart(g2d); 
+      int correctionShift = Math.abs(myXChartStart - otherXChartStart);
+      
       this.m_xChartStart = Math.max(this.calculateXChartStart(g2d), this.m_synchronizedXStartChart
           .calculateXChartStart(g2d));
       this.m_xChartEnd = Math.max(this.calculateXChartEnd(g2d), this.m_synchronizedXStartChart
@@ -2776,6 +2822,14 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       synchronized (this.m_synchronizedXStartChart) {
         this.m_synchronizedXStartChart.m_xChartStart = this.m_xChartStart;
         this.m_synchronizedXStartChart.m_xChartEnd = this.m_xChartEnd;
+        /*
+         * Install correction shift to the one that would be naturally more to the left: 
+         */
+        if (myXChartStart > otherXChartStart) {
+          this.m_synchronizedXStartChart.installXAxisLeftOffset(g2d, correctionShift);
+        } else {
+          this.installXAxisLeftOffset(g2d, correctionShift);
+        }
       }
     } else {
       if (!this.m_synchronizedXStart) {
