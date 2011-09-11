@@ -47,10 +47,11 @@ jchart2d-3.2.2 - month, day, year
   Thx for contribution to: Poik Spirit. 
 * Fixed bug #3289727: Dynamic chart with highlighting does not clear points.
 * Fixed potential memory leak in case traces with highlighting enabled are removed. 
-* Fixed bug #3308052: test sources missing from 3.2.1 source file download tree.
+* Fixed bug #3308052: Test sources missing from 3.2.1 source file download tree.
 * Fixed bug #3352480: Chart2D.removeTrace(ITrace2D) does not work after changing it's state (e.g. via setZindex(Integer)).
-* Fixed bug #3405539:  PointPainterDisc.setColorFill is invoked with the same color as the trace color, the disc fill will not happen. 
+* Fixed bug #3405539: PointPainterDisc.setColorFill is invoked with the same color as the trace color, the disc fill will not happen. 
   If the color is different, then fill happens.
+* Fixed bug #3357215: Stacked vertical charts not aligned.
 o Changed Chart2D method signature: 
   public final void removeTrace(final ITrace2D points)
   to 
