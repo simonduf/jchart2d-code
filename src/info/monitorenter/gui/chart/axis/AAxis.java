@@ -2482,9 +2482,10 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Allows the chart to register itself with the axix.
+   * Callback that allows the chart to register itself with the axis when the axis is added to the chart.
    * <p>
-   * This is intended for <code>Chart2D</code> only!.
+   * <b>This is intended for <code>Chart2D</code> only!</b>.
+   * Please do not use this from anywhere in your code. It allows to 
    * <p>
    * 
    * @param chart
@@ -2595,11 +2596,11 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   }
 
   /**
-   * Set wether the grid in this dimension should be painted or not.
+   * Set whether the grid in this dimension should be painted or not.
    * <p>
    * If the grid is set to show (argument is <code>true</code>) also the
    * painting of the scale labels (<code>{@link #setPaintScale(boolean)}</code>
-   * is turned on. This implicit behaviour is chosen as it seems senseless to
+   * is turned on. This implicit behavior is chosen as it seems senseless to
    * have gridlines without knowing which value they stand for.
    * <p>
    * 

@@ -33,7 +33,6 @@ import info.monitorenter.gui.chart.LabeledValue;
 import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterNumber;
 import info.monitorenter.util.Range;
-import info.monitorenter.util.math.MathUtil;
 
 import java.awt.Graphics;
 import java.util.LinkedList;
@@ -140,9 +139,12 @@ public class AxisScalePolicyManualTicks implements IAxisScalePolicy {
       final double range = max - min;
       double value;
       if (axis.isStartMajorTick()) {
-        value = ((int) (min / majorTickSpacing)) * (majorTickSpacing+1);
+        value = ((int) (min / majorTickSpacing)) * (majorTickSpacing);
+        if (value < min) {
+          value += majorTickSpacing;
+        }
       } else {
-        value = ((int) (min / minorTickSpacing)) * (minorTickSpacing+1);
+        value = ((int) (min / minorTickSpacing)) * (minorTickSpacing);
       }
       String labelName = "start";
       int loopStop = 0;

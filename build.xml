@@ -7,7 +7,7 @@
 	<!-- General Properties -->
 
 	<property name="project.name" value="jchart2d" />
-	<property name="project.version" value="3.2.1" />
+	<property name="project.version" value="3.2.2-prerelase-2" />
 	<property name="libdir" value="${basedir}/ext" />
 	<property name="outjar" value="${basedir}/${project.name}-${project.version}.jar" />
 	<property name="distfolder" value="${basedir}/${project.name}-${project.version}/" />

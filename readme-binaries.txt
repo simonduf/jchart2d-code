@@ -52,6 +52,7 @@ jchart2d-3.2.2 - month, day, year
 * Fixed bug #3405539: PointPainterDisc.setColorFill is invoked with the same color as the trace color, the disc fill will not happen. 
   If the color is different, then fill happens.
 * Fixed bug #3357215: Stacked vertical charts not aligned.
+* Fixed bug #3291886: AAxisTransformation transforms scale values (and duplicate #3406961: Labels on AxisLog10 axis are wrong). 
 o Changed Chart2D method signature: 
   public final void removeTrace(final ITrace2D points)
   to 
