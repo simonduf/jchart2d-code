@@ -32,6 +32,7 @@ import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.traces.painters.TracePainterDisc;
 import info.monitorenter.gui.chart.views.ChartPanel;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -62,6 +63,7 @@ public final class Log10AxisChart {
   public static void main(final String[] args) {
     // Create a chart:
     Chart2D chart = new Chart2D();
+    chart.setUseAntialiasing(true);
     // set a special axis:
     AAxis axisy = new AxisLog10();
     DecimalFormat df = new DecimalFormat();
@@ -73,8 +75,9 @@ public final class Log10AxisChart {
     ITrace2D trace = new Trace2DSimple();
     // Add the trace to the chart:
     chart.addTrace(trace);
-    trace.setTracePainter(new TracePainterDisc(1));
-    trace.setColor(Color.DARK_GRAY);
+    trace.setTracePainter(new TracePainterDisc(4));
+    trace.setColor(Color.BLUE);
+    trace.setStroke(new BasicStroke(1));
     // Add the function 1/x + random
     for (double i = 1; i < 10; i += 0.1) {
       trace.addPoint(i, Math.pow(10, i));

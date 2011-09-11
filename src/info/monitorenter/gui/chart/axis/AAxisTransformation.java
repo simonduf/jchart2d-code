@@ -115,7 +115,7 @@ public abstract class AAxisTransformation extends AAxis {
        */
       int result;
       double normalizedValue;
-      Range range = AAxisTransformation.this.getRange();
+      Range range = new Range(AAxisTransformation.this.getMinTransformed(), AAxisTransformation.this.getMaxTransformed());
       double scaler = range.getExtent();
       double absolute = value;
       try {
@@ -266,7 +266,7 @@ public abstract class AAxisTransformation extends AAxis {
   public AAxisTransformation() {
     super();
   }
-
+  
   /**
    * Creates an instance that will the given label formatter for formatting
    * labels.
@@ -311,10 +311,14 @@ public abstract class AAxisTransformation extends AAxis {
   }
 
   /**
+   * Returns the transformed max with additional error treatment in case of empty traces.
+   * <p>
+   * 
+   * @return the transformed max with additional error treatment in case of empty traces.
+   * 
    * @see info.monitorenter.gui.chart.axis.AAxis#getMax()
    */
-  @Override
-  public double getMax() {
+  public double getMaxTransformed() {
     double result = 1.0;
     try {
       result = this.transform(super.getMax());
@@ -325,10 +329,14 @@ public abstract class AAxisTransformation extends AAxis {
   }
 
   /**
+   * Returns the transformed min with additional error treatment in case of empty traces.
+   * <p>
+   * 
+   * @return the transformed min with additional error treatment in case of empty traces.
+   * 
    * @see info.monitorenter.gui.chart.axis.AAxis#getMin()
    */
-  @Override
-  public double getMin() {
+  public double getMinTransformed() {
     double result = 0.0;
     try {
       result = this.transform(super.getMin());
@@ -343,7 +351,7 @@ public abstract class AAxisTransformation extends AAxis {
    */
   public final double getScaledValue(final double absolute) {
     double result;
-    Range range = this.getRange();
+    Range range = new Range(this.getMinTransformed(), this.getMaxTransformed());
     try {
       result = (AAxisTransformation.this.transform(absolute) - range.getMin());
       double scaler = range.getExtent();
@@ -360,6 +368,18 @@ public abstract class AAxisTransformation extends AAxis {
       result = 0;
     }
     return result;
+  }
+
+  /**
+   * Overridden to incorporate transformation.
+   * <p>
+   * 
+   * @see info.monitorenter.gui.chart.IAxis#scaleTrace(info.monitorenter.gui.chart.ITrace2D)
+   */
+  @Override
+  public void scaleTrace(final ITrace2D trace) {
+    final Range range = new Range(this.getMinTransformed(), this.getMaxTransformed());
+    this.m_accessor.scaleTrace(trace, range);
   }
 
   /**

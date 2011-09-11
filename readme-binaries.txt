@@ -47,7 +47,8 @@ jchart2d-3.2.2 - month, day, year
   Thx for contribution to: Poik Spirit. 
 * Fixed bug #3289727: Dynamic chart with highlighting does not clear points.
 * Fixed potential memory leak in case traces with highlighting enabled are removed. 
-* Fixed bug #3308052: test sources missing from 3.2.1 source file download tree.
+* Fixed bug #3308052: Test sources missing from 3.2.1 source file download tree.
+* Fixed bug #3291886: AAxisTransformation transforms scale values (and duplicate #3406961: Labels on AxisLog10 axis are wrong). 
 
 jchart2d-3.2.1 - April, 16th, 2011
 
