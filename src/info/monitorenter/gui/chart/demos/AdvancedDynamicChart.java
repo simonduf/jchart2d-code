@@ -30,6 +30,7 @@ import info.monitorenter.gui.chart.io.ADataCollector;
 import info.monitorenter.gui.chart.io.RandomDataCollectorTimeStamped;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterDate;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterNumber;
+import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyMinimumViewport;
 import info.monitorenter.gui.chart.traces.Trace2DAxisSwap;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
@@ -69,14 +70,14 @@ public final class AdvancedDynamicChart {
   public static void main(final String[] args) {
     // Create a chart:
     Chart2D chart = new Chart2D();
-
+    
     // We want to use a date format for the y axis.
     // Currently works only this way:
     AAxis yAxis = new AxisLinear();
 
     // Number formatter does not work for AxisAutoUnit.
     AAxis xAxis = new AxisLinear();
-
+    
     // Set a date formatter:
     yAxis.setFormatter(new LabelFormatterDate(new SimpleDateFormat("HH:mm:ss")));
     chart.setAxisYLeft(yAxis, 0);
@@ -96,6 +97,7 @@ public final class AdvancedDynamicChart {
     // This must not be invoked before the Axis is connected to a Chart2D
     // (chart.setXAxis...)
     xAxis.setRangePolicy(new RangePolicyMinimumViewport(new Range(-10, +10)));
+
     // Create an ITrace:
     // Note that dynamic charts need limited amount of values!!!
 

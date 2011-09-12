@@ -24,9 +24,11 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.ZoomableChart;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
+import info.monitorenter.gui.chart.traces.painters.TracePainterDisc;
 import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BasicStroke;
@@ -119,15 +121,19 @@ public class ZoomTest
     ITrace2D trace = new Trace2DSimple("Trace");
     chart.addTrace(trace);
     trace.setColor(Color.RED);
-    trace.setStroke(new BasicStroke(2));
+    trace.setStroke(new BasicStroke(4));
+//    ITracePainter<?> painter = new TracePainterDisc(8);
+//    trace.setTracePainter(painter);
 
     // Add all points, as it is static
-    trace.addPoint(0, 0);
-    trace.addPoint(1, 1);
-    trace.addPoint(2, 1);
+    trace.addPoint(0, 1);
+    trace.addPoint(1, 5);
+    trace.addPoint(2, 4);
+    trace.addPoint(1, 6);
+    trace.addPoint(2, 7);
+    trace.addPoint(1, 9);
+    trace.addPoint(0, 4);
     trace.addPoint(3, 2);
-    trace.addPoint(4, 1);
-    trace.addPoint(5, 0);
 
     
     trace = new Trace2DSimple();
@@ -137,7 +143,12 @@ public class ZoomTest
     trace.addPoint(2, 2);
     trace.addPoint(3, 0);
     trace.addPoint(4, -1);
-    trace.addPoint(5, 1);
+    trace.addPoint(5, 4);
+    trace.addPoint(6, 4);
+    trace.addPoint(7, 4);
+    trace.addPoint(8, 4);
+    trace.addPoint(9, 4);
+    
     trace.setColor(Color.BLUE);
 
     // Tool tips and highlighting: Both modes point out the neares trace point to the cursor: 

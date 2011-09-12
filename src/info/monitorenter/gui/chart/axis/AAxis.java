@@ -2108,7 +2108,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     this.paintTitle(g2d);
     // drawing tick - scale, corresponding values, grid and conditional unit
     // label:
-    if (this.isPaintScale()) {
+    if (this.isPaintScale()|| this.isPaintGrid()) {
       final IAxisTickPainter tickPainter = chart.getAxisTickPainter();
       tmp = 0;
       final List<LabeledValue> labels = this.m_axisScalePolicy.getScaleValues(g2d, this);
@@ -2116,8 +2116,10 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
       for (final LabeledValue label : labels) {
         tmp = xAxisStart + (int) (label.getValue() * rangexPx);
         // true -> is bottom axis:
-        tickPainter.paintXTick(tmp, yAxisLine, label.isMajorTick(), true, g2d);
-        tickPainter.paintXLabel(tmp, yAxisLine + fontheight, label.getLabel(), g2d);
+        if (this.isPaintScale()) {
+          tickPainter.paintXTick(tmp, yAxisLine, label.isMajorTick(), true, g2d);
+          tickPainter.paintXLabel(tmp, yAxisLine + fontheight, label.getLabel(), g2d);
+        }
         if (this.isPaintGrid()) {
           // do not paint over the axis
           if (tmp != xAxisStart) {
@@ -2159,7 +2161,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     this.paintTitle(g2d);
     // drawing tick - scale, corresponding values, grid and conditional unit
     // label:
-    if (this.isPaintScale()) {
+    if (this.isPaintScale()||this.isPaintGrid()) {
       // first for x- angle.
       tmp = 0;
       final IAxisTickPainter tickPainter = chart.getAxisTickPainter();
@@ -2167,9 +2169,11 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
       final List<LabeledValue> labels = this.m_axisScalePolicy.getScaleValues(g2d, this);
       for (final LabeledValue label : labels) {
         tmp = xAxisStart + (int) (label.getValue() * rangexPx);
-        // 2nd boolean false -> is not bottom axis (top):
-        tickPainter.paintXTick(tmp, yAxisLine, label.isMajorTick(), false, g2d);
-        tickPainter.paintXLabel(tmp, yAxisLine - majorTickLength, label.getLabel(), g2d);
+        if (this.isPaintScale()) {
+          // 2nd boolean false -> is not bottom axis (top):
+          tickPainter.paintXTick(tmp, yAxisLine, label.isMajorTick(), false, g2d);
+          tickPainter.paintXLabel(tmp, yAxisLine - majorTickLength, label.getLabel(), g2d);
+        }
         if (this.isPaintGrid()) {
           // do not paint over the axis:
           if (tmp != xAxisStart) {
@@ -2211,19 +2215,19 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     this.paintTitle(g2d);
     // drawing tick - scale, corresponding values, grid and conditional unit
     // label:
-    if (this.isPaintScale()) {
+    if (this.isPaintScale() || this.isPaintGrid()) {
       final IAxisTickPainter tickPainter = chart.getAxisTickPainter();
       final int majorTickLength = tickPainter.getMajorTickLength();
       final List<LabeledValue> labels = this.m_axisScalePolicy.getScaleValues(g2d, this);
       for (final LabeledValue label : labels) {
         tmp = yAxisStart - (int) (label.getValue() * rangeyPx);
 
-        // true -> is left y axis:
-        tickPainter.paintYTick(xAxisLine, tmp, label.isMajorTick(), true, g2d);
-
-        tickPainter.paintYLabel(
-            xAxisLine - majorTickLength - fontdim.stringWidth(label.getLabel()), tmp, label
-                .getLabel(), g2d);
+        if (this.isPaintScale()) {
+          // true -> is left y axis:
+          tickPainter.paintYTick(xAxisLine, tmp, label.isMajorTick(), true, g2d);
+          tickPainter.paintYLabel(xAxisLine - majorTickLength
+              - fontdim.stringWidth(label.getLabel()), tmp, label.getLabel(), g2d);
+        }
         if (this.isPaintGrid()) {
           if (tmp != yAxisStart) {
             g2d.setColor(chart.getGridColor());
@@ -2263,16 +2267,18 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     this.paintTitle(g2d);
     // drawing tick - scale, corresponding values, grid and conditional unit
     // label:
-    if (this.isPaintScale()) {
+    if (this.isPaintScale() || this.isPaintGrid()) {
       // then for y- angle.
       final IAxisTickPainter tickPainter = chart.getAxisTickPainter();
       final List<LabeledValue> labels = this.m_axisScalePolicy.getScaleValues(g2d, this);
       final int tickWidth = tickPainter.getMajorTickLength() + 4;
       for (final LabeledValue label : labels) {
         tmp = yAxisStart - (int) (label.getValue() * rangeyPx);
-        // false -> is right y axis:
-        tickPainter.paintYTick(xAxisLine, tmp, label.isMajorTick(), false, g2d);
-        tickPainter.paintYLabel(xAxisLine + tickWidth, tmp, label.getLabel(), g2d);
+        if (this.isPaintScale()) {
+          // false -> is right y axis:
+          tickPainter.paintYTick(xAxisLine, tmp, label.isMajorTick(), false, g2d);
+          tickPainter.paintYLabel(xAxisLine + tickWidth, tmp, label.getLabel(), g2d);
+        }
         if (this.isPaintGrid()) {
           // do not paint over the axis:
           if (tmp != yAxisStart) {
@@ -2598,11 +2604,6 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
   /**
    * Set whether the grid in this dimension should be painted or not.
    * <p>
-   * If the grid is set to show (argument is <code>true</code>) also the
-   * painting of the scale labels (<code>{@link #setPaintScale(boolean)}</code>
-   * is turned on. This implicit behavior is chosen as it seems senseless to
-   * have gridlines without knowing which value they stand for.
-   * <p>
    * 
    * @param grid
    *          true if the grid should be painted or false if not.
@@ -2611,9 +2612,6 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     final boolean oldValue = this.m_paintGrid;
     this.m_paintGrid = grid;
     if (oldValue != grid) {
-      if (grid) {
-        this.setPaintScale(true);
-      }
       this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this,
           IAxis.PROPERTY_PAINTGRID, new Boolean(oldValue), Boolean.valueOf(this.m_paintGrid)));
     }
@@ -2627,7 +2625,12 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    *          true if the scale on this axis should be shown, false else.
    */
   public final void setPaintScale(final boolean show) {
+    boolean oldValue = this.m_paintScale;
     this.m_paintScale = show;
+    if (oldValue != this.m_paintScale) {
+      this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this,
+          IAxis.PROPERTY_PAINTSCALE, new Boolean(oldValue), Boolean.valueOf(this.m_paintGrid)));
+    }
   }
 
   /**
@@ -2677,6 +2680,21 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
 
     this.getRangePolicy().setRange(range);
   }
+  
+  /**
+   * Ensures that no deadlock / NPE due to a missing internal chart reference may
+   * occur.
+   * <p>
+   * 
+   * @throws IllegalStateException
+   *           if this axis is not assigned to a chart.
+   * 
+   */
+  protected final void ensureInitialized() {
+    if (this.m_accessor == null) {
+      throw new IllegalStateException("Add this axis to a chart first before this operation (undebuggable deadlocks might occur else)");
+    } 
+  }
 
   /**
    * <p>
@@ -2698,6 +2716,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    */
   public void setRangePolicy(final IRangePolicy rangePolicy) {
 
+    this.ensureInitialized();
     final IRangePolicy old = this.getRangePolicy();
 
     double max = 0;

@@ -103,6 +103,9 @@ public final class MinimalStaticChart extends JPanel {
 
     chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
 
+    chart.getAxisY().setPaintScale(false);
+    chart.getAxisX().setPaintScale(false);
+    
     // Make it visible:
     this.add(new ChartPanel(chart), BorderLayout.CENTER);
 

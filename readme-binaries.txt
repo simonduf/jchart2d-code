@@ -53,11 +53,13 @@ jchart2d-3.2.2 - month, day, year
   If the color is different, then fill happens.
 * Fixed bug #3357215: Stacked vertical charts not aligned.
 * Fixed bug #3291886: AAxisTransformation transforms scale values (and duplicate #3406961: Labels on AxisLog10 axis are wrong). 
+* Fixed bug #3307611: IAxis.setPaintScale(false) turns off grid. Both properties work individually now (decoupled).
 o Changed Chart2D method signature: 
   public final void removeTrace(final ITrace2D points)
   to 
   public final boolean removeTrace(final ITrace2D points)
   to return if removing was successful. 
+o Decoupled IAxis.setPaintGrid(boolean) from IAxis.setPaintScale(boolean). Earlier versions would turn on paintScale in case grid was turned on. 
   
 jchart2d-3.2.1 - April, 16th, 2011
 

@@ -57,7 +57,7 @@ public abstract class ALabelFormatter implements IAxisLabelFormatter {
   public static final AUnit UNIT_UNCHANGED = new UnitUnchanged();
 
   /** The corresponding axis to format for. */
-  private IAxis m_axis;
+  private transient IAxis m_axis;
 
   /** Support for acting as a property change event producer for listeners. */
   protected PropertyChangeSupport m_propertyChangeSupport;
@@ -199,7 +199,6 @@ public abstract class ALabelFormatter implements IAxisLabelFormatter {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((this.m_axis == null) ? 0 : this.m_axis.hashCode());
     result = prime * result
         + ((this.m_propertyChangeSupport == null) ? 0 : this.m_propertyChangeSupport.hashCode());
     return result;

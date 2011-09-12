@@ -398,6 +398,12 @@ public interface IAxis extends Serializable {
 
   /**
    * Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the
+   * paint scale flag.
+   */
+  public static final String PROPERTY_PAINTSCALE = "IAxis.PROPERTY_PAINTSCALE";
+
+  /**
+   * Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the
    * range policy.
    */
   public static final String PROPERTY_RANGEPOLICY = "IAxis.PROPERTY_RANGEPOLICY";
