@@ -68,7 +68,7 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
    * @see info.monitorenter.gui.chart.IAxisTitlePainter#getHeight(info.monitorenter.gui.chart.IAxis,
    *      java.awt.Graphics)
    */
-  public int getHeight(final IAxis axis, final Graphics g2d) {
+  public int getHeight(final IAxis<?> axis, final Graphics g2d) {
     int result = 0;
     IAxis.AxisTitle axisTitle = axis.getAxisTitle();
     String title = axisTitle.getTitle();
@@ -100,7 +100,7 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
    * @see info.monitorenter.gui.chart.IAxisTitlePainter#getWidth(info.monitorenter.gui.chart.IAxis,
    *      java.awt.Graphics)
    */
-  public int getWidth(final IAxis axis, final Graphics g2d) {
+  public int getWidth(final IAxis<?> axis, final Graphics g2d) {
     int result = 0;
     IAxis.AxisTitle axisTitle = axis.getAxisTitle();
     String title = axisTitle.getTitle();
@@ -146,7 +146,7 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
    * @see info.monitorenter.gui.chart.IAxisTitlePainter#paintTitle(info.monitorenter.gui.chart.IAxis,
    *      java.awt.Graphics)
    */
-  public void paintTitle(final IAxis axis, final Graphics g) {
+  public void paintTitle(final IAxis<?> axis, final Graphics g) {
 
     IAxis.AxisTitle axisTitle = axis.getAxisTitle();
     String title = axisTitle.getTitle();

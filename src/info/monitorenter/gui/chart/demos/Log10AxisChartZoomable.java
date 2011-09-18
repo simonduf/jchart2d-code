@@ -1,6 +1,5 @@
 /*
- *
- *  LogAxisChart.java, rendering demo of jchart2d.
+ *  Log10AxisChart.java, A demo chart that uses a logarithmic axis for Y.
  *  Copyright (C) 2007 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
@@ -25,69 +24,75 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.axis.AxisLogE;
+import info.monitorenter.gui.chart.ZoomableChart;
+import info.monitorenter.gui.chart.axis.AxisLog10;
 import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyTransformation;
-import info.monitorenter.gui.chart.traces.Trace2DLtd;
+import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
+import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.traces.painters.TracePainterDisc;
 import info.monitorenter.gui.chart.views.ChartPanel;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.DecimalFormat;
 
 import javax.swing.JFrame;
 
 /**
- * A demo chart that uses a logarithmic axis for Y ({@link info.monitorenter.gui.chart.axis.AxisLog10})
- * and a trace painter for discs ({@link info.monitorenter.gui.chart.traces.painters.TracePainterDisc}).
+ * A demo chart that uses a logarithmic axis for Y (
+ * {@link info.monitorenter.gui.chart.axis.AxisLog10}) and a trace painter for
+ * discs ({@link info.monitorenter.gui.chart.traces.painters.TracePainterDisc}).
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  * 
  */
-public final class LogAxisChart {
+public final class Log10AxisChartZoomable {
 
   /**
-   * Main entry.
+   * Creates a zoomable chart with y axis log 10, simple label formatter, gridlines, acitvated highlighting and activated tooltips. 
    * <p>
    * 
    * @param args
    *          ignored.
    */
   public static void main(final String[] args) {
-
     // Create a chart:
-    Chart2D chart = new Chart2D();
+    Chart2D chart = new ZoomableChart();
+    chart.setUseAntialiasing(true);
+    chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
+    chart.enablePointHighlighting(true);
     // set a special axis:
-    chart.setAxisYLeft(new AxisLogE<AxisScalePolicyTransformation>(), 0);
+    AxisLog10<AxisScalePolicyTransformation> axisy = new AxisLog10<AxisScalePolicyTransformation>();
+    DecimalFormat df = new DecimalFormat();
+    df.setMaximumFractionDigits(100);
+    chart.setAxisYLeft(axisy, 0);
+    axisy.setFormatter(new LabelFormatterSimple());
+    axisy.setPaintGrid(true);
+    
+    chart.getAxisX().setPaintGrid(true);
 
     // Create an ITrace:
-    ITrace2D trace = new Trace2DSimple("exponential");
+    ITrace2D trace = new Trace2DSimple();
     // Add the trace to the chart:
     chart.addTrace(trace);
-    // configure trace:
-    trace.setTracePainter(new TracePainterDisc());
-    trace.setColor(Color.DARK_GRAY);
+    trace.addPointHighlighter(new PointPainterDisc(10));
+    trace.setTracePainter(new TracePainterDisc(4));
+    trace.setColor(Color.BLUE);
+    trace.setStroke(new BasicStroke(1));
     // Add the function 1/x + random
-    for (int i = 1; i < 50; i++) {
-      trace.addPoint(i, Math.exp(i));
+    for (double i = 1; i <= 10; i += 0.1) {
+      trace.addPoint(i, Math.pow(10, i));
     }
-    
-    ITrace2D trace2 = new Trace2DLtd("linear");
-    trace2.setTracePainter(new TracePainterDisc());
-    trace2.setColor(Color.BLUE);
-    chart.addTrace(trace2);
-    for (int i = 1; i < 50; i++) {
-      trace2.addPoint(i, i);
-    }
-    
 
     // Make it visible:
     // Create a frame.
-    JFrame frame = new JFrame(LogAxisChart.class.getName());
+    JFrame frame = new JFrame(Log10AxisChartZoomable.class.getName());
     // add the chart to the frame:
     frame.getContentPane().add(new ChartPanel(chart));
     frame.setSize(400, 300);
@@ -108,7 +113,7 @@ public final class LogAxisChart {
    * Defcon.
    * <p>
    */
-  private LogAxisChart() {
+  private Log10AxisChartZoomable() {
     // nop
   }
 }

@@ -23,6 +23,7 @@
 package info.monitorenter.gui.chart.axis;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyAutomaticBestFit;
@@ -34,12 +35,17 @@ import info.monitorenter.util.math.MathUtil;
  * An <code>{@link AAxis}</code> with linear display of values.
  * <p>
  * 
+ * @param <T>
+ *          Subtypes may be more picky which scale policies the accept to
+ *          disallow incorrect scales: This supports it (see
+ *          {@link IAxis#setAxisScalePolicy(IAxisScalePolicy)}).  
+ *           
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  * 
  * @version $Revision: 1.22 $
  */
-public class AxisLinear extends AAxis {
+public class AxisLinear<T extends IAxisScalePolicy> extends AAxis<T> {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 4725336592625669661L;
@@ -51,8 +57,12 @@ public class AxisLinear extends AAxis {
    * <p>
    * 
    */
+  @SuppressWarnings("unchecked")
   public AxisLinear() {
-    this(new LabelFormatterSimple(), new AxisScalePolicyAutomaticBestFit());
+    /*
+     * Necessary cast a java bug?
+     */
+    this(new LabelFormatterSimple(), (T)new AxisScalePolicyAutomaticBestFit());
   }
 
   /**
@@ -63,8 +73,12 @@ public class AxisLinear extends AAxis {
    *          needed for formatting labels of this axis.
    * 
    */
+  @SuppressWarnings("unchecked")
   public AxisLinear(final IAxisLabelFormatter formatter) {
-    this(formatter, new AxisScalePolicyAutomaticBestFit());
+    /*
+     * Necessary cast a java bug?
+     */
+    this(formatter, (T)new AxisScalePolicyAutomaticBestFit());
   }
   
   /**
@@ -78,7 +92,7 @@ public class AxisLinear extends AAxis {
    * @param scalePolicy
    *          controls the ticks/labels and their distance.
    */
-  public AxisLinear(final IAxisLabelFormatter formatter, final IAxisScalePolicy scalePolicy) {
+  public AxisLinear(final IAxisLabelFormatter formatter, final T scalePolicy) {
     super(formatter, scalePolicy);
   }
 
@@ -96,14 +110,14 @@ public class AxisLinear extends AAxis {
         throw new IllegalArgumentException("X axis only valid with top or bottom position.");
       }
       this.setAxisPosition(position);
-      result = new AAxis.XDataAccessor(chart);
+      result = new XDataAccessor(chart);
     } else if (dimension == Chart2D.Y) {
       // Don't allow a combination of dimension and position that is not usable:
       if ((position & (Chart2D.CHART_POSITION_LEFT | Chart2D.CHART_POSITION_RIGHT)) == 0) {
         throw new IllegalArgumentException("Y axis only valid with left or right position.");
       }
       this.setAxisPosition(position);
-      result = new AAxis.YDataAccessor(chart);
+      result = new YDataAccessor(chart);
     } else {
       throw new IllegalArgumentException("Dimension has to be Chart2D.X or Chart2D.Y!");
     }

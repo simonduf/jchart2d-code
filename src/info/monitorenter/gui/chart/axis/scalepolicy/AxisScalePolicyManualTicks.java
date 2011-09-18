@@ -100,7 +100,7 @@ public class AxisScalePolicyManualTicks implements IAxisScalePolicy {
    * @return the value rounded to minor or major ticks.
    */
   protected LabeledValue createLabeledValue(final double value, final double majorTickSpacing,
-      final IAxis axis) {
+      final IAxis<?> axis) {
     final LabeledValue ret = new LabeledValue();
     ret.setValue(value);
     if (value % majorTickSpacing == 0) {
@@ -124,7 +124,7 @@ public class AxisScalePolicyManualTicks implements IAxisScalePolicy {
    * 
    * @return the labels for the axis.
    */
-  protected List<LabeledValue> getLabels(final IAxis axis) {
+  protected List<LabeledValue> getLabels(final IAxis<?> axis) {
     final List<LabeledValue> collect = new LinkedList<LabeledValue>();
     double minorTickSpacing = axis.getMinorTickSpacing();
     double majorTickSpacing = axis.getMajorTickSpacing();
@@ -194,14 +194,14 @@ public class AxisScalePolicyManualTicks implements IAxisScalePolicy {
    * @see info.monitorenter.gui.chart.IAxisScalePolicy#getScaleValues(java.awt.Graphics,
    *      info.monitorenter.gui.chart.IAxis)
    */
-  public List<LabeledValue> getScaleValues(final Graphics g2d, final IAxis axis) {
+  public List<LabeledValue> getScaleValues(final Graphics g2d, final IAxis<?> axis) {
     return this.getLabels(axis);
   }
 
   /**
    * @see info.monitorenter.gui.chart.IAxisScalePolicy#initPaintIteration(info.monitorenter.gui.chart.IAxis)
    */
-  public void initPaintIteration(IAxis axis) {
+  public void initPaintIteration(IAxis<?> axis) {
     // nop
   }
 

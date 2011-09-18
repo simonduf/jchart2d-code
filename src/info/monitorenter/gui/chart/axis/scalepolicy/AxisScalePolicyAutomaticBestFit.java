@@ -60,7 +60,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
    */
   protected double m_power;
 
-  public List<LabeledValue> getScaleValues(final Graphics g2d, final IAxis axis) {
+  public List<LabeledValue> getScaleValues(final Graphics g2d, final IAxis<?> axis) {
     final double labelspacepx = axis.getAccessor().getMinimumValueDistanceForLabels(g2d);
     final double formattingspace = axis.getFormatter().getMinimumValueShiftForChange();
     final double max = Math.max(labelspacepx, formattingspace);
@@ -70,7 +70,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
   /**
    * @see info.monitorenter.gui.chart.IAxisScalePolicy#initPaintIteration(info.monitorenter.gui.chart.IAxis)
    */
-  public void initPaintIteration(IAxis axis) {
+  public void initPaintIteration(IAxis<?> axis) {
     // get the powers of ten of the range, a minor Tick of 1.0 has to be
     // able to be 100 times in a range of 100 (match 1,2,3,... instead of
     // 10,20,30,....
@@ -112,7 +112,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
    * 
    * @return the labels for the axis.
    */
-  protected List<LabeledValue> getLabels(final double resolution, final IAxis axis) {
+  protected List<LabeledValue> getLabels(final double resolution, final IAxis<?> axis) {
     final List<LabeledValue> collect = new LinkedList<LabeledValue>();
     if (resolution > 0) {
 
@@ -196,7 +196,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
    * @return the value rounded to minor or major ticks.
    */
   protected LabeledValue roundToTicks(final double value, final boolean floor,
-      final boolean findMajorTick, final IAxis axis) {
+      final boolean findMajorTick, final IAxis<?> axis) {
     final LabeledValue ret = new LabeledValue();
 
     final double minorTick = axis.getMinorTickSpacing() * this.m_power;

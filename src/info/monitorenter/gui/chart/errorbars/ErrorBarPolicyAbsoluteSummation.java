@@ -234,7 +234,7 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
       final ITracePoint2D original) {
     final ITrace2D trace = this.getTrace();
     final Chart2D chart = trace.getRenderer();
-    final IAxis axisX = chart.getAxisX();
+    final IAxis<?> axisX = chart.getAxisX();
     // We cannot use IAxis.translateRelativeValueToPX because non-linear
     // transformations of axis implementations (e.g. log) will put the distance
     // argument in relation to 0 and return wrong results:
@@ -251,7 +251,7 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
       final ITracePoint2D original) {
     final ITrace2D trace = this.getTrace();
     final Chart2D chart = trace.getRenderer();
-    final IAxis axisY = chart.getAxisY();
+    final IAxis<?> axisY = chart.getAxisY();
     // We cannot use IAxis.translateRelativeValueToPX because non-linear
     // transformations of axis implementations (e.g. log) will put the distance
     // argument in relation to 0 and return wrong results:
@@ -268,7 +268,7 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
       final ITracePoint2D original) {
     final ITrace2D trace = this.getTrace();
     final Chart2D chart = trace.getRenderer();
-    final IAxis axisX = chart.getAxisX();
+    final IAxis<?> axisX = chart.getAxisX();
     // We cannot use IAxis.translateRelativeValueToPX with error only and then
     // add / subtract because non-linear
     // transformations of axis implementations (e.g. log) will put the distance
@@ -286,7 +286,7 @@ public class ErrorBarPolicyAbsoluteSummation extends AErrorBarPolicyConfigurable
       final ITracePoint2D original) {
     final ITrace2D trace = this.getTrace();
     final Chart2D chart = trace.getRenderer();
-    final IAxis axisY = chart.getAxisY();
+    final IAxis<?> axisY = chart.getAxisY();
     // We cannot use IAxis.translateRelativeValueToPX because non-linear
     // transformations of axis implementations (e.g. log) will put the distance
     // argument in relation to 0 and return wrong results:

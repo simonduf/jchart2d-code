@@ -62,7 +62,7 @@ public final class MinimalDynamicChart {
 
     // Add the trace to the chart:
     chart.addTrace(trace);
-    IAxis axisX = chart.getAxisX();
+    IAxis<?> axisX = chart.getAxisX();
     axisX.setStartMajorTick(false);
     axisX.setMajorTickSpacing(10);
     // Make it visible:

@@ -46,7 +46,11 @@ import java.util.List;
  * lowest one.
  * <p>
  * 
- * 
+ * @param <T>
+ *          Subtypes may be more picky which scale policies the accept to
+ *          disallow incorrect scales: This supports it (see
+ *          {@link IAxis#setAxisScalePolicy(IAxisScalePolicy)}).  
+ *           
  * @author Andrea Plotegher (initial contribution)
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
@@ -55,7 +59,7 @@ import java.util.List;
  * @version $Revision: 1.20 $
  */
 
-public class AxisInverse extends AAxis {
+public class AxisInverse<T extends IAxisScalePolicy> extends AAxis<T> {
 
   /**
    * 
@@ -66,7 +70,7 @@ public class AxisInverse extends AAxis {
    * 
    * @see Chart2D#getAxisX()
    */
-  public class XDataInverseAccessor extends AAxis.XDataAccessor {
+  protected class XDataInverseAccessor extends AAxis<T>.XDataAccessor {
 
     /** Generated <code>serialVersionUID</code>. */
     private static final long serialVersionUID = -7789192812199631543L;
@@ -136,7 +140,7 @@ public class AxisInverse extends AAxis {
    * 
    * @see Chart2D#getAxisY()
    */
-  protected class YDataInverseAccessor extends AAxis.YDataAccessor {
+  protected class YDataInverseAccessor extends AAxis<T>.YDataAccessor {
 
     /** Generated <code>serialVersionUID</code>. */
     private static final long serialVersionUID = -1759763478911933057L;
@@ -194,29 +198,6 @@ public class AxisInverse extends AAxis {
       }
       return result;
     }
-
-    // /**
-    // * @see
-    // info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateValueToPx(double)
-    // */
-    // public int translateValueToPx(final double value) {
-    // int result = 0;
-    // // first normalize to [00.0..1.0]
-    // double valueNormalized;
-    // // the same as AAxis.this.getRange().getExtend()
-    // double valueRange = AxisInverse.this.getMax() -
-    // AxisInverse.this.getMin();
-    // valueNormalized = 1 - ((value - AxisInverse.this.getMin()) / valueRange);
-    // // no expand into the pixel space:
-    // int rangeY = this.m_chart.getYChartStart() - this.m_chart.getYChartEnd();
-    // if (rangeY == 0) {
-    // // return null
-    // } else {
-    // result = (int) Math.round(this.m_chart.getYChartStart() - valueNormalized
-    // * rangeY);
-    // }
-    // return result;
-    // }
   }
 
   /** Generated <code>serialVersionUID</code>. */
@@ -241,7 +222,7 @@ public class AxisInverse extends AAxis {
    *          controls the ticks/labels and their distance.
    * 
    */
-  public AxisInverse(final IAxisLabelFormatter formatter, final IAxisScalePolicy scalePolicy) {
+  public AxisInverse(final IAxisLabelFormatter formatter, final T scalePolicy) {
     super(formatter, scalePolicy);
   }
 
@@ -259,14 +240,14 @@ public class AxisInverse extends AAxis {
         throw new IllegalArgumentException("X axis only valid with top or bottom position.");
       }
       this.setAxisPosition(position);
-      result = new AxisInverse.XDataInverseAccessor(chart);
+      result = new XDataInverseAccessor(chart);
     } else if (dimension == Chart2D.Y) {
       // Don't allow a combination of dimension and position that is not usable:
       if ((position & (Chart2D.CHART_POSITION_LEFT | Chart2D.CHART_POSITION_RIGHT)) == 0) {
         throw new IllegalArgumentException("Y axis only valid with left or right position.");
       }
       this.setAxisPosition(position);
-      result = new AxisInverse.YDataInverseAccessor(chart);
+      result = new YDataInverseAccessor(chart);
     } else {
       throw new IllegalArgumentException("Dimension has to be Chart2D.X or Chart2D.Y!");
     }
@@ -276,9 +257,13 @@ public class AxisInverse extends AAxis {
   /**
    * @see info.monitorenter.gui.chart.axis.AAxis#setAxisScalePolicy(info.monitorenter.gui.chart.IAxisScalePolicy)
    */
+  @SuppressWarnings("unchecked")
   @Override
-  public IAxisScalePolicy setAxisScalePolicy(final IAxisScalePolicy axisScalePolicy) {
-    return super.setAxisScalePolicy(new IAxisScalePolicy() {
+  public IAxisScalePolicy setAxisScalePolicy(final T axisScalePolicy) {
+    /*
+     * I consider the necessary cast to T as a java bug (compare definition of T in class header):
+     */
+    return super.setAxisScalePolicy((T)new IAxisScalePolicy() {
 
       public void initPaintIteration(IAxis axis) {
         axisScalePolicy.initPaintIteration(axis);

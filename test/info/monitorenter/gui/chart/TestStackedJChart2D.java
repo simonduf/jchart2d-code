@@ -22,12 +22,8 @@
  *
  */
 package info.monitorenter.gui.chart;
-import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.axis.*;
-
-import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
-import info.monitorenter.gui.chart.test.ATestJChart2D;
+import info.monitorenter.gui.chart.axis.AAxis;
+import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.test.ATestStackedJChart2D;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import junit.framework.Test;
@@ -72,15 +68,15 @@ public class TestStackedJChart2D extends ATestStackedJChart2D {
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#createAxisX()
    */
   @Override
-  protected AAxis createAxisX() {
-    return new AxisLinear();
+  protected AAxis<?> createAxisX() {
+    return new AxisLinear<IAxisScalePolicy>();
   }
 
   /**
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#createAxisY()
    */
   @Override
-  protected AAxis createAxisY() {
+  protected AAxis<?> createAxisY() {
     return this.createAxisX();
   }
 

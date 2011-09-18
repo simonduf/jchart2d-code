@@ -23,6 +23,7 @@
 package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.axis.AxisLinear;
@@ -30,7 +31,6 @@ import info.monitorenter.gui.chart.io.ADataCollector;
 import info.monitorenter.gui.chart.io.RandomDataCollectorTimeStamped;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterDate;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterNumber;
-import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyMinimumViewport;
 import info.monitorenter.gui.chart.traces.Trace2DAxisSwap;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
@@ -73,10 +73,10 @@ public final class AdvancedDynamicChart {
     
     // We want to use a date format for the y axis.
     // Currently works only this way:
-    AAxis yAxis = new AxisLinear();
+    AAxis<IAxisScalePolicy> yAxis = new AxisLinear<IAxisScalePolicy>();
 
     // Number formatter does not work for AxisAutoUnit.
-    AAxis xAxis = new AxisLinear();
+    AAxis<IAxisScalePolicy> xAxis = new AxisLinear<IAxisScalePolicy>();
     
     // Set a date formatter:
     yAxis.setFormatter(new LabelFormatterDate(new SimpleDateFormat("HH:mm:ss")));

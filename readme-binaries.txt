@@ -52,7 +52,8 @@ jchart2d-3.2.2 - month, day, year
 * Fixed bug #3405539: PointPainterDisc.setColorFill is invoked with the same color as the trace color, the disc fill will not happen. 
   If the color is different, then fill happens.
 * Fixed bug #3357215: Stacked vertical charts not aligned.
-* Fixed bug #3291886: AAxisTransformation transforms scale values (and duplicate #3406961: Labels on AxisLog10 axis are wrong). 
+* Fixed bug #3291886: AAxisTransformation transforms scale values (and duplicate #3406961: Labels on AxisLog10 axis are wrong). Credits for the 
+  inspiring contribution by Bill Schoolfield.
 * Fixed bug #3307611: IAxis.setPaintScale(false) turns off grid. Both properties work individually now (decoupled).
 o Changed Chart2D method signature: 
   public final void removeTrace(final ITrace2D points)
@@ -60,6 +61,19 @@ o Changed Chart2D method signature:
   public final boolean removeTrace(final ITrace2D points)
   to return if removing was successful. 
 o Decoupled IAxis.setPaintGrid(boolean) from IAxis.setPaintScale(boolean). Earlier versions would turn on paintScale in case grid was turned on. 
+o IAxis has a new generic parameter. 
+  1. Wherever you used 
+  IAxis axis = chart.getAxis();
+  replace it with: 
+  IAxis<?> axis = chart.getAxis();
+  2. Whenever you want to instantiate an axis: 
+  IAxis<?> axis = new AxisLinear<IAxisScalePolicy>();
+  The AAxisTransformation narrows this type (to ensure correct labels): 
+  IAxis<?> axisTransformed = new AxisLog10<AxisScalePolicyTransformation>();
+  3. If you want to reuse the charts axes and set a scale policy, a dirty cast is needed: 
+  IAxis<IAxisScalePolicy> xAxis = (IAxis<IAxisScalePolicy>)chart.getAxisX();
+  xAxis.setAxisScalePolicy(new AxisScalePolicyManualTicks()); 
+  Without the cast you could not set the scale policy. 
   
 jchart2d-3.2.1 - April, 16th, 2011
 

@@ -41,10 +41,7 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import junit.framework.Assert;
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.textui.TestRunner;
 
 /**
  * Junit testcase for <code>{@link info.monitorenter.gui.chart.Chart2D}</code>
@@ -196,7 +193,7 @@ public class TestChart2DHeadless extends TestCase {
   public void testSetAxis() {
     Chart2D chart = new Chart2D();
     IAxisLabelFormatter oldFormatter = chart.getAxisX().getFormatter();
-    AAxis axis = new AxisLinear();
+    AAxis<?> axis = new AxisLinear<IAxisScalePolicy>();
     IAxisLabelFormatter formatter = new LabelFormatterDate((SimpleDateFormat) DateFormat
         .getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT));
     axis.setFormatter(formatter);

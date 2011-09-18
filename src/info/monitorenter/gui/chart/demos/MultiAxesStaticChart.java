@@ -24,6 +24,7 @@
 package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.ITracePointProvider;
@@ -112,15 +113,15 @@ public final class MultiAxesStaticChart extends JPanel {
     carrots.setName("Carrots");
 
     // Use three y axes:
-    AAxis yAxisApples = new AxisLinear();
+    AAxis<?> yAxisApples = new AxisLinear<IAxisScalePolicy>();
     yAxisApples.getAxisTitle().setTitle("Y-Apples");
     yAxisApples.getAxisTitle().setTitleColor(Color.RED);
 
-    AAxis yAxisPears = new AxisLinear();
+    AAxis<?> yAxisPears = new AxisLinear<IAxisScalePolicy>();
     yAxisPears.getAxisTitle().setTitle("Y-Pears");
     yAxisPears.getAxisTitle().setTitleColor(Color.BLUE);
 
-    AAxis yAxisCarrots = new AxisLinear();
+    AAxis<?> yAxisCarrots = new AxisLinear<IAxisScalePolicy>();
     yAxisCarrots.getAxisTitle().setTitle("Y-Carrots");
     yAxisCarrots.getAxisTitle().setTitleColor(Color.MAGENTA);
 
@@ -130,15 +131,15 @@ public final class MultiAxesStaticChart extends JPanel {
     chart.addAxisYLeft(yAxisCarrots);
 
     // use three x axes:
-    AAxis xAxisApples = new AxisLinear();
+    AAxis<?> xAxisApples = new AxisLinear<IAxisScalePolicy>();
     xAxisApples.getAxisTitle().setTitle("X-Apples");
     xAxisApples.getAxisTitle().setTitleColor(Color.RED);
 
-    AAxis xAxisPears = new AxisLinear();
+    AAxis<?> xAxisPears = new AxisLinear<IAxisScalePolicy>();
     xAxisPears.getAxisTitle().setTitle("X-Pears");
     xAxisPears.getAxisTitle().setTitleColor(Color.BLUE);
 
-    AAxis xAxisCarrots = new AxisLinear();
+    AAxis<?> xAxisCarrots = new AxisLinear<IAxisScalePolicy>();
     xAxisCarrots.getAxisTitle().setTitle("X-Carrots");
     xAxisCarrots.getAxisTitle().setTitleColor(Color.MAGENTA);
 

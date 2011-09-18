@@ -27,6 +27,7 @@ import info.monitorenter.gui.chart.IErrorBarPolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ZoomableChart;
 import info.monitorenter.gui.chart.axis.AxisLogE;
+import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyTransformation;
 import info.monitorenter.gui.chart.errorbars.ErrorBarPainter;
 import info.monitorenter.gui.chart.errorbars.ErrorBarPolicyAbsoluteSummation;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
@@ -130,7 +131,7 @@ public class ZoomChartWithErrorBarsAndLogAxis extends JFrame {
     errorBarPolicy.addErrorBarPainter(painter);
     trace.addErrorBarPolicy(errorBarPolicy);
 
-    chart.setAxisYLeft(new AxisLogE(), 0);
+    chart.setAxisYLeft(new AxisLogE<AxisScalePolicyTransformation>(), 0);
 
     // Add all points, as it is static
     for (int i = 1; i < 100; i++) {

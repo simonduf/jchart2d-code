@@ -23,7 +23,6 @@
 package info.monitorenter.gui.chart.views;
 
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.annotations.IAnnotationCreator;
 import info.monitorenter.gui.chart.annotations.bubble.AnnotationCreatorBubble;

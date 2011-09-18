@@ -76,7 +76,7 @@ public abstract class AAxisAction extends AChart2DAction implements PropertyChan
 
     super(chart, description);
     this.m_axis = axis;
-    IAxis myAxis = this.getAxis();
+    IAxis<?> myAxis = this.getAxis();
     if (this.m_axis == Chart2D.X) {
       myAxis.addPropertyChangeListener(Chart2D.PROPERTY_AXIS_X_BOTTOM_REPLACE, this);
     } else if (this.m_axis == Chart2D.Y) {
@@ -97,10 +97,10 @@ public abstract class AAxisAction extends AChart2DAction implements PropertyChan
    * 
    * @return the axis that is controlled.
    */
-  protected IAxis getAxis() {
+  protected IAxis<?> getAxis() {
 
     // update in case the corresponding chart has a new axis:
-    IAxis axis = null;
+    IAxis<?> axis = null;
     switch (this.m_axis) {
       case Chart2D.X:
         axis = this.m_chart.getAxisX();
@@ -121,8 +121,8 @@ public abstract class AAxisAction extends AChart2DAction implements PropertyChan
     String property = evt.getPropertyName();
     if (((property.equals(Chart2D.PROPERTY_AXIS_X_BOTTOM_REPLACE)) && (this.m_axis == Chart2D.X))
         || (property.equals(Chart2D.PROPERTY_AXIS_Y_LEFT_REPLACE) && this.m_axis == Chart2D.Y)) {
-      IAxis oldAxis = (IAxis) evt.getOldValue();
-      IAxis newAxis = (IAxis) evt.getNewValue();
+      IAxis<?> oldAxis = (IAxis<?>) evt.getOldValue();
+      IAxis<?> newAxis = (IAxis<?>) evt.getNewValue();
       if (property.equals(Chart2D.PROPERTY_AXIS_X_BOTTOM_REPLACE)) {
         oldAxis.removePropertyChangeListener(Chart2D.PROPERTY_AXIS_X_BOTTOM_REPLACE, this);
         newAxis.addPropertyChangeListener(Chart2D.PROPERTY_AXIS_X_BOTTOM_REPLACE, this);

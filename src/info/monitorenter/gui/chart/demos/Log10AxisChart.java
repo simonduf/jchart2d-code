@@ -26,6 +26,7 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.axis.AxisLog10;
+import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyTransformation;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterAutoUnits;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterNumber;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
@@ -65,7 +66,7 @@ public final class Log10AxisChart {
     Chart2D chart = new Chart2D();
     chart.setUseAntialiasing(true);
     // set a special axis:
-    AAxis axisy = new AxisLog10();
+    AAxis<?> axisy = new AxisLog10<AxisScalePolicyTransformation>();
     DecimalFormat df = new DecimalFormat();
     df.setMaximumFractionDigits(100);
     chart.setAxisYLeft(axisy, 0);

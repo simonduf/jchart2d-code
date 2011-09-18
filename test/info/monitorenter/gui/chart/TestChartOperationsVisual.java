@@ -169,7 +169,7 @@ public class TestChartOperationsVisual extends ATestChartOperations {
 					this.m_testTraces[i] = new Trace2DLtd(300);
 					this.m_testTraces[i].setStroke(new BasicStroke(8));
 					this.m_testTraces[i].setColor(colors[i]);
-					AAxis axisY = new AxisLinear();
+					AAxis<?> axisY = new AxisLinear<IAxisScalePolicy>();
 					chart.addAxisYLeft(axisY);
 					chart.addTrace(this.m_testTraces[i], chart.getAxisX(),
 							axisY);
@@ -834,18 +834,18 @@ public class TestChartOperationsVisual extends ATestChartOperations {
 			@Override
 			public void preCondition(Chart2D chart) throws Exception {
 				super.preCondition(chart);
-				AAxis axisY1 = new AxisLinear();
+				AAxis<?> axisY1 = new AxisLinear<IAxisScalePolicy>();
 				axisY1.getAxisTitle().setTitle("asisY1");
-				AAxis axisY2 = new AxisLinear();
+				AAxis<?> axisY2 = new AxisLinear<IAxisScalePolicy>();
 				axisY2.getAxisTitle().setTitle("asisY2");
-				AAxis axisY3 = new AxisLinear();
+				AAxis<?> axisY3 = new AxisLinear<IAxisScalePolicy>();
 				axisY3.getAxisTitle().setTitle("asisY3");
 				chart.addAxisYLeft(axisY1);
 				chart.addAxisYLeft(axisY2);
 				chart.addAxisYLeft(axisY3);
 
 				// trace1
-				IAxis xAxis = chart.getAxisX();
+				IAxis<?> xAxis = chart.getAxisX();
 				ITrace2D trace1 = new Trace2DLtd();
 				trace1.setColor(Color.BLUE);
 				chart.addTrace(trace1, xAxis, axisY1);

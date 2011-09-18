@@ -126,7 +126,7 @@ public class LabelFormatterUnit
    * @see ALabelFormatter#getAxis()
    */
   @Override
-  public IAxis getAxis() {
+  public IAxis<?> getAxis() {
     return this.m_delegate.getAxis();
   }
 
@@ -269,7 +269,7 @@ public class LabelFormatterUnit
    * @see ALabelFormatter#setAxis(IAxis)
    */
   @Override
-  public void setAxis(final IAxis axis) {
+  public void setAxis(final IAxis<?> axis) {
 
     this.m_delegate.setAxis(axis);
   }

@@ -54,7 +54,7 @@ public interface IAxisTitlePainter extends Serializable {
    * @return the height of this axis title in px with respect to the current
    *         title of the given axis.
    */
-  public int getHeight(final IAxis axis, final Graphics g2d);
+  public int getHeight(final IAxis<?> axis, final Graphics g2d);
 
 
   /**
@@ -71,7 +71,7 @@ public interface IAxisTitlePainter extends Serializable {
    * @return the width of this axis title in px with respect to the current
    *         title of the given axis.
    */
-  public int getWidth(final IAxis axis, final Graphics g2d);
+  public int getWidth(final IAxis<?> axis, final Graphics g2d);
 
   /**
    * Invoked to let implementations paint the given title of the given axis.
@@ -87,6 +87,6 @@ public interface IAxisTitlePainter extends Serializable {
    * @param g
    *          needed for size informations.
    */
-  public void paintTitle(final IAxis axis, final Graphics g);
+  public void paintTitle(final IAxis<?> axis, final Graphics g);
 
 }

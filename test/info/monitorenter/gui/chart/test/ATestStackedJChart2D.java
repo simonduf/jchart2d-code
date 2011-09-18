@@ -46,17 +46,17 @@ import junit.framework.TestCase;
 public abstract class ATestStackedJChart2D extends TestCase {
 
     /** The x axis configured for the test chart. */
-    protected AAxis m_axisX1;
+    protected AAxis<?> m_axisX1;
     /** The y axis configured for the test chart. */
-    protected AAxis m_axisY1;
+    protected AAxis<?> m_axisY1;
     /** The traces configured for the test chart. */
     protected ITrace2D[] m_traces1;
     /** The test chart. */
     protected Chart2D m_chart1;
     /** The x axis configured for the 2nd test chart. */
-    protected AAxis m_axisX2;
+    protected AAxis<?> m_axisX2;
     /** The y axis configured for the 2nd test chart. */
-    protected AAxis m_axisY2;
+    protected AAxis<?> m_axisY2;
     /** The traces configured for the 2nd test chart. */
     protected ITrace2D[] m_traces2;
     /** The test 2nd chart. */
@@ -81,7 +81,7 @@ public abstract class ATestStackedJChart2D extends TestCase {
      * 
      * @return the <code>{@link AAxis}</code> to test.
      */
-    protected abstract AAxis createAxisX();
+    protected abstract AAxis<?> createAxisX();
 
     /**
      * Implement and return an instance of the type to test.
@@ -89,7 +89,7 @@ public abstract class ATestStackedJChart2D extends TestCase {
      * 
      * @return the y axis to test.
      */
-    protected abstract AAxis createAxisY();
+    protected abstract AAxis<?> createAxisY();
 
     /**
      * Implement and return the instances of the type to test.
@@ -225,7 +225,7 @@ public abstract class ATestStackedJChart2D extends TestCase {
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
         textArea.setText("Does the result look ok?");
-        ModalDialog dialog = new ModalDialog(m_frame, "Judge operation ", textArea);
+        ModalDialog dialog = new ModalDialog(this.m_frame, "Judge operation ", textArea);
         dialog.setSize(new Dimension(400, 100));
         dialog.showDialog();
         boolean failure = false;

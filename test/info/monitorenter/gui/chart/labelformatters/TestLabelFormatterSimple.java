@@ -89,7 +89,7 @@ public class TestLabelFormatterSimple extends ATestChartOperations {
         chart.getAxisY().setStartMajorTick(false);
         IAxisLabelFormatter formatter = new LabelFormatterSimple();
 
-        IAxis yAxis = chart.getAxisY();
+        IAxis<?> yAxis = chart.getAxisY();
         yAxis.setFormatter(formatter);
         // force the precondition visual change to have time show.
         // else the repaint could occur after the number format has been

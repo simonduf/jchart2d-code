@@ -195,6 +195,6 @@ public interface IAxisLabelFormatter extends Serializable {
    * @param axis
    *          the axis to gain information about.
    */
-  public void setAxis(IAxis axis);
+  public void setAxis(IAxis<?> axis);
 
 }

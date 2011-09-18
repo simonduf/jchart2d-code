@@ -54,7 +54,7 @@ public final class Chart2DActionSetAxis
   private final int m_axisTarget;
 
   /** The axis implementation to use. */
-  private final transient AAxis m_axis;
+  private final transient AAxis<?> m_axis;
 
   /**
    * Create an <code>Action</code> that accesses the trace and identifies
@@ -77,7 +77,7 @@ public final class Chart2DActionSetAxis
    * @throws IllegalArgumentException
    *             if the axis argument is invalid.
    */
-  public Chart2DActionSetAxis(final Chart2D chart, final AAxis axis, final String description,
+  public Chart2DActionSetAxis(final Chart2D chart, final AAxis<?> axis, final String description,
       final int axisTarget) throws IllegalArgumentException {
     super(chart, description);
     if (axisTarget != Chart2D.X && axisTarget != Chart2D.Y) {

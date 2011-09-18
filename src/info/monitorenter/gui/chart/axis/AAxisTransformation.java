@@ -29,6 +29,7 @@ import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
+import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyTransformation;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.math.MathUtil;
 
@@ -40,10 +41,21 @@ import java.util.Iterator;
  * display.
  * <p>
  * 
+ * Note that instances of this implementations will only accept subtypes of
+ * {@link AxisScalePolicyTransformation} for the method
+ * {@link #setAxisScalePolicy(IAxisScalePolicy)}.
+ * <p>
+ * 
+ * 
+ * @param <T>
+ *          Used to enforce that this instance only accepts
+ *          {@link AxisScalePolicyTransformation} and subtypes.
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
+ * 
  * @version $Revision: 1.32 $
  */
-public abstract class AAxisTransformation extends AAxis {
+public abstract class AAxisTransformation<T extends AxisScalePolicyTransformation> extends AAxis<T> {
 
   /**
    * An accessor for the x axis of a chart.
@@ -52,7 +64,7 @@ public abstract class AAxisTransformation extends AAxis {
    * @author <a href="mailto:Achim.Westermann@gmx.de>Achim Westermann </a>
    * @see Chart2D#getAxisX()
    */
-  public final class XDataAccessor extends AAxis.XDataAccessor {
+  protected final class XDataAccessor extends AAxis<T>.XDataAccessor {
 
     /** Generated <code>serialVersionUID</code>. */
     private static final long serialVersionUID = 8775312615991487847L;
@@ -104,6 +116,25 @@ public abstract class AAxisTransformation extends AAxis {
     }
 
     /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.XDataAccessor#translatePxToValue(int)
+     */
+    @Override
+    public double translatePxToValue(int pixel) {
+      double result = 0;
+      // relate to the offset:
+      final double px = pixel - this.m_chart.getXChartStart();
+
+      final int rangeX = this.m_chart.getXChartEnd() - this.m_chart.getXChartStart();
+      if (rangeX != 0) {
+        final double scaledX = px / rangeX;
+        final Range valueRangeX = new Range(AAxisTransformation.this.getMinTransformed(),
+            AAxisTransformation.this.getMaxTransformed());
+        result = scaledX * valueRangeX.getExtent() + valueRangeX.getMin();
+      }
+      return result;
+    }
+
+    /**
      * @see info.monitorenter.gui.chart.axis.AAxis.XDataAccessor#translateValueToPx(double)
      */
     @Override
@@ -115,7 +146,8 @@ public abstract class AAxisTransformation extends AAxis {
        */
       int result;
       double normalizedValue;
-      Range range = new Range(AAxisTransformation.this.getMinTransformed(), AAxisTransformation.this.getMaxTransformed());
+      Range range = new Range(AAxisTransformation.this.getMinTransformed(),
+          AAxisTransformation.this.getMaxTransformed());
       double scaler = range.getExtent();
       double absolute = value;
       try {
@@ -150,7 +182,7 @@ public abstract class AAxisTransformation extends AAxis {
    * @see Chart2D#getAxisY()
    */
 
-  protected final class YDataAccessor extends AAxis.YDataAccessor {
+  protected final class YDataAccessor extends AAxis<T>.YDataAccessor {
 
     /** Generated <code>serialVersionUID</code>. */
     private static final long serialVersionUID = 3043923189624836455L;
@@ -199,6 +231,25 @@ public abstract class AAxisTransformation extends AAxis {
           point.setScaledY(result);
         }
       }
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.YDataAccessor#translatePxToValue(int)
+     */
+    @Override
+    public double translatePxToValue(int pixel) {
+      double result = 0;
+      // invert, as awt px are higher the lower the chart value is:
+      final double px = this.m_chart.getYChartStart() - pixel;
+
+      final int rangeY = this.m_chart.getYChartStart() - this.m_chart.getYChartEnd();
+      if (rangeY != 0) {
+        final double scaledY = px / rangeY;
+        final Range valueRangeY = new Range(AAxisTransformation.this.getMinTransformed(),
+            AAxisTransformation.this.getMaxTransformed());
+        result = scaledY * valueRangeY.getExtent() + valueRangeY.getMin();
+      }
+      return result;
     }
 
     /**
@@ -266,7 +317,7 @@ public abstract class AAxisTransformation extends AAxis {
   public AAxisTransformation() {
     super();
   }
-  
+
   /**
    * Creates an instance that will the given label formatter for formatting
    * labels.
@@ -278,7 +329,7 @@ public abstract class AAxisTransformation extends AAxis {
    * @param scalePolicy
    *          controls the ticks/labels and their distance.
    */
-  public AAxisTransformation(final IAxisLabelFormatter formatter, final IAxisScalePolicy scalePolicy) {
+  public AAxisTransformation(final IAxisLabelFormatter formatter, final T scalePolicy) {
     super(formatter, scalePolicy);
   }
 
@@ -287,23 +338,23 @@ public abstract class AAxisTransformation extends AAxis {
    *      int, int)
    */
   @Override
-  protected AAxis.AChart2DDataAccessor createAccessor(final Chart2D chart, final int dimension,
+  protected AAxis<T>.AChart2DDataAccessor createAccessor(final Chart2D chart, final int dimension,
       final int position) {
-    AAxis.AChart2DDataAccessor result;
+    AAxis<T>.AChart2DDataAccessor result;
     if (dimension == Chart2D.X) {
       // Don't allow a combination of dimension and position that is not usable:
       if ((position & (Chart2D.CHART_POSITION_BOTTOM | Chart2D.CHART_POSITION_TOP)) == 0) {
         throw new IllegalArgumentException("X axis only valid with top or bottom position.");
       }
       this.setAxisPosition(position);
-      result = new AAxisTransformation.XDataAccessor(chart);
+      result = new XDataAccessor(chart);
     } else if (dimension == Chart2D.Y) {
       // Don't allow a combination of dimension and position that is not usable:
       if ((position & (Chart2D.CHART_POSITION_LEFT | Chart2D.CHART_POSITION_RIGHT)) == 0) {
         throw new IllegalArgumentException("Y axis only valid with left or right position.");
       }
       this.setAxisPosition(position);
-      result = new AAxisTransformation.YDataAccessor(chart);
+      result = new YDataAccessor(chart);
     } else {
       throw new IllegalArgumentException("Dimension has to be Chart2D.X or Chart2D.Y!");
     }
@@ -311,10 +362,12 @@ public abstract class AAxisTransformation extends AAxis {
   }
 
   /**
-   * Returns the transformed max with additional error treatment in case of empty traces.
+   * Returns the transformed max with additional error treatment in case of
+   * empty traces.
    * <p>
    * 
-   * @return the transformed max with additional error treatment in case of empty traces.
+   * @return the transformed max with additional error treatment in case of
+   *         empty traces.
    * 
    * @see info.monitorenter.gui.chart.axis.AAxis#getMax()
    */
@@ -329,10 +382,12 @@ public abstract class AAxisTransformation extends AAxis {
   }
 
   /**
-   * Returns the transformed min with additional error treatment in case of empty traces.
+   * Returns the transformed min with additional error treatment in case of
+   * empty traces.
    * <p>
    * 
-   * @return the transformed min with additional error treatment in case of empty traces.
+   * @return the transformed min with additional error treatment in case of
+   *         empty traces.
    * 
    * @see info.monitorenter.gui.chart.axis.AAxis#getMin()
    */
@@ -391,7 +446,7 @@ public abstract class AAxisTransformation extends AAxis {
    * 
    * @param in
    *          the value to transform.
-   *          
+   * 
    * @return the transformed value.
    * 
    * @throws IllegalArgumentException
@@ -399,7 +454,7 @@ public abstract class AAxisTransformation extends AAxis {
    *           in implementations like
    *           {@link info.monitorenter.gui.chart.axis.AxisLog10}
    */
-  protected abstract double transform(final double in) throws IllegalArgumentException;
+  public abstract double transform(final double in) throws IllegalArgumentException;
 
   /**
    * @see info.monitorenter.gui.chart.axis.AAxis#translateMousePosition(java.awt.event.MouseEvent)
@@ -428,5 +483,5 @@ public abstract class AAxisTransformation extends AAxis {
    *          the transformed value.
    * @return the normal value;
    */
-  protected abstract double untransform(final double in);
+  public abstract double untransform(final double in);
 }

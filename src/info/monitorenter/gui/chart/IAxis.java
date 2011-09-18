@@ -22,7 +22,7 @@
  */
 package info.monitorenter.gui.chart;
 
-import info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor;
+import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.axistitlepainters.AxisTitlePainterDefault;
 import info.monitorenter.util.Range;
 
@@ -39,10 +39,15 @@ import java.util.Set;
  * Interface for an axis of the {@link info.monitorenter.gui.chart.Chart2D}.
  * <p>
  * 
+ * @param <T>
+ *          Subtypes may be more picky which scale policies the accept to
+ *          disallow incorrect scales: This supports it (see
+ *          {@link IAxis#setAxisScalePolicy(IAxisScalePolicy)}).
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * @version $Revision: 1.39 $
  */
-public interface IAxis extends Serializable {
+public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
 
   /**
    * Represents a title of an axis.
@@ -194,7 +199,7 @@ public interface IAxis extends Serializable {
      * @return the height of this axis title in px with respect to the current
      *         title of the given axis.
      */
-    public int getHeight(final IAxis axis, final Graphics2D g2d) {
+    public int getHeight(final IAxis<?> axis, final Graphics2D g2d) {
       return this.m_titlePainter.getHeight(axis, g2d);
     }
 
@@ -273,7 +278,7 @@ public interface IAxis extends Serializable {
      * @return the width of this axis title in px with respect to the current
      *         title of the given axis.
      */
-    public int getWidth(final IAxis axis, final Graphics2D g2d) {
+    public int getWidth(final IAxis<?> axis, final Graphics2D g2d) {
       return this.m_titlePainter.getWidth(axis, g2d);
     }
 
@@ -497,7 +502,7 @@ public interface IAxis extends Serializable {
    * 
    * @return the accessor to the chart.
    */
-  public abstract AChart2DDataAccessor getAccessor();
+  public abstract AAxis<?>.AChart2DDataAccessor getAccessor();
 
   /**
    * Returns the constant for the position of this axis for the chart.
@@ -770,7 +775,7 @@ public interface IAxis extends Serializable {
    * 
    * @return the previous axis scale policy that was used before.
    */
-  public IAxisScalePolicy setAxisScalePolicy(IAxisScalePolicy axisScalePolicy);
+  public IAxisScalePolicy setAxisScalePolicy(T axisScalePolicy);
   
   /**
    * Returns the title or <code>null</code> if there was no title configured

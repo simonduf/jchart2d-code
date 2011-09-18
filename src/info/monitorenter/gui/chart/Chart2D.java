@@ -46,7 +46,6 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -436,8 +435,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
          * We need the axes of the point for correct formatting (expensive...).
          */
         ITrace2D trace = point.getListener();
-        IAxis xAxis = chart.getAxisX(trace);
-        IAxis yAxis = chart.getAxisY(trace);
+        IAxis<?> xAxis = chart.getAxisX(trace);
+        IAxis<?> yAxis = chart.getAxisY(trace);
 
         chart.setRequestedRepaint(true);
         StringBuffer buffer = new StringBuffer("X: ");
@@ -727,7 +726,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * of the call <code>{@link Chart2D#getAxisX()}</code>.
    * <p>
    */
-  private List<IAxis> m_axesXBottom;
+  private List<IAxis<?>> m_axesXBottom;
 
   /**
    * The top x axes of the chart.
@@ -735,7 +734,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * If empty no top x axes are shown.
    * <p>
    */
-  private List<IAxis> m_axesXTop;
+  private List<IAxis<?>> m_axesXTop;
 
   /**
    * The left y axes of the chart.
@@ -744,7 +743,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * of the call <code>{@link Chart2D#getAxisY()}</code>.
    * <p>
    */
-  private List<IAxis> m_axesYLeft;
+  private List<IAxis<?>> m_axesYLeft;
 
   /**
    * The right y axes of the chart.
@@ -752,7 +751,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * If empty no right y axes are shown.
    * <p>
    */
-  private List<IAxis> m_axesYRight;
+  private List<IAxis<?>> m_axesYRight;
 
   /** The internal label painter for this chart. */
   private IAxisTickPainter m_axisTickPainter;
@@ -775,7 +774,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * Defaults to the first bottom x axis.
    * <p>
    */
-  private AAxis m_mouseTranslationXAxis;
+  private AAxis<?> m_mouseTranslationXAxis;
 
   /**
    * The axis that is used for translation from mouse event to y value by method
@@ -784,7 +783,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * Defaults to the first left y axis.
    * <p>
    */
-  private AAxis m_mouseTranslationYAxis;
+  private AAxis<?> m_mouseTranslationYAxis;
 
   /**
    * When not null this format will be used within paint: then we deal with a
@@ -1141,18 +1140,18 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   public Chart2D() {
 
     // initialize the axis collections:
-    this.m_axesXBottom = new LinkedList<IAxis>();
-    this.m_axesXTop = new LinkedList<IAxis>();
-    this.m_axesYLeft = new LinkedList<IAxis>();
-    this.m_axesYRight = new LinkedList<IAxis>();
+    this.m_axesXBottom = new LinkedList<IAxis<?>>();
+    this.m_axesXTop = new LinkedList<IAxis<?>>();
+    this.m_axesYLeft = new LinkedList<IAxis<?>>();
+    this.m_axesYRight = new LinkedList<IAxis<?>>();
 
     this.setTracePointProvider(new TracePointProviderDefault());
 
-    AAxis axisX = new AxisLinear();
+    AAxis<?> axisX = new AxisLinear<IAxisScalePolicy>();
     this.setAxisXBottom(axisX, 0);
     axisX.getAxisTitle().setTitle("X");
 
-    AAxis axisY = new AxisLinear();
+    AAxis<?> axisY = new AxisLinear<IAxisScalePolicy>();
     this.setAxisYLeft(axisY, 0);
     axisY.getAxisTitle().setTitle("Y");
 
@@ -1213,7 +1212,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @param axisX
    *          the additional bottom x axis.
    */
-  public void addAxisXBottom(final AAxis axisX) {
+  public void addAxisXBottom(final AAxis<?> axisX) {
     this.ensureUniqueAxis(axisX);
     this.m_axesXBottom.add(axisX);
     axisX.setChart(this, Chart2D.X, Chart2D.CHART_POSITION_BOTTOM);
@@ -1234,7 +1233,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @param axisX
    *          the additional top x axis.
    */
-  public void addAxisXTop(final AAxis axisX) {
+  public void addAxisXTop(final AAxis<?> axisX) {
     this.ensureUniqueAxis(axisX);
     this.m_axesXTop.add(axisX);
     axisX.setChart(this, Chart2D.X, Chart2D.CHART_POSITION_TOP);
@@ -1255,7 +1254,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @param axisY
    *          the additional left y axis.
    */
-  public void addAxisYLeft(final AAxis axisY) {
+  public void addAxisYLeft(final AAxis<?> axisY) {
     this.ensureUniqueAxis(axisY);
     this.m_axesYLeft.add(axisY);
     axisY.setChart(this, Chart2D.Y, Chart2D.CHART_POSITION_LEFT);
@@ -1276,7 +1275,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @param axisY
    *          the additional right y axis.
    */
-  public void addAxisYRight(final AAxis axisY) {
+  public void addAxisYRight(final AAxis<?> axisY) {
     this.ensureUniqueAxis(axisY);
     this.m_axesYRight.add(axisY);
     axisY.setChart(this, Chart2D.Y, Chart2D.CHART_POSITION_RIGHT);
@@ -1306,8 +1305,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @see Chart2D#addTrace(ITrace2D, IAxis, IAxis)
    */
   public final void addTrace(final ITrace2D points) {
-    IAxis xAxis = this.m_axesXBottom.get(0);
-    IAxis yAxis = this.m_axesYLeft.get(0);
+    IAxis<?> xAxis = this.m_axesXBottom.get(0);
+    IAxis<?> yAxis = this.m_axesYLeft.get(0);
     this.addTrace(points, xAxis, yAxis);
   }
 
@@ -1337,7 +1336,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * 
    * @see IAxis#PROPERTY_ADD_REMOVE_TRACE
    */
-  public final void addTrace(final ITrace2D points, final IAxis xAxis, final IAxis yAxis) {
+  public final void addTrace(final ITrace2D points, final IAxis<?> xAxis, final IAxis<?> yAxis) {
     if (!this.m_axesXBottom.contains(xAxis)) {
       if (!this.m_axesXTop.contains(xAxis)) {
         throw new IllegalArgumentException(
@@ -1436,10 +1435,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     int result;
     result = (int) this.getSize().getWidth();
 
-    IAxis currentAxis;
+    IAxis<?> currentAxis;
     int axisWidth = 0;
     if (this.m_axesYRight.size() > 0) {
-      ListIterator<IAxis> it = this.m_axesYRight.listIterator(this.m_axesYRight.size());
+      ListIterator<IAxis<?>> it = this.m_axesYRight.listIterator(this.m_axesYRight.size());
       while (it.hasPrevious()) {
         currentAxis = it.previous();
         axisWidth = currentAxis.getWidth(g2d);
@@ -1456,7 +1455,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     } else {
       // use the maximum label width of the x axes to avoid x labels
       // being clipped in case there are no right y axes:
-      Iterator<IAxis> it = this.m_axesXBottom.iterator();
+      Iterator<IAxis<?>> it = this.m_axesXBottom.iterator();
       int xAxesMaxLabelWidth = 0;
       int tmp;
       while (it.hasNext()) {
@@ -1500,8 +1499,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   private int calculateXChartStart(final Graphics g2d) {
     int result = 0;
     // reverse iteration because the most left axes are the latter ones:
-    ListIterator<IAxis> it = this.m_axesYLeft.listIterator(this.m_axesYLeft.size());
-    IAxis currentAxis;
+    ListIterator<IAxis<?>> it = this.m_axesYLeft.listIterator(this.m_axesYLeft.size());
+    IAxis<?> currentAxis;
     while (it.hasPrevious()) {
       currentAxis = it.previous();
       currentAxis.setPixelXLeft(result);
@@ -1531,8 +1530,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   private int installXAxisLeftOffset(final Graphics g2d, final int offset) {
     int result = offset;
     // reverse iteration because the most left axes are the latter ones:
-    ListIterator<IAxis> it = this.m_axesYLeft.listIterator(this.m_axesYLeft.size());
-    IAxis currentAxis;
+    ListIterator<IAxis<?>> it = this.m_axesYLeft.listIterator(this.m_axesYLeft.size());
+    IAxis<?> currentAxis;
     while (it.hasPrevious()) {
       currentAxis = it.previous();
       currentAxis.setPixelXLeft(result);
@@ -1565,16 +1564,18 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @return the end y coordinate (upper bound) in pixel of the chart to draw.
    */
   private int calculateYChartEnd(final Graphics g2d) {
-    IAxis currentAxis;
+    IAxis<?> currentAxis;
     int tmp;
     int result = 0;
     int maxAxisYHeight = 0;
     int axesXTopHeight = 0;
-    // 1) Find the max y axis height (this is just the overhang cause by label
-    // TODO: maybe this is too much work in case all fonts of all axes are the
-    // same and
-    // every axis will give the same result for the height (debug).
-    Iterator<IAxis> it = this.m_axesYLeft.iterator();
+    /*
+     * 1) Find the max y axis height (this is just the overhang cause by label.
+     * 
+     * TODO: maybe this is too much work in case all fonts of all axes are the
+     * same and every axis will give the same result for the height (debug).
+     */
+    Iterator<IAxis<?>> it = this.m_axesYLeft.iterator();
     while (it.hasNext()) {
       currentAxis = it.next();
       tmp = currentAxis.getHeight(g2d);
@@ -1593,7 +1594,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
 
     // 2) Find the total height of top x axes
     // (and calculate the y pixel of the top axes):
-    ListIterator<IAxis> listIt = this.m_axesXTop.listIterator(this.m_axesXTop.size());
+    ListIterator<IAxis<?>> listIt = this.m_axesXTop.listIterator(this.m_axesXTop.size());
     int axisHeight = 0;
     while (listIt.hasPrevious()) {
       currentAxis = listIt.previous();
@@ -1631,9 +1632,9 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     int result;
     result = (int) this.getSize().getHeight();
     result = result - labelHeight;
-    IAxis currentAxis;
+    IAxis<?> currentAxis;
     int axesXBottomHeight = 0;
-    Iterator<IAxis> it = this.m_axesXBottom.iterator();
+    Iterator<IAxis<?>> it = this.m_axesXBottom.iterator();
     while (it.hasNext()) {
       currentAxis = it.next();
       currentAxis.setPixelYBottom(result);
@@ -1746,7 +1747,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @param axisToAdd
    *          the axis to test.
    */
-  private void ensureUniqueAxis(final IAxis axisToAdd) {
+  private void ensureUniqueAxis(final IAxis<?> axisToAdd) {
     if (this.m_axesXBottom.contains(axisToAdd)) {
       throw new IllegalArgumentException("Given axis (" + axisToAdd.getAxisTitle().getTitle()
           + " is already configured as bottom x axis!");
@@ -1771,6 +1772,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * <p>
    * 
    * @see java.lang.Object#finalize()
+   * 
    * @throws Throwable
    *           if a finalizer of a superclass fails.
    */
@@ -1792,18 +1794,18 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @return an array with the x (position 0) and the y axis (position 1) of the
    *         given trace if it is correctly set up.
    */
-  public IAxis[] findAxesOfTrace(final ITrace2D trace) {
-    IAxis[] result = new IAxis[2];
+  public IAxis<?>[] findAxesOfTrace(final ITrace2D trace) {
+    IAxis<?>[] result = new IAxis[2];
     // 1) find x axis:
-    IAxis xAxis = null;
-    for (IAxis axis : this.m_axesXBottom) {
+    IAxis<?> xAxis = null;
+    for (IAxis<?> axis : this.m_axesXBottom) {
       if (axis.getTraces().contains(trace)) {
         xAxis = axis;
         break;
       }
     }
     if (xAxis == null) {
-      for (IAxis axis : this.m_axesXTop) {
+      for (IAxis<?> axis : this.m_axesXTop) {
         if (axis.getTraces().contains(trace)) {
           xAxis = axis;
           break;
@@ -1811,15 +1813,15 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       }
     }
     // 2) find y axis:
-    IAxis yAxis = null;
-    for (IAxis axis : this.m_axesYLeft) {
+    IAxis<?> yAxis = null;
+    for (IAxis<?> axis : this.m_axesYLeft) {
       if (axis.getTraces().contains(trace)) {
         yAxis = axis;
         break;
       }
     }
     if (yAxis == null) {
-      for (IAxis axis : this.m_axesYRight) {
+      for (IAxis<?> axis : this.m_axesYRight) {
         if (axis.getTraces().contains(trace)) {
           yAxis = axis;
           break;
@@ -1838,8 +1840,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @return the <code>{@link List}&lt;{@link IAxis}&gt;</code> with all axes of
    *         the chart
    */
-  public final List<IAxis> getAxes() {
-    List<IAxis> result = new LinkedList<IAxis>();
+  public final List<IAxis<?>> getAxes() {
+    List<IAxis<?>> result = new LinkedList<IAxis<?>>();
     result.addAll(this.getAxesXBottom());
     result.addAll(this.getAxesXTop());
     result.addAll(this.getAxesYLeft());
@@ -1858,7 +1860,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @return the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances
    *         that are painted in x dimension on the bottom of the chart.
    */
-  public final List<IAxis> getAxesXBottom() {
+  public final List<IAxis<?>> getAxesXBottom() {
     return this.m_axesXBottom;
   }
 
@@ -1873,7 +1875,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @return the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances
    *         that are painted in x dimension on top of the chart.
    */
-  public final List<IAxis> getAxesXTop() {
+  public final List<IAxis<?>> getAxesXTop() {
     return this.m_axesXTop;
   }
 
@@ -1888,7 +1890,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @return the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances
    *         that are painted in y dimension on the left side of the chart.
    */
-  public final List<IAxis> getAxesYLeft() {
+  public final List<IAxis<?>> getAxesYLeft() {
     return this.m_axesYLeft;
   }
 
@@ -1903,7 +1905,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @return the <code>{@link List}&lt;{@link IAxis}&gt;</code> with instances
    *         that are painted in y dimension on the right side of the chart.
    */
-  public final List<IAxis> getAxesYRight() {
+  public final List<IAxis<?>> getAxesYRight() {
     return this.m_axesYRight;
   }
 
@@ -1923,7 +1925,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * 
    * @return the first bottom axis for the x dimension.
    */
-  public final IAxis getAxisX() {
+  public final IAxis<?> getAxisX() {
     return this.m_axesXBottom.get(0);
   }
 
@@ -1937,10 +1939,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @return the x axis that the given trace belongs to or null if this trace
    *         does not belong to any x axis of this chart.
    */
-  public IAxis getAxisX(final ITrace2D trace) {
-    IAxis result = null;
-    IAxis current = null;
-    Iterator<IAxis> it = this.m_axesXBottom.iterator();
+  public IAxis<?> getAxisX(final ITrace2D trace) {
+    IAxis<? > result = null;
+    IAxis<? > current = null;
+    Iterator<IAxis<?>> it = this.m_axesXBottom.iterator();
     while (it.hasNext()) {
       current = it.next();
       if (current.hasTrace(trace)) {
@@ -1967,7 +1969,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * 
    * @return the first left axis for the y dimension.
    */
-  public final IAxis getAxisY() {
+  public final IAxis<?> getAxisY() {
     return this.m_axesYLeft.get(0);
   }
 
@@ -1981,10 +1983,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @return the y axis that the given trace belongs to or null if this trace
    *         does not belong to any y axis of this chart.
    */
-  public IAxis getAxisY(final ITrace2D trace) {
-    IAxis result = null;
-    IAxis current = null;
-    Iterator<IAxis> it = this.m_axesYLeft.iterator();
+  public IAxis<?> getAxisY(final ITrace2D trace) {
+    IAxis<?> result = null;
+    IAxis<?> current = null;
+    Iterator<IAxis<?>> it = this.m_axesYLeft.iterator();
     while (it.hasNext()) {
       current = it.next();
       if (current.hasTrace(trace)) {
@@ -2355,8 +2357,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   public final SortedSet<ITrace2D> getTraces() {
     SortedSet<ITrace2D> result = new TreeSet<ITrace2D>();
     // 1.1) axes x bottom:
-    Iterator<IAxis> it = this.m_axesXBottom.iterator();
-    IAxis currentAxis;
+    Iterator<IAxis<?>> it = this.m_axesXBottom.iterator();
+    IAxis<?> currentAxis;
     Set<ITrace2D> axisTraces;
     while (it.hasNext()) {
       currentAxis = it.next();
@@ -2531,7 +2533,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @param axisNew
    *          the replacing new axis.
    */
-  private void internalTransferAxisState(IAxis old, AAxis axisNew) {
+  private void internalTransferAxisState(IAxis<?> old, AAxis<?> axisNew) {
 
     // 1. Traces:
     Set<ITrace2D> traces = old.removeAllTraces();
@@ -2772,7 +2774,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @param axis
    *          the axis to listen to.
    */
-  private void listenToAxis(final IAxis axis) {
+  private void listenToAxis(final IAxis<?> axis) {
     axis.addPropertyChangeListener(IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
     axis.addPropertyChangeListener(IAxis.PROPERTY_LABELFORMATTER, this);
     axis.addPropertyChangeListener(IAxis.PROPERTY_PAINTGRID, this);
@@ -3101,10 +3103,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   private void paintCoordinateSystem(final Graphics g2d) {
     // drawing the axes:
     g2d.setColor(this.getForeground());
-    IAxis currentAxis;
+    IAxis<?> currentAxis;
     // 1) x axes:
     // 1.1) x axes bottom:
-    Iterator<IAxis> it = this.m_axesXBottom.iterator();
+    Iterator<IAxis<?>> it = this.m_axesXBottom.iterator();
     while (it.hasNext()) {
       currentAxis = it.next();
       currentAxis.paint(g2d);
@@ -3424,8 +3426,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     Set<ITrace2D> axisTraces;
 
     // 1.1) axes x bottom:
-    Iterator<IAxis> it = this.m_axesXBottom.iterator();
-    IAxis currentAxis;
+    Iterator<IAxis<?>> it = this.m_axesXBottom.iterator();
+    IAxis<?> currentAxis;
     while (it.hasNext()) {
       currentAxis = it.next();
       axisTraces = currentAxis.removeAllTraces();
@@ -3474,7 +3476,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    *         not configured as a bottom x axis before or could not be removed
    *         for another reason.
    */
-  public boolean removeAxisXBottom(final IAxis axisX) {
+  public boolean removeAxisXBottom(final IAxis<?> axisX) {
     boolean result = this.m_axesXBottom.remove(axisX);
 
     this.unlistenToAxis(axisX);
@@ -3496,7 +3498,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    *         not configured as a top x axis before or could not be removed for
    *         another reason.
    */
-  public boolean removeAxisXTop(final IAxis axisX) {
+  public boolean removeAxisXTop(final IAxis<?> axisX) {
     boolean result = this.m_axesXTop.remove(axisX);
 
     this.unlistenToAxis(axisX);
@@ -3518,7 +3520,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    *         not configured as a left y axis before or could not be removed for
    *         another reason.
    */
-  public boolean removeAxisYLeft(final IAxis axisY) {
+  public boolean removeAxisYLeft(final IAxis<?> axisY) {
 
     boolean result = this.m_axesYLeft.remove(axisY);
     this.unlistenToAxis(axisY);
@@ -3540,7 +3542,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    *         not configured as a right y axis before or could not be removed for
    *         another reason.
    */
-  public boolean removeAxisYRight(final IAxis axisY) {
+  public boolean removeAxisYRight(final IAxis<?> axisY) {
     boolean result = this.m_axesYRight.remove(axisY);
 
     this.unlistenToAxis(axisY);
@@ -3580,8 +3582,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       synchronized (points) {
         // remove the trace from the axes it is potentially contained in:
         // 1) x - axes:
-        Iterator<IAxis> it = this.m_axesXBottom.iterator();
-        IAxis currentAxis;
+        Iterator<IAxis<?>> it = this.m_axesXBottom.iterator();
+        IAxis<?> currentAxis;
         boolean successRemoveX = false;
         while (it.hasNext()) {
           currentAxis = it.next();
@@ -3720,8 +3722,27 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    *         instance that was used at position 0.
    */
   @Deprecated
-  public List<IAxis> setAxisX(final AAxis axisX) {
-    return Arrays.asList(new IAxis[] {this.setAxisXBottom(axisX, 0) });
+  public List<IAxis<?>> setAxisX(final AAxis<?> axisX) {
+    List<IAxis<?>> axesBottom = new LinkedList<IAxis<?>>();
+    for(IAxis<?> axis:this.m_axesXBottom) {
+      // don't call remove here (concurrent modification exception), just collect:
+      axesBottom.add(axis);
+    }
+    List<IAxis<?>> axesTop = new LinkedList<IAxis<?>>();
+    
+    for(IAxis<?> axis:this.m_axesXTop) {
+      // don't call remove here (concurrent modification exception), just collect:
+      axesTop.add(axis);
+    }
+    // now remove
+    for(IAxis<?>axis:axesBottom) {
+      this.removeAxisXBottom(axis);
+    }
+    for(IAxis<?>axis:axesTop) {
+      this.removeAxisXTop(axis);
+    }
+    axesBottom.addAll(axesTop);
+    return axesBottom;
   }
 
   /**
@@ -3765,8 +3786,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * 
    * @return the previous axis on that bottom x position or null.
    */
-  public IAxis setAxisXBottom(final AAxis axisX, final int position) {
-    IAxis old = null;
+  public IAxis<?> setAxisXBottom(final AAxis<?> axisX, final int position) {
+    IAxis<?> old = null;
 
     if (this.m_axesXBottom.size() > position) {
       // this is a replace operation!
@@ -3827,8 +3848,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * 
    * @return the previous axis on that bottom x position.
    */
-  public IAxis setAxisXTop(final AAxis axisX, final int position) {
-    IAxis old = null;
+  public IAxis<?> setAxisXTop(final AAxis<?> axisX, final int position) {
+    IAxis<?> old = null;
 
     if (this.m_axesXTop.size() > position) {
       // this is a replace operation!
@@ -3867,8 +3888,29 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    *         instance that was used at position 0.
    */
   @Deprecated
-  public List<IAxis> setAxisY(final AAxis axisY) {
-    return Arrays.asList(new IAxis[] {this.setAxisYLeft(axisY, 0) });
+  public List<IAxis<?>> setAxisY(final AAxis<?> axisY) {
+    List<IAxis<?>> axesLeft = new LinkedList<IAxis<?>>();
+    for (IAxis<?> axis : this.m_axesYLeft) {
+      // don't call remove here (concurrent modification exception), just
+      // collect:
+      axesLeft.add(axis);
+    }
+
+    List<IAxis<?>> axesRight = new LinkedList<IAxis<?>>();
+    for (IAxis<?> axis : this.m_axesYRight) {
+      // don't call remove here (concurrent modification exception), just
+      // collect:
+      axesRight.add(axis);
+    }
+    // now remove
+    for (IAxis<?> axis : axesLeft) {
+      this.removeAxisYLeft(axis);
+    }
+    for (IAxis<?> axis : axesRight) {
+      this.removeAxisYRight(axis);
+    }
+    axesLeft.addAll(axesRight);
+    return axesLeft;
   }
 
   /**
@@ -3912,20 +3954,25 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * 
    * @return the previous axis on that bottom x position.
    */
-  public IAxis setAxisYLeft(final AAxis axisY, final int position) {
-    IAxis old = null;
+  public IAxis<?> setAxisYLeft(final AAxis<?> axisY, final int position) {
+    IAxis<?> old = null;
     if (this.m_axesYLeft.size() > position) {
       // this is a replace operation!
       old = this.m_axesYLeft.get(position);
       this.removeAxisYLeft(old);
       this.firePropertyChange(PROPERTY_AXIS_Y_LEFT_REPLACE, old, axisY);
     }
-    // we can only add after removal or else the position argument would get
-    // confused.
-    // add anyways in case no axis has been set before (see constructor)
+    /*
+     * We can only add after removal or else the position argument would get
+     * confused. Add anyways in case no axis has been set before (see
+     * constructor)
+     */
+    
     this.addAxisYLeft(axisY);
-    // we can only transfer state (which includes adding traces after the new
-    // axis is assigned to a chart!
+    /*
+     * We can only transfer state (which includes adding traces after the new
+     * axis is assigned to a chart!
+     */
     if (old != null) {
       this.internalTransferAxisState(old, axisY);
     }
@@ -3976,8 +4023,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @return the previous axis on that bottom x position.
    */
 
-  public IAxis setAxisYRight(final AAxis axisY, final int position) {
-    IAxis old = null;
+  public IAxis<?> setAxisYRight(final AAxis<?> axisY, final int position) {
+    IAxis<?> old = null;
     if (this.m_axesYRight.size() > position) {
       // this is a replace operation!
       old = this.m_axesYRight.get(position);
@@ -4347,7 +4394,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @param removedAxis
    *          the axis to not listen to any more.
    */
-  private void unlistenToAxis(final IAxis removedAxis) {
+  private void unlistenToAxis(final IAxis<?> removedAxis) {
     removedAxis.removePropertyChangeListener(IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
     removedAxis.removePropertyChangeListener(IAxis.PROPERTY_LABELFORMATTER, this);
     removedAxis.removePropertyChangeListener(IAxis.PROPERTY_PAINTGRID, this);
@@ -4392,9 +4439,9 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    */
   private synchronized void updateScaling(final boolean force) {
 
-    IAxis currentAxis;
+    IAxis<?> currentAxis;
     // 1) bottom x axes:
-    Iterator<IAxis> it = this.m_axesXBottom.iterator();
+    Iterator<IAxis<?>> it = this.m_axesXBottom.iterator();
     while (it.hasNext()) {
       currentAxis = it.next();
       boolean changed = force;

@@ -97,7 +97,7 @@ public class AxisActionSetRangePolicy
   public void actionPerformed(final ActionEvent e) {
     // initially configure the range to show all data (in case a fixed
     // view port is used):
-    IAxis axis = this.getAxis();
+    IAxis<?> axis = this.getAxis();
     Range actualRange = new Range(axis.getMinValue(), axis.getMaxValue());
     this.m_rangePolicy.setRange(actualRange);
     this.m_rangePolicy.setRange(actualRange);

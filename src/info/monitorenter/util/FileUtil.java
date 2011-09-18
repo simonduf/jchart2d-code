@@ -42,9 +42,6 @@ import java.util.StringTokenizer;
 /**
  * Utility class for file operations.
  * <p>
- * For methods that are not static get the singleton instance via
- * <code>{@link #getInstance()}</code>.
- * <p>
  * 
  * @author Achim Westermann
  * 

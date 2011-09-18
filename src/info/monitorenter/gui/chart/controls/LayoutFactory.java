@@ -26,6 +26,7 @@ package info.monitorenter.gui.chart.controls;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.IAxisLabelFormatter;
+import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.IErrorBarPolicy;
 import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.IPointPainterConfigurableUI;
@@ -36,6 +37,7 @@ import info.monitorenter.gui.chart.ZoomableChart;
 import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.axis.AxisLog10;
 import info.monitorenter.gui.chart.axis.AxisLogE;
+import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyTransformation;
 import info.monitorenter.gui.chart.errorbars.ErrorBarPolicyAbsoluteSummation;
 import info.monitorenter.gui.chart.errorbars.ErrorBarPolicyRelative;
 import info.monitorenter.gui.chart.events.AxisActionSetFormatter;
@@ -1498,7 +1500,7 @@ public final class LayoutFactory {
     return result;
   }
 
-  private Component createAxisFormatterMenu(Chart2D chart, IAxis axis, int axisDimension,
+  private Component createAxisFormatterMenu(Chart2D chart, IAxis<?> axis, int axisDimension,
       boolean adaptUI2Chart) {
 
     IAxisLabelFormatter presetFormatter = axis.getFormatter();
@@ -1731,7 +1733,7 @@ public final class LayoutFactory {
    * @return a {@link JMenuItem} that allows to trigger the features related to
    *         {@link info.monitorenter.gui.chart.axis.AAxis} features.
    */
-  public JMenuItem createAxisMenuItem(final IAxis axis, final int axisDimension,
+  public JMenuItem createAxisMenuItem(final IAxis<?> axis, final int axisDimension,
       final boolean adaptUI2Chart) {
     final Chart2D chart = axis.getAccessor().getChart();
     JMenuItem item;
@@ -1798,7 +1800,7 @@ public final class LayoutFactory {
    *         {@link info.monitorenter.gui.chart.IRangePolicy} implementations to
    *         set to it's axis identified by argument <code>axis</code>.
    */
-  public JMenu createAxisRangePolicyMenu(final Chart2D chart, final IAxis axis,
+  public JMenu createAxisRangePolicyMenu(final Chart2D chart, final IAxis<?> axis,
       final boolean adaptUI2Chart) {
     JMenuItem item;
     // Axis -> Range policy submenu
@@ -1910,7 +1912,7 @@ public final class LayoutFactory {
    *         given chart that will be identified by argument
    *         <code>axisDimension</code>.
    */
-  public JMenu createAxisTitleMenu(final Chart2D chart, final IAxis axis, final int axisDimension,
+  public JMenu createAxisTitleMenu(final Chart2D chart, final IAxis<?> axis, final int axisDimension,
       final boolean adaptUI2Chart) {
     // Axis title -> Axis title text
     JMenu axisTitle;
@@ -1983,7 +1985,7 @@ public final class LayoutFactory {
    *         given chart that will be set to it's axis identified by argument
    *         <code>axisDimension</code>.
    */
-  public JMenu createAxisTypeMenu(final Chart2D chart, final IAxis axis, final int axisDimension,
+  public JMenu createAxisTypeMenu(final Chart2D chart, final IAxis<?> axis, final int axisDimension,
       final boolean adaptUI2Chart) {
     // Axis -> Axis type
     JMenu axisType;
@@ -2003,11 +2005,11 @@ public final class LayoutFactory {
     boolean selected = typeClass == AxisLinear.class;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new Chart2DActionSetAxis(chart,
-          new AxisLinear(), "Linear", axisDimension), selected,
+          new AxisLinear<IAxisScalePolicy>(), "Linear", axisDimension), selected,
           BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetAxis(chart,
-          new AxisLinear(), "Linear", axisDimension), selected);
+          new AxisLinear<IAxisScalePolicy>(), "Linear", axisDimension), selected);
     }
     axisType.add(item);
     buttonGroup.add(item);
@@ -2015,10 +2017,10 @@ public final class LayoutFactory {
     selected = typeClass == AxisLogE.class;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new Chart2DActionSetAxis(chart,
-          new AxisLogE(), "Log E", axisDimension), selected,
+          new AxisLogE<AxisScalePolicyTransformation>(), "Log E", axisDimension), selected,
           BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
-      item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetAxis(chart, new AxisLogE(),
+      item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetAxis(chart, new AxisLogE<AxisScalePolicyTransformation>(),
           "Log E", axisDimension), selected);
     }
     axisType.add(item);
@@ -2030,11 +2032,11 @@ public final class LayoutFactory {
     selected = typeClass == AxisLog10.class;
     if (adaptUI2Chart) {
       item = new PropertyChangeJRadioButtonMenuItem(chart, new Chart2DActionSetAxis(chart,
-          new AxisLog10(), "Log 10", axisDimension), selected,
+          new AxisLog10<AxisScalePolicyTransformation>(), "Log 10", axisDimension), selected,
           BasicPropertyAdaptSupport.RemoveAsListenerFromComponentNever.getInstance());
     } else {
       item = new SelectionAdaptJRadioButtonMenuItem(new Chart2DActionSetAxis(chart,
-          new AxisLog10(), "Log 10", axisDimension), selected);
+          new AxisLog10<AxisScalePolicyTransformation>(), "Log 10", axisDimension), selected);
     }
     axisType.add(item);
     buttonGroup.add(item);

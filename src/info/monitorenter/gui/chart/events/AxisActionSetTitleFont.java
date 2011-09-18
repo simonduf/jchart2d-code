@@ -25,7 +25,6 @@ package info.monitorenter.gui.chart.events;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
-import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem;
 
 import java.awt.Font;

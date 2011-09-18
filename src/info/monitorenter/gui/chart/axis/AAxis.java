@@ -68,10 +68,15 @@ import java.util.TreeSet;
  * further configuration.
  * <p>
  * 
+ * @param <T>
+ *          Subtypes may be more picky which scale policies the accept to
+ *          disallow incorrect scales: This supports it (see
+ *          {@link IAxis#setAxisScalePolicy(IAxisScalePolicy)}).  
+ *          
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * @version $Revision: 1.61 $
  */
-public abstract class AAxis implements IAxis, PropertyChangeListener {
+public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, PropertyChangeListener {
 
   /**
    * Used for finding ticks with labels and controlling their value / distance.
@@ -91,7 +96,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * 
    * @see info.monitorenter.gui.chart.IAxis#setAxisScalePolicy(info.monitorenter.gui.chart.IAxisScalePolicy)
    */
-  public IAxisScalePolicy setAxisScalePolicy(final IAxisScalePolicy axisScalePolicy) {
+  public IAxisScalePolicy setAxisScalePolicy(final T axisScalePolicy) {
     // TODO Event management for update painting
     IAxisScalePolicy result = this.m_axisScalePolicy;
     this.m_axisScalePolicy = axisScalePolicy;
@@ -381,7 +386,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * @see info.monitorenter.gui.chart.axis.AAxis.IPropertyChangeReactor#propertyChange(java.beans.PropertyChangeEvent,
      *      info.monitorenter.gui.chart.axis.AAxis)
      */
-    public final void propertyChange(final PropertyChangeEvent changeEvent, final AAxis receiver) {
+    public final void propertyChange(final PropertyChangeEvent changeEvent, final AAxis<?> receiver) {
       final Chart2D chart = receiver.getAccessor().getChart();
       synchronized (chart) {
         if (Chart2D.DEBUG_THREADING) {
@@ -417,7 +422,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * @return if true a repaint request will be marked for the chart.
      */
     protected abstract boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
-        final AAxis receiver);
+        final AAxis<?> receiver);
 
   }
 
@@ -451,7 +456,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * @param receiver
      *          the original receiver of the change event.
      */
-    public void propertyChange(PropertyChangeEvent changeEvent, final AAxis receiver);
+    public void propertyChange(PropertyChangeEvent changeEvent, final AAxis<?> receiver);
   }
 
   /**
@@ -477,8 +482,8 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
      * @see info.monitorenter.gui.chart.axis.AAxis.IPropertyChangeReactor#propertyChange(java.beans.PropertyChangeEvent,
      *      info.monitorenter.gui.chart.axis.AAxis)
      */
-    public void propertyChange(final PropertyChangeEvent changeEvent, final AAxis receiver) {
-      final AChart2DDataAccessor accessor = receiver.getAccessor();
+    public void propertyChange(final PropertyChangeEvent changeEvent, final AAxis<?> receiver) {
+      final AAxis<?>.AChart2DDataAccessor accessor = receiver.getAccessor();
       // only if this axis is already connected to a chart:
       if (accessor != null) {
         final Chart2D parent = accessor.getChart();
@@ -496,7 +501,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * @author <a href="mailto:Achim.Westermann@gmx.de>Achim Westermann </a>
    * @see Chart2D#getAxisX()
    */
-  public class XDataAccessor extends AAxis.AChart2DDataAccessor {
+  public class XDataAccessor extends AAxis<T>.AChart2DDataAccessor {
 
     /** Generated <code>serialVersionUID</code>. */
     private static final long serialVersionUID = 1185826702304621485L;
@@ -741,7 +746,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * @see AAxis#setAccessor(info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor)
    * @see Chart2D#getAxisY()
    */
-  protected class YDataAccessor extends AAxis.AChart2DDataAccessor {
+  protected class YDataAccessor extends AAxis<T>.AChart2DDataAccessor {
 
     /** Generated <code>serialVersionUID</code>. */
     private static final long serialVersionUID = -3665759247443586028L;
@@ -1010,12 +1015,12 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
        */
       @Override
       protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
-          final AAxis receiver) {
+          final AAxis<?> receiver) {
         boolean result = false;
         if (Chart2D.DEBUG_SCALING) {
           System.out.println("pc-Xmax");
         }
-        final AChart2DDataAccessor accessor = receiver.getAccessor();
+        final AAxis<?>.AChart2DDataAccessor accessor = receiver.getAccessor();
         // only care if axis works in x dimension:
         if (accessor.getDimension() == Chart2D.X) {
           final double value = ((Double) changeEvent.getNewValue()).doubleValue();
@@ -1044,7 +1049,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
        */
       @Override
       protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
-          final AAxis receiver) {
+          final AAxis<?> receiver) {
         boolean result = false;
         if (Chart2D.DEBUG_SCALING) {
           System.out.println("pc-Xmin");
@@ -1076,7 +1081,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
        */
       @Override
       protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
-          final AAxis receiver) {
+          final AAxis<?> receiver) {
         boolean result = false;
         if (Chart2D.DEBUG_SCALING) {
           System.out.println("pc-Ymax");
@@ -1108,7 +1113,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
        */
       @Override
       protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
-          final AAxis receiver) {
+          final AAxis<?> receiver) {
         boolean result = false;
         if (Chart2D.DEBUG_SCALING) {
           System.out.println("pc-Ymin");
@@ -1140,7 +1145,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
        */
       @Override
       protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
-          final AAxis receiver) {
+          final AAxis<?> receiver) {
         boolean result = false;
         // now points added or removed -> rescale!
         if (Chart2D.DEBUG_SCALING) {
@@ -1165,7 +1170,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
        */
       @Override
       protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
-          final AAxis receiver) {
+          final AAxis<?> receiver) {
         boolean result = false;
         // invisible traces don't count for max and min, so
         // expensive search has to be started here:
@@ -1190,7 +1195,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
        */
       @Override
       protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent,
-          final AAxis receiver) {
+          final AAxis<?> receiver) {
         boolean result = false;
         final ITracePoint2D changed = (ITracePoint2D) changeEvent.getNewValue();
         receiver.scalePoint(changed);
@@ -1327,9 +1332,13 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * formatting labels.
    * <p>
    */
+  @SuppressWarnings("unchecked")
   public AAxis() {
+    /*
+     * I consider this necessary cast to T as a bug (compare with declaration if T in class header):
+     */
     this(new LabelFormatterAutoUnits(new LabelFormatterSimple()),
-        new AxisScalePolicyAutomaticBestFit());
+        (T)new AxisScalePolicyAutomaticBestFit());
   }
 
   /**
@@ -1342,13 +1351,18 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * @param scalePolicy
    *          controls the ticks/labels and their distance.
    */
-  public AAxis(final IAxisLabelFormatter formatter, final IAxisScalePolicy scalePolicy) {
+  public AAxis(final IAxisLabelFormatter formatter, final T scalePolicy) {
     this.m_propertyChangeSupport = new PropertyChangeSupport(this);
     this.setAxisTitle(new AxisTitle(null));
     this.m_rangePolicy = new RangePolicyUnbounded(Range.RANGE_UNBOUNDED);
     this.setFormatter(formatter);
     this.setAxisScalePolicy(scalePolicy);
   }
+
+//  public AAxis(LabelFormatterAutoUnits labelFormatterAutoUnits,
+//      AxisScalePolicyAutomaticBestFit axisScalePolicyAutomaticBestFit) {
+//    this(labelFormatterAutoUnits, axisScalePolicyAutomaticBestFit);
+//  }
 
   /**
    * @see info.monitorenter.gui.chart.IAxis#addPropertyChangeListener(java.lang.String,
@@ -1456,7 +1470,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
    * @return the proper <code>{@link AAxis.AChart2DDataAccessor}</code>
    *         implementation.
    */
-  protected abstract AChart2DDataAccessor createAccessor(Chart2D chart, int dimension, int position);
+  protected abstract AAxis<T>.AChart2DDataAccessor createAccessor(Chart2D chart, int dimension, int position);
 
   /**
    * @see java.lang.Object#equals(java.lang.Object)
@@ -1472,7 +1486,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     if (this.getClass() != obj.getClass()) {
       return false;
     }
-    final AAxis other = (AAxis) obj;
+    final AAxis<?> other = (AAxis<?>) obj;
     if (this.m_accessor == null) {
       if (other.m_accessor != null) {
         return false;
@@ -2108,7 +2122,7 @@ public abstract class AAxis implements IAxis, PropertyChangeListener {
     this.paintTitle(g2d);
     // drawing tick - scale, corresponding values, grid and conditional unit
     // label:
-    if (this.isPaintScale()|| this.isPaintGrid()) {
+    if (this.isPaintScale() || this.isPaintGrid()) {
       final IAxisTickPainter tickPainter = chart.getAxisTickPainter();
       tmp = 0;
       final List<LabeledValue> labels = this.m_axisScalePolicy.getScaleValues(g2d, this);

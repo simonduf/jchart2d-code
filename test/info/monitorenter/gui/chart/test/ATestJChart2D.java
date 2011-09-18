@@ -41,10 +41,10 @@ import junit.framework.TestCase;
 public abstract class ATestJChart2D extends TestCase {
 
   /** The x axis configured for the test chart. */
-  protected AAxis m_axisX;
+  protected AAxis<?> m_axisX;
 
   /** The y axis configured for the test chart. */
-  protected AAxis m_axisY;
+  protected AAxis<?> m_axisY;
 
   /** The traces configured for the test chart. */
   protected ITrace2D[] m_traces;
@@ -72,7 +72,7 @@ public abstract class ATestJChart2D extends TestCase {
    * 
    * @return the <code>{@link AAxis}</code> to test.
    */
-  protected abstract AAxis createAxisX();
+  protected abstract AAxis<?> createAxisX();
 
   /**
    * Implement and return an instance of the type to test.
@@ -80,7 +80,7 @@ public abstract class ATestJChart2D extends TestCase {
    * 
    * @return the y axis to test.
    */
-  protected abstract AAxis createAxisY();
+  protected abstract AAxis<?> createAxisY();
 
 
   /**

@@ -25,6 +25,7 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
+import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.IRangePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyManualTicks;
@@ -85,19 +86,23 @@ public final class AxisScalePolicyManualTickChart extends JPanel {
   /**
    * Defcon.
    */
+  @SuppressWarnings("unchecked")
   private AxisScalePolicyManualTickChart() {
     this.setLayout(new BorderLayout());
     Chart2D chart = new Chart2D();
     /*
      * This does the trick to configure the ticks manually:
+     * 
+     * Note: The dirty cast is needed as we want to reuse the axis of the chart.
+     * If we wanted to avoid it we had to create a new instance and set it.
      */
-    IAxis xAxis = chart.getAxisX();
+    IAxis<IAxisScalePolicy> xAxis = (IAxis<IAxisScalePolicy>)chart.getAxisX();
     xAxis.setAxisScalePolicy(new AxisScalePolicyManualTicks()); 
     xAxis.setMajorTickSpacing(10);
     xAxis.setMinorTickSpacing(1);
     xAxis.setStartMajorTick(true);
     
-    IAxis yAxis = chart.getAxisY();
+    IAxis<IAxisScalePolicy> yAxis = (IAxis<IAxisScalePolicy>)chart.getAxisY();
     yAxis.setAxisScalePolicy(new AxisScalePolicyManualTicks()); 
     yAxis.setMajorTickSpacing(50);
     yAxis.setMinorTickSpacing(10);
@@ -131,5 +136,5 @@ public final class AxisScalePolicyManualTickChart extends JPanel {
     this.add(new ChartPanel(chart), BorderLayout.CENTER);
 
   }
-
+  
 }

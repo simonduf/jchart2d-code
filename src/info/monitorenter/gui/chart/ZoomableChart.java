@@ -220,9 +220,9 @@ public class ZoomableChart extends Chart2D implements MouseListener, MouseMotion
         return;
       }
 
-      List<IAxis> axisList = this.getAxes();
-      for (Iterator<IAxis> i = axisList.iterator(); i.hasNext();) {
-        IAxis iAxis = i.next();
+      List<IAxis<?>> axisList = this.getAxes();
+      for (Iterator<IAxis<?>> i = axisList.iterator(); i.hasNext();) {
+        IAxis<?> iAxis = i.next();
         if ((Chart2D.CHART_POSITION_BOTTOM == iAxis.getAxisPosition())
             || (Chart2D.CHART_POSITION_TOP == iAxis.getAxisPosition())) {// its
           // x
@@ -272,7 +272,7 @@ public class ZoomableChart extends Chart2D implements MouseListener, MouseMotion
 
     this.m_zoomArea = null;
 
-    IAxis axis = this.getAxisX();
+    IAxis<?> axis = this.getAxisX();
     IRangePolicy zoomPolicy = new RangePolicyFixedViewport(new Range(xmin, xmax));
     axis.setRangePolicy(zoomPolicy);
   }
@@ -295,7 +295,7 @@ public class ZoomableChart extends Chart2D implements MouseListener, MouseMotion
    *          the end coordinate in the dimension of the given axis in pixel
    *          coords.
    */
-  public void zoom(IAxis axis, final double startP, final double endP) {
+  public void zoom(IAxis<?> axis, final double startP, final double endP) {
 
     this.m_zoomArea = null;
 
@@ -326,11 +326,11 @@ public class ZoomableChart extends Chart2D implements MouseListener, MouseMotion
 
     this.m_zoomArea = null;
 
-    IAxis axisX = this.getAxisX();
+    IAxis<?> axisX = this.getAxisX();
     IRangePolicy zoomPolicyX = new RangePolicyFixedViewport(new Range(xmin, xmax));
     axisX.setRangePolicy(zoomPolicyX);
 
-    IAxis axisY = this.getAxisY();
+    IAxis<?> axisY = this.getAxisY();
     IRangePolicy zoomPolicyY = new RangePolicyFixedViewport(new Range(ymin, ymax));
     axisY.setRangePolicy(zoomPolicyY);
   }
@@ -340,9 +340,9 @@ public class ZoomableChart extends Chart2D implements MouseListener, MouseMotion
    * <p>
    */
   public void zoomAll() {
-    List<IAxis> axisList = this.getAxes();
-    for (Iterator<IAxis> i = axisList.iterator(); i.hasNext();) {
-      IAxis iAxis =  i.next();
+    List<IAxis<?>> axisList = this.getAxes();
+    for (Iterator<IAxis<?>> i = axisList.iterator(); i.hasNext();) {
+      IAxis<?> iAxis =  i.next();
       iAxis.setRangePolicy(this.m_zoomAllRangePolicy);
     }
   }

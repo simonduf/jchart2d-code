@@ -170,7 +170,7 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
    * @see ALabelFormatter#getAxis()
    */
   @Override
-  public IAxis getAxis() {
+  public IAxis<?> getAxis() {
     return this.m_delegate.getAxis();
   }
 
@@ -308,7 +308,7 @@ public class LabelFormatterAutoUnits extends ALabelFormatter {
    * @see ALabelFormatter#setAxis(IAxis)
    */
   @Override
-  public void setAxis(final IAxis axis) {
+  public void setAxis(final IAxis<?> axis) {
 
     this.m_delegate.setAxis(axis);
     final Range range = axis.getRange();

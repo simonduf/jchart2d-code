@@ -23,6 +23,7 @@
  */
 package info.monitorenter.gui.chart.axis;
 
+import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.IRangePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
@@ -74,15 +75,15 @@ public class TestAxis extends ATestJChart2D {
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#createAxisX()
    */
   @Override
-  protected AAxis createAxisX() {
-    return new AxisLinear();
+  protected AAxis<?> createAxisX() {
+    return new AxisLinear<IAxisScalePolicy>();
   }
 
   /**
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#createAxisY()
    */
   @Override
-  protected AAxis createAxisY() {
+  protected AAxis<?> createAxisY() {
     return this.createAxisX();
   }
 

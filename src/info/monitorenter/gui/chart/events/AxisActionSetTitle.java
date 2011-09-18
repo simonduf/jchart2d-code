@@ -75,7 +75,7 @@ public class AxisActionSetTitle extends AAxisAction {
    */
   public void actionPerformed(final ActionEvent e) {
 
-    IAxis axis = this.getAxis();
+    IAxis<?> axis = this.getAxis();
     OneStringChooserPanel titlePanel = new OneStringChooserPanel("Title", axis.getAxisTitle().getTitle());
     ModalDialog dialog = new ModalDialog(axis.getAccessor().getChart(), "Choose a Title for the "
         + axis.toString() + " axis", titlePanel);

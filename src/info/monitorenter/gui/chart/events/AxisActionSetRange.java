@@ -107,7 +107,7 @@ public class AxisActionSetRange extends AAxisAction {
    */
   public void actionPerformed(final ActionEvent e) {
 
-    IAxis axis = this.getAxis();
+    IAxis<?> axis = this.getAxis();
     RangeChooserPanel rangePanel = new RangeChooserPanel(axis.getRangePolicy().getRange());
     ModalDialog dialog = new ModalDialog(axis.getAccessor().getChart(), "Choose a range",
         rangePanel);

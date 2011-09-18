@@ -25,6 +25,7 @@
 package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.axis.AxisInverse;
@@ -89,7 +90,7 @@ public final class StaticChartXAxisInverse extends JPanel {
   private StaticChartXAxisInverse() {
     this.setLayout(new BorderLayout());
     Chart2D chart = new Chart2D();
-    AAxis axisXinverted = new AxisInverse();
+    AAxis<?> axisXinverted = new AxisInverse<IAxisScalePolicy>();
     chart.setAxisXBottom(axisXinverted, 0);
 
     // Create an ITrace:

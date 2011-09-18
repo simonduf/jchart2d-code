@@ -84,15 +84,15 @@ public class TestChart2D
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#createAxisX()
    */
   @Override
-  protected AAxis createAxisX() {
-    return new AxisLinear();
+  protected AAxis<?> createAxisX() {
+    return new AxisLinear<IAxisScalePolicy>();
   }
 
   /**
    * @see info.monitorenter.gui.chart.test.ATestJChart2D#createAxisY()
    */
   @Override
-  protected AAxis createAxisY() {
+  protected AAxis<?> createAxisY() {
     return this.createAxisX();
   }
 

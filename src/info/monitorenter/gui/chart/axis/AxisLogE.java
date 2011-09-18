@@ -23,9 +23,9 @@
 package info.monitorenter.gui.chart.axis;
 
 import info.monitorenter.gui.chart.IAxisLabelFormatter;
-import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyAutomaticBestFit;
+import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyTransformation;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 
 import java.util.Iterator;
@@ -44,6 +44,10 @@ import java.util.Iterator;
  * lim -> 0.0 with more and more turns to a 100 % CPU load.
  * <p>
  * 
+ * @param <T>
+ *          Used to enforce that this instance only accepts
+ *          {@link AxisScalePolicyTransformation} and subtypes.
+ * 
  * @author Pieter-Jan Busschaert (contributor)
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
@@ -51,7 +55,7 @@ import java.util.Iterator;
  * 
  * @version $Revision: 1.13 $
  */
-public class AxisLogE extends AAxisTransformation {
+public class AxisLogE<T extends AxisScalePolicyTransformation> extends AAxisTransformation<T> {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 1839309514449455729L;
@@ -62,8 +66,12 @@ public class AxisLogE extends AAxisTransformation {
    * <p> 
    * 
    */
+  @SuppressWarnings("unchecked")
   public AxisLogE() {
-    this(new LabelFormatterSimple(), new AxisScalePolicyAutomaticBestFit());
+    /*
+     * I consider this necessary cast to T as a bug (compare with declaration if T in class header):
+     */
+    this(new LabelFormatterSimple(), (T)new AxisScalePolicyTransformation());
   }
 
   /**
@@ -72,12 +80,14 @@ public class AxisLogE extends AAxisTransformation {
    * <p>
    * 
    * @param formatter
-   *          needed for formatting labels of this axis.
+   *          needed for formatting labels of this axis. Prefer using simple
+   *          implementations like {@link LabelFormatterSimple}, a log axis is
+   *          complicated enough to understand.
    * 
    * @param scalePolicy
    *          controls the ticks/labels and their distance.
    */
-  public AxisLogE(final IAxisLabelFormatter formatter, final IAxisScalePolicy scalePolicy) {
+  public AxisLogE(final IAxisLabelFormatter formatter, final T scalePolicy) {
     super(formatter, scalePolicy);
   }
 
@@ -100,7 +110,7 @@ public class AxisLogE extends AAxisTransformation {
    * @return log base 10 for the given value.
    */
   @Override
-  protected double transform(final double in) {
+  public double transform(final double in) {
     double toTransform = in;
     /*
      * Starting from 1 downwards the transformation of this value becomes
@@ -139,7 +149,7 @@ public class AxisLogE extends AAxisTransformation {
    * @see AAxisTransformation#untransform(double)
    */
   @Override
-  protected double untransform(final double in) {
+  public double untransform(final double in) {
     return Math.pow(Math.E, in);
   }
 

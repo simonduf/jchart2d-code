@@ -57,7 +57,7 @@ public abstract class ALabelFormatter implements IAxisLabelFormatter {
   public static final AUnit UNIT_UNCHANGED = new UnitUnchanged();
 
   /** The corresponding axis to format for. */
-  private transient IAxis m_axis;
+  private transient IAxis<?> m_axis;
 
   /** Support for acting as a property change event producer for listeners. */
   protected PropertyChangeSupport m_propertyChangeSupport;
@@ -117,7 +117,7 @@ public abstract class ALabelFormatter implements IAxisLabelFormatter {
    * 
    * @return Returns the axis.
    */
-  public IAxis getAxis() {
+  public IAxis<?> getAxis() {
     return this.m_axis;
   }
 
@@ -233,7 +233,7 @@ public abstract class ALabelFormatter implements IAxisLabelFormatter {
    * @param axis
    *          The m_axis to set.
    */
-  public void setAxis(final IAxis axis) {
+  public void setAxis(final IAxis<?> axis) {
     this.m_axis = axis;
   }
 

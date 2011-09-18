@@ -24,6 +24,7 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
+import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.axis.AAxis;
@@ -72,8 +73,8 @@ public final class AdvancedStaticChart {
     Chart2D chart = new Chart2D();
     
     // Obtain the basic default axes: 
-    IAxis axisX = chart.getAxisX();
-    IAxis axisY = chart.getAxisY();
+    IAxis<?> axisX = chart.getAxisX();
+    IAxis<?> axisY = chart.getAxisY();
     
     // Feature: Grids:
     chart.setGridColor(Color.LIGHT_GRAY);
@@ -129,9 +130,9 @@ public final class AdvancedStaticChart {
     }
 
     // Hack: Close the box by using empty axes:
-    AAxis axisXTop = new AxisLinear(new LabelFormatterDate(new SimpleDateFormat("")));
+    AAxis<IAxisScalePolicy> axisXTop = new AxisLinear<IAxisScalePolicy>(new LabelFormatterDate(new SimpleDateFormat("")));
     axisXTop.setPaintScale(false);
-    AAxis axisYRight = new AxisLinear(new LabelFormatterDate(new SimpleDateFormat("")));
+    AAxis<IAxisScalePolicy> axisYRight = new AxisLinear<IAxisScalePolicy>(new LabelFormatterDate(new SimpleDateFormat("")));
     axisYRight.setPaintScale(false);
     chart.setAxisXTop(axisXTop, 0);
     chart.setAxisYRight(axisYRight,0);

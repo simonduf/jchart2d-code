@@ -46,7 +46,7 @@ public interface IAxisScalePolicy {
    * @return the labeled values that will be used by the <code>{@link Chart2D}
    *         </code> to paint labels.
    */
-  public abstract List<LabeledValue> getScaleValues(final Graphics g2d, final IAxis axis);
+  public abstract List<LabeledValue> getScaleValues(final Graphics g2d, final IAxis<?> axis);
 
   /**
    * Performs expensive calculations for various values that are used by many
@@ -64,6 +64,6 @@ public interface IAxisScalePolicy {
    * @param axis
    *          the axis to read data from.
    */
-  public void initPaintIteration(final IAxis axis);
+  public void initPaintIteration(final IAxis<?> axis);
 
 }
