@@ -100,38 +100,6 @@ public class Trace2DArithmeticMeanX extends ATrace2D {
   }
 
   /**
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (!super.equals(obj)) {
-      return false;
-    }
-    if (this.getClass() != obj.getClass()) {
-      return false;
-    }
-    final Trace2DArithmeticMeanX other = (Trace2DArithmeticMeanX) obj;
-    if (this.m_pointBuffer == null) {
-      if (other.m_pointBuffer != null) {
-        return false;
-      }
-    } else if (!this.m_pointBuffer.equals(other.m_pointBuffer)) {
-      return false;
-    }
-    if (this.m_points == null) {
-      if (other.m_points != null) {
-        return false;
-      }
-    } else if (!this.m_points.equals(other.m_points)) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
    * Returns a point with the arithmetic mean values for x and y computed of the
    * last n added points (n was constructor - given).
    * <p>
@@ -173,17 +141,7 @@ public class Trace2DArithmeticMeanX extends ATrace2D {
     return this.m_points.size();
   }
 
-  /**
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((this.m_pointBuffer == null) ? 0 : this.m_pointBuffer.hashCode());
-    result = prime * result + ((this.m_points == null) ? 0 : this.m_points.hashCode());
-    return result;
-  }
+
 
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#isEmpty()

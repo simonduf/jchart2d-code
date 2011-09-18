@@ -85,32 +85,7 @@ public class Trace2DSorted extends ATrace2D implements ITrace2D {
     this.removePoint(p);
     return this.m_points.add(p);
   }
-
-  /**
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (!super.equals(obj)) {
-      return false;
-    }
-    if (this.getClass() != obj.getClass()) {
-      return false;
-    }
-    final Trace2DSorted other = (Trace2DSorted) obj;
-    if (this.m_points == null) {
-      if (other.m_points != null) {
-        return false;
-      }
-    } else if (!this.m_points.equals(other.m_points)) {
-      return false;
-    }
-    return true;
-  }
-
+  
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#getMaxSize()
    */
@@ -123,17 +98,6 @@ public class Trace2DSorted extends ATrace2D implements ITrace2D {
    */
   public int getSize() {
     return this.m_points.size();
-  }
-
-  /**
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((this.m_points == null) ? 0 : this.m_points.hashCode());
-    return result;
   }
 
   /**

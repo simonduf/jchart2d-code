@@ -49,13 +49,13 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * The base class for an axis of the <code>{@link Chart2D}</code>.
@@ -1316,11 +1316,17 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
   private boolean m_startMajorTick = false;
 
   /**
-   * The internal <code>TreeSetGreedy</code> use to store the different
+   * The internal <code>Set</code> used to store the different
    * <code>ITrace2d</code> instances to paint with z-index ordering based on
    * <code>{@link ITrace2D#getZIndex()}</code>.
+   * <p>
+   * It is crucial to use a set implementation here that is not backed by a map. To be more precise: 
+   * It is crucial to use an implementation that will use equals whenever operations like contains are invoked 
+   * instead of searching by a computed key. In the latter case you could add traces here (at that point in time a key 
+   * is computed from the trace state) then modify the traces (e.g. adding points) and later when trying to remove the 
+   * trace the given traces's key would be computed but no key for it found. 
    */
-  private final Set<ITrace2D> m_traces = new HashSet<ITrace2D>();
+  private final Set<ITrace2D> m_traces = new CopyOnWriteArraySet<ITrace2D>();
 
   /**
    * True if this axis is to be painted on a chart; false to hide.

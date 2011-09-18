@@ -183,45 +183,6 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (this.getClass() != obj.getClass()) {
-      return false;
-    }
-    final Trace2DDebugger other = (Trace2DDebugger) obj;
-    if (this.m_delegate == null) {
-      if (other.m_delegate != null) {
-        return false;
-      }
-    } else if (!this.m_delegate.equals(other.m_delegate)) {
-      return false;
-    }
-    if (this.m_xRange == null) {
-      if (other.m_xRange != null) {
-        return false;
-      }
-    } else if (!this.m_xRange.equals(other.m_xRange)) {
-      return false;
-    }
-    if (this.m_yRange == null) {
-      if (other.m_yRange != null) {
-        return false;
-      }
-    } else if (!this.m_yRange.equals(other.m_yRange)) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
    * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(info.monitorenter.gui.chart.ITracePoint2D,
    *      int)
    */
@@ -400,19 +361,6 @@ public class Trace2DDebugger implements ITrace2D {
    */
   public Integer getZIndex() {
     return this.m_delegate.getZIndex();
-  }
-
-  /**
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((this.m_delegate == null) ? 0 : this.m_delegate.hashCode());
-    result = prime * result + ((this.m_xRange == null) ? 0 : this.m_xRange.hashCode());
-    result = prime * result + ((this.m_yRange == null) ? 0 : this.m_yRange.hashCode());
-    return result;
   }
 
   /**

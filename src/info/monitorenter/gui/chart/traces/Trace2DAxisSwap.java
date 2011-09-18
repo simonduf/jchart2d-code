@@ -143,31 +143,6 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
   }
 
   /**
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (this.getClass() != obj.getClass()) {
-      return false;
-    }
-    final Trace2DAxisSwap other = (Trace2DAxisSwap) obj;
-    if (this.m_delegate == null) {
-      if (other.m_delegate != null) {
-        return false;
-      }
-    } else if (!this.m_delegate.equals(other.m_delegate)) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
    * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(info.monitorenter.gui.chart.ITracePoint2D,
    *      int)
    */
@@ -326,17 +301,6 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
    */
   public Integer getZIndex() {
     return this.m_delegate.getZIndex();
-  }
-
-  /**
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((this.m_delegate == null) ? 0 : this.m_delegate.hashCode());
-    return result;
   }
 
   /**

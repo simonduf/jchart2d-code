@@ -98,44 +98,12 @@ public class Trace2DLtdSorted extends Trace2DSorted {
   }
 
   /**
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (!super.equals(obj)) {
-      return false;
-    }
-    if (this.getClass() != obj.getClass()) {
-      return false;
-    }
-    final Trace2DLtdSorted other = (Trace2DLtdSorted) obj;
-    if (this.m_maxsize != other.m_maxsize) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
    * @see info.monitorenter.gui.chart.ITrace2D#getMaxSize()
    */
   @Override
   public final int getMaxSize() {
 
     return this.m_maxsize;
-  }
-
-  /**
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + this.m_maxsize;
-    return result;
   }
 
   /**
