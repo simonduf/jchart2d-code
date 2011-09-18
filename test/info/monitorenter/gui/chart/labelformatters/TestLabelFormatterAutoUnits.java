@@ -55,7 +55,8 @@ public class TestLabelFormatterAutoUnits extends ATestChartOperations {
 
     TestSuite suite = new TestSuite();
     suite.setName(TestLabelFormatterAutoUnits.class.getName());
-
+    
+    suite.addTest(new TestLabelFormatterAutoUnits("testLabelFormatterSimple"));
     suite.addTest(new TestLabelFormatterAutoUnits("testLabelFormatterAutoUnits"));
     suite.addTest(new TestLabelFormatterAutoUnits("testLabelFormatterAutoUnitsFemto"));
     suite.addTest(new TestLabelFormatterAutoUnits("testLabelFormatterAutoUnitsNano"));
@@ -137,6 +138,18 @@ public class TestLabelFormatterAutoUnits extends ATestChartOperations {
         "y-axis should have femto prefix") {
 
       /**
+       * Sets a {@link LabelFormatterAutoUnits} to the y axis of the chart.
+       * <p>
+       * 
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#preCondition(info.monitorenter.gui.chart.Chart2D)
+       */
+      @Override
+      public void preCondition(Chart2D chart) throws Exception {
+        super.preCondition(chart);
+        chart.getAxisY().setFormatter(new LabelFormatterAutoUnits());
+      }
+
+      /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
        */
       public Object action(final Chart2D chart) {
@@ -167,7 +180,18 @@ public class TestLabelFormatterAutoUnits extends ATestChartOperations {
    */
   public void testLabelFormatterAutoUnitsNano() {
     ATestChartOperations.AChartOperation operation = new AChartOperation(
-        "y-axis should have femto prefix") {
+        "y-axis should have nano prefix") {
+      /**
+       * Sets a {@link LabelFormatterAutoUnits} to the y axis of the chart.
+       * <p>
+       * 
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#preCondition(info.monitorenter.gui.chart.Chart2D)
+       */
+      @Override
+      public void preCondition(Chart2D chart) throws Exception {
+        super.preCondition(chart);
+        chart.getAxisY().setFormatter(new LabelFormatterAutoUnits());
+      }
 
       /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
