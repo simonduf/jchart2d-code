@@ -7,7 +7,7 @@
 	<!-- General Properties -->
 
 	<property name="project.name" value="jchart2d" />
-	<property name="project.version" value="3.2.2-prerelase-2" />
+	<property name="project.version" value="3.2.2" />
 	<property name="libdir" value="${basedir}/ext" />
 	<property name="outjar" value="${basedir}/${project.name}-${project.version}.jar" />
 	<property name="distfolder" value="${basedir}/${project.name}-${project.version}/" />
@@ -79,13 +79,13 @@
 		<exec executable="java">
 			<arg value="-version" />
 		</exec>
-		<javac srcdir="${sourcedir}" fork="false" debug="true" source="1.5" target="1.5" destdir="${builddir}">
+		<javac srcdir="${sourcedir}" fork="false" debug="true" source="1.5" target="1.5" destdir="${builddir}" includeantruntime="false">
 			<classpath refid="classpath" />
 		</javac>
 	</target>
 
 	<target name="build.test" depends="build">
-		<javac srcdir="${sourcedir.test}" fork="true" debug="true" source="1.5" verbose="true" target="1.5" destdir="${builddir}">
+		<javac srcdir="${sourcedir.test}" fork="true" debug="true" source="1.5" verbose="true" target="1.5" destdir="${builddir}" includeantruntime="false">
 			<classpath refid="classpath" />
 		</javac>
 		<!-- copy the test resources -->
