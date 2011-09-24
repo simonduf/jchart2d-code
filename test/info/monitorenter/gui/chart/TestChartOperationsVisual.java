@@ -529,7 +529,6 @@ public class TestChartOperationsVisual extends ATestChartOperations {
 			public ITrace2D[] createTraces() {
 
 				ITrace2D result = new Trace2DLtdSorted();
-				result.setName("Lola");
 				return new ITrace2D[] { result };
 			}
 		};

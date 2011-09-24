@@ -94,6 +94,9 @@ public class TestChart2DHeadless extends TestCase {
       System.out.print("Creating really big trace (100000)...");
       trace = new Trace2DLtd(100000);
       System.out.println("    done!");
+      if (i % 5 == 0) {
+        System.out.println(i * 100 / 50 + " % done.");
+      }
       chart.addTrace(trace);
       chartMap.put(chart, null);
       chart.destroy();

@@ -205,13 +205,13 @@ public class TestLabelFormatterAutoUnits extends ATestChartOperations {
        */
       @Override
       public void fillTrace(final ITrace2D trace) {
-        trace.addPoint(47,  0.0000000000005);
-        trace.addPoint(48,  0.0000000000010);
-        trace.addPoint(48,  0.0000000000006);
-        trace.addPoint(49,  0.0000000000009);
-        trace.addPoint(49,  0.0000000000008);
-        trace.addPoint(50,  0.0000000000007);
-        trace.addPoint(50,  0.0000000000027);
+        trace.addPoint(47,  0.0000000005);
+        trace.addPoint(48,  0.0000000010);
+        trace.addPoint(48,  0.0000000006);
+        trace.addPoint(49,  0.0000000009);
+        trace.addPoint(49,  0.0000000008);
+        trace.addPoint(50,  0.0000000007);
+        trace.addPoint(50,  0.0000000027);
       }
     };
     this.setTestOperation(operation);
