@@ -38,7 +38,7 @@ o API change that requires refactoring.
   Note that refactoring of protected code intended for library 
   internal details will not be listed.
   
-jchart2d-3.2.2 - September, day, 2011
+jchart2d-3.2.2 - September, 24th, 2011
   
 ! New AxisScalePolicyManualTicks for controlling the ticks by hand. 
 ! Extended IAxis to have pluggable scale policies. See IAxis.setAxisScalePolicy(IAxisScalePolicy). 
