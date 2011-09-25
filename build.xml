@@ -126,7 +126,7 @@
 			<fileset dir="${distfolder}">
 			</fileset>
 		</zip>
-		<delete dir="${distfolder}"/>
+		<delete dir="${distfolder}" />
 	</target>
 
 	<target name="makejarBinary" depends="makejarFat">
@@ -247,7 +247,7 @@
 				<method access="public" name="**" />
 			</keep>
 		</proguard>
-	    <!--
+		<!--
 		<genkey alias="jchart2.sourceforge.net" storepass="password" keystore="${basedir}/.keystore" >
 		  <dname>
 		    <param name="CN" value="Achim Westermann"/>
@@ -264,8 +264,8 @@
 
 	<!-- Dependency only for ensuring validity -->
 	<target name="makezipEclipseProject" depends="build">
-		<property name="sourcezip" value="${project.name}-eclipse-project-${project.version}.zip"/>
-	    <delete file="${basedir}/${sourcezip}"/>
+		<property name="sourcezip" value="${project.name}-eclipse-project-${project.version}.zip" />
+		<delete file="${basedir}/${sourcezip}" />
 		<zip destfile="${sourcezip}" basedir="${basedir}/.." update="false">
 			<include name="${project.name}/src/**/*.java" />
 			<include name="${project.name}/test/**/*.java" />
@@ -288,7 +288,7 @@
 	</target>
 
 	<target name="javadoc" depends="delete.doc">
-		<delete dir="${basedir}/doc/docs/javadoc"/>
+		<delete dir="${basedir}/doc/docs/javadoc" />
 		<mkdir dir="${basedir}/doc/docs/javadoc" />
 		<javadoc destdir="${basedir}/doc/docs/javadoc" access="protected" use="false" notree="false" nonavbar="false" noindex="false" splitindex="true" Author="true" version="true" nodeprecatedlist="false" nodeprecated="false" doctitle="JChart2D API documentation, Version ${project.version}" windowtitle="JChart2D API documentation, Version ${project.version}" Verbose="true" stylesheetfile="${basedir}/doc/docs/javadoc/jchart2d.css" charset="UTF-8" docencoding="UTF-8">
 			<classpath refid="classpath" />

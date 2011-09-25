@@ -91,8 +91,9 @@ public class ZoomableChart extends Chart2D implements MouseListener, MouseMotion
    * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
    */
   public void mouseClicked(final MouseEvent e) {
-    // nop.
-
+    if (e.getClickCount() == 2) {
+      this.zoomAll();
+    }
   }
 
   /**

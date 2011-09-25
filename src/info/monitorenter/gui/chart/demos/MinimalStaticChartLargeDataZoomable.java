@@ -44,7 +44,7 @@ import javax.swing.JFrame;
  * 
  * @version $Revision: 1.7 $
  */
-public final class MinimalStaticChartLargeData {
+public final class MinimalStaticChartLargeDataZoomable {
 
   /**
    * Testing main hook.
@@ -70,7 +70,7 @@ public final class MinimalStaticChartLargeData {
     // Create a frame.
     JFrame frame = new JFrame("MinimalStaticChartLargeData");
     // add the chart to the frame:
-    frame.getContentPane().add(new ChartPanel(chart));
+    frame.getContentPane().add(chart);
     frame.setSize(800, 600);
     // Enable the termination button [cross on the upper right edge]:
     frame.addWindowListener(new WindowAdapter() {
@@ -89,7 +89,7 @@ public final class MinimalStaticChartLargeData {
    * Defcon.
    * <p>
    */
-  private MinimalStaticChartLargeData() {
+  private MinimalStaticChartLargeDataZoomable() {
     super();
   }
 }
