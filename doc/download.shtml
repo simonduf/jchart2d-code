@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-  var update="16/04/2011";
+  var update="02/10/2011";
  </script>
  <body id="download">
   <div id="wrapper">
@@ -27,7 +27,7 @@
        </font>
        <br/>
        <font size="big">
-        <a href="http://sourceforge.net/projects/jchart2d/files/jchart2d/binaries/jchart2d-3.2.1.zip/download" target="_blank">Download JChart2D Version 3.2.1 (compatible with java 1.5.0)</a>
+        <a href="http://sourceforge.net/projects/jchart2d/files/jchart2d/binaries/jchart2d-3.2.2.zip/download" target="_blank">Download JChart2D Version 3.2.2 (compatible with java 1.5.0)</a>
        </font>
        <br/>
       </p>
