@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-  var update="16/04/2011";
+  var update="02/10/2011";
  </script>
  <body id="usage">
   <div id="wrapper">
@@ -34,7 +34,7 @@
        <li>
        Ensure, you have a java runtime environment installed. On your command window 
        type <em>"java"</em>. If unsuccessful you should download and install the Java Runtime Environment 
-       from <a target="_blank" href="https://cds.sun.com/is-bin/INTERSHOP.enfinity/WFS/CDS-CDS_Developer-Site/en_US/-/USD/ViewProductDetail-Start?ProductRef=jre-6u24-oth-JPR@CDS-CDS_Developer">https://cds.sun.com/is-bin/INTERSHOP.enfinity/WFS/CDS-CDS_Developer-Site/en_US/-/USD/ViewProductDetail-Start?ProductRef=jre-6u24-oth-JPR@CDS-CDS_Developer</a>. 
+       from <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html</a>. 
        If you don't want to start developing in Java, the <em>JRE</em> link on that page is sufficient. 
        After this procedure reopen the command window and type <em>"java"</em> again. It should 
        work. If not set the bin subdirectory of the JRE installations 
