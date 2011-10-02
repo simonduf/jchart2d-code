@@ -105,7 +105,7 @@
 		</antcall>
 	</target>
 
-	<target name="dist" depends="makejarBinary,makejarApplet,makezipEclipseProject,zip.javadoc">
+	<target name="zip.binaries" depends="makejarBinary">
 		<description>Creates a zip file containing the core jar file and all 3rd party libraries.</description>
 		<delete dir="${distfolder}">
 		</delete>
@@ -127,6 +127,10 @@
 			</fileset>
 		</zip>
 		<delete dir="${distfolder}" />
+	</target>
+
+	<target name="dist" depends="zip.binaries,makejarApplet,makezipEclipseProject,zip.javadoc">
+		<description>Shortcut to build every file for a release.</description>
 	</target>
 
 	<target name="makejarBinary" depends="makejarFat">
@@ -293,7 +297,7 @@
 		<javadoc destdir="${basedir}/doc/docs/javadoc" access="protected" use="false" notree="false" nonavbar="false" noindex="false" splitindex="true" Author="true" version="true" nodeprecatedlist="false" nodeprecated="false" doctitle="JChart2D API documentation, Version ${project.version}" windowtitle="JChart2D API documentation, Version ${project.version}" Verbose="true" stylesheetfile="${basedir}/doc/docs/javadoc/jchart2d.css" charset="UTF-8" docencoding="UTF-8">
 			<classpath refid="classpath" />
 			<bottom>
-				<![CDATA[<i>Copyright &#169; 2001 - 2010 <a href="http://www.opensource.org/licenses/lgpl-license.php" target="_blank">LGPL</a>, All Rights Footloose.</i>]]></bottom>
+				<![CDATA[<i>Copyright &#169; 2001 - 2011 <a href="http://www.opensource.org/licenses/lgpl-license.php" target="_blank">LGPL</a>, All Rights Footloose.</i>]]></bottom>
 		<fileset refid="sourcefiles" />
 		<link offline="false" href="http://java.sun.com/j2se/1.5.0/docs/api/" packagelistLoc="${java.home}/docs/api/" />
 		<link offline="false" href="http://logging.apache.org/log4j/1.2/apidocs/" packagelistLoc="http://logging.apache.org/log4j/1.2/apidocs/package-list" />
