@@ -37,7 +37,11 @@ Legend:
 o API change that requires refactoring. 
   Note that refactoring of protected code intended for library 
   internal details will not be listed.
+
+jchart2d-3.2.3 - <month>, <day>, <year>
   
+* Fixed bug #3424004: missing label of Y axis when showing more than 1 chart in one component. 
+
 jchart2d-3.2.2 - September, 24th, 2011
   
 ! New AxisScalePolicyManualTicks for controlling the ticks by hand. 
