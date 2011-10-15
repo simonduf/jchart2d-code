@@ -215,17 +215,13 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
               if(titleStartX <= 0){
                 System.err.println("titleStartX below or equal to zero: "+titleStartX);
               } 
+              // store former font for later restore:
+              Font oldFont = g.getFont();
+              Font rotateFont = oldFont.deriveFont(AffineTransform.getRotateInstance(-Math.PI / 2.0));
+              g2d.setFont(rotateFont);
               
-              // store former transform for later restore:
-              AffineTransform tr = g2d.getTransform();
-              AffineTransform at = g2d.getDeviceConfiguration().getDefaultTransform();
-              at.translate(
-                  titleStartX,
-                  titleStartY);
-              at.rotate(-Math.PI / 2);
-              g2d.setTransform(at);
-              g2d.drawString(title, 0, 0);
-              g2d.setTransform(tr);
+              g2d.drawString(title, titleStartX, titleStartY);
+              g2d.setFont(oldFont);
             } else {
               // no rotation: display in vertical middle:
               int startY = chart.getYChartStart();
@@ -252,13 +248,22 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
               int xShiftPosition = chart.getAxisTickPainter().getMajorTickLength();
               xShiftPosition += axis.getFormatter().getMaxAmountChars() * chartLabelFontWidth;
 
-              AffineTransform tr = g2d.getTransform();
-              AffineTransform at = g2d.getDeviceConfiguration().getDefaultTransform();
-              at.translate(chart.getXChartEnd() + xShiftPosition, titleStartY);
-              at.rotate(-Math.PI / 2);
-              g2d.setTransform(at);
-              g2d.drawString(title, 0, 0);
-              g2d.setTransform(tr);
+//              AffineTransform tr = g2d.getTransform();
+//              AffineTransform at = g2d.getDeviceConfiguration().getDefaultTransform();
+//              at.translate(chart.getXChartEnd() + xShiftPosition, titleStartY);
+//              at.rotate(-Math.PI / 2);
+//              g2d.setTransform(at);
+//              g2d.drawString(title, 0, 0);
+//              g2d.setTransform(tr);
+              
+              // store former font for later restore:
+              Font oldFont = g.getFont();
+              Font rotateFont = oldFont.deriveFont(AffineTransform.getRotateInstance(-Math.PI / 2.0));
+              g2d.setFont(rotateFont);
+              g2d.drawString(title, chart.getXChartEnd() + xShiftPosition, titleStartY);
+              g2d.setFont(oldFont);
+              
+              
             } else {
               int startY = chart.getYChartStart();
               int endY = chart.getYChartEnd();
