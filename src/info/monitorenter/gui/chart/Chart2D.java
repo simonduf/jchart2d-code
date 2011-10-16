@@ -2501,12 +2501,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    */
   private boolean hasChartIntersection(ITracePoint2D oldpoint, ITracePoint2D newpoint) {
     boolean result = true;
-    // if we needed a more generic (slower) solution we had to test:
-    // if x1 >= xmax && x2 >= xmax
-    // Caution: getX() and getY() will always return 0.0 by now as we don't
-    // backtrace values from interpolated points!
-    result = (oldpoint.getScaledX() != newpoint.getScaledX() || oldpoint.getScaledY() != newpoint
-        .getScaledY());
+    result = !(((oldpoint.getScaledX()>=1.0) && (newpoint.getScaledX() >= 1.0)) 
+        || ((oldpoint.getScaledX()<=0.0) && (newpoint.getScaledX() <= 0.0))
+        || ((oldpoint.getScaledY()>=1.0) && (newpoint.getScaledY() >= 1.0))
+        || ((oldpoint.getScaledY()<=0.0) && (newpoint.getScaledY() <= 0.0)));
     return result;
   }
 
