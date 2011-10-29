@@ -1453,8 +1453,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         result -= 20;
       }
     } else {
-      // use the maximum label width of the x axes to avoid x labels
-      // being clipped in case there are no right y axes:
+      /*
+       * Use the maximum label width of the x axes to avoid x labels being
+       * clipped in case there are no right y axes:
+       */
       Iterator<IAxis<?>> it = this.m_axesXBottom.iterator();
       int xAxesMaxLabelWidth = 0;
       int tmp;

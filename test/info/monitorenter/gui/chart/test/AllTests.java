@@ -23,9 +23,10 @@
 
 package info.monitorenter.gui.chart.test;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import info.monitorenter.gui.chart.axis.TestAxis;
+
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 /**
  * JChart2D main test suite, executes the individual test suites of all core
@@ -37,57 +38,15 @@ import junit.framework.TestSuite;
  * 
  * @since 2.1.0
  */
+@RunWith(Suite.class)
+@Suite.SuiteClasses({info.monitorenter.gui.chart.AllTests.class,
+    info.monitorenter.gui.chart.axis.AllTests.class,
+    info.monitorenter.gui.chart.demos.AllTests.class,
+    info.monitorenter.gui.chart.errorbars.AllTests.class,
+    info.monitorenter.gui.chart.labelformatters.AllTests.class,
+    info.monitorenter.gui.chart.layouts.AllTests.class,
+    info.monitorenter.gui.chart.traces.AllTests.class,
+    info.monitorenter.util.collections.AllTests.class })
 public final class AllTests {
-  /**
-   * Creates the JChart2D JUnit test suite.
-   * <p>
-   * 
-   * @return the JChart2D JUnit test suite
-   */
-  public static Test suite() {
-
-    TestSuite suite = new TestSuite("JChart2d complete tests");
-
-    suite.addTest(info.monitorenter.gui.chart.AllTests.suite());
-    suite.addTest(info.monitorenter.gui.chart.axis.AllTests.suite());
-    suite.addTest(info.monitorenter.gui.chart.demos.AllTests.suite());
-    suite.addTest(info.monitorenter.gui.chart.errorbars.AllTests.suite());
-    suite.addTest(info.monitorenter.gui.chart.labelformatters.AllTests.suite());
-    suite.addTest(info.monitorenter.gui.chart.layouts.AllTests.suite());
-    suite.addTest(info.monitorenter.gui.chart.traces.AllTests.suite());
-    suite.addTest(info.monitorenter.util.collections.AllTests.suite());
-
-    TestSetup wrapper = new TestSetup(suite) {
-
-      /**
-       * @see junit.extensions.TestSetup#setUp()
-       */
-      @Override
-      protected void setUp() {
-
-        // oneTimeSetUp();
-      }
-
-      /**
-       * 
-       * @see junit.extensions.TestSetup#tearDown()
-       */
-      @Override
-      protected void tearDown() {
-
-        // oneTimeTearDown();
-      }
-    };
-
-    return wrapper;
-  }
-
-  /**
-   * Hide constructor to prevent generation of class instances.
-   * <p>
-   */
-  private AllTests() {
-
-    // empty
-  }
+  // nop
 }

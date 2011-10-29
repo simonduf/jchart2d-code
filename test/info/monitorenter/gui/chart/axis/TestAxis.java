@@ -23,6 +23,7 @@
  */
 package info.monitorenter.gui.chart.axis;
 
+import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.IRangePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
@@ -30,8 +31,12 @@ import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.test.ATestJChart2D;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.util.Range;
+import org.junit.Test;
+
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+
 import junit.framework.Assert;
-import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
@@ -42,23 +47,7 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  */
 public class TestAxis extends ATestJChart2D {
-  /**
-   * Test suite for this test class.
-   * <p>
-   * 
-   * @return the test suite
-   */
-  public static Test suite() {
-
-    TestSuite suite = new TestSuite();
-    suite.setName(TestAxis.class.getName());
-
-    suite.addTest(new TestAxis("testSetRangePolicyFixedViewPort"));
-    suite.addTest(new TestAxis("testTransformPxToValue"));
-    suite.addTest(new TestAxis("testTransformValueToPx"));
-
-    return suite;
-  }
+ 
 
   /**
    * Constructor with the test name.
@@ -110,6 +99,7 @@ public class TestAxis extends ATestJChart2D {
    * {@link RangePolicyFixedViewport}</code>.
    * <p>
    */
+  @Test
   public void testSetRangePolicyFixedViewPort() {
     Range range = new Range(1, 2);
     IRangePolicy rangePolicy = new RangePolicyFixedViewport(range);
@@ -128,6 +118,7 @@ public class TestAxis extends ATestJChart2D {
    * .
    * <p>
    */
+  @Test
   public void testTransformPxToValue() {
     // X-axis
     int pixel = 100;
@@ -174,6 +165,7 @@ public class TestAxis extends ATestJChart2D {
    * .
    * <p>
    */
+  @Test
   public void testTransformValueToPx() {
     double value = 50;
     int pixel = this.m_axisX.m_accessor.translateValueToPx(value);
@@ -200,4 +192,38 @@ public class TestAxis extends ATestJChart2D {
     retransform = this.m_axisY.m_accessor.translatePxToValue(pixel);
     Assert.assertEquals(value, retransform, 0);
   }
+  
+  /**
+   * Tests axis dimensions with {@link IAxis#setPaintScale(boolean)} set 
+   * to false.
+   * <p>
+   */
+  @Test
+  public void testPaintScaleFalse() {
+    this.m_axisY.setPaintScale(false);
+    BufferedImage image=new BufferedImage(400,400,BufferedImage.TYPE_INT_ARGB);
+    Graphics graphics=image.getGraphics();
+    int axisYWidth = this.m_axisY.getWidth(graphics);
+    assertEquals("Y axis without paintScale is too wide.",14, axisYWidth);
+    this.m_axisX.setPaintScale(false);
+    int axisXHeight = this.m_axisX.getHeight(graphics);
+    assertEquals("X axis without paintScale is too tall.",14, axisXHeight);
+    
+  }
+
+  /**
+   * Tests axis dimensions with {@link IAxis#setPaintScale(boolean)} set 
+   * to true.
+   * <p>
+   */
+  @Test
+  public void testPaintScaleTrue() {
+    BufferedImage image=new BufferedImage(400,400,BufferedImage.TYPE_INT_ARGB);
+    Graphics graphics=image.getGraphics();
+    int axisYWidth = this.m_axisY.getWidth(graphics);
+    assertEquals("Y axis without paintScale is too small.",75, axisYWidth);
+    int axisXHeight = this.m_axisX.getHeight(graphics);
+    assertEquals("X axis without paintScale is too small.",34, axisXHeight);
+  }
+
 }

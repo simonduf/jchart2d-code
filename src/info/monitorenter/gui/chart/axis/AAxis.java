@@ -531,14 +531,18 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      */
     @Override
     public int getHeight(final Graphics g2d) {
-      final FontMetrics fontdim = g2d.getFontMetrics();
-      // the height of the font:
-      int height = fontdim.getHeight();
-      // and the height of a major tick mark:
-      height += this.getChart().getAxisTickPainter().getMajorTickLength();
+      int result = 0;
+      if (AAxis.this.isPaintScale()) {
+
+        final FontMetrics fontdim = g2d.getFontMetrics();
+        // the height of the font:
+        result += fontdim.getHeight();
+        // and the height of a major tick mark:
+        result += this.getChart().getAxisTickPainter().getMajorTickLength();
+      }
       // and the height of the axis title:
-      height += AAxis.this.getAxisTitle().getTitlePainter().getHeight(AAxis.this, g2d);
-      return height;
+      result += AAxis.this.getAxisTitle().getTitlePainter().getHeight(AAxis.this, g2d);
+      return result;
     }
 
     /**
@@ -635,11 +639,22 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      */
     @Override
     public int getWidth(final Graphics g2d) {
-      final FontMetrics fontdim = g2d.getFontMetrics();
-      // only the space required for the right side label:
-      final int fontwidth = fontdim.charWidth('0');
-      final int rightSideOverhang = (AAxis.this.getFormatter().getMaxAmountChars()) * fontwidth;
-
+      /*
+       * Why return any width for the x-axis? 
+       * 
+       * In case there are no right y axes then there might be labels on x axes 
+       * that might be clipped in case their label width would not be respected. 
+       * For that case the maximum label width is taken into account when finding the 
+       * right x bound for the chart. 
+       * 
+       */
+      int rightSideOverhang = 0;
+      if (AAxis.this.isPaintScale()) {
+        final FontMetrics fontdim = g2d.getFontMetrics();
+        // only the space required for the right side label:
+        final int fontwidth = fontdim.charWidth('0');
+        rightSideOverhang = (AAxis.this.getFormatter().getMaxAmountChars()) * fontwidth;
+      }
       return rightSideOverhang;
     }
 
@@ -776,12 +791,21 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      */
     @Override
     public final int getHeight(final Graphics g2d) {
-      final FontMetrics fontdim = g2d.getFontMetrics();
-      // only the space required for the right side label:
-      int fontHeight = fontdim.getHeight();
-      // -4 is for showing colons of x - labels that are below the baseline
-      fontHeight += 4;
-      return fontHeight;
+      /*
+       * Why return a height for an y-axis?
+       * 
+       * In case there are no top x axes a label for an y-axis could be truncated when defining 
+       * the upper Y-bound for the chart. 
+       */
+      int result = 0;
+      if (AAxis.this.isPaintScale()) {
+        final FontMetrics fontdim = g2d.getFontMetrics();
+        // only the space required for the right side label:
+        result += fontdim.getHeight();
+        // -4 is for showing colons of x - labels that are below the baseline
+        result += 4;
+      }
+      return result;
     }
 
     /**
@@ -875,17 +899,20 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      */
     @Override
     public final int getWidth(final Graphics g2d) {
-      final FontMetrics fontdim = g2d.getFontMetrics();
-      // the width of the font:
-      final int fontWidth = fontdim.charWidth('0');
-      // times the maximum amount of chars:
-      int height = fontWidth * AAxis.this.getFormatter().getMaxAmountChars();
-      // and the height of a major tick mark:
-      height += this.getChart().getAxisTickPainter().getMajorTickLength();
-      // and the Width of the axis title:
-      height += AAxis.this.getAxisTitle().getTitlePainter().getWidth(AAxis.this, g2d);
-      return height;
+      int result = 0;
+      if (AAxis.this.isPaintScale()) {
+        final FontMetrics fontdim = g2d.getFontMetrics();
+        // the width of the font:
+        final int fontWidth = fontdim.charWidth('0');
+        // times the maximum amount of chars:
+        result = fontWidth * AAxis.this.getFormatter().getMaxAmountChars();
+        // and the height of a major tick mark:
+        result += this.getChart().getAxisTickPainter().getMajorTickLength();
 
+      }
+      // and the Width of the axis title:
+      result += AAxis.this.getAxisTitle().getTitlePainter().getWidth(AAxis.this, g2d);
+      return result;
     }
 
     /**

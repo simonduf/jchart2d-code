@@ -41,7 +41,8 @@ o API change that requires refactoring.
 jchart2d-3.2.3 - <month>, <day>, <year>
   
 * Fixed bug #3380123: Graphical artifacts when zooming (or using RangePolicyFixedViewPort) on the bounds of the chart. 
-* Fixed bug #3424004: missing label of Y axis when showing more than 1 chart in one component. 
+* Fixed bug #3424004: Missing label of Y axis when showing more than 1 chart in one component. 
+* Fixed bug #3427569: Non painted X axis scale takes up unecessary space.
 
 jchart2d-3.2.2 - September, 24th, 2011
   

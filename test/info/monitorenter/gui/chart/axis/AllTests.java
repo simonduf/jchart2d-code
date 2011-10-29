@@ -21,8 +21,8 @@
  */
 package info.monitorenter.gui.chart.axis;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
 /**
  * Main test suite for the package
@@ -34,29 +34,8 @@ import junit.framework.TestSuite;
  * 
  * @since 2.1.0
  */
-
+@RunWith(Suite.class)
+@Suite.SuiteClasses({TestAxis.class })
 public final class AllTests {
-  /**
-   * Returns the JUnit test suite for this package.
-   * <p>
-   * 
-   * @return the JUnit test suite for this package
-   */
-  public static Test suite() {
-    TestSuite suite = new TestSuite("Test for info.monitorenter.gui.chart.axis");
-    // $JUnit-BEGIN$
-    suite.addTest(TestAxis.suite());
-    // $JUnit-END$
-    return suite;
-  }
-
-  /**
-   * Hide constructor to prevent generation of class instances.
-   * <p>
-   */
-  private AllTests() {
-
-    // empty
-  }
-
+  // nop
 }
