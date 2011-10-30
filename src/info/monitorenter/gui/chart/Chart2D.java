@@ -52,12 +52,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Set;
+import java.util.Set; 
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.swing.JPanel;
-import javax.swing.JToolTip;
+import javax.swing.JToolTip; 
 import javax.swing.Timer;
 
 /**
@@ -68,7 +68,7 @@ import javax.swing.Timer;
  * display- range is done automatically which flattens the free configuration.
  * <p>
  * There are several default settings that may be changed in
- * <code>Chart2D</code><br>
+ * <code>Chart2D</code><br> 
  * <ul>
  * <li>The display range is chosen always big enough to show every
  * <code>TracePoint2D</code> contained in the all <code>ITrace2d</code>
