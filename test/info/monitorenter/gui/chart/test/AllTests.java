@@ -23,8 +23,6 @@
 
 package info.monitorenter.gui.chart.test;
 
-import info.monitorenter.gui.chart.axis.TestAxis;
-
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
