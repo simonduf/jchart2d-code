@@ -233,6 +233,14 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
    *          deregister.
    */
   public abstract void setListener(final ITrace2D listener);
+  
+  /**
+   * Returns true if {@link #getX()} and/or {@link #getY()} is {@link Double#NaN} which signals a discontinuation.
+   * <p>
+   * 
+   * @return true if {@link #getX()} and/or {@link #getY()} is {@link Double#NaN} which signals a discontinuation.
+   */
+  public boolean isDiscontinuation();
 
   /**
    * This method overloads the method of
