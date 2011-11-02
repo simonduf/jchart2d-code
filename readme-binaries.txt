@@ -43,6 +43,7 @@ jchart2d-3.2.3 - <month>, <day>, <year>
 * Fixed bug #3380123: Graphical artifacts when zooming (or using RangePolicyFixedViewPort) on the bounds of the chart. 
 * Fixed bug #3424004: Missing label of Y axis when showing more than 1 chart in one component. 
 * Fixed bug #3427569: Non painted X axis scale takes up unecessary space.
+* Fixed bug #3432154: Remove dependency to JIDE-oss (debian upstream), http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=626243
 
 jchart2d-3.2.2 - September, 24th, 2011
   
