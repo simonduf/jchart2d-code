@@ -2990,12 +2990,12 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
              * polylines and must not accumulate polylines that have a
              * discontinuation within):
              */
-            boolean isNaNNewpoint = Double.isNaN(newpoint.getX()) || Double.isNaN(newpoint.getY());
+            boolean isNaNNewpoint = newpoint.isDiscontinuation();
             boolean isNanOldpoint;
             if (oldpoint == null) {
               isNanOldpoint = false;
             } else {
-              isNanOldpoint = Double.isNaN(oldpoint.getX()) || Double.isNaN(oldpoint.getY());
+              isNanOldpoint = oldpoint.isDiscontinuation();
             }
             if (isNaNNewpoint || isNanOldpoint) {
               /*
