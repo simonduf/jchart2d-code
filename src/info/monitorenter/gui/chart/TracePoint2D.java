@@ -125,6 +125,14 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
     }
 
     /**
+     * @see info.monitorenter.gui.chart.ITracePoint2D#isDiscontinuation()
+     */
+    public boolean isDiscontinuation() {
+      
+      return java.lang.Double.isNaN(this.getX()) || java.lang.Double.isInfinite(this.getY());
+    }
+
+    /**
      * @see info.monitorenter.gui.chart.ITracePoint2D#clone()
      */
     @Override
