@@ -22,6 +22,7 @@
  */
 package info.monitorenter.gui.chart.controls;
 
+import info.monitorenter.gui.jcomponent.RangeSlider;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.math.MathUtil;
 
@@ -41,7 +42,6 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import com.jidesoft.swing.RangeSlider;
 
 /**
  * A panel that allows to choose a range from a special
@@ -86,11 +86,11 @@ public class RangeChooserPanel extends JPanel {
     int max = (int)range.getMax();
     int minBound;
     int maxBound;
-    if ((!MathUtil.isDouble(min)) || (min == -Double.MAX_VALUE)) {
+    if ((!MathUtil.isDouble(min)) || (min == Integer.MIN_VALUE)) {
       min = -100;
     }
 
-    if ((!MathUtil.isDouble(max)) || ((max == Double.MAX_VALUE))) {
+    if ((!MathUtil.isDouble(max)) || ((max == Integer.MAX_VALUE))) {
       max = 100;
     }
     minBound = (min - (max - min) / 2);
@@ -102,46 +102,9 @@ public class RangeChooserPanel extends JPanel {
     this.m_rangeSlider = new RangeSlider();
     this.m_rangeSlider.setMinimum(minBound);
     this.m_rangeSlider.setMaximum(maxBound);
-    this.m_rangeSlider.setHighValue(max);
-    this.m_rangeSlider.setLowValue(min);
+    this.m_rangeSlider.setUpperValue(max);
+    this.m_rangeSlider.setValue(min);
     
-    /*
-     * Dead project, deleted from dev.java.net, latest binaries from:
-     * http://vernier.frederic.free.fr/
-     */
-    // this.m_bislider = new BiSlider(BiSlider.CENTRAL);
-    // /*
-    // * Sound causes:
-    // * javax.sound.sampled.LineUnavailableException: line with format
-    // PCM_UNSIGNED 8000.0 Hz, 8 bit, mono, 1 bytes/frame, not supported.
-    // *
-    // * with java version "1.6.0_22" on Ubuntu 10.10 (already in constructor).
-    // *
-    // * The following call also does not help as this panel is instantiated for
-    // every new GUI Range operation :-(
-    // */
-    // this.m_bislider.setSound(false);
-    // this.m_bislider.setMinimumColor(Color.RED.brighter());
-    // this.m_bislider.setMaximumColor(Color.RED.brighter());
-    // // these are the bounds:
-    // this.m_bislider.setMinimumValue(minBound);
-    // this.m_bislider.setMaximumValue(maxBound);
-    //
-    // // these are the concrete values:
-    // this.m_bislider.setMinimumColoredValue(min);
-    // this.m_bislider.setMaximumColoredValue(max);
-    // // don't want these funny segment dashes...
-    // this.m_bislider.setSegmentSize(Double.MAX_VALUE);
-    // this.m_bislider.setPrecise(true);
-    // // round corners:
-    // this.m_bislider.setArcSize(8);
-    // this.m_bislider.setInterpolationMode(BiSlider.RGB);
-    //
-    // // The bislider should not be stretched because the tooltip would be
-    // clipped
-    // // on the edges.
-    // // Therefore put it into a panel with horizontal box layout:
-    // this.m_bislider.setPreferredSize(new Dimension(200, 30));
     JPanel rangePanel = new JPanel();
 
     rangePanel.setLayout(new FlowLayout());
@@ -154,7 +117,7 @@ public class RangeChooserPanel extends JPanel {
     // text field views to show the range values;
     // minimum value view:
     final JTextField rangeMinView = new JTextField();
-    rangeMinView.setText(this.m_nf.format(new Double(this.m_rangeSlider.getLowValue())));
+    rangeMinView.setText(this.m_nf.format(new Double(this.m_rangeSlider.getValue())));
     rangeMinView.setEditable(true);
     rangeMinView.setPreferredSize(new Dimension(120, 20));
     rangeMinView.addActionListener(new ActionListener() {
@@ -163,10 +126,10 @@ public class RangeChooserPanel extends JPanel {
         try {
           Number entered = RangeChooserPanel.this.m_nf.parse(textField.getText());
           int low = entered.intValue();
-          int high = RangeChooserPanel.this.m_rangeSlider.getHighValue();
+          int high = RangeChooserPanel.this.m_rangeSlider.getUpperValue();
           int minSlider = low - (high - low) / 2;
           RangeChooserPanel.this.m_rangeSlider.setMinimum(minSlider);
-          RangeChooserPanel.this.m_rangeSlider.setLowValue(low);
+          RangeChooserPanel.this.m_rangeSlider.setValue(low);
           
         } catch (ParseException e) {
           // TODO: maybe inform user of invalid input.
@@ -180,7 +143,7 @@ public class RangeChooserPanel extends JPanel {
 
     // maximum value view:
     final JTextField rangeMaxView = new JTextField();
-    rangeMaxView.setText(new Double(this.m_rangeSlider.getHighValue()).toString());
+    rangeMaxView.setText(new Double(this.m_rangeSlider.getUpperValue()).toString());
     rangeMaxView.setEditable(true);
 
     rangeMaxView.setPreferredSize(new Dimension(120, 20));
@@ -190,10 +153,10 @@ public class RangeChooserPanel extends JPanel {
         try {
           Number entered = RangeChooserPanel.this.m_nf.parse(textField.getText());
           int high = entered.intValue();
-          int low = RangeChooserPanel.this.m_rangeSlider.getLowValue();
+          int low = RangeChooserPanel.this.m_rangeSlider.getValue();
           int maxSlider =  + (high - low) / 2;
           RangeChooserPanel.this.m_rangeSlider.setMaximum(maxSlider);
-          RangeChooserPanel.this.m_rangeSlider.setHighValue(high);
+          RangeChooserPanel.this.m_rangeSlider.setUpperValue(high);
 
         } catch (ParseException e) {
           // TODO: maybe inform user of invalid input.
@@ -212,10 +175,10 @@ public class RangeChooserPanel extends JPanel {
        */
       public void stateChanged(ChangeEvent e) {
         RangeSlider slider = (RangeSlider)e.getSource();
-        int value = slider.getLowValue();
+        int value = slider.getValue();
         String text = RangeChooserPanel.this.m_nf.format(value);
         rangeMinView.setText(text);
-        value = slider.getHighValue();
+        value = slider.getUpperValue();
         text = RangeChooserPanel.this.m_nf.format(value);
         rangeMaxView.setText(text);
       }
@@ -242,6 +205,6 @@ public class RangeChooserPanel extends JPanel {
    * @return the current selected range.
    */
   public Range getRange() {
-    return new Range(this.m_rangeSlider.getLowValue(), this.m_rangeSlider.getHighValue());
+    return new Range(this.m_rangeSlider.getValue(), this.m_rangeSlider.getUpperValue());
   }
 }
