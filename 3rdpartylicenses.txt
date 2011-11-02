@@ -17,12 +17,11 @@ The license file of it is in this distribution: LICENSE-apache-xmlgraphics-commo
 The NOTICE file is in this distribution: NOTICE-apache-apache-xmlgraphics-commons
 
 =================================================================================================================================
-GNU GENERAL PUBLIC LICENSE
-http://www.gnu.org/licenses/gpl.html
+The MIT License (MIT)
+http://www.opensource.org/licenses/mit-license.php
 (with classpath exception:http://www.gnu.org/software/classpath/license.html) 
  
 ---------------------------------------------------------------------------------------------------------------------------------
-Jide common layer (http://www.jidesoft.com/products/oss.htm) is an optional library that adds a range slider for axes to 
-jchart2d if the corrosponding jar file (object code) is included in the java class path. The source may be downloaded at 
-https://jide-oss.dev.java.net/servlets/ProjectDocumentList 
-  
+The source of info.monitorenter.gui.jcomponent.RangeSlider and info.monitorenter.gui.jcomponent.RangeSliderUI were taken 
+from https://github.com/ernieyu/Swing-range-slider (blog: http://ernienotes.wordpress.com/2010/12/27/creating-a-java-swing-range-slider/) 
+and included here. Go for those links to get fresher implementations.
