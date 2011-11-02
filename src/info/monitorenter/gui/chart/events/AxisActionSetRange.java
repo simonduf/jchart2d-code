@@ -50,29 +50,6 @@ import java.beans.PropertyChangeEvent;
 public class AxisActionSetRange extends AAxisAction {
 
   /**
-   * Flag set whenever the proper jar file (apache-xmlgraphics-commons) is in
-   * the classpath.
-   */
-  public static final boolean RANGE_CHOOSER_SUPPORTED;
-
-  static {
-    Class< ? > test = null;
-    try {
-      // Do a fake operation that will not be inlined by the compiler:
-      test = Class.forName("com.visutools.nav.bislider.BiSlider");
-
-    } catch (Throwable ncde) {
-      // nop
-    } finally {
-      if (test != null) {
-        RANGE_CHOOSER_SUPPORTED = true;
-      } else {
-        RANGE_CHOOSER_SUPPORTED = false;
-      }
-    }
-  }
-
-  /**
    * Generated <code>serialVersionUID</code>.
    */
   private static final long serialVersionUID = 3258694286479406393L;
@@ -97,9 +74,6 @@ public class AxisActionSetRange extends AAxisAction {
    */
   public AxisActionSetRange(final Chart2D chart, final String description, final int axis) {
     super(chart, description, axis);
-    if (!RANGE_CHOOSER_SUPPORTED) {
-      this.setEnabled(false);
-    }
   }
 
   /**
