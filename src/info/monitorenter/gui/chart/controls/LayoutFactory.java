@@ -1769,9 +1769,6 @@ public final class LayoutFactory {
       } else {
         item = new JMenuItem(new AxisActionSetRange(chart, "Range", axisDimension));
       }
-      if (!AxisActionSetRange.RANGE_CHOOSER_SUPPORTED) {
-        item.setToolTipText("This is disabled as bislider.jar is missing on the class path.");
-      }
       axisMenuItem.add(item);
     }
     if ((this.m_showAxisXTitleMenu && axisDimension == Chart2D.X)
