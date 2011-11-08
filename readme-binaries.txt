@@ -44,6 +44,9 @@ jchart2d-3.2.3 - <month>, <day>, <year>
 * Fixed bug #3424004: Missing label of Y axis when showing more than 1 chart in one component. 
 * Fixed bug #3427569: Non painted X axis scale takes up unecessary space.
 * Fixed bug #3432154: Remove dependency to JIDE-oss (debian upstream), http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=626243
+o Changed policy of Chart2D.translateMousePosition(final MouseEvent mouseEvent). Before this the translation was done into the values 
+  covered by the first x and y axes. By now the translation is related to the axes of the trace of the nearest point to the given 
+  mouse event. 
 
 jchart2d-3.2.2 - September, 24th, 2011
   

@@ -30,6 +30,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
@@ -199,7 +200,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
      * @return the height of this axis title in px with respect to the current
      *         title of the given axis.
      */
-    public int getHeight(final IAxis<?> axis, final Graphics2D g2d) {
+    public int getHeight(final IAxis< ? > axis, final Graphics2D g2d) {
       return this.m_titlePainter.getHeight(axis, g2d);
     }
 
@@ -278,7 +279,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
      * @return the width of this axis title in px with respect to the current
      *         title of the given axis.
      */
-    public int getWidth(final IAxis<?> axis, final Graphics2D g2d) {
+    public int getWidth(final IAxis< ? > axis, final Graphics2D g2d) {
       return this.m_titlePainter.getWidth(axis, g2d);
     }
 
@@ -314,8 +315,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
     public final String setTitle(final String title) {
       String old = this.m_title;
       this.m_title = title;
-      this.m_propertyChangeSupport.firePropertyChange(AxisTitle.PROPERTY_TITLE, old,
-          this.m_title);
+      this.m_propertyChangeSupport.firePropertyChange(AxisTitle.PROPERTY_TITLE, old, this.m_title);
       return old;
     }
 
@@ -374,21 +374,23 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    * Use this constant to register a {@link java.beans.PropertyChangeListener}
    * with the <code>IAxis</code>.
    * <p>
-   * See {@link #addPropertyChangeListener(String, PropertyChangeListener)}  for property change events fired.
+   * See {@link #addPropertyChangeListener(String, PropertyChangeListener)} for
+   * property change events fired.
    */
   public static final String PROPERTY_ADD_REMOVE_TRACE = "IAxis.PROPERTY_ADD_REMOVE_TRACE";
 
   /**
-   * The bean property <code>constant</code> identifying a change of the
-   * axis scale policy. 
+   * The bean property <code>constant</code> identifying a change of the axis
+   * scale policy.
    * <p>
    * Use this constant to register a {@link java.beans.PropertyChangeListener}
    * with the <code>IAxis</code>.
    * <p>
-   * See {@link #addPropertyChangeListener(String, PropertyChangeListener)} for property change events fired.
+   * See {@link #addPropertyChangeListener(String, PropertyChangeListener)} for
+   * property change events fired.
    */
   public static final String PROPERTY_AXIS_SCALE_POLICY_CHANGED = "IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED";
-  
+
   /**
    * Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the
    * <code>{@link IAxisTitlePainter}</code>.
@@ -502,7 +504,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    * 
    * @return the accessor to the chart.
    */
-  public abstract AAxis<?>.AChart2DDataAccessor getAccessor();
+  public abstract AAxis< ? >.AChart2DDataAccessor getAccessor();
 
   /**
    * Returns the constant for the position of this axis for the chart.
@@ -517,25 +519,22 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
   public int getAxisPosition();
 
   /**
+   * Returns the axis scale policy which controls the position and distance of
+   * the ticks to draw.
+   * <p>
+   * 
+   * @return the axis scale policy which controls the position and distance of
+   *         the ticks to draw.
+   */
+  public IAxisScalePolicy getAxisScalePolicy();
+
+  /**
    * Returns the title of this axis.
    * <p>
    * 
    * @return the axis title used.
    */
   public IAxis.AxisTitle getAxisTitle();
-
-  /**
-   * Removes the title of this axis.
-   * <p>
-   * 
-   * Prefer this method instead of <code>{@link #getAxisTitle()}</code> if you
-   * want to drop the axis title as this method also "unlistens" this axis from
-   * it's title.
-   * <p>
-   * 
-   * @return the removed title.
-   */
-  public IAxis.AxisTitle removeAxisTitle();
 
   /**
    * Returns the constant for the dimension this axis stands for in the chart.
@@ -547,11 +546,13 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
   public int getDimension();
 
   /**
-   * Returns the String constant for the dimension this axis stands for in the chart.
+   * Returns the String constant for the dimension this axis stands for in the
+   * chart.
    * <p>
    * 
-   * @return "X", "Y" or <code>null</code> if not assigned to a <code>{@link Chart2D}</code>. 
-   **/ 
+   * @return "X", "Y" or <code>null</code> if not assigned to a <code>
+   *         {@link Chart2D}</code>.
+   **/
   public String getDimensionString();
 
   /**
@@ -757,27 +758,6 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
   public abstract double getScaledValue(final double absolute);
 
   /**
-   * Returns the axis scale policy which controls the position and distance of the ticks to draw. 
-   * <p>
-   * 
-   * @return the axis scale policy which controls the position and distance of the ticks to draw. 
-   */
-  public IAxisScalePolicy getAxisScalePolicy();
-  
-  /**
-   * Sets the axis scale policy which controls the position and distance of the
-   * ticks to draw.
-   * <p>
-   * 
-   * @param axisScalePolicy
-   *          the axis scale policy which controls the position and distance of
-   *          the ticks to draw to use.
-   * 
-   * @return the previous axis scale policy that was used before.
-   */
-  public IAxisScalePolicy setAxisScalePolicy(T axisScalePolicy);
-  
-  /**
    * Returns the title or <code>null</code> if there was no title configured
    * before.
    * <p>
@@ -803,8 +783,8 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
   public IAxisTitlePainter getTitlePainter();
 
   /**
-   * Returns a <code>{@link Set}&lt;{@link ITrace2D}&gt;</code> with all traces covered by
-   * this axis.
+   * Returns a <code>{@link Set}&lt;{@link ITrace2D}&gt;</code> with all traces
+   * covered by this axis.
    * <p>
    * <b>Caution!</b><br/>
    * The original internal modifiable set is returned for performance reasons
@@ -952,6 +932,19 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
   public Set<ITrace2D> removeAllTraces();
 
   /**
+   * Removes the title of this axis.
+   * <p>
+   * 
+   * Prefer this method instead of <code>{@link #getAxisTitle()}</code> if you
+   * want to drop the axis title as this method also "unlistens" this axis from
+   * it's title.
+   * <p>
+   * 
+   * @return the removed title.
+   */
+  public IAxis.AxisTitle removeAxisTitle();
+
+  /**
    * Remove a PropertyChangeListener for a specific property. If
    * <code>listener</code> was added more than once to the same event source for
    * the specified property, it will be notified one less time after being
@@ -1007,6 +1000,19 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    *          the trace to scale.
    */
   public void scaleTrace(final ITrace2D trace);
+
+  /**
+   * Sets the axis scale policy which controls the position and distance of the
+   * ticks to draw.
+   * <p>
+   * 
+   * @param axisScalePolicy
+   *          the axis scale policy which controls the position and distance of
+   *          the ticks to draw to use.
+   * 
+   * @return the previous axis scale policy that was used before.
+   */
+  public IAxisScalePolicy setAxisScalePolicy(T axisScalePolicy);
 
   /**
    * Sets the title of this axis.
@@ -1235,6 +1241,25 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    *          true to paint axis, false to hide.
    */
   public void setVisible(boolean visible);
+
+  /**
+   * Returns the translation of the mouse event coordinates of the given mouse
+   * event to the value within the chart for the dimension (x,y) covered by this
+   * axis.
+   * <p>
+   * Note that the mouse event has to be an event fired on this component!
+   * <p>
+   * 
+   * @param mouseEvent
+   *          a mouse event that has been fired on this component.
+   *          
+   * @return the translation of the mouse event coordinates of the given mouse
+   *         event to the value within the chart for the dimension covered by
+   *         this axis (x or y) or null if no calculations could be performed as
+   *         the chart was not painted before.
+   *         
+   */
+  public double translateMousePosition(final MouseEvent mouseEvent);
 
   /**
    * Transforms the given pixel value (which has to be a awt value like
