@@ -2764,6 +2764,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     axis.addPropertyChangeListener(IAxis.PROPERTY_PAINTGRID, this);
     axis.addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, this);
     axis.addPropertyChangeListener(IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED, this);
+    axis.addPropertyChangeListener(IAxis.PROPERTY_VISIBLE, this);
   }
 
   /**
@@ -3382,6 +3383,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       } else if (property.equals(IAxis.PROPERTY_PAINTGRID)) {
         // repaint
       } else if (property.equals(IAxis.PROPERTY_RANGEPOLICY)) {
+        // repaint
+      } else if(property.equals(IAxis.PROPERTY_VISIBLE)) {
         // repaint
       } else {
         throw new IllegalStateException("Received a property change event \"" + property
@@ -4409,6 +4412,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     removedAxis.removePropertyChangeListener(IAxis.PROPERTY_PAINTGRID, this);
     removedAxis.removePropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, this);
     removedAxis.removePropertyChangeListener(IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED, this);
+    removedAxis.removePropertyChangeListener(IAxis.PROPERTY_VISIBLE, this);
   }
 
   /**

@@ -416,6 +416,12 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
   public static final String PROPERTY_RANGEPOLICY = "IAxis.PROPERTY_RANGEPOLICY";
 
   /**
+   * Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the
+   * visibility.
+   */
+  public static final String PROPERTY_VISIBLE = "IAxis.PROPERTY_VISIBLE";
+
+  /**
    * Add a listener for the given property.
    * <p>
    * The following {@link java.beans.PropertyChangeEvent} types should be fired
