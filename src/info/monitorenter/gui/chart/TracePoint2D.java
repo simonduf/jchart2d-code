@@ -129,7 +129,7 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
      */
     public boolean isDiscontinuation() {
       
-      return java.lang.Double.isNaN(this.getX()) || java.lang.Double.isInfinite(this.getY());
+      return java.lang.Double.isNaN(this.getX()) || java.lang.Double.isNaN(this.getY());
     }
 
     /**
