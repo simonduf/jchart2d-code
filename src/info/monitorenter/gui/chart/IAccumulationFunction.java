@@ -78,11 +78,22 @@ public interface IAccumulationFunction {
   /**
    * Adds a point to accumulated.
    * <p>
+   * Contract: No point that returns true from
+   * {@link ITracePoint2D#isDiscontinuation()} must be given to this method. An
+   * {@link IllegalArgumentException} should punish violators of this contract.
+   * Reason: Accumulating a discontinuation would consume it while it has to be
+   * preserved to allow {@link Chart2D} to render this.
+   * <p>
    * 
    * @param point
    *          a point to accumulated.
+   * 
+   * @throws IllegalArgumentException
+   *           if null or a point with {@link ITracePoint2D#isDiscontinuation()}
+   *           is provided.
+   * 
    */
-  public void addPointToAccumulate(final ITracePoint2D point);
+  public void addPointToAccumulate(final ITracePoint2D point) throws IllegalArgumentException;
 
   /**
    * Returns the accumulated point resulting from all the points fed via
