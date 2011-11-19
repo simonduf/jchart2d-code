@@ -26,11 +26,10 @@
 
 package info.monitorenter.gui.util;
 
-import java.util.Iterator;
-
 import info.monitorenter.gui.chart.ITrace2DDataAccumulating;
 import info.monitorenter.gui.chart.ITracePoint2D;
-import info.monitorenter.gui.chart.ITracePointProvider;
+
+import java.util.Iterator;
 
 /**
  * Utility class helper, created for supporting data accumulation of
@@ -52,51 +51,46 @@ public class IteratorITracePoint2DUtil {
 
   /**
    * Scrolls the given iterator to the first point that is above the given
-   * x-coordinate and returns a synthetic interpolated point that exactly has
-   * the given x-coordinate as x value (position 0) or null if the first point
-   * was already above the x bound and the first trace point that was above the
-   * bound (position 1).
+   * x-coordinate and returns the point that was found before.
    * <p>
    * Note: this only makes sense if the given iterator returns trace points in
    * ascending order of x values!
+   * <p>
+   * Assumption: The points in the iterator already have been scaled to the
+   * visible range (by Chart2D). So this works by using
+   * {@link ITracePoint2D#getScaledX()} and finding out if the value is >= 0.
    * <p>
    * Note: the state of the given iterator is changed. After this call you may
    * continue iterating. You most probably will first consume the position 0 of
    * the result (interpolated point to the lower x bound) and position 1 of the
    * result (first trace point above given x point).
    * <p>
+   * Note: There is no guarantee that the iterator will return visible points
+   * after this call as y bounds or the upper x bound is not checked!
+   * <p>
    * 
    * @param traceIt
    *          the source iterator to scroll.
    * 
-   * @param tracePointProvider
-   *          needed to create a point that interpolates to <code>startX</code>.
-   * 
-   * @param startX
-   *          the lower x bound to scroll to.
-   * 
-   * @return a synthetic interpolated point that exactly has the given
-   *         x-coordinate as x value (position 0) or null if the first point was
-   *         already above the x bound and the first trace point that was above
-   *         the bound (position 1).
+   * @return the point that was found before getting into visible x range or the
+   *         first point found if it was already visible or null if no point was
+   *         found in the iterator.
    */
-  public static ITracePoint2D[] scrollToFirstVisibleXValueWithInterpolation(final Iterator<ITracePoint2D> traceIt,
-      final ITracePointProvider tracePointProvider, final int startX) {
-    ITracePoint2D[] result = new ITracePoint2D[2];
+  public static ITracePoint2D scrollToFirstVisibleXValue(final Iterator<ITracePoint2D> traceIt) {
+    ITracePoint2D result = null;
 
-    ITracePoint2D interpolated = null;
     ITracePoint2D previous = null;
     ITracePoint2D current;
     while (traceIt.hasNext()) {
       current = traceIt.next();
-      if (current.getX() >= startX) {
-        if(previous == null) {
+      if (current.getScaledX() < 0.0) {
+        if (previous == null) {
           // no interpolation possible:
-          result[0] = null;
+          result = current;
         } else {
           // interpolate
+          result = previous;
         }
-        result[1] = current;
         break;
       }
     }
