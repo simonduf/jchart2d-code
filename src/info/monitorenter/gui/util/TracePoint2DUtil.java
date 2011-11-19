@@ -29,7 +29,7 @@ package info.monitorenter.gui.util;
 import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.ITracePointProvider;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.tracepoints.TracePoint2D;
 
 /**
  * Utility helper class for basic computations on
