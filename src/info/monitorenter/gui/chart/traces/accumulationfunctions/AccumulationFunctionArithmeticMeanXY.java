@@ -63,7 +63,11 @@ public class AccumulationFunctionArithmeticMeanXY extends AAccumulationFunction 
   /**
    * @see info.monitorenter.gui.chart.IAccumulationFunction#addPointToAccumulate(info.monitorenter.gui.chart.ITracePoint2D)
    */
-  public void addPointToAccumulate(ITracePoint2D point) {
+  public void addPointToAccumulate(ITracePoint2D point) throws IllegalArgumentException {
+    
+    if(point.isDiscontinuation()) {
+      throw new IllegalArgumentException("Do not attemp to consume a discontinuation by accumulation - preserve them for the chart!");
+    }
     ITracePoint2D accumulatedPointCurrent = this.getAccumulatedPointCurrent();
     if (accumulatedPointCurrent == null) {
       ITracePointProvider tracePointProvider = this.acquireTracePointProvider(point);
