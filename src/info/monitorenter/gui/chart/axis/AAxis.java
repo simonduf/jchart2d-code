@@ -1961,9 +1961,18 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
   }
 
   /**
+   * @deprecated use {@link #containsTrace(ITrace2D)} instead.
+   * 
    * @see info.monitorenter.gui.chart.IAxis#hasTrace(info.monitorenter.gui.chart.ITrace2D)
    */
   public final boolean hasTrace(final ITrace2D trace) {
+    return this.containsTrace(trace);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAxis#containsTrace(info.monitorenter.gui.chart.ITrace2D)
+   */
+  public boolean containsTrace(ITrace2D trace) {
     // TODO: Null enters here for tooltips with arithmetic mean trace!!!
     boolean result = false;
     result = this.m_traces.contains(trace);
