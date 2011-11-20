@@ -26,10 +26,12 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IErrorBarPolicy;
 import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.ITrace2DDataAccumulating;
 import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.ITracePointProvider;
 import info.monitorenter.gui.chart.traces.painters.TracePainterPolyline;
+import info.monitorenter.util.Range;
 import info.monitorenter.util.SerializationUtility;
 import info.monitorenter.util.StringUtil;
 import info.monitorenter.util.math.MathUtil;
@@ -67,7 +69,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * @version $Revision: 1.75 $
  */
-public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
+public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Comparable<ITrace2D> {
 
   /**
    * Instance counter for read-access in subclasses.
@@ -85,6 +87,15 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
   public static int getInstanceCount() {
     return ATrace2D.instanceCount;
   }
+
+  /**
+   * The accumulation strategy to be used.
+   * <p>
+   * By default it is {@link AccumulationStrategy#ACCUMULATE_BYPASS}: No
+   * accumulation takes place, no overhead is spent on this.
+   * <p>
+   */
+  private AccumulationStrategy m_accumulationStrategy;
 
   /**
    * {@link javax.swing.event.ChangeListener} instances (mainly
@@ -212,6 +223,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
     this.m_tracePainters.add(new TracePainterPolyline());
     this.m_pointHighlighters = new LinkedHashSet<IPointPainter< ? >>();
     this.m_stroke = new BasicStroke(1f);
+    this.setAccumulationStrategy(AccumulationStrategy.ACCUMULATE_BYPASS);
   }
 
   /**
@@ -219,26 +231,6 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    */
   public void addComputingTrace(final ITrace2D trace) {
     this.m_computingTraces.add(trace);
-  }
-
-  /**
-   * Ensures that no deadlock due to a missing internal chart reference may
-   * occur.
-   * 
-   * @throws IllegalStateException
-   *           if this trace is not assigned to a chart.
-   * 
-   */
-  protected final void ensureInitialized() {
-    if (this.m_renderer == Boolean.FALSE) {
-      throw new IllegalStateException("Connect this trace (" + this.getName()
-          + ") to a chart first before this operation (undebuggable deadlocks might occur else)");
-    } else {
-      if (Chart2D.DEBUG_THREADING) {
-        System.out.println(this.getClass() + "(" + Thread.currentThread().getName()
-            + ") this.m_renderer: " + this.m_renderer);
-      }
-    }
   }
 
   /**
@@ -320,8 +312,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
     synchronized (this.m_renderer) {
       if (Chart2D.DEBUG_THREADING) {
         if (!(this.m_renderer instanceof Chart2D)) {
-          throw new RuntimeException(
-              "Call chart.setTrace(trace) first before adding points or you might run into deadlocks!");
+          throw new RuntimeException("Call chart.setTrace(trace) first before adding points or you might run into deadlocks!");
         }
         System.out.println(Thread.currentThread().getName() + ", ATrace2D.addPoint, 1 lock");
       }
@@ -367,14 +358,12 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
 
       }
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println(Thread.currentThread().getName()
-            + ", ATrace2D.addPoint, freed 1 lock,  1 lock remaining.");
+        System.out.println(Thread.currentThread().getName() + ", ATrace2D.addPoint, freed 1 lock,  1 lock remaining.");
       }
 
     }
     if (Chart2D.DEBUG_THREADING) {
-      System.out.println(Thread.currentThread().getName()
-          + ", ATrace2D.addPoint, freed 1 lock,  0 locks remaining.");
+      System.out.println(Thread.currentThread().getName() + ", ATrace2D.addPoint, freed 1 lock,  0 locks remaining.");
     }
     return accepted;
   }
@@ -426,8 +415,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * @see info.monitorenter.gui.chart.ITrace2D#addPropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
-  public final void addPropertyChangeListener(final String propertyName,
-      final PropertyChangeListener listener) {
+  public final void addPropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
     this.m_propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
   }
 
@@ -474,7 +462,24 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
     return this.m_tracePainters.contains(painter);
   }
 
- 
+  /**
+   * Ensures that no deadlock due to a missing internal chart reference may
+   * occur.
+   * 
+   * @throws IllegalStateException
+   *           if this trace is not assigned to a chart.
+   * 
+   */
+  protected final void ensureInitialized() {
+    if (this.m_renderer == Boolean.FALSE) {
+      throw new IllegalStateException("Connect this trace (" + this.getName()
+          + ") to a chart first before this operation (undebuggable deadlocks might occur else)");
+    } else {
+      if (Chart2D.DEBUG_THREADING) {
+        System.out.println(this.getClass() + "(" + Thread.currentThread().getName() + ") this.m_renderer: " + this.m_renderer);
+      }
+    }
+  }
 
   /**
    * Internally expands all bounds according to potential error bars.
@@ -702,8 +707,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
 
   /**
    * Method triggered by <code>{@link ITracePoint2D#setLocation(double, double)}
-   * </code>, <code>{@link #addPoint(ITracePoint2D)}</code>
-   * or <code>
+   * </code>, <code>{@link #addPoint(ITracePoint2D)}</code> or <code>
    * {@link #removePoint(ITracePoint2D)}</code>.
    * <p>
    * Bound checks are performed and property change events for the properties
@@ -765,24 +769,20 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
           if (tmpx >= this.m_maxX) {
             tmpx = this.m_maxX;
             this.maxXSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(tmpx), new Double(
-                this.m_maxX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(tmpx), new Double(this.m_maxX));
           } else if (tmpx <= this.m_minX) {
             tmpx = this.m_minX;
             this.minXSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(tmpx), new Double(
-                this.m_minX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(tmpx), new Double(this.m_minX));
           }
           if (tmpy >= this.m_maxY) {
             tmpy = this.m_maxY;
             this.maxYSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(tmpy), new Double(
-                this.m_maxY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(tmpy), new Double(this.m_maxY));
           } else if (tmpy <= this.m_minY) {
             tmpy = this.m_minY;
             this.minYSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(tmpy), new Double(
-                this.m_minY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(tmpy), new Double(this.m_minY));
           }
           if (this.getSize() == 0) {
             this.m_firsttime = true;
@@ -792,50 +792,42 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
           if (tmpx < this.m_maxX) {
             final double oldMaxX = this.m_maxX;
             this.maxXSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldMaxX), new Double(
-                this.m_maxX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldMaxX), new Double(this.m_maxX));
           } else if (tmpx > this.m_maxX) {
             final double oldMaxX = this.m_maxX;
             this.m_maxX = tmpx;
             this.expandMaxXErrorBarBounds();
-            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldMaxX), new Double(
-                this.m_maxX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldMaxX), new Double(this.m_maxX));
           }
           if (tmpx > this.m_minX) {
             final double oldMinX = this.m_minX;
             this.minXSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldMinX), new Double(
-                this.m_minX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldMinX), new Double(this.m_minX));
           } else if (tmpx < this.m_minX) {
             final double oldMinX = this.m_minX;
             this.m_minX = tmpx;
             this.expandMinXErrorBarBounds();
-            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldMinX), new Double(
-                this.m_minX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldMinX), new Double(this.m_minX));
           }
           if (tmpy < this.m_maxY) {
             final double oldMaxY = this.m_maxY;
             this.maxYSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldMaxY), new Double(
-                this.m_maxY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldMaxY), new Double(this.m_maxY));
           } else if (tmpy > this.m_maxY) {
             final double oldMaxY = this.m_maxY;
             this.m_maxY = tmpy;
             this.expandMaxYErrorBarBounds();
-            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldMaxY), new Double(
-                this.m_maxY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldMaxY), new Double(this.m_maxY));
           }
           if (tmpy > this.m_minY) {
             final double oldMinY = this.m_minY;
             this.minYSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldMinY), new Double(
-                this.m_minY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldMinY), new Double(this.m_minY));
           } else if (tmpy < this.m_minY) {
             final double oldMinY = this.m_minY;
             this.m_minY = tmpy;
             this.expandMinYErrorBarBounds();
-            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldMinY), new Double(
-                this.m_minY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldMinY), new Double(this.m_minY));
           }
           this.firePropertyChange(ITrace2D.PROPERTY_POINT_CHANGED, null, changed);
         }
@@ -876,11 +868,9 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * @param newvalue
    *          the new value of the property.
    */
-  protected final void firePropertyChange(final String property, final Object oldvalue,
-      final Object newvalue) {
-    if (property.equals(ITrace2D.PROPERTY_MAX_X) || property.equals(ITrace2D.PROPERTY_MAX_Y)
-        || property.equals(ITrace2D.PROPERTY_MIN_X) || property.equals(ITrace2D.PROPERTY_MIN_Y)
-        || property.equals(ITrace2D.PROPERTY_TRACEPOINT)
+  protected final void firePropertyChange(final String property, final Object oldvalue, final Object newvalue) {
+    if (property.equals(ITrace2D.PROPERTY_MAX_X) || property.equals(ITrace2D.PROPERTY_MAX_Y) || property.equals(ITrace2D.PROPERTY_MIN_X)
+        || property.equals(ITrace2D.PROPERTY_MIN_Y) || property.equals(ITrace2D.PROPERTY_TRACEPOINT)
         || property.equals(ITrace2D.PROPERTY_POINT_CHANGED)) {
       if (!Thread.holdsLock(this.m_renderer)) {
         throw new RuntimeException("Acquire a lock on the corresponding chart first!");
@@ -890,12 +880,18 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
       }
 
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println("trace.firePropertyChange (" + property + "), 2 locks, renderer is: "
-            + this.m_renderer);
+        System.out.println("trace.firePropertyChange (" + property + "), 2 locks, renderer is: " + this.m_renderer);
       }
     }
 
     this.m_propertyChangeSupport.firePropertyChange(property, oldvalue, newvalue);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2DDataAccumulating#getAccumulationStrategy()
+   */
+  public AccumulationStrategy getAccumulationStrategy() {
+    return this.m_accumulationStrategy;
   }
 
   /**
@@ -1137,8 +1133,8 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
     if (StringUtil.isEmpty(this.m_physicalUnitsX) && StringUtil.isEmpty(this.m_physicalUnitsY)) {
       result = "";
     } else {
-      result = new StringBuffer("[x: ").append(this.getPhysicalUnitsX()).append(", y: ").append(
-          this.getPhysicalUnitsY()).append("]").toString();
+      result = new StringBuffer("[x: ").append(this.getPhysicalUnitsX()).append(", y: ").append(this.getPhysicalUnitsY()).append("]")
+          .toString();
 
     }
     return result;
@@ -1222,19 +1218,16 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
     // as those are invoked several times for each iteration
     // (and paint contains several iterations).
     if (Chart2D.DEBUG_THREADING) {
-      System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName()
-          + ".getZindex, 0 locks");
+      System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName() + ".getZindex, 0 locks");
     }
     synchronized (this.m_renderer) {
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName()
-            + ".getZindex, 1 locks");
+        System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName() + ".getZindex, 1 locks");
       }
 
       synchronized (this) {
         if (Chart2D.DEBUG_THREADING) {
-          System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName()
-              + ".getZindex, 2 locks");
+          System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName() + ".getZindex, 2 locks");
         }
       }
       if (Chart2D.DEBUG_THREADING) {
@@ -1249,7 +1242,6 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
     return this.m_zIndex;
   }
 
- 
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#isVisible()
    */
@@ -1406,10 +1398,23 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
   public void propertyChange(final PropertyChangeEvent evt) {
-    if (IErrorBarPolicy.PROPERTY_CONFIGURATION.equals(evt.getPropertyName())) {
+    final String propertyName = evt.getPropertyName();
+    if (IErrorBarPolicy.PROPERTY_CONFIGURATION.equals(propertyName)) {
       this.expandErrorBarBounds();
-      this
-          .firePropertyChange(ITrace2D.PROPERTY_ERRORBARPOLICY_CONFIGURATION, null, evt.getSource());
+      /*
+       * Notify listeners of this class about an underlying change. Idiom: Chain
+       * of responsibility: Listeners should not listen on all underlying
+       * details but trust complex objects to inform them about any change.
+       */
+      this.firePropertyChange(ITrace2D.PROPERTY_ERRORBARPOLICY_CONFIGURATION, null, evt.getSource());
+    } else if (AccumulationStrategy.PROPERTY_ACCUMULATION_FUNCTION.equals(propertyName)) {
+      /*
+       * Notify listeners of this class about an underlying change. Idiom: Chain
+       * of responsibility: Listeners should not listen on all underlying
+       * details but trust complex objects to inform them about any change.
+       */
+      this.firePropertyChange(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY_ACCUMULATION_FUNCTION_CHANGED, evt.getOldValue(),
+          evt.getNewValue());
     }
 
   }
@@ -1424,8 +1429,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * @throws ClassNotFoundException
    *           if there is a classpath problem.
    */
-  private void readObject(final ObjectInputStream stream) throws IOException,
-      ClassNotFoundException {
+  private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
     stream.defaultReadObject();
     this.m_stroke = SerializationUtility.readStroke(stream);
   }
@@ -1459,20 +1463,16 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
         // property changes:
         double oldValue = this.m_maxX;
         this.m_maxX = 0;
-        this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldValue), new Double(
-            this.m_maxX));
+        this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldValue), new Double(this.m_maxX));
         oldValue = this.m_maxY;
         this.m_maxY = 0;
-        this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldValue), new Double(
-            this.m_maxY));
+        this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldValue), new Double(this.m_maxY));
         oldValue = this.m_minX;
         this.m_minX = 0;
-        this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldValue), new Double(
-            this.m_minX));
+        this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldValue), new Double(this.m_minX));
         oldValue = this.m_minY;
         this.m_minY = 0;
-        this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldValue), new Double(
-            this.m_minY));
+        this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldValue), new Double(this.m_minY));
 
         // inform computing traces:
         for (final ITrace2D trace : this.m_computingTraces) {
@@ -1566,24 +1566,20 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
           if (tmpx >= this.m_maxX) {
             tmpx = this.m_maxX;
             this.maxXSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(tmpx), new Double(
-                this.m_maxX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(tmpx), new Double(this.m_maxX));
           } else if (tmpx <= this.m_minX) {
             tmpx = this.m_minX;
             this.minXSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(tmpx), new Double(
-                this.m_minX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(tmpx), new Double(this.m_minX));
           }
           if (tmpy >= this.m_maxY) {
             tmpy = this.m_maxY;
             this.maxYSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(tmpy), new Double(
-                this.m_maxY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(tmpy), new Double(this.m_maxY));
           } else if (tmpy <= this.m_minY) {
             tmpy = this.m_minY;
             this.minYSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(tmpy), new Double(
-                this.m_minY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(tmpy), new Double(this.m_minY));
           }
 
           this.firePointRemoved(removed);
@@ -1660,8 +1656,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
    * @see info.monitorenter.gui.chart.ITrace2D#removePropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
-  public void removePropertyChangeListener(final String property,
-      final PropertyChangeListener listener) {
+  public void removePropertyChangeListener(final String property, final PropertyChangeListener listener) {
     this.m_propertyChangeSupport.removePropertyChangeListener(property, listener);
   }
 
@@ -1681,6 +1676,23 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
       // not allowed.
     }
     return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2DDataAccumulating#setAccumulationStrategy(info.monitorenter.gui.chart.ITrace2DDataAccumulating.AccumulationStrategy)
+   */
+  public AccumulationStrategy setAccumulationStrategy(AccumulationStrategy accumulationStrategy) {
+    AccumulationStrategy oldValue = this.m_accumulationStrategy;
+    this.m_accumulationStrategy = accumulationStrategy;
+    /*
+     * Unlisten to the old one, listen to the new one.
+     */
+    if (oldValue != null) {
+      oldValue.removePropertyChangeListener(AccumulationStrategy.PROPERTY_ACCUMULATION_FUNCTION, this);
+    }
+    this.m_accumulationStrategy.addPropertyChangeListener(AccumulationStrategy.PROPERTY_ACCUMULATION_FUNCTION, this);
+    this.firePropertyChange(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY, oldValue, accumulationStrategy);
+    return oldValue;
   }
 
   /**
@@ -1869,8 +1881,7 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
     final boolean oldValue = this.m_visible;
     this.m_visible = visible;
     if (oldValue != this.m_visible) {
-      this.firePropertyChange(ITrace2D.PROPERTY_VISIBLE, Boolean.valueOf(oldValue), Boolean
-          .valueOf(this.m_visible));
+      this.firePropertyChange(ITrace2D.PROPERTY_VISIBLE, Boolean.valueOf(oldValue), Boolean.valueOf(this.m_visible));
     }
   }
 
@@ -1908,8 +1919,8 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
     boolean result = false;
     for (final IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
       if (errorBarPolicy.getErrorBarPainters().size() > 0) {
-        if (errorBarPolicy.isShowNegativeXErrors() || errorBarPolicy.isShowNegativeYErrors()
-            || errorBarPolicy.isShowPositiveXErrors() || errorBarPolicy.isShowPositiveYErrors()) {
+        if (errorBarPolicy.isShowNegativeXErrors() || errorBarPolicy.isShowNegativeYErrors() || errorBarPolicy.isShowPositiveXErrors()
+            || errorBarPolicy.isShowPositiveYErrors()) {
           result = true;
           break;
         }
@@ -2004,5 +2015,12 @@ public abstract class ATrace2D implements ITrace2D, Comparable<ITrace2D> {
   private void writeObject(final ObjectOutputStream stream) throws IOException {
     stream.defaultWriteObject();
     SerializationUtility.writeStroke(this.m_stroke, stream);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2DDataAccumulating#iterator(int)
+   */
+  public final Iterator<ITracePoint2D> iterator( int amountOfVisiblePoints) {
+    return this.m_accumulationStrategy.iterator(this.iterator(), amountOfVisiblePoints, this.getSize());
   }
 }

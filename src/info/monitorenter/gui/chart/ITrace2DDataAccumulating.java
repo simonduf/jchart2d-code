@@ -172,7 +172,7 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
      * <p>
      */
     ACCUMULATE_AMOUNT_OF_POINTS(new AccumulationFunctionArithmeticMeanXY()) {
-      public Iterator<ITracePoint2D> iterator(final Range xRange, final Range yRange, final Iterator<ITracePoint2D> source,
+      public Iterator<ITracePoint2D> iterator(final Iterator<ITracePoint2D> source,
           final int amountOfPoints, final int totalPointsInSource) {
         return new AccumulatingIteratorConsecutivePoints(source, this.getAccumulationFunction(), amountOfPoints,
             totalPointsInSource);
@@ -184,7 +184,7 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
      * whenever you have unordered (by x value) traces.      
      */
     ACCUMULATE_AMOUNT_OF_POINTS_ASCENDING_X_VALUES(new AccumulationFunctionArithmeticMeanXY()) {
-      public Iterator<ITracePoint2D> iterator(final Range xRange, final Range yRange, final Iterator<ITracePoint2D> source,
+      public Iterator<ITracePoint2D> iterator(final Iterator<ITracePoint2D> source,
           final int amountOfPoints, final int totalPointsInSource) {
         return new AccumulatingIteratorConsecutivePoints(source, this.getAccumulationFunction(), amountOfPoints,
             totalPointsInSource);
@@ -194,10 +194,10 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
     /**
      * Bypass for accumulation: Just the given original <code>source</code>
      * argument is returned from it's method
-     * <code>{@link #iterator(Range, Range, Iterator, int, int)}</code>.
+     * <code>{@link #iterator(Iterator, int, int)}</code>.
      */
     ACCUMULATE_BYPASS(new AccumulationFunctionBypass()) {
-      public Iterator<ITracePoint2D> iterator(final Range xRange, final Range yRange, final Iterator<ITracePoint2D> source,
+      public Iterator<ITracePoint2D> iterator(final Iterator<ITracePoint2D> source,
           final int amountOfPoints, final int totalPointsInSource) {
         return source;
       }
@@ -228,7 +228,7 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
        * <p>
        * 
        */
-      public Iterator<ITracePoint2D> iterator(final Range xRange, final Range yRange, final Iterator<ITracePoint2D> source,
+      public Iterator<ITracePoint2D> iterator( final Iterator<ITracePoint2D> source,
           final int amountOfPointsk, final int totalPointsInSource) {
         return null;
       }
@@ -315,14 +315,6 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
      * Template method to return an iterator over accumulated points.
      * <p>
      * 
-     * @param xRange
-     *          would allow to filter out points outside the valid x-value
-     *          bounds.
-     * 
-     * @param yRange
-     *          would allow to filter out points outside the valid y-value
-     *          bounds.
-     * 
      * @param source
      *          iterator over the real points of this trace.
      * 
@@ -335,7 +327,7 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
      * 
      * @return an iterator over the accumulated points from the given iterator.
      */
-    public abstract Iterator<ITracePoint2D> iterator(final Range xRange, final Range yRange, final Iterator<ITracePoint2D> source,
+    public abstract Iterator<ITracePoint2D> iterator(final Iterator<ITracePoint2D> source,
         final int amountOfPoints, final int totalPointsInSource);
 
     /**
@@ -416,8 +408,7 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
   /**
    * Returns an <code>Iterator</code> over the internal <code>
    * {@link ITracePoint2D}</code> instances that might accumulate internal
-   * {@link ITracePoint2D} instances into one by taking visible range and
-   * desired amount of points into account.
+   * {@link ITracePoint2D} instances into one.
    * <p>
    * Implementations should be synchronized. As this method may return
    * "synthetic" points created at runtime that are made up by accumulation of
@@ -436,14 +427,6 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
    * the x value domain.
    * <p>
    * 
-   * @param visibleRangeX
-   *          All internal points with X values outside this range will be
-   *          ignored.
-   * 
-   * @param visibleRangeY
-   *          All internal points with Y values outside this range will be
-   *          ignored.
-   * 
    * @param amountOfVisiblePoints
    *          The amount of points that should at least be returned to the
    *          caller. Note that implementation may return twice as much points
@@ -457,7 +440,7 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
    *         internal {@link ITracePoint2D} instances into one by taking visible
    *         range and desired amount of points into account.
    */
-  public Iterator<ITracePoint2D> iterator(final Range visibleRangeX, final Range visibleRangeY, final int amountOfVisiblePoints);;
+  public Iterator<ITracePoint2D> iterator(final int amountOfVisiblePoints);;
 
   /**
    * Installs the given accumulation strategy.
