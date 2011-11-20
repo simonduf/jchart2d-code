@@ -29,8 +29,8 @@ import info.monitorenter.gui.chart.pointpainters.PointPainterVerticalBar;
 import java.awt.Graphics;
 
 /**
- * Renders traces by painting a bar with choosable width for each
- * {@link info.monitorenter.gui.chart.TracePoint2D} to show.
+ * Renders traces by painting a bar with selectable width for each
+ * {@link ITracePoint2D} to show.
  * <p>
  * Bars are placed around the x value to render: the middle of the bar in x
  * dimension is the exact x value.
