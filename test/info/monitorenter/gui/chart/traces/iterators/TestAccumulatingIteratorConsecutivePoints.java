@@ -17,11 +17,6 @@
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
- *
- *
- * File   : $Source: /cvsroot/jchart2d/jchart2d/codetemplates.xml,v $
- * Date   : $Date: 2009/02/24 16:45:41 $
- * Version: $Revision: 1.2 $
  */
 
 package info.monitorenter.gui.chart.traces.iterators;
@@ -257,6 +252,89 @@ public class TestAccumulatingIteratorConsecutivePoints {
     Assert.assertTrue(toTest.hasNext());
     result = toTest.next();
     Assert.assertEquals(four, result);
+    Assert.assertFalse(toTest.hasNext());
+  }
+
+  
+  /**
+   * Test an instance with a trace containing 4 points and an
+   * {@link AccumulationFunctionArithmeticMeanXY} and the request to accumulate
+   * two points into one (which is possible with 4 points). However there two 
+   * NaN values (discontinuation) on position 2 and 3.
+   * <p>
+   * Assumption: iterator must return just 4 points. The NaN points untouched.
+   * <p>
+   */
+  @Test
+  public void testFourValueTraceWith2NaNAccumulationFunctionArithmeticMeanXYWithRequestToAccumulate2into1() {
+    IAccumulationFunction accumulationFunction = new AccumulationFunctionArithmeticMeanXY();
+    ITracePoint2D one = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(0.0, 0.0);
+    ITracePoint2D two = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(1.0, Double.NaN);
+    ITracePoint2D three = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(Double.NaN, 2.0);
+    ITracePoint2D four = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(3.0, 3.0);
+
+    this.m_trace.addPoint(one);
+    this.m_trace.addPoint(two);
+    this.m_trace.addPoint(three);
+    this.m_trace.addPoint(four);
+
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace.iterator(), accumulationFunction, 3,
+        this.m_trace.getSize());
+    Assert.assertTrue(toTest.hasNext());
+    ITracePoint2D result = toTest.next();
+    Assert.assertEquals(one, result);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    // This must be two unchanged as it is a discontinuation!
+    Assert.assertEquals(two.getX(), result.getX(), 0.0);
+    Assert.assertEquals(two.getY(), result.getY(), 0.0);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    // This must be three unchanged as it is a discontinuation!
+    Assert.assertEquals(three.getX(), result.getX(), 0.0);
+    Assert.assertEquals(three.getY(), result.getY(), 0.0);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    Assert.assertEquals(four, result);
+    Assert.assertFalse(toTest.hasNext());
+  }
+  
+  /**
+   * Test an instance with a trace containing 4 points and an
+   * {@link AccumulationFunctionArithmeticMeanXY} and the request to accumulate
+   * two points into one (which is possible with 4 points). However there is one  
+   * NaN value (discontinuation) on position 1.
+   * <p>
+   * Assumption: iterator must return just 3 points. The NaN points untouched.
+   * <p>
+   */
+  @Test
+  public void testFourValueTraceWithFirstNaNAccumulationFunctionArithmeticMeanXYWithRequestToAccumulate2into1() {
+    IAccumulationFunction accumulationFunction = new AccumulationFunctionArithmeticMeanXY();
+    ITracePoint2D one = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(Double.NaN, 0.0);
+    ITracePoint2D two = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(1.0, 1.0);
+    ITracePoint2D three = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(2.0, 2.0);
+    ITracePoint2D four = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(3.0, 3.0);
+
+    this.m_trace.addPoint(one);
+    this.m_trace.addPoint(two);
+    this.m_trace.addPoint(three);
+    this.m_trace.addPoint(four);
+
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace.iterator(), accumulationFunction, 3,
+        this.m_trace.getSize());
+    Assert.assertTrue(toTest.hasNext());
+    ITracePoint2D result = toTest.next();
+    // This must be one unchanged as it is a discontinuation!
+    Assert.assertEquals(one.getX(), result.getX(), 0.0);
+    Assert.assertEquals(one.getY(), result.getY(), 0.0);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    Assert.assertEquals(1.5, result.getX(), 0.0);
+    Assert.assertEquals(1.5, result.getY(), 0.0);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    Assert.assertEquals(result, four);
     Assert.assertFalse(toTest.hasNext());
   }
 
