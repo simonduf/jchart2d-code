@@ -30,7 +30,6 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAccumulationFunction;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
-import info.monitorenter.gui.chart.TracePoint2D;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.traces.accumulationfunctions.AccumulationFunctionArithmeticMeanXY;
 
@@ -220,12 +219,55 @@ public class TestAccumulatingIteratorConsecutivePoints {
   }
 
   /**
+   * Test an instance with a trace containing 4 points and an
+   * {@link AccumulationFunctionArithmeticMeanXY} and the request to accumulate
+   * two points into one (which is possible with 4 points). However there is a
+   * NaN value (discontinuation) on position 3.
+   * <p>
+   * Assumption: iterator must return just 4 points. The NaN point untouched.
+   * <p>
+   */
+  @Test
+  public void testFourValueTraceWith1NaNAccumulationFunctionArithmeticMeanXYWithRequestToAccumulate2into1() {
+    IAccumulationFunction accumulationFunction = new AccumulationFunctionArithmeticMeanXY();
+    ITracePoint2D one = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(0.0, 0.0);
+    ITracePoint2D two = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(1.0, 1.0);
+    ITracePoint2D three = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(Double.NaN, 2.0);
+    ITracePoint2D four = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(3.0, 3.0);
+
+    this.m_trace.addPoint(one);
+    this.m_trace.addPoint(two);
+    this.m_trace.addPoint(three);
+    this.m_trace.addPoint(four);
+
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace.iterator(), accumulationFunction, 3,
+        this.m_trace.getSize());
+    Assert.assertTrue(toTest.hasNext());
+    ITracePoint2D result = toTest.next();
+    Assert.assertEquals(one, result);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    // This must be two unchanged as NaN is following!
+    Assert.assertEquals(two, result);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    // This must be three unchanged as it is a discontinuation!
+    Assert.assertEquals(three.getX(), result.getX(), 0.0);
+    Assert.assertEquals(three.getY(), result.getY(), 0.0);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    Assert.assertEquals(four, result);
+    Assert.assertFalse(toTest.hasNext());
+  }
+
+  /**
    * Test an instance with a trace containing 102 points and an
    * {@link AccumulationFunctionArithmeticMeanXY} and the request to accumulate
    * two points into one.
    * <p>
-   * Assumption: iterator must return just 52 points. First and last have to be returned as contained 
-   * in the original. Remaining points must be the arithmetic mean of two consecutive points. 
+   * Assumption: iterator must return just 52 points. First and last have to be
+   * returned as contained in the original. Remaining points must be the
+   * arithmetic mean of two consecutive points.
    * <p>
    */
   @Test
@@ -260,18 +302,19 @@ public class TestAccumulatingIteratorConsecutivePoints {
       } else {
         Assert.assertEquals(result, last);
       }
-      // Two points were advanced. 
+      // Two points were advanced.
       i += 2.0;
     }
   }
-  
+
   /**
    * Test an instance with a trace containing 92 points and an
    * {@link AccumulationFunctionArithmeticMeanXY} and the request to accumulate
    * three points into one.
    * <p>
-   * Assumption: iterator must return just 32 points. First and last have to be returned as contained 
-   * in the original. Remaining points must be the arithmetic mean of two consecutive points. 
+   * Assumption: iterator must return just 32 points. First and last have to be
+   * returned as contained in the original. Remaining points must be the
+   * arithmetic mean of two consecutive points.
    * <p>
    */
   @Test
@@ -306,10 +349,9 @@ public class TestAccumulatingIteratorConsecutivePoints {
       } else {
         Assert.assertEquals(result, last);
       }
-      // Two points were advanced. 
+      // Two points were advanced.
       i += 3.0;
     }
   }
-
 
 }
