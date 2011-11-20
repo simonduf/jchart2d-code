@@ -59,7 +59,7 @@ import java.util.Set;
  * fired to <code>{@link PropertyChangeListener}</code> instances that register
  * themselves with
  * <code>{@link #addPropertyChangeListener(String, PropertyChangeListener)}</code>.
- * <table * border="0">
+ * <table border="0">
  * <tr>
  * <th><code>getPropertyName()</code></th>
  * <th><code>getSource()</code></th>
