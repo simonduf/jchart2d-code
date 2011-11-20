@@ -47,19 +47,6 @@ public class AccumulationFunctionArithmeticMeanXY extends AAccumulationFunction 
    */
   private int m_accumulatedPointsCount = 0;
 
-  // /**
-  // * Creates an instance that uses the given trace point provider to create
-  // * accumulation points.
-  // * <p>
-  // *
-  // * @param tracePointProvider
-  // * see {@link #setTracePointProvider(ITracePointProvider)}.
-  // */
-  // public AccumulationFunctionArithmeticMeanXY(ITracePointProvider
-  // tracePointProvider) {
-  // super(tracePointProvider);
-  // }
-
   /**
    * @see info.monitorenter.gui.chart.IAccumulationFunction#addPointToAccumulate(info.monitorenter.gui.chart.ITracePoint2D)
    */
