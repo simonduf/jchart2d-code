@@ -135,6 +135,8 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
              * return the discontinuation.
              */
             result = this.m_previousNaN;
+            this.m_previousNaN = null;
+            break;
           } else {
             point = iterator.next();
             if (!point.isDiscontinuation()) {
