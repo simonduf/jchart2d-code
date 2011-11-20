@@ -1906,7 +1906,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     Iterator<IAxis< ? >> it = this.m_axesXBottom.iterator();
     while (it.hasNext()) {
       current = it.next();
-      if (current.hasTrace(trace)) {
+      if (current.containsTrace(trace)) {
         result = current;
         break;
       }
@@ -1950,7 +1950,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     Iterator<IAxis< ? >> it = this.m_axesYLeft.iterator();
     while (it.hasNext()) {
       current = it.next();
-      if (current.hasTrace(trace)) {
+      if (current.containsTrace(trace)) {
         result = current;
         break;
       }
@@ -1959,7 +1959,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       it = this.m_axesYRight.iterator();
       while (it.hasNext()) {
         current = it.next();
-        if (current.hasTrace(trace)) {
+        if (current.containsTrace(trace)) {
           result = current;
           break;
         }
@@ -2855,23 +2855,13 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
             /*
              * Use data accumulation. 
              * 
-             * 1. Find axes of trace. 
-             * 
-             * 2. Obtain range of axes. 
-             * 
-             * 3. Use amount of pixels as the amount of points to be obtained.
+             * 1. Use amount of pixels as the amount of points to be obtained.
              */
             // 1.
-            IAxis< ? > traceAxisX = this.getAxisX(trace);
-            IAxis< ? > traceAxisY = this.getAxisY(trace);
-            // 2.
-            Range xRange = traceAxisX.getRange();
-            Range yRange = traceAxisY.getRange();
-            // 3.
             int pixelsX = this.getXAxisWidth();
             int pixelsY = this.getYAxisHeight();
             int amountOfPoints = Math.max(pixelsX, pixelsY);
-            pointIt = ((ITrace2DDataAccumulating) trace).iterator(xRange, yRange, amountOfPoints);
+            pointIt = ((ITrace2DDataAccumulating) trace).iterator(amountOfPoints);
           } else {
             pointIt = trace.iterator();
           }
