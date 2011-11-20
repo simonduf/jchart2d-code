@@ -26,14 +26,13 @@
 
 package info.monitorenter.gui.chart.traces.accumulationfunctions;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.fail;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAccumulationFunction;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -71,7 +70,7 @@ public class TestAccumulationFunctionArithmeticMeanXY {
   @Test
   public void testEmpty() {
     ITracePoint2D result = this.m_toTest.getAccumulatedPoint();
-    assertEquals(null, result);
+    Assert.assertEquals(null, result);
   }
 
   /**
@@ -86,7 +85,7 @@ public class TestAccumulationFunctionArithmeticMeanXY {
     trace.addPoint(one);
     this.m_toTest.addPointToAccumulate(one);
     ITracePoint2D result = this.m_toTest.getAccumulatedPoint();
-    assertEquals(one, result);
+    Assert.assertEquals(one, result);
   }
 
   /**
@@ -104,8 +103,8 @@ public class TestAccumulationFunctionArithmeticMeanXY {
     this.m_toTest.addPointToAccumulate(one);
     this.m_toTest.addPointToAccumulate(two);
     ITracePoint2D result = this.m_toTest.getAccumulatedPoint();
-    assertEquals(1.5d, result.getX());
-    assertEquals(1.5d, result.getY());
+    Assert.assertEquals(1.5d, result.getX(), 0.0);
+    Assert.assertEquals(1.5d, result.getY(), 0.0);
   }
 
   /**
@@ -127,12 +126,12 @@ public class TestAccumulationFunctionArithmeticMeanXY {
     trace.addPoint(one);
     try {
       this.m_toTest.addPointToAccumulate(one);
-      fail("It must not be possible to enter trace points containing NaN.");
+      Assert.fail("It must not be possible to enter trace points containing NaN.");
     } catch (IllegalArgumentException iae) {
       // all good!
     } catch (Throwable f) {
       f.printStackTrace(System.err);
-      fail("Wrong type of exception: " + f.getClass().getName());
+      Assert.fail("Wrong type of exception: " + f.getClass().getName());
     }
   }
 
@@ -155,12 +154,12 @@ public class TestAccumulationFunctionArithmeticMeanXY {
     trace.addPoint(one);
     try {
       this.m_toTest.addPointToAccumulate(one);
-      fail("It must not be possible to enter trace points containing NaN.");
+      Assert.fail("It must not be possible to enter trace points containing NaN.");
     } catch (IllegalArgumentException iae) {
       // all good!
     } catch (Throwable f) {
       f.printStackTrace(System.err);
-      fail("Wrong type of exception: " + f.getClass().getName());
+      Assert.fail("Wrong type of exception: " + f.getClass().getName());
     }
   }
 
