@@ -30,6 +30,7 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAccumulationFunction;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
+import info.monitorenter.gui.chart.TracePoint2D;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.traces.accumulationfunctions.AccumulationFunctionArithmeticMeanXY;
 
@@ -179,7 +180,7 @@ public class TestAccumulatingIteratorConsecutivePoints {
     Assert.assertEquals(three, result);
     Assert.assertFalse(toTest.hasNext());
   }
-  
+
   /**
    * Test an instance with a trace containing 4 points and an
    * {@link AccumulationFunctionArithmeticMeanXY} and the request to accumulate
@@ -196,7 +197,7 @@ public class TestAccumulatingIteratorConsecutivePoints {
     ITracePoint2D two = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(1.0, 1.0);
     ITracePoint2D three = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(2.0, 2.0);
     ITracePoint2D four = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(3.0, 3.0);
-    
+
     this.m_trace.addPoint(one);
     this.m_trace.addPoint(two);
     this.m_trace.addPoint(three);
@@ -210,12 +211,105 @@ public class TestAccumulatingIteratorConsecutivePoints {
     Assert.assertTrue(toTest.hasNext());
     result = toTest.next();
     // This is the arithmetic mean (x,y) of two and three!
-    Assert.assertEquals(1.5, result.getX(),0.0);
-    Assert.assertEquals(1.5, result.getY(),0.0);
+    Assert.assertEquals(1.5, result.getX(), 0.0);
+    Assert.assertEquals(1.5, result.getY(), 0.0);
     Assert.assertTrue(toTest.hasNext());
     result = toTest.next();
     Assert.assertEquals(four, result);
     Assert.assertFalse(toTest.hasNext());
   }
+
+  /**
+   * Test an instance with a trace containing 102 points and an
+   * {@link AccumulationFunctionArithmeticMeanXY} and the request to accumulate
+   * two points into one.
+   * <p>
+   * Assumption: iterator must return just 52 points. First and last have to be returned as contained 
+   * in the original. Remaining points must be the arithmetic mean of two consecutive points. 
+   * <p>
+   */
+  @Test
+  public void test102ValueTraceAccumulationFunctionArithmeticMeanXYWithRequestToAccumulate2into1() {
+    IAccumulationFunction accumulationFunction = new AccumulationFunctionArithmeticMeanXY();
+    ITracePoint2D first = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(0.0, 0.0);
+    this.m_trace.addPoint(first);
+    for (int i = 1; i < 101; i++) {
+      this.m_trace.addPoint(new info.monitorenter.gui.chart.tracepoints.TracePoint2D(i, i));
+    }
+    ITracePoint2D last = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(101.0, 101.0);
+    this.m_trace.addPoint(last);
+
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace.iterator(), accumulationFunction, 52,
+        this.m_trace.getSize());
+    Assert.assertTrue(toTest.hasNext());
+    ITracePoint2D result = toTest.next();
+    Assert.assertEquals(first, result);
+
+    /*
+     * Loop them
+     */
+    double i = 1;
+    double expected;
+    while (toTest.hasNext()) {
+      // arithmetic mean of two following points.
+      expected = (i * 2 + 1) / 2;
+      result = toTest.next();
+      if (toTest.hasNext()) {
+        Assert.assertEquals(expected, result.getX(), 0.0);
+        Assert.assertEquals(expected, result.getY(), 0.0);
+      } else {
+        Assert.assertEquals(result, last);
+      }
+      // Two points were advanced. 
+      i += 2.0;
+    }
+  }
   
+  /**
+   * Test an instance with a trace containing 92 points and an
+   * {@link AccumulationFunctionArithmeticMeanXY} and the request to accumulate
+   * three points into one.
+   * <p>
+   * Assumption: iterator must return just 32 points. First and last have to be returned as contained 
+   * in the original. Remaining points must be the arithmetic mean of two consecutive points. 
+   * <p>
+   */
+  @Test
+  public void test92ValueTraceAccumulationFunctionArithmeticMeanXYWithRequestToAccumulate3into1() {
+    IAccumulationFunction accumulationFunction = new AccumulationFunctionArithmeticMeanXY();
+    ITracePoint2D first = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(0.0, 0.0);
+    this.m_trace.addPoint(first);
+    for (int i = 1; i < 91; i++) {
+      this.m_trace.addPoint(new info.monitorenter.gui.chart.tracepoints.TracePoint2D(i, i));
+    }
+    ITracePoint2D last = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(91.0, 91.0);
+    this.m_trace.addPoint(last);
+
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace.iterator(), accumulationFunction, 32,
+        this.m_trace.getSize());
+    Assert.assertTrue(toTest.hasNext());
+    ITracePoint2D result = toTest.next();
+    Assert.assertEquals(first, result);
+
+    /*
+     * Loop them
+     */
+    double i = 1;
+    double expected;
+    while (toTest.hasNext()) {
+      // arithmetic mean of two following points.
+      expected = (i * 3 + 3) / 3;
+      result = toTest.next();
+      if (toTest.hasNext()) {
+        Assert.assertEquals(expected, result.getX(), 0.0);
+        Assert.assertEquals(expected, result.getY(), 0.0);
+      } else {
+        Assert.assertEquals(result, last);
+      }
+      // Two points were advanced. 
+      i += 3.0;
+    }
+  }
+
+
 }
