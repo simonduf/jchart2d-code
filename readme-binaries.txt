@@ -42,11 +42,14 @@ jchart2d-3.2.3 - <month>, <day>, <year>
   
 * Fixed bug #3380123: Graphical artifacts when zooming (or using RangePolicyFixedViewPort) on the bounds of the chart. 
 * Fixed bug #3424004: Missing label of Y axis when showing more than 1 chart in one component. 
-* Fixed bug #3427569: Non painted X axis scale takes up unecessary space.
+* Fixed bug #3427569: Non painted X axis scale takes up unnecessary space.
 * Fixed bug #3432154: Remove dependency to JIDE-oss (debian upstream), http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=626243
 o Changed policy of Chart2D.translateMousePosition(final MouseEvent mouseEvent). Before this the translation was done into the values 
   covered by the first x and y axes. By now the translation is related to the axes of the trace of the nearest point to the given 
   mouse event. 
+o Deprecated method public boolean hasTrace(final ITrace2D trace) in IAxis. Use public boolean containsTrace(final ITrace2D trace) instead.
+o Moved info.monitorenter.gui.chart.TracePoint2D to info.monitorenter.gui.chart.tracepoints.TracePoint2D. 
+  The first was deprecated: Please update to the new package version.
 
 jchart2d-3.2.2 - September, 24th, 2011
   
@@ -607,7 +610,6 @@ o Renamed package info.monitorenter.gui.chart.layout.controls to
 
 jchart2d-2.0.1 - June, 5th, 2006
 
-- Binaries are now compiled with 1.4 option against java 1.5.0_07-b03.
 * Catch exceptions caused by illegal data for axis implementations 
   that transform values - Return 0 and only output a warning 
   (innapropriate axis implementation for this data) every 30 seconds.
@@ -625,6 +627,7 @@ jchart2d-2.0.1 - June, 5th, 2006
 * Scale value to 0 and print a warning on the console if 
   a logarithmic axis is used and a value is < 1. 
   (Instead of letting an exception go to the awt paint thread).
+o Binaries are now compiled with 1.4 option against java 1.5.0_07-b03.
   
 jchart2d-2.0.0 - May, 31th, 2006
 
@@ -633,7 +636,7 @@ jchart2d-2.0.0 - May, 31th, 2006
 * Started to use a new sourceforge package for each new version 
   on sourceforge (bugreport by Ken Webb).
 ! Optional use of standard UI menu items for menubar and popup menu 
-  (instead of thos that adapt their UI to the chart). 
+  (instead of those that adapt their UI to the chart). 
 ! New menu bar available in LayoutFactory 
   (see info.monitorenter.chart.layout.ChartPanel). 
 * Change of grid color of chart would not fire the expected event. 
