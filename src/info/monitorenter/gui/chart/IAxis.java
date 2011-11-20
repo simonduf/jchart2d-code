@@ -825,14 +825,31 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    * this instance with the given trace).
    * <p>
    * 
+   * @deprecated use {@link #containsTrace(ITrace2D)} instead.
+   * 
    * @param trace
    *          the trace to check for containment.
+   *          
    * @return true if this axis is responsible for rendering the scale of the
    *         given trace (<code>{@link IAxis#addTrace(ITrace2D)}</code> was
    *         called on this instance with the given trace).
    */
-  public boolean hasTrace(ITrace2D trace);
+  public boolean hasTrace(final ITrace2D trace);
 
+  /**
+   * Returns true if this axis is responsible for rendering the scale of the
+   * given trace (<code>{@link IAxis#addTrace(ITrace2D)}</code> was called on
+   * this instance with the given trace).
+   * <p>
+   * 
+   * @param trace
+   *          the trace to check for containment.
+   *          
+   * @return true if this axis is responsible for rendering the scale of the
+   *         given trace (<code>{@link IAxis#addTrace(ITrace2D)}</code> was
+   *         called on this instance with the given trace).
+   */
+  public boolean containsTrace(final ITrace2D trace);
   /**
    * Allows to perform expensive calculations for various values that are used
    * by many calls throughout a paint iterations.
