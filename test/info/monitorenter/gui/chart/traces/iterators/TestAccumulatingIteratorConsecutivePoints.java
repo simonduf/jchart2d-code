@@ -89,7 +89,7 @@ public class TestAccumulatingIteratorConsecutivePoints {
   }
 
   /**
-   * Test an instance with a trace containing two point and an
+   * Test an instance with a trace containing two points and an
    * {@link AccumulationFunctionArithmeticMeanXY}.
    * <p>
    * Assumption: iterator must return just two points. That two points must be
@@ -112,6 +112,38 @@ public class TestAccumulatingIteratorConsecutivePoints {
     Assert.assertTrue(toTest.hasNext());
     result = toTest.next();
     Assert.assertEquals(two, result);
+    Assert.assertFalse(toTest.hasNext());
+  }
+  
+  /**
+   * Test an instance with a trace containing three points and an
+   * {@link AccumulationFunctionArithmeticMeanXY}.
+   * <p>
+   * Assumption: iterator must return just three points. That three points must be
+   * equal to the one points in source.
+   * <p>
+   */
+  @Test
+  public void testThreeValueTraceAccumulationFunctionArithmeticMeanXY() {
+    IAccumulationFunction accumulationFunction = new AccumulationFunctionArithmeticMeanXY();
+    ITracePoint2D one = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(0.0, 0.0);
+    ITracePoint2D two = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(1.0, 1.0);
+    ITracePoint2D three = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(1.0, 1.0);
+    this.m_trace.addPoint(one);
+    this.m_trace.addPoint(two);
+    this.m_trace.addPoint(three);
+
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace.iterator(), accumulationFunction,
+        this.m_trace.getSize(), this.m_trace.getSize());
+    Assert.assertTrue(toTest.hasNext());
+    ITracePoint2D result = toTest.next();
+    Assert.assertEquals(one, result);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    Assert.assertEquals(two, result);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    Assert.assertEquals(three, result);
     Assert.assertFalse(toTest.hasNext());
   }
 }
