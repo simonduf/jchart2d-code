@@ -83,9 +83,14 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
     int targetCount = this.getAmountOfVisiblePoints();
     int sourceCount = this.getTotalPointsInSource();
     if ((targetCount != 0) && (sourceCount != 0)) {
-      this.m_countPerNext = (int) Math.ceil(sourceCount / targetCount);
+      // -2 is for first and last point
+      if ((sourceCount > 2) && (targetCount > 2)) {
+        this.m_countPerNext = (int) Math.ceil((sourceCount - 2) / (targetCount - 2));
+      } else {
+        this.m_countPerNext = 1;
+      }
     } else {
-      this.m_countPerNext = 0;
+      this.m_countPerNext = 1;
     }
   }
 
