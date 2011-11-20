@@ -20,6 +20,7 @@ import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.axistickpainters.AxisTickPainterDefault;
 import info.monitorenter.gui.chart.events.Chart2DActionPrintSingleton;
+import info.monitorenter.gui.util.TracePoint2DUtil;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.StringUtil;
 
@@ -278,8 +279,7 @@ import javax.swing.Timer;
  * @version $Revision: 1.142.2.1 $
  */
 
-public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<ITrace2D>,
-    Printable {
+public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<ITrace2D>, Printable {
   /**
    * Types of tool tip.
    * <p>
@@ -302,8 +302,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
        * @see info.monitorenter.gui.chart.Chart2D.PointFinder#getNearestPoint(java.awt.event.MouseEvent,
        *      info.monitorenter.gui.chart.Chart2D)
        */
-      public ITracePoint2D getNearestPoint(final int mouseEventX, final int mouseEventY,
-          final Chart2D chart) {
+      public ITracePoint2D getNearestPoint(final int mouseEventX, final int mouseEventY, final Chart2D chart) {
         return chart.getNearestPointEuclid(mouseEventX, mouseEventY);
       }
     },
@@ -322,8 +321,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
        * @see info.monitorenter.gui.chart.Chart2D.PointFinder#getNearestPoint(java.awt.event.MouseEvent,
        *      info.monitorenter.gui.chart.Chart2D)
        */
-      public ITracePoint2D getNearestPoint(final int mouseEventX, final int mouseEventY,
-          final Chart2D chart) {
+      public ITracePoint2D getNearestPoint(final int mouseEventX, final int mouseEventY, final Chart2D chart) {
         return chart.getNearestPointManhattan(mouseEventX, mouseEventY);
       }
 
@@ -801,8 +799,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * 
    * @author <a href="mailto:achim.westermann@gmx.de">Achim Westermann</a>
    */
-  final class PointHighlighter extends MouseMotionAdapter implements MouseMotionListener,
-      PropertyChangeListener {
+  final class PointHighlighter extends MouseMotionAdapter implements MouseMotionListener, PropertyChangeListener {
 
     /**
      * Default constructor, adds property change listener for point highlighters
@@ -847,8 +844,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
             for (Map.Entry<ITrace2D, ITracePoint2D> entry : this.m_previousHighlighted.entrySet()) {
               synchronized (entry.getKey()) {
                 Set<IPointPainter< ? >> highlighters = entry.getKey().getPointHighlighters();
-                Set<IPointPainter< ? >> additionalPainters = entry.getValue()
-                    .getAdditionalPointPainters();
+                Set<IPointPainter< ? >> additionalPainters = entry.getValue().getAdditionalPointPainters();
                 Iterator<IPointPainter< ? >> itAdditionasPainters = additionalPainters.iterator();
                 while (itAdditionasPainters.hasNext()) {
                   IPointPainter< ? > assignedHighlighter = itAdditionasPainters.next();
@@ -866,8 +862,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
               }
             }
             Chart2D.this.removeMouseMotionListener(this);
-            Chart2D.this.firePropertyChange(PROPERTY_POINT_HIGHLIGHTING_ENABLED, Boolean.TRUE,
-                Boolean.FALSE);
+            Chart2D.this.firePropertyChange(PROPERTY_POINT_HIGHLIGHTING_ENABLED, Boolean.TRUE, Boolean.FALSE);
             this.m_previousHighlighted.clear();
             Chart2D.this.setRequestedRepaint(true);
             result = true;
@@ -878,8 +873,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         if (!isEnabled) {
           synchronized (Chart2D.this) {
             Chart2D.this.addMouseMotionListener(this);
-            Chart2D.this.firePropertyChange(PROPERTY_POINT_HIGHLIGHTING_ENABLED, Boolean.FALSE,
-                Boolean.TRUE);
+            Chart2D.this.firePropertyChange(PROPERTY_POINT_HIGHLIGHTING_ENABLED, Boolean.FALSE, Boolean.TRUE);
             Chart2D.this.setRequestedRepaint(true);
             result = true;
           }
@@ -911,8 +905,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
 
       ITracePoint2D previousHighlightedPoint = this.m_previousHighlighted.remove(trace);
       if (previousHighlightedPoint != null) {
-        Iterator<IPointPainter< ? >> itAdditionaPainters = previousHighlightedPoint
-            .getAdditionalPointPainters().iterator();
+        Iterator<IPointPainter< ? >> itAdditionaPainters = previousHighlightedPoint.getAdditionalPointPainters().iterator();
         IPointPainter< ? > additionalPainter;
         Set<IPointPainter< ? >> highlighters = trace.getPointHighlighters();
         if (Chart2D.DEBUG_HIGHLIGHTING) {
@@ -934,8 +927,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
               break;
             } else {
               if (Chart2D.DEBUG_HIGHLIGHTING) {
-                System.err.println("Additional painter " + additionalPainter + " and highlighter "
-                    + highlighter + " of trace " + trace + " judged not as same.");
+                System.err.println("Additional painter " + additionalPainter + " and highlighter " + highlighter + " of trace " + trace
+                    + " judged not as same.");
               }
             }
           }
@@ -962,8 +955,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       ITracePoint2D point = Chart2D.this.getPointFinder().getNearestPoint(e, Chart2D.this);
       // don't work on empty charts:
       if (point != null) {
-        ITracePoint2D previousHighlightedPoint = this.m_previousHighlighted
-            .get(point.getListener());
+        ITracePoint2D previousHighlightedPoint = this.m_previousHighlighted.get(point.getListener());
         if (!point.equals(previousHighlightedPoint)) {
           ITrace2D trace = point.getListener();
           // avoid duplicate or no highlighting in concurrent paint situation.
@@ -1027,10 +1019,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
             }
 
           } else {
-            throw new RuntimeException(
-                "Programming error. Unneccessary event caught: "
-                    + evt
-                    + ". You only have to fire this event, if a point highlighter was addded or removed.");
+            throw new RuntimeException("Programming error. Unneccessary event caught: " + evt
+                + ". You only have to fire this event, if a point highlighter was addded or removed.");
           }
         }
       } else if (Chart2D.PROPERTY_ADD_REMOVE_TRACE.equals(property)) {
@@ -1040,10 +1030,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
           this.m_previousHighlighted.remove(oldTrace2d);
         }
       } else {
-        throw new RuntimeException("Programming error: " + this.getClass().getName()
-            + " only has to be registered to the event "
-            + ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED + " on instances of type (or subtype) "
-            + ITrace2D.class.getName());
+        throw new RuntimeException("Programming error: " + this.getClass().getName() + " only has to be registered to the event "
+            + ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED + " on instances of type (or subtype) " + ITrace2D.class.getName());
       }
     }
   }
@@ -1321,18 +1309,14 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   public final void addTrace(final ITrace2D points, final IAxis< ? > xAxis, final IAxis< ? > yAxis) {
     if (!this.m_axesXBottom.contains(xAxis)) {
       if (!this.m_axesXTop.contains(xAxis)) {
-        throw new IllegalArgumentException(
-            "Given x axis ("
-                + xAxis.getAxisTitle().getTitle()
-                + ") has to be added to this chart first (via setAxisX(AAxis) or addAxisXBottom(AAXis) or addAxisXTop(AAXis)).");
+        throw new IllegalArgumentException("Given x axis (" + xAxis.getAxisTitle().getTitle()
+            + ") has to be added to this chart first (via setAxisX(AAxis) or addAxisXBottom(AAXis) or addAxisXTop(AAXis)).");
       }
     }
     if (!this.m_axesYLeft.contains(yAxis)) {
       if (!this.m_axesYRight.contains(yAxis)) {
-        throw new IllegalArgumentException(
-            "Given y axis ("
-                + yAxis.getAxisTitle().getTitle()
-                + ") has to be added to this chart first (via setAxisY(AAxis) or addAxisYLeft(AAXis) or addAxisYRight(AAXis)).");
+        throw new IllegalArgumentException("Given y axis (" + yAxis.getAxisTitle().getTitle()
+            + ") has to be added to this chart first (via setAxisY(AAxis) or addAxisYLeft(AAXis) or addAxisYRight(AAXis)).");
       }
     }
     /*
@@ -1346,8 +1330,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
      * thread.
      */
     if (Chart2D.DEBUG_THREADING) {
-      System.out.println(Thread.currentThread().getName()
-          + ", addTrace(ITrace2D, XAxis, YAxis): 0 locks.");
+      System.out.println(Thread.currentThread().getName() + ", addTrace(ITrace2D, XAxis, YAxis): 0 locks.");
     }
     synchronized (this.getTreeLock()) {
       /*
@@ -1355,18 +1338,15 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
        * trace while counting them.
        */
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println(Thread.currentThread().getName()
-            + ", addTrace(ITrace2D, XAxis, YAxis): 1 locks.");
+        System.out.println(Thread.currentThread().getName() + ", addTrace(ITrace2D, XAxis, YAxis): 1 locks.");
       }
       synchronized (this) {
         if (Chart2D.DEBUG_THREADING) {
-          System.out.println(Thread.currentThread().getName()
-              + ", addTrace(ITrace2D, XAxis, YAxis): 2 locks.");
+          System.out.println(Thread.currentThread().getName() + ", addTrace(ITrace2D, XAxis, YAxis): 2 locks.");
         }
         synchronized (points) {
           if (Chart2D.DEBUG_THREADING) {
-            System.out.println(Thread.currentThread().getName()
-                + ", addTrace(ITrace2D, XAxis, YAxis): 3 locks.");
+            System.out.println(Thread.currentThread().getName() + ", addTrace(ITrace2D, XAxis, YAxis): 3 locks.");
           }
           boolean success = false;
           success |= xAxis.addTrace(points);
@@ -1379,19 +1359,16 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
           }
         }
         if (Chart2D.DEBUG_THREADING) {
-          System.out.println(Thread.currentThread().getName()
-              + ", addTrace(ITrace2D, XAxis, YAxis): dropped 1 lock, 2 locks remaining.");
+          System.out.println(Thread.currentThread().getName() + ", addTrace(ITrace2D, XAxis, YAxis): dropped 1 lock, 2 locks remaining.");
         }
 
       }
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println(Thread.currentThread().getName()
-            + ", addTrace(ITrace2D, XAxis, YAxis): dropped 1 lock, 1 locks remaining.");
+        System.out.println(Thread.currentThread().getName() + ", addTrace(ITrace2D, XAxis, YAxis): dropped 1 lock, 1 locks remaining.");
       }
     }
     if (Chart2D.DEBUG_THREADING) {
-      System.out.println(Thread.currentThread().getName()
-          + ", addTrace(ITrace2D, XAxis, YAxis): dropped 1 lock, 0 locks remaining.");
+      System.out.println(Thread.currentThread().getName() + ", addTrace(ITrace2D, XAxis, YAxis): dropped 1 lock, 0 locks remaining.");
     }
   }
 
@@ -1735,20 +1712,16 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    */
   private void ensureUniqueAxis(final IAxis< ? > axisToAdd) {
     if (this.m_axesXBottom.contains(axisToAdd)) {
-      throw new IllegalArgumentException("Given axis (" + axisToAdd.getAxisTitle().getTitle()
-          + " is already configured as bottom x axis!");
+      throw new IllegalArgumentException("Given axis (" + axisToAdd.getAxisTitle().getTitle() + " is already configured as bottom x axis!");
     }
     if (this.m_axesXTop.contains(axisToAdd)) {
-      throw new IllegalArgumentException("Given axis (" + axisToAdd.getAxisTitle().getTitle()
-          + " is already configured as top x axis!");
+      throw new IllegalArgumentException("Given axis (" + axisToAdd.getAxisTitle().getTitle() + " is already configured as top x axis!");
     }
     if (this.m_axesYLeft.contains(axisToAdd)) {
-      throw new IllegalArgumentException("Given axis (" + axisToAdd.getAxisTitle().getTitle()
-          + " is already configured as left y axis!");
+      throw new IllegalArgumentException("Given axis (" + axisToAdd.getAxisTitle().getTitle() + " is already configured as left y axis!");
     }
     if (this.m_axesYRight.contains(axisToAdd)) {
-      throw new IllegalArgumentException("Given axis (" + axisToAdd.getAxisTitle().getTitle()
-          + " is already configured as right y axis!");
+      throw new IllegalArgumentException("Given axis (" + axisToAdd.getAxisTitle().getTitle() + " is already configured as right y axis!");
     }
 
   }
@@ -1923,6 +1896,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * 
    * @param trace
    *          the trace to find the corresponding x axis of this chart for.
+   * 
    * @return the x axis that the given trace belongs to or null if this trace
    *         does not belong to any x axis of this chart.
    */
@@ -2411,6 +2385,17 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   }
 
   /**
+   * Returns the height of the Y axis in px.
+   * <p>
+   * 
+   * @return Returns the height of the Y axis in px.
+   * 
+   */
+  public final synchronized int getYAxisHeight() {
+    return this.m_yChartEnd - this.m_yChartStart;
+  }
+
+  /**
    * Returns the x coordinate of the chart's right edge in px.
    * <p>
    * 
@@ -2489,8 +2474,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     boolean result = true;
     result = !(((oldpoint.getScaledX() >= 1.0) && (newpoint.getScaledX() >= 1.0))
         || ((oldpoint.getScaledX() <= 0.0) && (newpoint.getScaledX() <= 0.0))
-        || ((oldpoint.getScaledY() >= 1.0) && (newpoint.getScaledY() >= 1.0)) || ((oldpoint
-        .getScaledY() <= 0.0) && (newpoint.getScaledY() <= 0.0)));
+        || ((oldpoint.getScaledY() >= 1.0) && (newpoint.getScaledY() >= 1.0)) || ((oldpoint.getScaledY() <= 0.0) && (newpoint.getScaledY() <= 0.0)));
     return result;
   }
 
@@ -2561,99 +2545,6 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
 
     // done for now...
 
-  }
-
-  /**
-   * Interpolates (linear) the two neighboring points.
-   * <p>
-   * Calling this method only makes sense if argument invisible is not null or
-   * if argument visible is not null (if then invisible is null, the visible
-   * point will be returned).
-   * <p>
-   * Visibility is determined only by their internally normalized coordinates
-   * that are within [0.0,1.0] for visible points.
-   * <p>
-   * 
-   * @param visible
-   *          the visible point.
-   * @param invisible
-   *          the invisible point.
-   * @return the interpolation towards the exceeded bound.
-   */
-  private ITracePoint2D interpolateVisible(final ITracePoint2D invisible,
-      final ITracePoint2D visible) {
-
-    ITracePoint2D result;
-    /*
-     * In the first call invisible is null because it is the previous point
-     * (there was no previous point: just return the new point):
-     */
-    if (invisible == null) {
-      result = visible;
-    } else {
-      /*
-       * Interpolation is done by the two point form: (y - y1)/(x - x1) = (y2 -
-       * y1)/(x2 - x1) solved to the missing value.
-       */
-      // interpolate
-      double xInterpolate = Double.NaN;
-      double yInterpolate = Double.NaN;
-      // find the bounds that has been exceeded:
-      // It is possible that two bound have been exceeded,
-      // then only one interpolation will be valid:
-      boolean interpolated = false;
-      boolean interpolatedWrong = false;
-      if (invisible.getScaledX() > 1.0) {
-        // right x bound
-        xInterpolate = 1.0;
-        yInterpolate = (visible.getScaledY() - invisible.getScaledY())
-            / (visible.getScaledX() - invisible.getScaledX()) * (1.0 - invisible.getScaledX())
-            + invisible.getScaledY();
-        interpolated = true;
-        interpolatedWrong = Double.isNaN(yInterpolate) || yInterpolate < 0.0 || yInterpolate > 1.0;
-      }
-      if ((invisible.getScaledX() < 0.0) && (!interpolated || interpolatedWrong)) {
-        // left x bound
-        xInterpolate = 0.0;
-        yInterpolate = (visible.getScaledY() - invisible.getScaledY())
-            / (visible.getScaledX() - invisible.getScaledX()) * -invisible.getScaledX()
-            + invisible.getScaledY();
-        interpolated = true;
-        interpolatedWrong = Double.isNaN(yInterpolate) || yInterpolate < 0.0 || yInterpolate > 1.0;
-      }
-      if ((invisible.getScaledY() > 1.0) && (!interpolated || interpolatedWrong)) {
-        // upper y bound, checked
-        yInterpolate = 1.0;
-        xInterpolate = (1.0 - invisible.getScaledY())
-            * (visible.getScaledX() - invisible.getScaledX())
-            / (visible.getScaledY() - invisible.getScaledY()) + invisible.getScaledX();
-        interpolated = true;
-        interpolatedWrong = Double.isNaN(xInterpolate) || xInterpolate < 0.0 || xInterpolate > 1.0;
-
-      }
-      if ((invisible.getScaledY() < 0.0) && (!interpolated || interpolatedWrong)) {
-        // lower y bound
-        yInterpolate = 0.0;
-        xInterpolate = -invisible.getScaledY() * (visible.getScaledX() - invisible.getScaledX())
-            / (visible.getScaledY() - invisible.getScaledY()) + invisible.getScaledX();
-        interpolated = true;
-        interpolatedWrong = Double.isNaN(xInterpolate) || xInterpolate < 0.0 || xInterpolate > 1.0;
-      }
-      if (interpolatedWrong) {
-        result = visible;
-      } else {
-        result = this.m_tracePointProvider.createTracePoint(0, 0);
-        // transfer potential point highlighters to the synthetic point:
-        for (IPointPainter< ? > highlighter : invisible.getAdditionalPointPainters()) {
-          result.addAdditionalPointPainter(highlighter);
-        }
-        result.setScaledX(xInterpolate);
-        result.setScaledY(yInterpolate);
-        result.setListener(invisible.getListener());
-        // TODO: do we have to compute and set the unscaled real values too?
-      }
-    }
-    return result;
   }
 
   /**
@@ -2733,8 +2624,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       result = false;
     } else {
       result = !(Double.isNaN(point.getScaledX()) || Double.isNaN(point.getScaledY()))
-          && !(point.getScaledX() > 1.0 || point.getScaledX() < 0.0 || point.getScaledY() > 1.0 || point
-              .getScaledY() < 0.0);
+          && !(point.getScaledX() > 1.0 || point.getScaledX() < 0.0 || point.getScaledY() > 1.0 || point.getScaledY() < 0.0);
     }
     return result;
   }
@@ -2772,16 +2662,21 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * events.
    * <p>
    * 
+   * @see #unlistenToTrace(ITrace2D)
+   * 
    * @param trace
    *          the trace to listen to.
    */
   private void listenToTrace(final ITrace2D trace) {
     // for tracking removal/addition of point highlighters visually:
-    trace.addPropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED,
-        this.m_pointHighlightListener);
+    trace.addPropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, this.m_pointHighlightListener);
     // for tracking enablement/disablement of point highlighting feature
     // (expensive mouse listener)
     trace.addPropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, this);
+    if (trace instanceof ITrace2DDataAccumulating) {
+      trace.addPropertyChangeListener(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY, this);
+      trace.addPropertyChangeListener(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY_ACCUMULATION_FUNCTION_CHANGED, this);
+    }
   }
 
   /**
@@ -2801,10 +2696,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       int otherXChartStart = this.m_synchronizedXStartChart.calculateXChartStart(g2d);
       int correctionShift = Math.abs(myXChartStart - otherXChartStart);
 
-      this.m_xChartStart = Math.max(this.calculateXChartStart(g2d),
-          this.m_synchronizedXStartChart.calculateXChartStart(g2d));
-      this.m_xChartEnd = Math.max(this.calculateXChartEnd(g2d),
-          this.m_synchronizedXStartChart.calculateXChartEnd(g2d));
+      this.m_xChartStart = Math.max(this.calculateXChartStart(g2d), this.m_synchronizedXStartChart.calculateXChartStart(g2d));
+      this.m_xChartEnd = Math.max(this.calculateXChartEnd(g2d), this.m_synchronizedXStartChart.calculateXChartEnd(g2d));
       synchronized (this.m_synchronizedXStartChart) {
         this.m_synchronizedXStartChart.m_xChartStart = this.m_xChartStart;
         this.m_synchronizedXStartChart.m_xChartEnd = this.m_xChartEnd;
@@ -2912,13 +2805,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       g2d = (Graphics2D) g;
       backupStroke = g2d.getStroke();
       if (this.isUseAntialiasing()) {
-        RenderingHints renderHints = new RenderingHints(RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_ON);
-        renderHints.put(RenderingHints.KEY_FRACTIONALMETRICS,
-            RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        RenderingHints renderHints = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        renderHints.put(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
         renderHints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        renderHints.put(RenderingHints.KEY_INTERPOLATION,
-            RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+        renderHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         g2d.setRenderingHints(renderHints);
       }
     }
@@ -2928,6 +2818,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     Iterator<IErrorBarPolicy< ? >> itTraceErrorBarPolicies;
     ITracePainter< ? > tracePainter;
     IErrorBarPolicy< ? > errorBarPolicy;
+    Iterator<ITracePoint2D> pointIt;
     while (traceIt.hasNext()) {
       oldpoint = null;
       newpoint = null;
@@ -2936,8 +2827,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       if (trace.isVisible()) {
         synchronized (trace) {
           if (Chart2D.DEBUG_THREADING) {
-            System.out.println("Chart2D.paintComponent(" + Thread.currentThread().getName()
-                + "), 2 locks (lock on trace " + trace.getName() + ")");
+            System.out.println("Chart2D.paintComponent(" + Thread.currentThread().getName() + "), 2 locks (lock on trace "
+                + trace.getName() + ")");
           }
           boolean hasErrorBars = trace.getHasErrorBars();
           if (g2d != null) {
@@ -2960,7 +2851,31 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
               errorBarPolicy.startPaintIteration(g);
             }
           }
-          Iterator<ITracePoint2D> pointIt = trace.iterator();
+          if (trace instanceof ITrace2DDataAccumulating) {
+            /*
+             * Use data accumulation. 
+             * 
+             * 1. Find axes of trace. 
+             * 
+             * 2. Obtain range of axes. 
+             * 
+             * 3. Use amount of pixels as the amount of points to be obtained.
+             */
+            // 1.
+            IAxis< ? > traceAxisX = this.getAxisX(trace);
+            IAxis< ? > traceAxisY = this.getAxisY(trace);
+            // 2.
+            Range xRange = traceAxisX.getRange();
+            Range yRange = traceAxisY.getRange();
+            // 3.
+            int pixelsX = this.getXAxisWidth();
+            int pixelsY = this.getYAxisHeight();
+            int amountOfPoints = Math.max(pixelsX, pixelsY);
+            pointIt = ((ITrace2DDataAccumulating) trace).iterator(xRange, yRange, amountOfPoints);
+          } else {
+            pointIt = trace.iterator();
+          }
+          pointIt = trace.iterator();
           boolean newpointVisible = false;
           boolean oldpointVisible = false;
           while (pointIt.hasNext()) {
@@ -3010,8 +2925,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
                * check if the interconnection of both invisible points cuts the
                * visible area:
                */
-              oldpoint = this.interpolateVisible(oldpoint, newpoint);
-              newpoint = this.interpolateVisible(newpoint, oldpoint);
+              oldpoint = TracePoint2DUtil.interpolateVisible(oldpoint, newpoint, this.m_tracePointProvider);
+              newpoint = TracePoint2DUtil.interpolateVisible(newpoint, oldpoint, this.m_tracePointProvider);
 
               tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
               tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
@@ -3030,7 +2945,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
             } else if (newpointVisible && !oldpointVisible) {
               // entering the visible bounds: interpolate from old point
               // to new point
-              oldpoint = this.interpolateVisible(oldpoint, newpoint);
+              oldpoint = TracePoint2DUtil.interpolateVisible(oldpoint, newpoint, this.m_tracePointProvider);
               tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
               tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
               oldtmpx = this.m_xChartStart + (int) Math.round(oldpoint.getScaledX() * rangex);
@@ -3040,7 +2955,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
             } else if (!newpointVisible && oldpointVisible) {
               // leaving the visible bounds:
               tmppt = (ITracePoint2D) newpoint.clone();
-              newpoint = this.interpolateVisible(newpoint, oldpoint);
+              newpoint = TracePoint2DUtil.interpolateVisible(newpoint, oldpoint, this.m_tracePointProvider);
               tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
               tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
               // don't use error bars for interpolated points!
@@ -3069,8 +2984,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         }
       }
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println("paint(" + Thread.currentThread().getName() + "), left lock on trace "
-            + trace.getName());
+        System.out.println("paint(" + Thread.currentThread().getName() + "), left lock on trace " + trace.getName());
       }
     }
     if (g2d != null) {
@@ -3154,9 +3068,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    *          intended for information only, should nor be needed to paint the
    *          point neither be changed in any way!
    */
-  private void paintErrorBars(final ITrace2D trace, final int oldtmpx, final int oldtmpy,
-      final int tmpx, final int tmpy, final Graphics g2d, final boolean discontinue,
-      final ITracePoint2D original) {
+  private void paintErrorBars(final ITrace2D trace, final int oldtmpx, final int oldtmpy, final int tmpx, final int tmpy,
+      final Graphics g2d, final boolean discontinue, final ITracePoint2D original) {
     IErrorBarPolicy< ? > errorBarPolicy;
     Iterator<IErrorBarPolicy< ? >> itTraceErrorBarPolicies = trace.getErrorBarPolicies().iterator();
     while (itTraceErrorBarPolicies.hasNext()) {
@@ -3208,9 +3121,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @param errorBarSupport
    *          optimization that allows to skip error bar code.
    */
-  private final void paintPoint(final int xPxOld, final int yPxOld, final int xPxNew,
-      final int yPxNew, final boolean discontinue, final ITrace2D trace, final Graphics g2d,
-      final ITracePoint2D original, final boolean errorBarSupport) {
+  private final void paintPoint(final int xPxOld, final int yPxOld, final int xPxNew, final int yPxNew, final boolean discontinue,
+      final ITrace2D trace, final Graphics g2d, final ITracePoint2D original, final boolean errorBarSupport) {
     Iterator<ITracePainter< ? >> itTracePainters;
     ITracePainter< ? > tracePainter;
     itTracePainters = trace.getTracePainters().iterator();
@@ -3297,8 +3209,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @see java.awt.print.Printable#print(java.awt.Graphics,
    *      java.awt.print.PageFormat, int)
    */
-  public int print(final Graphics graphics, final PageFormat pageFormat, final int pageIndex)
-      throws PrinterException {
+  public int print(final Graphics graphics, final PageFormat pageFormat, final int pageIndex) throws PrinterException {
     int result;
     if (pageIndex > 0) {
       // We have only one page, and 'page' is zero-based.
@@ -3330,13 +3241,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    */
   public void propertyChange(final PropertyChangeEvent evt) {
     if (Chart2D.DEBUG_THREADING) {
-      System.out
-          .println("chart.propertyChange (" + Thread.currentThread().getName() + "), 0 locks");
+      System.out.println("chart.propertyChange (" + Thread.currentThread().getName() + "), 0 locks");
     }
     synchronized (this) {
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println("Chart2D.propertyChange, " + evt.getPropertyName() + " ("
-            + Thread.currentThread().getName() + "), 1 lock");
+        System.out.println("Chart2D.propertyChange, " + evt.getPropertyName() + " (" + Thread.currentThread().getName() + "), 1 lock");
       }
       // TODO: use the property change reactor idiom also used in AAxis for
       // performance.
@@ -3367,8 +3276,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
          * (listen to axes to be informed whenever a trace was added). Also:
          * repaint definetely!
          */
-        this.firePropertyChange(IAxis.PROPERTY_ADD_REMOVE_TRACE, evt.getOldValue(),
-            evt.getNewValue());
+        this.firePropertyChange(IAxis.PROPERTY_ADD_REMOVE_TRACE, evt.getOldValue(), evt.getNewValue());
       } else if (property.equals(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED)) {
         int highlightersAddedOrRemoved = 0;
         if (evt.getOldValue() != null) {
@@ -3384,7 +3292,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         // repaint
       } else if (property.equals(IAxis.PROPERTY_RANGEPOLICY)) {
         // repaint
-      } else if(property.equals(IAxis.PROPERTY_VISIBLE)) {
+      } else if (property.equals(IAxis.PROPERTY_VISIBLE)) {
+        // repaint
+      } else if (property.equals(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY)) {
+        // repaint
+      } else if (property.equals(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY_ACCUMULATION_FUNCTION_CHANGED)) {
         // repaint
       } else {
         throw new IllegalStateException("Received a property change event \"" + property
@@ -3393,8 +3305,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       this.setRequestedRepaint(true);
     }
     if (Chart2D.DEBUG_THREADING) {
-      System.out.println("Chart2D.propertyChange, leaving (" + Thread.currentThread().getName()
-          + "), 0 locks");
+      System.out.println("Chart2D.propertyChange, leaving (" + Thread.currentThread().getName() + "), 0 locks");
     }
   }
 
@@ -4078,8 +3989,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     final boolean change = this.m_paintLabels != paintLabels;
     this.m_paintLabels = paintLabels;
     if (change) {
-      this.firePropertyChange(Chart2D.PROPERTY_PAINTLABELS, new Boolean(!paintLabels), new Boolean(
-          paintLabels));
+      this.firePropertyChange(Chart2D.PROPERTY_PAINTLABELS, new Boolean(!paintLabels), new Boolean(paintLabels));
       this.setRequestedRepaint(true);
     }
   }
@@ -4230,8 +4140,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     if (this.m_useAntialiasing != useAntialiasing) {
       boolean oldstate = this.m_useAntialiasing;
       this.m_useAntialiasing = useAntialiasing;
-      this.firePropertyChange(Chart2D.PROPERTY_ANTIALIASING_ENABLED, oldstate,
-          this.m_useAntialiasing);
+      this.firePropertyChange(Chart2D.PROPERTY_ANTIALIASING_ENABLED, oldstate, this.m_useAntialiasing);
 
     }
   }
@@ -4292,8 +4201,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       BufferedImage img;
       img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
       Graphics2D g2d = (Graphics2D) img.getGraphics();
-      g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-          RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+      g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
       g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
       this.paint(g2d);
       this.setSize(dsave);
@@ -4328,15 +4236,13 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         this.enablePointHighlighting(true);
       }
     } else {
-      if ((addedOrRemovedTraceHighlighters < 0)
-          && (Math.abs(addedOrRemovedTraceHighlighters) >= this.m_traceHighlighterCount)) {
+      if ((addedOrRemovedTraceHighlighters < 0) && (Math.abs(addedOrRemovedTraceHighlighters) >= this.m_traceHighlighterCount)) {
         this.enablePointHighlighting(false);
       }
     }
     this.m_traceHighlighterCount += addedOrRemovedTraceHighlighters;
     if (this.m_traceHighlighterCount < 0) {
-      System.err.println("Internal amount of point highlighters below zero: "
-          + this.m_traceHighlighterCount);
+      System.err.println("Internal amount of point highlighters below zero: " + this.m_traceHighlighterCount);
     }
   }
 
@@ -4363,14 +4269,12 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @throws IllegalArgumentException
    *           if the given mouse event does not belong to this component.
    */
-  public ITracePoint2D translateMousePosition(final MouseEvent mouseEvent)
-      throws IllegalArgumentException {
+  public ITracePoint2D translateMousePosition(final MouseEvent mouseEvent) throws IllegalArgumentException {
     if (mouseEvent.getSource() != this) {
-      throw new IllegalArgumentException(
-          "The given mouse event does not belong to this chart but to: " + mouseEvent.getSource());
+      throw new IllegalArgumentException("The given mouse event does not belong to this chart but to: " + mouseEvent.getSource());
     }
-    IAxis<?> translationXAxis = null;
-    IAxis<?> translationYAxis = null;
+    IAxis< ? > translationXAxis = null;
+    IAxis< ? > translationYAxis = null;
 
     ITracePoint2D result = null;
     ITracePoint2D nearestPoint = this.getPointFinder().getNearestPoint(mouseEvent, this);
@@ -4420,13 +4324,19 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * change events.
    * <p>
    * 
+   * @see #listenToTrace(ITrace2D)
+   * 
    * @param removedTrace
    *          the trace to not listen to any more.
    */
   private void unlistenToTrace(final ITrace2D removedTrace) {
-    removedTrace.removePropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED,
-        this.m_pointHighlightListener);
+    removedTrace.removePropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, this.m_pointHighlightListener);
     removedTrace.removePropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, this);
+    if (removedTrace instanceof ITrace2DDataAccumulating) {
+      removedTrace.removePropertyChangeListener(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY, this);
+      removedTrace
+          .removePropertyChangeListener(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY_ACCUMULATION_FUNCTION_CHANGED, this);
+    }
   }
 
   /**
@@ -4463,13 +4373,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         currentAxis.initPaintIteration();
         currentAxis.scale();
         if (Chart2D.DEBUG_SCALING) {
-          System.out.println("updateScaling: Scaling was performend for axis: "
-              + currentAxis.getAxisTitle().getTitle());
+          System.out.println("updateScaling: Scaling was performend for axis: " + currentAxis.getAxisTitle().getTitle());
         }
       } else {
         if (Chart2D.DEBUG_SCALING) {
-          System.out.println("updateScaling: No scaling was performend for axis: "
-              + currentAxis.getAxisTitle().getTitle());
+          System.out.println("updateScaling: No scaling was performend for axis: " + currentAxis.getAxisTitle().getTitle());
         }
       }
     }
@@ -4483,13 +4391,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         currentAxis.initPaintIteration();
         currentAxis.scale();
         if (Chart2D.DEBUG_SCALING) {
-          System.out.println("updateScaling: Scaling was performend for axis: "
-              + currentAxis.getAxisTitle().getTitle());
+          System.out.println("updateScaling: Scaling was performend for axis: " + currentAxis.getAxisTitle().getTitle());
         }
       } else {
         if (Chart2D.DEBUG_SCALING) {
-          System.out.println("updateScaling: No scaling was performend for axis: "
-              + currentAxis.getAxisTitle().getTitle());
+          System.out.println("updateScaling: No scaling was performend for axis: " + currentAxis.getAxisTitle().getTitle());
         }
       }
     }
@@ -4503,13 +4409,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         currentAxis.initPaintIteration();
         currentAxis.scale();
         if (Chart2D.DEBUG_SCALING) {
-          System.out.println("updateScaling: Scaling was performend for axis: "
-              + currentAxis.getAxisTitle().getTitle());
+          System.out.println("updateScaling: Scaling was performend for axis: " + currentAxis.getAxisTitle().getTitle());
         }
       } else {
         if (Chart2D.DEBUG_SCALING) {
-          System.out.println("updateScaling: No scaling was performend for axis: "
-              + currentAxis.getAxisTitle().getTitle());
+          System.out.println("updateScaling: No scaling was performend for axis: " + currentAxis.getAxisTitle().getTitle());
         }
       }
     }
@@ -4523,13 +4427,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         currentAxis.initPaintIteration();
         currentAxis.scale();
         if (Chart2D.DEBUG_SCALING) {
-          System.out.println("updateScaling: Scaling was performend for axis: "
-              + currentAxis.getAxisTitle().getTitle());
+          System.out.println("updateScaling: Scaling was performend for axis: " + currentAxis.getAxisTitle().getTitle());
         }
       } else {
         if (Chart2D.DEBUG_SCALING) {
-          System.out.println("updateScaling: No scaling was performend for axis: "
-              + currentAxis.getAxisTitle().getTitle());
+          System.out.println("updateScaling: No scaling was performend for axis: " + currentAxis.getAxisTitle().getTitle());
         }
       }
     }
