@@ -26,15 +26,13 @@
 
 package info.monitorenter.gui.chart.traces.accumulationfunctions;
 
-import static junit.framework.Assert.*;
-import junit.framework.TestCase;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.fail;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAccumulationFunction;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
-import info.monitorenter.gui.chart.TracePoint2D;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
-import info.monitorenter.util.ExceptionUtil;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -82,7 +80,7 @@ public class TestAccumulationFunctionArithmeticMeanXY {
    */
   @Test
   public void test1value() {
-    ITracePoint2D one = new TracePoint2D(1.0, 1.0);
+    ITracePoint2D one = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(1.0, 1.0);
     ITrace2D trace = new Trace2DSimple();
     this.m_chart.addTrace(trace);
     trace.addPoint(one);
@@ -97,8 +95,8 @@ public class TestAccumulationFunctionArithmeticMeanXY {
    */
   @Test
   public void test2values() {
-    ITracePoint2D one = new TracePoint2D(1.0, 1.0);
-    ITracePoint2D two = new TracePoint2D(2.0, 2.0);
+    ITracePoint2D one = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(1.0, 1.0);
+    ITracePoint2D two = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(2.0, 2.0);
     ITrace2D trace = new Trace2DSimple();
     this.m_chart.addTrace(trace);
     trace.addPoint(one);
@@ -123,7 +121,7 @@ public class TestAccumulationFunctionArithmeticMeanXY {
    */
   @Test
   public void testSingleNaNX() {
-    ITracePoint2D one = new TracePoint2D(Double.NaN, 1.0);
+    ITracePoint2D one = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(Double.NaN, 1.0);
     ITrace2D trace = new Trace2DSimple();
     this.m_chart.addTrace(trace);
     trace.addPoint(one);
@@ -151,7 +149,7 @@ public class TestAccumulationFunctionArithmeticMeanXY {
    */
   @Test
   public void testSingleNaNY() {
-    ITracePoint2D one = new TracePoint2D(1.0, Double.NaN);
+    ITracePoint2D one = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(1.0, Double.NaN);
     ITrace2D trace = new Trace2DSimple();
     this.m_chart.addTrace(trace);
     trace.addPoint(one);
