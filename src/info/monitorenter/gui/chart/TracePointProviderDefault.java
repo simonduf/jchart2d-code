@@ -24,7 +24,7 @@ package info.monitorenter.gui.chart;
 
 /**
  * Default creator of <code>{@link ITracePoint2D}</code> instances that returns
- * implementation <code>{@link TracePoint2D}</code>.
+ * implementation <code>{@link info.monitorenter.gui.chart.tracepoints.TracePoint2D}</code>.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
@@ -45,7 +45,7 @@ public class TracePointProviderDefault implements ITracePointProvider {
    *      double)
    */
   public ITracePoint2D createTracePoint(final double x, final double y) {
-    return new TracePoint2D(x, y);
+    return new info.monitorenter.gui.chart.tracepoints.TracePoint2D(x, y);
   }
 
 }
