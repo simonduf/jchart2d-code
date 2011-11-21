@@ -56,7 +56,7 @@ public class Trace2DSimple
   private static final long serialVersionUID = -132333501493433766L;
   
   /** Internal List &lt;ITracePoint2D&gt;. */
-  protected List<ITracePoint2D> m_points = new LinkedList<ITracePoint2D>();
+  protected LinkedList<ITracePoint2D> m_points = new LinkedList<ITracePoint2D>();
 
   /**
    * Creates an empty trace.
@@ -111,7 +111,16 @@ public class Trace2DSimple
    * @see info.monitorenter.gui.chart.ITrace2D#iterator()
    */
   public Iterator<ITracePoint2D> iterator() {
-    return this.m_points.iterator();
+    return this.m_points.listIterator();
+  }
+  
+  
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#descendingIterator()
+   */
+  public Iterator<ITracePoint2D> descendingIterator() {
+    return this.m_points.descendingIterator();
   }
 
   /**

@@ -323,6 +323,13 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
   public Iterator<ITracePoint2D> iterator() {
     return this.m_delegate.iterator();
   }
+  
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#descendingIterator()
+   */
+  public Iterator<ITracePoint2D> descendingIterator() {
+    return this.m_delegate.descendingIterator();
+  }
 
   /**
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)

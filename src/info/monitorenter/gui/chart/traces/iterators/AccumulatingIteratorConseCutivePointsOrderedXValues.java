@@ -85,6 +85,7 @@ public class AccumulatingIteratorConseCutivePointsOrderedXValues extends AAccumu
     SkipResult skipResult = IteratorITracePoint2DUtil.scrollToFirstVisibleXValue(this.getOriginalIterator());
     this.m_firstPoint = skipResult.getLastInvisible();
     
+    
     /*
      * Compute the amount of points per next() to accumulate:
      */

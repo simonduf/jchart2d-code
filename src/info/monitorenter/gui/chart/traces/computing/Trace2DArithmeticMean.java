@@ -72,7 +72,7 @@ public class Trace2DArithmeticMean extends ATrace2D {
   private final IRingBuffer<ITracePoint2D> m_pointBuffer;
 
   /** The internal list of points to render. */
-  private final List<ITracePoint2D> m_points = new LinkedList<ITracePoint2D>();
+  private final LinkedList<ITracePoint2D> m_points = new LinkedList<ITracePoint2D>();
 
   /**
    * The amount of n recent points to buffer. private int m_pointBufferSize; /**
@@ -200,6 +200,16 @@ public class Trace2DArithmeticMean extends ATrace2D {
    */
   public Iterator<ITracePoint2D> iterator() {
     return this.m_points.iterator();
+  }
+  
+  
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#descendingIterator()
+   */
+  @Override
+  public Iterator<ITracePoint2D> descendingIterator() {
+    return this.m_points.descendingIterator();
   }
 
   /**

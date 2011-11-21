@@ -233,6 +233,28 @@ public class Trace2DLtd extends ATrace2D implements ITrace2D {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#descendingIterator()
+   */
+  @Override
+  public Iterator<ITracePoint2D> descendingIterator() {
+    if (Chart2D.DEBUG_THREADING) {
+      System.out.println("Trace2DLtd.iterator, 0 locks");
+    }
+    this.ensureInitialized();
+    synchronized (this.m_renderer) {
+      if (Chart2D.DEBUG_THREADING) {
+        System.out.println("Trace2DLtd.iterator, 1 lock");
+      }
+      synchronized (this) {
+        if (Chart2D.DEBUG_THREADING) {
+          System.out.println("Trace2DLtd.iterator, 2 locks");
+        }
+        return this.m_buffer.iteratorF2L();
+      }
+    }
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#removeAllPoints()
    */
   @Override

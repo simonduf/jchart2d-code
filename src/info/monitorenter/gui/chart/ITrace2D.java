@@ -945,12 +945,12 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * instances.
    * <p>
    * Implementations should be synchronized. This method is meant to allow
-   * modifications of the intenal <code>TracePoint2D</code> instances, so the
+   * modifications of the internal <code>{@link ITracePoint2D}</code> instances, so the
    * original points should be returned.
    * <p>
    * There is no guarantee that changes made to the contained tracepoints will
    * be reflected in the display immediately. The order the iterator returns the
-   * <code>TracePoint2D</code> instances decides how the <code>Chart2D</code>
+   * <code>{@link ITracePoint2D}</code> instances decides how the <code>Chart2D</code>
    * will paint the trace.
    * <p>
    * 
@@ -958,6 +958,26 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    *         {@link ITracePoint2D}</code> instances.
    */
   public Iterator<ITracePoint2D> iterator();
+
+  /**
+   * Returns an <code>Iterator</code> over the internal <code>
+   * {@link ITrace2D}</code>
+   * instances in reverse order.
+   * <p>
+   * Implementations should be synchronized. This method is meant to allow
+   * modifications of the internal <code{@link ITracePoint2D}</code> instances, so the
+   * original points should be returned.
+   * <p>
+   * There is no guarantee that changes made to the contained tracepoints will
+   * be reflected in the display immediately. The order the iterator returns the
+   * <code>{@link ITracePoint2D}</code> instances decides how the <code>Chart2D</code>
+   * will paint the trace.
+   * <p>
+   * 
+   * @return an <code>Iterator</code> over the internal <code>
+   *         {@link ITracePoint2D}</code> instances in descending order.
+   */
+  public Iterator<ITracePoint2D> descendingIterator();
 
   /**
    * Clears all internal point highlighters used.

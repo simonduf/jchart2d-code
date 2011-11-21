@@ -57,7 +57,7 @@ public class Trace2DSorted extends ATrace2D implements ITrace2D {
   private static final long serialVersionUID = -3518797764292132652L;
 
   /** The sorted set of points. */
-  protected SortedSet<ITracePoint2D> m_points = new TreeSet<ITracePoint2D>();
+  protected TreeSet<ITracePoint2D> m_points = new TreeSet<ITracePoint2D>();
 
   /**
    * Defcon.
@@ -112,6 +112,16 @@ public class Trace2DSorted extends ATrace2D implements ITrace2D {
    */
   public Iterator<ITracePoint2D> iterator() {
     return this.m_points.iterator();
+  }
+  
+  
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#descendingIterator()
+   */
+  @Override
+  public Iterator<ITracePoint2D> descendingIterator() {
+    return this.m_points.descendingIterator();
   }
 
   /**
