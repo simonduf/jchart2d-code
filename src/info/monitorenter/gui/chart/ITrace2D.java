@@ -102,7 +102,7 @@ import java.util.Set;
  * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_TRACEPOINT}</code>
  * </td>
  * <td><code>{@link ITrace2D}</code> that changed</td>
- * <td><code>{@link info.monitorenter.gui.chart.TracePoint2D}</code>, the
+ * <td><code>{@link ITracePoint2D}</code>, the
  * instance that was removed</td>
  * <td><code>null</code>, indication that an instance was removed</td>
  * </tr>
@@ -112,7 +112,7 @@ import java.util.Set;
  * </td>
  * <td><code>{@link ITrace2D}</code> that changed</td>
  * <td><code>null</code>, indication that a value was added</td>
- * <td><code>{@link info.monitorenter.gui.chart.TracePoint2D}</code>, the new
+ * <td><code>{@link ITracePoint2D}</code>, the new
  * instance that was added, identifying that an instance was removed</td>
  * </tr>
  * <tr>
@@ -213,8 +213,8 @@ import java.util.Set;
  * trace point.</td>
  * <td><code>null</code> because it would be too much overhead to store the old
  * point in a additional instance as the original is modified in
- * <code>{@link TracePoint2D#setLocation(java.awt.geom.Point2D)}</code>.</td>
- * <td><code>{@link TracePoint2D}</code> the point whose location was modified.</td>
+ * <code>{@link ITracePoint2D#setLocation(double, double)}</code>.</td>
+ * <td><code>{@link ITracePoint2D}</code> the point whose location was modified.</td>
  * </tr>
  * <tr>
  * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_NAME}</code></td>
@@ -411,14 +411,14 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
 
   /**
    * The property key defining any change of a location of a contained <code>
-   * {@link TracePoint2D} </code>
+   * {@link ITracePoint2D} </code>
    * .
    * <p>
    * Use in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    * Property change event with this property will be fired if method
-   * <code>{@link TracePoint2D#setLocation(java.awt.geom.Point2D)}</code> or
-   * <code>{@link TracePoint2D#setLocation(double, double)}</code> of any
+   * <code>{@link ITracePoint2D#setLocation(double, double)}</code> or
+   * <code>{@link ITracePoint2D#setLocation(double, double)}</code> of any
    * contained point is invoked.
    * <p>
    */
@@ -441,7 +441,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
 
   /**
    * The property key defining a change in the collection of <code>
-   * {@link TracePoint2D}</code>
+   * {@link ITracePoint2D}</code>
    * instances within this trace. Use in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
@@ -603,7 +603,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public boolean containsTracePainter(final ITracePainter< ? > painter);
 
   /**
-   * Method to trigger by <code>{@link TracePoint2D#setLocation(double, double)}
+   * Method to trigger by <code>{@link ITracePoint2D#setLocation(double, double)}
    * </code>, <code>{@link #addPoint(ITracePoint2D)}</code>
    * or <code>
    * {@link #removePoint(ITracePoint2D)}</code>.
@@ -687,14 +687,14 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
 
   /**
    * <p>
-   * Returns the maximum amount of {@link TracePoint2D} instances that may be
+   * Returns the maximum amount of {@link ITracePoint2D} instances that may be
    * added. For implementations that limit the maximum amount this is a
    * reasonable amount. Non-limiting implementations should return
    * {@link Integer#MAX_VALUE}. This allows to detect the unlimitedness. Of
    * course no implementation could store that amount of points.
    * </p>
    * 
-   * @return The maximum amount of {@link TracePoint2D} instances that may be
+   * @return The maximum amount of {@link ITracePoint2D} instances that may be
    *         added.
    */
   public int getMaxSize();
@@ -776,7 +776,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * trace in Euclid distance.
    * <p>
    * Please note that the arguments must be normalized value coordinates like
-   * provided by a <code>{@link TracePoint2D#getScaledX()}</code> or the
+   * provided by a <code>{@link ITracePoint2D#getScaledX()}</code> or the
    * division of a pixel coordinate by the total pixel range of the chart.
    * <p>
    * Using the Manhattan distance is much faster than Euclid distance as it only
@@ -802,7 +802,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * trace in Manhattan distance.
    * <p>
    * Please note that the arguments must be normalized value coordinates like
-   * provided by a <code>{@link TracePoint2D#getScaledX()}</code> or the
+   * provided by a <code>{@link ITracePoint2D#getScaledX()}</code> or the
    * division of a pixel coordinate by the total pixel range of the chart.
    * <p>
    * Using the Manhattan distance is much faster than Euclid distance as it only
@@ -878,10 +878,10 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public Chart2D getRenderer();
 
   /**
-   * Returns the amount of {@link TracePoint2D} instances currently contained.
+   * Returns the amount of {@link ITracePoint2D} instances currently contained.
    * <p>
    * 
-   * @return The amount of <code>{@link TracePoint2D}</code> instances currently
+   * @return The amount of <code>{@link ITracePoint2D}</code> instances currently
    *         contained.
    */
   public int getSize();
@@ -922,11 +922,11 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public Integer getZIndex();
 
   /**
-   * Returns false if internal <code>{@link TracePoint2D}</code> instances are
+   * Returns false if internal <code>{@link ITracePoint2D}</code> instances are
    * contained or true if not.
    * <p>
    * 
-   * @return <tt>false</tt> if internal <code>{@link TracePoint2D}</code>
+   * @return <tt>false</tt> if internal <code>{@link ITracePoint2D}</code>
    *         instances are contained or <tt>true</tt> if not.
    */
   public boolean isEmpty();
@@ -941,7 +941,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
 
   /**
    * Returns an <code>Iterator</code> over the internal <code>
-   * {@link TracePoint2D}</code>
+   * {@link ITrace2D}</code>
    * instances.
    * <p>
    * Implementations should be synchronized. This method is meant to allow
@@ -955,7 +955,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * <p>
    * 
    * @return an <code>Iterator</code> over the internal <code>
-   *         {@link TracePoint2D}</code> instances.
+   *         {@link ITracePoint2D}</code> instances.
    */
   public Iterator<ITracePoint2D> iterator();
 
