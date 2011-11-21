@@ -38,7 +38,7 @@ o API change that requires refactoring.
   Note that refactoring of protected code intended for library 
   internal details will not be listed.
 
-jchart2d-3.2.3 - <month>, <day>, <year>
+jchart2d-3.3.0 - <month>, <day>, <year>
   
 * Fixed bug #3380123: Graphical artifacts when zooming (or using RangePolicyFixedViewPort) on the bounds of the chart. 
 * Fixed bug #3424004: Missing label of Y axis when showing more than 1 chart in one component. 
@@ -49,7 +49,8 @@ o Changed policy of Chart2D.translateMousePosition(final MouseEvent mouseEvent).
   mouse event. 
 o Deprecated method public boolean hasTrace(final ITrace2D trace) in IAxis. Use public boolean containsTrace(final ITrace2D trace) instead.
 o Moved info.monitorenter.gui.chart.TracePoint2D to info.monitorenter.gui.chart.tracepoints.TracePoint2D. 
-  The first was deprecated: Please update to the new package version.
+  The first was deprecated: Please update to the new package version. 
+o JChart2d-3.3.0 requires Java 1.6 now (binaries and source / libraries and compiler). 
 
 jchart2d-3.2.2 - September, 24th, 2011
   
