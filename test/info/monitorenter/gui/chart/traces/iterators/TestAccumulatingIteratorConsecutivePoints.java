@@ -57,7 +57,7 @@ public class TestAccumulatingIteratorConsecutivePoints {
   @Test
   public void testEmptyTraceAccumulationFunctionArithmeticMeanXY() {
     IAccumulationFunction accumulationFunction = new AccumulationFunctionArithmeticMeanXY();
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace.iterator(), accumulationFunction, 0, 0);
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 0);
     Assert.assertFalse(toTest.hasNext());
   }
 
@@ -75,8 +75,8 @@ public class TestAccumulatingIteratorConsecutivePoints {
     ITracePoint2D point = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(0.0, 0.0);
     this.m_trace.addPoint(point);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace.iterator(), accumulationFunction,
-        this.m_trace.getSize(), this.m_trace.getSize());
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction,
+        this.m_trace.getSize());
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(point, result);
@@ -99,8 +99,8 @@ public class TestAccumulatingIteratorConsecutivePoints {
     this.m_trace.addPoint(one);
     this.m_trace.addPoint(two);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace.iterator(), accumulationFunction,
-        this.m_trace.getSize(), this.m_trace.getSize());
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction,
+        this.m_trace.getSize());
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -128,8 +128,8 @@ public class TestAccumulatingIteratorConsecutivePoints {
     this.m_trace.addPoint(two);
     this.m_trace.addPoint(three);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace.iterator(), accumulationFunction,
-        this.m_trace.getSize(), this.m_trace.getSize());
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction,
+        this.m_trace.getSize());
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -161,8 +161,7 @@ public class TestAccumulatingIteratorConsecutivePoints {
     this.m_trace.addPoint(two);
     this.m_trace.addPoint(three);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace.iterator(), accumulationFunction, 2,
-        this.m_trace.getSize());
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 2);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -197,8 +196,7 @@ public class TestAccumulatingIteratorConsecutivePoints {
     this.m_trace.addPoint(three);
     this.m_trace.addPoint(four);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace.iterator(), accumulationFunction, 3,
-        this.m_trace.getSize());
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 3);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -235,8 +233,7 @@ public class TestAccumulatingIteratorConsecutivePoints {
     this.m_trace.addPoint(three);
     this.m_trace.addPoint(four);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace.iterator(), accumulationFunction, 3,
-        this.m_trace.getSize());
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 3);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -278,8 +275,7 @@ public class TestAccumulatingIteratorConsecutivePoints {
     this.m_trace.addPoint(three);
     this.m_trace.addPoint(four);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace.iterator(), accumulationFunction, 3,
-        this.m_trace.getSize());
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 3);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -321,8 +317,7 @@ public class TestAccumulatingIteratorConsecutivePoints {
     this.m_trace.addPoint(three);
     this.m_trace.addPoint(four);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace.iterator(), accumulationFunction, 3,
-        this.m_trace.getSize());
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 3);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     // This must be one unchanged as it is a discontinuation!
@@ -359,8 +354,7 @@ public class TestAccumulatingIteratorConsecutivePoints {
     ITracePoint2D last = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(101.0, 101.0);
     this.m_trace.addPoint(last);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace.iterator(), accumulationFunction, 52,
-        this.m_trace.getSize());
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 52);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(first, result);
@@ -406,8 +400,7 @@ public class TestAccumulatingIteratorConsecutivePoints {
     ITracePoint2D last = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(91.0, 91.0);
     this.m_trace.addPoint(last);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace.iterator(), accumulationFunction, 32,
-        this.m_trace.getSize());
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 32);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(first, result);

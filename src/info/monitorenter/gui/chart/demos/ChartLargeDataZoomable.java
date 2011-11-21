@@ -1,6 +1,6 @@
 /*
- *  MinimalDynamicChartLargeData.java of project jchart2d, a demonstration 
- *  that on certain computer a chart can carry 70.000 data points. 
+ *  ChartLargeDataZoomable.java of project jchart2d, a demonstration 
+ *  that on certain computer a chart can carry 700.000 data points. 
  *  Copyright (C) 2007 - 2011 Achim Westermann, created on 20.06.2007, 22:44:55
  *
  *  This library is free software; you can redistribute it and/or
@@ -23,11 +23,14 @@
  */
 package info.monitorenter.gui.chart.demos;
 
+import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ZoomableChart;
+import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.views.ChartPanel;
 
+import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Random;
@@ -35,7 +38,7 @@ import java.util.Random;
 import javax.swing.JFrame;
 
 /**
- * POC to show that "on some computers" jchart2d is able to show 70.000 data
+ * POC to show that "on some computers" jchart2d is able to show 700.000 data
  * points.
  * <p>
  * 
@@ -44,7 +47,7 @@ import javax.swing.JFrame;
  * 
  * @version $Revision: 1.7 $
  */
-public final class MinimalStaticChartLargeDataZoomable {
+public final class ChartLargeDataZoomable {
 
   /**
    * Testing main hook.
@@ -58,19 +61,25 @@ public final class MinimalStaticChartLargeDataZoomable {
     ZoomableChart chart = new ZoomableChart();
     // Create an ITrace:
     ITrace2D trace = new Trace2DSimple();
+    trace.setColor(Color.CYAN);
     // Add the trace to the chart:
     chart.addTrace(trace);
+    chart.setUseAntialiasing(true);
+    chart.enablePointHighlighting(true);
+    trace.setPointHighlighter(new PointPainterDisc(6));
+     chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
+    
     // Add all points, as it is static:
     Random random = new Random();
 
-    for (int i = 0; i < 70000; i++) {
+    for (int i = 0; i < 700000; i++) {
       trace.addPoint(i, (60 + random.nextDouble()) * i);
     }
     // Make it visible:
     // Create a frame.
     JFrame frame = new JFrame("MinimalStaticChartLargeData");
     // add the chart to the frame:
-    frame.getContentPane().add(chart);
+    frame.getContentPane().add(new ChartPanel(chart));
     frame.setSize(800, 600);
     // Enable the termination button [cross on the upper right edge]:
     frame.addWindowListener(new WindowAdapter() {
@@ -89,7 +98,7 @@ public final class MinimalStaticChartLargeDataZoomable {
    * Defcon.
    * <p>
    */
-  private MinimalStaticChartLargeDataZoomable() {
+  private ChartLargeDataZoomable() {
     super();
   }
 }

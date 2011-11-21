@@ -24,7 +24,6 @@ package info.monitorenter.gui.chart;
 import info.monitorenter.gui.chart.traces.accumulationfunctions.AccumulationFunctionArithmeticMeanXY;
 import info.monitorenter.gui.chart.traces.accumulationfunctions.AccumulationFunctionBypass;
 import info.monitorenter.gui.chart.traces.iterators.AccumulatingIteratorConsecutivePoints;
-import info.monitorenter.util.Range;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -172,34 +171,32 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
      * <p>
      */
     ACCUMULATE_AMOUNT_OF_POINTS(new AccumulationFunctionArithmeticMeanXY()) {
-      public Iterator<ITracePoint2D> iterator(final Iterator<ITracePoint2D> source,
-          final int amountOfPoints, final int totalPointsInSource) {
-        return new AccumulatingIteratorConsecutivePoints(source, this.getAccumulationFunction(), amountOfPoints,
-            totalPointsInSource);
+      public Iterator<ITracePoint2D> iterator(final ITrace2D source,
+          final int amountOfPoints) {
+        return new AccumulatingIteratorConsecutivePoints(source, this.getAccumulationFunction(), amountOfPoints);
       } 
     },
     /**
      * This strategy will just accumulate <code>amountOfPoints</code>
      * consecutive points without caring for data density. Best use this
-     * whenever you have unordered (by x value) traces.      
+     * whenever you have ordered (by x value) traces and want to cut off invisible points at the beginning (zoom mode).      
      */
     ACCUMULATE_AMOUNT_OF_POINTS_ASCENDING_X_VALUES(new AccumulationFunctionArithmeticMeanXY()) {
-      public Iterator<ITracePoint2D> iterator(final Iterator<ITracePoint2D> source,
-          final int amountOfPoints, final int totalPointsInSource) {
-        return new AccumulatingIteratorConsecutivePoints(source, this.getAccumulationFunction(), amountOfPoints,
-            totalPointsInSource);
+      public Iterator<ITracePoint2D> iterator(final ITrace2D source,
+          final int amountOfPoints) {
+        return new AccumulatingIteratorConsecutivePoints(source, this.getAccumulationFunction(), amountOfPoints);
       } 
     },
     
     /**
      * Bypass for accumulation: Just the given original <code>source</code>
      * argument is returned from it's method
-     * <code>{@link #iterator(Iterator, int, int)}</code>.
+     * <code>{@link #iterator(ITrace2D, int)}</code>.
      */
     ACCUMULATE_BYPASS(new AccumulationFunctionBypass()) {
-      public Iterator<ITracePoint2D> iterator(final Iterator<ITracePoint2D> source,
-          final int amountOfPoints, final int totalPointsInSource) {
-        return source;
+      public Iterator<ITracePoint2D> iterator(final ITrace2D source,
+          final int amountOfPoints) {
+        return source.iterator();
       }
     },
     /**
@@ -219,7 +216,7 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
        * is done and result is returned.
        * <p>
        * In this case <code>xRange</code> is not the total visible range given
-       * to {@link ITrace2DDataAccumulating#iterator(Range, Range, int)} but a
+       * to {@link ITrace2DDataAccumulating#iterator(int)} but a
        * segment within that range.
        * <p>
        * 
@@ -228,8 +225,8 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
        * <p>
        * 
        */
-      public Iterator<ITracePoint2D> iterator( final Iterator<ITracePoint2D> source,
-          final int amountOfPointsk, final int totalPointsInSource) {
+      public Iterator<ITracePoint2D> iterator( final ITrace2D source,
+          final int amountOfPoints) {
         return null;
       }
     };
@@ -316,19 +313,17 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
      * <p>
      * 
      * @param source
-     *          iterator over the real points of this trace.
+     *          the real points of this trace.
      * 
      * @param amountOfPoints
      *          would allow to filter out points to accumulate by just taking n
      *          consecutive trace points.
      * 
-     * @param totalPointsInSource
-     *          the amount of points in the source iterator.
      * 
      * @return an iterator over the accumulated points from the given iterator.
      */
-    public abstract Iterator<ITracePoint2D> iterator(final Iterator<ITracePoint2D> source,
-        final int amountOfPoints, final int totalPointsInSource);
+    public abstract Iterator<ITracePoint2D> iterator(final ITrace2D source,
+        final int amountOfPoints);
 
     /**
      * Unregisters a property change listener that has been registered for

@@ -30,6 +30,7 @@ import info.monitorenter.gui.chart.ITrace2DDataAccumulating;
 import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.util.Iterator;
+import java.util.ListIterator;
 
 /**
  * Utility class helper, created for supporting data accumulation of
@@ -47,6 +48,63 @@ public class IteratorITracePoint2DUtil {
    */
   private IteratorITracePoint2DUtil() {
     // nop
+  }
+
+  /**
+   * Simple struct to return the last skipped {@link ITracePoint2D} along with
+   * the skip count.
+   * <p>
+   * 
+   * 
+   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
+   * 
+   */
+  public static class SkipResult {
+    /**
+     * The last invisible trace point seen.
+     */
+    private ITracePoint2D m_lastInvisible;
+
+    /**
+     * The amount of points skipped.
+     */
+    private int m_skipCount;
+
+    /**
+     * Returns the amount of points skipped.
+     * <p>
+     * 
+     * @return the amount of points skipped.
+     */
+    public int getSkipCount() {
+      return this.m_skipCount;
+    }
+
+    /**
+     * Returns the last invisible trace point seen.
+     * <p>
+     * 
+     * @return the last invisible trace point seen.
+     */
+    public ITracePoint2D getLastInvisible() {
+      return this.m_lastInvisible;
+    }
+
+    /**
+     * Creates an instance containing both values.
+     * <p>
+     * 
+     * @param lastInvisible
+     *          the last invisible trace point seen.
+     * 
+     * @param skipCount
+     *          the amount of points skipped.
+     */
+    SkipResult(final ITracePoint2D lastInvisible, final int skipCount) {
+      this.m_lastInvisible = lastInvisible;
+      this.m_skipCount = skipCount;
+    }
+
   }
 
   /**
@@ -76,24 +134,27 @@ public class IteratorITracePoint2DUtil {
    *         first point found if it was already visible or null if no point was
    *         found in the iterator.
    */
-  public static ITracePoint2D scrollToFirstVisibleXValue(final Iterator<ITracePoint2D> traceIt) {
-    ITracePoint2D result = null;
+  public static SkipResult scrollToFirstVisibleXValue(final Iterator<ITracePoint2D> traceIt) {
+    ITracePoint2D point = null;
 
     ITracePoint2D previous = null;
     ITracePoint2D current;
+    int countSkip = 0;
     while (traceIt.hasNext()) {
       current = traceIt.next();
       if (current.getScaledX() < 0.0) {
         if (previous == null) {
-          // no interpolation possible:
-          result = current;
+          point = current;
         } else {
-          // interpolate
-          result = previous;
+          point = previous;
         }
         break;
+      } else {
+        previous = point;
+        countSkip++;
       }
     }
+    SkipResult result = new SkipResult(point, countSkip);
     return result;
   }
 

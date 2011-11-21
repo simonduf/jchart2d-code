@@ -405,7 +405,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
 
     },
     /**
-     * Snaps to the nearest <code>{@link TracePoint2D}</code> and shows it's
+     * Snaps to the nearest <code>{@link ITracePoint2D}</code> and shows it's
      * value.
      * <p>
      * Warning: due to the data structure of multiple axes this is very
@@ -506,6 +506,12 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    */
   public static final boolean DEBUG_SCALING = false;
 
+  /**
+   * A package wide switch for debugging problems with data accumulation. Set to false the
+   * compiler will remove the debugging statements.
+   */
+  public static final boolean DEBUG_DATA_ACCUMULATION = true;
+  
   /**
    * A package wide switch for debugging problems with highlighting. Set to
    * false the compiler will remove the debugging statements.
@@ -1915,7 +1921,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       it = this.m_axesXTop.iterator();
       while (it.hasNext()) {
         current = it.next();
-        if (current.hasTrace(trace)) {
+        if (current.containsTrace(trace)) {
           result = current;
           break;
         }
@@ -2392,7 +2398,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * 
    */
   public final synchronized int getYAxisHeight() {
-    return this.m_yChartEnd - this.m_yChartStart;
+    return this.m_yChartStart - this.m_yChartEnd;
   }
 
   /**
@@ -2813,7 +2819,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       }
     }
 
-    int count = 0;
+    int countTrace = 0;
     Iterator<ITracePainter< ? >> itTracePainters;
     Iterator<IErrorBarPolicy< ? >> itTraceErrorBarPolicies;
     ITracePainter< ? > tracePainter;
@@ -2822,7 +2828,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     while (traceIt.hasNext()) {
       oldpoint = null;
       newpoint = null;
-      count++;
+      countTrace++;
       trace = traceIt.next();
       if (trace.isVisible()) {
         synchronized (trace) {
@@ -2865,9 +2871,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
           } else {
             pointIt = trace.iterator();
           }
-          pointIt = trace.iterator();
           boolean newpointVisible = false;
           boolean oldpointVisible = false;
+        
+          int countPoints = 0;
           while (pointIt.hasNext()) {
             oldpoint = newpoint;
             oldtmpx = tmpx;
@@ -2875,7 +2882,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
             newpoint = pointIt.next();
             newpointVisible = this.isVisible(newpoint);
             oldpointVisible = this.isVisible(oldpoint);
-
+            countPoints ++;
             /*
              * Special case: if we have NaN just don't interpolate anything or
              * paint but just continue (and give a signal to trace painters to
@@ -2958,6 +2965,9 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
               tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
               this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, false, trace, g, newpoint, hasErrorBars);
             }
+          }
+          if(DEBUG_DATA_ACCUMULATION) {
+            System.out.println("Rendered " + countPoints + " points of a trace with " + trace.getSize() + " points.");
           }
           itTracePainters = trace.getTracePainters().iterator();
           while (itTracePainters.hasNext()) {

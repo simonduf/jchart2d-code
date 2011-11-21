@@ -2,6 +2,7 @@ package info.monitorenter.gui.chart.traces.iterators;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAccumulationFunction;
+import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.util.Iterator;
@@ -56,8 +57,8 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
    * Constructor with all that is needed for accumulating points.
    * <p>
    * 
-   * @param originalIterator
-   *          the iterator to decorate with the feature of accumulating points.
+   * @param originalTrace
+   *          the trace to decorate with the feature of accumulating points.
    * 
    * @param accumulationFunction
    *          the function to use for point - accumulation.
@@ -71,17 +72,15 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
    *          returned points may be smaller than this value as some segments
    *          might not contain any point.
    * 
-   * @param totalPointsInSource
-   *          The amount of point in the source iterator. *
    */
-  public AccumulatingIteratorConsecutivePoints(final Iterator<ITracePoint2D> originalIterator,
-      final IAccumulationFunction accumulationFunction, final int amountOfVisiblePoints, final int totalPointsInSource) {
-    super(originalIterator, accumulationFunction, amountOfVisiblePoints, totalPointsInSource);
+  public AccumulatingIteratorConsecutivePoints(final ITrace2D originalTrace,
+      final IAccumulationFunction accumulationFunction, final int amountOfVisiblePoints) {
+    super(originalTrace, accumulationFunction, amountOfVisiblePoints);
     /*
      * Compute the amount of points per next() to accumulate:
      */
     int targetCount = this.getAmountOfVisiblePoints();
-    int sourceCount = this.getTotalPointsInSource();
+    int sourceCount = originalTrace.getSize();
     if ((targetCount != 0) && (sourceCount != 0)) {
       // -2 is for first and last point
       if ((sourceCount > 2) && (targetCount > 2)) {
