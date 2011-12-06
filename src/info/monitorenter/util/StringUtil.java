@@ -22,8 +22,11 @@
  */
 package info.monitorenter.util;
 
+import info.monitorenter.util.collections.Entry;
+
 import java.lang.reflect.Array;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Nice static helpers for working with Strings.
@@ -64,45 +67,7 @@ public final class StringUtil {
     }
     return tmp.toString();
   }
-
-  /**
-   * Little String output - helper that modifies the given LinkedList by getting
-   * it's Objects and replace them by their toString() - representation.
-   * <p>
-   * 
-   * What is special? <br>
-   * If an Object in the given List is an Array (of Objects or primitive data
-   * types) reflection will be used to create a String - representation of them.
-   * The changes are reflected in the Objects that are in the given List. So
-   * keep a reference to it. If you are sure, that your List does not contain
-   * Arrays do not use this method to avoid overhead.
-   * <p>
-   * 
-   * Avoid structural modifications (remove) of the list while using this
-   * method. This method or better: the given List is only thread - safe if the
-   * list is synchronized.
-   * <p>
-   * 
-   * A clever VM (hotspot) will be able to inline this function because of void
-   * return.
-   * <p>
-   * 
-   * @param objects
-   *          the List of objects that will be changed to a list of the String
-   *          representation of the Objects with respect to special array
-   *          treatment.
-   * 
-   */
-  public static final void listOfArraysToString(final List<Object> objects) {
-    if (objects == null) {
-      return;
-    }
-    int stop = objects.size();
-    for (int i = 0; i < stop; i++) {
-      objects.add(i, StringUtil.arrayToString(objects.remove(i)));
-    }
-  }
-
+  
   /**
    * If the given Object is no Array, it's toString - method is invoked.
    * Primitive type - Arrays and Object - Arrays are introspected using
@@ -122,7 +87,6 @@ public final class StringUtil {
     String result = StringUtil.arrayToString(isArr, ",");
     return result;
   }
-  
   /**
    * If the given Object is no Array, it's toString - method is invoked.
    * Primitive type - Arrays and Object - Arrays are introspected using
@@ -199,7 +163,7 @@ public final class StringUtil {
   public static String getNewLine() {
     return  System.getProperty("line.separator");
   }
-
+  
   /**
    * Returns the singleton instance of this class.
    * <p>
@@ -235,6 +199,44 @@ public final class StringUtil {
       result = test.trim().length() == 0;
     }
     return result;
+  }
+
+  /**
+   * Little String output - helper that modifies the given LinkedList by getting
+   * it's Objects and replace them by their toString() - representation.
+   * <p>
+   * 
+   * What is special? <br>
+   * If an Object in the given List is an Array (of Objects or primitive data
+   * types) reflection will be used to create a String - representation of them.
+   * The changes are reflected in the Objects that are in the given List. So
+   * keep a reference to it. If you are sure, that your List does not contain
+   * Arrays do not use this method to avoid overhead.
+   * <p>
+   * 
+   * Avoid structural modifications (remove) of the list while using this
+   * method. This method or better: the given List is only thread - safe if the
+   * list is synchronized.
+   * <p>
+   * 
+   * A clever VM (hotspot) will be able to inline this function because of void
+   * return.
+   * <p>
+   * 
+   * @param objects
+   *          the List of objects that will be changed to a list of the String
+   *          representation of the Objects with respect to special array
+   *          treatment.
+   * 
+   */
+  public static final void listOfArraysToString(final List<Object> objects) {
+    if (objects == null) {
+      return;
+    }
+    int stop = objects.size();
+    for (int i = 0; i < stop; i++) {
+      objects.add(i, StringUtil.arrayToString(objects.remove(i)));
+    }
   }
 
   /**
@@ -282,10 +284,82 @@ public final class StringUtil {
   }
 
   /**
-   * Appends the necessary amount of spaces to the string until it has the givn
+   * This may be useful for comparison of canonical paths. For two strings a,b the prefix
+   * intersection of a and b is returned on the key side and the tail of b that did not match on the
+   * value side. <br>
+   * Example:
+   * <table border="1">
+   * <tr>
+   * <th>a</th>
+   * <th>b</th>
+   * <th>.getKey()</th>
+   * <th>.getValue()</th>
+   * </tr>
+   * <tr>
+   * <td>computer</td>
+   * <td>compare</td>
+   * <td>comp</td>
+   * <td>are</td>
+   * </tr>
+   * <tr>
+   * <td>compare</td>
+   * <td>computer</td>
+   * <td>comp</td>
+   * <td>uter</td>
+   * </tr>
+   * <tr>
+   * <td>computer</td>
+   * <td>put</td>
+   * <td>""</td>
+   * <td>""</td>
+   * </tr>
+   * <tr>
+   * <td>c:/work/myproject/bin/</td>
+   * <td>c:/work/myproject/bin/cpdetector/io/ClassFileFilter.class</td>
+   * <td>c:/work/myproject/bin/</td>
+   * <td>cpdetector/io/ClassFileFilter.class</td>
+   * </tr>
+   * <tr>
+   * <td>c:/work/myproject/bin/cpdetector/io/ClassFileFilter.class</td>
+   * <td>c:/work/myproject/bin/</td>
+   * <td>c:/work/myproject/bin/</td>
+   * <td>""</td>
+   * </tr>
+   * </table>
+   * Note that the prefix is not searched within the strings. Both strings have to have a common
+   * prefix (no skipping until identical parts are found).
+   * <p>
+   * 
+   * @param a first string to find a common prefix with 2nd string. 
+   * 
+   * @param b second string to find a common prefix with 1st string. 
+   * 
+   * @return for two strings a,b the prefix
+   * intersection of a and b is returned on the key side and the tail of b that did not match on the
+   * value side.
+   */
+  public static Map.Entry<String, String> prefixIntersection(final String a, final String b) {
+    Map.Entry<String,String> ret = null;
+    String key;
+    String value;
+    int index = b.indexOf(a);
+    if (index != -1) {
+      key = a;
+      value = b.substring(a.length());
+    } else {
+      key = "";
+      value = "";
+    }
+    ret = new Entry<String,String>(key, value);
+    return ret;
+  }
+
+  /**
+   * Appends the necessary amount of spaces to the string until it has the given
    * length. No Exception is thrown, if the length of the String is shorter than
    * the given length, but nothing will happen and a message will be printed to
    * the System.out.
+   * <p>
    * 
    * 
    * @param s
@@ -299,7 +373,7 @@ public final class StringUtil {
     String result = s;
     int oldlen = s.length();
     if (oldlen > length) {
-      System.err.println("greenpeace.util.setSize(String s,int length): length (" + length
+      System.err.println(StringUtil.class.getName()+".setSize(String s,int length): length (" + length
           + ") is smaller than s.length(" + oldlen + ") : " + s);
     } else {
       int tofill = length - oldlen;
