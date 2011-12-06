@@ -27,7 +27,6 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.util.Iterator;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
