@@ -314,29 +314,25 @@ public class Trace2DLtd extends ATrace2D implements ITrace2D {
         final double xmin = this.m_minX;
         this.minXSearch();
         if (this.m_minX != xmin) {
-          this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(xmin),
-              new Double(this.m_minX));
+          this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(xmin), new Double(this.m_minX));
         }
 
         final double xmax = this.m_maxX;
         this.maxXSearch();
         if (this.m_maxX != xmax) {
-          this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(xmax),
-              new Double(this.m_maxX));
+          this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(xmax), new Double(this.m_maxX));
         }
 
         final double ymax = this.m_maxY;
         this.maxYSearch();
         if (this.m_maxY != ymax) {
-          this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(ymax),
-              new Double(this.m_maxY));
+          this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(ymax), new Double(this.m_maxY));
         }
 
         final double ymin = this.m_minY;
         this.minYSearch();
         if (this.m_minY != ymin) {
-          this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(ymin),
-              new Double(this.m_minY));
+          this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(ymin), new Double(this.m_minY));
         }
       }
     }
