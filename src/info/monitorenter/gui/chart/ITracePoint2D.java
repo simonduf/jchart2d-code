@@ -90,31 +90,6 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
   public boolean addAdditionalPointPainter(IPointPainter< ? > pointPainter);
 
   /**
-   * Removes a point painter that additionally (to the pointer painters of the
-   * trace (<code>{@link ITrace2D#getTracePainters()} </code>)) paint this
-   * point.
-   * <p>
-   * 
-   * @param pointPainter
-   *          a point painter that currently is used to additionally (to the
-   *          trace painter of the chart) paint this point.
-   * 
-   * @return true if this point painter was removed (contained before by the
-   *         means of <code> {@link IPointPainter#compareTo(Object) } </code>.
-   */
-  public boolean removeAdditionalPointPainter(IPointPainter< ? > pointPainter);
-
-  /**
-   * Removes all point painters that additionally (to the pointer painters of
-   * the trace (<code>{@link ITrace2D#getTracePainters()} </code>)) paint this
-   * point.
-   * <p>
-   * 
-   * @return all instances that were used before this call.
-   */
-  public Set<IPointPainter< ? >> removeAllAdditionalPointPainters();
-
-  /**
    * Returns a cloned instance (deep copy).
    * <p>
    * 
@@ -222,6 +197,41 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
   public abstract double getY();
 
   /**
+   * Returns true if {@link #getX()} and/or {@link #getY()} is
+   * {@link Double#NaN} which signals a discontinuation.
+   * <p>
+   * 
+   * @return true if {@link #getX()} and/or {@link #getY()} is
+   *         {@link Double#NaN} which signals a discontinuation.
+   */
+  public boolean isDiscontinuation();
+
+  /**
+   * Removes a point painter that additionally (to the pointer painters of the
+   * trace (<code>{@link ITrace2D#getTracePainters()} </code>)) paint this
+   * point.
+   * <p>
+   * 
+   * @param pointPainter
+   *          a point painter that currently is used to additionally (to the
+   *          trace painter of the chart) paint this point.
+   * 
+   * @return true if this point painter was removed (contained before by the
+   *         means of <code> {@link IPointPainter#compareTo(Object) } </code>.
+   */
+  public boolean removeAdditionalPointPainter(IPointPainter< ? > pointPainter);
+
+  /**
+   * Removes all point painters that additionally (to the pointer painters of
+   * the trace (<code>{@link ITrace2D#getTracePainters()} </code>)) paint this
+   * point.
+   * <p>
+   * 
+   * @return all instances that were used before this call.
+   */
+  public Set<IPointPainter< ? >> removeAllAdditionalPointPainters();
+
+  /**
    * Allows <code>ITrace2D</code> instances to register (or de-register)
    * themselves with this point to receive (or stop receiving) change
    * information via {@link ITrace2D#firePointChanged(ITracePoint2D, int)}
@@ -233,14 +243,6 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
    *          deregister.
    */
   public abstract void setListener(final ITrace2D listener);
-  
-  /**
-   * Returns true if {@link #getX()} and/or {@link #getY()} is {@link Double#NaN} which signals a discontinuation.
-   * <p>
-   * 
-   * @return true if {@link #getX()} and/or {@link #getY()} is {@link Double#NaN} which signals a discontinuation.
-   */
-  public boolean isDiscontinuation();
 
   /**
    * This method overloads the method of
