@@ -28,10 +28,8 @@ import info.monitorenter.gui.chart.traces.ATrace2D;
 import info.monitorenter.util.collections.IRingBuffer;
 import info.monitorenter.util.collections.RingBufferArrayFast;
 
-import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * A trace that accumulates the latest n x values added to points with
