@@ -30,7 +30,6 @@ import info.monitorenter.util.collections.RingBufferArrayFast;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * A trace that accumulates the latest n points added to points with the
