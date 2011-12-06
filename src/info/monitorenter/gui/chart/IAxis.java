@@ -174,8 +174,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
      * @param listener
      *          the listener that will be informed.
      */
-    public void addPropertyChangeListener(final String propertyName,
-        final PropertyChangeListener listener) {
+    public void addPropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
       this.m_propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
     }
 
@@ -299,8 +298,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
      * @see java.beans.PropertyChangeSupport#removePropertyChangeListener(java.lang.String,
      *      java.beans.PropertyChangeListener)
      */
-    public void removePropertyChangeListener(final String property,
-        final PropertyChangeListener listener) {
+    public void removePropertyChangeListener(final String property, final PropertyChangeListener listener) {
       this.m_propertyChangeSupport.removePropertyChangeListener(property, listener);
     }
 
@@ -331,8 +329,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
     public void setTitleColor(final Color color) {
       Color old = this.m_titleColor;
       this.m_titleColor = color;
-      this.m_propertyChangeSupport.firePropertyChange(AxisTitle.PROPERTY_TITLECOLOR, old,
-          this.m_titleColor);
+      this.m_propertyChangeSupport.firePropertyChange(AxisTitle.PROPERTY_TITLECOLOR, old, this.m_titleColor);
     }
 
     /**
@@ -345,8 +342,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
     public void setTitleFont(final Font font) {
       Font old = this.m_titleFont;
       this.m_titleFont = font;
-      this.m_propertyChangeSupport.firePropertyChange(AxisTitle.PROPERTY_TITLEFONT, old,
-          this.m_titleFont);
+      this.m_propertyChangeSupport.firePropertyChange(AxisTitle.PROPERTY_TITLEFONT, old, this.m_titleFont);
     }
 
     /**
@@ -360,8 +356,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
     public final IAxisTitlePainter setTitlePainter(final IAxisTitlePainter titlePainter) {
       IAxisTitlePainter old = this.m_titlePainter;
       this.m_titlePainter = titlePainter;
-      this.m_propertyChangeSupport.firePropertyChange(AxisTitle.PROPERTY_TITLEPAINTER, old,
-          this.m_titlePainter);
+      this.m_propertyChangeSupport.firePropertyChange(AxisTitle.PROPERTY_TITLEPAINTER, old, this.m_titlePainter);
       return old;
     }
 
@@ -829,7 +824,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    * 
    * @param trace
    *          the trace to check for containment.
-   *          
+   * 
    * @return true if this axis is responsible for rendering the scale of the
    *         given trace (<code>{@link IAxis#addTrace(ITrace2D)}</code> was
    *         called on this instance with the given trace).
@@ -844,12 +839,13 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    * 
    * @param trace
    *          the trace to check for containment.
-   *          
+   * 
    * @return true if this axis is responsible for rendering the scale of the
    *         given trace (<code>{@link IAxis#addTrace(ITrace2D)}</code> was
    *         called on this instance with the given trace).
    */
   public boolean containsTrace(final ITrace2D trace);
+
   /**
    * Allows to perform expensive calculations for various values that are used
    * by many calls throughout a paint iterations.
@@ -1275,12 +1271,12 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    * 
    * @param mouseEvent
    *          a mouse event that has been fired on this component.
-   *          
+   * 
    * @return the translation of the mouse event coordinates of the given mouse
    *         event to the value within the chart for the dimension covered by
    *         this axis (x or y) or null if no calculations could be performed as
    *         the chart was not painted before.
-   *         
+   * 
    */
   public double translateMousePosition(final MouseEvent mouseEvent);
 
