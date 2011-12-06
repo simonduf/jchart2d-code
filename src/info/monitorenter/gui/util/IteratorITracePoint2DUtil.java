@@ -30,7 +30,6 @@ import info.monitorenter.gui.chart.ITrace2DDataAccumulating;
 import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.util.Iterator;
-import java.util.ListIterator;
 
 /**
  * Utility class helper, created for supporting data accumulation of
@@ -108,15 +107,14 @@ public class IteratorITracePoint2DUtil {
   }
 
   /**
-   * Scrolls the given iterator to the first point that is above the given
-   * x-coordinate and returns the point that was found before.
+   * Scrolls the given iterator to the first point that is in visible scaled x range [0.0 .. 1.0].
    * <p>
-   * Note: this only makes sense if the given iterator returns trace points in
-   * ascending order of x values!
+   * Note: this only makes sense if the given iterator returns trace points with 
+   * order of x values (ascending or descending!
    * <p>
    * Assumption: The points in the iterator already have been scaled to the
    * visible range (by Chart2D). So this works by using
-   * {@link ITracePoint2D#getScaledX()} and finding out if the value is >= 0.
+   * {@link ITracePoint2D#getScaledX()} and finding out if the value is within [0.0 .. 1.0].
    * <p>
    * Note: the state of the given iterator is changed. After this call you may
    * continue iterating. You most probably will first consume the position 0 of
@@ -140,9 +138,11 @@ public class IteratorITracePoint2DUtil {
     ITracePoint2D previous = null;
     ITracePoint2D current;
     int countSkip = 0;
+    double xScaled;
     while (traceIt.hasNext()) {
       current = traceIt.next();
-      if (current.getScaledX() < 0.0) {
+      xScaled = current.getScaledX();
+      if ((xScaled >= 0.0) && (xScaled <= 1.0)) {
         if (previous == null) {
           point = current;
         } else {
