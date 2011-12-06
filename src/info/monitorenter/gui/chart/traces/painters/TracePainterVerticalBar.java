@@ -79,8 +79,7 @@ public class TracePainterVerticalBar extends ATracePainter {
   @Override
   public void endPaintIteration(final Graphics g2d) {
     if (g2d != null) {
-      this.m_pointPainter.paintPoint(this.getPreviousX(), this.getPreviousY(), 0, 0, g2d, this
-          .getPreviousPoint());
+      this.m_pointPainter.paintPoint(this.getPreviousX(), this.getPreviousY(), 0, 0, g2d, this.getPreviousPoint());
     }
   }
 
@@ -136,8 +135,8 @@ public class TracePainterVerticalBar extends ATracePainter {
    *      info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final ITracePoint2D original) {
+  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX, final int nextY, final Graphics g,
+      final ITracePoint2D original) {
     super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
     this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
   }
