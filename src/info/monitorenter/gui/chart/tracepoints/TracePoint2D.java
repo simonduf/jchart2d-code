@@ -56,6 +56,7 @@ import java.util.Set;
  * 
  * @author Achim Westermann <a
  *         href='mailto:Achim.Westermann@gmx.de'>Achim.Westermann@gmx.de </a>
+ * 
  * @version $Revision: 1.34 $
  */
 public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
