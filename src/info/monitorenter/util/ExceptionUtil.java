@@ -22,6 +22,10 @@
  */
 package info.monitorenter.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.io.PrintStream;
 
 /**
@@ -41,6 +45,57 @@ public final class ExceptionUtil {
   private static ExceptionUtil instance = null;
 
   /**
+   * Returns an input stream that contains what will written in this Application to {@link System#err}.<p>
+   * 
+   * <b>Caution</b><br/>
+   * If you do not consume the bytes to read from the result you may block the whole application. Do only use this for debugging purposes or end to end test 
+   * code!<p>
+   * 
+   * @return an input stream that contains what will written in this Application to {@link System#err}.
+   * 
+   * @throws IOException if something goes wrong. 
+   */
+  public static InputStream captureSystemErrForDebuggingPurposesOnly() throws IOException{
+    PipedOutputStream pipeOut = new PipedOutputStream();
+    PipedInputStream pipeIn = new PipedInputStream(pipeOut);
+    PrintStream streamOut = new PrintStream(pipeOut);
+    System.setErr(streamOut);
+    return pipeIn;
+  }
+  
+  /**
+   * Returns an input stream that contains what will written in this Application to {@link System#out}.<p>
+   * 
+   * <b>Caution</b><br/>
+   * If you do not consume the bytes to read from the result you may block the whole application. Do only use this for debugging purposes or end to end test 
+   * code!<p>
+   * 
+   * @return an input stream that contains what will written in this Application to {@link System#out}.
+   * 
+   * @throws IOException if something goes wrong. 
+   */
+  public static InputStream captureSystemOutForDebuggingPurposesOnly() throws IOException{
+    PipedOutputStream pipeOut = new PipedOutputStream();
+    PipedInputStream pipeIn = new PipedInputStream(pipeOut);
+    PrintStream streamOut = new PrintStream(pipeOut);
+    System.setOut(streamOut);
+    return pipeIn;
+  }
+  
+  /**
+   * Prints out the current Thread stack to the given stream.<p>
+   * 
+   *   @see Thread#getStackTrace()
+   *   
+   * @param outprint the stream to print to (e.g. <code>{@link System#err}</code>).
+   */
+  public static void dumpThreadStack(PrintStream outprint) {
+    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+    String stackTraceString = StringUtil.arrayToString(stackTrace,"\n");
+    outprint.println(stackTraceString);
+  }
+  
+  /**
    * Returns the singleton instance of this class.
    * <p>
    * 
@@ -57,17 +112,5 @@ public final class ExceptionUtil {
     }
     return ExceptionUtil.instance;
   }
-  
-  /**
-   * Prints out the current Thread stack to the given stream.<p>
-   * 
-   *   @see Thread#getStackTrace()
-   *   
-   * @param outprint the stream to print to (e.g. <code>{@link System#err}</code>).
-   */
-  public static void dumpThreadStack(PrintStream outprint) {
-    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-    String stackTraceString = StringUtil.arrayToString(stackTrace,"\n");
-    outprint.println(stackTraceString);
-  }
+
 }
