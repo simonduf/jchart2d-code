@@ -128,12 +128,10 @@ public class Trace2DDebugger implements ITrace2D {
     final double x = p.getX();
     final double y = p.getY();
     if (!this.m_xRange.isContained(x)) {
-      throw new IllegalArgumentException(p.toString() + " is not within the valid x-range "
-          + this.m_xRange.toString());
+      throw new IllegalArgumentException(p.toString() + " is not within the valid x-range " + this.m_xRange.toString());
     }
     if (!this.m_yRange.isContained(y)) {
-      throw new IllegalArgumentException(p.toString() + " is not within the valid x-range "
-          + this.m_xRange.toString());
+      throw new IllegalArgumentException(p.toString() + " is not within the valid x-range " + this.m_xRange.toString());
     }
     return this.m_delegate.addPoint(p);
   }
@@ -145,8 +143,7 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see ITrace2D#addPropertyChangeListener(String, PropertyChangeListener)
    */
-  public void addPropertyChangeListener(final String propertyName,
-      final PropertyChangeListener listener) {
+  public void addPropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
     this.m_delegate.addPropertyChangeListener(propertyName, listener);
   }
 
@@ -383,14 +380,13 @@ public class Trace2DDebugger implements ITrace2D {
   public Iterator<ITracePoint2D> iterator() {
     return this.m_delegate.iterator();
   }
-  
+
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#descendingIterator()
    */
   public Iterator<ITracePoint2D> descendingIterator() {
     return this.m_delegate.descendingIterator();
   }
-
 
   /**
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
@@ -449,8 +445,7 @@ public class Trace2DDebugger implements ITrace2D {
    * @see info.monitorenter.gui.chart.ITrace2D#removePropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
-  public void removePropertyChangeListener(final String property,
-      final PropertyChangeListener listener) {
+  public void removePropertyChangeListener(final String property, final PropertyChangeListener listener) {
     this.m_delegate.removePropertyChangeListener(property, listener);
   }
 
