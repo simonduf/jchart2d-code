@@ -31,7 +31,6 @@ import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.ITracePointProvider;
 import info.monitorenter.gui.chart.traces.painters.TracePainterPolyline;
-import info.monitorenter.util.Range;
 import info.monitorenter.util.SerializationUtility;
 import info.monitorenter.util.StringUtil;
 import info.monitorenter.util.math.MathUtil;
