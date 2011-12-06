@@ -507,11 +507,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   public static final boolean DEBUG_SCALING = false;
 
   /**
-   * A package wide switch for debugging problems with data accumulation. Set to false the
-   * compiler will remove the debugging statements.
+   * A package wide switch for debugging problems with data accumulation. Set to
+   * false the compiler will remove the debugging statements.
    */
   public static final boolean DEBUG_DATA_ACCUMULATION = true;
-  
+
   /**
    * A package wide switch for debugging problems with highlighting. Set to
    * false the compiler will remove the debugging statements.
@@ -2478,8 +2478,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    */
   private boolean hasChartIntersection(ITracePoint2D oldpoint, ITracePoint2D newpoint) {
     boolean result = true;
-    result = !(((oldpoint.getScaledX() >= 1.0) && (newpoint.getScaledX() >= 1.0))
-        || ((oldpoint.getScaledX() <= 0.0) && (newpoint.getScaledX() <= 0.0))
+    result = !(((oldpoint.getScaledX() >= 1.0) && (newpoint.getScaledX() >= 1.0)) || ((oldpoint.getScaledX() <= 0.0) && (newpoint.getScaledX() <= 0.0))
         || ((oldpoint.getScaledY() >= 1.0) && (newpoint.getScaledY() >= 1.0)) || ((oldpoint.getScaledY() <= 0.0) && (newpoint.getScaledY() <= 0.0)));
     return result;
   }
@@ -2833,8 +2832,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       if (trace.isVisible()) {
         synchronized (trace) {
           if (Chart2D.DEBUG_THREADING) {
-            System.out.println("Chart2D.paintComponent(" + Thread.currentThread().getName() + "), 2 locks (lock on trace "
-                + trace.getName() + ")");
+            System.out.println("Chart2D.paintComponent(" + Thread.currentThread().getName() + "), 2 locks (lock on trace " + trace.getName() + ")");
           }
           boolean hasErrorBars = trace.getHasErrorBars();
           if (g2d != null) {
@@ -2859,7 +2857,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
           }
           if (trace instanceof ITrace2DDataAccumulating) {
             /*
-             * Use data accumulation. 
+             * Use data accumulation.
              * 
              * 1. Use amount of pixels as the amount of points to be obtained.
              */
@@ -2873,7 +2871,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
           }
           boolean newpointVisible = false;
           boolean oldpointVisible = false;
-        
+
           int countPoints = 0;
           while (pointIt.hasNext()) {
             oldpoint = newpoint;
@@ -2882,7 +2880,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
             newpoint = pointIt.next();
             newpointVisible = this.isVisible(newpoint);
             oldpointVisible = this.isVisible(oldpoint);
-            countPoints ++;
+            countPoints++;
             /*
              * Special case: if we have NaN just don't interpolate anything or
              * paint but just continue (and give a signal to trace painters to
@@ -2966,7 +2964,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
               this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, false, trace, g, newpoint, hasErrorBars);
             }
           }
-          if(DEBUG_DATA_ACCUMULATION) {
+          if (DEBUG_DATA_ACCUMULATION) {
             System.out.println("Rendered " + countPoints + " points of a trace with " + trace.getSize() + " points.");
           }
           itTracePainters = trace.getTracePainters().iterator();
@@ -3068,8 +3066,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    *          intended for information only, should nor be needed to paint the
    *          point neither be changed in any way!
    */
-  private void paintErrorBars(final ITrace2D trace, final int oldtmpx, final int oldtmpy, final int tmpx, final int tmpy,
-      final Graphics g2d, final boolean discontinue, final ITracePoint2D original) {
+  private void paintErrorBars(final ITrace2D trace, final int oldtmpx, final int oldtmpy, final int tmpx, final int tmpy, final Graphics g2d,
+      final boolean discontinue, final ITracePoint2D original) {
     IErrorBarPolicy< ? > errorBarPolicy;
     Iterator<IErrorBarPolicy< ? >> itTraceErrorBarPolicies = trace.getErrorBarPolicies().iterator();
     while (itTraceErrorBarPolicies.hasNext()) {
@@ -3121,8 +3119,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @param errorBarSupport
    *          optimization that allows to skip error bar code.
    */
-  private final void paintPoint(final int xPxOld, final int yPxOld, final int xPxNew, final int yPxNew, final boolean discontinue,
-      final ITrace2D trace, final Graphics g2d, final ITracePoint2D original, final boolean errorBarSupport) {
+  private final void paintPoint(final int xPxOld, final int yPxOld, final int xPxNew, final int yPxNew, final boolean discontinue, final ITrace2D trace,
+      final Graphics g2d, final ITracePoint2D original, final boolean errorBarSupport) {
     Iterator<ITracePainter< ? >> itTracePainters;
     ITracePainter< ? > tracePainter;
     itTracePainters = trace.getTracePainters().iterator();
@@ -3299,8 +3297,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       } else if (property.equals(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY_ACCUMULATION_FUNCTION_CHANGED)) {
         // repaint
       } else {
-        throw new IllegalStateException("Received a property change event \"" + property
-            + "\" the code is not expecting (programming error).");
+        throw new IllegalStateException("Received a property change event \"" + property + "\" the code is not expecting (programming error).");
       }
       this.setRequestedRepaint(true);
     }
@@ -4334,8 +4331,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     removedTrace.removePropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, this);
     if (removedTrace instanceof ITrace2DDataAccumulating) {
       removedTrace.removePropertyChangeListener(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY, this);
-      removedTrace
-          .removePropertyChangeListener(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY_ACCUMULATION_FUNCTION_CHANGED, this);
+      removedTrace.removePropertyChangeListener(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY_ACCUMULATION_FUNCTION_CHANGED, this);
     }
   }
 
