@@ -26,22 +26,19 @@ import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * A basic <code>{@link info.monitorenter.gui.chart.ITrace2D}</code>
  * implementation that stores the internal
- * <code>{@link info.monitorenter.gui.chart.TracePoint2D}</code> instances in
- * a <code>{@link java.util.List}</code>.
+ * <code>{@link info.monitorenter.gui.chart.ITracePoint2D}</code> instances in a
+ * <code>{@link java.util.List}</code>.
  * <p>
  * This class has the following behavior: <br>
  * <ul>
- * <li>All tracepoints that are added are stored unchanged in a LinkedList.
- * </li>
+ * <li>All tracepoints that are added are stored unchanged in a LinkedList.</li>
  * <li>All traceoints that are added are added to the end.</li>
  * <li>If a tracepoint is inserted whose x - value already exists in the List,
- * it is ok - the old point may remain. (no bijective assigement of X and Y)
- * </li>
+ * it is ok - the old point may remain. (no bijective assigement of X and Y)</li>
  * </ul>
  * <p>
  * 
@@ -49,12 +46,11 @@ import java.util.List;
  * 
  * @version $Revision: 1.16 $
  */
-public class Trace2DSimple
-    extends ATrace2D implements ITrace2D {
+public class Trace2DSimple extends ATrace2D implements ITrace2D {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -132333501493433766L;
-  
+
   /** Internal List &lt;ITracePoint2D&gt;. */
   protected LinkedList<ITracePoint2D> m_points = new LinkedList<ITracePoint2D>();
 
@@ -113,8 +109,6 @@ public class Trace2DSimple
   public Iterator<ITracePoint2D> iterator() {
     return this.m_points.listIterator();
   }
-  
-  
 
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#descendingIterator()
