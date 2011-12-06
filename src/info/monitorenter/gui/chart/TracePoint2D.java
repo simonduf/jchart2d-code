@@ -16,9 +16,6 @@
 
 package info.monitorenter.gui.chart;
 
-import java.awt.geom.Point2D;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  * A specialized version of <code>java.awt.Point2D.Double </code> who carries two further values: <code> double scaledX</code> and
