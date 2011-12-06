@@ -285,7 +285,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
      * @return the distance.
      */
     public final double getDistance() {
-      return this.m_distance;
+      return this.m_distance; 
     }
 
     /**
