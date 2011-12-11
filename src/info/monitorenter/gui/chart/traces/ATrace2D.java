@@ -23,6 +23,7 @@
 package info.monitorenter.gui.chart.traces;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAccumulationStrategy;
 import info.monitorenter.gui.chart.IErrorBarPolicy;
 import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITrace2D;
@@ -30,6 +31,9 @@ import info.monitorenter.gui.chart.ITrace2DDataAccumulating;
 import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.ITracePointProvider;
+import info.monitorenter.gui.chart.traces.accumulationfunctions.AccumulationFunctionBypass;
+import info.monitorenter.gui.chart.traces.accumulationstrategies.AAccumulationStrategy;
+import info.monitorenter.gui.chart.traces.accumulationstrategies.AccumulationStrategyByPass;
 import info.monitorenter.gui.chart.traces.painters.TracePainterPolyline;
 import info.monitorenter.util.SerializationUtility;
 import info.monitorenter.util.StringUtil;
@@ -90,11 +94,11 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   /**
    * The accumulation strategy to be used.
    * <p>
-   * By default it is {@link AccumulationStrategy#ACCUMULATE_BYPASS}: No
+   * By default it is {@link AccumulationStrategyByPass}: No
    * accumulation takes place, no overhead is spent on this.
    * <p>
    */
-  private AccumulationStrategy m_accumulationStrategy;
+  private IAccumulationStrategy m_accumulationStrategy;
 
   /**
    * {@link javax.swing.event.ChangeListener} instances (mainly
@@ -222,7 +226,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
     this.m_tracePainters.add(new TracePainterPolyline());
     this.m_pointHighlighters = new LinkedHashSet<IPointPainter< ? >>();
     this.m_stroke = new BasicStroke(1f);
-    this.setAccumulationStrategy(AccumulationStrategy.ACCUMULATE_BYPASS);
+    this.setAccumulationStrategy(new AccumulationStrategyByPass(new AccumulationFunctionBypass()));
   }
 
   /**
@@ -693,7 +697,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * <p>
    * Additionally before this property change, property change events for bounds
    * are fired as described in method
-   * <code>{@link #firePointChanged(ITracePoint2D, int)}</code>.
+   * <code>{@link #firePointChanged(ITracePoint2D, int, double, double)}</code>.
    * <p>
    * 
    * @param added
@@ -866,7 +870,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * <p>
    * Additionally before this property change, property change events for bounds
    * are fired as described in method
-   * <code>{@link #firePointChanged(ITracePoint2D, int)}</code>.
+   * <code>{@link #firePointChanged(ITracePoint2D, int, double, double)}</code>.
    * <p>
    * 
    * @param removed
@@ -910,7 +914,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   /**
    * @see info.monitorenter.gui.chart.ITrace2DDataAccumulating#getAccumulationStrategy()
    */
-  public AccumulationStrategy getAccumulationStrategy() {
+  public IAccumulationStrategy getAccumulationStrategy() {
     return this.m_accumulationStrategy;
   }
 
@@ -1424,7 +1428,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
        * details but trust complex objects to inform them about any change.
        */
       this.firePropertyChange(ITrace2D.PROPERTY_ERRORBARPOLICY_CONFIGURATION, null, evt.getSource());
-    } else if (AccumulationStrategy.PROPERTY_ACCUMULATION_FUNCTION.equals(propertyName)) {
+    } else if (AAccumulationStrategy.PROPERTY_ACCUMULATION_FUNCTION.equals(propertyName)) {
       /*
        * Notify listeners of this class about an underlying change. Idiom: Chain
        * of responsibility: Listeners should not listen on all underlying
@@ -1561,7 +1565,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    *          the <code>TracePoint2D</code> to remove.
    * @return true if the removal succeeded, false else: this could be that the
    *         given point was not contained.
-   * @see #firePointChanged(ITracePoint2D, int)
+   *         
+   * @see #firePointChanged(ITracePoint2D, int, double, double)
    */
   public boolean removePoint(final ITracePoint2D point) {
     this.ensureInitialized();
@@ -1695,18 +1700,18 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2DDataAccumulating#setAccumulationStrategy(info.monitorenter.gui.chart.ITrace2DDataAccumulating.AccumulationStrategy)
+   * @see info.monitorenter.gui.chart.ITrace2DDataAccumulating#setAccumulationStrategy(IAccumulationStrategy)
    */
-  public AccumulationStrategy setAccumulationStrategy(AccumulationStrategy accumulationStrategy) {
-    AccumulationStrategy oldValue = this.m_accumulationStrategy;
+  public IAccumulationStrategy setAccumulationStrategy(IAccumulationStrategy accumulationStrategy) {
+    IAccumulationStrategy oldValue = this.m_accumulationStrategy;
     this.m_accumulationStrategy = accumulationStrategy;
     /*
      * Unlisten to the old one, listen to the new one.
      */
     if (oldValue != null) {
-      oldValue.removePropertyChangeListener(AccumulationStrategy.PROPERTY_ACCUMULATION_FUNCTION, this);
+      oldValue.removePropertyChangeListener(AAccumulationStrategy.PROPERTY_ACCUMULATION_FUNCTION, this);
     }
-    this.m_accumulationStrategy.addPropertyChangeListener(AccumulationStrategy.PROPERTY_ACCUMULATION_FUNCTION, this);
+    this.m_accumulationStrategy.addPropertyChangeListener(AAccumulationStrategy.PROPERTY_ACCUMULATION_FUNCTION, this);
     this.firePropertyChange(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY, oldValue, accumulationStrategy);
     return oldValue;
   }

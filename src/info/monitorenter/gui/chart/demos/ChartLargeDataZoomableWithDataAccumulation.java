@@ -25,10 +25,12 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2DDataAccumulating;
-import info.monitorenter.gui.chart.ITrace2DDataAccumulating.AccumulationStrategy;
 import info.monitorenter.gui.chart.ZoomableChart;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
+import info.monitorenter.gui.chart.traces.accumulationfunctions.AccumulationFunctionArithmeticMeanXY;
+import info.monitorenter.gui.chart.traces.accumulationstrategies.AAccumulationStrategy;
+import info.monitorenter.gui.chart.traces.accumulationstrategies.AccumulationStrategyAmountOfPointsAscendingXValues;
 import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.Color;
@@ -60,7 +62,7 @@ public final class ChartLargeDataZoomableWithDataAccumulation {
     ZoomableChart chart = new ZoomableChart();
     // Create an ITrace:
     ITrace2DDataAccumulating trace = new Trace2DSimple();
-    trace.setAccumulationStrategy(AccumulationStrategy.ACCUMULATE_AMOUNT_OF_POINTS_ASCENDING_X_VALUES);
+    trace.setAccumulationStrategy(new AccumulationStrategyAmountOfPointsAscendingXValues(new AccumulationFunctionArithmeticMeanXY()));
     trace.setColor(Color.BLUE);
     // Add the trace to the chart:
     chart.addTrace(trace);

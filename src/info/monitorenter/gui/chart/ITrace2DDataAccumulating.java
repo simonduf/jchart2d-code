@@ -21,18 +21,14 @@
  */
 package info.monitorenter.gui.chart;
 
-import info.monitorenter.gui.chart.traces.accumulationfunctions.AccumulationFunctionArithmeticMeanXY;
-import info.monitorenter.gui.chart.traces.accumulationfunctions.AccumulationFunctionBypass;
-import info.monitorenter.gui.chart.traces.iterators.AccumulatingIteratorConseCutivePointsOrderedXValues;
-import info.monitorenter.gui.chart.traces.iterators.AccumulatingIteratorConsecutivePoints;
+
+import info.monitorenter.gui.chart.traces.accumulationstrategies.AAccumulationStrategy;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.util.Iterator;
 
-import javax.swing.event.SwingPropertyChangeSupport;
 
 /**
  * An <code>{@link IAxis}</code> sub interface intended for implementations that
@@ -76,10 +72,10 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * <code>{@link info.monitorenter.gui.chart.ITrace2DDataAccumulating#PROPERTY_ACCUMULATION_STRATEGY}</code>
  * </td>
  * <td><code>{@link ITrace2DDataAccumulating}</code> that changed</td>
- * <td><code>{@link AccumulationStrategy}</code>, the old value</td>
- * <td><code>{@link AccumulationStrategy}</code>, the new value</td>
+ * <td><code>{@link AAccumulationStrategy}</code>, the old value</td>
+ * <td><code>{@link AAccumulationStrategy}</code>, the new value</td>
  * <td>
- * <code>{@link ITrace2DDataAccumulating#setAccumulationStrategy(AccumulationStrategy)}</code>
+ * <code>{@link ITrace2DDataAccumulating#setAccumulationStrategy(AAccumulationStrategy)}</code>
  * was called.</td>
  * </tr>
  * <tr>
@@ -90,7 +86,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * <td><code>{@link IAccumulationFunction}</code>, the old value</td>
  * <td><code>{@link IAccumulationFunction}</code>, the new value</td>
  * <td>
- * <code>{@link AccumulationStrategy#setAccumulationFunction(IAccumulationFunction)}</code>
+ * <code>{@link AAccumulationStrategy#setAccumulationFunction(IAccumulationFunction)}</code>
  * was called on the current accumulation strategy.</td>
  * </tr>
  * </table>
@@ -102,274 +98,8 @@ import javax.swing.event.SwingPropertyChangeSupport;
 public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListener, Serializable {
 
   /**
-   * Design helper to deal with the following: If a trace is unsorted then you
-   * have to accumulated all n consecutive points into one regardless whether
-   * they jump large distances in the value domain. The output might look like
-   * something that has nothing in common with the original trace without
-   * accumulations. Accumulation then is done just by deflating n consecutive
-   * points (see {@link AccumulationStrategy#ACCUMULATE_AMOUNT_OF_POINTS}).
-   * <p>
-   * If a trace is sorted then accumulation may be done based on value regions.
-   * Consider you have sorted ascending x values that have a high density of
-   * tracepoints in certain regions but a very low density in other regions. If
-   * you would accumulated just n consecutive points you would thin out the
-   * regions with very little data points (low density) to become even less
-   * precision in those large regions while the regions with high density only
-   * loose little information. If you decide to split up the visible range in to
-   * parts with same value-span then you can just accumulate depending on the
-   * density of x values. You will not loose data in value-ranges with low
-   * density but are able to drop lots of unnecessary values in high-density
-   * areas (see
-   * {@link AccumulationStrategy#ACCUMULATE_X_RANGE_WITH_RESPECT_TO_DENSITY}).
-   * <p>
-   * 
-   * <h3>Property Change events</h3>
-   * The following <code>{@link java.beans.PropertyChangeEvent}</code> may be
-   * fired to <code>{@link PropertyChangeListener}</code> instances that
-   * register themselves with
-   * <code>{@link #addPropertyChangeListener(String, PropertyChangeListener)}</code>.
-   * <table border="0">
-   * <tr>
-   * <th><code>{@link PropertyChangeEvent#getPropertyName()}</code></th>
-   * <th><code>{@link PropertyChangeEvent#getSource()}</code></th>
-   * <th><code>{@link PropertyChangeEvent#getOldValue()}</code></th>
-   * <th><code>{@link PropertyChangeEvent#getNewValue()}</code></th>
-   * <th><code>When fired</code></th>
-   * </tr>
-   * <tr>
-   * <td>
-   * <code>{@link info.monitorenter.gui.chart.ITrace2DDataAccumulating.AccumulationStrategy#PROPERTY_ACCUMULATION_FUNCTION}</code>
-   * </td>
-   * <td><code>{@link AccumulationStrategy}</code> that changed</td>
-   * <td><code>{@link IAccumulationFunction}</code>, the old value</td>
-   * <td><code>{@link IAccumulationFunction}</code>, the new value</td>
-   * <td>
-   * <code>{@link ITrace2DDataAccumulating.AccumulationStrategy#setAccumulationFunction(IAccumulationFunction)}</code>
-   * was called.</td>
-   * </tr>
-   * <tr>
-   * <td>
-   * <code>{@link info.monitorenter.gui.chart.ITrace2DDataAccumulating#PROPERTY_ACCUMULATION_STRATEGY_ACCUMULATION_FUNCTION_CHANGED}</code>
-   * </td>
-   * <td><code>{@link ITrace2DDataAccumulating}</code> that changed</td>
-   * <td><code>{@link IAccumulationFunction}</code>, the old value</td>
-   * <td><code>{@link IAccumulationFunction}</code>, the new value</td>
-   * <td>
-   * <code>{@link AccumulationStrategy#setAccumulationFunction(IAccumulationFunction)}</code>
-   * was called on the current accumulation strategy.</td>
-   * </tr>
-   * </table>
-   * <p>
-   * 
-   * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
-   * 
-   */
-  public static enum AccumulationStrategy {
-    /**
-     * This strategy will just accumulate <code>amountOfPoints</code>
-     * consecutive points without caring for data density. Best use this
-     * whenever you have unordered (by x value) traces.
-     * <p>
-     */
-    ACCUMULATE_AMOUNT_OF_POINTS(new AccumulationFunctionArithmeticMeanXY()) {
-      public Iterator<ITracePoint2D> iterator(final ITrace2D source, final int amountOfPoints) {
-        return new AccumulatingIteratorConsecutivePoints(source, this.getAccumulationFunction(), amountOfPoints);
-      }
-    },
-    /**
-     * This strategy will just accumulate <code>amountOfPoints</code>
-     * consecutive points without caring for data density. Best use this
-     * whenever you have ordered (by x value) traces and want to cut off
-     * invisible points at the beginning (zoom mode).
-     */
-    ACCUMULATE_AMOUNT_OF_POINTS_ASCENDING_X_VALUES(new AccumulationFunctionArithmeticMeanXY()) {
-      public Iterator<ITracePoint2D> iterator(final ITrace2D source, final int amountOfPoints) {
-        return new AccumulatingIteratorConseCutivePointsOrderedXValues(source, this.getAccumulationFunction(), amountOfPoints);
-      }
-    },
-
-    /**
-     * Bypass for accumulation: Just the given original <code>source</code>
-     * argument is returned from it's method
-     * <code>{@link #iterator(ITrace2D, int)}</code>.
-     */
-    ACCUMULATE_BYPASS(new AccumulationFunctionBypass()) {
-      public Iterator<ITracePoint2D> iterator(final ITrace2D source, final int amountOfPoints) {
-        return source.iterator();
-      }
-    },
-    /**
-     * This strategy will use the x-range and take all following points out of
-     * the <code>source</code> (under the assumption trace is sorted by
-     * x-values) that are within the range and then accumulate them to a single
-     * trace point. Best use this whenever you have a trace with ordered x
-     * values to get accumulation based on density of x-values and thereby avoid
-     * loss of important points in areas with low x-value densities.
-     * <p>
-     */
-    ACCUMULATE_X_RANGE_WITH_RESPECT_TO_DENSITY(new AccumulationFunctionArithmeticMeanXY()) {
-      /**
-       * Accumulates all points that come from <code>source</code> and are in
-       * the given <code>xRange</code>. Once a point comes from
-       * <code>source</code> outside the given <code>xRange</code> accumulation
-       * is done and result is returned.
-       * <p>
-       * In this case <code>xRange</code> is not the total visible range given
-       * to {@link ITrace2DDataAccumulating#iterator(int)} but a segment within
-       * that range.
-       * <p>
-       * 
-       * Note that this only makes sense for traces with points ordered
-       * ascending by x-value.
-       * <p>
-       * 
-       */
-      public Iterator<ITracePoint2D> iterator(final ITrace2D source, final int amountOfPoints) {
-        return null;
-      }
-    };
-
-    /**
-     * The property key defining the
-     * <code>{@link #getAccumulationFunction()}</code> property. Use in
-     * combination with
-     * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
-     */
-    public static String PROPERTY_ACCUMULATION_FUNCTION = "AccumulationStrategy.PROPERTY_ACCUMULATION_FUNCTION";
-
-    /**
-     * The accumulation function used.
-     */
-    private IAccumulationFunction m_accumulationFunction;
-
-    /**
-     * The instance that add support for firing
-     * <code>PropertyChangeEvents</code> and maintaining
-     * <code>PropertyChangeListeners</code>.
-     * <p>
-     */
-    protected PropertyChangeSupport m_propertyChangeSupport = new SwingPropertyChangeSupport(this);
-
-    /**
-     * Constructor taking the accumulation function to use.
-     * <p>
-     * Point != null)
-     * 
-     * @param accumulationFunction
-     *          the accumulation function to use.
-     *          <p>
-     */
-    private AccumulationStrategy(IAccumulationFunction accumulationFunction) {
-      this.setAccumulationFunction(accumulationFunction);
-    }
-
-    /**
-     * Registers a property change listener that will be informed about changes
-     * of the property identified by the given <code>propertyName</code>.
-     * <p>
-     * 
-     * @param propertyName
-     *          the name of the property the listener is interested in
-     * @param listener
-     *          a listener that will only be informed if the property identified
-     *          by the argument <code>propertyName</code> changes
-     */
-    public void addPropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
-      this.m_propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
-    }
-
-    /**
-     * Fires a property change event to the registered listeners.
-     * <p>
-     * 
-     * @param property
-     *          one of the <code>PROPERTY_XXX</code> constants defined in <code>
-     *          {@link AccumulationStrategy}</code>.
-     * 
-     * @param oldvalue
-     *          the old value of the property.
-     * 
-     * @param newvalue
-     *          the new value of the property.
-     */
-    protected final void firePropertyChange(final String property, final Object oldvalue, final Object newvalue) {
-      this.m_propertyChangeSupport.firePropertyChange(property, oldvalue, newvalue);
-    }
-
-    /**
-     * Returns the accumulationFunction.
-     * <p>
-     * 
-     * @return the accumulationFunction
-     */
-    public IAccumulationFunction getAccumulationFunction() {
-      return this.m_accumulationFunction;
-    }
-
-    /**
-     * Template method to return an iterator over accumulated points.
-     * <p>
-     * 
-     * @param source
-     *          the real points of this trace.
-     * 
-     * @param amountOfPoints
-     *          would allow to filter out points to accumulate by just taking n
-     *          consecutive trace points.
-     * 
-     * 
-     * @return an iterator over the accumulated points from the given iterator.
-     */
-    public abstract Iterator<ITracePoint2D> iterator(final ITrace2D source, final int amountOfPoints);
-
-    /**
-     * Unregisters a property change listener that has been registered for
-     * listening on all properties.
-     * <p>
-     * 
-     * @param listener
-     *          a listener that will only be informed if the property identified
-     *          by the argument <code>propertyName</code> changes
-     */
-    public void removePropertyChangeListener(final PropertyChangeListener listener) {
-      this.m_propertyChangeSupport.removePropertyChangeListener(listener);
-    }
-
-    /**
-     * Removes a property change listener for listening on the given property.
-     * <p>
-     * 
-     * @param property
-     *          one of the constants with the <code>PROPERTY_</code> prefix
-     *          defined in this class or subclasses.
-     * 
-     * @param listener
-     *          the listener for this property change.
-     */
-    public void removePropertyChangeListener(final String property, final PropertyChangeListener listener) {
-      this.m_propertyChangeSupport.removePropertyChangeListener(property, listener);
-    }
-
-    /**
-     * Sets the accumulationFunction to use for this strategy.
-     * <p>
-     * 
-     * @param accumulationFunction
-     *          the accumulationFunction to set.
-     * 
-     * @return the previous accumulation function used.
-     */
-    public IAccumulationFunction setAccumulationFunction(IAccumulationFunction accumulationFunction) {
-      IAccumulationFunction result = this.m_accumulationFunction;
-      this.m_accumulationFunction = accumulationFunction;
-      this.firePropertyChange(PROPERTY_ACCUMULATION_FUNCTION, result, accumulationFunction);
-      return result;
-    }
-  }
-
-  /**
    * The property key defining the
-   * <code>{@link #setAccumulationStrategy(AccumulationStrategy)}</code>
+   * <code>{@link #setAccumulationStrategy(AAccumulationStrategy)}</code>
    * property. Use in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
@@ -377,9 +107,9 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
 
   /**
    * The property key defining a change of the
-   * <code>{@link #setAccumulationStrategy(AccumulationStrategy)}</code>
+   * <code>{@link #setAccumulationStrategy(AAccumulationStrategy)}</code>
    * property: Namely
-   * {@link AccumulationStrategy#setAccumulationFunction(IAccumulationFunction)}
+   * {@link AAccumulationStrategy#setAccumulationFunction(IAccumulationFunction)}
    * was called.
    * <p>
    * 
@@ -395,7 +125,7 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
    * 
    * @return the current accumulation strategy.
    */
-  public AccumulationStrategy getAccumulationStrategy();
+  public IAccumulationStrategy getAccumulationStrategy();
 
   /**
    * Returns an <code>Iterator</code> over the internal <code>
@@ -443,5 +173,5 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
    * 
    * @return the accumulation strategy used previously.
    */
-  public AccumulationStrategy setAccumulationStrategy(final AccumulationStrategy accumulationStrategy);
+  public IAccumulationStrategy setAccumulationStrategy(final IAccumulationStrategy accumulationStrategy);
 }
