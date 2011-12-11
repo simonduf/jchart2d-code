@@ -27,8 +27,15 @@
 package info.monitorenter.gui.chart.traces.accumulationfunctions;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.ITracePointProvider;
+
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import com.sun.org.apache.bcel.internal.generic.NEW;
 
 /**
  * Returns the arithmetic mean (x and y) of all points being accumulated by the
@@ -53,6 +60,12 @@ public class AccumulationFunctionArithmeticMeanXY extends AAccumulationFunction 
 
   /** To intermediately sum up all accumulations of Y values. */
   private double m_accumulatedSumY = 0;
+  
+  /** 
+   * During accumulation of a single output point all additional point painters 
+   * ({@link ITracePoint2D#getAdditionalPointPainters()}) are collected here to finally be added to the outgoing point.
+   */
+  private Set<IPointPainter<?>> m_collectedPointPainters = new TreeSet<IPointPainter<?>>();
 
   /**
    * @see info.monitorenter.gui.chart.IAccumulationFunction#addPointToAccumulate(info.monitorenter.gui.chart.ITracePoint2D)
@@ -63,6 +76,7 @@ public class AccumulationFunctionArithmeticMeanXY extends AAccumulationFunction 
       throw new IllegalArgumentException("Do not attemp to consume a discontinuation by accumulation - preserve them for the chart!");
     }
     ITracePoint2D accumulatedPointCurrent = this.getAccumulatedPointCurrent();
+    this.m_collectedPointPainters.addAll(point.getAdditionalPointPainters());
     if (accumulatedPointCurrent == null) {
       ITracePointProvider tracePointProvider = this.acquireTracePointProvider(point);
 
@@ -90,13 +104,22 @@ public class AccumulationFunctionArithmeticMeanXY extends AAccumulationFunction 
 
     ITracePoint2D accumulatedPointCurrent = this.getAccumulatedPointCurrent();
     if (accumulatedPointCurrent != null) {
+      // transfer state: 
+      // 1. location:
       accumulatedPointCurrent.setLocation(this.m_accumulatedSumX / this.m_accumulatedPointsCount, this.m_accumulatedSumY / this.m_accumulatedPointsCount);
+      // 2. additional point painters:
+      accumulatedPointCurrent.removeAllAdditionalPointPainters();
+      for(IPointPainter<?> pointPainter:this.m_collectedPointPainters) {
+        accumulatedPointCurrent.addAdditionalPointPainter(pointPainter);
+      }
       if (Chart2D.DEBUG_DATA_ACCUMULATION) {
         System.out.println(this.getClass().getName() + ": accumulated " + this.m_accumulatedPointsCount + " points into one: " + accumulatedPointCurrent);
       }
+      
       this.m_accumulatedPointsCount = 0;
       this.m_accumulatedSumX = 0;
       this.m_accumulatedSumY = 0;
+      this.m_collectedPointPainters.clear();
     }
     return super.getAccumulatedPoint();
   }
