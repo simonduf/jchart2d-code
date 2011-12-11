@@ -64,7 +64,7 @@ package info.monitorenter.gui.chart;
  * -value) and your counter is not full but your loop has no more points to
  * iterate return the last real point your own loop iterated. This is needed
  * because the contract of
- * {@link ITrace2DDataAccumulating#iterator(info.monitorenter.util.Range, info.monitorenter.util.Range, int)}
+ * {@link ITrace2DDataAccumulating#iterator(int)}
  * .</li>
  * <li>done!</li>
  * </ul>

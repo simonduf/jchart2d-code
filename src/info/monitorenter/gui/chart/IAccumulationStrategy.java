@@ -28,6 +28,8 @@ package info.monitorenter.gui.chart;
 
 
 import info.monitorenter.gui.chart.traces.accumulationstrategies.AAccumulationStrategy;
+import info.monitorenter.gui.chart.traces.accumulationstrategies.AccumulationStrategyAmountOfPoints;
+import info.monitorenter.gui.chart.traces.accumulationstrategies.AccumulationStrategyXRangeWithRespectToDensity;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -38,7 +40,7 @@ import java.util.Iterator;
  * they jump large distances in the value domain. The output might look like
  * something that has nothing in common with the original trace without
  * accumulations. Accumulation then is done just by deflating n consecutive
- * points (see {@link AAccumulationStrategy#ACCUMULATE_AMOUNT_OF_POINTS}).
+ * points (see {@link AccumulationStrategyAmountOfPoints}).
  * <p>
  * If a trace is sorted then accumulation may be done based on value regions.
  * Consider you have sorted ascending x values that have a high density of
@@ -51,7 +53,7 @@ import java.util.Iterator;
  * density of x values. You will not loose data in value-ranges with low
  * density but are able to drop lots of unnecessary values in high-density
  * areas (see
- * {@link AAccumulationStrategy#ACCUMULATE_X_RANGE_WITH_RESPECT_TO_DENSITY}).
+ * {@link AccumulationStrategyXRangeWithRespectToDensity}).
  * <p>
  * 
  * <h3>Property Change events</h3>

@@ -242,7 +242,7 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
   /**
    * Allows <code>ITrace2D</code> instances to register (or de-register)
    * themselves with this point to receive (or stop receiving) change
-   * information via {@link ITrace2D#firePointChanged(ITracePoint2D, int)}
+   * information via {@link ITrace2D#firePointChanged(ITracePoint2D, int, double, double)}
    * events.
    * <p>
    * 
@@ -257,7 +257,7 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
    * <code>java.awt.geom.Point2D.Double</code> to fire a property change event
    * to listeners of the corresponding <code>{@link ITrace2D}</code> instances
    * via their method
-   * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int)}</code> (with
+   * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int, double, double)}</code> (with
    * int argument set to <code>{@link #STATE_CHANGED}</code>).
    * <p>
    * 

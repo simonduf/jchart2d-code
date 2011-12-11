@@ -75,7 +75,7 @@ import java.util.Iterator;
  * <td><code>{@link AAccumulationStrategy}</code>, the old value</td>
  * <td><code>{@link AAccumulationStrategy}</code>, the new value</td>
  * <td>
- * <code>{@link ITrace2DDataAccumulating#setAccumulationStrategy(AAccumulationStrategy)}</code>
+ * <code>{@link ITrace2DDataAccumulating#setAccumulationStrategy(IAccumulationStrategy)}</code>
  * was called.</td>
  * </tr>
  * <tr>
@@ -99,7 +99,7 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
 
   /**
    * The property key defining the
-   * <code>{@link #setAccumulationStrategy(AAccumulationStrategy)}</code>
+   * <code>{@link #setAccumulationStrategy(IAccumulationStrategy)}</code>
    * property. Use in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
@@ -107,7 +107,7 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
 
   /**
    * The property key defining a change of the
-   * <code>{@link #setAccumulationStrategy(AAccumulationStrategy)}</code>
+   * <code>{@link #setAccumulationStrategy(IAccumulationStrategy)}</code>
    * property: Namely
    * {@link AAccumulationStrategy#setAccumulationFunction(IAccumulationFunction)}
    * was called.
@@ -162,7 +162,7 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
    *         internal {@link ITracePoint2D} instances into one by taking visible
    *         range and desired amount of points into account.
    */
-  public Iterator<ITracePoint2D> iterator(final int amountOfVisiblePoints);;
+  public Iterator<ITracePoint2D> iterator(final int amountOfVisiblePoints);
 
   /**
    * Installs the given accumulation strategy.
