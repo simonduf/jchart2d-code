@@ -152,7 +152,7 @@ public class TestMultithreading extends TestCase {
           System.out.println('[' + this.getName() + "] adding point... " + this.m_toAdd
               + " to go...");
         }
-        point = new TracePoint2D(this.m_toAdd, this.m_toAdd);
+        point = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(this.m_toAdd, this.m_toAdd);
         TestMultithreading.this.m_weakMap.put(point, point.toString());
         TestMultithreading.this.m_trace.addPoint(point);
         this.m_toAdd--;
@@ -188,21 +188,21 @@ public class TestMultithreading extends TestCase {
   protected List<Producer> m_producers;
 
   // test configuration
-  /** Amount of producers of <code>{@link TracePoint2D}</code>. */
+  /** Amount of producers of <code>{@link ITracePoint2D}</code>. */
   protected static final int PRODUCER_AMOUNT = 10;
 
   /**
    * Range of milliseconds to pick a random sleep time out between producing two
-   * <code>{@link TracePoint2D}</code> instances.
+   * <code>{@link ITracePoint2D}</code> instances.
    */
   protected static final int PRODUCER_SLEEPRANGE = 100;
 
-  /** Amount of <code>{@link TracePoint2D}</code> to create per producer. */
+  /** Amount of <code>{@link ITracePoint2D}</code> to create per producer. */
   protected static final int PRODUCER_ADD_POINT_AMOUNT = 500;
 
   /**
    * Range of milliseconds to pick a random sleep time out between consuming two
-   * <code>{@link TracePoint2D}</code>.
+   * <code>{@link ITracePoint2D}</code>.
    */
   protected static final int CONSUMER_SLEEPRANGE = 1000;
 
