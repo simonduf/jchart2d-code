@@ -28,7 +28,7 @@ import java.awt.Graphics;
 
 /**
  * Renders traces by painting a disc (hollow circle) with choosable diameter for
- * each {@link info.monitorenter.gui.chart.TracePoint2D} to show.
+ * each {@link ITracePoint2D} to show.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>

@@ -22,7 +22,6 @@
 package info.monitorenter.gui.chart.traces.painters;
 
 import info.monitorenter.gui.chart.ITracePoint2D;
-import info.monitorenter.gui.chart.TracePoint2D;
 
 import java.awt.Graphics;
 
@@ -54,7 +53,7 @@ public abstract class ATracePainter implements
    * to avoid duplicates.
    * <p>
    */
-  private ITracePoint2D m_previousPoint = new TracePoint2D(0, 0);
+  private ITracePoint2D m_previousPoint = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(0, 0);
 
   /**
    * The last x coordinate that was sent to
