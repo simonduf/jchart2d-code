@@ -265,12 +265,12 @@ public class AxisInverse<T extends IAxisScalePolicy> extends AAxis<T> {
      */
     return super.setAxisScalePolicy((T)new IAxisScalePolicy() {
 
-      public void initPaintIteration(IAxis axis) {
+      public void initPaintIteration(IAxis<?> axis) {
         axisScalePolicy.initPaintIteration(axis);
 
       }
 
-      public List<LabeledValue> getScaleValues(Graphics g2d, IAxis axis) {
+      public List<LabeledValue> getScaleValues(Graphics g2d, IAxis<?> axis) {
 
         List<LabeledValue> ret = axisScalePolicy.getScaleValues(g2d, axis);
         for (LabeledValue label : ret) {
