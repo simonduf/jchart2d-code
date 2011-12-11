@@ -50,7 +50,7 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
   /**
    * Runnable that will take a random break between 0 and
    * <code>sleepRange</code> milliseconds and then consume added <code>
-   * {@link TracePoint2D}</code> (by <code>{@link Producer}</code>) by invoking
+   * {@link ITracePoint2D}</code> (by <code>{@link Producer}</code>) by invoking
    * <code>{@link Chart2D#paint(java.awt.Graphics)}</code>.
    * <p>
    * 
@@ -101,7 +101,7 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
   /**
    * Producer implementation that sleeps a random range of milliseconds within
    * <code>{@link #PRODUCER_SLEEPRANGE}</code> and then adds a newly created
-   * <code>{@link TracePoint2D}</code> to a random picked <code>{@link ITrace2D}
+   * <code>{@link ITracePoint2D}</code> to a random picked <code>{@link ITrace2D}
    * </code> for <code>{@link #PRODUCER_ADD_POINT_AMOUNT}</code> times.
    * <p>
    */
@@ -150,7 +150,7 @@ public class TestMultiThreadingAndTracing extends TestMultithreading {
           System.out.println('[' + this.getName() + "] adding point to " + tmpTrace.getName()
               + "... " + this.m_toAdd + " to go...");
         }
-        point = new TracePoint2D(this.m_toAdd, this.m_toAdd);
+        point = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(this.m_toAdd, this.m_toAdd);
         TestMultiThreadingAndTracing.this.m_weakMap.put(point, point.toString());
         tmpTrace.addPoint(point);
         this.m_toAdd--;
