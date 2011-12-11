@@ -417,6 +417,11 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
   public static final String PROPERTY_VISIBLE = "IAxis.PROPERTY_VISIBLE";
 
   /**
+   * Constant for a <code>{@link java.beans.PropertyChangeEvent}</code> of the
+   * {@link #setAxisTitle(AxisTitle)}.
+   */
+  public static final String PROPERTY_AXIS_TITLE = "IAxis.PROPERTY_AXIS_TITLE";
+  /**
    * Add a listener for the given property.
    * <p>
    * The following {@link java.beans.PropertyChangeEvent} types should be fired
@@ -473,6 +478,12 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    * <td><code>{@link IAxis}</code> that changed</td>
    * <td><code>{@link IAxisScalePolicy}</code>, the old value.</td>
    * <td><code>{@link IAxisScalePolicy}</code>, the new value.</td>
+   * </tr>
+   * <tr>
+   * <td><code>{@link IAxis#PROPERTY_AXIS_TITLE}</code></td>
+   * <td><code>{@link IAxis}</code> that changed</td>
+   * <td><code>{@link AxisTitle}</code>, the old value.</td>
+   * <td><code>{@link AxisTitle}</code>, the new value.</td>
    * </tr>
    * </table>
    * <p>
@@ -602,7 +613,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
 
   /**
    * Returns the maximum value of all
-   * <code>{@link info.monitorenter.gui.chart.TracePoint2D}</code> instances in
+   * <code>{@link ITracePoint2D}</code> instances in
    * all <code>{@link ITrace2D}</code> instances in this axis regardless of the
    * configured <code>{@link IRangePolicy}</code> (see
    * <code>{@link IAxis#setRangePolicy(IRangePolicy)}</code>). The returned
@@ -611,7 +622,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    * <p>
    * 
    * @return the maximum value of all <code>
-   *         {@link info.monitorenter.gui.chart.TracePoint2D}</code> instances
+   *         {@link ITracePoint2D}</code> instances
    *         in all <code>{@link ITrace2D}</code> instances in this axis
    *         regardless of the configured <code>{@link IRangePolicy}</code> (see
    *         <code>{@link IAxis#setRangePolicy(IRangePolicy)}</code>).
@@ -639,7 +650,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
 
   /**
    * Returns the minimum value of all
-   * <code>{@link info.monitorenter.gui.chart.TracePoint2D}</code> instances in
+   * <code>{@link ITracePoint2D}</code> instances in
    * all <code>{@link ITrace2D}</code> instances in this axis regardless of the
    * configured <code>{@link IRangePolicy}</code> (see
    * <code>{@link IAxis#setRangePolicy(IRangePolicy)}</code>). The returned
@@ -648,7 +659,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    * <p>
    * 
    * @return the minimum value of all <code>
-   *         {@link info.monitorenter.gui.chart.TracePoint2D}</code> instances
+   *         {@link ITracePoint2D}</code> instances
    *         in all <code>{@link ITrace2D}</code> instances in this axis
    *         regardless of the configured <code>{@link IRangePolicy}</code> (see
    *         <code>{@link IAxis#setRangePolicy(IRangePolicy)}</code>).
@@ -863,14 +874,14 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
 
   /**
    * Returns true if the bounds in the given dimension of all
-   * {@link info.monitorenter.gui.chart.TracePoint2D} instances of all internal
+   * {@link ITracePoint2D} instances of all internal
    * {@link ITrace2D} instances have changed since all points have been
    * normalized to a value between 0 and 1 or true if this axis has different
    * range since the last call to <code>{@link IAxis#scale()}</code>.
    * <p>
    * 
    * @return true if the bounds in the given dimension of all
-   *         {@link info.monitorenter.gui.chart.TracePoint2D} instances of all
+   *         {@link ITracePoint2D} instances of all
    *         internal {@link ITrace2D} instances have changed since all points
    *         have been normalized to a value between 0 and 1 or true if this
    *         axis has different range since the last call to <code>

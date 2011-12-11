@@ -2507,10 +2507,12 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
    */
   public void setAxisTitle(final AxisTitle axisTitle) {
 
+    AxisTitle oldValue = this.m_axisTitle;
     this.unListenToAxisTitle(this.m_axisTitle);
+    
     this.m_axisTitle = axisTitle;
     this.listenToAxisTitle(this.m_axisTitle);
-
+    this.m_propertyChangeSupport.firePropertyChange(IAxis.PROPERTY_AXIS_TITLE, oldValue, axisTitle);
   }
 
   /**

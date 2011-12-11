@@ -44,6 +44,7 @@ jchart2d-3.3.0 - <month>, <day>, <year>
 * Fixed bug #3424004: Missing label of Y axis when showing more than 1 chart in one component. 
 * Fixed bug #3427569: Non painted X axis scale takes up unnecessary space.
 * Fixed bug #3432154: Remove dependency to JIDE-oss (debian upstream), http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=626243
+* Fixed untracked bug: Setting an axis title at runtime does not cause a repaint thus is not reflected until repaints occur. 
 ! Improved performance of ITracePoint.setLocation(double, double): This was O(n) where n was amount of points in a trace in any 
   case except boundary increase. Now it is only O(n) if an extremum was changed via that method.   
 ! Introduced data accumulation API. This allows you to have traces with 10^6 points painted with increased speed while zooming in 
