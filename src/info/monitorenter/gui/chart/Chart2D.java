@@ -2659,6 +2659,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     axis.addPropertyChangeListener(IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
     axis.addPropertyChangeListener(IAxis.PROPERTY_LABELFORMATTER, this);
     axis.addPropertyChangeListener(IAxis.PROPERTY_PAINTGRID, this);
+    axis.addPropertyChangeListener(IAxis.PROPERTY_PAINTSCALE, this);
     axis.addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, this);
     axis.addPropertyChangeListener(IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED, this);
     axis.addPropertyChangeListener(IAxis.PROPERTY_VISIBLE, this);
@@ -3294,6 +3295,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         }
         this.trackHighlightingEnablement(highlightersAddedOrRemoved);
       } else if (property.equals(IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED)) {
+        // repaint
+      }else if (property.equals(IAxis.PROPERTY_PAINTSCALE)) {
         // repaint
       } else if (property.equals(IAxis.PROPERTY_PAINTGRID)) {
         // repaint
@@ -4329,6 +4332,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     removedAxis.removePropertyChangeListener(IAxis.PROPERTY_ADD_REMOVE_TRACE, this);
     removedAxis.removePropertyChangeListener(IAxis.PROPERTY_LABELFORMATTER, this);
     removedAxis.removePropertyChangeListener(IAxis.PROPERTY_PAINTGRID, this);
+    removedAxis.removePropertyChangeListener(IAxis.PROPERTY_PAINTSCALE, this);
     removedAxis.removePropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, this);
     removedAxis.removePropertyChangeListener(IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED, this);
     removedAxis.removePropertyChangeListener(IAxis.PROPERTY_VISIBLE, this);

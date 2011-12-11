@@ -476,6 +476,28 @@ public class TestChartOperationsVisual extends ATestChartOperations {
     this.setTestOperation(operation);
   }
 
+  
+  /**
+   * Turns off scale painting for axes prompts for visual judgement.
+   * <p>
+   */
+  @org.junit.Test
+  public void testAxisSetPaintScale() {
+    ATestChartOperations.AChartOperation operation = new AChartOperation("IAxis.setPaintScale(false)") {
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
+      public Object action(final Chart2D chart) {
+
+        for (IAxis< ? > axis : chart.getAxes()) {
+          axis.setPaintScale(false);
+        }
+        return null;
+      }
+    };
+    this.setTestOperation(operation);
+  }
+
   /**
    * Sets a new name to the trace and prompts for visual judgment.
    * <p>
