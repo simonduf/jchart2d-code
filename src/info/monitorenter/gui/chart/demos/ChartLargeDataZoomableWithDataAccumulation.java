@@ -77,7 +77,7 @@ public final class ChartLargeDataZoomableWithDataAccumulation {
     }
     // Make it visible:
     // Create a frame.
-    JFrame frame = new JFrame("MinimalStaticChartLargeData");
+    JFrame frame = new JFrame(ChartLargeDataZoomableWithDataAccumulation.class.getName());
     // add the chart to the frame:
     frame.getContentPane().add(new ChartPanel(chart));
     frame.setSize(800, 600);
