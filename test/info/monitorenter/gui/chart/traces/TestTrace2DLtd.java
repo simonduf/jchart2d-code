@@ -25,7 +25,6 @@ package info.monitorenter.gui.chart.traces;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
-import info.monitorenter.gui.chart.TracePoint2D;
 
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -71,7 +70,7 @@ public class TestTrace2DLtd extends TestCase {
 	}
 
 	/**
-	 * Adds 1000000 <code>{@link TracePoint2D}</code> instances to a
+	 * Adds 1000000 <code>{@link ITracePoint2D}</code> instances to a
 	 * <code>{@link Trace2DLtd}</code> and asserts that not more points than
 	 * <code>{@link Trace2DLtd#getMaxSize()} </code> are remaining in memory.
 	 * <p>
@@ -89,7 +88,7 @@ public class TestTrace2DLtd extends TestCase {
 		ITracePoint2D point;
 		Map<ITracePoint2D, String> weakMap = new WeakHashMap<ITracePoint2D, String>();
 		for (long i = 0; i < max; i++) {
-			point = new TracePoint2D(i, i);
+			point = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(i, i);
 			trace.addPoint(point);
 			weakMap.put(point, point.toString());
 			if (i % percentModulo == 0) {
