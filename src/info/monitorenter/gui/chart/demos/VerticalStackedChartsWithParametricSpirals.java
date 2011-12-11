@@ -2,9 +2,7 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.ZoomableChart;
-import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.traces.painters.TracePainterDisc;
 import info.monitorenter.gui.chart.views.ChartPanel;
