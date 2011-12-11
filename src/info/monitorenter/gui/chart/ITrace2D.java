@@ -99,21 +99,20 @@ import java.util.Set;
  * </tr>
  * <tr>
  * <td>
- * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_TRACEPOINT}</code>
+ * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_TRACEPOINTS}</code>
  * </td>
  * <td><code>{@link ITrace2D}</code> that changed</td>
- * <td><code>{@link ITracePoint2D}</code>, the
- * instance that was removed</td>
+ * <td><code>{@link ITracePoint2D}</code>, the instance that was removed</td>
  * <td><code>null</code>, indication that an instance was removed</td>
  * </tr>
  * <tr>
  * <td>
- * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_TRACEPOINT}</code>
+ * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_TRACEPOINTS}</code>
  * </td>
  * <td><code>{@link ITrace2D}</code> that changed</td>
  * <td><code>null</code>, indication that a value was added</td>
- * <td><code>{@link ITracePoint2D}</code>, the new
- * instance that was added, identifying that an instance was removed</td>
+ * <td><code>{@link ITracePoint2D}</code>, the new instance that was added,
+ * identifying that an instance was removed</td>
  * </tr>
  * <tr>
  * <td>
@@ -140,28 +139,28 @@ import java.util.Set;
  * </tr>
  * <tr>
  * <td>
- * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_POINT_HIGHLIGHTERS_CHANGED}</code>
+ * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS}</code>
  * </td>
  * <td><code>{@link ITrace2D}</code> that changed</td>
  * <td><code>null</code>, indicating that a point highlighter was added.</td>
- * <td><code>{@link info.monitorenter.gui.chart.IPointPainter}</code>, the
- * new highlighter.</td>
+ * <td><code>{@link info.monitorenter.gui.chart.IPointPainter}</code>, the new
+ * highlighter.</td>
  * </tr>
  * <tr>
  * <td>
- * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_POINT_HIGHLIGHTERS_CHANGED}</code>
+ * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS}</code>
  * </td>
  * <td><code>{@link ITrace2D}</code> that changed</td>
- * <td><code>{@link info.monitorenter.gui.chart.IPointPainter}</code>, the
- * old highlighter.</td>
+ * <td><code>{@link info.monitorenter.gui.chart.IPointPainter}</code>, the old
+ * highlighter.</td>
  * <td><code>null</code>, indicating that a point highlighter was removed.</td>
  * </tr>
  * <tr>
  * <td>
  * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_PAINTERS}</code></td>
  * <td><code>{@link ITrace2D}</code> that changed</td>
- * <td><code>{@link info.monitorenter.gui.chart.IPointPainter}</code>, the
- * old highlighter.</td>
+ * <td><code>{@link info.monitorenter.gui.chart.IPointPainter}</code>, the old
+ * highlighter.</td>
  * <td><code>null</code>, indicating that a highlighter was removed.</td>
  * </tr>
  * <tr>
@@ -207,14 +206,15 @@ import java.util.Set;
  * </tr>
  * <tr>
  * <td>
- * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_POINT_CHANGED}</code>
+ * <code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_TRACEPOINT_CHANGED_LOCATION}</code>
  * </td>
  * <td><code>{@link ITrace2D}</code> that notifies the change of the contained
  * trace point.</td>
  * <td><code>null</code> because it would be too much overhead to store the old
  * point in a additional instance as the original is modified in
  * <code>{@link ITracePoint2D#setLocation(double, double)}</code>.</td>
- * <td><code>{@link ITracePoint2D}</code> the point whose location was modified.</td>
+ * <td><code>{@link ITracePoint2D}</code> the point whose location was modified.
+ * </td>
  * </tr>
  * <tr>
  * <td><code>{@link info.monitorenter.gui.chart.ITrace2D#PROPERTY_NAME}</code></td>
@@ -285,7 +285,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
      * @return the distance.
      */
     public final double getDistance() {
-      return this.m_distance; 
+      return this.m_distance;
     }
 
     /**
@@ -396,8 +396,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
 
   /**
    * The property key defining a change in the set of <code>
-   * {@link ITracePainter}</code>
-   * instances. Use in combination with
+   * {@link ITracePainter}</code> instances. Use in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
   public static final String PROPERTY_PAINTERS = "ITrace2D.PROPERTY_PAINTERS";
@@ -411,8 +410,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
 
   /**
    * The property key defining any change of a location of a contained <code>
-   * {@link ITracePoint2D} </code>
-   * .
+   * {@link ITracePoint2D} </code> .
    * <p>
    * Use in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
@@ -422,15 +420,14 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * contained point is invoked.
    * <p>
    */
-  public static final String PROPERTY_POINT_CHANGED = "ITrace2D.PROPERTY_POINT_CHANGED";
+  public static final String PROPERTY_TRACEPOINT_CHANGED_LOCATION = "ITrace2D.PROPERTY_TRACEPOINT_CHANGED_LOCATION";
 
   /**
    * The property key defining a change in the set of <code>
-   * {@link IPointPainter}</code>
-   * instances. Use in combination with
+   * {@link IPointPainter}</code> instances. Use in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_POINT_HIGHLIGHTERS_CHANGED = "ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED";
+  public static final String PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS = "ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS";
 
   /**
    * The property key defining the <code>stroke</code> property. Use in
@@ -441,12 +438,19 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
 
   /**
    * The property key defining a change in the collection of <code>
-   * {@link ITracePoint2D}</code>
-   * instances within this trace. Use in combination with
+   * {@link ITracePoint2D}</code> instances within this trace (add or remove). Use in
+   * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_TRACEPOINT = "ITrace2D.PROPERTY_TRACEPOINT";
+  public static final String PROPERTY_TRACEPOINTS = "ITrace2D.PROPERTY_TRACEPOINTS";
 
+  /**
+   * The property key defining a change in the rendering of  a contained 
+   * <code>{@link ITracePoint2D}</code> instance within this trace. Use in
+   * combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   */
+  public static final String PROPERTY_TRACEPOINT_CHANGED_RENDERING = "ITrace2D.PROPERTY_TRACEPOINT_CHANGED_RENDERING";
   /**
    * The property key defining the <code>visible</code> property. Use in
    * combination with
@@ -484,8 +488,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
 
   /**
    * Adds a trace that "should" compute values from the points added via <code>
-   * {@link #addPoint(ITracePoint2D)}</code>
-   * .
+   * {@link #addPoint(ITracePoint2D)}</code> .
    * <p>
    * The given trace will be informed in case an add operation on this trace
    * succeeds via <code>{@link #addPoint(ITracePoint2D)}</code>.
@@ -603,9 +606,9 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public boolean containsTracePainter(final ITracePainter< ? > painter);
 
   /**
-   * Method to trigger by <code>{@link ITracePoint2D#setLocation(double, double)}
-   * </code>, <code>{@link #addPoint(ITracePoint2D)}</code>
-   * or <code>
+   * Method to trigger by
+   * <code>{@link ITracePoint2D#setLocation(double, double)}
+   * </code>, <code>{@link #addPoint(ITracePoint2D)}</code> or <code>
    * {@link #removePoint(ITracePoint2D)}</code>.
    * <p>
    * Bound checks are performed and property change events for the properties
@@ -620,13 +623,24 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    *          the point that has been changed which may be a newly added point
    *          (from <code>{@link #addPoint(ITracePoint2D)}</code>, a removed one
    *          or a modified one.
+   * 
    * @param state
    *          one of {<code>{@link ITracePoint2D#STATE_ADDED},
    *          {@link ITracePoint2D#STATE_CHANGED},
-   *          {@link ITracePoint2D#STATE_REMOVED}</code> to inform about the
+   *          {@link ITracePoint2D#STATE_REMOVED},
+   *          {@link ITracePoint2D#STATE_RENDERING_CHANGED}
+   *          </code> to inform about the
    *          type of change.
+   * 
+   * @param oldX
+   *          if state is {@link ITracePoint2D#STATE_CHANGED} this is the
+   *          previous x value, else ignored.
+   * 
+   * @param oldY
+   *          if state is {@link ITracePoint2D#STATE_CHANGED} this is the
+   *          previous y value, else ignored.
    */
-  public void firePointChanged(final ITracePoint2D changed, final int state);
+  public void firePointChanged(final ITracePoint2D changed, final int state, final double oldX, final double oldY);
 
   /**
    * Because the color is data common to a trace of a <code>Chart2D</code> it is
@@ -652,8 +666,8 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public Color getColor();
 
   /**
-   * Returns the <code>Set&lt;{@link IErrorBarPolicy}&gt;</code> that will be used to render
-   * error bars for this trace.
+   * Returns the <code>Set&lt;{@link IErrorBarPolicy}&gt;</code> that will be
+   * used to render error bars for this trace.
    * <p>
    * 
    * @return the <code>Set&lt;{@link IErrorBarPolicy}&gt;</code> that will be
@@ -850,8 +864,8 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public String getPhysicalUnitsY();
 
   /**
-   * Returns the <code>Set&lt;{@link IPointPainter}&gt;</code> that may be used to highlight
-   * points of this trace.
+   * Returns the <code>Set&lt;{@link IPointPainter}&gt;</code> that may be used
+   * to highlight points of this trace.
    * <p>
    * This is used by the point highlighting feature:
    * <code>{@link Chart2D#enablePointHighlighting(boolean)}</code>
@@ -881,8 +895,8 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * Returns the amount of {@link ITracePoint2D} instances currently contained.
    * <p>
    * 
-   * @return The amount of <code>{@link ITracePoint2D}</code> instances currently
-   *         contained.
+   * @return The amount of <code>{@link ITracePoint2D}</code> instances
+   *         currently contained.
    */
   public int getSize();
 
@@ -896,8 +910,8 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public Stroke getStroke();
 
   /**
-   * Returns the <code>Set&lt;{@link ITracePainter}&gt;</code> that will be used to paint
-   * this trace.
+   * Returns the <code>Set&lt;{@link ITracePainter}&gt;</code> that will be used
+   * to paint this trace.
    * <p>
    * 
    * The original set should be returned by contract to allow adding painters
@@ -941,17 +955,16 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
 
   /**
    * Returns an <code>Iterator</code> over the internal <code>
-   * {@link ITrace2D}</code>
-   * instances.
+   * {@link ITrace2D}</code> instances.
    * <p>
    * Implementations should be synchronized. This method is meant to allow
-   * modifications of the internal <code>{@link ITracePoint2D}</code> instances, so the
-   * original points should be returned.
+   * modifications of the internal <code>{@link ITracePoint2D}</code> instances,
+   * so the original points should be returned.
    * <p>
    * There is no guarantee that changes made to the contained tracepoints will
    * be reflected in the display immediately. The order the iterator returns the
-   * <code>{@link ITracePoint2D}</code> instances decides how the <code>Chart2D</code>
-   * will paint the trace.
+   * <code>{@link ITracePoint2D}</code> instances decides how the
+   * <code>Chart2D</code> will paint the trace.
    * <p>
    * 
    * @return an <code>Iterator</code> over the internal <code>
@@ -961,17 +974,16 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
 
   /**
    * Returns an <code>Iterator</code> over the internal <code>
-   * {@link ITrace2D}</code>
-   * instances in reverse order.
+   * {@link ITrace2D}</code> instances in reverse order.
    * <p>
    * Implementations should be synchronized. This method is meant to allow
-   * modifications of the internal <code{@link ITracePoint2D}</code> instances, so the
-   * original points should be returned.
+   * modifications of the internal <code{@link ITracePoint2D}</code> instances,
+   * so the original points should be returned.
    * <p>
    * There is no guarantee that changes made to the contained tracepoints will
    * be reflected in the display immediately. The order the iterator returns the
-   * <code>{@link ITracePoint2D}</code> instances decides how the <code>Chart2D</code>
-   * will paint the trace.
+   * <code>{@link ITracePoint2D}</code> instances decides how the
+   * <code>Chart2D</code> will paint the trace.
    * <p>
    * 
    * @return an <code>Iterator</code> over the internal <code>
@@ -983,8 +995,8 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * Clears all internal point highlighters used.
    * <p>
    * 
-   * Returns the <code>Set&lt;{@link IPointPainter}&gt;</code> that was used to highlight
-   * points.
+   * Returns the <code>Set&lt;{@link IPointPainter}&gt;</code> that was used to
+   * highlight points.
    * <p>
    * This is used by the point highlighting feature:
    * <code>{@link Chart2D#enablePointHighlighting(boolean)}</code>
@@ -1114,8 +1126,8 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
 
   /**
    * Assigns a specific String representing the physical unit to the <code>
-   *  ITrace2D</code>
-   * (e.g. Volt, Ohm, lux, ...) which will be displayed by the <code>
+   *  ITrace2D</code> (e.g. Volt, Ohm, lux, ...) which will be displayed by the
+   * <code>
    * {@link Chart2D}</code>
    * <p>
    * 

@@ -1024,11 +1024,13 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     AAxis.propertyReactors.put(ITrace2D.PROPERTY_ERRORBARPOLICY, repaintReactor);
     AAxis.propertyReactors.put(ITrace2D.PROPERTY_ERRORBARPOLICY_CONFIGURATION, repaintReactor);
     AAxis.propertyReactors.put(ITrace2D.PROPERTY_ZINDEX, repaintReactor);
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_RENDERING, repaintReactor);
     AAxis.propertyReactors.put(IAxis.PROPERTY_LABELFORMATTER, repaintReactor);
     AAxis.propertyReactors.put(IAxisLabelFormatter.PROPERTY_FORMATCHANGE, repaintReactor);
     AAxis.propertyReactors.put(AxisTitle.PROPERTY_TITLEFONT, repaintReactor);
     AAxis.propertyReactors.put(AxisTitle.PROPERTY_TITLE, repaintReactor);
     AAxis.propertyReactors.put(AxisTitle.PROPERTY_TITLEPAINTER, repaintReactor);
+    
     AAxis.propertyReactors.put(ITrace2D.PROPERTY_MAX_X, new APropertyChangeReactorSynced() {
 
       /**
@@ -1155,7 +1157,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
         return result;
       }
     });
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_TRACEPOINT, new APropertyChangeReactorSynced() {
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_TRACEPOINTS, new APropertyChangeReactorSynced() {
 
       /**
        * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
@@ -1199,7 +1201,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
         return result;
       }
     });
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_POINT_CHANGED, new APropertyChangeReactorSynced() {
+    AAxis.propertyReactors.put(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_LOCATION, new APropertyChangeReactorSynced() {
 
       /**
        * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
@@ -2061,9 +2063,10 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     // listen to newly added points
     // this is needed for scaling at point level.
     // else every bound change would force to rescale all traces!
-    trace.addPropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT, this);
+    trace.addPropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINTS, this);
     // listen to changed points whose location was changed:
-    trace.addPropertyChangeListener(ITrace2D.PROPERTY_POINT_CHANGED, this);
+    trace.addPropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_LOCATION, this);
+    trace.addPropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_RENDERING, this);
   }
 
   /**
@@ -2882,8 +2885,11 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     trace.removePropertyChangeListener(ITrace2D.PROPERTY_ERRORBARPOLICY_CONFIGURATION, this);
     trace.removePropertyChangeListener(ITrace2D.PROPERTY_ZINDEX, this);
     trace.removePropertyChangeListener(ITrace2D.PROPERTY_NAME, this);
-    trace.removePropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT, this);
-    trace.removePropertyChangeListener(ITrace2D.PROPERTY_POINT_CHANGED, this);
+    trace.removePropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINTS, this);
+    trace.removePropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_LOCATION, this);
+    trace.removePropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_RENDERING, this);
+    
+    
   }
 
   /**

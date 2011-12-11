@@ -21,7 +21,9 @@ import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.axistickpainters.AxisTickPainterDefault;
 import info.monitorenter.gui.chart.events.Chart2DActionPrintSingleton;
 import info.monitorenter.gui.util.TracePoint2DUtil;
+import info.monitorenter.util.IStopWatch;
 import info.monitorenter.util.Range;
+import info.monitorenter.util.StopWatchSimple;
 import info.monitorenter.util.StringUtil;
 
 import java.awt.Color;
@@ -242,7 +244,7 @@ import javax.swing.Timer;
  * <td>if point highlighting is enabled/disabled.</td>
  * </tr>
  * <tr>
- * <td>{@link ITrace2D#PROPERTY_POINT_HIGHLIGHTERS_CHANGED}</td>
+ * <td>{@link ITrace2D#PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS}</td>
  * <td>{@link Chart2D}</td>
  * <td>{@link IPointPainter}</td>
  * <td>null</td>
@@ -250,7 +252,7 @@ import javax.swing.Timer;
  * traces.</td>
  * </tr>
  * <tr>
- * <td>{@link ITrace2D#PROPERTY_POINT_HIGHLIGHTERS_CHANGED}</td>
+ * <td>{@link ITrace2D#PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS}</td>
  * <td>{@link Chart2D}</td>
  * <td>null</td>
  * <td>{@link IPointPainter}</td>
@@ -510,7 +512,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * A package wide switch for debugging problems with data accumulation. Set to
    * false the compiler will remove the debugging statements.
    */
-  public static final boolean DEBUG_DATA_ACCUMULATION = true;
+  public static final boolean DEBUG_DATA_ACCUMULATION = false;
 
   /**
    * A package wide switch for debugging problems with highlighting. Set to
@@ -818,7 +820,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
        * added thus making them "unfindable" in a map based on hashcode!
        */
       this.m_previousHighlighted = new IdentityHashMap<ITrace2D, ITracePoint2D>();
-      Chart2D.this.addPropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, this);
+      Chart2D.this.addPropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, this);
       Chart2D.this.addPropertyChangeListener(Chart2D.PROPERTY_ADD_REMOVE_TRACE, this);
 
     }
@@ -1001,7 +1003,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     public void propertyChange(PropertyChangeEvent evt) {
 
       String property = evt.getPropertyName();
-      if (ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED.equals(property)) {
+      if (ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS.equals(property)) {
         ITrace2D trace = (ITrace2D) evt.getSource();
         ITracePoint2D point = this.m_previousHighlighted.get(trace);
         if (point != null) {
@@ -1037,7 +1039,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         }
       } else {
         throw new RuntimeException("Programming error: " + this.getClass().getName() + " only has to be registered to the event "
-            + ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED + " on instances of type (or subtype) " + ITrace2D.class.getName());
+            + ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS + " on instances of type (or subtype) " + ITrace2D.class.getName());
       }
     }
   }
@@ -2674,10 +2676,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    */
   private void listenToTrace(final ITrace2D trace) {
     // for tracking removal/addition of point highlighters visually:
-    trace.addPropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, this.m_pointHighlightListener);
+    trace.addPropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, this.m_pointHighlightListener);
     // for tracking enablement/disablement of point highlighting feature
     // (expensive mouse listener)
-    trace.addPropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, this);
+    trace.addPropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, this);
     if (trace instanceof ITrace2DDataAccumulating) {
       trace.addPropertyChangeListener(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY, this);
       trace.addPropertyChangeListener(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY_ACCUMULATION_FUNCTION_CHANGED, this);
@@ -2873,6 +2875,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
           boolean oldpointVisible = false;
 
           int countPoints = 0;
+          IStopWatch stopWatchPointRendering = null;
+          if(Chart2D.DEBUG_DATA_ACCUMULATION) {
+            stopWatchPointRendering = new StopWatchSimple(true);
+          }
           while (pointIt.hasNext()) {
             oldpoint = newpoint;
             oldtmpx = tmpx;
@@ -2965,7 +2971,9 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
             }
           }
           if (DEBUG_DATA_ACCUMULATION) {
-            System.out.println("Rendered " + countPoints + " points of a trace with " + trace.getSize() + " points.");
+            stopWatchPointRendering.stop();
+            System.out.println(this.getClass().getName()+" rendered " + countPoints + " points of a trace with " + trace.getSize() + " points. It took "+stopWatchPointRendering.getPureMilliSeconds()+" ms.");
+            stopWatchPointRendering.reset();
           }
           itTracePainters = trace.getTracePainters().iterator();
           while (itTracePainters.hasNext()) {
@@ -3275,7 +3283,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
          * repaint definetely!
          */
         this.firePropertyChange(IAxis.PROPERTY_ADD_REMOVE_TRACE, evt.getOldValue(), evt.getNewValue());
-      } else if (property.equals(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED)) {
+      } else if (property.equals(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS)) {
         int highlightersAddedOrRemoved = 0;
         if (evt.getOldValue() != null) {
           highlightersAddedOrRemoved--;
@@ -4274,9 +4282,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     IAxis< ? > translationYAxis = null;
 
     ITracePoint2D result = null;
+    ITrace2D nearestTrace = null;
     ITracePoint2D nearestPoint = this.getPointFinder().getNearestPoint(mouseEvent, this);
     if (nearestPoint != null) {
-      ITrace2D nearestTrace = nearestPoint.getListener();
+      nearestTrace = nearestPoint.getListener();
       if (nearestTrace != null) {
         translationXAxis = this.getAxisX();
         translationYAxis = this.getAxisY();
@@ -4294,7 +4303,13 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
 
     double valueX = translationXAxis.translateMousePosition(mouseEvent);
     double valueY = translationYAxis.translateMousePosition(mouseEvent);
-    result = this.m_tracePointProvider.createTracePoint(valueX, valueY);
+    if(nearestTrace != null) 
+    {
+      result = this.m_tracePointProvider.createTracePoint(valueX, valueY, nearestTrace);
+    } else {
+      result = this.m_tracePointProvider.createTracePoint(valueX, valueY, null);
+      // TODO: warn?
+    }
 
     return result;
   }
@@ -4327,8 +4342,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    *          the trace to not listen to any more.
    */
   private void unlistenToTrace(final ITrace2D removedTrace) {
-    removedTrace.removePropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, this.m_pointHighlightListener);
-    removedTrace.removePropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, this);
+    removedTrace.removePropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, this.m_pointHighlightListener);
+    removedTrace.removePropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, this);
     if (removedTrace instanceof ITrace2DDataAccumulating) {
       removedTrace.removePropertyChangeListener(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY, this);
       removedTrace.removePropertyChangeListener(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY_ACCUMULATION_FUNCTION_CHANGED, this);

@@ -26,6 +26,7 @@
 
 package info.monitorenter.gui.chart.traces.accumulationfunctions;
 
+import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.ITracePointProvider;
 
@@ -47,19 +48,27 @@ public class AccumulationFunctionArithmeticMeanXY extends AAccumulationFunction 
    */
   private int m_accumulatedPointsCount = 0;
 
+  /** To intermediately sum up all accumulations of x values. */
+  private double m_accumulatedSumX = 0;
+
+  /** To intermediately sum up all accumulations of Y values. */
+  private double m_accumulatedSumY = 0;
+
   /**
    * @see info.monitorenter.gui.chart.IAccumulationFunction#addPointToAccumulate(info.monitorenter.gui.chart.ITracePoint2D)
    */
   public void addPointToAccumulate(ITracePoint2D point) throws IllegalArgumentException {
-    
-    if(point.isDiscontinuation()) {
+
+    if (point.isDiscontinuation()) {
       throw new IllegalArgumentException("Do not attemp to consume a discontinuation by accumulation - preserve them for the chart!");
     }
     ITracePoint2D accumulatedPointCurrent = this.getAccumulatedPointCurrent();
     if (accumulatedPointCurrent == null) {
       ITracePointProvider tracePointProvider = this.acquireTracePointProvider(point);
 
-      accumulatedPointCurrent = tracePointProvider.createTracePoint(point.getX(), point.getY());
+      accumulatedPointCurrent = tracePointProvider.createTracePoint(point.getX(), point.getY(), point.getListener());
+      this.m_accumulatedSumX += point.getX();
+      this.m_accumulatedSumY += point.getY();
       this.setAccumulatedPointCurrent(accumulatedPointCurrent);
     } else {
       /*
@@ -67,7 +76,8 @@ public class AccumulationFunctionArithmeticMeanXY extends AAccumulationFunction 
        * collection of the sum of all added points. Calculation is done in
        * getAccumulatedPoint()!
        */
-      accumulatedPointCurrent.setLocation(accumulatedPointCurrent.getX() + point.getX(), accumulatedPointCurrent.getY() + point.getY());
+      this.m_accumulatedSumX += point.getX();
+      this.m_accumulatedSumY += point.getY();
     }
     this.m_accumulatedPointsCount++;
   }
@@ -77,11 +87,16 @@ public class AccumulationFunctionArithmeticMeanXY extends AAccumulationFunction 
    */
   @Override
   public ITracePoint2D getAccumulatedPoint() {
+
     ITracePoint2D accumulatedPointCurrent = this.getAccumulatedPointCurrent();
     if (accumulatedPointCurrent != null) {
-      accumulatedPointCurrent.setLocation(accumulatedPointCurrent.getX() / this.m_accumulatedPointsCount, accumulatedPointCurrent.getY()
-          / this.m_accumulatedPointsCount);
+      accumulatedPointCurrent.setLocation(this.m_accumulatedSumX / this.m_accumulatedPointsCount, this.m_accumulatedSumY / this.m_accumulatedPointsCount);
+      if (Chart2D.DEBUG_DATA_ACCUMULATION) {
+        System.out.println(this.getClass().getName() + ": accumulated " + this.m_accumulatedPointsCount + " points into one: " + accumulatedPointCurrent);
+      }
       this.m_accumulatedPointsCount = 0;
+      this.m_accumulatedSumX = 0;
+      this.m_accumulatedSumY = 0;
     }
     return super.getAccumulatedPoint();
   }

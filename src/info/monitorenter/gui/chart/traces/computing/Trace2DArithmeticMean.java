@@ -155,7 +155,7 @@ public class Trace2DArithmeticMean extends ATrace2D {
     }
     y /= divisor;
     x /= divisor;
-    result = this.getRenderer().getTracePointProvider().createTracePoint(x, y);
+    result = this.getRenderer().getTracePointProvider().createTracePoint(x, y, this);
     return result;
 
   }

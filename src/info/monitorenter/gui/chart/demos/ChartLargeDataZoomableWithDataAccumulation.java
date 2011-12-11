@@ -67,7 +67,7 @@ public final class ChartLargeDataZoomableWithDataAccumulation {
     chart.setUseAntialiasing(true);
     chart.enablePointHighlighting(true);
     trace.setPointHighlighter(new PointPainterDisc(6));
-     chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
+    chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
     
     // Add all points, as it is static:
     Random random = new Random();

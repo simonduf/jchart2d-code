@@ -79,7 +79,7 @@ public final class Trace2DActionAddRemoveHighlighter extends ATrace2DAction {
       final IPointPainter< ? > hightlighter) {
     super(trace, description);
     this.m_pointHighlighter = hightlighter;
-    trace.addPropertyChangeListener(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, this);
+    trace.addPropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, this);
   }
 
   /**
@@ -110,7 +110,7 @@ public final class Trace2DActionAddRemoveHighlighter extends ATrace2DAction {
    */
   public void propertyChange(final PropertyChangeEvent evt) {
     String property = evt.getPropertyName();
-    if (property.equals(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED)) {
+    if (property.equals(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS)) {
       IPointPainter< ? > oldValue = (IPointPainter< ? >) evt.getOldValue();
       IPointPainter< ? > newValue = (IPointPainter< ? >) evt.getNewValue();
       // added or removed?

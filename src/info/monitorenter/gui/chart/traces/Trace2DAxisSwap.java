@@ -91,7 +91,7 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
    * @see info.monitorenter.gui.chart.ITrace2D#addPoint(double, double)
    */
   public boolean addPoint(final double x, final double y) {
-    final ITracePoint2D p = this.getRenderer().getTracePointProvider().createTracePoint(x, y);
+    final ITracePoint2D p = this.getRenderer().getTracePointProvider().createTracePoint(x, y, this);
     return this.addPoint(p);
   }
 
@@ -141,11 +141,10 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(info.monitorenter.gui.chart.ITracePoint2D,
-   *      int)
+   * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(ITracePoint2D, int, double, double)
    */
-  public void firePointChanged(final ITracePoint2D changed, final int state) {
-    this.m_delegate.firePointChanged(changed, state);
+  public void firePointChanged(final ITracePoint2D changed, final int state, final double oldX, final double oldY) {
+    this.m_delegate.firePointChanged(changed, state, oldX, oldY);
   }
 
   /**

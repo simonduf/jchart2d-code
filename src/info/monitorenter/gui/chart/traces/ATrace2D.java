@@ -272,7 +272,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
     if (chart != null) {
       final ITracePointProvider pointProvider = chart.getTracePointProvider();
       if (pointProvider != null) {
-        p = pointProvider.createTracePoint(x, y);
+        p = pointProvider.createTracePoint(x, y, this);
       }
     }
     if (p != null) {
@@ -297,7 +297,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * <code>{@link #firePointAdded(ITracePoint2D)}</code>.
    * <p>
    * 
-   * @see #firePointChanged(ITracePoint2D, int)
+   * @see #firePointChanged(ITracePoint2D, int, double, double)
    * @param p
    *          the <code>TracePoint2D</code> to add.
    * @return true if the operation was successful, false else.
@@ -377,7 +377,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
       synchronized (this) {
         result = this.m_pointHighlighters.add(highlighter);
         if (result) {
-          this.firePropertyChange(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, null, highlighter);
+          this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, null, highlighter);
         }
       }
     }
@@ -394,7 +394,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * returns <code>true</code> the outer logic of the calling method
    * <code>{@link #addPoint(ITracePoint2D)}</code> will perform bound checks for
    * the new point and fire property changes as described in method
-   * <code>{@link #firePointChanged(ITracePoint2D, int)}</code>.
+   * <code>{@link #firePointChanged(ITracePoint2D, int, double, double)}</code>.
    * </p>
    * <p>
    * In special cases - when additional modifications to the internal set of
@@ -687,7 +687,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * Fire property change events related to an added point.
    * <p>
    * A property change event for property
-   * <code>{@link ITrace2D#PROPERTY_TRACEPOINT}</code> with null as the old
+   * <code>{@link ITrace2D#PROPERTY_TRACEPOINTS}</code> with null as the old
    * value and the new point as the new value is fired. This allows e.g.
    * rescaling of those instances (instead of having to rescale a whole trace).
    * <p>
@@ -700,8 +700,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    *          the point that was added.
    */
   protected void firePointAdded(final ITracePoint2D added) {
-    this.firePointChanged(added, ITracePoint2D.STATE_ADDED);
-    this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT, null, added);
+    this.firePointChanged(added, ITracePoint2D.STATE_ADDED, 0, 0);
+    this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINTS, null, added);
   }
 
   /**
@@ -718,8 +718,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * <p>
    * If <code>state</code> is <code>{@link ITracePoint2D#STATE_CHANGED}</code> a
    * property change event with
-   * <code>{@link ITrace2D#PROPERTY_POINT_CHANGED}</code> will be fired to all
-   * listeners.
+   * <code>{@link ITrace2D#PROPERTY_TRACEPOINT_CHANGED_LOCATION}</code> will be
+   * fired to all listeners.
    * <p>
    * 
    * @param changed
@@ -731,8 +731,16 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    *          {@link ITracePoint2D#STATE_CHANGED},
    *          {@link ITracePoint2D#STATE_REMOVED}</code> to inform about the
    *          type of change.
+   * 
+   * @param oldX
+   *          if state is {@link ITracePoint2D#STATE_CHANGED} this is the
+   *          previous x value, else ignored.
+   * 
+   * @param oldY
+   *          if state is {@link ITracePoint2D#STATE_CHANGED} this is the
+   *          previous y value, else ignored.
    */
-  public void firePointChanged(final ITracePoint2D changed, final int state) {
+  public void firePointChanged(final ITracePoint2D changed, final int state, final double oldX, final double oldY) {
     double tmpx = changed.getX();
     double tmpy = changed.getY();
     this.ensureInitialized();
@@ -762,8 +770,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
             this.expandMinYErrorBarBounds();
             this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, null, new Double(this.m_minY));
           }
-        }
-        if (ITracePoint2D.STATE_REMOVED == state) {
+        } else if (ITracePoint2D.STATE_REMOVED == state) {
           // removal: care for extrema (<=, >=)
           if (tmpx >= this.m_maxX) {
             tmpx = this.m_maxX;
@@ -786,12 +793,15 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           if (this.getSize() == 0) {
             this.m_firsttime = true;
           }
-        }
-        if (state == ITracePoint2D.STATE_CHANGED) {
+        } else if (state == ITracePoint2D.STATE_CHANGED) {
           if (tmpx < this.m_maxX) {
-            final double oldMaxX = this.m_maxX;
-            this.maxXSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldMaxX), new Double(this.m_maxX));
+            // check if the changed point was maxX
+            if (oldX == this.m_maxX) {
+              // the point was maximum: expensive re-search of new maximum
+              final double oldMaxX = this.m_maxX;
+              this.maxXSearch();
+              this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldMaxX), new Double(this.m_maxX));
+            }
           } else if (tmpx > this.m_maxX) {
             final double oldMaxX = this.m_maxX;
             this.m_maxX = tmpx;
@@ -799,9 +809,13 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
             this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldMaxX), new Double(this.m_maxX));
           }
           if (tmpx > this.m_minX) {
-            final double oldMinX = this.m_minX;
-            this.minXSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldMinX), new Double(this.m_minX));
+            if (oldX == this.m_minX) {
+              // the point was minimum: expensive re-search of new minimum
+
+              final double oldMinX = this.m_minX;
+              this.minXSearch();
+              this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldMinX), new Double(this.m_minX));
+            }
           } else if (tmpx < this.m_minX) {
             final double oldMinX = this.m_minX;
             this.m_minX = tmpx;
@@ -809,9 +823,12 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
             this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldMinX), new Double(this.m_minX));
           }
           if (tmpy < this.m_maxY) {
-            final double oldMaxY = this.m_maxY;
-            this.maxYSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldMaxY), new Double(this.m_maxY));
+            if (oldY == this.m_maxY) {
+              // the point was maximum: expensive re-search of new maximum
+              final double oldMaxY = this.m_maxY;
+              this.maxYSearch();
+              this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldMaxY), new Double(this.m_maxY));
+            }
           } else if (tmpy > this.m_maxY) {
             final double oldMaxY = this.m_maxY;
             this.m_maxY = tmpy;
@@ -819,16 +836,21 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
             this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldMaxY), new Double(this.m_maxY));
           }
           if (tmpy > this.m_minY) {
-            final double oldMinY = this.m_minY;
-            this.minYSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldMinY), new Double(this.m_minY));
+            if (oldY == this.m_maxY) {
+              // the point was minimum: expensive re-search of new minimum
+              final double oldMinY = this.m_minY;
+              this.minYSearch();
+              this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldMinY), new Double(this.m_minY));
+            }
           } else if (tmpy < this.m_minY) {
             final double oldMinY = this.m_minY;
             this.m_minY = tmpy;
             this.expandMinYErrorBarBounds();
             this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldMinY), new Double(this.m_minY));
           }
-          this.firePropertyChange(ITrace2D.PROPERTY_POINT_CHANGED, null, changed);
+          this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_LOCATION, null, changed);
+        } else if (state == ITracePoint2D.STATE_RENDERING_CHANGED) {
+          this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_RENDERING, null, changed);
         }
       }
     }
@@ -838,7 +860,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * Fire property change events related to a removed point.
    * <p>
    * A property change event for property
-   * <code>{@link ITrace2D#PROPERTY_TRACEPOINT}</code> with a point as the old
+   * <code>{@link ITrace2D#PROPERTY_TRACEPOINTS}</code> with a point as the old
    * value and null as the new value is fired. This allows e.g. rescaling of
    * those instances (instead of having to rescale a whole trace).
    * <p>
@@ -851,8 +873,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    *          the point that was removed.
    */
   protected void firePointRemoved(final ITracePoint2D removed) {
-    this.firePointChanged(removed, ITracePoint2D.STATE_REMOVED);
-    this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT, removed, null);
+    this.firePointChanged(removed, ITracePoint2D.STATE_REMOVED, 0, 0);
+    this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINTS, removed, null);
   }
 
   /**
@@ -869,8 +891,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    */
   protected final void firePropertyChange(final String property, final Object oldvalue, final Object newvalue) {
     if (property.equals(ITrace2D.PROPERTY_MAX_X) || property.equals(ITrace2D.PROPERTY_MAX_Y) || property.equals(ITrace2D.PROPERTY_MIN_X)
-        || property.equals(ITrace2D.PROPERTY_MIN_Y) || property.equals(ITrace2D.PROPERTY_TRACEPOINT)
-        || property.equals(ITrace2D.PROPERTY_POINT_CHANGED)) {
+        || property.equals(ITrace2D.PROPERTY_MIN_Y) || property.equals(ITrace2D.PROPERTY_TRACEPOINTS)
+        || property.equals(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_LOCATION)) {
       if (!Thread.holdsLock(this.m_renderer)) {
         throw new RuntimeException("Acquire a lock on the corresponding chart first!");
       }
@@ -882,7 +904,6 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
         System.out.println("trace.firePropertyChange (" + property + "), 2 locks, renderer is: " + this.m_renderer);
       }
     }
-
     this.m_propertyChangeSupport.firePropertyChange(property, oldvalue, newvalue);
   }
 
@@ -1132,8 +1153,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
     if (StringUtil.isEmpty(this.m_physicalUnitsX) && StringUtil.isEmpty(this.m_physicalUnitsY)) {
       result = "";
     } else {
-      result = new StringBuffer("[x: ").append(this.getPhysicalUnitsX()).append(", y: ").append(this.getPhysicalUnitsY()).append("]")
-          .toString();
+      result = new StringBuffer("[x: ").append(this.getPhysicalUnitsX()).append(", y: ").append(this.getPhysicalUnitsY()).append("]").toString();
 
     }
     return result;
@@ -1230,13 +1250,11 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
         }
       }
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName()
-            + ".getZindex, freed 1 lock: 1 lock remaining");
+        System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName() + ".getZindex, freed 1 lock: 1 lock remaining");
       }
     }
     if (Chart2D.DEBUG_THREADING) {
-      System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName()
-          + ".getZindex, freed 1 lock: 0 locks remaining");
+      System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName() + ".getZindex, freed 1 lock: 0 locks remaining");
     }
     return this.m_zIndex;
   }
@@ -1412,8 +1430,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
        * of responsibility: Listeners should not listen on all underlying
        * details but trust complex objects to inform them about any change.
        */
-      this.firePropertyChange(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY_ACCUMULATION_FUNCTION_CHANGED, evt.getOldValue(),
-          evt.getNewValue());
+      this.firePropertyChange(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY_ACCUMULATION_FUNCTION_CHANGED, evt.getOldValue(), evt.getNewValue());
     }
 
   }
@@ -1604,7 +1621,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
         boolean result = false;
         result = this.m_pointHighlighters.remove(higlighter);
         if (result) {
-          this.firePropertyChange(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, higlighter, null);
+          this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, higlighter, null);
         }
         return result;
       }
@@ -1795,9 +1812,9 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
         final boolean added = this.m_pointHighlighters.add(highlighter);
         if (added) {
           for (final IPointPainter< ? > rem : result) {
-            this.firePropertyChange(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, rem, null);
+            this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, rem, null);
           }
-          this.firePropertyChange(ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED, null, highlighter);
+          this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, null, highlighter);
 
         } else {
           // roll back: will never happen, but here for formal reason
@@ -2019,7 +2036,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   /**
    * @see info.monitorenter.gui.chart.ITrace2DDataAccumulating#iterator(int)
    */
-  public final Iterator<ITracePoint2D> iterator( int amountOfVisiblePoints) {
+  public final Iterator<ITracePoint2D> iterator(int amountOfVisiblePoints) {
     return this.m_accumulationStrategy.iterator(this, amountOfVisiblePoints);
   }
 }

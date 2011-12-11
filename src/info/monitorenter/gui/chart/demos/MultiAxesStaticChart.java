@@ -160,7 +160,7 @@ public final class MultiAxesStaticChart extends JPanel {
     double time = System.currentTimeMillis();
     int i;
     for (i = 0; i < 120; i++) {
-      apples.addPoint(pointCreator.createTracePoint(time + i * 10000, (10.0 + Math.random()) * i));
+      apples.addPoint(pointCreator.createTracePoint(time + i * 10000, (10.0 + Math.random()) * i, apples));
     }
     // add pears:
     ITracePoint2D copyPoint;
@@ -169,7 +169,7 @@ public final class MultiAxesStaticChart extends JPanel {
     while (it.hasNext()) {
       copyPoint = it.next();
       pears.addPoint(pointCreator.createTracePoint(i * 0.001, copyPoint.getY()
-          + (Math.random() * 1000)));
+          + (Math.random() * 1000), pears));
       i++;
     }
     // add carrots:
@@ -177,7 +177,7 @@ public final class MultiAxesStaticChart extends JPanel {
     i = 0;
     while (it.hasNext()) {
       copyPoint = it.next();
-      carrots.addPoint(pointCreator.createTracePoint(i * 100, 100 - copyPoint.getY()));
+      carrots.addPoint(pointCreator.createTracePoint(i * 100, 100 - copyPoint.getY(), carrots));
       i++;
     }
 

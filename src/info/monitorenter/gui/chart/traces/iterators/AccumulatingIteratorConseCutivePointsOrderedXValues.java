@@ -6,6 +6,8 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.util.IteratorITracePoint2DUtil;
 import info.monitorenter.gui.util.IteratorITracePoint2DUtil.SkipResult;
+import info.monitorenter.util.IStopWatch;
+import info.monitorenter.util.StopWatchSimple;
 
 import java.util.Iterator;
 
@@ -50,6 +52,12 @@ public class AccumulatingIteratorConseCutivePointsOrderedXValues extends AAccumu
   private ITracePoint2D m_lastPoint;
 
   /**
+   * If true this iterator is considered empty as no points visible will follow
+   * (due to ordered x values constraint).
+   */
+  private boolean m_hasReachedVisibleXUpperBound = false;
+
+  /**
    * Internal needed to store if we had to return an accumulated point while
    * seeing NaN which we then have to return next time.
    */
@@ -74,23 +82,40 @@ public class AccumulatingIteratorConseCutivePointsOrderedXValues extends AAccumu
    *          returned points may be smaller than this value as some segments
    *          might not contain any point.
    */
-  public AccumulatingIteratorConseCutivePointsOrderedXValues(final ITrace2D originalTrace,
-      final IAccumulationFunction accumulationFunction, final int amountOfVisiblePoints) {
+  public AccumulatingIteratorConseCutivePointsOrderedXValues(final ITrace2D originalTrace, final IAccumulationFunction accumulationFunction,
+      final int amountOfVisiblePoints) {
     super(originalTrace, accumulationFunction, amountOfVisiblePoints);
 
+    IStopWatch stopWatch = null;
     /*
      * Skip invisible points:
      */
+    if (Chart2D.DEBUG_DATA_ACCUMULATION) {
+      stopWatch = new StopWatchSimple();
+      stopWatch.start();
+    }
     SkipResult skipResult = IteratorITracePoint2DUtil.scrollToFirstVisibleXValue(this.getOriginalIterator());
     if (Chart2D.DEBUG_DATA_ACCUMULATION) {
       System.out.println(this.getClass().getName() + " skipped " + skipResult.getSkipCount() + " leading invisible points.");
     }
     this.m_firstPoint = skipResult.getLastInvisible();
+    if (Chart2D.DEBUG_DATA_ACCUMULATION) {
+      stopWatch.stop();
+      System.out.println(this.getClass().getName() + " took " + stopWatch.getPureMilliSeconds() + " ms to scroll to first visbible point. ");
+    }
 
     Iterator<ITracePoint2D> backwardIterator = originalTrace.descendingIterator();
+
+    if (Chart2D.DEBUG_DATA_ACCUMULATION) {
+      stopWatch.reset();
+      stopWatch.start();
+    }
+
     SkipResult skipResultBackwards = IteratorITracePoint2DUtil.scrollToFirstVisibleXValue(backwardIterator);
     if (Chart2D.DEBUG_DATA_ACCUMULATION) {
       System.out.println(this.getClass().getName() + " skipped " + skipResultBackwards.getSkipCount() + " tailing invisible points.");
+      stopWatch.stop();
+      System.out.println(this.getClass().getName() + " took " + stopWatch.getPureMilliSeconds() + " ms to scroll out tailing invisible points");
     }
     /*
      * Compute the amount of points per next() to accumulate:
@@ -119,7 +144,7 @@ public class AccumulatingIteratorConseCutivePointsOrderedXValues extends AAccumu
    * @see java.util.Iterator#hasNext()
    */
   public boolean hasNext() {
-    return ((this.getOriginalIterator().hasNext()) || (this.m_lastPoint != null) || (this.m_firstPoint != null));
+    return ((!this.m_hasReachedVisibleXUpperBound) && (this.getOriginalIterator().hasNext()) || (this.m_lastPoint != null) || (this.m_firstPoint != null));
   }
 
   /**
@@ -159,7 +184,20 @@ public class AccumulatingIteratorConseCutivePointsOrderedXValues extends AAccumu
             this.m_previousNaN = null;
             break;
           } else {
+            
             point = iterator.next();
+            
+            // CODE IN QUESTION START
+            if (point.getScaledX() > 1.0) {
+              this.m_hasReachedVisibleXUpperBound = true;
+              result = accumulate.getAccumulatedPoint();
+              if (result == null) {
+                result = point;
+                break;
+              }
+            }
+            // CODE IN QUESTION END
+
             if (!point.isDiscontinuation()) {
               /*
                * [a] We must not blindly add this point to the accumulation

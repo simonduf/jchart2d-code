@@ -135,7 +135,7 @@ public class StopWatchSimple implements IStopWatch{
     }
     
     /**
-     * Stops the measurement by assinging current time in ms to the stop value.
+     * Stops the measurement by assigning current time in ms to the stop value.
      * Return true if a valid measurement has been made (StopWatch was running before invoking this method).
      */
     public synchronized boolean stop() {

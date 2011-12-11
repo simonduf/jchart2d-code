@@ -134,7 +134,7 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
         final boolean res = TracePoint2D.this.m_additionalPointPainters.add(additionalPointPainter);
         // for interpolated points listener may be null:
         if (res && TracePoint2D.this.m_listener != null) {
-          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE_CHANGED);
+          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE_RENDERING_CHANGED, 0, 0);
         }
         return Boolean.valueOf(res);
       }
@@ -310,10 +310,12 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
     this.doSynchronized(new ICodeBlock<Object>() {
       @SuppressWarnings("synthetic-access")
       public Object execute() {
+        double oldX = TracePoint2D.this.m_x;
+        double oldY = TracePoint2D.this.m_y;
         TracePoint2D.this.m_x = xValue;
         TracePoint2D.this.m_y = yValue;
         if (TracePoint2D.this.m_listener != null) {
-          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE_CHANGED);
+          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE_CHANGED, oldX, oldY);
         }
         return null;
       }
@@ -393,7 +395,7 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
         boolean res = TracePoint2D.this.m_additionalPointPainters.remove(pointPainter);
         if (res) {
           if (TracePoint2D.this != null) {
-            TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE_CHANGED);
+            TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE_RENDERING_CHANGED, 0, 0);
           }
         }
         return Boolean.valueOf(res);
@@ -413,7 +415,7 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
         Set<IPointPainter< ? >> result = TracePoint2D.this.m_additionalPointPainters;
         TracePoint2D.this.m_additionalPointPainters = new LinkedHashSet<IPointPainter< ? >>();
         if (TracePoint2D.this != null) {
-          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE_CHANGED);
+          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE_RENDERING_CHANGED, 0, 0);
         }
         return result;
       }

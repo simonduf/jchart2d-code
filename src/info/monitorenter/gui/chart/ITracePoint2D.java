@@ -34,7 +34,7 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
 
   /**
    * The state flag used to inform the <code>{@link ITrace2D}</code> listener
-   * via <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int)}</code> in
+   * via <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int, double, double)}</code> in
    * case a point was added.
    * <p>
    */
@@ -42,7 +42,7 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
 
   /**
    * The state flag used to inform the <code>{@link ITrace2D}</code> listener
-   * via <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int)}</code> in
+   * via <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int, double, double)}</code> in
    * case a point was changed.
    * <p>
    * Will be used by <code>{@link #setLocation(double, double)}</code> and
@@ -53,11 +53,19 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
 
   /**
    * The state flag used to inform the <code>{@link ITrace2D}</code> listener
-   * via <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int)}</code> in
+   * via <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int, double, double)}</code> in
    * case a point was removed.
    * <p>
    */
   public static final int STATE_REMOVED = 2;
+  /**
+   * The state flag used to inform the <code>{@link ITrace2D}</code> listener
+   * via <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int, double, double)}</code> in
+   * case a point has changed it's way to render it (e.g. {@link ITracePoint2D#addAdditionalPointPainter(IPointPainter)}).
+   * <p>
+   */
+  
+  public static final int STATE_RENDERING_CHANGED = 16;
 
   /**
    * Adds a point painter that additionally (to the pointer painters of the

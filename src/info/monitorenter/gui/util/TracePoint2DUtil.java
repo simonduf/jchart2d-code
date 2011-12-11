@@ -151,7 +151,7 @@ public class TracePoint2DUtil {
          */
         result = visible;
       } else {
-        result = tracePointProvider.createTracePoint(0, 0);
+        result = tracePointProvider.createTracePoint(0, 0, visible.getListener());
         // transfer potential point highlighters to the synthetic point:
         for (IPointPainter< ? > highlighter : invisible.getAdditionalPointPainters()) {
           result.addAdditionalPointPainter(highlighter);

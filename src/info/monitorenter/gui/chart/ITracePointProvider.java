@@ -39,7 +39,9 @@ public interface ITracePointProvider {
    * 
    * @param y the y value for the new instance. 
    * 
+   * @param listener the trace that the point is assigned to (and get's updates if the point is changed via {@link ITracePoint2D#setLocation(double, double)}).
+   * 
    * @return the desired trace point implementation to use.
    */
-  public abstract ITracePoint2D createTracePoint(final double x, final double y);
+  public abstract ITracePoint2D createTracePoint(final double x, final double y, final ITrace2D listener);
 }

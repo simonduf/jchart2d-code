@@ -44,6 +44,11 @@ jchart2d-3.3.0 - <month>, <day>, <year>
 * Fixed bug #3424004: Missing label of Y axis when showing more than 1 chart in one component. 
 * Fixed bug #3427569: Non painted X axis scale takes up unnecessary space.
 * Fixed bug #3432154: Remove dependency to JIDE-oss (debian upstream), http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=626243
+! Improved performance of ITracePoint.setLocation(double, double): This was O(n) where n was amount of points in a trace in any 
+  case except boundary increase. Now it is only O(n) if an extremum was changed via that method.   
+! Introduced data accumulation API. This allows you to have traces with 10^6 points painted with increased speed while zooming in 
+  will show details with higher point resolution. By default this is bypassed. Turn it on with: 
+  trace.setAccumulationStrategy(AccumulationStrategy.ACCUMULATE_AMOUNT_OF_POINTS_ASCENDING_X_VALUES);
 o Changed policy of Chart2D.translateMousePosition(final MouseEvent mouseEvent). Before this the translation was done into the values 
   covered by the first x and y axes. By now the translation is related to the axes of the trace of the nearest point to the given 
   mouse event. 
@@ -51,6 +56,15 @@ o Deprecated method public boolean hasTrace(final ITrace2D trace) in IAxis. Use 
 o Moved info.monitorenter.gui.chart.TracePoint2D to info.monitorenter.gui.chart.tracepoints.TracePoint2D. 
   The first was deprecated: Please update to the new package version. 
 o JChart2d-3.3.0 requires Java 1.6 now (binaries and source / libraries and compiler). 
+o ITrace2D.PROPERTY_TRACEPOINT has been renamed to ITrace2D.PROPERTY_TRACEPOINTS.
+o ITrace2D.PROPERTY_POINT_CHANGED has been renamed to ITrace2D.PROPERTY_TRACEPOINT_CHANGED_LOCATION.
+o ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED has been renamed to ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS.
+o Changed ITrace2D.firePointChanged(ITracePoint2D, int) to ITrace2D.firePointChanged(ITracePoint2D, int, double double) 
+  to let it know if an extremum was changed which saves a lot of performance especially on large traces.  
+
+
+
+
 
 jchart2d-3.2.2 - September, 24th, 2011
   

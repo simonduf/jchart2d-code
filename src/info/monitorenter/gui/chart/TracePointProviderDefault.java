@@ -42,11 +42,12 @@ public class TracePointProviderDefault implements ITracePointProvider {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePointProvider#createTracePoint(double,
-   *      double)
+   * @see info.monitorenter.gui.chart.ITracePointProvider#createTracePoint(double, double, info.monitorenter.gui.chart.ITrace2D)
    */
-  public ITracePoint2D createTracePoint(final double x, final double y) {
-    return new info.monitorenter.gui.chart.tracepoints.TracePoint2D(x, y);
+  public ITracePoint2D createTracePoint(final double x, final double y, final ITrace2D listener) {
+    ITracePoint2D result = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(x, y);
+    result.setListener(listener);
+    return result;
   }
 
 }
