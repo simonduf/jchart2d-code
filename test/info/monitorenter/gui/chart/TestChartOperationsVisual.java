@@ -694,7 +694,7 @@ public class TestChartOperationsVisual extends ATestChartOperations {
   }
 
   /**
-   * Invokes <code>{@link TracePoint2D#setLocation(java.awt.geom.Point2D)}
+   * Invokes <code>{@link ITracePoint2D#setLocation(double, double)}
    * </code> on an extremum point to move away from the extremum.
    * <p>
    */
@@ -724,10 +724,10 @@ public class TestChartOperationsVisual extends ATestChartOperations {
 
       @Override
       public void fillTrace(ITrace2D trace) {
-        this.m_extremum = new TracePoint2D(10, 10);
-        trace.addPoint(new TracePoint2D(2, 3));
-        trace.addPoint(new TracePoint2D(3, 2));
-        trace.addPoint(new TracePoint2D(5, 7));
+        this.m_extremum = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(10, 10);
+        trace.addPoint(new info.monitorenter.gui.chart.tracepoints.TracePoint2D(2, 3));
+        trace.addPoint(new info.monitorenter.gui.chart.tracepoints.TracePoint2D(3, 2));
+        trace.addPoint(new info.monitorenter.gui.chart.tracepoints.TracePoint2D(5, 7));
         trace.addPoint(this.m_extremum);
       }
 
