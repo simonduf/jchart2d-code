@@ -29,7 +29,6 @@ import info.monitorenter.gui.chart.ZoomableChart;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.traces.accumulationfunctions.AccumulationFunctionArithmeticMeanXY;
-import info.monitorenter.gui.chart.traces.accumulationstrategies.AAccumulationStrategy;
 import info.monitorenter.gui.chart.traces.accumulationstrategies.AccumulationStrategyAmountOfPointsAscendingXValues;
 import info.monitorenter.gui.chart.views.ChartPanel;
 
