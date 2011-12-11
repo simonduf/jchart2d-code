@@ -26,7 +26,6 @@ package info.monitorenter.gui.chart.traces;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
-import info.monitorenter.gui.chart.TracePoint2D;
 
 import java.awt.Color;
 import java.awt.GraphicsEnvironment;
@@ -248,7 +247,7 @@ public class TestTrace2D extends TestCase {
 		Chart2D dummyChart = new Chart2D();
 		ITrace2D trace = new Trace2DSimple();
 		dummyChart.addTrace(trace);
-		ITracePoint2D point = new TracePoint2D(1, 1);
+		ITracePoint2D point = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(1, 1);
 		trace.addPoint(point);
 		Assert.assertEquals(1, trace.getSize());
 		trace.removePoint(point);
