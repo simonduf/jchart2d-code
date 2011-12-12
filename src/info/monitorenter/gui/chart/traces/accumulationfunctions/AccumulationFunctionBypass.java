@@ -28,13 +28,13 @@ package info.monitorenter.gui.chart.traces.accumulationfunctions;
 
 import info.monitorenter.gui.chart.IAccumulationFunction;
 import info.monitorenter.gui.chart.ITracePoint2D;
-import info.monitorenter.gui.chart.traces.accumulationstrategies.AAccumulationStrategy;
+import info.monitorenter.gui.chart.traces.accumulationstrategies.AccumulationStrategyByPass;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Dummy stub implementation of {@link IAccumulationFunction} that does not work correctly but throws 
  * {@link NotImplementedException} from every method and is only intended for 
- * being used by {@link AAccumulationStrategy#ACCUMULATE_BYPASS}
+ * being used by {@link AccumulationStrategyByPass}
  *  
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
