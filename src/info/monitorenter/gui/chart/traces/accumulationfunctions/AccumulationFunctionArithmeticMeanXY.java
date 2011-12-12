@@ -32,10 +32,7 @@ import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.ITracePointProvider;
 
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
-
-import com.sun.org.apache.bcel.internal.generic.NEW;
 
 /**
  * Returns the arithmetic mean (x and y) of all points being accumulated by the
