@@ -30,8 +30,6 @@ package info.monitorenter.gui.chart.traces.accumulationstrategies;
 import info.monitorenter.gui.chart.IAccumulationFunction;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
-import info.monitorenter.gui.chart.traces.iterators.AccumulatingIteratorConseCutivePointsOrderedXValues;
-import info.monitorenter.gui.chart.traces.iterators.AccumulatingIteratorConsecutivePoints;
 
 import java.util.Iterator;
 /**
@@ -46,7 +44,11 @@ public class AccumulationStrategyByPass extends AAccumulationStrategy {
   
   
   /**
-   * {@inheritDoc}
+   * Constructor taking the accumulation function to use.
+   * <p>
+   * 
+   * @param accumulationFunction
+   *          the accumulation function to use.
    */
   public AccumulationStrategyByPass(final IAccumulationFunction accumulationFunction) {
     super(accumulationFunction);

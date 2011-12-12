@@ -45,7 +45,11 @@ import java.util.Iterator;
 public class AccumulationStrategyAmountOfPointsAscendingXValues extends AAccumulationStrategy {
 
   /**
-   * {@inheritDoc}
+   * Constructor taking the accumulation function to use.
+   * <p>
+   * 
+   * @param accumulationFunction
+   *          the accumulation function to use.
    */
   public AccumulationStrategyAmountOfPointsAscendingXValues(IAccumulationFunction accumulationFunction) {
     super(accumulationFunction);

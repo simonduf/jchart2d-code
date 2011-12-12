@@ -131,7 +131,6 @@ public abstract class AAccumulationStrategy implements IAccumulationStrategy {
    * 
    * @param accumulationFunction
    *          the accumulation function to use.
-   *          <p>
    */
   public AAccumulationStrategy(IAccumulationFunction accumulationFunction) {
     this.setAccumulationFunction(accumulationFunction);

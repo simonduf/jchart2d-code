@@ -35,6 +35,10 @@ import java.util.Iterator;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 /**
+ * Warning: this is not implemented yet and must not be used. 
+ * <p>
+ * 
+ * 
  * This strategy will use the x-range and take all following points out of
  * the <code>source</code> (under the assumption trace is sorted by
  * x-values) that are within the range and then accumulate them to a single
@@ -46,7 +50,11 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 public class AccumulationStrategyXRangeWithRespectToDensity extends AAccumulationStrategy {
   
   /**
-   * {@inheritDoc}
+   * Constructor taking the accumulation function to use.
+   * <p>
+   * 
+   * @param accumulationFunction
+   *          the accumulation function to use.
    */
   public AccumulationStrategyXRangeWithRespectToDensity(IAccumulationFunction accumulationFunction) {
     super(accumulationFunction);
