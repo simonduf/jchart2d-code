@@ -511,7 +511,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * A switch for debugging problems with layouting. Set to false the
    * compiler will remove the debugging statements.
    */
-  public static final boolean DEBUG_LAYOUT = true;
+  public static final boolean DEBUG_LAYOUT = false;
 
   /**
    * A switch for debugging problems with data accumulation. Set to
@@ -2701,7 +2701,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @param g2d
    *          needed for size information.
    * @see #calculateXChartStart(Graphics2D)
-   * @see #calculateXChartEnd(Graphics2D)
+   * @see #calculateXChartEnd(Graphics)
    */
   private void negociateXChart(final Graphics2D g2d) {
     if (this.m_synchronizedXStartChart != null) {
@@ -2823,7 +2823,6 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         g2d.setRenderingHints(renderHints);
       }
 
-    int countTrace = 0;
     Iterator<ITracePainter< ? >> itTracePainters;
     Iterator<IErrorBarPolicy< ? >> itTraceErrorBarPolicies;
     ITracePainter< ? > tracePainter;
@@ -2832,7 +2831,6 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     while (traceIt.hasNext()) {
       oldpoint = null;
       newpoint = null;
-      countTrace++;
       trace = traceIt.next();
       if (trace.isVisible()) {
         synchronized (trace) {
