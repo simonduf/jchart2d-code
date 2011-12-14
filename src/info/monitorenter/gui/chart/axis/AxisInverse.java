@@ -34,7 +34,7 @@ import info.monitorenter.gui.chart.LabeledValue;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.math.MathUtil;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.Iterator;
 import java.util.List;
 
@@ -265,12 +265,18 @@ public class AxisInverse<T extends IAxisScalePolicy> extends AAxis<T> {
      */
     return super.setAxisScalePolicy((T)new IAxisScalePolicy() {
 
+      /**
+       * @see info.monitorenter.gui.chart.IAxisScalePolicy#initPaintIteration(info.monitorenter.gui.chart.IAxis)
+       */
       public void initPaintIteration(IAxis<?> axis) {
         axisScalePolicy.initPaintIteration(axis);
 
       }
 
-      public List<LabeledValue> getScaleValues(Graphics g2d, IAxis<?> axis) {
+      /**
+       * @see info.monitorenter.gui.chart.IAxisScalePolicy#getScaleValues(java.awt.Graphics2D, info.monitorenter.gui.chart.IAxis)
+       */
+      public List<LabeledValue> getScaleValues(Graphics2D g2d, IAxis<?> axis) {
 
         List<LabeledValue> ret = axisScalePolicy.getScaleValues(g2d, axis);
         for (LabeledValue label : ret) {

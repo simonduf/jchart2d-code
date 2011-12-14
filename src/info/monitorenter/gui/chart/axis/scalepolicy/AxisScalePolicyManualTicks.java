@@ -34,7 +34,7 @@ import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterNumber;
 import info.monitorenter.util.Range;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -191,10 +191,9 @@ public class AxisScalePolicyManualTicks implements IAxisScalePolicy {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IAxisScalePolicy#getScaleValues(java.awt.Graphics,
-   *      info.monitorenter.gui.chart.IAxis)
+   * @see info.monitorenter.gui.chart.IAxisScalePolicy#getScaleValues(java.awt.Graphics2D, info.monitorenter.gui.chart.IAxis)
    */
-  public List<LabeledValue> getScaleValues(final Graphics g2d, final IAxis<?> axis) {
+  public List<LabeledValue> getScaleValues(final Graphics2D g2d, final IAxis<?> axis) {
     return this.getLabels(axis);
   }
 

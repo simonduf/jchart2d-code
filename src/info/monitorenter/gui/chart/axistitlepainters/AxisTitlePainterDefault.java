@@ -66,14 +66,20 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
 
   /**
    * @see info.monitorenter.gui.chart.IAxisTitlePainter#getHeight(info.monitorenter.gui.chart.IAxis,
-   *      java.awt.Graphics)
+   *      java.awt.Graphics2D)
    */
-  public int getHeight(final IAxis<?> axis, final Graphics g2d) {
+  public int getHeight(final IAxis< ? > axis, final Graphics2D g2d) {
     int result = 0;
     IAxis.AxisTitle axisTitle = axis.getAxisTitle();
     String title = axisTitle.getTitle();
     if (!StringUtil.isEmpty(title)) {
-      Rectangle2D bounds = g2d.getFontMetrics().getStringBounds(title, g2d);
+      Rectangle2D bounds;
+      Font titleFont = axisTitle.getTitleFont();
+      if (titleFont == null) {
+        bounds = g2d.getFontMetrics().getStringBounds(title, g2d);
+      } else {
+        bounds = titleFont.getStringBounds(title, g2d.getFontRenderContext());
+      }
       int dimension = axis.getDimension();
       switch (dimension) {
         case Chart2D.X:
@@ -89,8 +95,7 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
           }
           break;
         default:
-          throw new IllegalArgumentException(
-              "Given axis.getDimension() is neither Chart2D.X nor Chart2D.Y!");
+          throw new IllegalArgumentException("Given axis.getDimension() is neither Chart2D.X nor Chart2D.Y!");
       }
     }
     return result;
@@ -98,20 +103,23 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
 
   /**
    * @see info.monitorenter.gui.chart.IAxisTitlePainter#getWidth(info.monitorenter.gui.chart.IAxis,
-   *      java.awt.Graphics)
+   *      java.awt.Graphics2D)
    */
-  public int getWidth(final IAxis<?> axis, final Graphics g2d) {
+  public int getWidth(final IAxis< ? > axis, final Graphics2D g2d) {
     int result = 0;
     IAxis.AxisTitle axisTitle = axis.getAxisTitle();
     String title = axisTitle.getTitle();
+    Rectangle2D bounds;
     if (!StringUtil.isEmpty(title)) {
       // incorporation of our font if there:
       Font backUpFont = g2d.getFont();
       Font titleFont = axisTitle.getTitleFont();
       if (titleFont != null) {
         g2d.setFont(titleFont);
+        bounds = titleFont.getStringBounds(title, g2d.getFontRenderContext());
+      } else {
+        bounds = g2d.getFontMetrics().getStringBounds(title, g2d);
       }
-      Rectangle2D bounds = g2d.getFontMetrics().getStringBounds(title, g2d);
       int dimension = axis.getDimension();
       switch (dimension) {
         case Chart2D.X:
@@ -127,8 +135,7 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
           }
           break;
         default:
-          throw new IllegalArgumentException(
-              "Given axis.getDimension() is neither Chart2D.X nor Chart2D.Y!");
+          throw new IllegalArgumentException("Given axis.getDimension() is neither Chart2D.X nor Chart2D.Y!");
       }
       // resetting original font if it was changed:
       if (titleFont != null) {
@@ -144,10 +151,10 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
    * position (overwriting titles)!
    * 
    * @see info.monitorenter.gui.chart.IAxisTitlePainter#paintTitle(info.monitorenter.gui.chart.IAxis,
-   *      java.awt.Graphics)
+   *      java.awt.Graphics2D)
    */
-  public void paintTitle(final IAxis<?> axis, final Graphics g) {
-
+  public void paintTitle(final IAxis< ? > axis, final Graphics2D g) {
+    Chart2D chart = axis.getAccessor().getChart();
     IAxis.AxisTitle axisTitle = axis.getAxisTitle();
     String title = axisTitle.getTitle();
     Rectangle2D bounds;
@@ -156,18 +163,19 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
     Font backUpFont = g.getFont();
     Color titleColor = axisTitle.getTitleColor();
     Color backUpColor = g.getColor();
-
+    int fontDecent = 0;
     if (titleFont != null) {
       g.setFont(titleFont);
+      bounds = titleFont.getStringBounds(title, g.getFontRenderContext());
+      fontDecent = (int)titleFont.getLineMetrics(title, g.getFontRenderContext()).getDescent();
+    } else {
+      bounds = g.getFontMetrics().getStringBounds(title, g);
+      titleFont = chart.getFont();
+      fontDecent = (int)g.getFontMetrics().getDescent();
     }
     if (titleColor != backUpColor && titleColor != null) {
       g.setColor(titleColor);
     }
-
-    bounds = g.getFontMetrics().getStringBounds(title, g);
-
-    Chart2D chart = axis.getAccessor().getChart();
-
     int dimension = axis.getDimension();
     int position = axis.getAxisPosition();
     switch (dimension) {
@@ -179,7 +187,13 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
             int endX = chart.getXChartEnd();
             double xspace = bounds.getWidth();
             int titleStartX = (int) ((endX - startX) / 2.0 - xspace / 2.0);
-            g.drawString(title, titleStartX, axis.getPixelYBottom() - 4);
+            g.drawString(title, titleStartX, axis.getPixelYBottom());
+            if (Chart2D.DEBUG_LAYOUT) {
+              Color backupColor = g.getColor();
+              g.setColor(Color.LIGHT_GRAY);
+              g.drawRect(titleStartX, axis.getPixelYBottom()-(int)bounds.getHeight(), (int) bounds.getWidth(), (int) bounds.getHeight());
+              g.setColor(backupColor);
+            }
             break;
           }
           case Chart2D.CHART_POSITION_TOP: {
@@ -187,8 +201,7 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
             int endX = chart.getXChartEnd();
             double xspace = bounds.getWidth();
             int titleStartX = (int) ((endX - startX) / 2.0 - xspace / 2.0);
-            g.drawString(title, titleStartX, axis.getPixelYTop()
-                + chart.getFontMetrics(chart.getFont()).getHeight());
+            g.drawString(title, titleStartX, axis.getPixelYTop() + (int) bounds.getHeight());
             break;
           }
           default: {
@@ -208,28 +221,33 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
               int endY = chart.getYChartEnd();
               double yspace = bounds.getWidth();
               int titleStartY = (int) ((startY - endY) / 2.0 + yspace / 2.0);
-              if(titleStartY <= 0){
-                System.err.println("titleStartY below or equal to zero: "+titleStartY);
-              } 
-              int titleStartX = axis.getPixelXLeft() + chart.getFontMetrics(chart.getFont()).getHeight();
-              if(titleStartX <= 0){
-                System.err.println("titleStartX below or equal to zero: "+titleStartX);
-              } 
+              if (titleStartY <= 0) {
+                System.err.println("titleStartY below or equal to zero: " + titleStartY);
+              }
+              int titleStartX = axis.getPixelXLeft() + (int) bounds.getHeight()-fontDecent;
+              if (titleStartX <= 0) {
+                System.err.println("titleStartX below or equal to zero: " + titleStartX);
+              }
               // store former font for later restore:
-              Font oldFont = g.getFont();
-              Font rotateFont = oldFont.deriveFont(AffineTransform.getRotateInstance(-Math.PI / 2.0));
+              Font rotateFont = titleFont.deriveFont(AffineTransform.getRotateInstance(-Math.PI / 2.0));
               g2d.setFont(rotateFont);
-              
+
               g2d.drawString(title, titleStartX, titleStartY);
-              g2d.setFont(oldFont);
+              if(Chart2D.DEBUG_LAYOUT) {
+                Color backupColor = g.getColor();
+                g.setColor(Color.LIGHT_GRAY);
+                g.drawRect(axis.getPixelXLeft(), titleStartY-(int)bounds.getWidth(), (int)bounds.getHeight(), (int)bounds.getWidth());
+                g.setColor(backupColor);
+              }
+
+              g2d.setFont(titleFont);
             } else {
               // no rotation: display in vertical middle:
               int startY = chart.getYChartStart();
               int endY = chart.getYChartEnd();
               double yspace = bounds.getWidth();
               int titleStartY = (int) ((startY - endY) / 2.0 + yspace / 2.0);
-              int titleStartX = axis.getPixelXLeft()
-                  + chart.getFontMetrics(chart.getFont()).getHeight();
+              int titleStartX = axis.getPixelXLeft() + (int) bounds.getHeight();
               g.drawString(title, titleStartX, titleStartY);
 
             }
@@ -243,33 +261,33 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
               int endY = chart.getYChartEnd();
               double yspace = bounds.getWidth();
               int titleStartY = (int) ((startY - endY) / 2.0 + yspace / 2.0);
-
-              int chartLabelFontWidth = chart.getFontMetrics(chart.getFont()).charWidth('0');
+              int chartLabelFontWidth = chart.getFontMetrics(titleFont).charWidth('0');
               int xShiftPosition = chart.getAxisTickPainter().getMajorTickLength();
               xShiftPosition += axis.getFormatter().getMaxAmountChars() * chartLabelFontWidth;
 
-//              AffineTransform tr = g2d.getTransform();
-//              AffineTransform at = g2d.getDeviceConfiguration().getDefaultTransform();
-//              at.translate(chart.getXChartEnd() + xShiftPosition, titleStartY);
-//              at.rotate(-Math.PI / 2);
-//              g2d.setTransform(at);
-//              g2d.drawString(title, 0, 0);
-//              g2d.setTransform(tr);
-              
+              // AffineTransform tr = g2d.getTransform();
+              // AffineTransform at =
+              // g2d.getDeviceConfiguration().getDefaultTransform();
+              // at.translate(chart.getXChartEnd() + xShiftPosition,
+              // titleStartY);
+              // at.rotate(-Math.PI / 2);
+              // g2d.setTransform(at);
+              // g2d.drawString(title, 0, 0);
+              // g2d.setTransform(tr);
+
               // store former font for later restore:
               Font oldFont = g.getFont();
               Font rotateFont = oldFont.deriveFont(AffineTransform.getRotateInstance(-Math.PI / 2.0));
               g2d.setFont(rotateFont);
               g2d.drawString(title, chart.getXChartEnd() + xShiftPosition, titleStartY);
               g2d.setFont(oldFont);
-              
-              
+
             } else {
               int startY = chart.getYChartStart();
               int endY = chart.getYChartEnd();
               double yspace = bounds.getWidth();
               int titleStartY = (int) ((startY - endY) / 2.0 + yspace / 2.0);
-              int chartLabelFontWidth = chart.getFontMetrics(chart.getFont()).charWidth('0');
+              int chartLabelFontWidth = chart.getFontMetrics(titleFont).charWidth('0');
               int xShiftPosition = chart.getAxisTickPainter().getMajorTickLength();
               xShiftPosition += axis.getFormatter().getMaxAmountChars() * chartLabelFontWidth;
               int titleStartX = xShiftPosition + chart.getXChartEnd();
@@ -283,8 +301,7 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
         }
         break;
       default:
-        throw new IllegalArgumentException(
-            "Given axis.getDimension() is neither Chart2D.X nor Chart2D.Y!");
+        throw new IllegalArgumentException("Given axis.getDimension() is neither Chart2D.X nor Chart2D.Y!");
     }
     // resetting original font if it was changed:
     if (titleFont != null) {

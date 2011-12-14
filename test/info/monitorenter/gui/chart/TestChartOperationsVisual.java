@@ -19,6 +19,7 @@ import info.monitorenter.util.Range;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -461,6 +462,19 @@ public class TestChartOperationsVisual extends ATestChartOperations {
   @org.junit.Test
   public void testHideAxisTitles() {
     ATestChartOperations.AChartOperation operation = new AChartOperation("Hide axis titles") {
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#preCondition(info.monitorenter.gui.chart.Chart2D)
+       */
+      @Override
+      public void preCondition(Chart2D chart) throws Exception {
+        super.preCondition(chart);
+        AxisTitle yTitle = chart.getAxisX().getAxisTitle();
+        Font yFont = yTitle.getTitleFont();
+        Font yNewFont = yFont.deriveFont(36f);
+        yTitle.setTitleFont(yNewFont);
+      }
+
       /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
        */
@@ -476,7 +490,6 @@ public class TestChartOperationsVisual extends ATestChartOperations {
     this.setTestOperation(operation);
   }
 
-  
   /**
    * Turns off scale painting for axes prompts for visual judgement.
    * <p>
@@ -484,6 +497,29 @@ public class TestChartOperationsVisual extends ATestChartOperations {
   @org.junit.Test
   public void testAxisSetPaintScale() {
     ATestChartOperations.AChartOperation operation = new AChartOperation("IAxis.setPaintScale(false)") {
+      
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#preCondition(info.monitorenter.gui.chart.Chart2D)
+       */
+      @Override
+      public void preCondition(Chart2D chart) throws Exception {
+        super.preCondition(chart);
+        // y
+        AxisTitle title = chart.getAxisY().getAxisTitle();
+        Font font = title.getTitleFont();
+        if(font == null){
+          font = chart.getFont();
+        }
+        
+        Font newFont = font.deriveFont(36f);
+        title.setTitleFont(newFont);
+        // x
+        title = chart.getAxisX().getAxisTitle();
+        title.setTitle("W");
+        title.setTitleFont(newFont);
+        
+        
+      }
       /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
        */

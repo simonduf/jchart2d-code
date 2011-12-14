@@ -33,7 +33,7 @@ import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.math.MathUtil;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -60,7 +60,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
    */
   protected double m_power;
 
-  public List<LabeledValue> getScaleValues(final Graphics g2d, final IAxis<?> axis) {
+  public List<LabeledValue> getScaleValues(final Graphics2D g2d, final IAxis<?> axis) {
     final double labelspacepx = axis.getAccessor().getMinimumValueDistanceForLabels(g2d);
     final double formattingspace = axis.getFormatter().getMinimumValueShiftForChange();
     final double max = Math.max(labelspacepx, formattingspace);

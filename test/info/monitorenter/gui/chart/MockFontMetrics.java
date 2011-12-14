@@ -27,7 +27,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 
 /**
- * A mock ojbect for <code>{@link FontMetrics}</code>.
+ * A mock object for <code>{@link FontMetrics}</code>.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>

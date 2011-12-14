@@ -44,6 +44,7 @@ import info.monitorenter.util.math.MathUtil;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -165,9 +166,10 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      * 
      * @param g2d
      *          needed for font metric information.
+     *          
      * @return the height in pixel the corresponding axis needs to paint itself.
      */
-    public abstract int getHeight(Graphics g2d);
+    public abstract int getHeight(Graphics2D g2d);
 
     /**
      * Returns the maximum pixels that will be needed to paint a label.
@@ -178,7 +180,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      *          (e.g. font size).
      * @return the maximum pixels that will be needed to paint a label.
      */
-    protected abstract double getMaximumPixelForLabel(final Graphics g2d);
+    protected abstract double getMaximumPixelForLabel(final Graphics2D g2d);
 
     /**
      * Returns the max value of the given trace according to the dimension the
@@ -201,7 +203,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      * <p>
      * This procedure needs the amount of pixels needed by the largest possible
      * label and relies on the implementation of
-     * {@link #getMaximumPixelForLabel(Graphics)}, whose result is multiplied
+     * {@link #getMaximumPixelForLabel(Graphics2D)}, whose result is multiplied
      * with the "value per pixel" quantifier.
      * <p>
      * 
@@ -211,7 +213,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      * @return the minimum amount of increase in the value that will be needed
      *         to display all labels without overwriting each others.
      */
-    public abstract double getMinimumValueDistanceForLabels(final Graphics g2d);
+    public abstract double getMinimumValueDistanceForLabels(final Graphics2D g2d);
 
     /**
      * Returns the min value of the given trace according to the dimension the
@@ -293,7 +295,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      *          needed for font metric information.
      * @return the width in pixel the corresponding axis needs to paint itself.
      */
-    public abstract int getWidth(Graphics g2d);
+    public abstract int getWidth(Graphics2D g2d);
 
     /**
      * Scales the given trace in the dimension represented by this axis.
@@ -526,7 +528,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getHeight(java.awt.Graphics)
      */
     @Override
-    public int getHeight(final Graphics g2d) {
+    public int getHeight(final Graphics2D g2d) {
       int result = 0;
       if (AAxis.this.isPaintScale()) {
 
@@ -545,7 +547,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMaximumPixelForLabel(Graphics)
      */
     @Override
-    protected final double getMaximumPixelForLabel(final Graphics g2d) {
+    protected final double getMaximumPixelForLabel(final Graphics2D g2d) {
 
       final FontMetrics fontdim = g2d.getFontMetrics();
       final int fontwidth = fontdim.charWidth('0');
@@ -570,7 +572,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMinimumValueDistanceForLabels(java.awt.Graphics)
      */
     @Override
-    public final double getMinimumValueDistanceForLabels(final Graphics g2d) {
+    public final double getMinimumValueDistanceForLabels(final Graphics2D g2d) {
 
       double result;
       final Dimension d = this.m_chart.getSize();
@@ -634,7 +636,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getWidth(java.awt.Graphics)
      */
     @Override
-    public int getWidth(final Graphics g2d) {
+    public int getWidth(final Graphics2D g2d) {
       /*
        * Why return any width for the x-axis?
        * 
@@ -785,7 +787,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getHeight(java.awt.Graphics)
      */
     @Override
-    public final int getHeight(final Graphics g2d) {
+    public final int getHeight(final Graphics2D g2d) {
       /*
        * Why return a height for an y-axis?
        * 
@@ -800,17 +802,19 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
         // -4 is for showing colons of x - labels that are below the baseline
         result += 4;
       }
+      // and the Width of the axis title:
+      result += AAxis.this.getAxisTitle().getTitlePainter().getHeight(AAxis.this, g2d);
       return result;
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMaximumPixelForLabel(Graphics)
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMaximumPixelForLabel(Graphics2D)
      * @param g2d
      *          the current graphic context to use in case further information
      *          is required.
      */
     @Override
-    protected final double getMaximumPixelForLabel(final Graphics g2d) {
+    protected final double getMaximumPixelForLabel(final Graphics2D g2d) {
 
       final FontMetrics fontdim = g2d.getFontMetrics();
       final int fontheight = fontdim.getHeight();
@@ -829,7 +833,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMinimumValueDistanceForLabels(Graphics)
      */
     @Override
-    public final double getMinimumValueDistanceForLabels(final Graphics g2d) {
+    public final double getMinimumValueDistanceForLabels(final Graphics2D g2d) {
 
       double result;
       final Dimension d = this.m_chart.getSize();
@@ -893,7 +897,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getWidth(java.awt.Graphics)
      */
     @Override
-    public final int getWidth(final Graphics g2d) {
+    public final int getWidth(final Graphics2D g2d) {
       int result = 0;
       if (AAxis.this.isPaintScale()) {
         final FontMetrics fontdim = g2d.getFontMetrics();
@@ -1719,9 +1723,9 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IAxis#getHeight(java.awt.Graphics)
+   * @see info.monitorenter.gui.chart.IAxis#getHeight(java.awt.Graphics2D)
    */
-  public final int getHeight(final Graphics g2d) {
+  public final int getHeight(final Graphics2D g2d) {
 
     return this.getAccessor().getHeight(g2d);
   }
@@ -1896,9 +1900,9 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IAxis#getWidth(java.awt.Graphics)
+   * @see info.monitorenter.gui.chart.IAxis#getWidth(java.awt.Graphics2D)
    */
-  public final int getWidth(final Graphics g2d) {
+  public final int getWidth(final Graphics2D g2d) {
     return this.getAccessor().getWidth(g2d);
   }
 
@@ -2086,9 +2090,9 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IAxis#paint(java.awt.Graphics)
+   * @see info.monitorenter.gui.chart.IAxis#paint(java.awt.Graphics2D)
    */
-  public void paint(final Graphics g2d) {
+  public void paint(final Graphics2D g2d) {
     if (!this.m_visible) {
       return;
     }
@@ -2124,7 +2128,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
    * @param g2d
    *          the graphics context to use.
    */
-  private void paintAxisXBottom(final Graphics g2d) {
+  private void paintAxisXBottom(final Graphics2D g2d) {
     final Chart2D chart = this.getAccessor().getChart();
     int tmp = 0;
     final FontMetrics fontdim = g2d.getFontMetrics();
@@ -2178,7 +2182,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
    * @param g2d
    *          the graphics context to use.
    */
-  private void paintAxisXTop(final Graphics g2d) {
+  private void paintAxisXTop(final Graphics2D g2d) {
     final Chart2D chart = this.getAccessor().getChart();
     int tmp = 0;
     final FontMetrics fontdim = g2d.getFontMetrics();
@@ -2231,7 +2235,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
    * @param g2d
    *          the graphics context to use.
    */
-  private void paintAxisYLeft(final Graphics g2d) {
+  private void paintAxisYLeft(final Graphics2D g2d) {
     final Chart2D chart = this.getAccessor().getChart();
     int tmp = 0;
     final FontMetrics fontdim = g2d.getFontMetrics();
@@ -2282,7 +2286,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
    * @param g2d
    *          the graphics context to use.
    */
-  private void paintAxisYRight(final Graphics g2d) {
+  private void paintAxisYRight(final Graphics2D g2d) {
     final Chart2D chart = this.getAccessor().getChart();
     int tmp = 0;
     final FontMetrics fontdim = g2d.getFontMetrics();
@@ -2331,7 +2335,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
   /**
    * @see info.monitorenter.gui.chart.IAxis#paintTitle(java.awt.Graphics)
    */
-  public int paintTitle(final Graphics g2d) {
+  public int paintTitle(final Graphics2D g2d) {
     int result = 0;
     // TODO: Add support for different axis locations: top, bottom, left,right!
     // drawing the title :

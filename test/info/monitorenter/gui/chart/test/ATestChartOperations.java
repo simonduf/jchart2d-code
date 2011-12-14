@@ -400,6 +400,7 @@ public abstract class ATestChartOperations extends TestCase {
      this.m_testOperation.fillTrace(traces[i]);
      }
     // Assert.assertNotSame(this.m_axisX, this.m_axisY);
+     this.m_testOperation.preCondition(chart);
 
     JFrame frame = new JFrame();
     frame.getContentPane().add(chart);
@@ -410,7 +411,6 @@ public abstract class ATestChartOperations extends TestCase {
 
     Thread.sleep(1000);
 
-    this.m_testOperation.preCondition(chart);
 
     // Modal dialog for announcing the test:
     JTextArea textArea = new JTextArea();

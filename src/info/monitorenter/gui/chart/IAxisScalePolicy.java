@@ -26,7 +26,7 @@
 
 package info.monitorenter.gui.chart;
 
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.List;
 
 public interface IAxisScalePolicy {
@@ -46,7 +46,7 @@ public interface IAxisScalePolicy {
    * @return the labeled values that will be used by the <code>{@link Chart2D}
    *         </code> to paint labels.
    */
-  public abstract List<LabeledValue> getScaleValues(final Graphics g2d, final IAxis<?> axis);
+  public abstract List<LabeledValue> getScaleValues(final Graphics2D g2d, final IAxis<?> axis);
 
   /**
    * Performs expensive calculations for various values that are used by many

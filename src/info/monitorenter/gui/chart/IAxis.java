@@ -421,6 +421,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    * {@link #setAxisTitle(AxisTitle)}.
    */
   public static final String PROPERTY_AXIS_TITLE = "IAxis.PROPERTY_AXIS_TITLE";
+
   /**
    * Add a listener for the given property.
    * <p>
@@ -580,16 +581,17 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    * <p>
    * This includes the axis line, it's ticks and labels and it's title.
    * <p>
-   * <b>Note:</b></br/> For an y axis the hight only includes the overhang it
+   * <b>Note:</b></br/> For an y axis the height only includes the overhang it
    * needs on the upper edge for painting a complete lable, not the complete
    * space it needs for the complete line.
    * <p>
    * 
    * @param g2d
    *          needed for font metric information.
+   * 
    * @return the height in pixel this axis needs to paint itself.
    */
-  public int getHeight(Graphics g2d);
+  public int getHeight(Graphics2D g2d);
 
   /**
    * Get the major tick spacing for label generation.
@@ -612,20 +614,18 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
   public double getMax();
 
   /**
-   * Returns the maximum value of all
-   * <code>{@link ITracePoint2D}</code> instances in
-   * all <code>{@link ITrace2D}</code> instances in this axis regardless of the
-   * configured <code>{@link IRangePolicy}</code> (see
+   * Returns the maximum value of all <code>{@link ITracePoint2D}</code>
+   * instances in all <code>{@link ITrace2D}</code> instances in this axis
+   * regardless of the configured <code>{@link IRangePolicy}</code> (see
    * <code>{@link IAxis#setRangePolicy(IRangePolicy)}</code>). The returned
    * value is either in x or y dimension - depending on the dimension this axis
    * is working in for the chart.
    * <p>
    * 
-   * @return the maximum value of all <code>
-   *         {@link ITracePoint2D}</code> instances
-   *         in all <code>{@link ITrace2D}</code> instances in this axis
-   *         regardless of the configured <code>{@link IRangePolicy}</code> (see
-   *         <code>{@link IAxis#setRangePolicy(IRangePolicy)}</code>).
+   * @return the maximum value of all <code> {@link ITracePoint2D}</code>
+   *         instances in all <code>{@link ITrace2D}</code> instances in this
+   *         axis regardless of the configured <code>{@link IRangePolicy}</code>
+   *         (see <code>{@link IAxis#setRangePolicy(IRangePolicy)}</code>).
    */
   public double getMaxValue();
 
@@ -649,20 +649,18 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
   public abstract double getMinorTickSpacing();
 
   /**
-   * Returns the minimum value of all
-   * <code>{@link ITracePoint2D}</code> instances in
-   * all <code>{@link ITrace2D}</code> instances in this axis regardless of the
-   * configured <code>{@link IRangePolicy}</code> (see
+   * Returns the minimum value of all <code>{@link ITracePoint2D}</code>
+   * instances in all <code>{@link ITrace2D}</code> instances in this axis
+   * regardless of the configured <code>{@link IRangePolicy}</code> (see
    * <code>{@link IAxis#setRangePolicy(IRangePolicy)}</code>). The returned
    * value is either in x or y dimension - depending on the dimension this axis
    * is working in for the chart.
    * <p>
    * 
-   * @return the minimum value of all <code>
-   *         {@link ITracePoint2D}</code> instances
-   *         in all <code>{@link ITrace2D}</code> instances in this axis
-   *         regardless of the configured <code>{@link IRangePolicy}</code> (see
-   *         <code>{@link IAxis#setRangePolicy(IRangePolicy)}</code>).
+   * @return the minimum value of all <code> {@link ITracePoint2D}</code>
+   *         instances in all <code>{@link ITrace2D}</code> instances in this
+   *         axis regardless of the configured <code>{@link IRangePolicy}</code>
+   *         (see <code>{@link IAxis#setRangePolicy(IRangePolicy)}</code>).
    */
   public double getMinValue();
 
@@ -823,7 +821,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    *          needed for font metric information.
    * @return the width in pixel this axis needs to paint itself.
    */
-  public int getWidth(Graphics g2d);
+  public int getWidth(Graphics2D g2d);
 
   /**
    * Returns true if this axis is responsible for rendering the scale of the
@@ -874,18 +872,17 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
 
   /**
    * Returns true if the bounds in the given dimension of all
-   * {@link ITracePoint2D} instances of all internal
-   * {@link ITrace2D} instances have changed since all points have been
-   * normalized to a value between 0 and 1 or true if this axis has different
-   * range since the last call to <code>{@link IAxis#scale()}</code>.
+   * {@link ITracePoint2D} instances of all internal {@link ITrace2D} instances
+   * have changed since all points have been normalized to a value between 0 and
+   * 1 or true if this axis has different range since the last call to
+   * <code>{@link IAxis#scale()}</code>.
    * <p>
    * 
    * @return true if the bounds in the given dimension of all
-   *         {@link ITracePoint2D} instances of all
-   *         internal {@link ITrace2D} instances have changed since all points
-   *         have been normalized to a value between 0 and 1 or true if this
-   *         axis has different range since the last call to <code>
-   *         {@link IAxis#scale()}</code>.
+   *         {@link ITracePoint2D} instances of all internal {@link ITrace2D}
+   *         instances have changed since all points have been normalized to a
+   *         value between 0 and 1 or true if this axis has different range
+   *         since the last call to <code> {@link IAxis#scale()}</code>.
    */
   public boolean isDirtyScaling();
 
@@ -931,7 +928,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    * @param g2d
    *          the graphics context to use.
    */
-  public void paint(final Graphics g2d);
+  public void paint(final Graphics2D g2d);
 
   /**
    * Routine for painting the title of this axis.
@@ -940,10 +937,11 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    * 
    * @param g2d
    *          needed for painting.
+   * 
    * @return the width consumed in pixel for y axis, the height consumed in
    *         pixel for x axis.
    */
-  public int paintTitle(final Graphics g2d);
+  public int paintTitle(final Graphics2D g2d);
 
   /**
    * Convenience method for removing all contained <code>{@link ITrace2D}</code>

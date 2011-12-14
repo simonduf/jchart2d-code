@@ -503,25 +503,30 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   public static final int CHART_POSITION_TOP = 16;
 
   /**
-   * A package wide switch for debugging problems with scaling. Set to false the
+   * A switch for debugging problems with scaling. Set to false the
    * compiler will remove the debugging statements.
    */
   public static final boolean DEBUG_SCALING = false;
+  /**
+   * A switch for debugging problems with layouting. Set to false the
+   * compiler will remove the debugging statements.
+   */
+  public static final boolean DEBUG_LAYOUT = true;
 
   /**
-   * A package wide switch for debugging problems with data accumulation. Set to
+   * A switch for debugging problems with data accumulation. Set to
    * false the compiler will remove the debugging statements.
    */
   public static final boolean DEBUG_DATA_ACCUMULATION = false;
 
   /**
-   * A package wide switch for debugging problems with highlighting. Set to
+   * A switch for debugging problems with highlighting. Set to
    * false the compiler will remove the debugging statements.
    */
   public static final boolean DEBUG_HIGHLIGHTING = false;
 
   /**
-   * A package wide switch for debugging problems with multithreading. Set to
+   * A switch for debugging problems with multithreading. Set to
    * false the compiler will remove the debugging statements.
    */
   public static final boolean DEBUG_THREADING = false;
@@ -1398,9 +1403,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    *          needed for size informations.
    * @return the end x coordinate (right bound) in pixel of the chart to draw.
    */
-  private int calculateXChartEnd(final Graphics g2d) {
+  private int calculateXChartEnd(final Graphics g) {
     int result;
     result = (int) this.getSize().getWidth();
+    Graphics2D g2d = (Graphics2D) g;
 
     IAxis< ? > currentAxis;
     int axisWidth = 0;
@@ -1465,8 +1471,9 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * 
    * @return the start x coordinate (left bound) in pixel of the chart to draw.
    */
-  private int calculateXChartStart(final Graphics g2d) {
+  private int calculateXChartStart(final Graphics2D g2d) {
     int result = 0;
+    
     // reverse iteration because the most left axes are the latter ones:
     ListIterator<IAxis< ? >> it = this.m_axesYLeft.listIterator(this.m_axesYLeft.size());
     IAxis< ? > currentAxis;
@@ -1498,7 +1505,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * 
    * @return the start x coordinate (left bound) in pixel of the chart to draw.
    */
-  private int installXAxisLeftOffset(final Graphics g2d, final int offset) {
+  private int installXAxisLeftOffset(final Graphics2D g2d, final int offset) {
     int result = offset;
     // reverse iteration because the most left axes are the latter ones:
     ListIterator<IAxis< ? >> it = this.m_axesYLeft.listIterator(this.m_axesYLeft.size());
@@ -1534,7 +1541,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    *          needed for size informations.
    * @return the end y coordinate (upper bound) in pixel of the chart to draw.
    */
-  private int calculateYChartEnd(final Graphics g2d) {
+  private int calculateYChartEnd(final Graphics2D g2d) {
     IAxis< ? > currentAxis;
     int tmp;
     int result = 0;
@@ -1599,12 +1606,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    *          the height of the labels below the chart.
    * @return the start y coordinate (lower bound) in pixel of the chart to draw.
    */
-  private int calculateYChartStart(final Graphics g2d, final int labelHeight) {
+  private int calculateYChartStart(final Graphics2D g2d, final int labelHeight) {
     int result;
     result = (int) this.getSize().getHeight();
     result = result - labelHeight;
     IAxis< ? > currentAxis;
-    int axesXBottomHeight = 0;
     Iterator<IAxis< ? >> it = this.m_axesXBottom.iterator();
     while (it.hasNext()) {
       currentAxis = it.next();
@@ -1614,8 +1620,6 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       }
       currentAxis.setPixelYTop(result);
     }
-
-    result = result - axesXBottomHeight;
     if (result == this.getSize().getHeight()) {
       // ensure minimum offset when no axis are visible
       result -= 20;
@@ -2696,10 +2700,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * 
    * @param g2d
    *          needed for size information.
-   * @see #calculateXChartStart(Graphics)
-   * @see #calculateXChartEnd(Graphics)
+   * @see #calculateXChartStart(Graphics2D)
+   * @see #calculateXChartEnd(Graphics2D)
    */
-  private void negociateXChart(final Graphics g2d) {
+  private void negociateXChart(final Graphics2D g2d) {
     if (this.m_synchronizedXStartChart != null) {
       int myXChartStart = this.calculateXChartStart(g2d);
       int otherXChartStart = this.m_synchronizedXStartChart.calculateXChartStart(g2d);
@@ -2773,13 +2777,13 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       System.out.println("paint, 1 lock");
     }
     super.paintComponent(g);
+    Graphics2D g2d = (Graphics2D) g;
     // printing ?
     if (this.m_pageFormat != null) {
       /*
        * User (0,0) is typically outside the imageable area, so we must
        * translate by the X and Y values in the PageFormat to avoid clipping
        */
-      Graphics2D g2d = (Graphics2D) g;
       double startX = this.m_pageFormat.getImageableX();
       double startY = this.m_pageFormat.getImageableY();
       g2d.translate(startX, startY);
@@ -2789,14 +2793,14 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     ITrace2D trace;
     Iterator<ITrace2D> traceIt;
     // painting trace labels
-    this.negociateXChart(g);
+    this.negociateXChart(g2d);
     int labelHeight = this.paintTraceLabels(g);
     // finding start point of coordinate System.
-    this.m_yChartStart = this.calculateYChartStart(g, labelHeight);
-    this.m_yChartEnd = this.calculateYChartEnd(g);
+    this.m_yChartStart = this.calculateYChartStart(g2d, labelHeight);
+    this.m_yChartEnd = this.calculateYChartEnd(g2d);
     int rangex = this.m_xChartEnd - this.m_xChartStart;
     int rangey = this.m_yChartStart - this.m_yChartEnd;
-    this.paintCoordinateSystem(g);
+    this.paintCoordinateSystem(g2d);
     // paint Traces.
     int tmpx = 0;
     int oldtmpx;
@@ -2807,10 +2811,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     ITracePoint2D tmppt = null;
     traceIt = this.getTraces().iterator();
     // Some operations (e.g. stroke) need Graphics2d
-    Graphics2D g2d = null;
     Stroke backupStroke = null;
 
-    if (g instanceof Graphics2D) {
       g2d = (Graphics2D) g;
       backupStroke = g2d.getStroke();
       if (this.isUseAntialiasing()) {
@@ -2820,7 +2822,6 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         renderHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         g2d.setRenderingHints(renderHints);
       }
-    }
 
     int countTrace = 0;
     Iterator<ITracePainter< ? >> itTracePainters;
@@ -3012,7 +3013,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @param g2d
    *          the graphics context to use.
    */
-  private void paintCoordinateSystem(final Graphics g2d) {
+  private void paintCoordinateSystem(final Graphics2D g2d) {
     // drawing the axes:
     g2d.setColor(this.getForeground());
     IAxis< ? > currentAxis;
