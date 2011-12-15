@@ -1399,8 +1399,9 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * be clipped.
    * <p>
    * 
-   * @param g2d
+   * @param g
    *          needed for size informations.
+   *          
    * @return the end x coordinate (right bound) in pixel of the chart to draw.
    */
   private int calculateXChartEnd(final Graphics g) {
@@ -2973,7 +2974,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
           }
           if (DEBUG_DATA_ACCUMULATION) {
             stopWatchPointRendering.stop();
-            System.out.println(this.getClass().getName()+" rendered " + countPoints + " points of a trace with " + trace.getSize() + " points. It took "+stopWatchPointRendering.getPureMilliSeconds()+" ms.");
+            System.out.println(this.getClass().getName()+" rendered " + countPoints + " points of a trace with " + trace.getSize() + " points. It took "+stopWatchPointRendering.snapShot() +" ms.");
             stopWatchPointRendering.reset();
           }
           itTracePainters = trace.getTracePainters().iterator();

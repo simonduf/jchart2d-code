@@ -101,7 +101,7 @@ public class AccumulatingIteratorConseCutivePointsOrderedXValues extends AAccumu
     this.m_firstPoint = skipResult.getLastInvisible();
     if (Chart2D.DEBUG_DATA_ACCUMULATION) {
       stopWatch.stop();
-      System.out.println(this.getClass().getName() + " took " + stopWatch.getPureMilliSeconds() + " ms to scroll to first visbible point. ");
+      System.out.println(this.getClass().getName() + " took " + stopWatch.snapShot() + " ms to scroll to first visbible point. ");
     }
 
     Iterator<ITracePoint2D> backwardIterator = originalTrace.descendingIterator();
@@ -115,7 +115,7 @@ public class AccumulatingIteratorConseCutivePointsOrderedXValues extends AAccumu
     if (Chart2D.DEBUG_DATA_ACCUMULATION) {
       System.out.println(this.getClass().getName() + " skipped " + skipResultBackwards.getSkipCount() + " tailing invisible points.");
       stopWatch.stop();
-      System.out.println(this.getClass().getName() + " took " + stopWatch.getPureMilliSeconds() + " ms to scroll out tailing invisible points");
+      System.out.println(this.getClass().getName() + " took " + stopWatch.snapShot() + " ms to scroll out tailing invisible points");
     }
     /*
      * Compute the amount of points per next() to accumulate:
