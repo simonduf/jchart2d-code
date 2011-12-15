@@ -25,7 +25,7 @@ import java.io.Serializable;
 
 /**
  * Interface for an error bar in the pixel domain (vs. value domain) for a single
- * {@link info.monitorenter.gui.chart.TracePoint2D}.
+ * {@link info.monitorenter.gui.chart.ITracePoint2D}.
  * <p>
  * Errors returned from the getters represent only the error part and not the absolute value. Errors
  * are always absolute values (vs. relative to the original value to add the error to.

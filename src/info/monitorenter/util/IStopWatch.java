@@ -84,12 +84,17 @@ public interface IStopWatch {
      *  Adds the period from the m_start-value to now to the internal total measurement- 
      *  call. To avoid double - summation of the same time- periods a new m_start- value 
      *  is set directly. 
+     *  <p>
+     *  
+     *  @return the amount of milliseconds this stop watch has been running since last call to {@link #reset()}.
      **/
     public long snapShot();
     /**
      *  Returns the current value of the IStopWatch in ms. 
      *  This has to be the sum of all previous measurements (circles  of <code>m_start()-stop()</code>)
      *  not interrupted by calls to <code>reset()</code>.
+     *  
+     *  @return the current value of the IStopWatch in ms. 
      **/
     public long getPureMilliSeconds();
 

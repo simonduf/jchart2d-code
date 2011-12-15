@@ -525,7 +525,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getHeight(java.awt.Graphics)
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getHeight(Graphics2D)
      */
     @Override
     public int getHeight(final Graphics2D g2d) {
@@ -544,7 +544,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMaximumPixelForLabel(Graphics)
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMaximumPixelForLabel(Graphics2D)
      */
     @Override
     protected final double getMaximumPixelForLabel(final Graphics2D g2d) {
@@ -569,7 +569,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMinimumValueDistanceForLabels(java.awt.Graphics)
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMinimumValueDistanceForLabels(Graphics2D)
      */
     @Override
     public final double getMinimumValueDistanceForLabels(final Graphics2D g2d) {
@@ -633,7 +633,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getWidth(java.awt.Graphics)
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getWidth(Graphics2D)
      */
     @Override
     public int getWidth(final Graphics2D g2d) {
@@ -784,7 +784,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getHeight(java.awt.Graphics)
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getHeight(Graphics2D)
      */
     @Override
     public final int getHeight(final Graphics2D g2d) {
@@ -830,7 +830,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMinimumValueDistanceForLabels(Graphics)
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMinimumValueDistanceForLabels(Graphics2D)
      */
     @Override
     public final double getMinimumValueDistanceForLabels(final Graphics2D g2d) {
@@ -894,7 +894,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getWidth(java.awt.Graphics)
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getWidth(Graphics2D)
      */
     @Override
     public final int getWidth(final Graphics2D g2d) {
@@ -2333,7 +2333,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IAxis#paintTitle(java.awt.Graphics)
+   * @see info.monitorenter.gui.chart.IAxis#paintTitle(Graphics2D)
    */
   public int paintTitle(final Graphics2D g2d) {
     int result = 0;

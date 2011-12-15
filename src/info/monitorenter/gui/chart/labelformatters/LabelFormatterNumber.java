@@ -34,7 +34,7 @@ import java.text.ParseException;
  * <p>
  * To avoid loss of precision please choose a sufficient resolution for your
  * constructor given NumberFormat. Example: If you add new
- * {@link info.monitorenter.gui.chart.TracePoint2D} instances to the
+ * {@link info.monitorenter.gui.chart.ITracePoint2D} instances to the
  * {@link info.monitorenter.gui.chart.Chart2D} every second, prefer using a
  * NumberFormat that at least formats the seconds like (e.g.):
  * 

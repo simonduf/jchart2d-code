@@ -36,7 +36,7 @@ import info.monitorenter.util.Range;
  * <li>Guarantees to always display the constructor given range.
  * <li>Guarantees to always display every value within the
  * <code>{@link info.monitorenter.gui.chart.Chart2D}</code> (every
- * <code>{@link info.monitorenter.gui.chart.TracePoint2D}</code> of the chart's
+ * <code>{@link info.monitorenter.gui.chart.ITracePoint2D}</code> of the chart's
  * <code>{@link info.monitorenter.gui.chart.ITrace2D}</code> instances).
  * </ol>
  * <p>

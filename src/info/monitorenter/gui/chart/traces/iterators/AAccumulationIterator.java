@@ -3,7 +3,6 @@ package info.monitorenter.gui.chart.traces.iterators;
 import info.monitorenter.gui.chart.IAccumulationFunction;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
-import info.monitorenter.util.Range;
 
 import java.util.Iterator;
 

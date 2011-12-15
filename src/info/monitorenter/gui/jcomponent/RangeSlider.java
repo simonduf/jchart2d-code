@@ -115,6 +115,8 @@ public class RangeSlider extends JSlider {
 
   /**
    * Returns the upper value in the range.
+   * 
+   * @return the upper value in the range.
    */
   public int getUpperValue() {
     return getValue() + getExtent();
@@ -122,6 +124,8 @@ public class RangeSlider extends JSlider {
 
   /**
    * Sets the upper value in the range.
+   * 
+   * @param value the upper value in the range.
    */
   public void setUpperValue(int value) {
     // Compute new extent.

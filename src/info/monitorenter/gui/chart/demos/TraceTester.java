@@ -27,7 +27,7 @@ package info.monitorenter.gui.chart.demos;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.tracepoints.TracePoint2D;
 import info.monitorenter.gui.chart.traces.Trace2DBijective;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.gui.chart.traces.Trace2DLtdReplacing;
