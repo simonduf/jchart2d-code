@@ -503,31 +503,32 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   public static final int CHART_POSITION_TOP = 16;
 
   /**
-   * A switch for debugging problems with scaling. Set to false the
-   * compiler will remove the debugging statements.
+   * A switch for debugging problems with scaling. Set to false the compiler
+   * will remove the debugging statements.
    */
   public static final boolean DEBUG_SCALING = false;
+
   /**
-   * A switch for debugging problems with layouting. Set to false the
-   * compiler will remove the debugging statements.
+   * A switch for debugging problems with layouting. Set to false the compiler
+   * will remove the debugging statements.
    */
   public static final boolean DEBUG_LAYOUT = false;
 
   /**
-   * A switch for debugging problems with data accumulation. Set to
-   * false the compiler will remove the debugging statements.
+   * A switch for debugging problems with data accumulation. Set to false the
+   * compiler will remove the debugging statements.
    */
   public static final boolean DEBUG_DATA_ACCUMULATION = false;
 
   /**
-   * A switch for debugging problems with highlighting. Set to
-   * false the compiler will remove the debugging statements.
+   * A switch for debugging problems with highlighting. Set to false the
+   * compiler will remove the debugging statements.
    */
   public static final boolean DEBUG_HIGHLIGHTING = false;
 
   /**
-   * A switch for debugging problems with multithreading. Set to
-   * false the compiler will remove the debugging statements.
+   * A switch for debugging problems with multithreading. Set to false the
+   * compiler will remove the debugging statements.
    */
   public static final boolean DEBUG_THREADING = false;
 
@@ -1401,7 +1402,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * 
    * @param g
    *          needed for size informations.
-   *          
+   * 
    * @return the end x coordinate (right bound) in pixel of the chart to draw.
    */
   private int calculateXChartEnd(final Graphics g) {
@@ -1474,7 +1475,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    */
   private int calculateXChartStart(final Graphics2D g2d) {
     int result = 0;
-    
+
     // reverse iteration because the most left axes are the latter ones:
     ListIterator<IAxis< ? >> it = this.m_axesYLeft.listIterator(this.m_axesYLeft.size());
     IAxis< ? > currentAxis;
@@ -1893,13 +1894,29 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   }
 
   /**
-   * Returns the first bottom axis for the x dimension.
+   * Returns the first axis in the x dimension or <code>null</code> if no x-axis
+   * is present.
+   * <p>
+   * This will be
+   * <ul>
+   * <li>The first {@link #getAxesXBottom()} if not <code>null</code></li>
+   * <li>The first {@link #getAxesXTop()} if not <code>null</code></li>
+   * <li><code>null</code></li>
+   * </ul>
+   * in that order.
    * <p>
    * 
-   * @return the first bottom axis for the x dimension.
+   * @return the first axis in the x dimension or <code>null</code> if no x-axis
+   *         is present.
    */
   public final IAxis< ? > getAxisX() {
-    return this.m_axesXBottom.get(0);
+    IAxis< ? > result = null;
+    if (this.m_axesXBottom.size() > 0) {
+      result = this.m_axesXBottom.get(0);
+    } else if (this.m_axesXTop.size() > 0) {
+      result = this.m_axesXTop.get(0);
+    }
+    return result;
   }
 
   /**
@@ -1938,13 +1955,29 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   }
 
   /**
-   * Returns the first left axis for the y dimension.
+   * Returns the first axis in the y dimension or <code>null</code> if no y-axis
+   * is present.
+   * <p>
+   * This will be
+   * <ul>
+   * <li>The first {@link #getAxesYLeft()} if not <code>null</code></li>
+   * <li>The first {@link #getAxesYRight()} if not <code>null</code></li>
+   * <li><code>null</code></li>
+   * </ul>
+   * in that order.
    * <p>
    * 
-   * @return the first left axis for the y dimension.
+   * @return the first axis in the y dimension or <code>null</code> if no y-axis
+   *         is present.
    */
   public final IAxis< ? > getAxisY() {
-    return this.m_axesYLeft.get(0);
+    IAxis< ? > result = null;
+    if (this.m_axesYLeft.size() > 0) {
+      result = this.m_axesYLeft.get(0);
+    } else if (this.m_axesYRight.size() > 0) {
+      result = this.m_axesYRight.get(0);
+    }
+    return result;
   }
 
   /**
@@ -2814,15 +2847,15 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     // Some operations (e.g. stroke) need Graphics2d
     Stroke backupStroke = null;
 
-      g2d = (Graphics2D) g;
-      backupStroke = g2d.getStroke();
-      if (this.isUseAntialiasing()) {
-        RenderingHints renderHints = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        renderHints.put(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-        renderHints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        renderHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-        g2d.setRenderingHints(renderHints);
-      }
+    g2d = (Graphics2D) g;
+    backupStroke = g2d.getStroke();
+    if (this.isUseAntialiasing()) {
+      RenderingHints renderHints = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      renderHints.put(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+      renderHints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+      renderHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+      g2d.setRenderingHints(renderHints);
+    }
 
     Iterator<ITracePainter< ? >> itTracePainters;
     Iterator<IErrorBarPolicy< ? >> itTraceErrorBarPolicies;
@@ -2878,7 +2911,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
 
           int countPoints = 0;
           IStopWatch stopWatchPointRendering = null;
-          if(Chart2D.DEBUG_DATA_ACCUMULATION) {
+          if (Chart2D.DEBUG_DATA_ACCUMULATION) {
             stopWatchPointRendering = new StopWatchSimple(true);
           }
           while (pointIt.hasNext()) {
@@ -2974,7 +3007,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
           }
           if (DEBUG_DATA_ACCUMULATION) {
             stopWatchPointRendering.stop();
-            System.out.println(this.getClass().getName()+" rendered " + countPoints + " points of a trace with " + trace.getSize() + " points. It took "+stopWatchPointRendering.snapShot() +" ms.");
+            System.out.println(this.getClass().getName() + " rendered " + countPoints + " points of a trace with " + trace.getSize() + " points. It took "
+                + stopWatchPointRendering.snapShot() + " ms.");
             stopWatchPointRendering.reset();
           }
           itTracePainters = trace.getTracePainters().iterator();
@@ -3296,13 +3330,13 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         this.trackHighlightingEnablement(highlightersAddedOrRemoved);
       } else if (property.equals(IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED)) {
         // repaint
-      }else if (property.equals(IAxis.PROPERTY_PAINTSCALE)) {
+      } else if (property.equals(IAxis.PROPERTY_PAINTSCALE)) {
         // repaint
       } else if (property.equals(IAxis.PROPERTY_PAINTGRID)) {
         // repaint
       } else if (property.equals(IAxis.PROPERTY_AXIS_TITLE)) {
         // repaint
-      }  else if (property.equals(IAxis.PROPERTY_RANGEPOLICY)) {
+      } else if (property.equals(IAxis.PROPERTY_RANGEPOLICY)) {
         // repaint
       } else if (property.equals(IAxis.PROPERTY_VISIBLE)) {
         // repaint
@@ -4309,8 +4343,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
 
     double valueX = translationXAxis.translateMousePosition(mouseEvent);
     double valueY = translationYAxis.translateMousePosition(mouseEvent);
-    if(nearestTrace != null) 
-    {
+    if (nearestTrace != null) {
       result = this.m_tracePointProvider.createTracePoint(valueX, valueY, nearestTrace);
     } else {
       result = this.m_tracePointProvider.createTracePoint(valueX, valueY, null);
