@@ -30,7 +30,7 @@ import junit.framework.TestSuite;
 
 /**
  * 
- * JUnit test for class <code>{@link TracePoint2D}</code>.
+ * JUnit test for class <code>{@link info.monitorenter.gui.chart.tracepoints.TracePoint2D}</code>.
  * <p>
  * 
  * @author Achim Westermann
@@ -77,7 +77,7 @@ public class TestTracePoint2D extends TestChart2D {
   }
 
   /**
-   * Test for <code>{@link TracePoint2D#setLocation(double, double)}.</code>
+   * Test for <code>{@link info.monitorenter.gui.chart.tracepoints.TracePoint2D#setLocation(double, double)}.</code>
    * <p>
    * 
    * @throws InterruptedException

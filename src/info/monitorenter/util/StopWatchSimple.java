@@ -112,7 +112,7 @@ public class StopWatchSimple implements IStopWatch {
    * call to stop will be the sum of all previous runtimes.
    */
   public final boolean start() {
-    if (!running) {
+    if (!this.running) {
       this.m_start = System.currentTimeMillis();
       this.running = true;
       return true;
@@ -131,19 +131,19 @@ public class StopWatchSimple implements IStopWatch {
    * <code>{@link  #start()}</code>. The call to
    * <code>{@link #snapShot()}</code> does not switch the state. If afterwards
    * <code>m_start()</code> is called, no new value gets assigned to the
-   * m_start- value of the StopWatch. Despite of this <code>{@link #snapShot}</code> Adds
-   * the period from the m_start-value to now to the internal total measurement-
-   * call. To avoid double - summation of the same time- periods a new start-
-   * value is set directly.
+   * m_start- value of the StopWatch. Despite of this
+   * <code>{@link #snapShot}</code> Adds the period from the m_start-value to
+   * now to the internal total measurement- call. To avoid double - summation of
+   * the same time- periods a new start- value is set directly.
    * <p>
    * 
    * @see StopWatchSimple#stop()
    */
   public long snapShot() {
-    if(this.running) {
-    long restart = System.currentTimeMillis();
-    this.allms += restart - this.m_start;
-    this.m_start = restart;
+    if (this.running) {
+      long restart = System.currentTimeMillis();
+      this.allms += restart - this.m_start;
+      this.m_start = restart;
     }
     return this.allms;
   }
@@ -164,13 +164,13 @@ public class StopWatchSimple implements IStopWatch {
   }
 
   /**
-   * Returns a String representation of the current measured time in the format 
-   * "<msrunning> ms". 
+   * Returns a String representation of the current measured time in the format
+   * "<msrunning> ms".
    * <p>
-   * This will take a {@link  #snapShot()}
+   * This will take a {@link #snapShot()}
    * <p>
    * 
-   * @return "<msrunning> ms". 
+   * @return "<msrunning> ms".
    * 
    */
   public String toString() {
@@ -179,10 +179,11 @@ public class StopWatchSimple implements IStopWatch {
   }
 
   /**
-   * Test main hook. 
+   * Test main hook.
    * <p>
    * 
-   * @param args the command line arguments. 
+   * @param args
+   *          the command line arguments.
    */
   public static void main(String[] args) {
     try {

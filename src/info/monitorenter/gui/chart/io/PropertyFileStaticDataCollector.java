@@ -25,7 +25,7 @@ package info.monitorenter.gui.chart.io;
 
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.tracepoints.TracePoint2D;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class PropertyFileStaticDataCollector extends AStaticDataCollector {
 
   /**
    * The input stream in {@link java.util.Properties} format where
-   * {@link info.monitorenter.gui.chart.TracePoint2D} are parsed from.
+   * {@link info.monitorenter.gui.chart.ITracePoint2D} are parsed from.
    * <p>
    */
   private InputStream m_source;
@@ -63,7 +63,7 @@ public class PropertyFileStaticDataCollector extends AStaticDataCollector {
    * 
    * @param propertyFileStream
    *            the stream of the file in the {@link java.util.Properties}
-   *            format where {@link info.monitorenter.gui.chart.TracePoint2D}
+   *            format where {@link info.monitorenter.gui.chart.ITracePoint2D}
    *            instances (key is x, value is y) is parsed from.
    */
   public PropertyFileStaticDataCollector(final ITrace2D trace, final InputStream propertyFileStream) {

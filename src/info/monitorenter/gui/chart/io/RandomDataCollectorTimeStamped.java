@@ -26,7 +26,7 @@ package info.monitorenter.gui.chart.io;
 
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
-import info.monitorenter.gui.chart.TracePoint2D;
+import info.monitorenter.gui.chart.tracepoints.TracePoint2D;
 
 
 
