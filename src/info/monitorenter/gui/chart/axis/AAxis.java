@@ -43,7 +43,6 @@ import info.monitorenter.util.math.MathUtil;
 
 import java.awt.Dimension;
 import java.awt.FontMetrics;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -1848,7 +1847,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
 
   /**
    * @deprecated use {@link #getAxisTitle()} and on the result
-   *             {@link IAxis.AxisTitle#getTitle()}.
+   *             {@link info.monitorenter.gui.chart.IAxis.AxisTitle#getTitle()}.
    */
   @Deprecated
   public final String getTitle() {
@@ -2788,7 +2787,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
 
   /**
    * @deprecated use {@link #getAxisTitle()} and on the result
-   *             {@link IAxis.AxisTitle#setTitle(String)}
+   *             {@link info.monitorenter.gui.chart.IAxis.AxisTitle#setTitle(String)}
    */
   @Deprecated
   public final String setTitle(final String title) {
@@ -2803,7 +2802,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
    * <p>
    * 
    * @deprecated use {@link #getAxisTitle()} and on the result
-   *             {@link IAxis.AxisTitle#setTitlePainter(IAxisTitlePainter)}
+   *             {@link info.monitorenter.gui.chart.IAxis.AxisTitle#setTitlePainter(IAxisTitlePainter)}
    *             instead.
    */
   @Deprecated
