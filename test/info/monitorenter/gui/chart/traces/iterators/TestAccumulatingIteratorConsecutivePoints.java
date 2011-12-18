@@ -21,12 +21,16 @@
 
 package info.monitorenter.gui.chart.traces.iterators;
 
+import java.util.Iterator;
+
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAccumulationFunction;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
+import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.traces.accumulationfunctions.AccumulationFunctionArithmeticMeanXY;
+import info.monitorenter.util.Range;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -400,7 +404,7 @@ public class TestAccumulatingIteratorConsecutivePoints {
     ITracePoint2D last = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(91.0, 91.0);
     this.m_trace.addPoint(last);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 32);
+    Iterator<ITracePoint2D> toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 32);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(first, result);
@@ -424,5 +428,79 @@ public class TestAccumulatingIteratorConsecutivePoints {
       i += 3.0;
     }
   }
+
+  /**
+   * Adds a point outside the visible range (lower bound) then a point in the visible range and then a point outside the 
+   * visible range (upper bound) all with ascending x value. <p>
+   * 
+   * <ul>
+   * <li> First point returned has to be the first invisible one (contract to allow that interpolation towards visible bounds still 
+   * works with accumulation API).</li>
+   * <li> 2nd point has to be the original visible point.</li>
+   * <li> Last point returned has to be the last invisible one (contract to allow that interpolation towards visible bounds still 
+   * works with accumulation API).</li>
+   * </ul>
+   * <p>
+   * 
+   */
+  @Test
+  public void testReturnsFirstInvisible() {
+    Chart2D chart = this.m_trace.getRenderer();
+    Range visibleRange = new Range(0, 1.0);
+    chart.getAxisX().setRangePolicy(new RangePolicyFixedViewport(visibleRange));
+    chart.getAxisY().setRangePolicy(new RangePolicyFixedViewport(visibleRange));
+    IAccumulationFunction accumulationFunction = new AccumulationFunctionArithmeticMeanXY();
+    ITracePoint2D one = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(-1.0, -1.0);
+    ITracePoint2D two = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(0.5, 0.5);
+    ITracePoint2D three = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(1.0, 1.0);
+    this.m_trace.addPoint(one);
+    this.m_trace.addPoint(two);
+    this.m_trace.addPoint(three);
+    Iterator<ITracePoint2D> toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 3);
+    Assert.assertTrue(toTest.hasNext());
+    ITracePoint2D result = toTest.next();
+    Assert.assertEquals(one, result);
+    Assert.assertEquals(two, toTest.next());
+    Assert.assertEquals(three, toTest.next());
+  }
+  
+  /**
+   * Adds a point outside the visible range (lower bound) then many points in the visible range and then a point outside the 
+   * visible range (upper bound) all with ascending x value. <p>
+   * 
+   * <ul>
+   * <li> First point returned has to be the first invisible one (contract to allow that interpolation towards visible bounds still 
+   * works with accumulation API).</li>
+   * <li> 2nd point has to be the original visible point.</li>
+   * <li> Last point returned has to be the last invisible one (contract to allow that interpolation towards visible bounds still 
+   * works with accumulation API).</li>
+   * </ul>
+   * <p>
+   * 
+   */
+  @Test
+  public void testReturnsFirstInvisibleManyPoints() {
+    Chart2D chart = this.m_trace.getRenderer();
+    Range visibleRange = new Range(0, 1.0);
+    chart.getAxisX().setRangePolicy(new RangePolicyFixedViewport(visibleRange));
+    chart.getAxisY().setRangePolicy(new RangePolicyFixedViewport(visibleRange));
+    IAccumulationFunction accumulationFunction = new AccumulationFunctionArithmeticMeanXY();
+    ITracePoint2D one = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(-1.0, -1.0);
+    ITracePoint2D three = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(3.0, 3.0);
+    this.m_trace.addPoint(one);
+    for(int i=100; i> 0; i--) {
+      this.m_trace.addPoint(new info.monitorenter.gui.chart.tracepoints.TracePoint2D(1.0/i,1.0/i));
+    }
+    this.m_trace.addPoint(three);
+    Iterator<ITracePoint2D> toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 3);
+    Assert.assertTrue(toTest.hasNext());
+    ITracePoint2D result = toTest.next();
+    Assert.assertEquals(one, result);
+    result = toTest.next();
+    System.out.println(result);
+    result = toTest.next();
+    Assert.assertFalse("Should be empty", toTest.hasNext());
+  }
+
 
 }

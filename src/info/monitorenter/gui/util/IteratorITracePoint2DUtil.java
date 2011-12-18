@@ -150,7 +150,7 @@ public class IteratorITracePoint2DUtil {
         }
         break;
       } else {
-        previous = point;
+        previous = current;
         countSkip++;
       }
     }
