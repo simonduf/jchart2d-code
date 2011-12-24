@@ -31,9 +31,9 @@ import info.monitorenter.gui.chart.IAccumulationFunction;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.ITracePointProvider;
+import info.monitorenter.util.math.MathUtil;
 
 public abstract class AAccumulationFunction implements IAccumulationFunction {
-
 
   /**
    * The current accumulated point, potentially not the result until
@@ -42,12 +42,14 @@ public abstract class AAccumulationFunction implements IAccumulationFunction {
   private ITracePoint2D m_accumulatedPointCurrent;
 
   /**
-   * Sets the current accumulated point.<p>
-   *
+   * Sets the current accumulated point.
+   * <p>
+   * 
    * This is intended for internal (subclass) use only.
    * <p>
    * 
-   * @param accumulatedPointCurrent the accumulatedPointCurrent to set
+   * @param accumulatedPointCurrent
+   *          the accumulatedPointCurrent to set
    */
   protected void setAccumulatedPointCurrent(ITracePoint2D accumulatedPointCurrent) {
     this.m_accumulatedPointCurrent = accumulatedPointCurrent;
@@ -99,6 +101,15 @@ public abstract class AAccumulationFunction implements IAccumulationFunction {
     ITracePoint2D result = this.getAccumulatedPointCurrent();
     this.m_accumulatedPointPrevious = result;
     this.setAccumulatedPointCurrent(null);
+    if (result != null) {
+      if (!MathUtil.isDouble(result.getX()) || !MathUtil.isDouble(result.getY())) {
+        throw new IllegalStateException("Result has a wrong value (programming and/or rounding error): " + result);
+      }
+    } else {
+      /*
+       * This happens when nothing was accumulated but an upper bound was crossed by the accumulation iterator (ordered x). 
+       */
+    }
     return result;
   }
 
@@ -120,17 +131,14 @@ public abstract class AAccumulationFunction implements IAccumulationFunction {
    *           if the point is not assigned to a trace which is assigned to a
    *           chart.
    */
-  protected final ITracePointProvider acquireTracePointProvider(final ITracePoint2D point)
-      throws IllegalStateException {
+  protected final ITracePointProvider acquireTracePointProvider(final ITracePoint2D point) throws IllegalStateException {
     ITrace2D trace = point.getListener();
     if (trace == null) {
-      throw new IllegalStateException(
-          "You cannot use accumulation functions for trace points that have not been assigned to a trace yet!");
+      throw new IllegalStateException("You cannot use accumulation functions for trace points that have not been assigned to a trace yet!");
     } else {
       Chart2D chart = trace.getRenderer();
       if (chart == null) {
-        throw new IllegalStateException(
-            "You cannot use accumulation functions for trace points of traces that have not been assigned to a chart yet!");
+        throw new IllegalStateException("You cannot use accumulation functions for trace points of traces that have not been assigned to a chart yet!");
       } else {
         ITracePointProvider tracePointProvider = chart.getTracePointProvider();
         return tracePointProvider;
@@ -139,5 +147,4 @@ public abstract class AAccumulationFunction implements IAccumulationFunction {
 
   }
 
-  
 }

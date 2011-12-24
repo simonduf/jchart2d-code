@@ -63,6 +63,26 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
    * @param accumulationFunction
    *          the function to use for point - accumulation.
    * 
+   * @param countPerNext
+   *          The amount of points to accumulate per call to {@link #next()}.
+   */
+  public AccumulatingIteratorConsecutivePoints(final ITrace2D originalTrace, final IAccumulationFunction accumulationFunction, final int countPerNext) {
+    super(originalTrace, accumulationFunction);
+    this.m_countPerNext = countPerNext;
+  }
+
+  /**
+   * Creator pattern for instances used as under certain conditions performance
+   * may be gained as the plain iterator over the <code>originalTrace</code> may
+   * be returned.
+   * <p>
+   * 
+   * @param originalTrace
+   *          the trace to decorate with the feature of accumulating points.
+   * 
+   * @param accumulationFunction
+   *          the function to use for point - accumulation.
+   * 
    * @param amountOfVisiblePoints
    *          The amount of visible points to accumulate. This will be used in
    *          case we do accumulate <code>amountOfPoints</code> consecutive
@@ -72,25 +92,36 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
    *          returned points may be smaller than this value as some segments
    *          might not contain any point.
    * 
+   * @return an iterator with data accumulation support.
    */
-  public AccumulatingIteratorConsecutivePoints(final ITrace2D originalTrace,
-      final IAccumulationFunction accumulationFunction, final int amountOfVisiblePoints) {
-    super(originalTrace, accumulationFunction, amountOfVisiblePoints);
+  public static Iterator<ITracePoint2D> create(final ITrace2D originalTrace, final IAccumulationFunction accumulationFunction, final int amountOfVisiblePoints) {
+    Iterator<ITracePoint2D> result;
     /*
      * Compute the amount of points per next() to accumulate:
      */
-    int targetCount = this.getAmountOfVisiblePoints();
+    int targetCount = amountOfVisiblePoints;
     int sourceCount = originalTrace.getSize();
+    int countPerNext = 0;
     if ((targetCount != 0) && (sourceCount != 0)) {
       // -2 is for first and last point
       if ((sourceCount > 2) && (targetCount > 2)) {
-        this.m_countPerNext = (int) Math.ceil((sourceCount - 2) / (targetCount - 2));
+        countPerNext = (int) Math.ceil((sourceCount - 2) / (targetCount - 2));
       } else {
-        this.m_countPerNext = 1;
+        countPerNext = 1;
       }
-    } else {
-      this.m_countPerNext = 1;
+    } 
+    if (countPerNext == 0) {
+      countPerNext = 1;
     }
+    /*
+     * Skip data accumulation if not feasible: 
+     */
+    if(countPerNext == 1) {
+      result = originalTrace.iterator();
+    } else {
+      result = new AccumulatingIteratorConsecutivePoints(originalTrace, accumulationFunction, countPerNext);
+    }
+    return result;
   }
 
   /**

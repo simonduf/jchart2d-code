@@ -84,7 +84,7 @@ public class AccumulatingIteratorConseCutivePointsOrderedXValues extends AAccumu
    */
   public AccumulatingIteratorConseCutivePointsOrderedXValues(final ITrace2D originalTrace, final IAccumulationFunction accumulationFunction,
       final int amountOfVisiblePoints) {
-    super(originalTrace, accumulationFunction, amountOfVisiblePoints);
+    super(originalTrace, accumulationFunction);
 
     IStopWatch stopWatch = null;
     /*
@@ -120,7 +120,7 @@ public class AccumulatingIteratorConseCutivePointsOrderedXValues extends AAccumu
     /*
      * Compute the amount of points per next() to accumulate:
      */
-    int targetCount = this.getAmountOfVisiblePoints();
+    int targetCount = amountOfVisiblePoints;
     int sourceCount = originalTrace.getSize() - skipResult.getSkipCount() - skipResultBackwards.getSkipCount();
     if (Chart2D.DEBUG_DATA_ACCUMULATION) {
       System.out.println(this.getClass().getName() + " this leaves " + sourceCount + " point to accumulate. ");
@@ -132,9 +132,14 @@ public class AccumulatingIteratorConseCutivePointsOrderedXValues extends AAccumu
       } else {
         this.m_countPerNext = 1;
       }
-    } else {
+    }
+    if (this.m_countPerNext == 0) {
+      if (Chart2D.DEBUG_DATA_ACCUMULATION) {
+        System.out.println("Count per next is zero! Defaulting to 1.");
+      }
       this.m_countPerNext = 1;
     }
+
     if (Chart2D.DEBUG_DATA_ACCUMULATION) {
       System.out.println(this.getClass().getName() + " accumulating " + this.m_countPerNext + " point into one");
     }
@@ -184,17 +189,17 @@ public class AccumulatingIteratorConseCutivePointsOrderedXValues extends AAccumu
             this.m_previousNaN = null;
             break;
           } else {
-            
+
             point = iterator.next();
-            
+
             // CODE IN QUESTION START
             if (point.getScaledX() > 1.0) {
               this.m_hasReachedVisibleXUpperBound = true;
               result = accumulate.getAccumulatedPoint();
               if (result == null) {
                 result = point;
-                break;
               }
+              break;
             }
             // CODE IN QUESTION END
 

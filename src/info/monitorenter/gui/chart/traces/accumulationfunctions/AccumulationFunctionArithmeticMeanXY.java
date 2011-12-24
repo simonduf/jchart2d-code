@@ -30,6 +30,7 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.ITracePointProvider;
+import info.monitorenter.util.math.MathUtil;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -57,12 +58,13 @@ public class AccumulationFunctionArithmeticMeanXY extends AAccumulationFunction 
 
   /** To intermediately sum up all accumulations of Y values. */
   private double m_accumulatedSumY = 0;
-  
-  /** 
-   * During accumulation of a single output point all additional point painters 
-   * ({@link ITracePoint2D#getAdditionalPointPainters()}) are collected here to finally be added to the outgoing point.
+
+  /**
+   * During accumulation of a single output point all additional point painters
+   * ({@link ITracePoint2D#getAdditionalPointPainters()}) are collected here to
+   * finally be added to the outgoing point.
    */
-  private Set<IPointPainter<?>> m_collectedPointPainters = new TreeSet<IPointPainter<?>>();
+  private Set<IPointPainter< ? >> m_collectedPointPainters = new TreeSet<IPointPainter< ? >>();
 
   /**
    * @see info.monitorenter.gui.chart.IAccumulationFunction#addPointToAccumulate(info.monitorenter.gui.chart.ITracePoint2D)
@@ -101,23 +103,38 @@ public class AccumulationFunctionArithmeticMeanXY extends AAccumulationFunction 
 
     ITracePoint2D accumulatedPointCurrent = this.getAccumulatedPointCurrent();
     if (accumulatedPointCurrent != null) {
-      // transfer state: 
-      // 1. location:
-      accumulatedPointCurrent.setLocation(this.m_accumulatedSumX / this.m_accumulatedPointsCount, this.m_accumulatedSumY / this.m_accumulatedPointsCount);
+      // transfer state:
+      // 1. location: this also causes an update chain that scales the point:
+      double accumulatedX = this.m_accumulatedSumX / this.m_accumulatedPointsCount;
+      double accumulatedY = this.m_accumulatedSumY / this.m_accumulatedPointsCount;
+      if (Chart2D.DEBUG_DATA_ACCUMULATION) {
+        if (!MathUtil.isDouble(accumulatedX) || !MathUtil.isDouble(accumulatedY)) {
+          throw new IllegalStateException("Accumulated to non double. x: " + accumulatedX + ", y: " + accumulatedY);
+        }
+      }
+      accumulatedPointCurrent.setLocation(accumulatedX, accumulatedY);
+      if (Chart2D.DEBUG_DATA_ACCUMULATION) {
+        double scaledX = accumulatedPointCurrent.getScaledX();
+        double scaledY = accumulatedPointCurrent.getScaledY();
+        if(scaledX <= 0 || scaledX >1 || scaledY<= 0 || scaledY > 1) {
+          System.err.println("Accumulated point scaled into invisibility: x.scaled = " + scaledX + ", y.scaled =  " + scaledY);
+        }
+      }      
       // 2. additional point painters:
       accumulatedPointCurrent.removeAllAdditionalPointPainters();
-      for(IPointPainter<?> pointPainter:this.m_collectedPointPainters) {
+      for (IPointPainter< ? > pointPainter : this.m_collectedPointPainters) {
         accumulatedPointCurrent.addAdditionalPointPainter(pointPainter);
       }
       if (Chart2D.DEBUG_DATA_ACCUMULATION) {
         System.out.println(this.getClass().getName() + ": accumulated " + this.m_accumulatedPointsCount + " points into one: " + accumulatedPointCurrent);
       }
-      
+
       this.m_accumulatedPointsCount = 0;
       this.m_accumulatedSumX = 0;
       this.m_accumulatedSumY = 0;
       this.m_collectedPointPainters.clear();
     }
-    return super.getAccumulatedPoint();
+    ITracePoint2D result = super.getAccumulatedPoint();
+    return result;
   }
 }

@@ -518,7 +518,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * A switch for debugging problems with data accumulation. Set to false the
    * compiler will remove the debugging statements.
    */
-  public static final boolean DEBUG_DATA_ACCUMULATION = false;
+  public static final boolean DEBUG_DATA_ACCUMULATION = true;
 
   /**
    * A switch for debugging problems with highlighting. Set to false the
