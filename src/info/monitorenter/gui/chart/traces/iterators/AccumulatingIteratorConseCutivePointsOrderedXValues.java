@@ -41,9 +41,14 @@ public class AccumulatingIteratorConseCutivePointsOrderedXValues extends AAccumu
   private int m_countPerNext;
 
   /**
-   * Return the first point.
+   * Return the first invisible point.
    */
-  private ITracePoint2D m_firstPoint = null;
+  private ITracePoint2D m_firstInvisiblePoint = null;
+
+  /**
+   * Return the first visible point.
+   */
+  private ITracePoint2D m_firstVisiblePoint = null;
 
   /**
    * Store the last available point in case we found it but first have to return
@@ -98,7 +103,9 @@ public class AccumulatingIteratorConseCutivePointsOrderedXValues extends AAccumu
     if (Chart2D.DEBUG_DATA_ACCUMULATION) {
       System.out.println(this.getClass().getName() + " skipped " + skipResult.getSkipCount() + " leading invisible points.");
     }
-    this.m_firstPoint = skipResult.getLastInvisible();
+    this.m_firstInvisiblePoint = skipResult.getLastInvisible();
+    this.m_firstVisiblePoint = skipResult.getFirstVisible();
+    
     if (Chart2D.DEBUG_DATA_ACCUMULATION) {
       stopWatch.stop();
       System.out.println(this.getClass().getName() + " took " + stopWatch.snapShot() + " ms to scroll to first visbible point. ");
@@ -149,7 +156,7 @@ public class AccumulatingIteratorConseCutivePointsOrderedXValues extends AAccumu
    * @see java.util.Iterator#hasNext()
    */
   public boolean hasNext() {
-    return ((!this.m_hasReachedVisibleXUpperBound) && (this.getOriginalIterator().hasNext()) || (this.m_lastPoint != null) || (this.m_firstPoint != null));
+    return ((!this.m_hasReachedVisibleXUpperBound) && (this.getOriginalIterator().hasNext()) || (this.m_lastPoint != null) || (this.m_firstInvisiblePoint != null));
   }
 
   /**
@@ -164,9 +171,18 @@ public class AccumulatingIteratorConseCutivePointsOrderedXValues extends AAccumu
     Iterator<ITracePoint2D> iterator = this.getOriginalIterator();
     ITracePoint2D point;
     int amountToAccumulate = this.m_countPerNext;
-    if (this.m_firstPoint != null) {
-      result = this.m_firstPoint;
-      this.m_firstPoint = null;
+    if (this.m_firstInvisiblePoint != null) {
+      /*
+       * Return the latest invisible skipped point.
+       */
+      result = this.m_firstInvisiblePoint;
+      this.m_firstInvisiblePoint = null;
+    } else if( this.m_firstInvisiblePoint != null) {
+      /*
+       * Return the first visible point skipped to.
+       */
+      result = this.m_firstVisiblePoint; 
+      this.m_firstInvisiblePoint = null;
     } else {
 
       if (!iterator.hasNext()) {

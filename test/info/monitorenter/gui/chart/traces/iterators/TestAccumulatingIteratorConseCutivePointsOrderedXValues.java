@@ -464,7 +464,7 @@ public class TestAccumulatingIteratorConseCutivePointsOrderedXValues {
     this.m_trace.addPoint(two);
     this.m_trace.addPoint(three);
     this.m_trace.addPoint(four);
-    Iterator<ITracePoint2D> toTest = new AccumulatingIteratorConseCutivePointsOrderedXValues(this.m_trace, accumulationFunction, 3);
+    Iterator<ITracePoint2D> toTest = new AccumulatingIteratorConseCutivePointsOrderedXValues(this.m_trace, accumulationFunction, 1);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(two, result);

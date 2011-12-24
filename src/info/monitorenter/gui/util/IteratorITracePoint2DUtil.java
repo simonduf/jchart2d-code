@@ -65,6 +65,27 @@ public class IteratorITracePoint2DUtil {
     private ITracePoint2D m_lastInvisible;
 
     /**
+     * As there is no "peek-method" in iterator when searching for the first
+     * visible point we will already have consumed it. This stores the first
+     * visible result.
+     * <p>
+     * 
+     */
+    private ITracePoint2D m_firstVisible;
+
+    /**
+     * As there is no "peek-method" in iterator when searching for the first
+     * visible point we will already have consumed it. This stores the first
+     * visible result.
+     * <p>
+     * 
+     * @return the first visible point skipped to.
+     */
+    public ITracePoint2D getFirstVisible() {
+      return this.m_firstVisible;
+    }
+
+    /**
      * The amount of points skipped.
      */
     private int m_skipCount;
@@ -96,25 +117,31 @@ public class IteratorITracePoint2DUtil {
      * @param lastInvisible
      *          the last invisible trace point seen.
      * 
+     * @param firstVisible
+     *          the first visible trace point found.
+     * 
      * @param skipCount
      *          the amount of points skipped.
      */
-    SkipResult(final ITracePoint2D lastInvisible, final int skipCount) {
+    SkipResult(final ITracePoint2D lastInvisible, final ITracePoint2D firstVisible, final int skipCount) {
       this.m_lastInvisible = lastInvisible;
+      this.m_firstVisible = firstVisible;
       this.m_skipCount = skipCount;
     }
 
   }
 
   /**
-   * Scrolls the given iterator to the first point that is in visible scaled x range [0.0 .. 1.0].
+   * Scrolls the given iterator to the first point that is in visible scaled x
+   * range [0.0 .. 1.0].
    * <p>
-   * Note: this only makes sense if the given iterator returns trace points with 
+   * Note: this only makes sense if the given iterator returns trace points with
    * order of x values (ascending or descending!
    * <p>
    * Assumption: The points in the iterator already have been scaled to the
    * visible range (by Chart2D). So this works by using
-   * {@link ITracePoint2D#getScaledX()} and finding out if the value is within [0.0 .. 1.0].
+   * {@link ITracePoint2D#getScaledX()} and finding out if the value is within
+   * [0.0 .. 1.0].
    * <p>
    * Note: the state of the given iterator is changed. After this call you may
    * continue iterating. You most probably will first consume the position 0 of
@@ -136,7 +163,7 @@ public class IteratorITracePoint2DUtil {
     ITracePoint2D point = null;
 
     ITracePoint2D previous = null;
-    ITracePoint2D current;
+    ITracePoint2D current = null;
     int countSkip = 0;
     double xScaled;
     while (traceIt.hasNext()) {
@@ -154,7 +181,7 @@ public class IteratorITracePoint2DUtil {
         countSkip++;
       }
     }
-    SkipResult result = new SkipResult(point, countSkip);
+    SkipResult result = new SkipResult(point, current, countSkip);
     return result;
   }
 
