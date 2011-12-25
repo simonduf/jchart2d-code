@@ -24,7 +24,6 @@
 package info.monitorenter.gui.chart.events;
 
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.controls.LayoutFactory;
 import info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem;
 
 import java.awt.ItemSelectable;
@@ -39,9 +38,9 @@ import javax.swing.JRadioButtonMenuItem;
  * upon selection by the triggering <code>{@link AbstractButton}</code>.<p>
  * 
  * Also this <code>Action</p> will track the state <code>{@link Chart2D#isUseAntialiasing()}</code> 
- * as a listener of the chart and inform all listeners of this action for the event <code>{@link LayoutFactory.PropertyChangeCheckBoxMenuItem#PROPERTY_SELECTED}</code> 
+ * as a listener of the chart and inform all listeners of this action for the event <code>{@link info.monitorenter.gui.chart.controls.LayoutFactory.PropertyChangeCheckBoxMenuItem#PROPERTY_SELECTED}</code> 
  * with the new state.
- * To listen to this action just have a look at the usage of <code>{@link LayoutFactory.SelectionPropertyAdaptSupport}</code>.<p>
+ * To listen to this action just have a look at the usage of <code>{@link info.monitorenter.gui.chart.controls.LayoutFactory.SelectionPropertyAdaptSupport}</code>.<p>
  * 
  * <h2>Caution</h2> This implementation only works if assigned to a trigger that
  * descends from {@link AbstractButton} (e.g.

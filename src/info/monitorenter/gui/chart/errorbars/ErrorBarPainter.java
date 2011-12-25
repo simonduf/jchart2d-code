@@ -81,9 +81,9 @@ public class ErrorBarPainter implements IErrorBarPainter {
      * </code>.
          * <p>
          * 
-         * Note that adding property change listeners to the nested access facades of type <code>{@link IErrorBarPainter.ISegment}</code>
+         * Note that adding property change listeners to the nested access facades of type <code>{@link info.monitorenter.gui.chart.IErrorBarPainter.ISegment}</code>
          * accessible via <code>getXXXSegment()</code> methods will fire the corresponding events for listeners of this instance (as they
-         * delegate the calls) while they fire events for properties defined in <code>{@link IErrorBarPainter.ISegment}</code> too. If you
+         * delegate the calls) while they fire events for properties defined in <code>{@link info.monitorenter.gui.chart.IErrorBarPainter.ISegment}</code> too. If you
          * register for events of this instance and for the retrieved segments you will receive two
          * <code>{@link PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)}</code> for the same value changed.
          * <p>

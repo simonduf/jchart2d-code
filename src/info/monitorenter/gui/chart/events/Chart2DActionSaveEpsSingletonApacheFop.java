@@ -183,10 +183,7 @@ public final class Chart2DActionSaveEpsSingletonApacheFop {
       // nop
     }
   }
-
-  /** Generated <code>serialVersionUID</code>. */
-  private static final long serialVersionUID = -7446202109342192546L;
-
+  
   /** Flag set whenever the proper jar file (apache-xmlgraphics-commons) is in the classpath. */
   public static final boolean EPS_SUPPORTED;
 

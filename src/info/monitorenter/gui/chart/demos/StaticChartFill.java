@@ -66,12 +66,10 @@ public final class StaticChartFill {
     trace.setTracePainter(new TracePainterFill(chart));
     trace.setColor(Color.DARK_GRAY);
     // Add all points, as it is static:
-    double count = 0;
     double value;
     double place = 0;
     Random random = new Random();
     for (int i = 120; i >= 0; i--) {
-      count += 1.0;
       place += 1.0;
       value = random.nextDouble() * 10.0 + i;
       trace.addPoint(place, value);
