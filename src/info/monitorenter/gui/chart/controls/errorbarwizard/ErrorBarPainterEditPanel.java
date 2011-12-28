@@ -71,7 +71,7 @@ public class ErrorBarPainterEditPanel extends JPanel {
 
         /**
          * An adaptor that registers itself as a <code>{@link PropertyChangeListener}</code> on an
-         * <code>{@link IErrorBarPainter.ISegment}</code> and sets the color to the constructor given <code>{@link ColorIcon}</code>.
+         * <code>{@link info.monitorenter.gui.chart.IErrorBarPainter.ISegment}</code> and sets the color to the constructor given <code>{@link ColorIcon}</code>.
          * <p>
          * 
          * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
