@@ -518,7 +518,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * A switch for debugging problems with data accumulation. Set to false the
    * compiler will remove the debugging statements.
    */
-  public static final boolean DEBUG_DATA_ACCUMULATION = true;
+  public static final boolean DEBUG_DATA_ACCUMULATION = false;
 
   /**
    * A switch for debugging problems with highlighting. Set to false the
@@ -4393,7 +4393,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
 
   /**
    * Compares wether the bounds since last invocation have changed and
-   * conditionally rescales the internal <code>{@link TracePoint2D}</code>
+   * conditionally rescales the internal <code>{@link ITracePoint2D}</code>
    * instances.
    * <p>
    * Must only be called from <code>{@link #paint(Graphics)}</code>.
