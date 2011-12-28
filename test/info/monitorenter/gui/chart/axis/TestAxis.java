@@ -31,13 +31,14 @@ import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.test.ATestJChart2D;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.util.Range;
-import org.junit.Test;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import junit.framework.Assert;
-import junit.framework.TestSuite;
+
+import org.junit.Test;
 
 /**
  * Junit test for <code>{@link info.monitorenter.gui.chart.IAxis}</code>
@@ -202,7 +203,7 @@ public class TestAxis extends ATestJChart2D {
   public void testPaintScaleFalse() {
     this.m_axisY.setPaintScale(false);
     BufferedImage image=new BufferedImage(400,400,BufferedImage.TYPE_INT_ARGB);
-    Graphics graphics=image.getGraphics();
+    Graphics2D graphics=(Graphics2D)image.getGraphics();
     int axisYWidth = this.m_axisY.getWidth(graphics);
     assertEquals("Y axis without paintScale is too wide.",14, axisYWidth);
     this.m_axisX.setPaintScale(false);
@@ -219,7 +220,7 @@ public class TestAxis extends ATestJChart2D {
   @Test
   public void testPaintScaleTrue() {
     BufferedImage image=new BufferedImage(400,400,BufferedImage.TYPE_INT_ARGB);
-    Graphics graphics=image.getGraphics();
+    Graphics2D graphics=(Graphics2D)image.getGraphics();
     int axisYWidth = this.m_axisY.getWidth(graphics);
     assertEquals("Y axis without paintScale is too small.",75, axisYWidth);
     int axisXHeight = this.m_axisX.getHeight(graphics);

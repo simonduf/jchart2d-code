@@ -588,7 +588,8 @@ public class TestChartOperationsVisual extends ATestChartOperations {
    * <p>
    */
   public void testSetTraceTitleOnEmptyTitleTrace() {
-    ATestChartOperations.AChartOperation operation = new AChartOperation("trace.setName(\"foobar\")") {
+    ATestChartOperations.AChartOperation operation = new AChartOperation(
+        "trace.setName(\"foobar\")") {
       /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
        */
