@@ -29,7 +29,7 @@ import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyAutomaticBestFit;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 import info.monitorenter.util.Range;
-import info.monitorenter.util.math.MathUtil;
+
 
 /**
  * An <code>{@link AAxis}</code> with linear display of values.
