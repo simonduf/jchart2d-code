@@ -12,13 +12,12 @@ import info.monitorenter.util.StopWatchSimple;
 import java.util.Iterator;
 
 /**
- * An implementation that - without any care for order of x or y values and
- * without any care for density-based accumulation accumulates n consecutive
- * points.
+ * An implementation that assumes that x values in the underlying iterator are
+ * ascending. This allows to skip leading and tailing invisible points (e.g. in
+ * zoom mode).
  * <p>
- * Invisible points will still be accumulated allowing the {@link Chart2D}
- * rendering the data to interpolate into visibility bounds. See the super class
- * description for additional contracts.
+ * A constructor-given amount of consecutive points will be accumulated into one
+ * (vs.: density based accumulation).
  * <p>
  * Points having a {@link ITracePoint2D#getX()} value of {@link Double#NaN} will
  * not be accumulated. Those are discontinuations that have to be preserved.
@@ -87,8 +86,8 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValues extends AAccumu
    *          returned points may be smaller than this value as some segments
    *          might not contain any point.
    */
-  public AccumulatingIteratorConsecutivePointsOrderedXValues(final ITrace2D originalTrace, final IAccumulationFunction accumulationFunction,
-      final int amountOfVisiblePoints) {
+  public AccumulatingIteratorConsecutivePointsOrderedXValues(final ITrace2D originalTrace,
+      final IAccumulationFunction accumulationFunction, final int amountOfVisiblePoints) {
     super(originalTrace, accumulationFunction);
 
     IStopWatch stopWatch = null;
@@ -99,16 +98,19 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValues extends AAccumu
       stopWatch = new StopWatchSimple();
       stopWatch.start();
     }
-    SkipResult skipResult = IteratorITracePoint2DUtil.scrollToFirstVisibleXValue(this.getOriginalIterator());
+    SkipResult skipResult = IteratorITracePoint2DUtil.scrollToFirstVisibleXValue(this
+        .getOriginalIterator());
     if (Chart2D.DEBUG_DATA_ACCUMULATION) {
-      System.out.println(this.getClass().getName() + " skipped " + skipResult.getSkipCount() + " leading invisible points.");
+      System.out.println(this.getClass().getName() + " skipped " + skipResult.getSkipCount()
+          + " leading invisible points.");
     }
     this.m_firstInvisiblePoint = skipResult.getLastInvisible();
     this.m_firstVisiblePoint = skipResult.getFirstVisible();
-    
+
     if (Chart2D.DEBUG_DATA_ACCUMULATION) {
       stopWatch.stop();
-      System.out.println(this.getClass().getName() + " took " + stopWatch.snapShot() + " ms to scroll to first visbible point. ");
+      System.out.println(this.getClass().getName() + " took " + stopWatch.snapShot()
+          + " ms to scroll to first visbible point. ");
     }
 
     Iterator<ITracePoint2D> backwardIterator = originalTrace.descendingIterator();
@@ -118,19 +120,24 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValues extends AAccumu
       stopWatch.start();
     }
 
-    SkipResult skipResultBackwards = IteratorITracePoint2DUtil.scrollToFirstVisibleXValue(backwardIterator);
+    SkipResult skipResultBackwards = IteratorITracePoint2DUtil
+        .scrollToFirstVisibleXValue(backwardIterator);
     if (Chart2D.DEBUG_DATA_ACCUMULATION) {
-      System.out.println(this.getClass().getName() + " skipped " + skipResultBackwards.getSkipCount() + " tailing invisible points.");
+      System.out.println(this.getClass().getName() + " skipped "
+          + skipResultBackwards.getSkipCount() + " tailing invisible points.");
       stopWatch.stop();
-      System.out.println(this.getClass().getName() + " took " + stopWatch.snapShot() + " ms to scroll out tailing invisible points");
+      System.out.println(this.getClass().getName() + " took " + stopWatch.snapShot()
+          + " ms to scroll out tailing invisible points");
     }
     /*
      * Compute the amount of points per next() to accumulate:
      */
     int targetCount = amountOfVisiblePoints;
-    int sourceCount = originalTrace.getSize() - skipResult.getSkipCount() - skipResultBackwards.getSkipCount();
+    int sourceCount = originalTrace.getSize() - skipResult.getSkipCount()
+        - skipResultBackwards.getSkipCount();
     if (Chart2D.DEBUG_DATA_ACCUMULATION) {
-      System.out.println(this.getClass().getName() + " this leaves " + sourceCount + " point to accumulate. ");
+      System.out.println(this.getClass().getName() + " this leaves " + sourceCount
+          + " point to accumulate. ");
     }
     if ((targetCount != 0) && (sourceCount != 0)) {
       // -2 is for first and last point
@@ -148,7 +155,8 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValues extends AAccumu
     }
 
     if (Chart2D.DEBUG_DATA_ACCUMULATION) {
-      System.out.println(this.getClass().getName() + " accumulating " + this.m_countPerNext + " point into one");
+      System.out.println(this.getClass().getName() + " accumulating " + this.m_countPerNext
+          + " point into one");
     }
   }
 
@@ -156,7 +164,8 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValues extends AAccumu
    * @see java.util.Iterator#hasNext()
    */
   public boolean hasNext() {
-    return ((!this.m_hasReachedVisibleXUpperBound) && (this.getOriginalIterator().hasNext()) || (this.m_lastPoint != null) || (this.m_firstInvisiblePoint != null));
+    return ((!this.m_hasReachedVisibleXUpperBound) && (this.getOriginalIterator().hasNext())
+        || (this.m_lastPoint != null) || (this.m_firstInvisiblePoint != null));
   }
 
   /**
@@ -177,11 +186,11 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValues extends AAccumu
        */
       result = this.m_firstInvisiblePoint;
       this.m_firstInvisiblePoint = null;
-    } else if( this.m_firstInvisiblePoint != null) {
+    } else if (this.m_firstInvisiblePoint != null) {
       /*
        * Return the first visible point skipped to.
        */
-      result = this.m_firstVisiblePoint; 
+      result = this.m_firstVisiblePoint;
       this.m_firstInvisiblePoint = null;
     } else {
 
@@ -309,7 +318,8 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValues extends AAccumu
    */
   public void remove() {
 
-    throw new UnsupportedOperationException("This is not supported for " + this.getClass().getName()
+    throw new UnsupportedOperationException("This is not supported for "
+        + this.getClass().getName()
         + ". Data is not contained but computed (non 1-1) from an underlying source. ");
   }
 
