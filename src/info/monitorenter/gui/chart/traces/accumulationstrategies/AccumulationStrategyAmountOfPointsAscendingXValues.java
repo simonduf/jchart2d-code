@@ -31,7 +31,7 @@ package info.monitorenter.gui.chart.traces.accumulationstrategies;
 import info.monitorenter.gui.chart.IAccumulationFunction;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
-import info.monitorenter.gui.chart.traces.iterators.AccumulatingIteratorConseCutivePointsOrderedXValues;
+import info.monitorenter.gui.chart.traces.iterators.AccumulatingIteratorConsecutivePointsOrderedXValues;
 
 import java.util.Iterator;
 /**
@@ -59,6 +59,6 @@ public class AccumulationStrategyAmountOfPointsAscendingXValues extends AAccumul
    * @see info.monitorenter.gui.chart.traces.accumulationstrategies.AAccumulationStrategy#iterator(info.monitorenter.gui.chart.ITrace2D, int)
    */
   public Iterator<ITracePoint2D> iterator(final ITrace2D source, final int amountOfPoints) {
-    return new AccumulatingIteratorConseCutivePointsOrderedXValues(source, this.getAccumulationFunction(), amountOfPoints);
+    return new AccumulatingIteratorConsecutivePointsOrderedXValues(source, this.getAccumulationFunction(), amountOfPoints);
   }
 }
