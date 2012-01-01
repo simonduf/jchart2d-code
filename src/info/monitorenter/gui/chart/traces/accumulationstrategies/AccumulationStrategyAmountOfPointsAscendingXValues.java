@@ -34,11 +34,15 @@ import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.traces.iterators.AccumulatingIteratorConsecutivePointsOrderedXValues;
 
 import java.util.Iterator;
+
 /**
- * This strategy will just accumulate <code>amountOfPoints</code>
- * consecutive points without caring for data density. Best use this
- * whenever you have ordered (by x value) traces and want to cut off
- * invisible points at the beginning (zoom mode).
+ * This strategy will just accumulate <code>amountOfPoints</code> consecutive
+ * points without caring for data density but with assuming that x values are
+ * ascending in the underlying iterator which allows to cut off leading and
+ * tailing points outside the visible range (zoom). Best use this whenever you
+ * have ordered (by x value) traces and want to cut off invisible points at the
+ * beginning (zoom mode).
+ * <p>
  * 
  * @author Achim Westermann
  */
@@ -51,14 +55,17 @@ public class AccumulationStrategyAmountOfPointsAscendingXValues extends AAccumul
    * @param accumulationFunction
    *          the accumulation function to use.
    */
-  public AccumulationStrategyAmountOfPointsAscendingXValues(IAccumulationFunction accumulationFunction) {
+  public AccumulationStrategyAmountOfPointsAscendingXValues(
+      IAccumulationFunction accumulationFunction) {
     super(accumulationFunction);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.traces.accumulationstrategies.AAccumulationStrategy#iterator(info.monitorenter.gui.chart.ITrace2D, int)
+   * @see info.monitorenter.gui.chart.traces.accumulationstrategies.AAccumulationStrategy#iterator(info.monitorenter.gui.chart.ITrace2D,
+   *      int)
    */
   public Iterator<ITracePoint2D> iterator(final ITrace2D source, final int amountOfPoints) {
-    return new AccumulatingIteratorConsecutivePointsOrderedXValues(source, this.getAccumulationFunction(), amountOfPoints);
+    return new AccumulatingIteratorConsecutivePointsOrderedXValues(source,
+        this.getAccumulationFunction(), amountOfPoints);
   }
 }
