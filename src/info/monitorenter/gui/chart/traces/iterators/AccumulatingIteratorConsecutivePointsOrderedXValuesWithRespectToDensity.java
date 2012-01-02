@@ -213,7 +213,7 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDen
             this.m_xRangePerXLowerBound += this.m_xRangeSize;
             upperXBound = this.m_xRangePerXLowerBound + this.m_xRangeSize;
           }
-          while ((point.getScaledX() <= upperXBound) && (iterator.hasNext())) {
+          do {
 
             // CODE IN QUESTION START
             if (point.getScaledX() > 1.0) {
@@ -273,8 +273,10 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDen
              * FIXME: won't this throw a no such element exception in case we
              * have just 1 point in the trace???
              */
-            point = iterator.next();
-          }
+            if (iterator.hasNext()) {
+              point = iterator.next();
+            }
+          } while ((point.getScaledX() <= upperXBound) && (iterator.hasNext()));
 
         }
       }
