@@ -28,27 +28,26 @@ package info.monitorenter.gui.chart.traces.accumulationstrategies;
 
 import info.monitorenter.gui.chart.IAccumulationFunction;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.ITrace2DDataAccumulating;
 import info.monitorenter.gui.chart.ITracePoint2D;
+import info.monitorenter.gui.chart.traces.iterators.AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDensity;
 
 import java.util.Iterator;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 /**
- * Warning: this is not implemented yet and must not be used. 
+ * Warning: this is not implemented yet and must not be used.
  * <p>
  * 
  * 
- * This strategy will use the x-range and take all following points out of
- * the <code>source</code> (under the assumption trace is sorted by
- * x-values) that are within the range and then accumulate them to a single
- * trace point. Best use this whenever you have a trace with ordered x
- * values to get accumulation based on density of x-values and thereby avoid
- * loss of important points in areas with low x-value densities.
+ * This strategy will use the x-range and take all following points out of the
+ * <code>source</code> (under the assumption trace is sorted by x-values) that
+ * are within the range and then accumulate them to a single trace point. Best
+ * use this whenever you have a trace with ordered x values to get accumulation
+ * based on density of x-values and thereby avoid loss of important points in
+ * areas with low x-value densities.
  * <p>
  */
 public class AccumulationStrategyXRangeWithRespectToDensity extends AAccumulationStrategy {
-  
+
   /**
    * Constructor taking the accumulation function to use.
    * <p>
@@ -61,23 +60,21 @@ public class AccumulationStrategyXRangeWithRespectToDensity extends AAccumulatio
   }
 
   /**
-     * Accumulates all points that come from <code>source</code> and are in
-     * the given <code>xRange</code>. Once a point comes from
-     * <code>source</code> outside the given <code>xRange</code> accumulation
-     * is done and result is returned.
-     * <p>
-     * In this case <code>xRange</code> is not the total visible range given
-     * to {@link ITrace2DDataAccumulating#iterator(int)} but a segment within
-     * that range.
-     * <p>
-     * 
-     * Note that this only makes sense for traces with points ordered
-     * ascending by x-value.
-     * <p>
-     * 
-     */
-    public Iterator<ITracePoint2D> iterator(final ITrace2D source, final int amountOfPoints) {
-      throw new NotImplementedException();
-    }
-    
+   * Returns an interator that splits up the visible range into
+   * <code>amountOfPoints</code> windows. All points within each window will be
+   * accumulated into one point per
+   * {@link AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDensity#next()}
+   * .
+   * <p>
+   * 
+   * Note that this will not work for traces with points that are not ordered
+   * ascending by x-value.
+   * <p>
+   * 
+   */
+  public Iterator<ITracePoint2D> iterator(final ITrace2D source, final int amountOfPoints) {
+    return new AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDensity(source,
+        this.getAccumulationFunction(), amountOfPoints);
+  }
+
 }

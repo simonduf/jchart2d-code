@@ -32,7 +32,7 @@ import info.monitorenter.gui.chart.test.ATestJChart2D;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.util.Range;
 
-import java.awt.Graphics;
+
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 

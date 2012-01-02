@@ -129,16 +129,17 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValues extends AAccumu
       System.out.println(this.getClass().getName() + " took " + stopWatch.snapShot()
           + " ms to scroll out tailing invisible points");
     }
-    /*
-     * Compute the amount of points per next() to accumulate:
-     */
-    int targetCount = amountOfVisiblePoints;
     int sourceCount = originalTrace.getSize() - skipResult.getSkipCount()
         - skipResultBackwards.getSkipCount();
     if (Chart2D.DEBUG_DATA_ACCUMULATION) {
       System.out.println(this.getClass().getName() + " this leaves " + sourceCount
           + " point to accumulate. ");
     }
+    /*
+     * Compute the amount of points per next() to accumulate:
+     */
+    int targetCount = amountOfVisiblePoints;
+
     if ((targetCount != 0) && (sourceCount != 0)) {
       // -2 is for first and last point
       if ((sourceCount > 2) && (targetCount > 2)) {
@@ -239,6 +240,7 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValues extends AAccumu
               if (iterator.hasNext()) {
                 accumulate.addPointToAccumulate(point);
               } else {
+                // [a]
                 this.m_lastPoint = point;
               }
               // wipe out potential previous NaN!

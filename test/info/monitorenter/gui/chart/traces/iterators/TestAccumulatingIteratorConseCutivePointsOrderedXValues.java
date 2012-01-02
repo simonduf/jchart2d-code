@@ -37,7 +37,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests for {@link AccumulatingIteratorConseCutivePointsOrderedXValues}.
+ * Tests for {@link AccumulatingIteratorConsecutivePointsOrderedXValues}.
  * <p>
  * 
  * 
@@ -69,7 +69,7 @@ public class TestAccumulatingIteratorConseCutivePointsOrderedXValues {
   @Test
   public void testEmptyTraceAccumulationFunctionArithmeticMeanXY() {
     IAccumulationFunction accumulationFunction = new AccumulationFunctionArithmeticMeanXY();
-    AAccumulationIterator toTest = new AccumulatingIteratorConseCutivePointsOrderedXValues(this.m_trace, accumulationFunction, 0);
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePointsOrderedXValues(this.m_trace, accumulationFunction, 0);
     Assert.assertFalse(toTest.hasNext());
   }
 
@@ -87,7 +87,7 @@ public class TestAccumulatingIteratorConseCutivePointsOrderedXValues {
     ITracePoint2D point = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(0.0, 0.0);
     this.m_trace.addPoint(point);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConseCutivePointsOrderedXValues(this.m_trace, accumulationFunction, this.m_trace.getSize());
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePointsOrderedXValues(this.m_trace, accumulationFunction, this.m_trace.getSize());
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(point, result);
@@ -110,7 +110,7 @@ public class TestAccumulatingIteratorConseCutivePointsOrderedXValues {
     this.m_trace.addPoint(one);
     this.m_trace.addPoint(two);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConseCutivePointsOrderedXValues(this.m_trace, accumulationFunction, this.m_trace.getSize());
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePointsOrderedXValues(this.m_trace, accumulationFunction, this.m_trace.getSize());
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -138,7 +138,7 @@ public class TestAccumulatingIteratorConseCutivePointsOrderedXValues {
     this.m_trace.addPoint(two);
     this.m_trace.addPoint(three);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConseCutivePointsOrderedXValues(this.m_trace, accumulationFunction, this.m_trace.getSize());
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePointsOrderedXValues(this.m_trace, accumulationFunction, this.m_trace.getSize());
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -170,7 +170,7 @@ public class TestAccumulatingIteratorConseCutivePointsOrderedXValues {
     this.m_trace.addPoint(two);
     this.m_trace.addPoint(three);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConseCutivePointsOrderedXValues(this.m_trace, accumulationFunction, 2);
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePointsOrderedXValues(this.m_trace, accumulationFunction, 2);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -205,7 +205,7 @@ public class TestAccumulatingIteratorConseCutivePointsOrderedXValues {
     this.m_trace.addPoint(three);
     this.m_trace.addPoint(four);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConseCutivePointsOrderedXValues(this.m_trace, accumulationFunction, 3);
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePointsOrderedXValues(this.m_trace, accumulationFunction, 3);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -242,7 +242,7 @@ public class TestAccumulatingIteratorConseCutivePointsOrderedXValues {
     this.m_trace.addPoint(three);
     this.m_trace.addPoint(four);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConseCutivePointsOrderedXValues(this.m_trace, accumulationFunction, 3);
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePointsOrderedXValues(this.m_trace, accumulationFunction, 3);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -283,7 +283,7 @@ public class TestAccumulatingIteratorConseCutivePointsOrderedXValues {
     this.m_trace.addPoint(three);
     this.m_trace.addPoint(four);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConseCutivePointsOrderedXValues(this.m_trace, accumulationFunction, 3);
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePointsOrderedXValues(this.m_trace, accumulationFunction, 3);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -325,7 +325,7 @@ public class TestAccumulatingIteratorConseCutivePointsOrderedXValues {
     this.m_trace.addPoint(three);
     this.m_trace.addPoint(four);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConseCutivePointsOrderedXValues(this.m_trace, accumulationFunction, 3);
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePointsOrderedXValues(this.m_trace, accumulationFunction, 3);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     // This must be one unchanged as it is a discontinuation!
@@ -362,7 +362,7 @@ public class TestAccumulatingIteratorConseCutivePointsOrderedXValues {
     ITracePoint2D last = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(101.0, 101.0);
     this.m_trace.addPoint(last);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConseCutivePointsOrderedXValues(this.m_trace, accumulationFunction, 52);
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePointsOrderedXValues(this.m_trace, accumulationFunction, 52);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(first, result);
@@ -408,7 +408,7 @@ public class TestAccumulatingIteratorConseCutivePointsOrderedXValues {
     ITracePoint2D last = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(91.0, 91.0);
     this.m_trace.addPoint(last);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConseCutivePointsOrderedXValues(this.m_trace, accumulationFunction, 32);
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePointsOrderedXValues(this.m_trace, accumulationFunction, 32);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(first, result);
@@ -464,7 +464,7 @@ public class TestAccumulatingIteratorConseCutivePointsOrderedXValues {
     this.m_trace.addPoint(two);
     this.m_trace.addPoint(three);
     this.m_trace.addPoint(four);
-    Iterator<ITracePoint2D> toTest = new AccumulatingIteratorConseCutivePointsOrderedXValues(this.m_trace, accumulationFunction, 1);
+    Iterator<ITracePoint2D> toTest = new AccumulatingIteratorConsecutivePointsOrderedXValues(this.m_trace, accumulationFunction, 1);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(two, result);

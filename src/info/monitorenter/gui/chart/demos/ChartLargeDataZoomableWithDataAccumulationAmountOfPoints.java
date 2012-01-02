@@ -43,11 +43,15 @@ import javax.swing.JFrame;
  * POC to show that "on some computers" jchart2d is able to show 700.000 data
  * points.
  * <p>
+ * Accumulation is done by an implementation that skips invisible points (by
+ * assuming x values are ascending) and accumulates n points into one:
+ * {@link AccumulationStrategyAmountOfPointsAscendingXValues}.
+ * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
  */
-public final class ChartLargeDataZoomableWithDataAccumulation {
+public final class ChartLargeDataZoomableWithDataAccumulationAmountOfPoints {
 
   /**
    * Testing main hook.
@@ -61,7 +65,8 @@ public final class ChartLargeDataZoomableWithDataAccumulation {
     ZoomableChart chart = new ZoomableChart();
     // Create an ITrace:
     ITrace2DDataAccumulating trace = new Trace2DSimple();
-    trace.setAccumulationStrategy(new AccumulationStrategyAmountOfPointsAscendingXValues(new AccumulationFunctionArithmeticMeanXY()));
+    trace.setAccumulationStrategy(new AccumulationStrategyAmountOfPointsAscendingXValues(
+        new AccumulationFunctionArithmeticMeanXY()));
     trace.setColor(Color.BLUE);
     // Add the trace to the chart:
     chart.addTrace(trace);
@@ -69,7 +74,7 @@ public final class ChartLargeDataZoomableWithDataAccumulation {
     chart.enablePointHighlighting(true);
     trace.setPointHighlighter(new PointPainterDisc(6));
     chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
-    
+
     // Add all points, as it is static:
     Random random = new Random();
 
@@ -78,7 +83,8 @@ public final class ChartLargeDataZoomableWithDataAccumulation {
     }
     // Make it visible:
     // Create a frame.
-    JFrame frame = new JFrame(ChartLargeDataZoomableWithDataAccumulation.class.getName());
+    JFrame frame = new JFrame(
+        ChartLargeDataZoomableWithDataAccumulationAmountOfPoints.class.getName());
     // add the chart to the frame:
     frame.getContentPane().add(new ChartPanel(chart));
     frame.setSize(800, 600);
@@ -99,7 +105,7 @@ public final class ChartLargeDataZoomableWithDataAccumulation {
    * Defcon.
    * <p>
    */
-  private ChartLargeDataZoomableWithDataAccumulation() {
+  private ChartLargeDataZoomableWithDataAccumulationAmountOfPoints() {
     // TODO Auto-generated constructor stub
   }
 }
