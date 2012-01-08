@@ -102,8 +102,16 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDen
       System.out.println(this.getClass().getName() + " skipped " + skipResult.getSkipCount()
           + " leading invisible points.");
     }
-    this.m_firstInvisiblePoint = skipResult.getLastInvisible();
-    this.m_firstVisiblePoint = skipResult.getFirstVisible();
+
+    int skipCount = skipResult.getSkipCount();
+    if (skipCount == 0) {
+      this.m_firstInvisiblePoint = null;
+      this.m_firstVisiblePoint = skipResult.getFirstVisible();
+
+    } else {
+      this.m_firstInvisiblePoint = skipResult.getLastInvisible();
+      this.m_firstVisiblePoint = skipResult.getFirstVisible();
+    }
 
     if (Chart2D.DEBUG_DATA_ACCUMULATION) {
       stopWatch.stop();
@@ -127,8 +135,7 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDen
       System.out.println(this.getClass().getName() + " took " + stopWatch.snapShot()
           + " ms to scroll out tailing invisible points");
     }
-    int sourceCount = originalTrace.getSize() - skipResult.getSkipCount()
-        - skipResultBackwards.getSkipCount();
+    int sourceCount = originalTrace.getSize() - skipCount - skipResultBackwards.getSkipCount();
     if (Chart2D.DEBUG_DATA_ACCUMULATION) {
       System.out.println(this.getClass().getName() + " this leaves " + sourceCount
           + " point to accumulate. ");
@@ -150,8 +157,8 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDen
    * @see java.util.Iterator#hasNext()
    */
   public boolean hasNext() {
-    return ((this.m_xRangePerXLowerBound < 1.0) && (this.getOriginalIterator().hasNext())
-        || (this.m_lastPoint != null) || (this.m_firstInvisiblePoint != null));
+    return (((this.m_xRangePerXLowerBound < 1.0) && (this.getOriginalIterator().hasNext()))
+        || (this.m_lastPoint != null) || (this.m_firstInvisiblePoint != null) || (this.m_firstVisiblePoint != null));
   }
 
   /**
@@ -174,12 +181,12 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDen
        */
       result = this.m_firstInvisiblePoint;
       this.m_firstInvisiblePoint = null;
-    } else if (this.m_firstInvisiblePoint != null) {
+    } else if (this.m_firstVisiblePoint != null) {
       /*
        * Return the first visible point skipped to.
        */
       result = this.m_firstVisiblePoint;
-      this.m_firstInvisiblePoint = null;
+      this.m_firstVisiblePoint = null;
     } else {
 
       if (!iterator.hasNext()) {

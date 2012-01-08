@@ -333,12 +333,24 @@ public class TestAccumulatingIteratorConsecutivePointsOrderedXValues {
     Assert.assertEquals(one.getY(), result.getY(), 0.0);
     Assert.assertTrue(toTest.hasNext());
     result = toTest.next();
-    Assert.assertEquals(1.5, result.getX(), 0.0);
-    Assert.assertEquals(1.5, result.getY(), 0.0);
+    /*
+     * This one has to be the first visible point (as that other first was NaN):
+     */
+    Assert.assertEquals(two, result);
     Assert.assertTrue(toTest.hasNext());
     result = toTest.next();
-    Assert.assertEquals(result, four);
-    Assert.assertFalse(toTest.hasNext());
+    /*
+     * This has to be three as four is the last one and must not be accumulated: 
+     */
+    Assert.assertEquals(three, result);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    /*
+     * This has to be four as it is the last one: 
+     */
+    Assert.assertEquals(four, result);
+    
+    
   }
 
   /**

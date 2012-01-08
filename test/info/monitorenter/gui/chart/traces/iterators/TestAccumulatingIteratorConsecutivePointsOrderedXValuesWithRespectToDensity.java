@@ -110,7 +110,9 @@ public class TestAccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectT
     this.m_trace.addPoint(one);
     this.m_trace.addPoint(two);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDensity(this.m_trace, accumulationFunction, this.m_trace.getSize());
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePointsOrderedXValues(this.m_trace, accumulationFunction, this.m_trace.getSize());
+
+//    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDensity(this.m_trace, accumulationFunction, this.m_trace.getSize());
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
