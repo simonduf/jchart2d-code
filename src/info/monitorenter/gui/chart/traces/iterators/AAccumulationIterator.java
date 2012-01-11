@@ -35,6 +35,11 @@ import java.util.Iterator;
  * wrapped iterator then the last point returned from {@link #next()} has to
  * be an interpolated point at the exact coordinate of the upper bound of the
  * range.</li>
+ * <li>
+ * After a discontinuation ({@link ITracePoint2D#isDiscontinuation()}) has been
+ * returned the next visible point must not be accumulated but returned as-is to
+ * prevent showing a bigger gap than actually exists!
+ * </li>
  * </ul>
  * <p>
  * 

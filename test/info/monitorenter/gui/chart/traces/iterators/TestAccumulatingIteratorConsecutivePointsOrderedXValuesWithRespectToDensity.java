@@ -474,4 +474,62 @@ public class TestAccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectT
     Assert.assertEquals(four, toTest.next());
     Assert.assertFalse("Should be empty now.", toTest.hasNext());
   }
+  
+  /**
+   * Test if after a discontinuation the next point is returend without data
+   * accumulation even if it would be possible to accumulate that
+   * NaN-following-point with following visible points.
+   * <p>
+   * Contract: After NaN the next visible point must not be accumulated to
+   * prevent discontinuation-gaps to show up bigger than they really are.
+   * <p>
+   */
+  @Test
+  public void testReturns1stVisiblePointAfterDiscontinuation() {
+    IAccumulationFunction accumulationFunction = new AccumulationFunctionArithmeticMeanXY();
+    ITracePoint2D one = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(0.0, 0.0);
+    ITracePoint2D two = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(1.0, Double.NaN);
+    ITracePoint2D three = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(2.0, 2.0);
+    ITracePoint2D four = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(3.0, 3.0);
+    ITracePoint2D five = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(4.0, 4.0);
+    ITracePoint2D six = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(6.0, 6.0);
+
+    this.m_trace.addPoint(one);
+    this.m_trace.addPoint(two);
+    this.m_trace.addPoint(three);
+    this.m_trace.addPoint(four);
+    this.m_trace.addPoint(five);
+    this.m_trace.addPoint(six);
+
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePointsOrderedXValues(this.m_trace,
+        accumulationFunction, 3);
+    Assert.assertTrue(toTest.hasNext());
+    ITracePoint2D result = toTest.next();
+    Assert.assertEquals(one, result);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    // This must be two unchanged as it is a discontinuation!
+    Assert.assertEquals(two.getX(), result.getX(), 0.0);
+    Assert.assertEquals(two.getY(), result.getY(), 0.0);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    /*
+     * This must be three unchanged as it is the first point after a
+     * discontinuation!
+     */
+    Assert.assertEquals(three, result);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    /*
+     * This has to be the arithmetic mean of four and five (even if we want to
+     * accumulate 3 points together) as the six is the last point!
+     */
+    Assert
+        .assertEquals(
+            "This has to be the arithmetic mean of four and five (even if we want to accumulate 3 points together) as the six is the last point!",
+            (four.getX() + five.getX()) / 2, result.getX(), 0.0);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    Assert.assertEquals("This should be the unchanged last point!", six, result);
+  }
 }

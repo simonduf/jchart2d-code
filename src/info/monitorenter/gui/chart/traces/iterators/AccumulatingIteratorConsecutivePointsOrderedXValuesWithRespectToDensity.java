@@ -28,6 +28,11 @@ import java.util.Iterator;
  * alternating <code>NaN</code> x-values and non- <code>NaN</code> x values
  * occur.
  * <p>
+ * After a discontinuation ({@link ITracePoint2D#isDiscontinuation()}) has been
+ * returned the next visible point must not be accumulated but returned as-is to
+ * prevent showing a bigger gap than actually exists!
+ * <p>
+ * 
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
@@ -68,6 +73,14 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDen
    */
   private ITracePoint2D m_previousNaN;
 
+  /**
+   * Flag to remember that in previous call to {@link #next()} a discontinuation
+   * ({@link ITracePoint2D#isDiscontinuation()}) was returned. In that case the
+   * next visible point has to be returned without accumulation to prevent
+   * showing a bigger gap than actually exists.
+   */
+  private boolean m_previousNaNWasReturned;
+  
   /**
    * Constructor with all that is needed for accumulating points.
    * <p>
@@ -206,6 +219,7 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDen
            */
           result = this.m_previousNaN;
           this.m_previousNaN = null;
+          this.m_previousNaNWasReturned = true;
         } else {
           point = iterator.next();
           pointCount++;
@@ -233,14 +247,24 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDen
             // CODE IN QUESTION END
 
             if (!point.isDiscontinuation()) {
-              /*
-               * [a] We must not blindly add this point to the accumulation
-               * result: The contract is that the last point has to be returned
-               * unchanged (as this implementation does not make use of the
-               * given ranges). In case this is the last point: Store it for the
-               * next invocation of next.
-               */
-              if (iterator.hasNext()) {
+              if (this.m_previousNaNWasReturned) {
+                /*
+                 * Don't accumulate anything but return unaccumulated point as
+                 * we do not want to increase the gap of the previous
+                 * discontinuation by accumulation!
+                 */
+                result = point;
+                // reset!
+                this.m_previousNaNWasReturned = false;
+                break;
+              }else if (iterator.hasNext()) {
+                /*
+                 * [a] We must not blindly add this point to the accumulation
+                 * result: The contract is that the last point has to be returned
+                 * unchanged (as this implementation does not make use of the
+                 * given ranges). In case this is the last point: Store it for the
+                 * next invocation of next.
+                 */
                 accumulate.addPointToAccumulate(point);
               } else {
                 // [a]
@@ -264,6 +288,7 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDen
                    * Just return it!
                    */
                   result = point;
+                  this.m_previousNaNWasReturned = true;
                   break;
                 } else {
                   /*

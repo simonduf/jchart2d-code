@@ -9,7 +9,7 @@ import java.util.Iterator;
 
 /**
  * An implementation that - without any care for order of x or y values and
- * without any care for densitiy-based accumulation accumulates n consecutive
+ * without any care for density-based accumulation accumulates n consecutive
  * points.
  * <p>
  * Invisible points will still be accumulated allowing the {@link Chart2D}
@@ -23,6 +23,10 @@ import java.util.Iterator;
  * the worst case no accumulations may be performed: In the case that
  * alternating <code>NaN</code> x-values and non- <code>NaN</code> x values
  * occur.
+ * <p>
+ * After a discontinuation ({@link ITracePoint2D#isDiscontinuation()}) has been
+ * returned the next visible point must not be accumulated but returned as-is to
+ * prevent showing a bigger gap than actually exists!
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
@@ -51,7 +55,15 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
    * Internal needed to store if we had to return an accumulated point while
    * seeing NaN which we then have to return next time.
    */
-  private ITracePoint2D m_previousNaN;
+  private ITracePoint2D m_previousNaNPoint;
+
+  /**
+   * Flag to remember that in previous call to {@link #next()} a discontinuation
+   * ({@link ITracePoint2D#isDiscontinuation()}) was returned. In that case the
+   * next visible point has to be returned without accumulation to prevent
+   * showing a bigger gap than actually exists.
+   */
+  private boolean m_previousNaNWasReturned;
 
   /**
    * Constructor with all that is needed for accumulating points.
@@ -66,7 +78,8 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
    * @param countPerNext
    *          The amount of points to accumulate per call to {@link #next()}.
    */
-  public AccumulatingIteratorConsecutivePoints(final ITrace2D originalTrace, final IAccumulationFunction accumulationFunction, final int countPerNext) {
+  public AccumulatingIteratorConsecutivePoints(final ITrace2D originalTrace,
+      final IAccumulationFunction accumulationFunction, final int countPerNext) {
     super(originalTrace, accumulationFunction);
     this.m_countPerNext = countPerNext;
   }
@@ -94,7 +107,8 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
    * 
    * @return an iterator with data accumulation support.
    */
-  public static Iterator<ITracePoint2D> create(final ITrace2D originalTrace, final IAccumulationFunction accumulationFunction, final int amountOfVisiblePoints) {
+  public static Iterator<ITracePoint2D> create(final ITrace2D originalTrace,
+      final IAccumulationFunction accumulationFunction, final int amountOfVisiblePoints) {
     Iterator<ITracePoint2D> result;
     /*
      * Compute the amount of points per next() to accumulate:
@@ -109,17 +123,18 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
       } else {
         countPerNext = 1;
       }
-    } 
+    }
     if (countPerNext == 0) {
       countPerNext = 1;
     }
     /*
-     * Skip data accumulation if not feasible: 
+     * Skip data accumulation if not feasible:
      */
-    if(countPerNext == 1) {
+    if (countPerNext == 1) {
       result = originalTrace.iterator();
     } else {
-      result = new AccumulatingIteratorConsecutivePoints(originalTrace, accumulationFunction, countPerNext);
+      result = new AccumulatingIteratorConsecutivePoints(originalTrace, accumulationFunction,
+          countPerNext);
     }
     return result;
   }
@@ -132,6 +147,11 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
   }
 
   /**
+   * {@inheritDoc}
+   * <p>
+   * FIXME: If you have time use your IT skills and implement a state-engine
+   * here to clean up this complex spaghetti if-else condition dangling!
+   * 
    * @see java.util.Iterator#next()
    */
   public ITracePoint2D next() {
@@ -144,6 +164,9 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
     ITracePoint2D point;
     int amountToAccumulate = this.m_countPerNext;
     if (this.m_firstCall2Next) {
+      /*
+       * Return the latest invisible skipped point.
+       */
       result = iterator.next();
       this.m_firstCall2Next = false;
     } else {
@@ -158,36 +181,47 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
         this.m_lastPoint = null;
       } else {
         while ((amountToAccumulate > 0) && (iterator.hasNext())) {
-          if (this.m_previousNaN != null) {
+          if (this.m_previousNaNPoint != null) {
             /*
              * In case our previous call next returned an accumulated point but
              * kept in mind that NaN (discontinuation) was found: immediately
              * return the discontinuation.
              */
-            result = this.m_previousNaN;
-            this.m_previousNaN = null;
+            result = this.m_previousNaNPoint;
+            this.m_previousNaNPoint = null;
+            this.m_previousNaNWasReturned = true;
             break;
           } else {
             point = iterator.next();
             if (!point.isDiscontinuation()) {
-              /*
-               * [a] We must not blindly add this point to the accumulation
-               * result: The contract is that the last point has to be returned
-               * unchanged (as this implementation does not make use of the
-               * given ranges). In case this is the last point: Store it for the
-               * next invocation of next.
-               */
-              if (iterator.hasNext()) {
+              if (this.m_previousNaNWasReturned) {
+                /*
+                 * Don't accumulate anything but return unaccumulated point as
+                 * we do not want to increase the gap of the previous
+                 * discontinuation by accumulation!
+                 */
+                result = point;
+                // reset!
+                this.m_previousNaNWasReturned = false;
+                break;
+              } else if (iterator.hasNext()) {
+                /*
+                 * [a] We must not blindly add this point to the accumulation
+                 * result: The contract is that the last point has to be
+                 * returned unchanged (as this implementation does not make use
+                 * of the given ranges). In case this is the last point: Store
+                 * it for the next invocation of next.
+                 */
                 accumulate.addPointToAccumulate(point);
               } else {
                 this.m_lastPoint = point;
               }
               // wipe out potential previous NaN!
-              this.m_previousNaN = null;
+              this.m_previousNaNPoint = null;
               amountToAccumulate--;
             } else {
               // point is NaN!
-              if (this.m_previousNaN != null) {
+              if (this.m_previousNaNPoint != null) {
                 /*
                  * Don't care: our previous point was also NaN. So skip that NaN
                  * discontinuation.
@@ -201,6 +235,7 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
                    * Just return it!
                    */
                   result = point;
+                  this.m_previousNaNWasReturned = true;
                   break;
                 } else {
                   /*
@@ -208,7 +243,7 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
                    * result. We have to return the previous accumulation result
                    * but keep in mind that we next have a NaN to return.
                    */
-                  this.m_previousNaN = point;
+                  this.m_previousNaNPoint = point;
                   break;
                 }
               }
@@ -259,7 +294,8 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
    */
   public void remove() {
 
-    throw new UnsupportedOperationException("This is not supported for " + this.getClass().getName()
+    throw new UnsupportedOperationException("This is not supported for "
+        + this.getClass().getName()
         + ". Data is not contained but computed (non 1-1) from an underlying source. ");
   }
 

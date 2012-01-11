@@ -61,7 +61,8 @@ public class TestAccumulatingIteratorConsecutivePoints {
   @Test
   public void testEmptyTraceAccumulationFunctionArithmeticMeanXY() {
     IAccumulationFunction accumulationFunction = new AccumulationFunctionArithmeticMeanXY();
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 0);
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace,
+        accumulationFunction, 0);
     Assert.assertFalse(toTest.hasNext());
   }
 
@@ -79,8 +80,8 @@ public class TestAccumulatingIteratorConsecutivePoints {
     ITracePoint2D point = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(0.0, 0.0);
     this.m_trace.addPoint(point);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction,
-        this.m_trace.getSize());
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace,
+        accumulationFunction, this.m_trace.getSize());
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(point, result);
@@ -103,8 +104,8 @@ public class TestAccumulatingIteratorConsecutivePoints {
     this.m_trace.addPoint(one);
     this.m_trace.addPoint(two);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction,
-        this.m_trace.getSize());
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace,
+        accumulationFunction, this.m_trace.getSize());
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -132,8 +133,8 @@ public class TestAccumulatingIteratorConsecutivePoints {
     this.m_trace.addPoint(two);
     this.m_trace.addPoint(three);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction,
-        this.m_trace.getSize());
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace,
+        accumulationFunction, this.m_trace.getSize());
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -165,7 +166,8 @@ public class TestAccumulatingIteratorConsecutivePoints {
     this.m_trace.addPoint(two);
     this.m_trace.addPoint(three);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 2);
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace,
+        accumulationFunction, 2);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -200,7 +202,8 @@ public class TestAccumulatingIteratorConsecutivePoints {
     this.m_trace.addPoint(three);
     this.m_trace.addPoint(four);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 3);
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace,
+        accumulationFunction, 3);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -237,7 +240,8 @@ public class TestAccumulatingIteratorConsecutivePoints {
     this.m_trace.addPoint(three);
     this.m_trace.addPoint(four);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 3);
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace,
+        accumulationFunction, 3);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -256,11 +260,10 @@ public class TestAccumulatingIteratorConsecutivePoints {
     Assert.assertFalse(toTest.hasNext());
   }
 
-  
   /**
    * Test an instance with a trace containing 4 points and an
    * {@link AccumulationFunctionArithmeticMeanXY} and the request to accumulate
-   * two points into one (which is possible with 4 points). However there two 
+   * two points into one (which is possible with 4 points). However there two
    * NaN values (discontinuation) on position 2 and 3.
    * <p>
    * Assumption: iterator must return just 4 points. The NaN points untouched.
@@ -279,7 +282,8 @@ public class TestAccumulatingIteratorConsecutivePoints {
     this.m_trace.addPoint(three);
     this.m_trace.addPoint(four);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 3);
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace,
+        accumulationFunction, 3);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -298,11 +302,11 @@ public class TestAccumulatingIteratorConsecutivePoints {
     Assert.assertEquals(four, result);
     Assert.assertFalse(toTest.hasNext());
   }
-  
+
   /**
    * Test an instance with a trace containing 4 points and an
    * {@link AccumulationFunctionArithmeticMeanXY} and the request to accumulate
-   * two points into one (which is possible with 4 points). However there is one  
+   * two points into one (which is possible with 4 points). However there is one
    * NaN value (discontinuation) on position 1.
    * <p>
    * Assumption: iterator must return just 3 points. The NaN points untouched.
@@ -321,7 +325,8 @@ public class TestAccumulatingIteratorConsecutivePoints {
     this.m_trace.addPoint(three);
     this.m_trace.addPoint(four);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 3);
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace,
+        accumulationFunction, 3);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     // This must be one unchanged as it is a discontinuation!
@@ -358,7 +363,8 @@ public class TestAccumulatingIteratorConsecutivePoints {
     ITracePoint2D last = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(101.0, 101.0);
     this.m_trace.addPoint(last);
 
-    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 52);
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace,
+        accumulationFunction, 2);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(first, result);
@@ -404,7 +410,8 @@ public class TestAccumulatingIteratorConsecutivePoints {
     ITracePoint2D last = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(91.0, 91.0);
     this.m_trace.addPoint(last);
 
-    Iterator<ITracePoint2D> toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 32);
+    Iterator<ITracePoint2D> toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace,
+        accumulationFunction, 3);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(first, result);
@@ -430,15 +437,19 @@ public class TestAccumulatingIteratorConsecutivePoints {
   }
 
   /**
-   * Adds a point outside the visible range (lower bound) then a point in the visible range and then a point outside the 
-   * visible range (upper bound) all with ascending x value. <p>
+   * Adds a point outside the visible range (lower bound) then a point in the
+   * visible range and then a point outside the visible range (upper bound) all
+   * with ascending x value.
+   * <p>
    * 
    * <ul>
-   * <li> First point returned has to be the first invisible one (contract to allow that interpolation towards visible bounds still 
-   * works with accumulation API).</li>
-   * <li> 2nd point has to be the original visible point.</li>
-   * <li> Last point returned has to be the last invisible one (contract to allow that interpolation towards visible bounds still 
-   * works with accumulation API).</li>
+   * <li>First point returned has to be the first invisible one (contract to
+   * allow that interpolation towards visible bounds still works with
+   * accumulation API).</li>
+   * <li>2nd point has to be the original visible point.</li>
+   * <li>Last point returned has to be the last invisible one (contract to allow
+   * that interpolation towards visible bounds still works with accumulation
+   * API).</li>
    * </ul>
    * <p>
    * 
@@ -456,24 +467,29 @@ public class TestAccumulatingIteratorConsecutivePoints {
     this.m_trace.addPoint(one);
     this.m_trace.addPoint(two);
     this.m_trace.addPoint(three);
-    Iterator<ITracePoint2D> toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 3);
+    Iterator<ITracePoint2D> toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace,
+        accumulationFunction, 3);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
     Assert.assertEquals(two, toTest.next());
     Assert.assertEquals(three, toTest.next());
   }
-  
+
   /**
-   * Adds a point outside the visible range (lower bound) then many points in the visible range and then a point outside the 
-   * visible range (upper bound) all with ascending x value. <p>
+   * Adds a point outside the visible range (lower bound) then many points in
+   * the visible range and then a point outside the visible range (upper bound)
+   * all with ascending x value.
+   * <p>
    * 
    * <ul>
-   * <li> First point returned has to be the first invisible one (contract to allow that interpolation towards visible bounds still 
-   * works with accumulation API).</li>
-   * <li> 2nd point has to be the original visible point.</li>
-   * <li> Last point returned has to be the last invisible one (contract to allow that interpolation towards visible bounds still 
-   * works with accumulation API).</li>
+   * <li>First point returned has to be the first invisible one (contract to
+   * allow that interpolation towards visible bounds still works with
+   * accumulation API).</li>
+   * <li>2nd point has to be the original visible point.</li>
+   * <li>Last point returned has to be the last invisible one (contract to allow
+   * that interpolation towards visible bounds still works with accumulation
+   * API).</li>
    * </ul>
    * <p>
    * 
@@ -488,11 +504,13 @@ public class TestAccumulatingIteratorConsecutivePoints {
     ITracePoint2D one = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(-1.0, -1.0);
     ITracePoint2D three = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(3.0, 3.0);
     this.m_trace.addPoint(one);
-    for(int i=100; i> 0; i--) {
-      this.m_trace.addPoint(new info.monitorenter.gui.chart.tracepoints.TracePoint2D(1.0/i,1.0/i));
+    for (int i = 100; i > 0; i--) {
+      this.m_trace.addPoint(new info.monitorenter.gui.chart.tracepoints.TracePoint2D(1.0 / i,
+          1.0 / i));
     }
     this.m_trace.addPoint(three);
-    Iterator<ITracePoint2D> toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace, accumulationFunction, 3);
+    Iterator<ITracePoint2D> toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace,
+        accumulationFunction, 100);
     Assert.assertTrue(toTest.hasNext());
     ITracePoint2D result = toTest.next();
     Assert.assertEquals(one, result);
@@ -502,5 +520,62 @@ public class TestAccumulatingIteratorConsecutivePoints {
     Assert.assertFalse("Should be empty", toTest.hasNext());
   }
 
+  /**
+   * Test if after a discontinuation the next point is returend without data
+   * accumulation even if it would be possible to accumulate that
+   * NaN-following-point with following visible points.
+   * <p>
+   * Contract: After NaN the next visible point must not be accumulated to
+   * prevent discontinuation-gaps to show up bigger than they really are.
+   * <p>
+   */
+  @Test
+  public void testReturns1stVisiblePointAfterDiscontinuation() {
+    IAccumulationFunction accumulationFunction = new AccumulationFunctionArithmeticMeanXY();
+    ITracePoint2D one = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(0.0, 0.0);
+    ITracePoint2D two = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(1.0, Double.NaN);
+    ITracePoint2D three = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(2.0, 2.0);
+    ITracePoint2D four = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(3.0, 3.0);
+    ITracePoint2D five = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(4.0, 4.0);
+    ITracePoint2D six = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(6.0, 6.0);
+
+    this.m_trace.addPoint(one);
+    this.m_trace.addPoint(two);
+    this.m_trace.addPoint(three);
+    this.m_trace.addPoint(four);
+    this.m_trace.addPoint(five);
+    this.m_trace.addPoint(six);
+
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace,
+        accumulationFunction, 3);
+    Assert.assertTrue(toTest.hasNext());
+    ITracePoint2D result = toTest.next();
+    Assert.assertEquals(one, result);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    // This must be two unchanged as it is a discontinuation!
+    Assert.assertEquals(two.getX(), result.getX(), 0.0);
+    Assert.assertEquals(two.getY(), result.getY(), 0.0);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    /*
+     * This must be three unchanged as it is the first point after a
+     * discontinuation!
+     */
+    Assert.assertEquals(three, result);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    /*
+     * This has to be the arithmetic mean of four and five (even if we want to
+     * accumulate 3 points together) as the six is the last point!
+     */
+    Assert
+        .assertEquals(
+            "This has to be the arithmetic mean of four and five (even if we want to accumulate 3 points together) as the six is the last point!",
+            (four.getX() + five.getX()) / 2, result.getX(), 0.0);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    Assert.assertEquals("This should be the unchanged last point!", six, result);
+  }
 
 }
