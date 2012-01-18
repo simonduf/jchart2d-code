@@ -163,13 +163,6 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
     Iterator<ITracePoint2D> iterator = this.getOriginalIterator();
     ITracePoint2D point;
     int amountToAccumulate = this.m_countPerNext;
-    if (this.m_firstCall2Next) {
-      /*
-       * Return the latest invisible skipped point.
-       */
-      result = iterator.next();
-      this.m_firstCall2Next = false;
-    } else {
 
       if (!iterator.hasNext()) {
         /*
@@ -181,6 +174,21 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
         this.m_lastPoint = null;
       } else {
         while ((amountToAccumulate > 0) && (iterator.hasNext())) {
+          if (this.m_firstCall2Next) {
+            /*
+             * Return the first point if it is visible. 
+             * Else the last invisible point has to be returned which is dealt with in "else". 
+             */
+            result = iterator.next();
+            if(result.isVisble()) {
+              break;
+            } else {
+              // continue search
+              result = null;
+            }
+            this.m_firstCall2Next = false;
+          } 
+          
           if (this.m_previousNaNPoint != null) {
             /*
              * In case our previous call next returned an accumulated point but
@@ -247,9 +255,7 @@ public class AccumulatingIteratorConsecutivePoints extends AAccumulationIterator
                   break;
                 }
               }
-
             }
-          }
         }
       }
 

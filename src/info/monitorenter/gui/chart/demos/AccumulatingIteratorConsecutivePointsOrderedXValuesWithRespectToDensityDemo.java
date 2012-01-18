@@ -29,7 +29,7 @@ import info.monitorenter.gui.chart.ZoomableChart;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.traces.accumulationfunctions.AccumulationFunctionArithmeticMeanXY;
-import info.monitorenter.gui.chart.traces.accumulationstrategies.AccumulationStrategyAmountOfPointsAscendingXValues;
+import info.monitorenter.gui.chart.traces.accumulationstrategies.AccumulationStrategyXRangeWithRespectToDensity;
 import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.Color;
@@ -45,13 +45,14 @@ import javax.swing.JFrame;
  * <p>
  * Accumulation is done by an implementation that skips invisible points (by
  * assuming x values are ascending) and accumulates n points into one:
- * {@link AccumulationStrategyAmountOfPointsAscendingXValues}.
+ * {@link AccumulationStrategyXRangeWithRespectToDensity}.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
+ * 
  */
-public final class ChartLargeDataZoomableWithDataAccumulationAmountOfPoints {
+public final class AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDensityDemo {
 
   /**
    * Testing main hook.
@@ -65,7 +66,7 @@ public final class ChartLargeDataZoomableWithDataAccumulationAmountOfPoints {
     ZoomableChart chart = new ZoomableChart();
     // Create an ITrace:
     ITrace2DDataAccumulating trace = new Trace2DSimple();
-    trace.setAccumulationStrategy(new AccumulationStrategyAmountOfPointsAscendingXValues(
+    trace.setAccumulationStrategy(new AccumulationStrategyXRangeWithRespectToDensity(
         new AccumulationFunctionArithmeticMeanXY()));
     trace.setColor(Color.BLUE);
     // Add the trace to the chart:
@@ -78,13 +79,21 @@ public final class ChartLargeDataZoomableWithDataAccumulationAmountOfPoints {
     // Add all points, as it is static:
     Random random = new Random();
 
-    for (int i = 0; i < 700000; i++) {
+    int pointCount = 0;
+    for (double i = 1; i < 70000; i+= 100/i) {
       trace.addPoint(i, (60 + random.nextDouble()) * i);
+      pointCount++;
+      if (pointCount > 700000) {
+        break;
+      }
     }
     // Make it visible:
     // Create a frame.
     JFrame frame = new JFrame(
-        ChartLargeDataZoomableWithDataAccumulationAmountOfPoints.class.getName());
+        pointCount
+            + " points in "
+            + AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDensityDemo.class
+                .getName());
     // add the chart to the frame:
     frame.getContentPane().add(new ChartPanel(chart));
     frame.setSize(800, 600);
@@ -105,7 +114,7 @@ public final class ChartLargeDataZoomableWithDataAccumulationAmountOfPoints {
    * Defcon.
    * <p>
    */
-  private ChartLargeDataZoomableWithDataAccumulationAmountOfPoints() {
+  private AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDensityDemo() {
     // TODO Auto-generated constructor stub
   }
 }

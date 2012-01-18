@@ -577,5 +577,40 @@ public class TestAccumulatingIteratorConsecutivePoints {
     result = toTest.next();
     Assert.assertEquals("This should be the unchanged last point!", six, result);
   }
+  
+  /**
+   * Two points are added both in the invisible area. But they have an intersection in the visible range and have to show up.
+   * <p>
+   * Contract: 
+   * If no points are within the visible area but two points have an intersection in the visible area those points have to be returned 
+   * unchanged (to allow the chart painting that intersection).
+   * <p>
+   */
+  @Test
+  public void testIntersectionOfInvisiblePoints(){
+    Chart2D chart = this.m_trace.getRenderer();
+    Range visibleRange = new Range(0, 1.0);
+    chart.getAxisX().setRangePolicy(new RangePolicyFixedViewport(visibleRange));
+    chart.getAxisY().setRangePolicy(new RangePolicyFixedViewport(visibleRange));
+    IAccumulationFunction accumulationFunction = new AccumulationFunctionArithmeticMeanXY();
+    
+    ITracePoint2D zero = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(-2.0, -2.0);
+    ITracePoint2D one = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(-1.0, -1.0);
+    ITracePoint2D two = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(3.0, 3.0);
+    ITracePoint2D three = new info.monitorenter.gui.chart.tracepoints.TracePoint2D(4.0, 4.0);
+    this.m_trace.addPoint(zero);
+    this.m_trace.addPoint(one);
+    this.m_trace.addPoint(two);
+    this.m_trace.addPoint(three);
+    AAccumulationIterator toTest = new AccumulatingIteratorConsecutivePoints(this.m_trace,
+        accumulationFunction, 3);
+    
+    Assert.assertTrue(toTest.hasNext());
+    ITracePoint2D result = toTest.next();
+    Assert.assertEquals("Latest lower invisible point has to be returned for interpolation. ", one, result);
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    Assert.assertEquals("First upper invisible point has to be returned for interpolation. ", two, result);
+  }
 
 }

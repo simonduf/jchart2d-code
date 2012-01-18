@@ -173,11 +173,11 @@ public final class Chart2DActionSaveImageSingleton
       ImageWriter imgWriter = ImageIO.getImageWritersBySuffix(extension).next();
       // parameters for the writer:
       ImageWriteParam params = imgWriter.getDefaultWriteParam();
-      if (params.canWriteCompressed()) {
-        params.setCompressionMode(ImageWriteParam.MODE_DISABLED);
-        // params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-        // params.setCompressionQuality(1.0f);
-      }
+//      if (!params.canWriteCompressed()) {
+//        params.setCompressionMode(ImageWriteParam.MODE_DISABLED);
+//        // params.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+//        // params.setCompressionQuality(1.0f);
+//      }
       try {
         imgWriter.setOutput(new FileImageOutputStream(new File(file.getAbsolutePath() + "."
             + extension)));

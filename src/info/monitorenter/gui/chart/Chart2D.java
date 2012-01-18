@@ -26,6 +26,7 @@ import info.monitorenter.util.Range;
 import info.monitorenter.util.StopWatchSimple;
 import info.monitorenter.util.StringUtil;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
@@ -4244,7 +4245,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       Dimension dsave = new Dimension(this.getWidth(), this.getHeight());
       this.setSize(new Dimension(width, height));
       BufferedImage img;
-      img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+      img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
       Graphics2D g2d = (Graphics2D) img.getGraphics();
       g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
       g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);

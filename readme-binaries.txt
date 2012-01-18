@@ -53,6 +53,7 @@ jchart2d-3.3.0 - <month>, <day>, <year>
   ITrace2D.setAccumulationStrategy(new AccumulationStrategyAmountOfPointsAscendingXValues(new AccumulationFunctionArithmeticMeanXY()));
 ! Improved axis title spacing. 
 ! Added feature #3426071: Let getAxisX()/getAxisY() support right y axes/ top y axes (avoid naive NPE in case x axis bottom and/or y axis left is empty).
+! Saving images with transparent background is supported now. 
 o Changed policy of Chart2D.translateMousePosition(final MouseEvent mouseEvent). Before this the translation was done into the values 
   covered by the first x and y axes. By now the translation is related to the axes of the trace of the nearest point to the given 
   mouse event. 

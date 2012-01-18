@@ -29,7 +29,7 @@ import info.monitorenter.gui.chart.ZoomableChart;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.traces.accumulationfunctions.AccumulationFunctionArithmeticMeanXY;
-import info.monitorenter.gui.chart.traces.accumulationstrategies.AccumulationStrategyXRangeWithRespectToDensity;
+import info.monitorenter.gui.chart.traces.accumulationstrategies.AccumulationStrategyAmountOfPointsAscendingXValues;
 import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.Color;
@@ -45,16 +45,13 @@ import javax.swing.JFrame;
  * <p>
  * Accumulation is done by an implementation that skips invisible points (by
  * assuming x values are ascending) and accumulates n points into one:
- * {@link AccumulationStrategyXRangeWithRespectToDensity}.
+ * {@link AccumulationStrategyAmountOfPointsAscendingXValues}.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * 
- * 
- * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
- * 
  */
-public final class ChartLargeDataZoomableWithDataAccumulationDensityBased {
+public final class AccumulatingIteratorConsecutivePointsOrderedXValuesDemo {
 
   /**
    * Testing main hook.
@@ -68,7 +65,8 @@ public final class ChartLargeDataZoomableWithDataAccumulationDensityBased {
     ZoomableChart chart = new ZoomableChart();
     // Create an ITrace:
     ITrace2DDataAccumulating trace = new Trace2DSimple();
-    trace.setAccumulationStrategy(new AccumulationStrategyXRangeWithRespectToDensity(new AccumulationFunctionArithmeticMeanXY()));
+    trace.setAccumulationStrategy(new AccumulationStrategyAmountOfPointsAscendingXValues(
+        new AccumulationFunctionArithmeticMeanXY()));
     trace.setColor(Color.BLUE);
     // Add the trace to the chart:
     chart.addTrace(trace);
@@ -76,7 +74,7 @@ public final class ChartLargeDataZoomableWithDataAccumulationDensityBased {
     chart.enablePointHighlighting(true);
     trace.setPointHighlighter(new PointPainterDisc(6));
     chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
-    
+
     // Add all points, as it is static:
     Random random = new Random();
 
@@ -85,7 +83,8 @@ public final class ChartLargeDataZoomableWithDataAccumulationDensityBased {
     }
     // Make it visible:
     // Create a frame.
-    JFrame frame = new JFrame(ChartLargeDataZoomableWithDataAccumulationDensityBased.class.getName());
+    JFrame frame = new JFrame(
+        AccumulatingIteratorConsecutivePointsOrderedXValuesDemo.class.getName());
     // add the chart to the frame:
     frame.getContentPane().add(new ChartPanel(chart));
     frame.setSize(800, 600);
@@ -106,7 +105,7 @@ public final class ChartLargeDataZoomableWithDataAccumulationDensityBased {
    * Defcon.
    * <p>
    */
-  private ChartLargeDataZoomableWithDataAccumulationDensityBased() {
+  private AccumulatingIteratorConsecutivePointsOrderedXValuesDemo() {
     // TODO Auto-generated constructor stub
   }
 }

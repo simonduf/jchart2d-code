@@ -134,7 +134,8 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
         final boolean res = TracePoint2D.this.m_additionalPointPainters.add(additionalPointPainter);
         // for interpolated points listener may be null:
         if (res && TracePoint2D.this.m_listener != null) {
-          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE_RENDERING_CHANGED, 0, 0);
+          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this,
+              ITracePoint2D.STATE_RENDERING_CHANGED, 0, 0);
         }
         return Boolean.valueOf(res);
       }
@@ -160,7 +161,8 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
     result.m_y = this.m_y;
     result.m_scaledX = this.m_scaledX;
     result.m_scaledY = this.m_scaledY;
-    result.m_additionalPointPainters = new LinkedHashSet<IPointPainter< ? >>(this.m_additionalPointPainters);
+    result.m_additionalPointPainters = new LinkedHashSet<IPointPainter< ? >>(
+        this.m_additionalPointPainters);
     return result;
   }
 
@@ -315,7 +317,8 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
         TracePoint2D.this.m_x = xValue;
         TracePoint2D.this.m_y = yValue;
         if (TracePoint2D.this.m_listener != null) {
-          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE_CHANGED, oldX, oldY);
+          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this,
+              ITracePoint2D.STATE_CHANGED, oldX, oldY);
         }
         return null;
       }
@@ -395,7 +398,8 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
         boolean res = TracePoint2D.this.m_additionalPointPainters.remove(pointPainter);
         if (res) {
           if (TracePoint2D.this != null) {
-            TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE_RENDERING_CHANGED, 0, 0);
+            TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this,
+                ITracePoint2D.STATE_RENDERING_CHANGED, 0, 0);
           }
         }
         return Boolean.valueOf(res);
@@ -415,13 +419,33 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
         Set<IPointPainter< ? >> result = TracePoint2D.this.m_additionalPointPainters;
         TracePoint2D.this.m_additionalPointPainters = new LinkedHashSet<IPointPainter< ? >>();
         if (TracePoint2D.this != null) {
-          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE_RENDERING_CHANGED, 0, 0);
+          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this,
+              ITracePoint2D.STATE_RENDERING_CHANGED, 0, 0);
         }
         return result;
       }
     }
 
     );
-
   }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITracePoint2D#isVisble()
+   */
+  @Override
+  public boolean isVisble() {
+    boolean result = true;
+    if (this.m_scaledX < 0.0) {
+      result = false;
+    } else if (this.m_scaledX > 1.0) {
+      result = false;
+    } else if (this.m_scaledY < 0.0) {
+      result = false;
+    } else if (this.m_scaledY > 1.0) {
+      result = false;
+    }
+
+    return result;
+  }
+
 }
