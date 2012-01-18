@@ -1,5 +1,5 @@
 /*
- * RunningChart, a test for the Chart2D.
+ * TransparentChart, a test for the Chart2D.
  * Copyright (c) 2007 - 2011  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
@@ -25,12 +25,10 @@ package info.monitorenter.gui.chart.demos;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
-import info.monitorenter.gui.chart.rangepolicies.RangePolicyMinimumViewport;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.gui.chart.traces.painters.TracePainterPolyline;
 import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.reflection.ObjRecorder2Trace2DAdapter;
-import info.monitorenter.util.Range;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -43,11 +41,10 @@ import javax.swing.JFrame;
 
 /**
  * A test for the <code>Chart2D</code> that constantly adds new tracepoints to a
- * <code> Trace2DLtd</code>. Mainly the runtime- scaling is interesting.
+ * <code> Trace2DLtd</code>. Mainly the transparent background color is interesting. Try saving 
+ * an image as a png and see transparency. 
  * <p>
- * Furthermore this is an example on how to connect other components to the
- * <code>Chart2D</code> using an adaptor- class. If interested have a look on
- * {@link info.monitorenter.reflection.ObjRecorder2Trace2DAdapter}.
+ * Warning: Updates will not overwrite the previous paintings. The display looks weird. 
  * <p>
  * 
  * @author <a href='mailto:Achim.Westermann@gmx.de'> Achim Westermann </a>
