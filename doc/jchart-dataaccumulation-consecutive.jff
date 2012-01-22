@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--Created with JFLAP 6.4.--><structure>
+	<type>mealy</type>
+	<automaton>
+		<!--The list of states.-->
+		<state id="0" name="q0">
+			<x>-144.0</x>
+			<y>35.0</y>
+			<label>Start</label>
+			<initial/>
+		</state>
+		<state id="1" name="q1">
+			<x>58.0</x>
+			<y>528.0</y>
+			<label>Before first visible</label>
+		</state>
+		<state id="2" name="q2">
+			<x>480.0</x>
+			<y>36.0</y>
+			<label>Accumulating visible</label>
+		</state>
+		<state id="3" name="q3">
+			<x>490.0</x>
+			<y>599.0</y>
+			<label>Invisible / Discontinuation</label>
+		</state>
+		<!--The list of transitions.-->
+		<transition>
+			<from>1</from>
+			<to>2</to>
+			<read>visible &amp;&amp; !discontinuation</read>
+			<transout>previous point, current point</transout>
+		</transition>
+		<transition>
+			<from>1</from>
+			<to>1</to>
+			<controlx>64</controlx>
+			<controly>710</controly>
+			<read>!visible|| discontinuation</read>
+			<transout>null</transout>
+		</transition>
+		<transition>
+			<from>2</from>
+			<to>3</to>
+			<read>!visible || discontinuation</read>
+			<transout>current point</transout>
+		</transition>
+		<transition>
+			<from>3</from>
+			<to>2</to>
+			<read>visible &amp;&amp; !discontinuation</read>
+			<transout>previous point, current point</transout>
+		</transition>
+		<transition>
+			<from>3</from>
+			<to>3</to>
+			<controlx>488</controlx>
+			<controly>746</controly>
+			<read>!visible || discontinuation</read>
+			<transout>null</transout>
+		</transition>
+		<transition>
+			<from>2</from>
+			<to>2</to>
+			<controlx>349</controlx>
+			<controly>-134</controly>
+			<read>visible &amp;&amp; !discontinuation &amp;&amp; accumulationcount &lt; accumulatePerNext</read>
+			<transout>null</transout>
+		</transition>
+		<transition>
+			<from>0</from>
+			<to>2</to>
+			<read>visible &amp;&amp; !discontinuation</read>
+			<transout>current point</transout>
+		</transition>
+		<transition>
+			<from>0</from>
+			<to>1</to>
+			<read>!visible || discontinuation</read>
+			<transout>null</transout>
+		</transition>
+		<transition>
+			<from>2</from>
+			<to>2</to>
+			<controlx>358</controlx>
+			<controly>-166</controly>
+			<read>visible &amp;&amp; !discontinuation &amp;&amp; acuumulationcount &gt;= accumulatePerNext</read>
+			<transout>accumuluated point</transout>
+		</transition>
+	</automaton>
+</structure>
