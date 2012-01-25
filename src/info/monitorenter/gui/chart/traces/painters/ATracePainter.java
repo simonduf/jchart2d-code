@@ -223,7 +223,8 @@ public abstract class ATracePainter implements
    * @see info.monitorenter.gui.chart.ITracePainter#startPaintIteration(java.awt.Graphics)
    */
   public void startPaintIteration(final Graphics g2d) {
-    // nop
+    this.m_previousX = Integer.MIN_VALUE;
+    this.m_previousY = Integer.MIN_VALUE;
   }
 
 }

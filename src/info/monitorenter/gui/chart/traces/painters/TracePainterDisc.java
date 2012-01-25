@@ -68,8 +68,12 @@ public class TracePainterDisc extends ATracePainter {
   @Override
   public void endPaintIteration(final Graphics g2d) {
     if (g2d != null) {
-      this.m_pointPainter.paintPoint(this.getPreviousX(), this.getPreviousY(), 0, 0, g2d, this
+      int previousX = this.getPreviousX();
+      int previousY = this.getPreviousY();
+      if(previousX != Integer.MIN_VALUE || previousY != Integer.MIN_VALUE) {
+      this.m_pointPainter.paintPoint(previousX, previousY, 0, 0, g2d, this
           .getPreviousPoint());
+      }
     }
     this.m_pointPainter.endPaintIteration(g2d);
   }
@@ -148,6 +152,7 @@ public class TracePainterDisc extends ATracePainter {
    */
   @Override
   public void startPaintIteration(final Graphics g2d) {
+    super.startPaintIteration(g2d);
     this.m_pointPainter.startPaintIteration(g2d);
   }
 }

@@ -360,14 +360,5 @@ public class AccumulatingIteratorConsecutivePointsOrderedXValuesWithRespectToDen
 
   }
 
-  /**
-   * @see java.util.Iterator#remove()
-   */
-  public void remove() {
-
-    throw new UnsupportedOperationException("This is not supported for "
-        + this.getClass().getName()
-        + ". Data is not contained but computed (non 1-1) from an underlying source. ");
-  }
 
 }
