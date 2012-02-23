@@ -46,6 +46,8 @@ jchart2d-3.3.0 - <month>, <day>, <year>
 * Fixed bug #3432154: Remove dependency to JIDE-oss (debian upstream), http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=626243
 * Fixed untracked bug: Setting an axis title at runtime does not cause a repaint thus is not reflected until repaints occur. 
 * Fixed untracked bug: Setting axis paint scale to false at runtime does not cause a repaint thus is not reflected. 
+* Fixed bug #3479485: TracePainterDisc - last painted disc left when all points are removed at runtime.
+* Fixed bug #3488397: Axis labels not centred.
 ! Improved performance of ITracePoint.setLocation(double, double): This was O(n) where n was amount of points in a trace in any 
   case except boundary increase. Now it is only O(n) if an extremum was diminished via that method.   
 ! Introduced data accumulation API. This allows you to have traces with 10^6 points painted with increased speed while zooming in 

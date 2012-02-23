@@ -220,7 +220,7 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
               int startY = chart.getYChartStart();
               int endY = chart.getYChartEnd();
               double yspace = bounds.getWidth();
-              int titleStartY = (int) ((startY - endY) / 2.0 + yspace / 2.0);
+              int titleStartY = (int) ((startY + endY) / 2.0 + yspace / 2.0);
               if (titleStartY <= 0) {
                 System.err.println("titleStartY below or equal to zero: " + titleStartY);
               }
