@@ -26,7 +26,6 @@ import info.monitorenter.util.Range;
 import info.monitorenter.util.StopWatchSimple;
 import info.monitorenter.util.StringUtil;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
@@ -974,7 +973,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         if (!point.equals(previousHighlightedPoint)) {
           ITrace2D trace = point.getListener();
           // avoid duplicate or no highlighting in concurrent paint situation.
-          synchronized (this) {
+          synchronized (Chart2D.this) {
             synchronized (trace) {
               this.clearOutdatedHighlighters(trace);
               this.attachHighlighters(point);
