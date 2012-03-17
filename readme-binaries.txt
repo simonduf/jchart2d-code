@@ -56,7 +56,9 @@ jchart2d-3.3.0 - <month>, <day>, <year>
   ITrace2D.setAccumulationStrategy(new AccumulationStrategyAmountOfPointsAscendingXValues(new AccumulationFunctionArithmeticMeanXY()));
 ! Improved axis title spacing. 
 ! Added feature #3426071: Let getAxisX()/getAxisY() support right y axes/ top y axes (avoid naive NPE in case x axis bottom and/or y axis left is empty).
-! Saving images with transparent background is supported now. 
+! Saving images with transparent background is supported now.
+! Added IPointHighlightListener: You can register on the chart to get informed about highlighted points now. 
+  Use this e.g. to cast the point into your subtype to extract further information about the highlighted point. 
 o Changed policy of Chart2D.translateMousePosition(final MouseEvent mouseEvent). Before this the translation was done into the values 
   covered by the first x and y axes. By now the translation is related to the axes of the trace of the nearest point to the given 
   mouse event. 
@@ -95,7 +97,8 @@ o Changed Chart2D method signature:
   public final boolean removeTrace(final ITrace2D points)
   to return if removing was successful. 
 o Decoupled IAxis.setPaintGrid(boolean) from IAxis.setPaintScale(boolean). Earlier versions would turn on paintScale in case grid was turned on. 
-o IAxis has a new generic parameter. 
+o IAxis has a new generic parameter. This is only done to allow subtypes to narrow down which subtypes of IScalePolicy 
+  they will allow. This is e.g. used for AAxisTransformation to prevent wrong labels (which would cause a "silent" UI bug).  
   1. Wherever you used 
   IAxis axis = chart.getAxis();
   replace it with: 

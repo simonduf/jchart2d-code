@@ -342,6 +342,248 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   }
 
   /**
+   * Tracks mouse motion events and highlights the nearest point in the trace.
+   * <p>
+   */
+  final class PointHighlighter extends MouseMotionAdapter implements MouseMotionListener, PropertyChangeListener {
+
+    /** Needed to de-highlight previously highlighted points. */
+    private Map<ITrace2D, ITracePoint2D> m_previousHighlighted;
+
+    /**
+     * Default constructor, adds property change listener for point highlighters
+     * to the enclosing chart.
+     * <p>
+     */
+    public PointHighlighter() {
+      /*
+       * Need an identity hash map as the trace keys will change upon points
+       * added thus making them "unfindable" in a map based on hashcode!
+       */
+      this.m_previousHighlighted = new IdentityHashMap<ITrace2D, ITracePoint2D>();
+      Chart2D.this.addPropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, this);
+      Chart2D.this.addPropertyChangeListener(Chart2D.PROPERTY_ADD_REMOVE_TRACE, this);
+
+    }
+
+    /**
+     * Attaches the highlighters of the trace of the point to the point: it will
+     * be highlighted then.
+     * <p>
+     * 
+     * @param point
+     *          the point to highlight.
+     */
+    private void attachHighlighters(ITracePoint2D point) {
+
+      ITrace2D trace = point.getListener();
+      for (IPointPainter< ? > highlighter : trace.getPointHighlighters()) {
+        point.addAdditionalPointPainter(highlighter);
+      }
+    }
+
+    /**
+     * Removes the exclusive point highlighters from the old highlighted point.
+     */
+    private void clearOutdatedHighlighters(final ITrace2D trace) {
+
+      ITracePoint2D previousHighlightedPoint = this.m_previousHighlighted.remove(trace);
+      if (previousHighlightedPoint != null) {
+        Iterator<IPointPainter< ? >> itAdditionaPainters = previousHighlightedPoint.getAdditionalPointPainters().iterator();
+        IPointPainter< ? > additionalPainter;
+        Set<IPointPainter< ? >> highlighters = trace.getPointHighlighters();
+        if (Chart2D.DEBUG_HIGHLIGHTING) {
+          System.err.println("Trace " + trace.getName() + " has highlighters " + highlighters);
+          ITrace2D prevHiTrace = previousHighlightedPoint.getListener();
+          if (prevHiTrace != null) {
+            System.err.println("Previously highlighted trace: " + prevHiTrace.getName());
+          }
+        }
+        while (itAdditionaPainters.hasNext()) {
+          additionalPainter = itAdditionaPainters.next();
+          for (IPointPainter< ? > highlighter : highlighters) {
+            /*
+             * Cannot rely on "contains" method as comparable/equals might judge
+             * an equal highlighter added externally via api as a highlighter
+             */
+            if (highlighter == additionalPainter) {
+              itAdditionaPainters.remove();
+              break;
+            } else {
+              if (Chart2D.DEBUG_HIGHLIGHTING) {
+                System.err.println("Additional painter " + additionalPainter + " and highlighter " + highlighter + " of trace " + trace
+                    + " judged not as same.");
+              }
+            }
+          }
+        }
+      } else {
+        if (Chart2D.DEBUG_HIGHLIGHTING) {
+          System.err.println("No previous point highlighted in trace " + trace.getName());
+        }
+      }
+    }
+
+    /**
+     * Attaches highlighters of the trace of the point next to the cursor and
+     * removes highlighters from the previous highlighted point.
+     * <p>
+     * 
+     * TODO: Peek at getToolTipText invocations: Save operations in case the
+     * mouse has not moved much?
+     * 
+     * @see java.awt.event.MouseMotionAdapter#mouseMoved(java.awt.event.MouseEvent)
+     */
+    @Override
+    public void mouseMoved(MouseEvent e) {
+      ITracePoint2D point = Chart2D.this.getPointFinder().getNearestPoint(e, Chart2D.this);
+      // don't work on empty charts:
+      if (point != null) {
+        ITracePoint2D previousHighlightedPoint = this.m_previousHighlighted.get(point.getListener());
+        if (!point.equals(previousHighlightedPoint)) {
+          ITrace2D trace = point.getListener();
+          // avoid duplicate or no highlighting in concurrent paint situation.
+          synchronized (Chart2D.this) {
+            synchronized (trace) {
+              this.clearOutdatedHighlighters(trace);
+              this.attachHighlighters(point);
+              this.m_previousHighlighted.put(trace, point);
+              Chart2D.this.setRequestedRepaint(true);
+            }
+          }
+          Chart2D.this.notifyPointHighlightListeners(point);
+        }
+      }
+    }
+
+    /**
+     * This is needed in case the point Highlighters of a trace (
+     * <code>{@link ITrace2D#setPointHighlighter(IPointPainter)}</code>,
+     * <code>{@link ITrace2D#addPointHighlighter(IPointPainter)}</code> or
+     * <code>{@link ITrace2D#removePointHighlighter(IPointPainter)}</code> or
+     * <code>{@link ITrace2D#removeAllPointHighlighters()}</code>) are changed
+     * in order to re-attach the proper point highlighters to the highlighted
+     * points.
+     * <p>
+     * Also a hook is installed for
+     * <code>{@link Chart2D#PROPERTY_ADD_REMOVE_TRACE}</code> to clear out a
+     * reference to a highlighted trace to make it garbage-collectable in case
+     * the trace is removed.
+     * <p>
+     * 
+     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+     * @see ITrace2D#addPointHighlighter(IPointPainter)
+     * @see ITrace2D#setPointHighlighter(IPointPainter)
+     * @see ITrace2D#removePointHighlighter(IPointPainter)
+     * @see ITrace2D#removeAllPointHighlighters()
+     */
+    public void propertyChange(PropertyChangeEvent evt) {
+
+      String property = evt.getPropertyName();
+      if (ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS.equals(property)) {
+        ITrace2D trace = (ITrace2D) evt.getSource();
+        ITracePoint2D point = this.m_previousHighlighted.get(trace);
+        if (point != null) {
+          if ((evt.getNewValue() != null) && (evt.getOldValue() == null)) {
+            if (this.m_previousHighlighted != null) {
+              synchronized (Chart2D.this) {
+                synchronized (trace) {
+                  point.addAdditionalPointPainter((IPointPainter< ? >) evt.getNewValue());
+                  Chart2D.this.setRequestedRepaint(true);
+                }
+              }
+            }
+          } else if ((evt.getNewValue() == null) && (evt.getOldValue() != null)) {
+            if (this.m_previousHighlighted != null) {
+              synchronized (Chart2D.this) {
+                synchronized (trace) {
+                  point.removeAdditionalPointPainter((IPointPainter< ? >) evt.getOldValue());
+                  Chart2D.this.setRequestedRepaint(true);
+                }
+              }
+            }
+
+          } else {
+            throw new RuntimeException("Programming error. Unneccessary event caught: " + evt
+                + ". You only have to fire this event, if a point highlighter was addded or removed.");
+          }
+        }
+      } else if (Chart2D.PROPERTY_ADD_REMOVE_TRACE.equals(property)) {
+        ITrace2D oldTrace2d = (ITrace2D) evt.getOldValue();
+        if (evt.getNewValue() == null) {
+          // trace was removed, so remove my potential reference:
+          this.m_previousHighlighted.remove(oldTrace2d);
+        }
+      } else {
+        throw new RuntimeException("Programming error: " + this.getClass().getName() + " only has to be registered to the event "
+            + ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS + " on instances of type (or subtype) " + ITrace2D.class.getName());
+      }
+    }
+
+    /**
+     * Activates or deactivates point higlighting.
+     * <p>
+     * This handles tracking of mouse motion events of the chart.
+     * <p>
+     * 
+     * @param onoff
+     *          if true, highlighting will be enabled, if false it will be
+     *          deactivated.
+     * 
+     * @return true if a change took place.
+     */
+    @SuppressWarnings("synthetic-access")
+    public boolean setActive(boolean onoff) {
+      boolean result = false;
+      boolean isEnabled = Chart2D.this.isEnabledPointHighlighting();
+
+      if (!onoff) {
+        if (isEnabled) {
+          synchronized (Chart2D.this) {
+            // deactivate all previously highlighted traces:
+            for (Map.Entry<ITrace2D, ITracePoint2D> entry : this.m_previousHighlighted.entrySet()) {
+              synchronized (entry.getKey()) {
+                Set<IPointPainter< ? >> highlighters = entry.getKey().getPointHighlighters();
+                Set<IPointPainter< ? >> additionalPainters = entry.getValue().getAdditionalPointPainters();
+                Iterator<IPointPainter< ? >> itAdditionasPainters = additionalPainters.iterator();
+                while (itAdditionasPainters.hasNext()) {
+                  IPointPainter< ? > assignedHighlighter = itAdditionasPainters.next();
+                  for (IPointPainter< ? > highlighter : highlighters) {
+                    // cannot check for equality as outside configured same
+                    // additional point painters not working for highlighting
+                    // could be erased.
+                    if (assignedHighlighter == highlighter) {
+                      itAdditionasPainters.remove();
+                      break;
+                    }
+                  }
+                }
+
+              }
+            }
+            Chart2D.this.removeMouseMotionListener(this);
+            Chart2D.this.firePropertyChange(PROPERTY_POINT_HIGHLIGHTING_ENABLED, Boolean.TRUE, Boolean.FALSE);
+            this.m_previousHighlighted.clear();
+            Chart2D.this.setRequestedRepaint(true);
+            result = true;
+          }
+        }
+
+      } else {
+        if (!isEnabled) {
+          synchronized (Chart2D.this) {
+            Chart2D.this.addMouseMotionListener(this);
+            Chart2D.this.firePropertyChange(PROPERTY_POINT_HIGHLIGHTING_ENABLED, Boolean.FALSE, Boolean.TRUE);
+            Chart2D.this.setRequestedRepaint(true);
+            result = true;
+          }
+        }
+      }
+      return result;
+    }
+  }
+
+  /**
    * Types of tool tip.
    * <p>
    * 
@@ -503,22 +745,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   public static final int CHART_POSITION_TOP = 16;
 
   /**
-   * A switch for debugging problems with scaling. Set to false the compiler
-   * will remove the debugging statements.
-   */
-  public static final boolean DEBUG_SCALING = false;
-
-  /**
-   * A switch for debugging problems with layouting. Set to false the compiler
-   * will remove the debugging statements.
-   */
-  public static final boolean DEBUG_LAYOUT = false;
-
-  /**
    * A switch for debugging problems with data accumulation. Set to false the
    * compiler will remove the debugging statements.
    */
-  public static final boolean DEBUG_DATA_ACCUMULATION = false;
+  public static final boolean DEBUG_DATA_ACCUMULATION = true;
 
   /**
    * A switch for debugging problems with highlighting. Set to false the
@@ -527,10 +757,31 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   public static final boolean DEBUG_HIGHLIGHTING = false;
 
   /**
+   * A switch for debugging problems with layouting. Set to false the compiler
+   * will remove the debugging statements.
+   */
+  public static final boolean DEBUG_LAYOUT = false;
+
+  /**
+   * A switch for debugging problems with scaling. Set to false the compiler
+   * will remove the debugging statements.
+   */
+  public static final boolean DEBUG_SCALING = false;
+
+  /**
    * A switch for debugging problems with multithreading. Set to false the
    * compiler will remove the debugging statements.
    */
   public static final boolean DEBUG_THREADING = false;
+
+  /**
+   * The bean property <code>constant</code> identifying a change of traces.
+   * <p>
+   * Use this constant to register a {@link java.beans.PropertyChangeListener}
+   * with the <code>Chart2D</code>.
+   * <p>
+   */
+  public static final String PROPERTY_ADD_REMOVE_TRACE = IAxis.PROPERTY_ADD_REMOVE_TRACE;
 
   /**
    * The bean property <code>constant</code> identifying a change of the
@@ -662,15 +913,6 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * <p>
    */
   public static final String PROPERTY_GRID_COLOR = "Chart2D.PROPERTY_GRID_COLOR";
-
-  /**
-   * The bean property <code>constant</code> identifying a change of traces.
-   * <p>
-   * Use this constant to register a {@link java.beans.PropertyChangeListener}
-   * with the <code>Chart2D</code>.
-   * <p>
-   */
-  public static final String PROPERTY_ADD_REMOVE_TRACE = IAxis.PROPERTY_ADD_REMOVE_TRACE;
 
   /**
    * The bean property <code>constant</code> identifying a change of the paint
@@ -805,250 +1047,15 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * previous highlighted point.
    * <p>
    */
-  private final PointHighlighter m_pointHighlightListener = new PointHighlighter();
+  private final PointHighlighter m_pointHighlighter = new PointHighlighter();
 
-  /**
-   * Tracks mouse motion events and highlights the nearest point in the trace.
+  /** 
+   * The list of point highlight listeners. 
    * <p>
-   * 
-   * @author <a href="mailto:achim.westermann@gmx.de">Achim Westermann</a>
+   * These will get informed about highlighted points. 
+   * <p>
    */
-  final class PointHighlighter extends MouseMotionAdapter implements MouseMotionListener, PropertyChangeListener {
-
-    /**
-     * Default constructor, adds property change listener for point highlighters
-     * to the enclosing chart.
-     * <p>
-     */
-    public PointHighlighter() {
-      /*
-       * Need an identity hash map as the trace keys will change upon points
-       * added thus making them "unfindable" in a map based on hashcode!
-       */
-      this.m_previousHighlighted = new IdentityHashMap<ITrace2D, ITracePoint2D>();
-      Chart2D.this.addPropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, this);
-      Chart2D.this.addPropertyChangeListener(Chart2D.PROPERTY_ADD_REMOVE_TRACE, this);
-
-    }
-
-    /** Needed to de-highlight previously highlighted points. */
-    private Map<ITrace2D, ITracePoint2D> m_previousHighlighted;
-
-    /**
-     * Activates or deactivates point higlighting.
-     * <p>
-     * This handles tracking of mouse motion events of the chart.
-     * <p>
-     * 
-     * @param onoff
-     *          if true, highlighting will be enabled, if false it will be
-     *          deactivated.
-     * 
-     * @return true if a change took place.
-     */
-    @SuppressWarnings("synthetic-access")
-    public boolean setActive(boolean onoff) {
-      boolean result = false;
-      boolean isEnabled = Chart2D.this.isEnabledPointHighlighting();
-
-      if (!onoff) {
-        if (isEnabled) {
-          synchronized (Chart2D.this) {
-            // deactivate all previously highlighted traces:
-            for (Map.Entry<ITrace2D, ITracePoint2D> entry : this.m_previousHighlighted.entrySet()) {
-              synchronized (entry.getKey()) {
-                Set<IPointPainter< ? >> highlighters = entry.getKey().getPointHighlighters();
-                Set<IPointPainter< ? >> additionalPainters = entry.getValue().getAdditionalPointPainters();
-                Iterator<IPointPainter< ? >> itAdditionasPainters = additionalPainters.iterator();
-                while (itAdditionasPainters.hasNext()) {
-                  IPointPainter< ? > assignedHighlighter = itAdditionasPainters.next();
-                  for (IPointPainter< ? > highlighter : highlighters) {
-                    // cannot check for equality as outside configured same
-                    // additional point painters not working for highlighting
-                    // could be erased.
-                    if (assignedHighlighter == highlighter) {
-                      itAdditionasPainters.remove();
-                      break;
-                    }
-                  }
-                }
-
-              }
-            }
-            Chart2D.this.removeMouseMotionListener(this);
-            Chart2D.this.firePropertyChange(PROPERTY_POINT_HIGHLIGHTING_ENABLED, Boolean.TRUE, Boolean.FALSE);
-            this.m_previousHighlighted.clear();
-            Chart2D.this.setRequestedRepaint(true);
-            result = true;
-          }
-        }
-
-      } else {
-        if (!isEnabled) {
-          synchronized (Chart2D.this) {
-            Chart2D.this.addMouseMotionListener(this);
-            Chart2D.this.firePropertyChange(PROPERTY_POINT_HIGHLIGHTING_ENABLED, Boolean.FALSE, Boolean.TRUE);
-            Chart2D.this.setRequestedRepaint(true);
-            result = true;
-          }
-        }
-      }
-      return result;
-    }
-
-    /**
-     * Attaches the highlighters of the trace of the point to the point: it will
-     * be highlighted then.
-     * <p>
-     * 
-     * @param point
-     *          the point to highlight.
-     */
-    private void attachHighlighters(ITracePoint2D point) {
-
-      ITrace2D trace = point.getListener();
-      for (IPointPainter< ? > highlighter : trace.getPointHighlighters()) {
-        point.addAdditionalPointPainter(highlighter);
-      }
-    }
-
-    /**
-     * Removes the exclusive point highlighters from the old highlighted point.
-     */
-    private void clearOutdatedHighlighters(final ITrace2D trace) {
-
-      ITracePoint2D previousHighlightedPoint = this.m_previousHighlighted.remove(trace);
-      if (previousHighlightedPoint != null) {
-        Iterator<IPointPainter< ? >> itAdditionaPainters = previousHighlightedPoint.getAdditionalPointPainters().iterator();
-        IPointPainter< ? > additionalPainter;
-        Set<IPointPainter< ? >> highlighters = trace.getPointHighlighters();
-        if (Chart2D.DEBUG_HIGHLIGHTING) {
-          System.err.println("Trace " + trace.getName() + " has highlighters " + highlighters);
-          ITrace2D prevHiTrace = previousHighlightedPoint.getListener();
-          if (prevHiTrace != null) {
-            System.err.println("Previously highlighted trace: " + prevHiTrace.getName());
-          }
-        }
-        while (itAdditionaPainters.hasNext()) {
-          additionalPainter = itAdditionaPainters.next();
-          for (IPointPainter< ? > highlighter : highlighters) {
-            /*
-             * Cannot rely on "contains" method as comparable/equals might judge
-             * an equal highlighter added externally via api as a highlighter
-             */
-            if (highlighter == additionalPainter) {
-              itAdditionaPainters.remove();
-              break;
-            } else {
-              if (Chart2D.DEBUG_HIGHLIGHTING) {
-                System.err.println("Additional painter " + additionalPainter + " and highlighter " + highlighter + " of trace " + trace
-                    + " judged not as same.");
-              }
-            }
-          }
-        }
-      } else {
-        if (Chart2D.DEBUG_HIGHLIGHTING) {
-          System.err.println("No previous point highlighted in trace " + trace.getName());
-        }
-      }
-    }
-
-    /**
-     * Attaches highlighters of the trace of the point next to the cursor and
-     * removes highlighters from the previous highlighted point.
-     * <p>
-     * 
-     * TODO: Peek at getToolTipText invocations: Save operations in case the
-     * mouse has not moved much?
-     * 
-     * @see java.awt.event.MouseMotionAdapter#mouseMoved(java.awt.event.MouseEvent)
-     */
-    @Override
-    public void mouseMoved(MouseEvent e) {
-      ITracePoint2D point = Chart2D.this.getPointFinder().getNearestPoint(e, Chart2D.this);
-      // don't work on empty charts:
-      if (point != null) {
-        ITracePoint2D previousHighlightedPoint = this.m_previousHighlighted.get(point.getListener());
-        if (!point.equals(previousHighlightedPoint)) {
-          ITrace2D trace = point.getListener();
-          // avoid duplicate or no highlighting in concurrent paint situation.
-          synchronized (Chart2D.this) {
-            synchronized (trace) {
-              this.clearOutdatedHighlighters(trace);
-              this.attachHighlighters(point);
-              this.m_previousHighlighted.put(trace, point);
-              Chart2D.this.setRequestedRepaint(true);
-            }
-          }
-        }
-      }
-    }
-
-    /**
-     * This is needed in case the point Highlighters of a trace (
-     * <code>{@link ITrace2D#setPointHighlighter(IPointPainter)}</code>,
-     * <code>{@link ITrace2D#addPointHighlighter(IPointPainter)}</code> or
-     * <code>{@link ITrace2D#removePointHighlighter(IPointPainter)}</code> or
-     * <code>{@link ITrace2D#removeAllPointHighlighters()}</code>) are changed
-     * in order to re-attach the proper point highlighters to the highlighted
-     * points.
-     * <p>
-     * Also a hook is installed for
-     * <code>{@link Chart2D#PROPERTY_ADD_REMOVE_TRACE}</code> to clear out a
-     * reference to a highlighted trace to make it garbage-collectable in case
-     * the trace is removed.
-     * <p>
-     * 
-     * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-     * @see ITrace2D#addPointHighlighter(IPointPainter)
-     * @see ITrace2D#setPointHighlighter(IPointPainter)
-     * @see ITrace2D#removePointHighlighter(IPointPainter)
-     * @see ITrace2D#removeAllPointHighlighters()
-     */
-    public void propertyChange(PropertyChangeEvent evt) {
-
-      String property = evt.getPropertyName();
-      if (ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS.equals(property)) {
-        ITrace2D trace = (ITrace2D) evt.getSource();
-        ITracePoint2D point = this.m_previousHighlighted.get(trace);
-        if (point != null) {
-          if ((evt.getNewValue() != null) && (evt.getOldValue() == null)) {
-            if (this.m_previousHighlighted != null) {
-              synchronized (Chart2D.this) {
-                synchronized (trace) {
-                  point.addAdditionalPointPainter((IPointPainter< ? >) evt.getNewValue());
-                  Chart2D.this.setRequestedRepaint(true);
-                }
-              }
-            }
-          } else if ((evt.getNewValue() == null) && (evt.getOldValue() != null)) {
-            if (this.m_previousHighlighted != null) {
-              synchronized (Chart2D.this) {
-                synchronized (trace) {
-                  point.removeAdditionalPointPainter((IPointPainter< ? >) evt.getOldValue());
-                  Chart2D.this.setRequestedRepaint(true);
-                }
-              }
-            }
-
-          } else {
-            throw new RuntimeException("Programming error. Unneccessary event caught: " + evt
-                + ". You only have to fire this event, if a point highlighter was addded or removed.");
-          }
-        }
-      } else if (Chart2D.PROPERTY_ADD_REMOVE_TRACE.equals(property)) {
-        ITrace2D oldTrace2d = (ITrace2D) evt.getOldValue();
-        if (evt.getNewValue() == null) {
-          // trace was removed, so remove my potential reference:
-          this.m_previousHighlighted.remove(oldTrace2d);
-        }
-      } else {
-        throw new RuntimeException("Programming error: " + this.getClass().getName() + " only has to be registered to the event "
-            + ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS + " on instances of type (or subtype) " + ITrace2D.class.getName());
-      }
-    }
-  }
+  private List<IPointHighlightListener> m_pointHighlightListeners = null;
 
   /**
    * Internal timer for repaint control with guarantee that the interval between
@@ -1268,6 +1275,22 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
 
     this.firePropertyChange(Chart2D.PROPERTY_AXIS_Y, null, axisY);
     this.setRequestedRepaint(true);
+  }
+
+  /**
+   * Add a point highlighter listener.
+   * <p>
+   * 
+   * @param listener
+   *            the point highlighter listener to add.
+   */
+  public final void addPointHighlightListener(
+          final IPointHighlightListener listener) {
+      if (this.m_pointHighlightListeners == null) {
+          this.m_pointHighlightListeners = new LinkedList<IPointHighlightListener>();
+      }
+      this.m_pointHighlightListeners.add(listener);
+      this.setRequestedRepaint(true);
   }
 
   /**
@@ -1493,39 +1516,6 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   }
 
   /**
-   * Installs the offset the the left y-axes in case this chart is stacked /
-   * synchronized vertically via {@link #setSynchronizedXStartChart(Chart2D)}.
-   * <p>
-   * 
-   * This is only necessary for the charts whose left y axes should start more
-   * to the right than if they were all on their own and didn't have to care for
-   * other charts.
-   * <p>
-   * 
-   * @param g2d
-   *          needed for size information.
-   * 
-   * @return the start x coordinate (left bound) in pixel of the chart to draw.
-   */
-  private int installXAxisLeftOffset(final Graphics2D g2d, final int offset) {
-    int result = offset;
-    // reverse iteration because the most left axes are the latter ones:
-    ListIterator<IAxis< ? >> it = this.m_axesYLeft.listIterator(this.m_axesYLeft.size());
-    IAxis< ? > currentAxis;
-    while (it.hasPrevious()) {
-      currentAxis = it.previous();
-      currentAxis.setPixelXLeft(result);
-      if (currentAxis.isVisible()) {
-        result += currentAxis.getWidth(g2d);
-      }
-      currentAxis.setPixelXRight(result);
-    }
-
-    // ensure a minimum offset for e.g. when no Y axes are visible
-    return result > 0 ? result : 20;
-  }
-
-  /**
    * Calculates the end y coordinate (upper bound) in pixel of the chart to
    * draw.
    * <p>
@@ -1712,7 +1702,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    */
   public boolean enablePointHighlighting(final boolean onoff) {
     boolean result;
-    result = this.m_pointHighlightListener.setActive(onoff);
+    result = this.m_pointHighlighter.setActive(onoff);
     return result;
   }
 
@@ -2431,17 +2421,6 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   }
 
   /**
-   * Returns the height of the Y axis in px.
-   * <p>
-   * 
-   * @return Returns the height of the Y axis in px.
-   * 
-   */
-  public final synchronized int getYAxisHeight() {
-    return this.m_yChartStart - this.m_yChartEnd;
-  }
-
-  /**
    * Returns the x coordinate of the chart's right edge in px.
    * <p>
    * 
@@ -2459,6 +2438,17 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    */
   public final synchronized int getXChartStart() {
     return this.m_xChartStart;
+  }
+
+  /**
+   * Returns the height of the Y axis in px.
+   * <p>
+   * 
+   * @return Returns the height of the Y axis in px.
+   * 
+   */
+  public final synchronized int getYAxisHeight() {
+    return this.m_yChartStart - this.m_yChartEnd;
   }
 
   /**
@@ -2521,6 +2511,39 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     result = !(((oldpoint.getScaledX() >= 1.0) && (newpoint.getScaledX() >= 1.0)) || ((oldpoint.getScaledX() <= 0.0) && (newpoint.getScaledX() <= 0.0))
         || ((oldpoint.getScaledY() >= 1.0) && (newpoint.getScaledY() >= 1.0)) || ((oldpoint.getScaledY() <= 0.0) && (newpoint.getScaledY() <= 0.0)));
     return result;
+  }
+
+  /**
+   * Installs the offset the the left y-axes in case this chart is stacked /
+   * synchronized vertically via {@link #setSynchronizedXStartChart(Chart2D)}.
+   * <p>
+   * 
+   * This is only necessary for the charts whose left y axes should start more
+   * to the right than if they were all on their own and didn't have to care for
+   * other charts.
+   * <p>
+   * 
+   * @param g2d
+   *          needed for size information.
+   * 
+   * @return the start x coordinate (left bound) in pixel of the chart to draw.
+   */
+  private int installXAxisLeftOffset(final Graphics2D g2d, final int offset) {
+    int result = offset;
+    // reverse iteration because the most left axes are the latter ones:
+    ListIterator<IAxis< ? >> it = this.m_axesYLeft.listIterator(this.m_axesYLeft.size());
+    IAxis< ? > currentAxis;
+    while (it.hasPrevious()) {
+      currentAxis = it.previous();
+      currentAxis.setPixelXLeft(result);
+      if (currentAxis.isVisible()) {
+        result += currentAxis.getWidth(g2d);
+      }
+      currentAxis.setPixelXRight(result);
+    }
+
+    // ensure a minimum offset for e.g. when no Y axes are visible
+    return result > 0 ? result : 20;
   }
 
   /**
@@ -2601,7 +2624,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   public boolean isEnabledPointHighlighting() {
     boolean isEnabled = false;
     for (MouseMotionListener listener : this.getMouseMotionListeners()) {
-      if (listener == this.m_pointHighlightListener) {
+      if (listener == this.m_pointHighlighter) {
         isEnabled = true;
         break;
       }
@@ -2716,7 +2739,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    */
   private void listenToTrace(final ITrace2D trace) {
     // for tracking removal/addition of point highlighters visually:
-    trace.addPropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, this.m_pointHighlightListener);
+    trace.addPropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, this.m_pointHighlighter);
     // for tracking enablement/disablement of point highlighting feature
     // (expensive mouse listener)
     trace.addPropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, this);
@@ -2764,6 +2787,22 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         this.m_xChartEnd = this.calculateXChartEnd(g2d);
       }
     }
+  }
+
+  /**
+   * Notify the point highlight listeners that ref is highlighted.
+   * <p>
+   * 
+   * @param ref
+   *          the highlighted trace point.
+   */
+  private void notifyPointHighlightListeners(final ITracePoint2D ref) {
+      if (this.m_pointHighlightListeners != null) {
+          Iterator<IPointHighlightListener> it = this.m_pointHighlightListeners.iterator();
+          while (it.hasNext()) {
+              it.next().highlight(ref);
+          }
+      }
   }
 
   /**
@@ -4353,6 +4392,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     return result;
   }
 
+
   /**
    * Helper that removes this chart as a listener from the required property
    * change events.
@@ -4383,7 +4423,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    *          the trace to not listen to any more.
    */
   private void unlistenToTrace(final ITrace2D removedTrace) {
-    removedTrace.removePropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, this.m_pointHighlightListener);
+    removedTrace.removePropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, this.m_pointHighlighter);
     removedTrace.removePropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, this);
     if (removedTrace instanceof ITrace2DDataAccumulating) {
       removedTrace.removePropertyChangeListener(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY, this);
@@ -4488,5 +4528,4 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       }
     }
   }
-
 }
