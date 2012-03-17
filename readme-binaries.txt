@@ -57,7 +57,7 @@ jchart2d-3.3.0 - <month>, <day>, <year>
 ! Improved axis title spacing. 
 ! Added feature #3426071: Let getAxisX()/getAxisY() support right y axes/ top y axes (avoid naive NPE in case x axis bottom and/or y axis left is empty).
 ! Saving images with transparent background is supported now.
-! Added IPointHighlightListener: You can register on the chart to get informed about highlighted points now. 
+! Added IPointHighlightListener (contribution by Frans Bouwmans): You can register on the chart to get informed about highlighted points now. 
   Use this e.g. to cast the point into your subtype to extract further information about the highlighted point. 
 o Changed policy of Chart2D.translateMousePosition(final MouseEvent mouseEvent). Before this the translation was done into the values 
   covered by the first x and y axes. By now the translation is related to the axes of the trace of the nearest point to the given 
