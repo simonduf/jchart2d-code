@@ -81,12 +81,12 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
   /**
    * Used for finding ticks with labels and controlling their value / distance.
    */
-  private IAxisScalePolicy m_axisScalePolicy;
+  private T m_axisScalePolicy;
 
   /**
    * @see info.monitorenter.gui.chart.IAxis#getAxisScalePolicy()
    */
-  public IAxisScalePolicy getAxisScalePolicy() {
+  public T getAxisScalePolicy() {
     return this.m_axisScalePolicy;
   }
 
@@ -94,10 +94,10 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
    * The default used is <code>{@link AxisScalePolicyAutomaticBestFit}</code>.
    * <p>
    * 
-   * @see info.monitorenter.gui.chart.IAxis#setAxisScalePolicy(info.monitorenter.gui.chart.IAxisScalePolicy)
+   * @see info.monitorenter.gui.chart.IAxis#setAxisScalePolicy(IAxisScalePolicy)
    */
-  public IAxisScalePolicy setAxisScalePolicy(final T axisScalePolicy) {
-    IAxisScalePolicy result = this.m_axisScalePolicy;
+  public T setAxisScalePolicy(final T axisScalePolicy) {
+    T result = this.m_axisScalePolicy;
     this.m_axisScalePolicy = axisScalePolicy;
     this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this, IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED, result,
         this.m_axisScalePolicy));
@@ -801,8 +801,13 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
         // -4 is for showing colons of x - labels that are below the baseline
         result += 4;
       }
-      // and the Width of the axis title:
-      result += AAxis.this.getAxisTitle().getTitlePainter().getHeight(AAxis.this, g2d);
+      /*
+       * the width of the y-axis title (it is rotated by default) is skipped here as it is 
+       * centered vertically. There could be situations where it is very long and would 
+       * extend much and had to be taken into account. But then again the code here 
+       * had to look whether it is rotated and also how it is positioned....
+       */
+//      result += AAxis.this.getAxisTitle().getTitlePainter().getHeight(AAxis.this, g2d);
       return result;
     }
 
