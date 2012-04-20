@@ -1,6 +1,6 @@
 /*
- *  MinimalStaticChart.java of project jchart2d, a demonstration 
- *  of the minimal code to set up a chart with static data. 
+ *  StaticChartWith2StrokeSizes.java of project jchart2d, a demonstration 
+ *  that bigger strokes extend up, down, left and right. 
  *  Copyright (C) 2007 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
@@ -38,10 +38,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
- * Title: MinimalStaticChart
- * <p>
- * 
- * Description: A minimal example for rendering a static chart.
+ * Description: A demonstration that bigger strokes extend up, down, left and
+ * right
  * <p>
  * 
  * @author Achim Westermann
@@ -63,7 +61,7 @@ public final class StaticChartWith2StrokeSizes extends JPanel {
    */
   public static void main(final String[] args) {
     for (int i = 0; i < 1; i++) {
-      JFrame frame = new JFrame("SampleChart");
+      JFrame frame = new JFrame(StaticChartWith2StrokeSizes.class.getName());
       frame.getContentPane().add(new StaticChartWith2StrokeSizes());
       frame.addWindowListener(new WindowAdapter() {
         /**
