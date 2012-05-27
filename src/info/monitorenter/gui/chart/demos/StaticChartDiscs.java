@@ -26,8 +26,7 @@ package info.monitorenter.gui.chart.demos;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
-import info.monitorenter.gui.chart.traces.painters.TracePainterDisc;
-import info.monitorenter.gui.chart.traces.painters.TracePainterPolyline;
+import info.monitorenter.gui.chart.traces.painters.TracePainterVerticalBar;
 import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.Color;
@@ -63,7 +62,7 @@ public final class StaticChartDiscs {
     ITrace2D trace = new Trace2DSimple();
     // Add the trace to the chart:
     chart.addTrace(trace);
-    trace.setTracePainter(new TracePainterDisc());
+    trace.setTracePainter(new TracePainterVerticalBar(2, chart));
     trace.setColor(Color.DARK_GRAY);
     // Add all points, as it is static:
     double count = 0;
@@ -94,15 +93,15 @@ public final class StaticChartDiscs {
     });
     frame.setVisible(true);
     
-//    try {
-//      Thread.sleep(3000);
-//      } catch (InterruptedException e1) {
-//      e1.printStackTrace();
-//      }
-//
-//      trace.removeAllPoints();
-//
-//      chart.updateUI(); 
+    try {
+      Thread.sleep(3000);
+      } catch (InterruptedException e1) {
+      e1.printStackTrace();
+      }
+
+      trace.removeAllPoints();
+
+      //chart.updateUI(); 
   }
 
   /**

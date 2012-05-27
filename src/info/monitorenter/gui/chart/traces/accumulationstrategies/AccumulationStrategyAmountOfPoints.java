@@ -30,7 +30,7 @@ package info.monitorenter.gui.chart.traces.accumulationstrategies;
 import info.monitorenter.gui.chart.IAccumulationFunction;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
-import info.monitorenter.gui.chart.traces.iterators.AccumulatingIteratorConsecutivePoints;
+import info.monitorenter.gui.chart.traces.iterators.fsm.IteratorTracePointStateEngine;
 
 import java.util.Iterator;
 /**
@@ -59,6 +59,14 @@ public class AccumulationStrategyAmountOfPoints extends AAccumulationStrategy {
    * @see info.monitorenter.gui.chart.traces.accumulationstrategies.AAccumulationStrategy#iterator(info.monitorenter.gui.chart.ITrace2D, int)
    */
   public Iterator<ITracePoint2D> iterator(final ITrace2D source, final int amountOfPoints) {
-    return new AccumulatingIteratorConsecutivePoints(source, this.getAccumulationFunction(), amountOfPoints);
+    Iterator<ITracePoint2D> result = null;
+    IAccumulationControl control = new AccumulationControlConsecutivePoints();
+    control.initializeControl(source.getSize(), amountOfPoints);
+    if(control.isAccumulationBypassable()) {
+      result = source.iterator();
+    }else {
+      result = new IteratorTracePointStateEngine(source, this.getAccumulationFunction(), control);
+    }
+    return result;
   }
 }

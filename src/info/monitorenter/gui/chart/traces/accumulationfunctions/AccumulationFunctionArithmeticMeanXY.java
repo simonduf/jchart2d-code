@@ -116,7 +116,7 @@ public class AccumulationFunctionArithmeticMeanXY extends AAccumulationFunction 
       if (Chart2D.DEBUG_DATA_ACCUMULATION) {
         double scaledX = accumulatedPointCurrent.getScaledX();
         double scaledY = accumulatedPointCurrent.getScaledY();
-        if(scaledX <= 0 || scaledX >1 || scaledY<= 0 || scaledY > 1) {
+        if(scaledX < 0 || scaledX >1 || scaledY< 0 || scaledY > 1) {
           System.err.println("Accumulated point scaled into invisibility: x.scaled = " + scaledX + ", y.scaled =  " + scaledY);
         }
       }      
@@ -137,4 +137,14 @@ public class AccumulationFunctionArithmeticMeanXY extends AAccumulationFunction 
     ITracePoint2D result = super.getAccumulatedPoint();
     return result;
   }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAccumulationFunction#getAccumulatedPointCount()
+   */
+  @Override
+  public int getAccumulatedPointCount() {
+    return this.m_accumulatedPointsCount;
+  }
+  
+  
 }

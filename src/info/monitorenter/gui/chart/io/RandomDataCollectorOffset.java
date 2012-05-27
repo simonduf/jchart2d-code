@@ -42,7 +42,13 @@ import info.monitorenter.gui.chart.tracepoints.TracePoint2D;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  * @version $Revision: 1.9 $
+ * 
+ * @deprecated this is a proprietary example on how to use Threads: Bigger
+ *             applications will use Threadpools, Reactor- or Observer- patterns
+ *             to save setting up new Threads for ever single piece of the
+ *             application, so this will be voided soon.
  */
+@Deprecated
 public class RandomDataCollectorOffset extends ADataCollector {
 
   /** The start time of this collector. */

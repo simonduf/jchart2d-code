@@ -2041,7 +2041,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   /**
    * @see info.monitorenter.gui.chart.ITrace2DDataAccumulating#iterator(int)
    */
-  public final Iterator<ITracePoint2D> iterator(int amountOfVisiblePoints) {
-    return this.m_accumulationStrategy.iterator(this, amountOfVisiblePoints);
+  public final Iterator<ITracePoint2D> iterator(int amountOfDesiredPoints) {
+    return this.m_accumulationStrategy.iterator(this, amountOfDesiredPoints);
   }
 }

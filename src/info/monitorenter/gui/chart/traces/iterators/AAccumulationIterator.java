@@ -1,6 +1,8 @@
 package info.monitorenter.gui.chart.traces.iterators;
 
 import info.monitorenter.gui.chart.IAccumulationFunction;
+import info.monitorenter.gui.chart.IAccumulationStrategy;
+import info.monitorenter.gui.chart.IAccumulationStrategy.IAccumulationControl;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 
@@ -56,6 +58,18 @@ public abstract class AAccumulationIterator implements Iterator<ITracePoint2D> {
   /** The accumulation function being used. */
   private final IAccumulationFunction m_accumulationFunction;
 
+  /** The termination criteria for each accumulation. */
+  private final IAccumulationStrategy.IAccumulationControl m_accumulationControl;
+
+  /**
+   * Returns the termination criteria for each accumulation.<p>
+   *
+   * @return the termination criteria for each accumulation.
+   */
+  protected IAccumulationStrategy.IAccumulationControl getAccumulationControl() {
+    return this.m_accumulationControl;
+  }
+
   /**
    * The original trace that is decorated with the point accumulation feature.
    */
@@ -84,13 +98,19 @@ public abstract class AAccumulationIterator implements Iterator<ITracePoint2D> {
    * @param accumulationFunction
    *          the function to use for point - accumulation.
    * 
+   * @param accumulationControl
+   *          termination criteria for a single accumulation run. Note that it's
+   *          {@link IAccumulationControl#initializeControl(int, int)} method
+   *          has to be been called before.
    * 
    */
   public AAccumulationIterator(final ITrace2D originalTrace,
-      final IAccumulationFunction accumulationFunction) {
+      final IAccumulationFunction accumulationFunction,
+      final IAccumulationStrategy.IAccumulationControl accumulationControl) {
     this.m_originalTrace = originalTrace;
     this.m_accumulationFunction = accumulationFunction;
     this.m_originalIterator = this.m_originalTrace.iterator();
+    this.m_accumulationControl = accumulationControl;
   }
 
   /**

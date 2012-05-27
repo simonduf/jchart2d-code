@@ -65,4 +65,22 @@ public class AccumulationFunctionBypass implements IAccumulationFunction {
   public ITracePoint2D getAccumulatedPoint() {
     throw new NotImplementedException();
   }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAccumulationFunction#getAccumulatedPointCount()
+   */
+  @Override
+  public int getAccumulatedPointCount() {
+    throw new NotImplementedException();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IAccumulationFunction#getAccumulatedPointCurrent()
+   */
+  @Override
+  public ITracePoint2D getAccumulatedPointCurrent() {
+    throw new NotImplementedException();
+  }
+  
+  
 }
