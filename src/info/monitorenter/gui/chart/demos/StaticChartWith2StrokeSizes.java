@@ -24,15 +24,22 @@
 package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxis;
+import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyManualTicks;
+import info.monitorenter.gui.chart.labelformatters.LabelFormatterNumber;
+import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.views.ChartPanel;
+import info.monitorenter.util.Range;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.DecimalFormat;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -98,6 +105,20 @@ public final class StaticChartWith2StrokeSizes extends JPanel {
     // Add the trace to the chart:
     chart.addTrace(trace1);
     chart.addTrace(trace2);
+    
+    IAxis<IAxisScalePolicy> xAxis = (IAxis<IAxisScalePolicy>)chart.getAxisX();
+    xAxis.setRangePolicy(new RangePolicyFixedViewport(new Range(0, 50)));
+    xAxis.setAxisScalePolicy(new AxisScalePolicyManualTicks());
+    xAxis.setMinorTickSpacing(1);
+    xAxis.setFormatter(new LabelFormatterNumber(new DecimalFormat("###,###")));
+    xAxis.setPaintGrid(true);
+
+    IAxis<IAxisScalePolicy> yAxis = (IAxis<IAxisScalePolicy>)chart.getAxisY();
+    yAxis.setRangePolicy(new RangePolicyFixedViewport(new Range(0, 150)));
+    yAxis.setAxisScalePolicy(new AxisScalePolicyManualTicks());
+    yAxis.setMinorTickSpacing(0.5);
+
+    yAxis.setFormatter(new LabelFormatterNumber(new DecimalFormat("#0.00")));
 
     // Add all points, as it is static:
     double rand;
