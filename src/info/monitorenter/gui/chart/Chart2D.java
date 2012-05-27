@@ -1541,7 +1541,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     }
 
     // ensure a minimum offset for e.g. when no Y axes are visible
-    return result > 0 ? result : 20;
+    return result;
   }
 
   /**
@@ -2836,7 +2836,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * @param ref
    *          the highlighted trace point.
    */
-  private void notifyPointHighlightListeners(final ITracePoint2D ref) {
+  protected void notifyPointHighlightListeners(final ITracePoint2D ref) {
     if (this.m_pointHighlightListeners != null) {
       Iterator<IPointHighlightListener> it = this.m_pointHighlightListeners.iterator();
       while (it.hasNext()) {

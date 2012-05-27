@@ -73,6 +73,8 @@ public class TestChartOperationsVisual extends ATestChartOperations {
     suite.addTest(new TestChartOperationsVisual("testSetZIndex"));
     suite.addTest(new TestChartOperationsVisual("testRemoveTraceForBug2891801"));
     suite.addTest(new TestChartOperationsVisual("testAddDiscontinuation"));
+    suite.addTest(new TestChartOperationsVisual("testDisablePaintScaleAndTitle"));
+    
     return suite;
   }
 
@@ -651,6 +653,52 @@ public class TestChartOperationsVisual extends ATestChartOperations {
       public Object action(final Chart2D chart) {
         ITrace2D trace = chart.getTraces().first();
         trace.addPoint(5, Double.NaN);
+        return null;
+      }
+    };
+    this.setTestOperation(operation);
+  }
+  
+  /**
+   * Inserts a new TracePoint with an y value <code>{@link Double#NaN}</code> to
+   * a sorted trace to get a discontinued trace.
+   * <p>
+   */
+  public void testDisablePaintScaleAndTitle() {
+    ATestChartOperations.AChartOperation operation = new AChartOperation("Setting paint scale to false and clearing titles.") {
+
+      /**
+       * Creates a <code>{@link Trace2DLtdReplacing}</code>.
+       * <p>
+       * 
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation
+       *      #createTraces()
+       */
+      @Override
+      public ITrace2D[] createTraces() {
+        ITrace2D trace = new Trace2DLtd(500);
+        return new ITrace2D[] {trace };
+      }
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#fillTrace(info.monitorenter.gui.chart.ITrace2D)
+       */
+      @Override
+      public void fillTrace(ITrace2D trace) {
+        for (int i = 0; i < 10; i++) {
+          trace.addPoint(i, (Math.random() + 1.0) * i);
+        }
+      }
+
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
+      public Object action(final Chart2D chart) {
+        chart.getAxisY().setPaintScale(false);
+        chart.getAxisY().setAxisTitle(new AxisTitle(" "));
+        
+        chart.getAxisX().setPaintScale(false);
+        chart.getAxisX().setAxisTitle(new AxisTitle(" "));
         return null;
       }
     };

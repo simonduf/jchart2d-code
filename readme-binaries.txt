@@ -50,6 +50,7 @@ jchart2d-3.3.0 - <month>, <day>, <year>
 * Fixed bug #3488397: Axis labels not centered.
 * Fixed bug #3483737: Deadlock when plotting traces with point highlighting turned on. 
 * Fixed bug #3507000: Null pointer in Gettooltiptext when data is cleared.
+* Fixed bug #3529738: Weird line is drawn when having no scale and title.
 ! Improved performance of ITracePoint.setLocation(double, double): This was O(n) where n was amount of points in a trace in any 
   case except boundary increase. Now it is only O(n) if an extremum was diminished via that method.   
 ! Introduced data accumulation API. This allows you to have traces with 10^6 points painted with increased speed while zooming in 
