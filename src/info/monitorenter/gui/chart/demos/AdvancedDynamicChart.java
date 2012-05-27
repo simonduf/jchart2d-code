@@ -71,14 +71,14 @@ public final class AdvancedDynamicChart {
   public static void main(final String[] args) {
     // Create a chart:
     Chart2D chart = new Chart2D();
-    
+
     // We want to use a date format for the y axis.
     // Currently works only this way:
-    IAxis<?> yAxis = chart.getAxisY();
+    IAxis< ? > yAxis = chart.getAxisY();
 
     // Number formatter does not work for AxisAutoUnit.
     AAxis<IAxisScalePolicy> xAxis = new AxisLinear<IAxisScalePolicy>();
-    
+
     // Set a date formatter:
     yAxis.setFormatter(new LabelFormatterDate(new SimpleDateFormat("HH:mm:ss")));
 
