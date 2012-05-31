@@ -22,6 +22,7 @@ import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.TracePointProviderDefault;
+import info.monitorenter.util.math.MathUtil;
 
 import java.awt.geom.Point2D;
 import java.util.LinkedHashSet;
@@ -448,17 +449,18 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
    */
   @Override
   public boolean isVisble() {
-    boolean result = true;
-    if (this.m_scaledX < 0.0) {
-      result = false;
-    } else if (this.m_scaledX > 1.0) {
-      result = false;
-    } else if (this.m_scaledY < 0.0) {
-      result = false;
-    } else if (this.m_scaledY > 1.0) {
-      result = false;
+    boolean result = !this.isDiscontinuation();
+    if (result) {
+      if (this.m_scaledX < 0.0) {
+        result = false;
+      } else if (this.m_scaledX > 1.0) {
+        result = false;
+      } else if (this.m_scaledY < 0.0) {
+        result = false;
+      } else if (this.m_scaledY > 1.0) {
+        result = false;
+      }
     }
-
     return result;
   }
 
