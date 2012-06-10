@@ -584,15 +584,15 @@ public class TestIteratorTracePointStateEngine {
     for (int i = 100; i > 0; i--) {
       x = 1.0 / i;
       y = 1.0 / i;
-      /*
-       * First visible point will be returned bare and not be accumulated!
-       */
-      if (count > 0) {
+      if (i != 100) {
+        /*
+         * First visible point will be returned without accumulation. 
+         */
         accumX += x;
         accumY += y;
+        count++;
       }
       this.m_trace.addPoint(new info.monitorenter.gui.chart.tracepoints.TracePoint2D(x, y));
-      count++;
     }
     this.m_trace.addPoint(three);
     accumX /= count;
@@ -616,6 +616,8 @@ public class TestIteratorTracePointStateEngine {
      * First visible point!
      */
     result = toTest.next();
+    Assert.assertEquals(0.01, result.getX(),0.0);
+    Assert.assertEquals(0.01, result.getY(),0.0);
     /*
      * Whole lotta accumulated point!
      */
