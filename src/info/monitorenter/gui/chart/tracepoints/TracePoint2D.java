@@ -22,6 +22,7 @@ import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.TracePointProviderDefault;
+import info.monitorenter.util.math.MathUtil;
 
 import java.awt.geom.Point2D;
 import java.util.LinkedHashSet;
@@ -352,6 +353,15 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
         }
       } else {
         // not connected to a chart by now:
+        if (Chart2D.DEBUG_THREADING) {
+          System.err
+              .println("Only partially synchronized execution of code that should run synchronized ("
+                  + runSynchronized.getClass().getSimpleName()
+                  + ") for point "
+                  + this.toString()
+                  + " as trace (" + this.m_listener.getName() + ") is not connected to chart.");
+        }
+
         synchronized (this.m_listener) {
           result = runSynchronized.execute();
         }
@@ -359,6 +369,11 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
     } else {
       // not connected to any trace now:
       result = runSynchronized.execute();
+      if (Chart2D.DEBUG_THREADING) {
+        System.err.println("Unsynchronized execution of code that should run synchronized ("
+            + runSynchronized.getClass().getSimpleName() + ") for point " + this.toString()
+            + " as listener (trace) is not connected.");
+      }
     }
     return result;
   }
@@ -434,17 +449,18 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
    */
   @Override
   public boolean isVisble() {
-    boolean result = true;
-    if (this.m_scaledX < 0.0) {
-      result = false;
-    } else if (this.m_scaledX > 1.0) {
-      result = false;
-    } else if (this.m_scaledY < 0.0) {
-      result = false;
-    } else if (this.m_scaledY > 1.0) {
-      result = false;
+    boolean result = !this.isDiscontinuation();
+    if (result) {
+      if (this.m_scaledX < 0.0) {
+        result = false;
+      } else if (this.m_scaledX > 1.0) {
+        result = false;
+      } else if (this.m_scaledY < 0.0) {
+        result = false;
+      } else if (this.m_scaledY > 1.0) {
+        result = false;
+      }
     }
-
     return result;
   }
 

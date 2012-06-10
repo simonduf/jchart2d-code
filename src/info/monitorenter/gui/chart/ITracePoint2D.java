@@ -222,13 +222,13 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
 
   /**
    * Returns true if {@link #getScaledX()} AND {@link #getScaledY()} is in the
-   * range [0.0..1.0].
+   * range [0.0..1.0] and {@link #isDiscontinuation()} returns false. 
    * <p>
    * This call only makes sense after the point has been added to a trace.
    * <p>
    * 
    * @return true if {@link #getScaledX()} AND {@link #getScaledY()} is in the
-   *         range [0.0..1.0].
+   *         range [0.0..1.0] and {@link #isDiscontinuation()} returns false. 
    */
   public boolean isVisble();
 

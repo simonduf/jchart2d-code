@@ -220,7 +220,7 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
               int startY = chart.getYChartStart();
               int endY = chart.getYChartEnd();
               double yspace = bounds.getWidth();
-              int titleStartY = (int) ((startY - endY) / 2.0 + yspace / 2.0);
+              int titleStartY = (int) ((startY + endY) / 2.0 + yspace / 2.0);
               if (titleStartY <= 0) {
                 System.err.println("titleStartY below or equal to zero: " + titleStartY);
               }
@@ -264,16 +264,6 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
               int chartLabelFontWidth = chart.getFontMetrics(titleFont).charWidth('0');
               int xShiftPosition = chart.getAxisTickPainter().getMajorTickLength();
               xShiftPosition += axis.getFormatter().getMaxAmountChars() * chartLabelFontWidth;
-
-              // AffineTransform tr = g2d.getTransform();
-              // AffineTransform at =
-              // g2d.getDeviceConfiguration().getDefaultTransform();
-              // at.translate(chart.getXChartEnd() + xShiftPosition,
-              // titleStartY);
-              // at.rotate(-Math.PI / 2);
-              // g2d.setTransform(at);
-              // g2d.drawString(title, 0, 0);
-              // g2d.setTransform(tr);
 
               // store former font for later restore:
               Font oldFont = g.getFont();

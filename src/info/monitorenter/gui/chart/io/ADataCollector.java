@@ -55,7 +55,14 @@ import info.monitorenter.gui.chart.ITracePoint2D;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * @version $Revision: 1.11 $
+ * 
+ * @deprecated this is a proprietary example on how to use Threads: Bigger
+ *             applications will use Threadpools, Reactor- or Observer- patterns
+ *             to save setting up new Threads for ever single piece of the
+ *             application, so this will be voided soon.
+ * 
  */
+@Deprecated
 public abstract class ADataCollector implements Runnable {
 
   /** Flag to check wether the collector is running. */

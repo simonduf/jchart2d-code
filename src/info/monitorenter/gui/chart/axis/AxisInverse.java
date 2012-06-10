@@ -259,7 +259,7 @@ public class AxisInverse<T extends IAxisScalePolicy> extends AAxis<T> {
    */
   @SuppressWarnings("unchecked")
   @Override
-  public IAxisScalePolicy setAxisScalePolicy(final T axisScalePolicy) {
+  public T setAxisScalePolicy(final T axisScalePolicy) {
     /*
      * I consider the necessary cast to T as a java bug (compare definition of T in class header):
      */

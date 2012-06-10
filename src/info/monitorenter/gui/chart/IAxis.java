@@ -538,7 +538,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    * @return the axis scale policy which controls the position and distance of
    *         the ticks to draw.
    */
-  public IAxisScalePolicy getAxisScalePolicy();
+  public T getAxisScalePolicy();
 
   /**
    * Returns the title of this axis.
@@ -1039,7 +1039,7 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
    * 
    * @return the previous axis scale policy that was used before.
    */
-  public IAxisScalePolicy setAxisScalePolicy(T axisScalePolicy);
+  public T setAxisScalePolicy(T axisScalePolicy);
 
   /**
    * Sets the title of this axis.

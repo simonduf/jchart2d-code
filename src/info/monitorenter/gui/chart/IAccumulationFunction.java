@@ -63,9 +63,7 @@ package info.monitorenter.gui.chart;
  * <li>In case you are implementing an iterator for a trace that is sorted (by x
  * -value) and your counter is not full but your loop has no more points to
  * iterate return the last real point your own loop iterated. This is needed
- * because the contract of
- * {@link ITrace2DDataAccumulating#iterator(int)}
- * .</li>
+ * because the contract of {@link ITrace2DDataAccumulating#iterator(int)} .</li>
  * <li>done!</li>
  * </ul>
  * </ul>
@@ -112,5 +110,21 @@ public interface IAccumulationFunction {
    *         <code>null</code> is returned.
    */
   public ITracePoint2D getAccumulatedPoint();
+
+  /**
+   * Returns the current amount of accumulated points.
+   * <p>
+   * 
+   * @return the current amount of accumulated points.
+   */
+  public int getAccumulatedPointCount();
+  
+  /**
+   * Returns the current accumulated point.
+   * <p>
+   * 
+   * @return the current accumulated point.
+   */
+  public ITracePoint2D getAccumulatedPointCurrent();
 
 }

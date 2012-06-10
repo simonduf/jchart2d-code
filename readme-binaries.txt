@@ -46,6 +46,11 @@ jchart2d-3.3.0 - <month>, <day>, <year>
 * Fixed bug #3432154: Remove dependency to JIDE-oss (debian upstream), http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=626243
 * Fixed untracked bug: Setting an axis title at runtime does not cause a repaint thus is not reflected until repaints occur. 
 * Fixed untracked bug: Setting axis paint scale to false at runtime does not cause a repaint thus is not reflected. 
+* Fixed bug #3479485: TracePainterDisc - last painted disc left when all points are removed at runtime.
+* Fixed bug #3488397: Axis labels not centered.
+* Fixed bug #3483737: Deadlock when plotting traces with point highlighting turned on. 
+* Fixed bug #3507000: Null pointer in Gettooltiptext when data is cleared.
+* Fixed bug #3529738: Weird line is drawn when having no scale and title.
 ! Improved performance of ITracePoint.setLocation(double, double): This was O(n) where n was amount of points in a trace in any 
   case except boundary increase. Now it is only O(n) if an extremum was diminished via that method.   
 ! Introduced data accumulation API. This allows you to have traces with 10^6 points painted with increased speed while zooming in 
@@ -53,7 +58,9 @@ jchart2d-3.3.0 - <month>, <day>, <year>
   ITrace2D.setAccumulationStrategy(new AccumulationStrategyAmountOfPointsAscendingXValues(new AccumulationFunctionArithmeticMeanXY()));
 ! Improved axis title spacing. 
 ! Added feature #3426071: Let getAxisX()/getAxisY() support right y axes/ top y axes (avoid naive NPE in case x axis bottom and/or y axis left is empty).
-! Saving images with transparent background is supported now. 
+! Saving images with transparent background is supported now.
+! Added IPointHighlightListener (contribution by Frans Bouwmans): You can register on the chart to get informed about highlighted points now. 
+  Use this e.g. to cast the point into your subtype to extract further information about the highlighted point. 
 o Changed policy of Chart2D.translateMousePosition(final MouseEvent mouseEvent). Before this the translation was done into the values 
   covered by the first x and y axes. By now the translation is related to the axes of the trace of the nearest point to the given 
   mouse event. 
@@ -92,7 +99,8 @@ o Changed Chart2D method signature:
   public final boolean removeTrace(final ITrace2D points)
   to return if removing was successful. 
 o Decoupled IAxis.setPaintGrid(boolean) from IAxis.setPaintScale(boolean). Earlier versions would turn on paintScale in case grid was turned on. 
-o IAxis has a new generic parameter. 
+o IAxis has a new generic parameter. This is only done to allow subtypes to narrow down which subtypes of IScalePolicy 
+  they will allow. This is e.g. used for AAxisTransformation to prevent wrong labels (which would cause a "silent" UI bug).  
   1. Wherever you used 
   IAxis axis = chart.getAxis();
   replace it with: 

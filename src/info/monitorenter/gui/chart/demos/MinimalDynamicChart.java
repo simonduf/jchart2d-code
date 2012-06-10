@@ -26,13 +26,14 @@ package info.monitorenter.gui.chart.demos;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.io.ADataCollector;
-import info.monitorenter.gui.chart.io.RandomDataCollectorOffset;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
+import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JFrame;
 
@@ -57,7 +58,7 @@ public final class MinimalDynamicChart {
     Chart2D chart = new Chart2D();
     // Create an ITrace:
     // Note that dynamic charts need limited amount of values!!!
-    ITrace2D trace = new Trace2DLtd(100);
+    final ITrace2D trace = new Trace2DLtd(100);
     trace.setColor(Color.RED);
 
     // Add the trace to the chart:
@@ -69,7 +70,7 @@ public final class MinimalDynamicChart {
     // Create a frame.
     JFrame frame = new JFrame("MinimalDynamicChart");
     // add the chart to the frame:
-    frame.getContentPane().add(chart);
+    frame.getContentPane().add(new ChartPanel(chart));
     frame.setSize(400, 300);
     // Enable the termination button [cross on the upper right edge]:
     frame.addWindowListener(new WindowAdapter() {
@@ -82,9 +83,38 @@ public final class MinimalDynamicChart {
       }
     });
     frame.setVisible(true);
+    
+    
+      /* 
+       * Now the dynamic adding of points. This is just a demo! 
+       * 
+       * Use a separate thread to simulate dynamic adding of date. 
+       * Note that you do not have to copy this code. Dynamic charting is just about 
+       * adding points to traces at runtime from another thread. Whenever you hook on 
+       * to a serial port or some other data source with a polling Thread (or an event 
+       * notification pattern) you will have your own thread that just has to add points 
+       * to a trace. 
+       */
+    
+    Timer timer = new Timer(true);
+    TimerTask task = new TimerTask(){
+
+      private double m_y = 0;
+      private long m_starttime = System.currentTimeMillis();
+      /**
+       * @see java.util.TimerTask#run()
+       */
+      @Override
+      public void run() {
+        double rand = Math.random();
+        boolean add = (rand >= 0.5) ? true : false;
+        this.m_y = (add) ? this.m_y + Math.random() : this.m_y - Math.random();
+        trace.addPoint(((double) System.currentTimeMillis() - this.m_starttime), this.m_y);
+      }
+      
+    };
     // Every 20 milliseconds a new value is collected.
-    ADataCollector collector = new RandomDataCollectorOffset(trace, 100);
-    collector.start();
+    timer.schedule(task, 1000, 20);
   }
 
   /** Defcon. */

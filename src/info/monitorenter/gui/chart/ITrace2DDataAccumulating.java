@@ -149,7 +149,7 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
    * the x value domain.
    * <p>
    * 
-   * @param amountOfVisiblePoints
+   * @param amountOfDesiredPoints
    *          The amount of points that should at least be returned to the
    *          caller. Note that implementation may return twice as much points
    *          depending on the accumulation function that is used (e.g. an
@@ -162,7 +162,7 @@ public interface ITrace2DDataAccumulating extends ITrace2D, PropertyChangeListen
    *         internal {@link ITracePoint2D} instances into one by taking visible
    *         range and desired amount of points into account.
    */
-  public Iterator<ITracePoint2D> iterator(final int amountOfVisiblePoints);
+  public Iterator<ITracePoint2D> iterator(final int amountOfDesiredPoints);
 
   /**
    * Installs the given accumulation strategy.

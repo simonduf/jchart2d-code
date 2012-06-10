@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
  <!--#include virtual="./head.shtml" -->
  <script language="javascript">
-  var update="02/10/2011";
+  var update="26/04/2012";
  </script>
  <body id="usage">
   <div id="wrapper">
@@ -254,31 +254,41 @@ public class MinimalStaticChart {
       limited amount of points has to be chosen: The Trace2DLtd implementation 
       is based on a ringbuffer and guarantees, that no java.lang.OutOfMemoryError 
       will happen. Also it is helpful for performance: The more points have to be rendered, 
-      the more calculations have to be done. The example uses a basic helper for 
-      Threads that add data: The AbstractDataCollector class and a dummy implementation. 
-      For your work you should write a subclass of that class too and implement it's 
-      method: <code>public abstract TracePoint2D collectData()</code>. 
+      the more calculations have to be done. 
+     <p>
+     <p>
+      In this example a timer is used to simulate that points are added over time from a separate 
+      Thread. In your application most often you have a separate polling Thread that collects 
+      the data to plot (e.g. from a database or a serial port ("Observer pattern")). Or some event listener which will 
+      be called from a separate thread (e.g. a web request, database trigger... ("Reactor pattern")). So don't copy 
+      the timer stuff unless you need a polling thread that observes external data structures.  
      </p>
      <p>
       <pre class="code">
 package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
-import info.monitorenter.gui.chart.io.ADataCollector;
-import info.monitorenter.gui.chart.io.RandomDataCollectorOffset;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
+import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JFrame;
-
+<span class="comment">
+/**
+ * Demonstrates minimal effort to create a dynamic chart.
+ * 
+ * @author Achim Westermann
+ * 
+ */
+</span>
 public class MinimalDynamicChart {
-  private MinimalDynamicChart() {
-    super();
-  }
   
   public static void main(String[]args){
 <span class="comment">    // Create a chart: </span> 
@@ -306,13 +316,46 @@ public class MinimalDynamicChart {
         }
       );
     frame.setVisible(true); 
-<span class="comment">    // Every 50 milliseconds a new value is collected. </span>
-   ADataCollector collector = new RandomDataCollectorOffset(trace, 100);
-<span class="comment">    // Start an internal Thread that adds the values: </span>
-    collector.start();
+<span class="comment">   
+    /* 
+     * Now the dynamic adding of points. This is just a demo! 
+     * 
+     * Use a separate thread to simulate dynamic adding of date. 
+     * Note that you do not have to copy this code. Dynamic charting is just about 
+     * adding points to traces at runtime from another thread. Whenever you hook on 
+     * to a serial port or some other data source with a polling Thread (or an event 
+     * notification pattern) you will have your own thread that just has to add points 
+     * to a trace. 
+     */
+</span>
+    Timer timer = new Timer(true);
+    TimerTask task = new TimerTask(){
+
+      private double m_y = 0;
+      private long m_starttime = System.currentTimeMillis();
+      /**
+       * @see java.util.TimerTask#run()
+       */
+      @Override
+      public void run() {
+<span class="comment">        // This is just computation of some nice looking value.</span>
+        double rand = Math.random();
+        boolean add = (rand >= 0.5) ? true : false;
+        this.m_y = (add) ? this.m_y + Math.random() : this.m_y - Math.random();
+<span class="comment">        // This is the important thing: Point is added from separate Thread.</span>
+        trace.addPoint(((double) System.currentTimeMillis() - this.m_starttime), this.m_y);
+      }
+      
+    };
+<span class="comment">    // Every 20 milliseconds a new value is collected.</span>
+    timer.schedule(task, 1000, 20);
+  }
+
+  /** Defcon. */
+  private MinimalDynamicChart() {
+    // nop
   }
 }
-
       </pre>
      </p>
      

@@ -13,6 +13,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -27,6 +28,12 @@ import javax.swing.JPanel;
  * 
  */
 public class VerticalStackedChartsWithParametricSpirals {
+  /**
+   * Constructor taking a panel to add itself to. 
+   * <p> 
+   * 
+   * @param panel to add this {@link JComponent} to. 
+   */
   public VerticalStackedChartsWithParametricSpirals(JPanel panel) {
     panel.setLayout(new BorderLayout());
     panel.setPreferredSize(new Dimension(800, 500));

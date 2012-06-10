@@ -58,12 +58,10 @@ public abstract class AAccumulationFunction implements IAccumulationFunction {
   /**
    * Returns the current accumulated point.
    * <p>
-   * This is intended for internal (subclass) use only.
-   * <p>
    * 
    * @return the current accumulated point.
    */
-  protected ITracePoint2D getAccumulatedPointCurrent() {
+  public ITracePoint2D getAccumulatedPointCurrent() {
     return this.m_accumulatedPointCurrent;
   }
 
