@@ -78,7 +78,7 @@ public final class StaticChartDiscs {
 
     // Make it visible:
     // Create a frame.
-    JFrame frame = new JFrame("StaticChartDiscs");
+    JFrame frame = new JFrame(StaticChartDiscs.class.getSimpleName());
     // add the chart to the frame:
     frame.getContentPane().add(new ChartPanel(chart));
     frame.setSize(400, 300);
