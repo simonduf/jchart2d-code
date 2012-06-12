@@ -439,10 +439,10 @@ public class IteratorTracePointStateEngine extends AIteratorITracePointStateEngi
       }
     };
 
-    // 3: Action - it's actionNoOutput
+    // 3: Action - it's actionOutputPoint
 
     // 3: Transition
-    Transition transition3 = new Transition(conditionInvisibleNotLast, actionNoOutput,
+    Transition transition3 = new Transition(conditionInvisibleNotLast, actionOutputPoint,
         STATES.BEFORE_FIRST_VISIBLE);
 
     // 3: Add to transition List for state START:
@@ -525,59 +525,8 @@ public class IteratorTracePointStateEngine extends AIteratorITracePointStateEngi
 
     // 7: Add to transition List for state BEFORE_FIRST_VISIBLE:
     transitionsBEFORE_FIRST_VISIBLE.add(transition7);
-
+    
     // 8: Condition
-    ICondition conditionLastAccumulatedSomething = new ACondition("conditionLastAccumulatedSomething") {
-
-      /**
-       * @see info.monitorenter.gui.chart.traces.iterators.fsm.AIteratorITracePointStateEnginge.ICondition#isMet(info.monitorenter.gui.chart.ITracePoint2D)
-       */
-      @Override
-      public boolean isMet(final ITracePoint2D input, final boolean isLastPoint) {
-        boolean result;
-        IAccumulationFunction function = IteratorTracePointStateEngine.this
-            .getAccumulationFunction();
-        boolean accumulated;
-        accumulated = function.getAccumulatedPointCount() > 0;
-        result = accumulated && isLastPoint;
-        return result;
-      }
-    };
-
-    // 8: Action
-    IAction actionOutputAcuumPointIfNotNullAndPoint = new AAction(
-        "actionOutputAcuumPointIfNotNullAndPoint") {
-
-      /**
-       * @see info.monitorenter.gui.chart.traces.iterators.fsm.AIteratorITracePointStateEnginge.IAction#computeOutput(info.monitorenter.gui.chart.ITracePoint2D,
-       *      java.util.List)
-       */
-      @Override
-      public void computeOutput(ITracePoint2D input, List<ITracePoint2D> outputTarget) {
-
-        IAccumulationFunction function = IteratorTracePointStateEngine.this
-            .getAccumulationFunction();
-        ITracePoint2D accumulatedPoint = function.getAccumulatedPoint();
-        /*
-         * Could be that nothing was accumulated yet or in last run accumulation was finished.
-         */
-        if(accumulatedPoint != null) {
-          outputTarget.add(accumulatedPoint);
-        }
-        outputTarget.add(input);
-      }
-    };
-
-    // 8: Transition
-    Transition transition8 = new Transition(conditionLastAccumulatedSomething,
-        actionOutputAcuumPointIfNotNullAndPoint, STATES.END);
-
-    // 8: Add to transition List for state ACCUMULATING_VISIBLE:
-    List<Transition> transitionsACCUMULATING_VISIBLE = new LinkedList<AIteratorITracePointStateEnginge.Transition>();
-    transitionsACCUMULATING_VISIBLE.add(transition8);
-    transitionTable[STATES.ACCUMULATING_VISIBLE.ordinal()] = transitionsACCUMULATING_VISIBLE;
- 
-    // 9: Condition
     ICondition conditionLastAccumulatedNothing = new ACondition("conditionLastAccumulatedNothing") {
 
       /**
@@ -595,16 +544,113 @@ public class IteratorTracePointStateEngine extends AIteratorITracePointStateEngi
       }
     };
 
-    // 9: Action - it's actionOutputPoint
+    // 8: Action - it's actionOutputPoint
+
+    // 8: Transition
+    Transition transition8 = new Transition(conditionLastAccumulatedNothing,
+        actionOutputPoint, STATES.END);
+
+    // 8: Add to transition List for state ACCUMULATING_VISIBLE:
+    List<Transition> transitionsACCUMULATING_VISIBLE = new LinkedList<AIteratorITracePointStateEnginge.Transition>();
+    transitionsACCUMULATING_VISIBLE.add(transition8);
+
+    // 9: Condition
+    ICondition conditionLastAccumulatedOnlyOnePoint = new ACondition("conditionLastAccumulatedOnlyOnePoint") {
+
+      /**
+       * @see info.monitorenter.gui.chart.traces.iterators.fsm.AIteratorITracePointStateEnginge.ICondition#isMet(info.monitorenter.gui.chart.ITracePoint2D)
+       */
+      @Override
+      public boolean isMet(final ITracePoint2D input, final boolean isLastPoint) {
+        boolean result;
+        IAccumulationFunction function = IteratorTracePointStateEngine.this
+            .getAccumulationFunction();
+        ITracePoint2D accumPoint = function.getAccumulatedPointCurrent();
+        ITracePoint2D previousPoint = IteratorTracePointStateEngine.this.getPreviousPoint();
+        boolean accumulated;
+        accumulated = function.getAccumulatedPointCount() > 0;
+        boolean accumulatedEqualsPreviousPoint;
+        accumulatedEqualsPreviousPoint = previousPoint != null && accumPoint != null && accumPoint.equals(previousPoint);
+        result = accumulated && isLastPoint && accumulatedEqualsPreviousPoint;
+        return result;
+      }
+    };
+
+    // 9: Action
+    IAction actionOutputAcuumPointAndPoint = new AAction(
+        "actionOutputAcuumPointAndPoint") {
+
+      /**
+       * @see info.monitorenter.gui.chart.traces.iterators.fsm.AIteratorITracePointStateEnginge.IAction#computeOutput(info.monitorenter.gui.chart.ITracePoint2D,
+       *      java.util.List)
+       */
+      @Override
+      public void computeOutput(ITracePoint2D input, List<ITracePoint2D> outputTarget) {
+
+        IAccumulationFunction function = IteratorTracePointStateEngine.this
+            .getAccumulationFunction();
+        ITracePoint2D accumulatedPoint = function.getAccumulatedPoint();
+        outputTarget.add(accumulatedPoint);
+        outputTarget.add(input);
+      }
+    };
 
     // 9: Transition
-    Transition transition9 = new Transition(conditionLastAccumulatedNothing,
-        actionOutputPoint, STATES.END);
+    Transition transition9 = new Transition(conditionLastAccumulatedOnlyOnePoint,
+        actionOutputAcuumPointAndPoint, STATES.END);
 
     // 9: Add to transition List for state ACCUMULATING_VISIBLE:
     transitionsACCUMULATING_VISIBLE.add(transition9);
-
+    transitionTable[STATES.ACCUMULATING_VISIBLE.ordinal()] = transitionsACCUMULATING_VISIBLE;
+    
     // 10: Condition
+    ICondition conditionLastAccumulatedSomething = new ACondition("conditionLastAccumulatedSomething") {
+
+      /**
+       * @see info.monitorenter.gui.chart.traces.iterators.fsm.AIteratorITracePointStateEnginge.ICondition#isMet(info.monitorenter.gui.chart.ITracePoint2D)
+       */
+      @Override
+      public boolean isMet(final ITracePoint2D input, final boolean isLastPoint) {
+        boolean result;
+        IAccumulationFunction function = IteratorTracePointStateEngine.this
+            .getAccumulationFunction();
+        ITracePoint2D accumPoint = function.getAccumulatedPointCurrent();
+        ITracePoint2D previousPoint = IteratorTracePointStateEngine.this.getPreviousPoint();
+        boolean accumulated;
+        accumulated = function.getAccumulatedPointCount() > 0;
+        boolean accumulatedEqualsPreviousPoint;
+        accumulatedEqualsPreviousPoint = previousPoint != null && accumPoint!= null && accumPoint.equals(previousPoint);
+        result = accumulated && isLastPoint && ! accumulatedEqualsPreviousPoint;
+        return result;
+      }
+    };
+    
+    // 10: Action 
+    IAction actionOutputAccumulatedPointAndPreviousAndCurrent = new AAction(
+        "actionOutputAccumulatedPointAndPreviousAndCurrent") {
+
+      /**
+       * @see info.monitorenter.gui.chart.traces.iterators.fsm.AIteratorITracePointStateEnginge.IAction#computeOutput(info.monitorenter.gui.chart.ITracePoint2D,
+       *      java.util.List)
+       */
+      @Override
+      public void computeOutput(ITracePoint2D input, List<ITracePoint2D> outputTarget) {
+
+        IAccumulationFunction function = IteratorTracePointStateEngine.this
+            .getAccumulationFunction();
+        outputTarget.add(function.getAccumulatedPoint());
+        outputTarget.add(IteratorTracePointStateEngine.this.getPreviousPoint());
+        outputTarget.add(input);
+      }
+    };
+
+    
+    // 10: Transition
+    Transition transition10 = new Transition(conditionLastAccumulatedSomething,
+        actionOutputAccumulatedPointAndPreviousAndCurrent, STATES.END);
+    transitionsACCUMULATING_VISIBLE.add(transition10);
+    
+    // 11: Condition
     ICondition conditionVisibleNotLastAndNotAccumulationDone = new ACondition(
         "conditionVisibleNotLastAndNotAccumulationDone") {
 
@@ -624,7 +670,7 @@ public class IteratorTracePointStateEngine extends AIteratorITracePointStateEngi
       }
     };
 
-    // 10: Action
+    // 11: Action
     IAction actionAccumulatePointNoOutput = new AAction("actionAccumulatePointNoOutput") {
 
       /**
@@ -646,14 +692,14 @@ public class IteratorTracePointStateEngine extends AIteratorITracePointStateEngi
       }
     };
 
-    // 10: Transition
-    Transition transition10 = new Transition(conditionVisibleNotLastAndNotAccumulationDone,
+    // 11: Transition
+    Transition transition11 = new Transition(conditionVisibleNotLastAndNotAccumulationDone,
         actionAccumulatePointNoOutput, STATES.ACCUMULATING_VISIBLE);
 
-    // 10: Add to transition List for state ACCUMULATING_VISIBLE:
-    transitionsACCUMULATING_VISIBLE.add(transition10);
+    // 11: Add to transition List for state ACCUMULATING_VISIBLE:
+    transitionsACCUMULATING_VISIBLE.add(transition11);
 
-    // 11: Condition
+    // 12: Condition
     ICondition conditionVisibleNotLastAndAccumulationDoneAndAccumPointIsPreviousPoint = new ACondition(
         "conditionVisibleNotLastAndAccumulationDoneAndAccumPointIsPreviousPoint") {
 
@@ -677,7 +723,7 @@ public class IteratorTracePointStateEngine extends AIteratorITracePointStateEngi
       }
     };
 
-    // 11: Action
+    // 12: Action
     IAction actionEraseAccumulatePoint = new AAction("actionEraseAccumulatePoint") {
 
       /**
@@ -695,15 +741,15 @@ public class IteratorTracePointStateEngine extends AIteratorITracePointStateEngi
       }
     };
 
-    // 11: Transition
-    Transition transition11 = new Transition(conditionVisibleNotLastAndAccumulationDoneAndAccumPointIsPreviousPoint,
+    // 12: Transition
+    Transition transition12 = new Transition(conditionVisibleNotLastAndAccumulationDoneAndAccumPointIsPreviousPoint,
         actionEraseAccumulatePoint, STATES.ACCUMULATING_VISIBLE);
 
-    // 11: Add to transition List for state ACCUMULATING_VISIBLE:
-    transitionsACCUMULATING_VISIBLE.add(transition11);
+    // 12: Add to transition List for state ACCUMULATING_VISIBLE:
+    transitionsACCUMULATING_VISIBLE.add(transition12);
 
     
-    // 12: Condition
+    // 13: Condition
     ICondition conditionVisibleNotLastAndAccumulationDoneAndAccumPointNotPreviousPoint = new ACondition(
         "conditionVisibleNotLastAndAccumulationDoneAndAccumPointNotPreviousPoint") {
 
@@ -727,7 +773,7 @@ public class IteratorTracePointStateEngine extends AIteratorITracePointStateEngi
       }
     };
 
-    // 12: Action
+    // 13: Action
     IAction actionAccumulatePointOutput = new AAction("actionAccumulatePointOutput") {
 
       /**
@@ -750,12 +796,12 @@ public class IteratorTracePointStateEngine extends AIteratorITracePointStateEngi
       }
     };
 
-    // 12: Transition
-    Transition transition12 = new Transition(conditionVisibleNotLastAndAccumulationDoneAndAccumPointNotPreviousPoint,
+    // 13: Transition
+    Transition transition13 = new Transition(conditionVisibleNotLastAndAccumulationDoneAndAccumPointNotPreviousPoint,
         actionAccumulatePointOutput, STATES.ACCUMULATING_VISIBLE);
 
-    // 12: Add to transition List for state ACCUMULATING_VISIBLE:
-    transitionsACCUMULATING_VISIBLE.add(transition12);
+    // 13: Add to transition List for state ACCUMULATING_VISIBLE:
+    transitionsACCUMULATING_VISIBLE.add(transition13);
     
     
     
@@ -768,7 +814,7 @@ public class IteratorTracePointStateEngine extends AIteratorITracePointStateEngi
     
     
     
-    // 13: Condition
+    // 14: Condition
     ICondition conditionInvisibleNotLastAndAccumulated = new ACondition(
         "conditionInvisibleNotLastAndAccumulated") {
 
@@ -784,39 +830,21 @@ public class IteratorTracePointStateEngine extends AIteratorITracePointStateEngi
         ITracePoint2D previousPoint = IteratorTracePointStateEngine.this.getPreviousPoint();
         boolean accumulated = accumPoint!= null && !accumPoint.equals(previousPoint);
         boolean visible = input.isVisble();
-        boolean discontinuation = input.isDiscontinuation();
-        result = (!visible || discontinuation) && accumulated && !isLastPoint;
+        result = !visible && accumulated && !isLastPoint;
         return result;
       }
     };
-    // 13: Action 
-    IAction actionOutputAccumulatedPointAndPreviousAndCurrent = new AAction(
-        "actionOutputAccumulatedPointAndPreviousAndCurrent") {
-
-      /**
-       * @see info.monitorenter.gui.chart.traces.iterators.fsm.AIteratorITracePointStateEnginge.IAction#computeOutput(info.monitorenter.gui.chart.ITracePoint2D,
-       *      java.util.List)
-       */
-      @Override
-      public void computeOutput(ITracePoint2D input, List<ITracePoint2D> outputTarget) {
-
-        IAccumulationFunction function = IteratorTracePointStateEngine.this
-            .getAccumulationFunction();
-        outputTarget.add(function.getAccumulatedPoint());
-        outputTarget.add(IteratorTracePointStateEngine.this.getPreviousPoint());
-        outputTarget.add(input);
-      }
-    };
+    // 14: Action - it's actionOutputAccumulatedPointAndPreviousAndCurrent
 
 
-    // 13: Transition
-    Transition transition13 = new Transition(conditionInvisibleNotLastAndAccumulated,
+    // 14: Transition
+    Transition transition14 = new Transition(conditionInvisibleNotLastAndAccumulated,
         actionOutputAccumulatedPointAndPreviousAndCurrent, STATES.INVISIBLE_OR_DISCONTINUATION);
 
-    // 13: Add to transition List for state ACCUMULATING_VISIBLE:
-    transitionsACCUMULATING_VISIBLE.add(transition13);
+    // 14: Add to transition List for state ACCUMULATING_VISIBLE:
+    transitionsACCUMULATING_VISIBLE.add(transition14);
 
-    // 14: Condition 
+    // 15: Condition 
     ICondition conditionInvisibleNotLastAndAccumulated1Point   = new ACondition(
         "conditionInvisibleNotLastAndAccumulated1Point") {
 
@@ -832,22 +860,21 @@ public class IteratorTracePointStateEngine extends AIteratorITracePointStateEngi
         ITracePoint2D previousPoint = IteratorTracePointStateEngine.this.getPreviousPoint();
         boolean accumulatedOnePoint = accumPoint!= null && accumPoint.equals(previousPoint);
         boolean visible = input.isVisble();
-        boolean discontinuation = input.isDiscontinuation();
-        result = (!visible || discontinuation) && accumulatedOnePoint && !isLastPoint;
+        result = !visible && accumulatedOnePoint && !isLastPoint;
         return result;
       }
     };
     
-    // 14: Action - it's actionOutputPreviousPointAndPoint
+    // 15: Action - it's actionOutputPreviousPointAndPoint
     
-    // 14: Transition
-    Transition transition14 = new Transition(conditionInvisibleNotLastAndAccumulated1Point,
+    // 15: Transition
+    Transition transition15 = new Transition(conditionInvisibleNotLastAndAccumulated1Point,
         actionOutputPreviousPointAndPoint, STATES.INVISIBLE_OR_DISCONTINUATION);
     
-    // 14: Add to transition List for state ACCUMULATING_VISIBLE:
-    transitionsACCUMULATING_VISIBLE.add(transition14);
+    // 15: Add to transition List for state ACCUMULATING_VISIBLE:
+    transitionsACCUMULATING_VISIBLE.add(transition15);
     
-    // 15: Condition
+    // 16: Condition
     ICondition conditionInvisibleNotLastAndNotAccumulated = new ACondition(
         "conditionInvisibleNotLastAndNotAccumulated") {
 
@@ -863,91 +890,90 @@ public class IteratorTracePointStateEngine extends AIteratorITracePointStateEngi
         ITracePoint2D previousPoint = IteratorTracePointStateEngine.this.getPreviousPoint();
         boolean accumulated = accumPoint!= null && !accumPoint.equals(previousPoint);
         boolean visible = input.isVisble();
-        boolean discontinuation = input.isDiscontinuation();
-        result = (!visible || discontinuation) && !accumulated && !isLastPoint;
+        result = !visible && !accumulated && !isLastPoint;
         return result;
       }
     };
 
-    // 15: Action - it's actionOutputPoint
-
-    // 15: Transition
-    Transition transition15 = new Transition(conditionInvisibleNotLastAndNotAccumulated,
-        actionOutputPoint, STATES.INVISIBLE_OR_DISCONTINUATION);
-
-    // 15: Add to transition List for state ACCUMULATING_VISIBLE:
-    transitionsACCUMULATING_VISIBLE.add(transition15);
-
-    // 16: Condition - it's conditionLast
-
     // 16: Action - it's actionOutputPoint
 
     // 16: Transition
-    Transition transition16 = new Transition(conditionLast, actionOutputPoint, STATES.END);
+    Transition transition16 = new Transition(conditionInvisibleNotLastAndNotAccumulated,
+        actionOutputPoint, STATES.INVISIBLE_OR_DISCONTINUATION);
 
-    // 15: Add to transition List for state INVISIBLE_OR_DISCONTINUATION:
-    List<Transition> transitionsINVISIBLE_OR_DISCONTINUATION = new LinkedList<AIteratorITracePointStateEnginge.Transition>();
-    transitionsINVISIBLE_OR_DISCONTINUATION.add(transition16);
-    transitionTable[STATES.INVISIBLE_OR_DISCONTINUATION.ordinal()] = transitionsINVISIBLE_OR_DISCONTINUATION;
+    // 16: Add to transition List for state ACCUMULATING_VISIBLE:
+    transitionsACCUMULATING_VISIBLE.add(transition16);
 
-    // 17: Condition - it's conditionInvisibleNotLast
+    // 17: Condition - it's conditionLast
 
-    // 17: Action - it's actionNoOutput
+    // 17: Action - it's actionOutputPoint
 
     // 17: Transition
-    Transition transition17 = new Transition(conditionInvisibleNotLast, actionNoOutput,
-        STATES.INVISIBLE_OR_DISCONTINUATION_CONTINUED);
+    Transition transition17 = new Transition(conditionLast, actionOutputPoint, STATES.END);
 
     // 17: Add to transition List for state INVISIBLE_OR_DISCONTINUATION:
+    List<Transition> transitionsINVISIBLE_OR_DISCONTINUATION = new LinkedList<AIteratorITracePointStateEnginge.Transition>();
     transitionsINVISIBLE_OR_DISCONTINUATION.add(transition17);
+    transitionTable[STATES.INVISIBLE_OR_DISCONTINUATION.ordinal()] = transitionsINVISIBLE_OR_DISCONTINUATION;
 
-    // 18: Condition - it's conditionVisibleNotLast
+    // 18: Condition - it's conditionInvisibleNotLast
 
-    // 18: Action - it's actionOutputPoint
-   
+    // 18: Action - it's actionNoOutput
+
     // 18: Transition
-    Transition transition18 = new Transition(conditionVisibleNotLast, actionOutputPoint,
-        STATES.ACCUMULATING_VISIBLE);
+    Transition transition18 = new Transition(conditionInvisibleNotLast, actionNoOutput,
+        STATES.INVISIBLE_OR_DISCONTINUATION_CONTINUED);
 
     // 18: Add to transition List for state INVISIBLE_OR_DISCONTINUATION:
     transitionsINVISIBLE_OR_DISCONTINUATION.add(transition18);
 
-    // 19: Condition - it's conditionLast
+    // 19: Condition - it's conditionVisibleNotLast
 
-    // 19: Action - it's actionOutputPreviousPointAndPoint
-
+    // 19: Action - it's actionOutputPoint
+   
     // 19: Transition
-    Transition transition19 = new Transition(conditionLast, actionOutputPreviousPointAndPoint,
-        STATES.END);
+    Transition transition19 = new Transition(conditionVisibleNotLast, actionOutputPoint,
+        STATES.ACCUMULATING_VISIBLE);
 
-    // 19: Add to transition List for state
-    // INVISIBLE_OR_DISCONTINUATION_CONTINUED:
-    List<Transition> transitionsINVISIBLE_OR_DISCONTINUATION_CONTINUED = new LinkedList<AIteratorITracePointStateEnginge.Transition>();
-    transitionsINVISIBLE_OR_DISCONTINUATION_CONTINUED.add(transition19);
-    transitionTable[STATES.INVISIBLE_OR_DISCONTINUATION_CONTINUED.ordinal()] = transitionsINVISIBLE_OR_DISCONTINUATION_CONTINUED;
+    // 19: Add to transition List for state INVISIBLE_OR_DISCONTINUATION:
+    transitionsINVISIBLE_OR_DISCONTINUATION.add(transition19);
 
-    // 20: Condition - it's conditionInvisibleNotLast
+    // 20: Condition - it's conditionLast
 
-    // 20: Action - it's actionNoOutput
+    // 20: Action - it's actionOutputPreviousPointAndPoint
 
     // 20: Transition
-    Transition transition20 = new Transition(conditionInvisibleNotLast, actionNoOutput,
+    Transition transition20 = new Transition(conditionLast, actionOutputPreviousPointAndPoint,
+        STATES.END);
+
+    // 20: Add to transition List for state
+    // INVISIBLE_OR_DISCONTINUATION_CONTINUED:
+    List<Transition> transitionsINVISIBLE_OR_DISCONTINUATION_CONTINUED = new LinkedList<AIteratorITracePointStateEnginge.Transition>();
+    transitionsINVISIBLE_OR_DISCONTINUATION_CONTINUED.add(transition20);
+    transitionTable[STATES.INVISIBLE_OR_DISCONTINUATION_CONTINUED.ordinal()] = transitionsINVISIBLE_OR_DISCONTINUATION_CONTINUED;
+
+    // 21: Condition - it's conditionInvisibleNotLast
+
+    // 21: Action - it's actionNoOutput
+
+    // 21: Transition
+    Transition transition21 = new Transition(conditionInvisibleNotLast, actionNoOutput,
         STATES.INVISIBLE_OR_DISCONTINUATION_CONTINUED);
 
-    // 19: Add to transition List for state
+    // 21: Add to transition List for state
     // INVISIBLE_OR_DISCONTINUATION_CONTINUED:
-    transitionsINVISIBLE_OR_DISCONTINUATION_CONTINUED.add(transition20);
+    transitionsINVISIBLE_OR_DISCONTINUATION_CONTINUED.add(transition21);
 
-    // 21: Condition - it's conditionVisibleNotLast
+    // 22: Condition - it's conditionVisibleNotLast
 
-    // 21: Action - it's actionOutputPreviousPointAndPoint  
+    // 22: Action - it's actionOutputPreviousPointAndPoint  
   
-    // 21: Transition
-    Transition transition21 = new Transition(conditionVisibleNotLast,
+    // 22: Transition
+    Transition transition22 = new Transition(conditionVisibleNotLast,
         actionOutputPreviousPointAndPoint, STATES.ACCUMULATING_VISIBLE);
 
-    // 21: Add to transition List for state START:
-    transitionsINVISIBLE_OR_DISCONTINUATION_CONTINUED.add(transition21);
+    // 22: Add to transition List for state START:
+    transitionsINVISIBLE_OR_DISCONTINUATION_CONTINUED.add(transition22);
 
     /*
      * END state has no transitions. At least leave an empty list for it at the

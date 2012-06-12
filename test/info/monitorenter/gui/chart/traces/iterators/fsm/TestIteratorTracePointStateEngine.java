@@ -237,6 +237,16 @@ public class TestIteratorTracePointStateEngine {
     // This is the arithmetic mean (x,y) of two and three!
     Assert.assertEquals(1.5, result.getX(), 0.0);
     Assert.assertEquals(1.5, result.getY(), 0.0);
+    /*
+     * Next point has to be the last point of the previous accumulation phase as it is not equal 
+     * to the previous accumulated point. Policy is: When leaving accumulation (towards invisiblity or last point) the last visible point 
+     * has to be returned bare in case it is different from the last accumulated point. 
+     */
+    Assert.assertTrue(toTest.hasNext());
+    result = toTest.next();
+    Assert.assertEquals(three, result);
+
+    // last point
     Assert.assertTrue(toTest.hasNext());
     result = toTest.next();
     Assert.assertEquals(four, result);
