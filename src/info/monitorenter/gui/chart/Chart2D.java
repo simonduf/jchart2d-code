@@ -767,7 +767,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * A switch for debugging problems with data accumulation. Set to false the
    * compiler will remove the debugging statements.
    */
-  public static final boolean DEBUG_DATA_ACCUMULATION = true;
+  public static final boolean DEBUG_DATA_ACCUMULATION = false;
 
   /**
    * A switch for debugging problems with highlighting. Set to false the
@@ -3621,26 +3621,20 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("removeTrace, 0 locks");
     }
-    synchronized (this) {
+    synchronized (this.getTreeLock()) {
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println("removeTrace, 1 lock");
+        System.out.println("removeTrace, 1 lock (on treelock)");
       }
-      synchronized (points) {
-        // remove the trace from the axes it is potentially contained in:
-        // 1) x - axes:
-        Iterator<IAxis< ? >> it = this.m_axesXBottom.iterator();
-        IAxis< ? > currentAxis;
-        boolean successRemoveX = false;
-        while (it.hasNext()) {
-          currentAxis = it.next();
-          successRemoveX = currentAxis.removeTrace(points);
-          if (successRemoveX) {
-            break;
-          }
+      synchronized (this) {
+        if (Chart2D.DEBUG_THREADING) {
+          System.out.println("removeTrace, 2 locks (on treelock and chart)");
         }
-        // was not found in bottom x axes:
-        if (!successRemoveX) {
-          it = this.m_axesXTop.iterator();
+        synchronized (points) {
+          // remove the trace from the axes it is potentially contained in:
+          // 1) x - axes:
+          Iterator<IAxis< ? >> it = this.m_axesXBottom.iterator();
+          IAxis< ? > currentAxis;
+          boolean successRemoveX = false;
           while (it.hasNext()) {
             currentAxis = it.next();
             successRemoveX = currentAxis.removeTrace(points);
@@ -3648,34 +3642,45 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
               break;
             }
           }
-        }
-        // 2) y - axes:
-        boolean successRemoveY = false;
-        it = this.m_axesYLeft.iterator();
-        while (it.hasNext()) {
-          currentAxis = it.next();
-          successRemoveY = currentAxis.removeTrace(points);
-        }
-        // was not found in left y axes:
-        if (!successRemoveY) {
-          it = this.m_axesYRight.iterator();
+          // was not found in bottom x axes:
+          if (!successRemoveX) {
+            it = this.m_axesXTop.iterator();
+            while (it.hasNext()) {
+              currentAxis = it.next();
+              successRemoveX = currentAxis.removeTrace(points);
+              if (successRemoveX) {
+                break;
+              }
+            }
+          }
+          // 2) y - axes:
+          boolean successRemoveY = false;
+          it = this.m_axesYLeft.iterator();
           while (it.hasNext()) {
             currentAxis = it.next();
             successRemoveY = currentAxis.removeTrace(points);
-            if (successRemoveY) {
-              break;
+          }
+          // was not found in left y axes:
+          if (!successRemoveY) {
+            it = this.m_axesYRight.iterator();
+            while (it.hasNext()) {
+              currentAxis = it.next();
+              successRemoveY = currentAxis.removeTrace(points);
+              if (successRemoveY) {
+                break;
+              }
             }
           }
+          boolean success = successRemoveY && successRemoveX;
+          if (success) {
+            int amountofremovedhighlighters = points.getPointHighlighters().size();
+            this.trackHighlightingEnablement(amountofremovedhighlighters);
+            this.unlistenToTrace(points);
+            this.setRequestedRepaint(true);
+          }
+          result = success;
+          return result;
         }
-        boolean success = successRemoveY && successRemoveX;
-        if (success) {
-          int amountofremovedhighlighters = points.getPointHighlighters().size();
-          this.trackHighlightingEnablement(amountofremovedhighlighters);
-          this.unlistenToTrace(points);
-          this.setRequestedRepaint(true);
-        }
-        result = success;
-        return result;
       }
     }
   }
