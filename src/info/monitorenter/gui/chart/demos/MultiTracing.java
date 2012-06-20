@@ -26,6 +26,7 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyMinimumViewport;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.views.ChartPanel;
+import info.monitorenter.gui.util.ColorIterator;
 import info.monitorenter.util.Range;
 
 import java.awt.BorderLayout;
@@ -33,6 +34,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Random;
 
 import javax.swing.JFrame;
 
@@ -83,8 +85,8 @@ public final class MultiTracing extends JFrame {
     private ITrace2D m_trace;
 
     /**
-     * Creates an instance that paints data to the trace that is added to the
-     * chart.
+     * Creates an instance that paints the given data to the trace that is added
+     * to the chart.
      * <p>
      * 
      * @param chart
@@ -109,6 +111,25 @@ public final class MultiTracing extends JFrame {
     }
 
     /**
+     * Creates an instance that paints 100 values arbitrary data within the
+     * given range to the trace that is added to the chart.
+     * <p>
+     * 
+     * @param chart
+     *          the chart to use.
+     * 
+     * @param trace
+     *          the trace to add points to.
+     * 
+     * @param sleep
+     *          the length of the sleep break between painting points in ms.
+     */
+    public AddPaintRemoveThread(final Chart2D chart, final ITrace2D trace, final long sleep) {
+      this(chart, trace, MultiTracing.getRandData(100), sleep);
+
+    }
+
+    /**
      * @see java.lang.Runnable#run()
      */
     @Override
@@ -124,7 +145,8 @@ public final class MultiTracing extends JFrame {
           this.m_innnerChart.addTrace(this.m_trace);
           for (int i = 0; i < this.m_data.length; i++) {
             if (Chart2D.DEBUG_THREADING) {
-              System.out.println("Thread "+ this.getName() + " adding point to " + this.m_trace.getName());
+              System.out.println("Thread " + this.getName() + " adding point to "
+                  + this.m_trace.getName());
             }
             this.m_trace.addPoint(i, this.m_data[i]);
             try {
@@ -254,6 +276,43 @@ public final class MultiTracing extends JFrame {
     new AddPaintRemoveThread(wnd.m_chart, trace, data[5], (long) (MultiTracing.SLEEP * 3.5))
         .start();
 
+    /*
+     * Additional 95 threads:
+     */
+    Color color;
+    ColorIterator colorIt = new ColorIterator(Color.RED, new ColorIterator.HueStepper(95));
+    for (int i = 0; i < 95; i++) {
+      trace = new Trace2DSimple();
+      color = colorIt.next();
+      trace.setColor(color);
+      new AddPaintRemoveThread(wnd.m_chart, trace,
+          (long) (MultiTracing.SLEEP * (Math.random() + 1))).start();
+      try {
+        Thread.sleep(500);
+      } catch (InterruptedException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    }
+
+  }
+
+  /**
+   * Returns amount values of random data.
+   * <p>
+   * 
+   * @param amount
+   *          amount of desired data.
+   * 
+   * @return amount values of random data.
+   */
+  static double[] getRandData(int amount) {
+    double[] data = new double[amount];
+    Random rand = new Random(System.currentTimeMillis());
+    for (int i = 0; i < amount; i++) {
+      data[i] = rand.nextDouble() * 100;
+    }
+    return data;
   }
 
   /** The chart to fill. */
