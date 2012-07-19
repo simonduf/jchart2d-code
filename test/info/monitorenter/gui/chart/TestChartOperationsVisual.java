@@ -519,9 +519,9 @@ public class TestChartOperationsVisual extends ATestChartOperations {
         title = chart.getAxisX().getAxisTitle();
         title.setTitle("W");
         title.setTitleFont(newFont);
-        
-        
       }
+      
+  
       /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
        */
@@ -536,6 +536,30 @@ public class TestChartOperationsVisual extends ATestChartOperations {
     this.setTestOperation(operation);
   }
 
+  
+  /**
+   * Gets the IAxisTitle of axis y and set a new title String. 
+   * <p>
+   */
+  @org.junit.Test
+  public void testAxisSetTitle() {
+    ATestChartOperations.AChartOperation operation = new AChartOperation("YAxis.getAxisTitle().setTitle(\"Seconds\")") {
+ 
+      /**
+       * @see info.monitorenter.gui.chart.test.ATestChartOperations.IChart2DOperation#action(info.monitorenter.gui.chart.Chart2D)
+       */
+      public Object action(final Chart2D chart) {
+
+        chart.getAxisX().getAxisTitle().setTitle("Seconds");
+        chart.getAxisY().getAxisTitle().setTitle("Temperature");
+        return null;
+      }
+    };
+    this.setTestOperation(operation);
+      
+    }
+  
+  
   /**
    * Sets a new name to the trace and prompts for visual judgment.
    * <p>
