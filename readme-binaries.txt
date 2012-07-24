@@ -63,6 +63,8 @@ jchart2d-3.3.0 - <month>, <day>, <year>
 ! Saving images with transparent background is supported now.
 ! Added IPointHighlightListener (contribution by Frans Bouwmans): You can register on the chart to get informed about highlighted points now. 
   Use this e.g. to cast the point into your subtype to extract further information about the highlighted point. 
+! Added AxisTickPainterInwards, an axis tick mark painter that paints the ticks within the chart area. Contribution by 
+  Verhaag, G.C.H.M.!  
 o Changed policy of Chart2D.translateMousePosition(final MouseEvent mouseEvent). Before this the translation was done into the values 
   covered by the first x and y axes. By now the translation is related to the axes of the trace of the nearest point to the given 
   mouse event. 
