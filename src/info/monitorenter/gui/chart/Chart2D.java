@@ -3752,7 +3752,9 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    *          The axis tick painter to set.
    */
   public synchronized void setAxisTickPainter(final IAxisTickPainter tickPainter) {
+    // FIXME: Throw change event!
     this.m_axisTickPainter = tickPainter;
+    this.setRequestedRepaint(true);
   }
 
   /**
