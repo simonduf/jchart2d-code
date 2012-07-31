@@ -43,8 +43,8 @@ import java.util.List;
  * <p>
  * 
  * @author Alessio Sambarino (Contributor)
- * @author Klaus Pesendorfer (Bugfix contributor) 
- * @author Anadi Mishra (Bugfix contributor) 
+ * @author Klaus Pesendorfer (Bugfix contributor)
+ * @author Anadi Mishra (Bugfix contributor)
  * 
  * @version $Revision: 1.19 $
  * 
@@ -92,9 +92,9 @@ public class ZoomableChart extends Chart2D implements MouseListener, MouseMotion
    */
   public void mouseClicked(final MouseEvent e) {
     /*
-     * This will be used for zoom out in case ZoomableChart was not wrapped in a 
-     * ChartPanel. Might be replaced by "Hold down Ctrl and wheel" which seems a 
-     * famous gesture since e.g. Microsoft Visio. 
+     * This will be used for zoom out in case ZoomableChart was not wrapped in a
+     * ChartPanel. Might be replaced by "Hold down Ctrl and wheel" which seems a
+     * famous gesture since e.g. Microsoft Visio.
      */
     if (e.getClickCount() == 2) {
       this.zoomAll();
@@ -161,6 +161,7 @@ public class ZoomableChart extends Chart2D implements MouseListener, MouseMotion
       this.m_zoomArea = new Rectangle2D.Double(startX, startY, dimX, dimY);
 
       this.setRequestedRepaint(true);
+      this.getParent().repaint();
     }
   }
 
@@ -223,27 +224,25 @@ public class ZoomableChart extends Chart2D implements MouseListener, MouseMotion
       if ((endPx - startPx) < 20 || (endPy - startPy) < 20) {
         this.m_zoomArea = null;
         this.setRequestedRepaint(true);
-        return;
-      }
+      } else {
 
-      List<IAxis<?>> axisList = this.getAxes();
-      for (Iterator<IAxis<?>> i = axisList.iterator(); i.hasNext();) {
-        IAxis<?> iAxis = i.next();
-        if ((Chart2D.CHART_POSITION_BOTTOM == iAxis.getAxisPosition())
-            || (Chart2D.CHART_POSITION_TOP == iAxis.getAxisPosition())) {// its
-          // x
-          // axis
-          this.zoom(iAxis, startPx, endPx);
-        }
-        if ((Chart2D.CHART_POSITION_LEFT == iAxis.getAxisPosition())
-            || (Chart2D.CHART_POSITION_RIGHT == iAxis.getAxisPosition())) {// its
-          // x
-          // axis
-          this.zoom(iAxis, startPy, endPy);
+        List<IAxis< ? >> axisList = this.getAxes();
+        for (Iterator<IAxis< ? >> i = axisList.iterator(); i.hasNext();) {
+          IAxis< ? > iAxis = i.next();
+          if ((Chart2D.CHART_POSITION_BOTTOM == iAxis.getAxisPosition())
+              || (Chart2D.CHART_POSITION_TOP == iAxis.getAxisPosition())) {// its
+            // x
+            // axis
+            this.zoom(iAxis, startPx, endPx);
+          }
+          if ((Chart2D.CHART_POSITION_LEFT == iAxis.getAxisPosition())
+              || (Chart2D.CHART_POSITION_RIGHT == iAxis.getAxisPosition())) {// its
+            // x
+            // axis
+            this.zoom(iAxis, startPy, endPy);
+          }
         }
       }
-
-      // this.zoom(xAxisMin, xAxisMax, yAxisMin, yAxisMax);
     }
   }
 
@@ -262,6 +261,13 @@ public class ZoomableChart extends Chart2D implements MouseListener, MouseMotion
       g2.setPaint(new Color(255, 255, 0, 100));
       g2.fill(this.m_zoomArea);
     }
+    /*
+     * https://sourceforge.net/projects/jchart2d/forums/forum/166411/topic/5468937
+     * 
+     * If some other component with higher z-index is overlapping the chart trigger it's 
+     * repaint too!
+     */
+    this.getParent().repaint();
   }
 
   /**
@@ -278,7 +284,7 @@ public class ZoomableChart extends Chart2D implements MouseListener, MouseMotion
 
     this.m_zoomArea = null;
 
-    IAxis<?> axis = this.getAxisX();
+    IAxis< ? > axis = this.getAxisX();
     IRangePolicy zoomPolicy = new RangePolicyFixedViewport(new Range(xmin, xmax));
     axis.setRangePolicy(zoomPolicy);
   }
@@ -301,7 +307,7 @@ public class ZoomableChart extends Chart2D implements MouseListener, MouseMotion
    *          the end coordinate in the dimension of the given axis in pixel
    *          coords.
    */
-  public void zoom(IAxis<?> axis, final double startP, final double endP) {
+  public void zoom(IAxis< ? > axis, final double startP, final double endP) {
 
     this.m_zoomArea = null;
 
@@ -332,11 +338,11 @@ public class ZoomableChart extends Chart2D implements MouseListener, MouseMotion
 
     this.m_zoomArea = null;
 
-    IAxis<?> axisX = this.getAxisX();
+    IAxis< ? > axisX = this.getAxisX();
     IRangePolicy zoomPolicyX = new RangePolicyFixedViewport(new Range(xmin, xmax));
     axisX.setRangePolicy(zoomPolicyX);
 
-    IAxis<?> axisY = this.getAxisY();
+    IAxis< ? > axisY = this.getAxisY();
     IRangePolicy zoomPolicyY = new RangePolicyFixedViewport(new Range(ymin, ymax));
     axisY.setRangePolicy(zoomPolicyY);
   }
@@ -346,9 +352,9 @@ public class ZoomableChart extends Chart2D implements MouseListener, MouseMotion
    * <p>
    */
   public void zoomAll() {
-    List<IAxis<?>> axisList = this.getAxes();
-    for (Iterator<IAxis<?>> i = axisList.iterator(); i.hasNext();) {
-      IAxis<?> iAxis =  i.next();
+    List<IAxis< ? >> axisList = this.getAxes();
+    for (Iterator<IAxis< ? >> i = axisList.iterator(); i.hasNext();) {
+      IAxis< ? > iAxis = i.next();
       iAxis.setRangePolicy(this.m_zoomAllRangePolicy);
     }
   }
