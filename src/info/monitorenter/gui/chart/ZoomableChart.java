@@ -161,7 +161,6 @@ public class ZoomableChart extends Chart2D implements MouseListener, MouseMotion
       this.m_zoomArea = new Rectangle2D.Double(startX, startY, dimX, dimY);
 
       this.setRequestedRepaint(true);
-      this.getParent().repaint();
     }
   }
 
@@ -261,13 +260,6 @@ public class ZoomableChart extends Chart2D implements MouseListener, MouseMotion
       g2.setPaint(new Color(255, 255, 0, 100));
       g2.fill(this.m_zoomArea);
     }
-    /*
-     * https://sourceforge.net/projects/jchart2d/forums/forum/166411/topic/5468937
-     * 
-     * If some other component with higher z-index is overlapping the chart trigger it's 
-     * repaint too!
-     */
-    this.getParent().repaint();
   }
 
   /**
