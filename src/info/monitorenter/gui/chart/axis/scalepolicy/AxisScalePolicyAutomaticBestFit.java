@@ -41,10 +41,15 @@ import java.util.List;
  * Very basic and fast scale policy implementation that ensures the following:
  * <ul>
  * <li>Every scale tick is a minor or major tick of the corresponding axis.</li>
- * <li>If a scale tick was found that matches a major and a minor tick it is judged as major tick.</li>
- * <li>Every major tick is a multiple of minor ticks: It is not possible for the sum minor ticks to "skip" a major tick.</li>
- * <li>There is no guarantee that the labels of ticks will overwrite each others.</li>
- * <li>There is no guarantee that the major and minor ticks of the axis are chosen in a reasonable manner: You could get no labels at all if the values are too high or thousands of labels with a weird output.</li>
+ * <li>If a scale tick was found that matches a major and a minor tick it is
+ * judged as major tick.</li>
+ * <li>Every major tick is a multiple of minor ticks: It is not possible for the
+ * sum minor ticks to "skip" a major tick.</li>
+ * <li>There is no guarantee that the labels of ticks will overwrite each
+ * others.</li>
+ * <li>There is no guarantee that the major and minor ticks of the axis are
+ * chosen in a reasonable manner: You could get no labels at all if the values
+ * are too high or thousands of labels with a weird output.</li>
  * </ul>
  * <p>
  * 
@@ -60,17 +65,30 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
    */
   protected double m_power;
 
-  public List<LabeledValue> getScaleValues(final Graphics2D g2d, final IAxis<?> axis) {
+  public List<LabeledValue> getScaleValues(final Graphics2D g2d, final IAxis< ? > axis) {
     final double labelspacepx = axis.getAccessor().getMinimumValueDistanceForLabels(g2d);
     final double formattingspace = axis.getFormatter().getMinimumValueShiftForChange();
+   // final double max = this.normalize(Math.max(labelspacepx, formattingspace));
     final double max = Math.max(labelspacepx, formattingspace);
     return this.getLabels(max, axis);
+  }
+
+  private double normalize(final double value) {
+    double norm = Math.pow(10, Math.ceil(Math.log10(value)));
+    if ((norm / 8.0) >= value) {
+      norm /= 8.0;
+    } else if ((norm / 4.0) >= value) {
+      norm /= 4.0;
+    } else if ((norm / 2.0) >= value) {
+      norm /= 2.0;
+    }
+    return norm;
   }
 
   /**
    * @see info.monitorenter.gui.chart.IAxisScalePolicy#initPaintIteration(info.monitorenter.gui.chart.IAxis)
    */
-  public void initPaintIteration(IAxis<?> axis) {
+  public void initPaintIteration(IAxis< ? > axis) {
     // get the powers of ten of the range, a minor Tick of 1.0 has to be
     // able to be 100 times in a range of 100 (match 1,2,3,... instead of
     // 10,20,30,....
@@ -112,7 +130,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
    * 
    * @return the labels for the axis.
    */
-  protected List<LabeledValue> getLabels(final double resolution, final IAxis<?> axis) {
+  protected List<LabeledValue> getLabels(final double resolution, final IAxis< ? > axis) {
     final List<LabeledValue> collect = new LinkedList<LabeledValue>();
     if (resolution > 0) {
 
@@ -196,7 +214,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
    * @return the value rounded to minor or major ticks.
    */
   protected LabeledValue roundToTicks(final double value, final boolean floor,
-      final boolean findMajorTick, final IAxis<?> axis) {
+      final boolean findMajorTick, final IAxis< ? > axis) {
     final LabeledValue ret = new LabeledValue();
 
     final double minorTick = axis.getMinorTickSpacing() * this.m_power;
@@ -247,6 +265,6 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
     // point the label string describes.
     ret.setValue(axis.getFormatter().parse(ret.getLabel()).doubleValue());
     return ret;
-  } 
+  }
 
 }
