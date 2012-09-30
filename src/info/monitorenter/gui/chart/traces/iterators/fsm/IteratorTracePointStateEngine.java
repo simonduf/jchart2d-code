@@ -439,10 +439,10 @@ public class IteratorTracePointStateEngine extends AIteratorITracePointStateEngi
       }
     };
 
-    // 3: Action - it's actionOutputPoint
+    // 3: Action - it's actionNoOutput
 
     // 3: Transition
-    Transition transition3 = new Transition(conditionInvisibleNotLast, actionOutputPoint,
+    Transition transition3 = new Transition(conditionInvisibleNotLast, actionNoOutput,
         STATES.BEFORE_FIRST_VISIBLE);
 
     // 3: Add to transition List for state START:
@@ -482,10 +482,10 @@ public class IteratorTracePointStateEngine extends AIteratorITracePointStateEngi
         return result;
       }
     };
-    // 5: Action - it's actionNoOutput
+    // 5: Action - it's actionOutputPoint
 
     // 5: Transition
-    Transition transition5 = new Transition(conditionLast, actionNoOutput, STATES.END);
+    Transition transition5 = new Transition(conditionLast, actionOutputPoint, STATES.END);
 
     // 5: Add to transition List for state BEFORE_FIRST_VISIBLE:
     List<Transition> transitionsBEFORE_FIRST_VISIBLE = new LinkedList<AIteratorITracePointStateEnginge.Transition>();
