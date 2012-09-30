@@ -1,0 +1,37 @@
+STATE		EVENT		OUTPUT			FOLLOW-STATE		COMMENT
+start		x-y-		-				x-y-
+start		x-y0		-				x-y0
+start		x-y+		-				x-y+
+start		x0y-		-				x0y-
+start		x0y0		p				x0y0			accumulation start
+start		x0y+		-				x0y+
+start		x+y+		-				x+y+
+start		nan			-				nan
+x-y-		x-y-		-				x-y-
+x-y-		x-y0		-				x-y0
+x-y-		x-y+		-				x-y+
+x-y-		x0y-		-				x0y-
+x-y-		x0y0		pp,p			x0y0			interpolation to visibility
+x-y-		x0y+		pp,p			x0y+			intersection possible
+x-y-		x+y-		-				x+y-
+x-y-		x+y0		pp,p			x+y0			intersection possible 
+x-y-		x+y+		pp,p			x+y+			intersection possible 
+x-y-		nan			-				nan
+x-y0		x-y-		-				x-y-
+x-y0		x-y0		-				x-y0
+x-y0		x-y+		-				x-y+ 
+x-y0		x0y-		pp,p			x0y-			intersection possible 
+x-y0		x0y0		pp,p			x0y0			interpolation to visibility
+x-y0		x0y+		pp,p			x-y0			intersection possible 
+x-y0		x+y-		pp,p			x+y-			intersection possible 
+x-y0		x+y0		pp,p			x+y0			intersection
+x-y0		x+y+		pp,p			x+y+			intersection possible 
+x-y0		nan			-				nan
+x-y+		x-y-		-				x-y- 
+x-y+		x-y0		-				x-y0
+x-y+		x-y+		-				x-y+
+x-y+		x0y-		pp,p			x0y-			intersection possible 
+x-y+		x0y0		pp,p			x0y0			interpolation to visiblity 
+x-y+		x0y+		-				x0y+ 
+x-y+		x+y-		pp,p			x+y-			intersection possible
+		
