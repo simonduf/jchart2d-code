@@ -28,6 +28,7 @@ import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.ITracePoint2D;
+import info.monitorenter.gui.chart.ITracePointProvider;
 
 import java.awt.Color;
 import java.awt.Stroke;
@@ -91,8 +92,7 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
    * @see info.monitorenter.gui.chart.ITrace2D#addPoint(double, double)
    */
   public boolean addPoint(final double x, final double y) {
-    final ITracePoint2D p = this.getRenderer().getTracePointProvider().createTracePoint(x, y, this);
-    return this.addPoint(p);
+    return this.m_delegate.addPoint(x,y);
   }
 
   /**
@@ -138,6 +138,13 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
    */
   public boolean containsTracePainter(final ITracePainter< ? > painter) {
     return this.m_delegate.containsTracePainter(painter);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#descendingIterator()
+   */
+  public Iterator<ITracePoint2D> descendingIterator() {
+    return this.m_delegate.descendingIterator();
   }
 
   /**
@@ -294,6 +301,13 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getTracePointProvider()
+   */
+  public ITracePointProvider getTracePointProvider() {
+    return this.m_delegate.getTracePointProvider();
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#getZIndex()
    */
   public Integer getZIndex() {
@@ -319,13 +333,6 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
    */
   public Iterator<ITracePoint2D> iterator() {
     return this.m_delegate.iterator();
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.ITrace2D#descendingIterator()
-   */
-  public Iterator<ITracePoint2D> descendingIterator() {
-    return this.m_delegate.descendingIterator();
   }
 
   /**
@@ -448,6 +455,13 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
    */
   public Set<ITracePainter< ? >> setTracePainter(final ITracePainter< ? > painter) {
     return this.m_delegate.setTracePainter(painter);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#setTracePointProvider(info.monitorenter.gui.chart.ITracePointProvider)
+   */
+  public void setTracePointProvider(ITracePointProvider tracePointProvider) {
+    this.m_delegate.setTracePointProvider(tracePointProvider);
   }
 
   /**

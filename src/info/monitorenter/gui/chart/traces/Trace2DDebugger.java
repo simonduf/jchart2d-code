@@ -28,6 +28,7 @@ import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.ITracePoint2D;
+import info.monitorenter.gui.chart.ITracePointProvider;
 import info.monitorenter.util.Range;
 
 import java.awt.Color;
@@ -117,8 +118,7 @@ public class Trace2DDebugger implements ITrace2D {
    * @see ITrace2D#addPoint(double, double)
    */
   public boolean addPoint(final double x, final double y) {
-    final ITracePoint2D p = this.getRenderer().getTracePointProvider().createTracePoint(x, y, this);
-    return this.addPoint(p);
+    return this.m_delegate.addPoint(x, y);
   }
 
   /**
@@ -128,14 +128,19 @@ public class Trace2DDebugger implements ITrace2D {
     final double x = p.getX();
     final double y = p.getY();
     if (!this.m_xRange.isContained(x)) {
-      throw new IllegalArgumentException(p.toString() + " is not within the valid x-range " + this.m_xRange.toString());
+      throw new IllegalArgumentException(p.toString() + " is not within the valid x-range "
+          + this.m_xRange.toString());
     }
     if (!this.m_yRange.isContained(y)) {
-      throw new IllegalArgumentException(p.toString() + " is not within the valid x-range " + this.m_xRange.toString());
+      throw new IllegalArgumentException(p.toString() + " is not within the valid x-range "
+          + this.m_xRange.toString());
     }
     return this.m_delegate.addPoint(p);
   }
 
+  /**
+   * @see ITrace2D#addPointHighlighter(IPointPainter)
+   */
   public boolean addPointHighlighter(final IPointPainter< ? > highlighter) {
     return this.m_delegate.addPointHighlighter(highlighter);
   }
@@ -143,7 +148,8 @@ public class Trace2DDebugger implements ITrace2D {
   /**
    * @see ITrace2D#addPropertyChangeListener(String, PropertyChangeListener)
    */
-  public void addPropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
+  public void addPropertyChangeListener(final String propertyName,
+      final PropertyChangeListener listener) {
     this.m_delegate.addPropertyChangeListener(propertyName, listener);
   }
 
@@ -155,11 +161,6 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @param debug
-   *          The ITrace to debug.
-   */
-
-  /**
    * @param o
    *          the trace to compare to.
    * @return see interface.
@@ -169,9 +170,6 @@ public class Trace2DDebugger implements ITrace2D {
     return this.m_delegate.compareTo(o);
   }
 
-  // /////////////////////////////////
-  // Proxy methods
-
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#containsTracePainter(info.monitorenter.gui.chart.ITracePainter)
    */
@@ -180,9 +178,26 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(ITracePoint2D, int, double, double)
+   * @param debug
+   *          The ITrace to debug.
    */
-  public void firePointChanged(final ITracePoint2D changed, final int state, final double oldX, final double oldY) {
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#descendingIterator()
+   */
+  public Iterator<ITracePoint2D> descendingIterator() {
+    return this.m_delegate.descendingIterator();
+  }
+
+  // /////////////////////////////////
+  // Proxy methods
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(ITracePoint2D,
+   *      int, double, double)
+   */
+  public void firePointChanged(final ITracePoint2D changed, final int state, final double oldX,
+      final double oldY) {
     this.m_delegate.firePointChanged(changed, state, oldX, oldY);
   }
 
@@ -333,6 +348,13 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getTracePointProvider()
+   */
+  public ITracePointProvider getTracePointProvider() {
+    return this.m_delegate.getTracePointProvider();
+  }
+
+  /**
    * Returns the range of valid points of the x axis.
    * <p>
    * 
@@ -378,13 +400,6 @@ public class Trace2DDebugger implements ITrace2D {
    */
   public Iterator<ITracePoint2D> iterator() {
     return this.m_delegate.iterator();
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.ITrace2D#descendingIterator()
-   */
-  public Iterator<ITracePoint2D> descendingIterator() {
-    return this.m_delegate.descendingIterator();
   }
 
   /**
@@ -444,7 +459,8 @@ public class Trace2DDebugger implements ITrace2D {
    * @see info.monitorenter.gui.chart.ITrace2D#removePropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
-  public void removePropertyChangeListener(final String property, final PropertyChangeListener listener) {
+  public void removePropertyChangeListener(final String property,
+      final PropertyChangeListener listener) {
     this.m_delegate.removePropertyChangeListener(property, listener);
   }
 
@@ -507,6 +523,13 @@ public class Trace2DDebugger implements ITrace2D {
    */
   public final Set<ITracePainter< ? >> setTracePainter(final ITracePainter< ? > painter) {
     return this.m_delegate.setTracePainter(painter);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#setTracePointProvider(info.monitorenter.gui.chart.ITracePointProvider)
+   */
+  public void setTracePointProvider(ITracePointProvider tracePointProvider) {
+    this.m_delegate.setTracePointProvider(tracePointProvider);
   }
 
   /**

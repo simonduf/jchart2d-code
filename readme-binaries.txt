@@ -65,6 +65,8 @@ jchart2d-3.3.0 - <month>, <day>, <year>
   Use this e.g. to cast the point into your subtype to extract further information about the highlighted point. 
 ! Added AxisTickPainterInwards, an axis tick mark painter that paints the ticks within the chart area. Contribution by 
   Gerard Verhaag!  
+! Property of type ITracePointProvider is now assigned at trace level (vs. for all traces of a chart) which enables you 
+  to define them differently for each trace in a chart.
 o Changed policy of Chart2D.translateMousePosition(final MouseEvent mouseEvent). Before this the translation was done into the values 
   covered by the first x and y axes. By now the translation is related to the axes of the trace of the nearest point to the given 
   mouse event. 
@@ -77,8 +79,8 @@ o ITrace2D.PROPERTY_POINT_CHANGED has been renamed to ITrace2D.PROPERTY_TRACEPOI
 o ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED has been renamed to ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS.
 o Changed ITrace2D.firePointChanged(ITracePoint2D, int) to ITrace2D.firePointChanged(ITracePoint2D, int, double double) 
   to let it know if an extremum was changed which saves a lot of performance especially on large traces.  
-
-
+o Chart2D.setTracePointProvider(ITracePointProvider) has been removed. Use ITrace2D.setTracePointProvider(ITracePointProvider) instead. 
+o Chart2D.getTracePointProvider() has been removed. Use ITrace2D.getTracePointProvider() instead. 
 
 jchart2d-3.2.2 - September, 24th, 2011
   

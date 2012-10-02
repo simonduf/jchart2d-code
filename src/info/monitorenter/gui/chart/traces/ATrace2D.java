@@ -31,6 +31,7 @@ import info.monitorenter.gui.chart.ITrace2DDataAccumulating;
 import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.ITracePointProvider;
+import info.monitorenter.gui.chart.TracePointProviderDefault;
 import info.monitorenter.gui.chart.traces.accumulationfunctions.AccumulationFunctionBypass;
 import info.monitorenter.gui.chart.traces.accumulationstrategies.AAccumulationStrategy;
 import info.monitorenter.gui.chart.traces.accumulationstrategies.AccumulationStrategyByPass;
@@ -90,7 +91,6 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   public static int getInstanceCount() {
     return ATrace2D.instanceCount;
   }
-
   /**
    * The accumulation strategy to be used.
    * <p>
@@ -99,17 +99,17 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * <p>
    */
   private IAccumulationStrategy m_accumulationStrategy;
-
+ 
   /**
    * {@link javax.swing.event.ChangeListener} instances (mainly
    * <code>Char2D</code> instances that are interested in changes of internal
    * <code>ITracePoint2D</code> instances.
    */
   private final List<ChangeListener> m_changeListeners = new LinkedList<ChangeListener>();
-
+ 
   /** The color property. */
   private Color m_color = Color.black;
-
+  
   /** The list of traces that compute their values from this trace. */
   protected List<ITrace2D> m_computingTraces = new LinkedList<ITrace2D>();
 
@@ -205,6 +205,9 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   /** The internal set of trace painters to use. */
   private Set<ITracePainter< ? >> m_tracePainters;
 
+  /** Used to create trace point instances. */
+  private ITracePointProvider m_tracePointProvider;
+
   /**
    * The visible property.
    */
@@ -227,6 +230,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
     this.m_pointHighlighters = new LinkedHashSet<IPointPainter< ? >>();
     this.m_stroke = new BasicStroke(1f);
     this.setAccumulationStrategy(new AccumulationStrategyByPass(new AccumulationFunctionBypass()));
+    this.setTracePointProvider(new TracePointProviderDefault());
   }
 
   /**
@@ -274,7 +278,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
     ITracePoint2D p = null;
     final Chart2D chart = this.getRenderer();
     if (chart != null) {
-      final ITracePointProvider pointProvider = chart.getTracePointProvider();
+      final ITracePointProvider pointProvider = this.getTracePointProvider();
       if (pointProvider != null) {
         p = pointProvider.createTracePoint(x, y, this);
       }
@@ -1232,6 +1236,13 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#getTracePointProvider()
+   */
+  public final ITracePointProvider getTracePointProvider() {
+    return this.m_tracePointProvider;
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#getZIndex()
    */
   public final Integer getZIndex() {
@@ -1268,6 +1279,13 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    */
   public final boolean isVisible() {
     return this.m_visible;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2DDataAccumulating#iterator(int)
+   */
+  public final Iterator<ITracePoint2D> iterator(int amountOfDesiredPoints) {
+    return this.m_accumulationStrategy.iterator(this, amountOfDesiredPoints);
   }
 
   /**
@@ -1886,6 +1904,16 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   }
 
   /**
+   * FIXME: Throw change event!
+   * 
+   * @see info.monitorenter.gui.chart.ITrace2D#setTracePointProvider(info.monitorenter.gui.chart.ITracePointProvider)
+   */
+  public void setTracePointProvider(final ITracePointProvider tracePointProvider) {
+    assert (tracePointProvider != null);
+    this.m_tracePointProvider = tracePointProvider;
+  }
+
+  /**
    * <p>
    * Set the visible property of this instance.
    * </p>
@@ -2036,12 +2064,5 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   private void writeObject(final ObjectOutputStream stream) throws IOException {
     stream.defaultWriteObject();
     SerializationUtility.writeStroke(this.m_stroke, stream);
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.ITrace2DDataAccumulating#iterator(int)
-   */
-  public final Iterator<ITracePoint2D> iterator(int amountOfDesiredPoints) {
-    return this.m_accumulationStrategy.iterator(this, amountOfDesiredPoints);
   }
 }
