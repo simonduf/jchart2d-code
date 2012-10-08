@@ -60,6 +60,38 @@ public class TracePainterConfigurable<T extends IPointPainter<T>> extends ATrace
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(double)
+   */
+  @Override
+  public double calculateMaxX(double x) {
+
+    return this.m_pointPainter.calculateMaxX(x);
+  }
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(double)
+   */
+  @Override
+  public double calculateMaxY(double y) {
+    return this.m_pointPainter.calculateMaxY(y);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(double)
+   */
+  @Override
+  public double calculateMinX(double x) {
+    return this.m_pointPainter.calculateMinX(x);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(double)
+   */
+  @Override
+  public double calculateMinY(double y) {
+    return this.m_pointPainter.calculateMinY(y);
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics)
    */
   @Override

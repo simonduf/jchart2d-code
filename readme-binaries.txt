@@ -53,6 +53,10 @@ jchart2d-3.3.0 - <month>, <day>, <year>
 * Fixed bug #3529738: Weird line is drawn when having no scale and title.
 * Fixed unreported bug: Potential deadlock when removing trace because treelock was not acquired before lock of chart 
   (and paint() first acquires treelock then demands chart lock). 
+* Bound changes for added/removed/changed points are now computed taking into account the space the actually need 
+  to be painted (not only their raw coordinates). This is a heavy change that will remove bugs related to clipped 
+  renderings in case error bars / additional point painters / trace painters actually require more space than the 
+  mere coordinate bounds. This also allows to implement the feature #3571940: Real time candle stick chart.   
 ! Improved performance of ITracePoint.setLocation(double, double): This was O(n) where n was amount of points in a trace in any 
   case except boundary increase. Now it is only O(n) if an extremum was diminished via that method.   
 ! Introduced data accumulation API. This allows you to have traces with 10^6 points painted with increased speed while zooming in 

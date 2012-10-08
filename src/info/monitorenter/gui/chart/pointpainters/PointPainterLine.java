@@ -48,6 +48,38 @@ public class PointPainterLine extends APointPainter<PointPainterLine> {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(double)
+   */
+  @Override
+  public double calculateMaxX(double x) {
+    return x;
+  }
+  
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(double)
+   */
+  @Override
+  public double calculateMaxY(double y) {
+    return y;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(double)
+   */
+  @Override
+  public double calculateMinX(double x) {
+    return x;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(double)
+   */
+  @Override
+  public double calculateMinY(double y) {
+    return y;
+  }
+
+  /**
    * Paints a line from current to next point.
    * <p>
    * 
@@ -58,5 +90,6 @@ public class PointPainterLine extends APointPainter<PointPainterLine> {
       final int nextY, final Graphics g, final ITracePoint2D point) {
     g.drawLine(absoluteX, absoluteY, nextX, nextY);
   }
+
 
 }

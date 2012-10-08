@@ -60,6 +60,38 @@ public class TracePainterPolyline extends ATracePainter {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(double)
+   */
+  @Override
+  public double calculateMaxX(double x) {
+    return x;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(double)
+   */
+  @Override
+  public double calculateMaxY(double y) {
+    return y;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(double)
+   */
+  @Override
+  public double calculateMinX(double x) {
+    return x;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(double)
+   */
+  @Override
+  public double calculateMinY(double y) {
+    return y;
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics)
    */
   @Override
@@ -81,9 +113,18 @@ public class TracePainterPolyline extends ATracePainter {
         count++;
       }
       y[count] = this.getPreviousY();
-
-      g2d.drawPolyline(x, y, x.length);
+      this.doDrawOperation(g2d,x,y,x.length);
     }
+  }
+
+  /**
+   * Internally invokes the draw operation (to allow subclassing with a different one).
+   * <p>
+   * This implementation uses {@link Graphics#drawPolyline(int[], int[], int)}.
+   * <p>
+   */
+  protected void doDrawOperation(final Graphics g2d, int[] x, int[] y, int length) {
+    g2d.drawPolyline(x, y, x.length);
   }
 
   /**
@@ -161,5 +202,7 @@ public class TracePainterPolyline extends ATracePainter {
       this.m_yPoints.clear();
     }
   }
+  
+  
 
 }

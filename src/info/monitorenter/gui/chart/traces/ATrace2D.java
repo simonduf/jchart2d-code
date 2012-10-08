@@ -38,7 +38,6 @@ import info.monitorenter.gui.chart.traces.accumulationstrategies.AccumulationStr
 import info.monitorenter.gui.chart.traces.painters.TracePainterPolyline;
 import info.monitorenter.util.SerializationUtility;
 import info.monitorenter.util.StringUtil;
-import info.monitorenter.util.math.MathUtil;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -91,25 +90,26 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   public static int getInstanceCount() {
     return ATrace2D.instanceCount;
   }
+
   /**
    * The accumulation strategy to be used.
    * <p>
-   * By default it is {@link AccumulationStrategyByPass}: No
-   * accumulation takes place, no overhead is spent on this.
+   * By default it is {@link AccumulationStrategyByPass}: No accumulation takes
+   * place, no overhead is spent on this.
    * <p>
    */
   private IAccumulationStrategy m_accumulationStrategy;
- 
+
   /**
    * {@link javax.swing.event.ChangeListener} instances (mainly
    * <code>Char2D</code> instances that are interested in changes of internal
    * <code>ITracePoint2D</code> instances.
    */
   private final List<ChangeListener> m_changeListeners = new LinkedList<ChangeListener>();
- 
+
   /** The color property. */
   private Color m_color = Color.black;
-  
+
   /** The list of traces that compute their values from this trace. */
   protected List<ITrace2D> m_computingTraces = new LinkedList<ITrace2D>();
 
@@ -261,7 +261,13 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
         if (result) {
           errorBarPolicy.setTrace(this);
           errorBarPolicy.addPropertyChangeListener(IErrorBarPolicy.PROPERTY_CONFIGURATION, this);
-          this.expandErrorBarBounds();
+          /*
+           * TODO: Performance gain could be achieved by caching the extremum
+           * points and just update the bounds of those with the
+           * calculatePointBounds(ITrace2D) method instead of iterating every
+           * point. Do this in case profiling shows that this is worthwhile.
+           */
+          this.boundSearch();
           this.firePropertyChange(ITrace2D.PROPERTY_ERRORBARPOLICY, null, errorBarPolicy);
         }
       }
@@ -319,7 +325,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
     synchronized (this.m_renderer) {
       if (Chart2D.DEBUG_THREADING) {
         if (!(this.m_renderer instanceof Chart2D)) {
-          throw new RuntimeException("Call chart.setTrace(trace) first before adding points or you might run into deadlocks!");
+          throw new RuntimeException(
+              "Call chart.setTrace(trace) first before adding points or you might run into deadlocks!");
         }
         System.out.println(Thread.currentThread().getName() + ", ATrace2D.addPoint, 1 lock");
       }
@@ -329,9 +336,6 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
         }
         accepted = this.addPointInternal(p);
         if (accepted) {
-          // fires property changes for max/min x/y:
-          this.expandErrorBarBounds();
-          // min max bounds exceeded?
           this.firePointAdded(p);
           p.setListener(this);
           // inform computing traces:
@@ -365,12 +369,14 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
 
       }
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println(Thread.currentThread().getName() + ", ATrace2D.addPoint, freed 1 lock,  1 lock remaining.");
+        System.out.println(Thread.currentThread().getName()
+            + ", ATrace2D.addPoint, freed 1 lock,  1 lock remaining.");
       }
 
     }
     if (Chart2D.DEBUG_THREADING) {
-      System.out.println(Thread.currentThread().getName() + ", ATrace2D.addPoint, freed 1 lock,  0 locks remaining.");
+      System.out.println(Thread.currentThread().getName()
+          + ", ATrace2D.addPoint, freed 1 lock,  0 locks remaining.");
     }
     return accepted;
   }
@@ -385,7 +391,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
       synchronized (this) {
         result = this.m_pointHighlighters.add(highlighter);
         if (result) {
-          this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, null, highlighter);
+          this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, null,
+              highlighter);
         }
       }
     }
@@ -422,7 +429,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * @see info.monitorenter.gui.chart.ITrace2D#addPropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
-  public final void addPropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
+  public final void addPropertyChangeListener(final String propertyName,
+      final PropertyChangeListener listener) {
     this.m_propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
   }
 
@@ -483,70 +491,82 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           + ") to a chart first before this operation (undebuggable deadlocks might occur else)");
     } else {
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println(this.getClass() + "(" + Thread.currentThread().getName() + ") this.m_renderer: " + this.m_renderer);
+        System.out.println(this.getClass() + "(" + Thread.currentThread().getName()
+            + ") this.m_renderer: " + this.m_renderer);
       }
     }
   }
 
   /**
    * Internally expands all bounds according to potential error bars.
+   * 
+   * @deprecated put that into
+   *             {@link #firePointChanged(ITracePoint2D, int, double, double)}.
    */
-  private void expandErrorBarBounds() {
-    final boolean requiresErrorBarCalculation = !this.isEmpty();
-    if (requiresErrorBarCalculation) {
-      boolean change;
-      this.ensureInitialized();
-      synchronized (this.m_renderer) {
-        synchronized (this) {
-          if (this.showsPositiveXErrorBars()) {
-            change = this.expandMaxXErrorBarBounds();
-            if (change) {
-              this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, this, new Double(this.getMaxX()));
-            }
-          } else {
-            if (this.m_maxXErrorBar != -Double.MAX_VALUE) {
-              this.m_maxXErrorBar = -Double.MAX_VALUE;
-              this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, this, new Double(this.getMaxX()));
-            }
-          }
-          if (this.showsPositiveYErrorBars()) {
-            change = this.expandMaxYErrorBarBounds();
-            if (change) {
-              this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, this, new Double(this.getMaxY()));
-            }
-          } else {
-            if (this.m_maxYErrorBar != -Double.MAX_VALUE) {
-              this.m_maxYErrorBar = -Double.MAX_VALUE;
-              this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, this, new Double(this.getMaxY()));
-            }
-          }
-          if (this.showsNegativeXErrorBars()) {
-            change = this.expandMinXErrorBarBounds();
-            if (change) {
-              this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, this, new Double(this.getMinX()));
-            }
-          } else {
-            if (this.m_minXErrorBar != Double.MAX_VALUE) {
-              this.m_minXErrorBar = Double.MAX_VALUE;
-              this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, this, new Double(this.getMinX()));
-            }
-          }
-          if (this.showsNegativeYErrorBars()) {
-            change = this.expandMinYErrorBarBounds();
-            if (change) {
-              this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, this, new Double(this.getMinY()));
-            }
-          } else {
-            if (this.m_minYErrorBar != Double.MAX_VALUE) {
-              this.m_minYErrorBar = Double.MAX_VALUE;
-              this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, this, new Double(this.getMinY()));
-            }
-          }
-        }
-      }
-    }
-  }
-
+  @Deprecated
+  // private void expandErrorBarBounds() {
+  // final boolean requiresErrorBarCalculation = !this.isEmpty();
+  // if (requiresErrorBarCalculation) {
+  // boolean change;
+  // this.ensureInitialized();
+  // synchronized (this.m_renderer) {
+  // synchronized (this) {
+  // if (this.showsPositiveXErrorBars()) {
+  // change = this.expandMaxXErrorBarBounds();
+  // if (change) {
+  // this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, this, new
+  // Double(this.getMaxX()));
+  // }
+  // } else {
+  // if (this.m_maxXErrorBar != -Double.MAX_VALUE) {
+  // this.m_maxXErrorBar = -Double.MAX_VALUE;
+  // this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, this, new
+  // Double(this.getMaxX()));
+  // }
+  // }
+  // if (this.showsPositiveYErrorBars()) {
+  // change = this.expandMaxYErrorBarBounds();
+  // if (change) {
+  // this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, this, new
+  // Double(this.getMaxY()));
+  // }
+  // } else {
+  // if (this.m_maxYErrorBar != -Double.MAX_VALUE) {
+  // this.m_maxYErrorBar = -Double.MAX_VALUE;
+  // this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, this, new
+  // Double(this.getMaxY()));
+  // }
+  // }
+  // if (this.showsNegativeXErrorBars()) {
+  // change = this.expandMinXErrorBarBounds();
+  // if (change) {
+  // this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, this, new
+  // Double(this.getMinX()));
+  // }
+  // } else {
+  // if (this.m_minXErrorBar != Double.MAX_VALUE) {
+  // this.m_minXErrorBar = Double.MAX_VALUE;
+  // this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, this, new
+  // Double(this.getMinX()));
+  // }
+  // }
+  // if (this.showsNegativeYErrorBars()) {
+  // change = this.expandMinYErrorBarBounds();
+  // if (change) {
+  // this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, this, new
+  // Double(this.getMinY()));
+  // }
+  // } else {
+  // if (this.m_minYErrorBar != Double.MAX_VALUE) {
+  // this.m_minYErrorBar = Double.MAX_VALUE;
+  // this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, this, new
+  // Double(this.getMinY()));
+  // }
+  // }
+  // }
+  // }
+  // }
+  // }
   /**
    * Internally takes into account that in case of error bars to render the
    * maximum x value will be different.
@@ -556,128 +576,119 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * 
    * @return true if a change to <code>{@link #getMaxX()}</code> was done.
    */
-  private boolean expandMaxXErrorBarBounds() {
-    final Chart2D chart = this.getRenderer();
-    boolean change = false;
-    double errorBarMaxXCollect = -Double.MAX_VALUE;
-    if (chart != null) {
-      double errorBarMaxX = -Double.MAX_VALUE;
-      for (final IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
-        if (errorBarPolicy.isShowPositiveXErrors()) {
-          // was it turned on?
-          errorBarMaxX = errorBarPolicy.getXError(this.m_maxX);
-          if (errorBarMaxX > errorBarMaxXCollect) {
-            errorBarMaxXCollect = errorBarMaxX;
-          }
-        }
-      }
-    }
-    final double absoluteMax = errorBarMaxXCollect + this.m_maxX;
-    if (!MathUtil.assertEqual(this.m_maxXErrorBar, absoluteMax, 0.00000001)) {
-      this.m_maxXErrorBar = absoluteMax;
-      change = true;
-    }
-    return change;
-  }
-
-  /**
-   * Internally takes into account that in case of error bars to render the
-   * maximum y value will be different.
-   * <p>
-   * Returns true if a change to <code>{@link #getMaxY()}</code> was done.
-   * <p>
-   * 
-   * @return true if a change to <code>{@link #getMaxY()}</code> was done.
-   */
-  private boolean expandMaxYErrorBarBounds() {
-    final Chart2D chart = this.getRenderer();
-    boolean change = false;
-    double errorBarMaxYCollect = -Double.MAX_VALUE;
-    if (chart != null) {
-      double errorBarMaxY = -Double.MAX_VALUE;
-      for (final IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
-        if (errorBarPolicy.isShowPositiveYErrors()) {
-          errorBarMaxY = errorBarPolicy.getYError(this.m_maxY);
-          if (errorBarMaxY > errorBarMaxYCollect) {
-            errorBarMaxYCollect = errorBarMaxY;
-          }
-        }
-      }
-    }
-    final double absoluteMax = errorBarMaxYCollect + this.m_maxY;
-    if (!MathUtil.assertEqual(this.m_maxYErrorBar, absoluteMax, 0.00000001)) {
-      this.m_maxYErrorBar = absoluteMax;
-      change = true;
-    }
-    return change;
-
-  }
-
-  /**
-   * Internally takes into account that in case of error bars to render the
-   * minimum x value will be different.
-   * <p>
-   * Returns true if a change to <code>{@link #getMinX()}</code> was done.
-   * <p>
-   * 
-   * @return true if a change to <code>{@link #getMinX()}</code> was done.
-   */
-  private boolean expandMinXErrorBarBounds() {
-    final Chart2D chart = this.getRenderer();
-    boolean change = false;
-    double errorBarMinXCollect = -Double.MAX_VALUE;
-    if (chart != null) {
-      double errorBarMinX = -Double.MAX_VALUE;
-      for (final IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
-        if (errorBarPolicy.isShowNegativeXErrors()) {
-          errorBarMinX = errorBarPolicy.getXError(this.m_minX);
-          if (errorBarMinX > errorBarMinXCollect) {
-            errorBarMinXCollect = errorBarMinX;
-          }
-        }
-      }
-    }
-    final double absoluteMin = this.m_minX - errorBarMinXCollect;
-    if (!MathUtil.assertEqual(this.m_minXErrorBar, absoluteMin, 0.00000001)) {
-      this.m_minXErrorBar = absoluteMin;
-      change = true;
-    }
-    return change;
-  }
-
-  /**
-   * Internally takes into account that in case of error bars to render the
-   * minimum y value will be different.
-   * <p>
-   * Returns true if a change to <code>{@link #getMinY()}</code> was done.
-   * <p>
-   * 
-   * @return true if a change to <code>{@link #getMinY()}</code> was done.
-   */
-  private boolean expandMinYErrorBarBounds() {
-    final Chart2D chart = this.getRenderer();
-    boolean change = false;
-    double errorBarMinYCollect = -Double.MAX_VALUE;
-    if (chart != null) {
-      double errorBarMinY = -Double.MAX_VALUE;
-      for (final IErrorBarPolicy< ? > errorBarPolicy : this.getErrorBarPolicies()) {
-        if (errorBarPolicy.isShowNegativeYErrors()) {
-          // calculate the error
-          errorBarMinY = errorBarPolicy.getYError(this.m_minY);
-          if (errorBarMinY > errorBarMinYCollect) {
-            errorBarMinYCollect = errorBarMinY;
-          }
-        }
-      }
-    }
-    final double absoluteMin = this.m_minY - errorBarMinYCollect;
-    if (!MathUtil.assertEqual(this.m_minYErrorBar, absoluteMin, 0.00000001)) {
-      this.m_minYErrorBar = absoluteMin;
-      change = true;
-    }
-    return change;
-  }
-
+  // private boolean expandMaxXErrorBarBounds() {
+  // final Chart2D chart = this.getRenderer();
+  // boolean change = false;
+  // double errorBarMaxXCollect = -Double.MAX_VALUE;
+  // if (chart != null) {
+  // double errorBarMaxX = -Double.MAX_VALUE;
+  // for (final IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
+  // errorBarMaxX = errorBarPolicy.getXError(this.m_maxX);
+  // if (errorBarMaxX > errorBarMaxXCollect) {
+  // errorBarMaxXCollect = errorBarMaxX;
+  // }
+  // }
+  // }
+  // final double absoluteMax = errorBarMaxXCollect + this.m_maxX;
+  // if (!MathUtil.assertEqual(this.m_maxXErrorBar, absoluteMax, 0.00000001)) {
+  // this.m_maxXErrorBar = absoluteMax;
+  // change = true;
+  // }
+  // return change;
+  // }
+  //
+  // /**
+  // * Internally takes into account that in case of error bars to render the
+  // * maximum y value will be different.
+  // * <p>
+  // * Returns true if a change to <code>{@link #getMaxY()}</code> was done.
+  // * <p>
+  // *
+  // * @return true if a change to <code>{@link #getMaxY()}</code> was done.
+  // */
+  // private boolean expandMaxYErrorBarBounds() {
+  // final Chart2D chart = this.getRenderer();
+  // boolean change = false;
+  // double errorBarMaxYCollect = -Double.MAX_VALUE;
+  // if (chart != null) {
+  // double errorBarMaxY = -Double.MAX_VALUE;
+  // for (final IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
+  // errorBarMaxY = errorBarPolicy.getYError(this.m_maxY);
+  // if (errorBarMaxY > errorBarMaxYCollect) {
+  // errorBarMaxYCollect = errorBarMaxY;
+  // }
+  // }
+  // }
+  // final double absoluteMax = errorBarMaxYCollect + this.m_maxY;
+  // if (!MathUtil.assertEqual(this.m_maxYErrorBar, absoluteMax, 0.00000001)) {
+  // this.m_maxYErrorBar = absoluteMax;
+  // change = true;
+  // }
+  // return change;
+  //
+  // }
+  //
+  // /**
+  // * Internally takes into account that in case of error bars to render the
+  // * minimum x value will be different.
+  // * <p>
+  // * Returns true if a change to <code>{@link #getMinX()}</code> was done.
+  // * <p>
+  // *
+  // * @return true if a change to <code>{@link #getMinX()}</code> was done.
+  // */
+  // private boolean expandMinXErrorBarBounds() {
+  // final Chart2D chart = this.getRenderer();
+  // boolean change = false;
+  // double errorBarMinXCollect = -Double.MAX_VALUE;
+  // if (chart != null) {
+  // double errorBarMinX = -Double.MAX_VALUE;
+  // for (final IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
+  // errorBarMinX = errorBarPolicy.getXError(this.m_minX);
+  // if (errorBarMinX > errorBarMinXCollect) {
+  // errorBarMinXCollect = errorBarMinX;
+  // }
+  // }
+  // }
+  // final double absoluteMin = this.m_minX - errorBarMinXCollect;
+  // if (!MathUtil.assertEqual(this.m_minXErrorBar, absoluteMin, 0.00000001)) {
+  // this.m_minXErrorBar = absoluteMin;
+  // change = true;
+  // }
+  // return change;
+  // }
+  //
+  // /**
+  // * Internally takes into account that in case of error bars to render the
+  // * minimum y value will be different.
+  // * <p>
+  // * Returns true if a change to <code>{@link #getMinY()}</code> was done.
+  // * <p>
+  // *
+  // * @return true if a change to <code>{@link #getMinY()}</code> was done.
+  // */
+  // private boolean expandMinYErrorBarBounds() {
+  // final Chart2D chart = this.getRenderer();
+  // boolean change = false;
+  // double errorBarMinYCollect = -Double.MAX_VALUE;
+  // if (chart != null) {
+  // double errorBarMinY = -Double.MAX_VALUE;
+  // for (final IErrorBarPolicy< ? > errorBarPolicy :
+  // this.getErrorBarPolicies()) {
+  // // calculate the error
+  // errorBarMinY = errorBarPolicy.getYError(this.m_minY);
+  // if (errorBarMinY > errorBarMinYCollect) {
+  // errorBarMinYCollect = errorBarMinY;
+  // }
+  // }
+  // }
+  // final double absoluteMin = this.m_minY - errorBarMinYCollect;
+  // if (!MathUtil.assertEqual(this.m_minYErrorBar, absoluteMin, 0.00000001)) {
+  // this.m_minYErrorBar = absoluteMin;
+  // change = true;
+  // }
+  // return change;
+  // }
   /**
    * Decreases internal instance count by one.
    * <p>
@@ -748,120 +759,293 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    *          if state is {@link ITracePoint2D#STATE_CHANGED} this is the
    *          previous y value, else ignored.
    */
-  public void firePointChanged(final ITracePoint2D changed, final int state, final double oldX, final double oldY) {
-    double tmpx = changed.getX();
-    double tmpy = changed.getY();
+  public void firePointChanged(final ITracePoint2D changed, final int state, final double oldX,
+      final double oldY) {
     this.ensureInitialized();
     synchronized (this.m_renderer) {
       synchronized (this) {
-        // for a changed point all cases (new extremum as for added case, other
-        // point becomes extremum as the change point was one like in removed
-        // case) have
-        // to be tested. Additionally we have to fire a changd point event.
+        /*
+         * First find out if the tracepainters, errorbarpainters or the
+         * additional point painters would require more space:
+         */
+        double[] bounds = this.calculatePointBounds(changed);
+        double collectMaxX = bounds[POINTBOUNDS_MAX_X];
+        double collectMinX = bounds[POINTBOUNDS_MIN_X];
+        double collectMaxY = bounds[POINTBOUNDS_MAX_Y];
+        double collectMinY = bounds[POINTBOUNDS_MIN_Y];
+
+        /*
+         * For a changed point all cases (new extremum as for added case, other
+         * point becomes extremum as the change point was one like in removed
+         * case) have to be tested. Additionally we have to fire a changd point
+         * event.
+         */
         if (ITracePoint2D.STATE_ADDED == state) {
           // add
-          if (tmpx > this.m_maxX) {
-            this.m_maxX = tmpx;
-            this.expandMaxXErrorBarBounds();
+          if (collectMaxX > this.m_maxX) {
+            this.m_maxX = collectMaxX;
             this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, null, new Double(this.m_maxX));
-          } else if (tmpx < this.m_minX) {
-            this.m_minX = tmpx;
-            this.expandMinXErrorBarBounds();
+          }
+          if (collectMinX < this.m_minX) {
+            this.m_minX = collectMinX;
             this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, null, new Double(this.m_minX));
           }
-          if (tmpy > this.m_maxY) {
-            this.m_maxY = tmpy;
-            this.expandMaxYErrorBarBounds();
+          if (collectMaxY > this.m_maxY) {
+            this.m_maxY = collectMaxY;
             this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, null, new Double(this.m_maxY));
-          } else if (tmpy < this.m_minY) {
-            this.m_minY = tmpy;
-            this.expandMinYErrorBarBounds();
+          }
+          if (collectMinY < this.m_minY) {
+            this.m_minY = collectMinY;
             this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, null, new Double(this.m_minY));
           }
         } else if (ITracePoint2D.STATE_REMOVED == state) {
           // removal: care for extrema (<=, >=)
-          if (tmpx >= this.m_maxX) {
-            tmpx = this.m_maxX;
+          if (collectMaxX >= this.m_maxX) {
+            collectMaxX = this.m_maxX;
             this.maxXSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(tmpx), new Double(this.m_maxX));
-          } else if (tmpx <= this.m_minX) {
-            tmpx = this.m_minX;
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(collectMaxX), new Double(
+                this.m_maxX));
+          }
+          if (collectMinX <= this.m_minX) {
+            collectMinX = this.m_minX;
             this.minXSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(tmpx), new Double(this.m_minX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(collectMinX), new Double(
+                this.m_minX));
           }
-          if (tmpy >= this.m_maxY) {
-            tmpy = this.m_maxY;
+          if (collectMaxY >= this.m_maxY) {
+            collectMaxY = this.m_maxY;
             this.maxYSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(tmpy), new Double(this.m_maxY));
-          } else if (tmpy <= this.m_minY) {
-            tmpy = this.m_minY;
-            this.minYSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(tmpy), new Double(this.m_minY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(collectMaxY), new Double(
+                this.m_maxY));
           }
+          if (collectMinY <= this.m_minY) {
+            collectMinY = this.m_minY;
+            this.minYSearch();
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(collectMinY), new Double(
+                this.m_minY));
+          }
+          /*
+           * Was this the last point?
+           */
           if (this.getSize() == 0) {
             this.m_firsttime = true;
           }
         } else if (state == ITracePoint2D.STATE_CHANGED) {
-          if (tmpx < this.m_maxX) {
+          // did we decrease bounds?
+          if (collectMaxX < this.m_maxX) {
             // check if the changed point was maxX
             if (oldX == this.m_maxX) {
               // the point was maximum: expensive re-search of new maximum
               final double oldMaxX = this.m_maxX;
               this.maxXSearch();
-              this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldMaxX), new Double(this.m_maxX));
+              this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldMaxX), new Double(
+                  this.m_maxX));
             }
-          } else if (tmpx > this.m_maxX) {
+          } else if (collectMaxX > this.m_maxX) {
             final double oldMaxX = this.m_maxX;
-            this.m_maxX = tmpx;
-            this.expandMaxXErrorBarBounds();
-            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldMaxX), new Double(this.m_maxX));
+            this.m_maxX = collectMaxX;
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldMaxX), new Double(
+                this.m_maxX));
           }
-          if (tmpx > this.m_minX) {
+          // did we decrease bounds?
+          if (collectMinX > this.m_minX) {
             if (oldX == this.m_minX) {
               // the point was minimum: expensive re-search of new minimum
-
               final double oldMinX = this.m_minX;
               this.minXSearch();
-              this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldMinX), new Double(this.m_minX));
+              this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldMinX), new Double(
+                  this.m_minX));
             }
-          } else if (tmpx < this.m_minX) {
+          } else if (collectMinX < this.m_minX) {
             final double oldMinX = this.m_minX;
-            this.m_minX = tmpx;
-            this.expandMinXErrorBarBounds();
-            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldMinX), new Double(this.m_minX));
+            this.m_minX = collectMinX;
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldMinX), new Double(
+                this.m_minX));
           }
-          if (tmpy < this.m_maxY) {
+          // did we decrease bounds?
+          if (collectMaxY < this.m_maxY) {
             if (oldY == this.m_maxY) {
               // the point was maximum: expensive re-search of new maximum
               final double oldMaxY = this.m_maxY;
               this.maxYSearch();
-              this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldMaxY), new Double(this.m_maxY));
+              this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldMaxY), new Double(
+                  this.m_maxY));
             }
-          } else if (tmpy > this.m_maxY) {
+          } else if (collectMaxY > this.m_maxY) {
             final double oldMaxY = this.m_maxY;
-            this.m_maxY = tmpy;
-            this.expandMaxYErrorBarBounds();
-            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldMaxY), new Double(this.m_maxY));
+            this.m_maxY = collectMaxY;
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldMaxY), new Double(
+                this.m_maxY));
           }
-          if (tmpy > this.m_minY) {
+          // did we decrease bounds?
+          if (collectMinY > this.m_minY) {
             if (oldY == this.m_maxY) {
               // the point was minimum: expensive re-search of new minimum
               final double oldMinY = this.m_minY;
               this.minYSearch();
-              this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldMinY), new Double(this.m_minY));
+              this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldMinY), new Double(
+                  this.m_minY));
             }
-          } else if (tmpy < this.m_minY) {
+          } else if (collectMinY < this.m_minY) {
             final double oldMinY = this.m_minY;
-            this.m_minY = tmpy;
-            this.expandMinYErrorBarBounds();
-            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldMinY), new Double(this.m_minY));
+            this.m_minY = collectMinY;
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldMinY), new Double(
+                this.m_minY));
           }
           this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_LOCATION, null, changed);
         } else if (state == ITracePoint2D.STATE_RENDERING_CHANGED) {
+          // FIXME: could a changed/added/removed painter cause bound changes???
           this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_RENDERING, null, changed);
         }
       }
     }
+  }
+
+  /**
+   * Index for accessing the result of
+   * {@link #calculatePointBounds(ITracePoint2D)}.
+   */
+  private static int POINTBOUNDS_MIN_X = 0;
+
+  /**
+   * Index for accessing the result of
+   * {@link #calculatePointBounds(ITracePoint2D)}.
+   */
+  private static int POINTBOUNDS_MAX_X = 1;
+
+  /**
+   * Index for accessing the result of
+   * {@link #calculatePointBounds(ITracePoint2D)}.
+   */
+  private static int POINTBOUNDS_MIN_Y = 2;
+
+  /**
+   * Index for accessing the result of
+   * {@link #calculatePointBounds(ITracePoint2D)}.
+   */
+  private static int POINTBOUNDS_MAX_Y = 3;
+
+  /**
+   * We need to know the x and y range of a trace in order to scale all points.
+   * However the point's position is not sufficient. Because:
+   * <ul>
+   * <li>{@link #getTracePainters()} may exceed bounds.</li>
+   * <li>{@link ITracePoint2D#getAdditionalPointPainters()} may exceed bounds.</li>
+   * <li>{@link #getErrorBarPolicies()} may exceed bounds.</li>
+   * </ul>
+   * <p>
+   * All this is taken into account here. This returns a <code>double[4]</code>
+   * which should be accessed by the constants:
+   * <ul>
+   * <li>{@link #POINTBOUNDS_MAX_X}</li>
+   * <li>{@link #POINTBOUNDS_MIN_X}</li>
+   * <li>{@link #POINTBOUNDS_MAX_Y}</li>
+   * <li>{@link #POINTBOUNDS_MIN_Y}</li>
+   * <ul>
+   * 
+   * @param point
+   *          the point to find the bounds of.
+   * 
+   * @return a <code>double[4]</code> which should be accessed by the constants:
+   *         <ul>
+   *         <li>{@link #POINTBOUNDS_MAX_X}</li> <li>{@link #POINTBOUNDS_MIN_X}
+   *         </li> <li>{@link #POINTBOUNDS_MAX_Y}</li> <li>
+   *         {@link #POINTBOUNDS_MIN_Y}</li>
+   *         <ul>
+   *         .
+   */
+  private double[] calculatePointBounds(final ITracePoint2D point) {
+    final double[] result = new double[4];
+    double tmpMaxX, collectMaxX = point.getX();
+    double tmpMinX, collectMinX = point.getX();
+    double tmpMaxY, collectMaxY = point.getY();
+    double tmpMinY, collectMinY = point.getY();
+    Set<ITracePainter< ? >> tracePainters = this.getTracePainters();
+    /*
+     * TODO: incorporate half stroke width to all extremums!
+     */
+    /*
+     * 1. ITracePainters
+     */
+    for (ITracePainter< ? > painter : tracePainters) {
+      tmpMaxX = painter.calculateMaxX(point.getX());
+      if (tmpMaxX > collectMaxX) {
+        collectMaxX = tmpMaxX;
+      }
+      tmpMinX = painter.calculateMinX(point.getX());
+      if (tmpMinX < collectMinX) {
+        collectMinX = tmpMinX;
+      }
+      tmpMaxY = painter.calculateMaxY(point.getY());
+      if (tmpMaxY > collectMaxY) {
+        collectMaxY = tmpMaxY;
+      }
+      tmpMinY = painter.calculateMinY(point.getY());
+      if (tmpMinY < collectMinY) {
+        collectMinY = tmpMinY;
+      }
+    }
+    /*
+     * 2. additional point painter
+     */
+    Set<IPointPainter< ? >> pointPainters = point.getAdditionalPointPainters();
+    for (IPointPainter< ? > painter : pointPainters) {
+      tmpMaxX = painter.calculateMaxX(point.getX());
+      if (tmpMaxX > collectMaxX) {
+        collectMaxX = tmpMaxX;
+      }
+      tmpMinX = painter.calculateMinX(point.getX());
+      if (tmpMinX < collectMinX) {
+        collectMinX = tmpMinX;
+      }
+      tmpMaxY = painter.calculateMaxY(point.getY());
+      if (tmpMaxY > collectMaxY) {
+        collectMaxY = tmpMaxY;
+      }
+      tmpMinY = painter.calculateMinY(point.getY());
+      if (tmpMinY < collectMinY) {
+        collectMinY = tmpMinY;
+      }
+    }
+    /*
+     * 3. IErrorBarPolicies
+     */
+    Set<IErrorBarPolicy< ? >> errorBarPolicies = this.getErrorBarPolicies();
+
+    for (IErrorBarPolicy< ? > errorBarPolicy : errorBarPolicies) {
+      if (errorBarPolicy.isShowPositiveXErrors()) {
+        tmpMaxX = errorBarPolicy.calculateMaxX(point.getX());
+        if (tmpMaxX > collectMaxX) {
+          collectMaxX = tmpMaxX;
+        }
+      }
+      if (errorBarPolicy.isShowNegativeXErrors()) {
+        tmpMinX = errorBarPolicy.calculateMaxX(point.getX());
+        if (tmpMinX < collectMinX) {
+          collectMinX = tmpMinX;
+        }
+      }
+      if (errorBarPolicy.isShowPositiveYErrors()) {
+        tmpMaxY = errorBarPolicy.calculateMaxX(point.getY());
+        if (tmpMaxY > collectMaxY) {
+          collectMaxY = tmpMaxY;
+        }
+      }
+      if (errorBarPolicy.isShowNegativeYErrors()) {
+        tmpMinY = errorBarPolicy.calculateMaxX(point.getY());
+        if (tmpMinY < collectMinY) {
+          collectMinY = tmpMinY;
+        }
+      }
+    }
+    /*
+     * Done: we have explored all possible increased bounds!
+     */
+    result[POINTBOUNDS_MAX_X] = collectMaxX;
+    result[POINTBOUNDS_MIN_X] = collectMinX;
+    result[POINTBOUNDS_MAX_Y] = collectMaxY;
+    result[POINTBOUNDS_MIN_Y] = collectMinY;
+    return result;
   }
 
   /**
@@ -897,9 +1081,11 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * @param newvalue
    *          the new value of the property.
    */
-  protected final void firePropertyChange(final String property, final Object oldvalue, final Object newvalue) {
-    if (property.equals(ITrace2D.PROPERTY_MAX_X) || property.equals(ITrace2D.PROPERTY_MAX_Y) || property.equals(ITrace2D.PROPERTY_MIN_X)
-        || property.equals(ITrace2D.PROPERTY_MIN_Y) || property.equals(ITrace2D.PROPERTY_TRACEPOINTS)
+  protected final void firePropertyChange(final String property, final Object oldvalue,
+      final Object newvalue) {
+    if (property.equals(ITrace2D.PROPERTY_MAX_X) || property.equals(ITrace2D.PROPERTY_MAX_Y)
+        || property.equals(ITrace2D.PROPERTY_MIN_X) || property.equals(ITrace2D.PROPERTY_MIN_Y)
+        || property.equals(ITrace2D.PROPERTY_TRACEPOINTS)
         || property.equals(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_LOCATION)) {
       if (!Thread.holdsLock(this.m_renderer)) {
         throw new RuntimeException("Acquire a lock on the corresponding chart first!");
@@ -909,9 +1095,11 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
       }
 
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println("trace.firePropertyChange (" + property + "), 2 locks, renderer is: " + this.m_renderer);
+        System.out.println("trace.firePropertyChange (" + property + "), 2 locks, renderer is: "
+            + this.m_renderer);
       }
     }
+
     this.m_propertyChangeSupport.firePropertyChange(property, oldvalue, newvalue);
   }
 
@@ -1161,7 +1349,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
     if (StringUtil.isEmpty(this.m_physicalUnitsX) && StringUtil.isEmpty(this.m_physicalUnitsY)) {
       result = "";
     } else {
-      result = new StringBuffer("[x: ").append(this.getPhysicalUnitsX()).append(", y: ").append(this.getPhysicalUnitsY()).append("]").toString();
+      result = new StringBuffer("[x: ").append(this.getPhysicalUnitsX()).append(", y: ")
+          .append(this.getPhysicalUnitsY()).append("]").toString();
 
     }
     return result;
@@ -1252,24 +1441,29 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
     // as those are invoked several times for each iteration
     // (and paint contains several iterations).
     if (Chart2D.DEBUG_THREADING) {
-      System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName() + ".getZindex, 0 locks");
+      System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName()
+          + ".getZindex, 0 locks");
     }
     synchronized (this.m_renderer) {
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName() + ".getZindex, 1 locks");
+        System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName()
+            + ".getZindex, 1 locks");
       }
 
       synchronized (this) {
         if (Chart2D.DEBUG_THREADING) {
-          System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName() + ".getZindex, 2 locks");
+          System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName()
+              + ".getZindex, 2 locks");
         }
       }
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName() + ".getZindex, freed 1 lock: 1 lock remaining");
+        System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName()
+            + ".getZindex, freed 1 lock: 1 lock remaining");
       }
     }
     if (Chart2D.DEBUG_THREADING) {
-      System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName() + ".getZindex, freed 1 lock: 0 locks remaining");
+      System.out.println(Thread.currentThread().getName() + ", " + this.getClass().getName()
+          + ".getZindex, freed 1 lock: 0 locks remaining");
     }
     return this.m_zIndex;
   }
@@ -1286,6 +1480,85 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    */
   public final Iterator<ITracePoint2D> iterator(int amountOfDesiredPoints) {
     return this.m_accumulationStrategy.iterator(this, amountOfDesiredPoints);
+  }
+
+  /**
+   * Internal search for all bounds which is very expensive!
+   * <p>
+   * The result is assigned to the the properties
+   * <ul>
+   * <li>maxX</li>
+   * <li>minX</li>
+   * <li>maxY</li>
+   * <li>minY</li>
+   * </ul>
+   * maxX.
+   * <p>
+   * Also property change events are fired for detected bound changes.
+   * <p>
+   */
+  protected void boundSearch() {
+    if (Chart2D.DEBUG_THREADING) {
+      System.out.println("trace.maxXSearch, 0 locks");
+    }
+
+    synchronized (this) {
+      if (Chart2D.DEBUG_THREADING) {
+        System.out.println("trace.maxXSearch, 1 locks");
+      }
+      // for firing events:
+      double oldMaxX = this.m_maxX;
+      double oldMinX = this.m_minX;
+      double oldMaxY = this.m_maxX;
+      double oldMinY = this.m_minY;
+
+      // go search
+      double maxXCollect = -Double.MAX_VALUE;
+      double maxYCollect = -Double.MAX_VALUE;
+      double minXCollect = Double.MAX_VALUE;
+      double minYCollect = Double.MAX_VALUE;
+      ITracePoint2D tmpoint = null;
+      final Iterator<ITracePoint2D> it = this.iterator();
+      double[] pointBounds;
+      while (it.hasNext()) {
+        tmpoint = it.next();
+        pointBounds = this.calculatePointBounds(tmpoint);
+        if (pointBounds[POINTBOUNDS_MAX_X] > maxXCollect) {
+          maxXCollect = pointBounds[POINTBOUNDS_MAX_X];
+        }
+        if (pointBounds[POINTBOUNDS_MAX_Y] > maxYCollect) {
+          maxXCollect = pointBounds[POINTBOUNDS_MAX_Y];
+        }
+        if (pointBounds[POINTBOUNDS_MIN_X] > minXCollect) {
+          minXCollect = pointBounds[POINTBOUNDS_MIN_X];
+        }
+        if (pointBounds[POINTBOUNDS_MIN_Y] > minYCollect) {
+          minXCollect = pointBounds[POINTBOUNDS_MIN_Y];
+        }
+      }
+      this.m_maxX = maxXCollect;
+      this.m_maxY = maxYCollect;
+      this.m_minX = minXCollect;
+      this.m_minY = minYCollect;
+
+      // fire events:
+      if (oldMaxX < this.m_maxX) {
+        this.firePropertyChange(PROPERTY_MAX_X, Double.valueOf(oldMaxX),
+            Double.valueOf(this.m_maxX));
+      }
+      if (oldMaxY < this.m_maxY) {
+        this.firePropertyChange(PROPERTY_MAX_Y, Double.valueOf(oldMaxY),
+            Double.valueOf(this.m_maxY));
+      }
+      if (oldMinX > this.m_minX) {
+        this.firePropertyChange(PROPERTY_MIN_X, Double.valueOf(oldMinX),
+            Double.valueOf(this.m_minX));
+      }
+      if (oldMinY > this.m_minY) {
+        this.firePropertyChange(PROPERTY_MIN_Y, Double.valueOf(oldMinY),
+            Double.valueOf(this.m_minY));
+      }
+    }
   }
 
   /**
@@ -1308,19 +1581,17 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
       }
       double ret = -Double.MAX_VALUE;
       ITracePoint2D tmpoint = null;
-      double tmp;
       final Iterator<ITracePoint2D> it = this.iterator();
+      double[] pointBounds;
       while (it.hasNext()) {
         tmpoint = it.next();
-        tmp = tmpoint.getX();
-        if (tmp > ret) {
-          ret = tmp;
+        pointBounds = this.calculatePointBounds(tmpoint);
+        if (pointBounds[POINTBOUNDS_MAX_X] > ret) {
+          ret = pointBounds[POINTBOUNDS_MAX_X];
         }
       }
       this.m_maxX = ret;
     }
-    // compute the extra amount in case of error bar painters:
-    this.expandMaxXErrorBarBounds();
   }
 
   /**
@@ -1333,6 +1604,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * @see #getMaxY()
    */
   protected void maxYSearch() {
+
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("trace.maxYSearch, 0 locks");
     }
@@ -1342,21 +1614,19 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
         System.out.println("trace.maxYSearch, 1 lock");
       }
 
+      double[] pointBounds;
       double ret = -Double.MAX_VALUE;
       ITracePoint2D tmpoint = null;
-      double tmp;
       final Iterator<ITracePoint2D> it = this.iterator();
       while (it.hasNext()) {
         tmpoint = it.next();
-        tmp = tmpoint.getY();
-        if (tmp > ret) {
-          ret = tmp;
+        pointBounds = this.calculatePointBounds(tmpoint);
+        if (pointBounds[POINTBOUNDS_MAX_Y] > ret) {
+          ret = pointBounds[POINTBOUNDS_MAX_Y];
         }
       }
       this.m_maxY = ret;
     }
-    // compute the extra amount in case of error bar painters:
-    this.expandMaxYErrorBarBounds();
   }
 
   /**
@@ -1369,6 +1639,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * @see #getMinX()
    */
   protected void minXSearch() {
+
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("trace.minXSearch, 0 locks");
     }
@@ -1380,19 +1651,17 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
 
       double ret = Double.MAX_VALUE;
       ITracePoint2D tmpoint = null;
-      double tmp;
+      double[] pointBounds;
       final Iterator<ITracePoint2D> it = this.iterator();
       while (it.hasNext()) {
         tmpoint = it.next();
-        tmp = tmpoint.getX();
-        if (tmp < ret) {
-          ret = tmp;
+        pointBounds = this.calculatePointBounds(tmpoint);
+        if (pointBounds[POINTBOUNDS_MIN_X] < ret) {
+          ret = pointBounds[POINTBOUNDS_MIN_X];
         }
       }
       this.m_minX = ret;
     }
-    // compute the extra amount in case of error bar painters:
-    this.expandMinXErrorBarBounds();
   }
 
   /**
@@ -1405,6 +1674,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * @see #getMinY()
    */
   protected void minYSearch() {
+
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("trace.minYSearch, 0 locks");
     }
@@ -1416,21 +1686,17 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
 
       double ret = Double.MAX_VALUE;
       ITracePoint2D tmpoint = null;
-      double tmp;
+      double[] pointBounds;
       final Iterator<ITracePoint2D> it = this.iterator();
       while (it.hasNext()) {
         tmpoint = it.next();
-        tmp = tmpoint.getY();
-        if (tmp < ret) {
-          ret = tmp;
+        pointBounds = this.calculatePointBounds(tmpoint);
+        if (pointBounds[POINTBOUNDS_MIN_Y] < ret) {
+          ret = pointBounds[POINTBOUNDS_MIN_Y];
         }
       }
       this.m_minY = ret;
-
-      // compute the extra amount in case of error bar painters:
-      this.expandMinYErrorBarBounds();
     }
-
   }
 
   /**
@@ -1439,7 +1705,6 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   public void propertyChange(final PropertyChangeEvent evt) {
     final String propertyName = evt.getPropertyName();
     if (IErrorBarPolicy.PROPERTY_CONFIGURATION.equals(propertyName)) {
-      this.expandErrorBarBounds();
       /*
        * Notify listeners of this class about an underlying change. Idiom: Chain
        * of responsibility: Listeners should not listen on all underlying
@@ -1452,7 +1717,9 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
        * of responsibility: Listeners should not listen on all underlying
        * details but trust complex objects to inform them about any change.
        */
-      this.firePropertyChange(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY_ACCUMULATION_FUNCTION_CHANGED, evt.getOldValue(), evt.getNewValue());
+      this.firePropertyChange(
+          ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY_ACCUMULATION_FUNCTION_CHANGED,
+          evt.getOldValue(), evt.getNewValue());
     }
 
   }
@@ -1467,7 +1734,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * @throws ClassNotFoundException
    *           if there is a classpath problem.
    */
-  private void readObject(final ObjectInputStream stream) throws IOException, ClassNotFoundException {
+  private void readObject(final ObjectInputStream stream) throws IOException,
+      ClassNotFoundException {
     stream.defaultReadObject();
     this.m_stroke = SerializationUtility.readStroke(stream);
   }
@@ -1501,16 +1769,20 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
         // property changes:
         double oldValue = this.m_maxX;
         this.m_maxX = 0;
-        this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldValue), new Double(this.m_maxX));
+        this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldValue), new Double(
+            this.m_maxX));
         oldValue = this.m_maxY;
         this.m_maxY = 0;
-        this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldValue), new Double(this.m_maxY));
+        this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldValue), new Double(
+            this.m_maxY));
         oldValue = this.m_minX;
         this.m_minX = 0;
-        this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldValue), new Double(this.m_minX));
+        this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldValue), new Double(
+            this.m_minX));
         oldValue = this.m_minY;
         this.m_minY = 0;
-        this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldValue), new Double(this.m_minY));
+        this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldValue), new Double(
+            this.m_minY));
 
         // inform computing traces:
         for (final ITrace2D trace : this.m_computingTraces) {
@@ -1559,7 +1831,13 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
         if (result) {
           errorBarPolicy.setTrace(null);
           errorBarPolicy.removePropertyChangeListener(IErrorBarPolicy.PROPERTY_CONFIGURATION, this);
-          this.expandErrorBarBounds();
+          /*
+           * TODO: Performance gain could be achieved by caching the extremum
+           * points and just update the bounds of those with the
+           * calculatePointBounds(ITrace2D) method instead of iterating every
+           * point. Do this in case profiling shows that this is worthwhile.
+           */
+          this.boundSearch();
           this.firePropertyChange(ITrace2D.PROPERTY_ERRORBARPOLICY, errorBarPolicy, null);
         }
       }
@@ -1583,7 +1861,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    *          the <code>TracePoint2D</code> to remove.
    * @return true if the removal succeeded, false else: this could be that the
    *         given point was not contained.
-   *         
+   * 
    * @see #firePointChanged(ITracePoint2D, int, double, double)
    */
   public boolean removePoint(final ITracePoint2D point) {
@@ -1605,20 +1883,24 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           if (tmpx >= this.m_maxX) {
             tmpx = this.m_maxX;
             this.maxXSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(tmpx), new Double(this.m_maxX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(tmpx), new Double(
+                this.m_maxX));
           } else if (tmpx <= this.m_minX) {
             tmpx = this.m_minX;
             this.minXSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(tmpx), new Double(this.m_minX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(tmpx), new Double(
+                this.m_minX));
           }
           if (tmpy >= this.m_maxY) {
             tmpy = this.m_maxY;
             this.maxYSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(tmpy), new Double(this.m_maxY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(tmpy), new Double(
+                this.m_maxY));
           } else if (tmpy <= this.m_minY) {
             tmpy = this.m_minY;
             this.minYSearch();
-            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(tmpy), new Double(this.m_minY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(tmpy), new Double(
+                this.m_minY));
           }
 
           this.firePointRemoved(removed);
@@ -1644,7 +1926,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
         boolean result = false;
         result = this.m_pointHighlighters.remove(higlighter);
         if (result) {
-          this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, higlighter, null);
+          this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, higlighter,
+              null);
         }
         return result;
       }
@@ -1695,7 +1978,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * @see info.monitorenter.gui.chart.ITrace2D#removePropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
-  public void removePropertyChangeListener(final String property, final PropertyChangeListener listener) {
+  public void removePropertyChangeListener(final String property,
+      final PropertyChangeListener listener) {
     this.m_propertyChangeSupport.removePropertyChangeListener(property, listener);
   }
 
@@ -1727,10 +2011,13 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
      * Unlisten to the old one, listen to the new one.
      */
     if (oldValue != null) {
-      oldValue.removePropertyChangeListener(AAccumulationStrategy.PROPERTY_ACCUMULATION_FUNCTION, this);
+      oldValue.removePropertyChangeListener(AAccumulationStrategy.PROPERTY_ACCUMULATION_FUNCTION,
+          this);
     }
-    this.m_accumulationStrategy.addPropertyChangeListener(AAccumulationStrategy.PROPERTY_ACCUMULATION_FUNCTION, this);
-    this.firePropertyChange(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY, oldValue, accumulationStrategy);
+    this.m_accumulationStrategy.addPropertyChangeListener(
+        AAccumulationStrategy.PROPERTY_ACCUMULATION_FUNCTION, this);
+    this.firePropertyChange(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY, oldValue,
+        accumulationStrategy);
     return oldValue;
   }
 
@@ -1771,8 +2058,13 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
         final boolean added = this.m_errorBarPolicies.add(errorBarPolicy);
         if (added) {
           errorBarPolicy.setTrace(this);
-          this.expandErrorBarBounds();
-          errorBarPolicy.addPropertyChangeListener(IErrorBarPolicy.PROPERTY_CONFIGURATION, this);
+          /*
+           * TODO: Performance gain could be achieved by caching the extremum
+           * points and just update the bounds of those with the
+           * calculatePointBounds(ITrace2D) method instead of iterating every
+           * point. Do this in case profiling shows that this is worthwhile.
+           */
+          this.boundSearch();
           this.firePropertyChange(ITrace2D.PROPERTY_ERRORBARPOLICY, null, errorBarPolicy);
         }
         // now remove this from the previous instances:
@@ -1837,7 +2129,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           for (final IPointPainter< ? > rem : result) {
             this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, rem, null);
           }
-          this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, null, highlighter);
+          this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS, null,
+              highlighter);
 
         } else {
           // roll back: will never happen, but here for formal reason
@@ -1860,11 +2153,11 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    *          the chart that paints this instance.
    */
   public final void setRenderer(final Chart2D renderer) {
-    final boolean requiresErrorBarCalculation = this.m_renderer != renderer;
     this.m_renderer = renderer;
-    if (requiresErrorBarCalculation) {
-      this.expandErrorBarBounds();
-    }
+    /*
+     * TODO: check if we have to send out bound extremum messages to the new
+     * renderer!
+     */
   }
 
   /**
@@ -1930,7 +2223,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
     final boolean oldValue = this.m_visible;
     this.m_visible = visible;
     if (oldValue != this.m_visible) {
-      this.firePropertyChange(ITrace2D.PROPERTY_VISIBLE, Boolean.valueOf(oldValue), Boolean.valueOf(this.m_visible));
+      this.firePropertyChange(ITrace2D.PROPERTY_VISIBLE, Boolean.valueOf(oldValue),
+          Boolean.valueOf(this.m_visible));
     }
   }
 
@@ -1968,8 +2262,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
     boolean result = false;
     for (final IErrorBarPolicy< ? > errorBarPolicy : this.m_errorBarPolicies) {
       if (errorBarPolicy.getErrorBarPainters().size() > 0) {
-        if (errorBarPolicy.isShowNegativeXErrors() || errorBarPolicy.isShowNegativeYErrors() || errorBarPolicy.isShowPositiveXErrors()
-            || errorBarPolicy.isShowPositiveYErrors()) {
+        if (errorBarPolicy.isShowNegativeXErrors() || errorBarPolicy.isShowNegativeYErrors()
+            || errorBarPolicy.isShowPositiveXErrors() || errorBarPolicy.isShowPositiveYErrors()) {
           result = true;
           break;
         }

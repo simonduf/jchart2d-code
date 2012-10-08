@@ -31,6 +31,9 @@ import java.awt.Graphics;
  * each {@link ITracePoint2D} to show.
  * <p>
  * 
+ * FIXME: Look if this one could extend {@link TracePainterConfigurable}.
+ * <p>
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  * @version $Revision: 1.20 $
@@ -63,6 +66,39 @@ public class TracePainterDisc extends ATracePainter {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(double)
+   */
+  @Override
+  public double calculateMaxX(double x) {
+
+    return this.m_pointPainter.calculateMaxX(x);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(double)
+   */
+  @Override
+  public double calculateMaxY(double y) {
+    return this.m_pointPainter.calculateMaxY(y);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(double)
+   */
+  @Override
+  public double calculateMinX(double x) {
+    return this.m_pointPainter.calculateMinX(x);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(double)
+   */
+  @Override
+  public double calculateMinY(double y) {
+    return this.m_pointPainter.calculateMinY(y);
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics)
    */
   @Override
@@ -70,9 +106,8 @@ public class TracePainterDisc extends ATracePainter {
     if (g2d != null) {
       int previousX = this.getPreviousX();
       int previousY = this.getPreviousY();
-      if(previousX != Integer.MIN_VALUE || previousY != Integer.MIN_VALUE) {
-      this.m_pointPainter.paintPoint(previousX, previousY, 0, 0, g2d, this
-          .getPreviousPoint());
+      if (previousX != Integer.MIN_VALUE || previousY != Integer.MIN_VALUE) {
+        this.m_pointPainter.paintPoint(previousX, previousY, 0, 0, g2d, this.getPreviousPoint());
       }
     }
     this.m_pointPainter.endPaintIteration(g2d);
@@ -155,4 +190,5 @@ public class TracePainterDisc extends ATracePainter {
     super.startPaintIteration(g2d);
     this.m_pointPainter.startPaintIteration(g2d);
   }
+
 }

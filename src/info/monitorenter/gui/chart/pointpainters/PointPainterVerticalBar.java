@@ -80,6 +80,37 @@ public class PointPainterVerticalBar extends APointPainter<PointPainterVerticalB
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(double)
+   */
+  @Override
+  public double calculateMaxX(double x) {
+    return x + Math.ceil(this.getBarWidth() / 2);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(double)
+   */
+  @Override
+  public double calculateMaxY(double y) {
+    return y;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(double)
+   */
+  @Override
+  public double calculateMinX(double x) {
+    return x - Math.ceil(this.getBarWidth() / 2);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(double)
+   */
+  @Override
+  public double calculateMinY(double y) {
+    return y;
+  }
+  /**
    * @see info.monitorenter.gui.chart.pointpainters.APointPainter#equals(java.lang.Object)
    */
   @Override

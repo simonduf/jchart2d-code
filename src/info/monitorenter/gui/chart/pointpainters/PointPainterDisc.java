@@ -183,4 +183,37 @@ public class PointPainterDisc extends APointPainter<PointPainterDisc> {
     this.m_halfDiscSize = this.m_discSize / 2;
   }
 
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(double)
+   */
+  @Override
+  public double calculateMaxX(double x) {
+
+    return x + this.m_discSize;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(double)
+   */
+  @Override
+  public double calculateMaxY(double y) {
+    return y + this.m_discSize;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(double)
+   */
+  @Override
+  public double calculateMinX(double x) {
+    return x - this.m_discSize;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(double)
+   */
+  @Override
+  public double calculateMinY(double y) {
+    return y - this.m_discSize;
+  }
+
 }

@@ -91,6 +91,70 @@ public interface IPointPainter<T extends IPointPainter<T>> extends Serializable,
       final int nextY, final Graphics g, final ITracePoint2D original);
 
   /**
+   * Returns the maximum x bound this painter will need to paint the given
+   * point's x-coordinate.
+   * <p>
+   * This is needed because a point's bounds may be exceeded when actually
+   * painting it.
+   * <p>
+   * 
+   * @param x
+   *          the point's x-coordinate that should be painted.
+   * 
+   * @return the maximum x bound this painter will need to paint the given
+   *         point.
+   */
+  public double calculateMaxX(final double x);
+
+  /**
+   * Returns the minimum x bound this painter will need to paint the given
+   * point's x-coordinate.
+   * <p>
+   * This is needed because a point's bounds may be exceeded when actually
+   * painting it.
+   * <p>
+   * 
+   * @param x
+   *          the point's x-coordinate that should be painted.
+   * 
+   * @return the minimum x bound this painter will need to paint the given
+   *         point.
+   */
+  public double calculateMinX(final double x);
+
+  /**
+   * Returns the maximum y bound this painter will need to paint the given
+   * point's y-coordinate.
+   * <p>
+   * This is needed because a point's bounds may be exceeded when actually
+   * painting it.
+   * <p>
+   * 
+   * @param y
+   *          the point's y-coordinate that should be painted.
+   * 
+   * @return the maximum y bound this painter will need to paint the given
+   *         point.
+   */
+  public double calculateMaxY(final double y);
+
+  /**
+   * Returns the minimum y bound this painter will need to paint the given
+   * point's y-coordinate.
+   * <p>
+   * This is needed because a point's bounds may be exceeded when actually
+   * painting it.
+   * <p>
+   * 
+   * @param y
+   *          the point's y-coordinate that should be painted.
+   * 
+   * @return the minimum y bound this painter will need to paint the given
+   *         point.
+   */
+  public double calculateMinY(final double y);
+  
+  /**
    * Invoked to inform implementations that a paint iteration starts for the
    * corresponding {@link info.monitorenter.gui.chart.ITrace2D}.
    * <p>

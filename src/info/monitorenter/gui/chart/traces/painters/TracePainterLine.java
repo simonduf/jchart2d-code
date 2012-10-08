@@ -31,6 +31,9 @@ import java.awt.Graphics;
  * A trace painter that renders a trace by lines.
  * <p>
  * 
+ * FIXME: Look if this one could extend {@link TracePainterConfigurable}.
+ * <p>
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  * @version $Revision: 1.22 $
@@ -48,8 +51,42 @@ public class TracePainterLine extends ATracePainter {
    * Defcon.
    * <p>
    */
-  public TracePainterLine() {
+  public TracePainterLine() {    // TODO Auto-generated method stub
+
     this.m_pointPainter = new PointPainterLine();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(double)
+   */
+  @Override
+  public double calculateMaxX(double x) {
+
+    return this.m_pointPainter.calculateMaxX(x);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(double)
+   */
+  @Override
+  public double calculateMaxY(double y) {
+    return this.m_pointPainter.calculateMaxY(y);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(double)
+   */
+  @Override
+  public double calculateMinX(double x) {
+    return this.m_pointPainter.calculateMinX(x);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(double)
+   */
+  @Override
+  public double calculateMinY(double y) {
+    return this.m_pointPainter.calculateMinY(y);
   }
 
   /**
@@ -109,13 +146,5 @@ public class TracePainterLine extends ATracePainter {
       final int nextY, final Graphics g, final ITracePoint2D original) {
     super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
     this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#startPaintIteration(java.awt.Graphics)
-   */
-  @Override
-  public void startPaintIteration(final Graphics g2d) {
-    this.m_pointPainter.startPaintIteration(g2d);
   }
 }
