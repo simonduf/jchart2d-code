@@ -22,7 +22,6 @@ import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.TracePointProviderDefault;
-import info.monitorenter.util.math.MathUtil;
 
 import java.awt.geom.Point2D;
 import java.util.LinkedHashSet;
