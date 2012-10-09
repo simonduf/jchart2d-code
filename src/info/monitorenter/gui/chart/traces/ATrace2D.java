@@ -1020,19 +1020,19 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
         }
       }
       if (errorBarPolicy.isShowNegativeXErrors()) {
-        tmpMinX = errorBarPolicy.calculateMaxX(point.getX());
+        tmpMinX = errorBarPolicy.calculateMinX(point.getX());
         if (tmpMinX < collectMinX) {
           collectMinX = tmpMinX;
         }
       }
       if (errorBarPolicy.isShowPositiveYErrors()) {
-        tmpMaxY = errorBarPolicy.calculateMaxX(point.getY());
+        tmpMaxY = errorBarPolicy.calculateMaxY(point.getY());
         if (tmpMaxY > collectMaxY) {
           collectMaxY = tmpMaxY;
         }
       }
       if (errorBarPolicy.isShowNegativeYErrors()) {
-        tmpMinY = errorBarPolicy.calculateMaxX(point.getY());
+        tmpMinY = errorBarPolicy.calculateMinY(point.getY());
         if (tmpMinY < collectMinY) {
           collectMinY = tmpMinY;
         }
