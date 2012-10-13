@@ -962,7 +962,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
     double tmpMinY, collectMinY = point.getY();
     Set<ITracePainter< ? >> tracePainters = this.getTracePainters();
     /*
-     * Incorporate half stroke width to all extremums:
+     * Incorporate half stroke width to all extrema:
      */
     double halfStrokeWidth = 0.0;
     ITrace2D trace = point.getListener();
