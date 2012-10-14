@@ -65,6 +65,10 @@ jchart2d-3.3.0 - <month>, <day>, <year>
   Use this e.g. to cast the point into your subtype to extract further information about the highlighted point. 
 ! Added AxisTickPainterInwards, an axis tick mark painter that paints the ticks within the chart area. Contribution by 
   Gerard Verhaag!  
+! Added option to define strokes for the grid. This i.e. allows you to draw dashed grids via: 
+  chart.setGridStroke(new BasicStroke(3.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] {10.0f }, 0.0f));
+  and 
+  chart.getAxisY().setPaintGrid(true);
 o Changed policy of Chart2D.translateMousePosition(final MouseEvent mouseEvent). Before this the translation was done into the values 
   covered by the first x and y axes. By now the translation is related to the axes of the trace of the nearest point to the given 
   mouse event. 
