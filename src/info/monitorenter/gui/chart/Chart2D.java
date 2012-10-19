@@ -801,16 +801,6 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   public static final boolean DEBUG_THREADING = false;
 
   /**
-   * The bean property <code>constant</code> identifying a change of the grid
-   * stroke.
-   * <p>
-   * Use this constant to register a {@link java.beans.PropertyChangeListener}
-   * with the <code>Chart2D</code>.
-   * <p>
-   */
-  public static final String PROPERTY_GRID_STROKE = "Chart2D.PROPERTY_GRID_STROKE";
-
-  /**
    * The bean property <code>constant</code> identifying a change of traces.
    * <p>
    * Use this constant to register a {@link java.beans.PropertyChangeListener}
@@ -949,6 +939,16 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * <p>
    */
   public static final String PROPERTY_GRID_COLOR = "Chart2D.PROPERTY_GRID_COLOR";
+
+  /**
+   * The bean property <code>constant</code> identifying a change of the grid
+   * stroke.
+   * <p>
+   * Use this constant to register a {@link java.beans.PropertyChangeListener}
+   * with the <code>Chart2D</code>.
+   * <p>
+   */
+  public static final String PROPERTY_GRID_STROKE = "Chart2D.PROPERTY_GRID_STROKE";
 
   /**
    * The bean property <code>constant</code> identifying a change of the paint
