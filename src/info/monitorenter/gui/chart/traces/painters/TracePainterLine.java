@@ -57,36 +57,35 @@ public class TracePainterLine extends ATracePainter {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMaxX(double x) {
-
-    return this.m_pointPainter.calculateMaxX(x);
+  public double calculateMaxX(final ITracePoint2D point) {
+    return this.m_pointPainter.calculateMaxX(point);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMaxY(double y) {
-    return this.m_pointPainter.calculateMaxY(y);
+  public double calculateMaxY(final ITracePoint2D point) {
+    return this.m_pointPainter.calculateMaxY(point);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMinX(double x) {
-    return this.m_pointPainter.calculateMinX(x);
+  public double calculateMinX(final ITracePoint2D point) {
+    return this.m_pointPainter.calculateMinX(point);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMinY(double y) {
-    return this.m_pointPainter.calculateMinY(y);
+  public double calculateMinY(final ITracePoint2D point) {
+    return this.m_pointPainter.calculateMinY(point);
   }
 
   /**

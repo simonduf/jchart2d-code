@@ -62,8 +62,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * 
  * @version $Revision: 1.41 $
  */
-public abstract class AErrorBarPolicyConfigurable implements
-    IErrorBarPolicy<AErrorBarPolicyConfigurable>, PropertyChangeListener {
+public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy<AErrorBarPolicyConfigurable>, PropertyChangeListener {
 
   /** Generated <code>serialVersionUID</code>. **/
   private static final long serialVersionUID = -1163969612681194656L;
@@ -169,8 +168,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @see info.monitorenter.gui.chart.ITrace2D#addPropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
-  public final void addPropertyChangeListener(final String propertyName,
-      final PropertyChangeListener listener) {
+  public final void addPropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
     this.m_propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
   }
 
@@ -179,8 +177,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    *      int, info.monitorenter.gui.chart.errorbars.ErrorBarPixel,
    *      info.monitorenter.gui.chart.ITracePoint2D)
    */
-  public final void calculateErrorBar(final int xPixel, final int yPixel,
-      final ErrorBarPixel errorBar, final ITracePoint2D original) {
+  public final void calculateErrorBar(final int xPixel, final int yPixel, final ErrorBarPixel errorBar, final ITracePoint2D original) {
     errorBar.clear();
 
     if (this.m_showNegativeXErrors) {
@@ -217,11 +214,9 @@ public abstract class AErrorBarPolicyConfigurable implements
    */
   public void endPaintIteration(final Graphics g2d) {
     if (g2d != null) {
-      this.calculateErrorBar(this.getPreviousX(), this.getPreviousY(), this.m_reusedErrorBarPixel,
-          this.getPreviousTracePoint());
+      this.calculateErrorBar(this.getPreviousX(), this.getPreviousY(), this.m_reusedErrorBarPixel, this.getPreviousTracePoint());
       for (final IErrorBarPainter painter : this.m_errorBarPainters) {
-        painter.paintErrorBar(this.getPreviousX(), this.getPreviousY(),
-            this.getPreviousTracePoint(), g2d, this.m_reusedErrorBarPixel);
+        painter.paintErrorBar(this.getPreviousX(), this.getPreviousY(), this.getPreviousTracePoint(), g2d, this.m_reusedErrorBarPixel);
       }
     }
   }
@@ -293,8 +288,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @param newvalue
    *          the new value of the property.
    */
-  protected final void firePropertyChange(final String property, final Object oldvalue,
-      final Object newvalue) {
+  protected final void firePropertyChange(final String property, final Object oldvalue, final Object newvalue) {
     this.m_propertyChangeSupport.firePropertyChange(property, oldvalue, newvalue);
   }
 
@@ -393,8 +387,7 @@ public abstract class AErrorBarPolicyConfigurable implements
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result
-        + ((this.m_errorBarPainters == null) ? 0 : this.m_errorBarPainters.hashCode());
+    result = prime * result + ((this.m_errorBarPainters == null) ? 0 : this.m_errorBarPainters.hashCode());
     result = prime * result + (this.m_isEnded ? 1231 : 1237);
     result = prime * result + ((this.m_lastPoint == null) ? 0 : this.m_lastPoint.hashCode());
     result = prime * result + this.m_lastX;
@@ -424,8 +417,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    *         value (not relative to the the origin value).
    * 
    */
-  protected abstract int internalGetNegativeXError(final int xPixel, final int yPixel,
-      final ITracePoint2D original);
+  protected abstract int internalGetNegativeXError(final int xPixel, final int yPixel, final ITracePoint2D original);
 
   /**
    * Internally compute the negative y error for the given point as a pixel
@@ -444,8 +436,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @param original
    *          the original point, possibly useful for calculations.
    */
-  protected abstract int internalGetNegativeYError(final int xPixel, final int yPixel,
-      final ITracePoint2D original);
+  protected abstract int internalGetNegativeYError(final int xPixel, final int yPixel, final ITracePoint2D original);
 
   /**
    * Internally compute the positive x error in pixel for the given point as an
@@ -464,8 +455,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @return the positive x error in pixel for the given point as an absolute
    *         value (not relative to the the origin value).
    */
-  protected abstract int internalGetPositiveXError(final int xPixel, final int yPixel,
-      final ITracePoint2D original);
+  protected abstract int internalGetPositiveXError(final int xPixel, final int yPixel, final ITracePoint2D original);
 
   /**
    * Internally compute the positive y error in pixel for the given point as an
@@ -484,8 +474,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @return the positive y error in pixel for the given point as an absolute
    *         value (not relative to the the origin value).
    */
-  protected abstract int internalGetPositiveYError(final int xPixel, final int yPixel,
-      final ITracePoint2D original);
+  protected abstract int internalGetPositiveYError(final int xPixel, final int yPixel, final ITracePoint2D original);
 
   /**
    * @see info.monitorenter.gui.chart.IErrorBarPolicy#isShowNegativeXErrors()
@@ -519,8 +508,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @see info.monitorenter.gui.chart.IPointPainter#paintPoint(int, int, int,
    *      int, java.awt.Graphics, info.monitorenter.gui.chart.ITracePoint2D)
    */
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final ITracePoint2D original) {
+  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX, final int nextY, final Graphics g, final ITracePoint2D original) {
 
     this.calculateErrorBar(nextX, nextY, this.m_reusedErrorBarPixel, original);
     for (final IErrorBarPainter painter : this.m_errorBarPainters) {
@@ -543,8 +531,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
   public void propertyChange(final PropertyChangeEvent evt) {
-    this.firePropertyChange(IErrorBarPolicy.PROPERTY_CONFIGURATION, evt.getOldValue(),
-        evt.getNewValue());
+    this.firePropertyChange(IErrorBarPolicy.PROPERTY_CONFIGURATION, evt.getOldValue(), evt.getNewValue());
   }
 
   /**
@@ -577,8 +564,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @see info.monitorenter.gui.chart.IErrorBarPolicy#removePropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
-  public void removePropertyChangeListener(final String property,
-      final PropertyChangeListener listener) {
+  public void removePropertyChangeListener(final String property, final PropertyChangeListener listener) {
     this.m_propertyChangeSupport.removePropertyChangeListener(property, listener);
   }
 
@@ -697,14 +683,14 @@ public abstract class AErrorBarPolicyConfigurable implements
    * error bar and then paints that one.
    * <p>
    * 
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(ITracePoint2D)
    */
   @Override
-  public double calculateMaxX(final double x) {
+  public double calculateMaxX(final ITracePoint2D point) {
     /*
      * 1. Find the absolute error bar bound based upon the given point.
      */
-    double result = x;
+    double result = point.getX();
     double errorBarMaxXCollect = 0;
     if (this.isShowPositiveXErrors()) {
       errorBarMaxXCollect = this.getXError(result);
@@ -724,7 +710,7 @@ public abstract class AErrorBarPolicyConfigurable implements
          * also look strange).
          */
         IPointPainter< ? > endPointPainter = painter.getEndPointPainter();
-        errorBarMaxXCollect = endPointPainter.calculateMaxX(result);
+        errorBarMaxXCollect = endPointPainter.calculateMaxX(point);
         if (errorBarMaxXCollect > result) {
           result = errorBarMaxXCollect;
         }
@@ -734,14 +720,14 @@ public abstract class AErrorBarPolicyConfigurable implements
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMinX(final double x) {
+  public double calculateMinX(final ITracePoint2D point) {
     /*
      * 1. Find the absolute error bar bound based upon the given point.
      */
-    double result = x;
+    double result = point.getX();
     double errorBarMinXCollect = 0;
     if (this.isShowNegativeXErrors()) {
       errorBarMinXCollect = this.getXError(result);
@@ -761,7 +747,7 @@ public abstract class AErrorBarPolicyConfigurable implements
          * also look strange).
          */
         IPointPainter< ? > endPointPainter = painter.getEndPointPainter();
-        errorBarMinXCollect = endPointPainter.calculateMinX(result);
+        errorBarMinXCollect = endPointPainter.calculateMinX(point);
         if (errorBarMinXCollect < result) {
           result = errorBarMinXCollect;
         }
@@ -771,14 +757,14 @@ public abstract class AErrorBarPolicyConfigurable implements
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMaxY(final double y) {
+  public double calculateMaxY(final ITracePoint2D point) {
     /*
      * 1. Find the absolute error bar bound based upon the given point.
      */
-    double result = y;
+    double result = point.getY();
     double errorBarMaxYCollect = 0;
     if (this.isShowPositiveYErrors()) {
       errorBarMaxYCollect = this.getXError(result);
@@ -798,7 +784,7 @@ public abstract class AErrorBarPolicyConfigurable implements
          * also look strange).
          */
         IPointPainter< ? > endPointPainter = painter.getEndPointPainter();
-        errorBarMaxYCollect = endPointPainter.calculateMaxY(result);
+        errorBarMaxYCollect = endPointPainter.calculateMaxY(point);
         if (errorBarMaxYCollect > result) {
           result = errorBarMaxYCollect;
         }
@@ -808,14 +794,14 @@ public abstract class AErrorBarPolicyConfigurable implements
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMinY(final double y) {
+  public double calculateMinY(final ITracePoint2D point) {
     /*
      * 1. Find the absolute error bar bound based upon the given point.
      */
-    double result = y;
+    double result = point.getY();
     double errorBarMinYCollect = 0;
     if (this.isShowNegativeXErrors()) {
       errorBarMinYCollect = this.getXError(result);
@@ -835,13 +821,12 @@ public abstract class AErrorBarPolicyConfigurable implements
          * also look strange).
          */
         IPointPainter< ? > endPointPainter = painter.getEndPointPainter();
-        errorBarMinYCollect = endPointPainter.calculateMinY(result);
+        errorBarMinYCollect = endPointPainter.calculateMinY(point);
         if (errorBarMinYCollect < result) {
           result = errorBarMinYCollect;
         }
       }
     }
-
     return result;
   }
 

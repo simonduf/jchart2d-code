@@ -68,7 +68,7 @@ public class Trace2DDebugger implements ITrace2D {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -3016496113269676817L;
-
+ 
   /**
    * The instance to debug.
    */
@@ -136,6 +136,13 @@ public class Trace2DDebugger implements ITrace2D {
           + this.m_xRange.toString());
     }
     return this.m_delegate.addPoint(p);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#addPoint(info.monitorenter.gui.chart.ITracePoint2D, info.monitorenter.gui.chart.ITrace2D)
+   */
+  public boolean addPoint(ITracePoint2D p, ITrace2D wrapperOfMe) {
+    return this.m_delegate.addPoint(p, wrapperOfMe);
   }
 
   /**

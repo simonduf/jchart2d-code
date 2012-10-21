@@ -26,6 +26,7 @@
 
 package info.monitorenter.gui.chart.tracepoints;
 
+
 /**
  * Faked tracepoint that adds the properties to contain all data for a
  * candlestick.

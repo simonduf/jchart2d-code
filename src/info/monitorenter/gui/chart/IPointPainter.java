@@ -87,73 +87,72 @@ public interface IPointPainter<T extends IPointPainter<T>> extends Serializable,
    *          just for information, for painting this should be irrelevant and
    *          it should not be changed too!
    */
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final ITracePoint2D original);
+  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX, final int nextY, final Graphics g, final ITracePoint2D original);
 
   /**
    * Returns the maximum x bound this painter will need to paint the given
-   * point's x-coordinate.
+   * point.
    * <p>
    * This is needed because a point's bounds may be exceeded when actually
    * painting it.
    * <p>
    * 
-   * @param x
-   *          the point's x-coordinate that should be painted.
+   * @param point
+   *          the point to draw.
    * 
    * @return the maximum x bound this painter will need to paint the given
    *         point.
    */
-  public double calculateMaxX(final double x);
+  public double calculateMaxX(final ITracePoint2D point);
 
   /**
    * Returns the minimum x bound this painter will need to paint the given
-   * point's x-coordinate.
+   * point.
    * <p>
    * This is needed because a point's bounds may be exceeded when actually
    * painting it.
    * <p>
    * 
-   * @param x
-   *          the point's x-coordinate that should be painted.
+   * @param point
+   *          the point to draw.
    * 
    * @return the minimum x bound this painter will need to paint the given
    *         point.
    */
-  public double calculateMinX(final double x);
+  public double calculateMinX(final ITracePoint2D point);
 
   /**
    * Returns the maximum y bound this painter will need to paint the given
-   * point's y-coordinate.
+   * point.
    * <p>
    * This is needed because a point's bounds may be exceeded when actually
    * painting it.
    * <p>
    * 
-   * @param y
-   *          the point's y-coordinate that should be painted.
+   * @param point
+   *          the point to draw.
    * 
    * @return the maximum y bound this painter will need to paint the given
    *         point.
    */
-  public double calculateMaxY(final double y);
+  public double calculateMaxY(final ITracePoint2D point);
 
   /**
    * Returns the minimum y bound this painter will need to paint the given
-   * point's y-coordinate.
+   * point.
    * <p>
    * This is needed because a point's bounds may be exceeded when actually
    * painting it.
    * <p>
    * 
-   * @param y
-   *          the point's y-coordinate that should be painted.
+   * @param point
+   *          the point to draw.
    * 
    * @return the minimum y bound this painter will need to paint the given
    *         point.
    */
-  public double calculateMinY(final double y);
-  
+  public double calculateMinY(final ITracePoint2D point);
+
   /**
    * Invoked to inform implementations that a paint iteration starts for the
    * corresponding {@link info.monitorenter.gui.chart.ITrace2D}.

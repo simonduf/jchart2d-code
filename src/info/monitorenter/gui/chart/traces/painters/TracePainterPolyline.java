@@ -60,35 +60,35 @@ public class TracePainterPolyline extends ATracePainter {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMaxX(double x) {
-    return x;
+  public double calculateMaxX(final ITracePoint2D point) {
+    return point.getX();
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMaxY(double y) {
-    return y;
+  public double calculateMaxY(final ITracePoint2D point) {
+    return point.getY();
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMinX(double x) {
-    return x;
+  public double calculateMinX(final ITracePoint2D point) {
+    return point.getX();
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMinY(double y) {
-    return y;
+  public double calculateMinY(final ITracePoint2D point) {
+    return point.getY();
   }
 
   /**
@@ -113,12 +113,13 @@ public class TracePainterPolyline extends ATracePainter {
         count++;
       }
       y[count] = this.getPreviousY();
-      this.doDrawOperation(g2d,x,y,x.length);
+      this.doDrawOperation(g2d, x, y, x.length);
     }
   }
 
   /**
-   * Internally invokes the draw operation (to allow subclassing with a different one).
+   * Internally invokes the draw operation (to allow subclassing with a
+   * different one).
    * <p>
    * This implementation uses {@link Graphics#drawPolyline(int[], int[], int)}.
    * <p>
@@ -177,8 +178,7 @@ public class TracePainterPolyline extends ATracePainter {
    *      info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final ITracePoint2D original) {
+  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX, final int nextY, final Graphics g, final ITracePoint2D original) {
     super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
     this.m_xPoints.add(new Integer(absoluteX));
     this.m_yPoints.add(new Integer(absoluteY));
@@ -202,7 +202,5 @@ public class TracePainterPolyline extends ATracePainter {
       this.m_yPoints.clear();
     }
   }
-  
-  
 
 }

@@ -41,6 +41,8 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.ITracePointProvider;
+import info.monitorenter.gui.chart.pointpainters.PointPainterCandleStick;
+import info.monitorenter.gui.chart.tracepoints.CandleStick;
 
 /**
  * An ITrace2D decorator that adds the feature of drawing candlestick-traces.
@@ -68,9 +70,35 @@ public class Trace2DCandleSticks implements ITrace2D {
    */
   private final ITrace2D m_delegate;
 
-  public Trace2DCandleSticks(final ITrace2D delegateThatIsEnrichedByCandlestickPainting) {
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#addPoint(info.monitorenter.gui.chart.ITracePoint2D,
+   *      info.monitorenter.gui.chart.ITrace2D)
+   */
+  public boolean addPoint(ITracePoint2D p, ITrace2D wrapperOfMe) {
+    return this.m_delegate.addPoint(p, wrapperOfMe);
+  }
+
+  /**
+   * Constructor taking the trace implementation to decorate with candle stick
+   * painting.
+   * <p>
+   * 
+   * @param delegateThatIsEnrichedByCandlestickPainting
+   *          impl that will deal with the basic trace functionality.
+   * 
+   * @param candleStickWidth
+   *          width of the candlesticks.
+   */
+  public Trace2DCandleSticks(final ITrace2D delegateThatIsEnrichedByCandlestickPainting, final int candleStickWidth) {
     assert (delegateThatIsEnrichedByCandlestickPainting != null) : " Do not pass null";
     this.m_delegate = delegateThatIsEnrichedByCandlestickPainting;
+    /*
+     * FIXME: Once method removeAllTracePainters() is available switch to that.
+     */
+    for (ITracePainter< ? > tracePainter : this.m_delegate.getTracePainters()) {
+      this.m_delegate.removeTracePainter(tracePainter);
+    }
+    this.m_candleStickPainter = new PointPainterCandleStick(candleStickWidth);
   }
 
   /**
@@ -114,11 +142,19 @@ public class Trace2DCandleSticks implements ITrace2D {
   }
 
   /**
+   * Reused candle stick point painter.
+   */
+  private IPointPainter< ? > m_candleStickPainter;
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#addPoint(info.monitorenter.gui.chart.ITracePoint2D)
    */
   public boolean addPoint(ITracePoint2D p) {
-    // FIXME: Type test here for candlestick!
-    return this.m_delegate.addPoint(p);
+    CandleStick candleStick = (CandleStick) p;
+    candleStick.removeAllAdditionalPointPainters();
+    candleStick.addAdditionalPointPainter(this.m_candleStickPainter);
+    boolean result = this.m_delegate.addPoint(p, this);
+    return result;
   }
 
   /**
@@ -204,8 +240,9 @@ public class Trace2DCandleSticks implements ITrace2D {
    * @see info.monitorenter.gui.chart.ITrace2D#getMaxX()
    */
   public double getMaxX() {
-    // FIXME:check the max of the max value of the contained candlesticks
-    // tracepoints!
+    /*
+     * This works as delegate asks point which asks the special painter.
+     */
     return this.m_delegate.getMaxX();
   }
 
@@ -213,8 +250,9 @@ public class Trace2DCandleSticks implements ITrace2D {
    * @see info.monitorenter.gui.chart.ITrace2D#getMaxY()
    */
   public double getMaxY() {
-    // FIXME:check the max of the max value of the contained candlesticks
-    // tracepoints!
+    /*
+     * This works as delegate asks point which asks the special painter.
+     */
     return this.m_delegate.getMaxY();
   }
 
@@ -222,8 +260,9 @@ public class Trace2DCandleSticks implements ITrace2D {
    * @see info.monitorenter.gui.chart.ITrace2D#getMinX()
    */
   public double getMinX() {
-    // FIXME:check the min of the min value of the contained candlesticks
-    // tracepoints!
+    /*
+     * This works as delegate asks point which asks the special painter.
+     */
     return this.m_delegate.getMinX();
   }
 
@@ -231,8 +270,9 @@ public class Trace2DCandleSticks implements ITrace2D {
    * @see info.monitorenter.gui.chart.ITrace2D#getMinY()
    */
   public double getMinY() {
-    // FIXME:check the min of the min value of the contained candlesticks
-    // tracepoints!
+    /*
+     * This works as delegate asks point which asks the special painter.
+     */
     return this.m_delegate.getMinY();
   }
 
@@ -488,8 +528,7 @@ public class Trace2DCandleSticks implements ITrace2D {
    * 
    * @see info.monitorenter.gui.chart.ITrace2D#setTracePointProvider(info.monitorenter.gui.chart.ITracePointProvider)
    */
-  public void setTracePointProvider(ITracePointProvider tracePointProvider)
-      throws UnsupportedOperationException {
+  public void setTracePointProvider(ITracePointProvider tracePointProvider) throws UnsupportedOperationException {
     throw new UnsupportedOperationException("Don't use this on a " + this.getClass().getName()
         + " instance as this implementation needs a special trace point provider implementation. ");
   }
@@ -542,5 +581,4 @@ public class Trace2DCandleSticks implements ITrace2D {
   public boolean showsPositiveYErrorBars() {
     return this.m_delegate.showsPositiveYErrorBars();
   }
-
 }

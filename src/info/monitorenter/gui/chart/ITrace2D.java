@@ -550,6 +550,27 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public boolean addPoint(ITracePoint2D p);
 
   /**
+   * Do not call this unless you know what it does. This is a hook for
+   * {@link ITrace2D} implementations that decorate other implementations and
+   * have to register themselves with the added point (instead of this instance
+   * directly).
+   * <p>
+   * Prefer calling {@link #addPoint(ITracePoint2D)}.
+   * <p>
+   * 
+   * @see #firePointChanged(ITracePoint2D, int, double, double)
+   * 
+   * @param p
+   *          the <code>TracePoint2D</code> to add.
+   * 
+   * @param wrapperOfMe
+   *          the trace instance that wraps this instance.
+   * 
+   * @return true if the operation was successful, false else.
+   */
+  public boolean addPoint(final ITracePoint2D p, final ITrace2D wrapperOfMe);
+
+  /**
    * Adds the given point painter to the internal set of point highlighters.
    * <p>
    * It will be the last point painter to paint highlighting if highlighting is

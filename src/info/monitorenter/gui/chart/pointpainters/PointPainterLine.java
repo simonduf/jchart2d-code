@@ -48,35 +48,35 @@ public class PointPainterLine extends APointPainter<PointPainterLine> {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMaxX(double x) {
-    return x;
-  }
-  
-  /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(double)
-   */
-  @Override
-  public double calculateMaxY(double y) {
-    return y;
+  public double calculateMaxX(final ITracePoint2D point) {
+    return point.getX();
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMinX(double x) {
-    return x;
+  public double calculateMaxY(final ITracePoint2D point) {
+    return point.getY();
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMinY(double y) {
-    return y;
+  public double calculateMinX(final ITracePoint2D point) {
+    return point.getX();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMinY(final ITracePoint2D point) {
+    return point.getY();
   }
 
   /**
@@ -86,10 +86,8 @@ public class PointPainterLine extends APointPainter<PointPainterLine> {
    * @see info.monitorenter.gui.chart.IPointPainter#paintPoint(int, int, int,
    *      int, java.awt.Graphics, info.monitorenter.gui.chart.ITracePoint2D)
    */
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final ITracePoint2D point) {
+  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX, final int nextY, final Graphics g, final ITracePoint2D point) {
     g.drawLine(absoluteX, absoluteY, nextX, nextY);
   }
-
 
 }

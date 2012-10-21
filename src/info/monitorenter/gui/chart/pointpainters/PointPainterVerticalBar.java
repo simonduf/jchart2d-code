@@ -23,7 +23,9 @@
 package info.monitorenter.gui.chart.pointpainters;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITracePoint2D;
+import info.monitorenter.gui.util.TracePoint2DUtil;
 
 import java.awt.Graphics;
 
@@ -80,36 +82,41 @@ public class PointPainterVerticalBar extends APointPainter<PointPainterVerticalB
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMaxX(double x) {
-    return x + Math.ceil(this.getBarWidth() / 2);
+  public double calculateMaxX(final ITracePoint2D point) {
+    IAxis< ? > xAxis = TracePoint2DUtil.getAxisXOfTracePoint(point);
+    double barWidthValue = xAxis.translatePxToValue(this.getBarWidth());
+    return point.getX() + Math.ceil(barWidthValue / 2);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMaxY(double y) {
-    return y;
+  public double calculateMaxY(final ITracePoint2D point) {
+    return point.getY();
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMinX(double x) {
-    return x - Math.ceil(this.getBarWidth() / 2);
+  public double calculateMinX(final ITracePoint2D point) {
+    IAxis< ? > xAxis = TracePoint2DUtil.getAxisXOfTracePoint(point);
+    double barWidthValue = xAxis.translatePxToValue(this.getBarWidth());
+    return point.getX() - Math.ceil(barWidthValue / 2);
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMinY(double y) {
-    return y;
+  public double calculateMinY(final ITracePoint2D point) {
+    return point.getY();
   }
+
   /**
    * @see info.monitorenter.gui.chart.pointpainters.APointPainter#equals(java.lang.Object)
    */
@@ -164,11 +171,8 @@ public class PointPainterVerticalBar extends APointPainter<PointPainterVerticalB
    * @see info.monitorenter.gui.chart.IPointPainter#paintPoint(int, int, int,
    *      int, java.awt.Graphics, info.monitorenter.gui.chart.ITracePoint2D)
    */
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final ITracePoint2D original) {
-    g.fillRect(absoluteX - this.m_halfWidth, absoluteY, 2 * this.m_halfWidth, this.m_chart
-        .getYChartStart()
-        - absoluteY);
+  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX, final int nextY, final Graphics g, final ITracePoint2D original) {
+    g.fillRect(absoluteX - this.m_halfWidth, absoluteY, 2 * this.m_halfWidth, this.m_chart.getYChartStart() - absoluteY);
   }
 
   /**

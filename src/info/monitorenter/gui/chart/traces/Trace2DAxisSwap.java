@@ -104,6 +104,13 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
     return this.m_delegate.addPoint(swap);
   }
 
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#addPoint(info.monitorenter.gui.chart.ITracePoint2D, info.monitorenter.gui.chart.ITrace2D)
+   */
+  public boolean addPoint(ITracePoint2D p, ITrace2D wrapperOfMe) {
+    return this.m_delegate.addPoint(p, wrapperOfMe);
+  }
+
   public boolean addPointHighlighter(final IPointPainter< ? > highlighter) {
     return this.m_delegate.addPointHighlighter(highlighter);
   }

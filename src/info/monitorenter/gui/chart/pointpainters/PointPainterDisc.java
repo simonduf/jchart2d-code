@@ -21,7 +21,9 @@
  */
 package info.monitorenter.gui.chart.pointpainters;
 
+import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITracePoint2D;
+import info.monitorenter.gui.util.TracePoint2DUtil;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -118,8 +120,7 @@ public class PointPainterDisc extends APointPainter<PointPainterDisc> {
    * @see info.monitorenter.gui.chart.IPointPainter#paintPoint(int, int, int,
    *      int, java.awt.Graphics, info.monitorenter.gui.chart.ITracePoint2D)
    */
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final ITracePoint2D original) {
+  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX, final int nextY, final Graphics g, final ITracePoint2D original) {
     final Stroke backupStroke = this.installStroke(g);
     Color backupColor = null;
     Color test = this.installColorFill(g);
@@ -142,8 +143,7 @@ public class PointPainterDisc extends APointPainter<PointPainterDisc> {
       // - this.m_halfDiscSize
       // + halfstrokeWidth, this.m_discSize - strokeWidth, this.m_discSize -
       // strokeWidth);
-      g.fillOval(absoluteX - this.m_halfDiscSize, absoluteY - this.m_halfDiscSize, this.m_discSize,
-          this.m_discSize);
+      g.fillOval(absoluteX - this.m_halfDiscSize, absoluteY - this.m_halfDiscSize, this.m_discSize, this.m_discSize);
     }
     test = this.installColor(g);
     if (backupColor == null) {
@@ -158,8 +158,7 @@ public class PointPainterDisc extends APointPainter<PointPainterDisc> {
         backupColor = null;
       }
     }
-    g.drawOval(absoluteX - this.m_halfDiscSize, absoluteY - this.m_halfDiscSize, this.m_discSize,
-        this.m_discSize);
+    g.drawOval(absoluteX - this.m_halfDiscSize, absoluteY - this.m_halfDiscSize, this.m_discSize, this.m_discSize);
 
     if (backupStroke != null) {
       // cast is legal as installation would have failed and have returned null
@@ -184,36 +183,42 @@ public class PointPainterDisc extends APointPainter<PointPainterDisc> {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMaxX(double x) {
-
-    return x + this.m_discSize;
+  public double calculateMaxX(final ITracePoint2D point) {
+    IAxis< ? > xAxis = TracePoint2DUtil.getAxisXOfTracePoint(point);
+    double discSizeValue = xAxis.translatePxToValue(this.getDiscSize());
+    return point.getX() + discSizeValue / 2;
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMaxY(double y) {
-    return y + this.m_discSize;
+  public double calculateMaxY(final ITracePoint2D point) {
+    IAxis< ? > yAxis = TracePoint2DUtil.getAxisYOfTracePoint(point);
+    double discSizeValue = yAxis.translatePxToValue(this.getDiscSize());
+    return point.getY() + discSizeValue / 2;
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public double calculateMinX(double x) {
-    return x - this.m_discSize;
+  public double calculateMinX(final ITracePoint2D point) {
+    IAxis< ? > xAxis = TracePoint2DUtil.getAxisXOfTracePoint(point);
+    double discSizeValue = xAxis.translatePxToValue(this.getDiscSize());
+    return point.getX() - discSizeValue / 2;
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(double)
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(info.monitorenter.gui.chart.ITracePoint2D)
    */
-  @Override
-  public double calculateMinY(double y) {
-    return y - this.m_discSize;
+  public double calculateMinY(final ITracePoint2D point) {
+    IAxis< ? > yAxis = TracePoint2DUtil.getAxisYOfTracePoint(point);
+    double discSizeValue = yAxis.translatePxToValue(this.getDiscSize());
+    return point.getY() - discSizeValue;
   }
 
 }

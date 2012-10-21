@@ -3248,16 +3248,16 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     while (itTracePainters.hasNext()) {
       tracePainter = itTracePainters.next();
       tracePainter.paintPoint(xPxOld, yPxOld, xPxNew, yPxNew, g2d, original);
-      Set<IPointPainter< ? >> additionalHighlighters = original.getAdditionalPointPainters();
-      Iterator<IPointPainter< ? >> itPointHighlighters = additionalHighlighters.iterator();
-      IPointPainter< ? > highlighter;
-      while (itPointHighlighters.hasNext()) {
-        highlighter = itPointHighlighters.next();
-        highlighter.paintPoint(xPxNew, yPxNew, xPxNew, yPxNew, g2d, original);
-      }
       if (discontinue) {
         tracePainter.discontinue(g2d);
       }
+    }
+    Set<IPointPainter< ? >> additionalHighlighters = original.getAdditionalPointPainters();
+    Iterator<IPointPainter< ? >> itPointHighlighters = additionalHighlighters.iterator();
+    IPointPainter< ? > highlighter;
+    while (itPointHighlighters.hasNext()) {
+      highlighter = itPointHighlighters.next();
+      highlighter.paintPoint(xPxNew, yPxNew, xPxNew, yPxNew, g2d, original);
     }
     if (errorBarSupport) {
       this.paintErrorBars(trace, xPxOld, yPxOld, xPxNew, yPxNew, g2d, discontinue, original);

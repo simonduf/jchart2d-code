@@ -432,7 +432,7 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
       public Set<IPointPainter< ? >> execute() {
         Set<IPointPainter< ? >> result = TracePoint2D.this.m_additionalPointPainters;
         TracePoint2D.this.m_additionalPointPainters = new LinkedHashSet<IPointPainter< ? >>();
-        if (TracePoint2D.this != null) {
+        if (TracePoint2D.this != null && TracePoint2D.this.m_listener != null) {
           TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this,
               ITracePoint2D.STATE_RENDERING_CHANGED, 0, 0);
         }
