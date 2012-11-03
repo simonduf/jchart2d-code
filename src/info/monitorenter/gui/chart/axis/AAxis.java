@@ -44,6 +44,7 @@ import info.monitorenter.util.math.MathUtil;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -99,8 +100,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
   public T setAxisScalePolicy(final T axisScalePolicy) {
     T result = this.m_axisScalePolicy;
     this.m_axisScalePolicy = axisScalePolicy;
-    this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this, IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED, result,
-        this.m_axisScalePolicy));
+    this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this, IAxis.PROPERTY_AXIS_SCALE_POLICY_CHANGED, result, this.m_axisScalePolicy));
 
     return result;
   }
@@ -165,7 +165,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      * 
      * @param g2d
      *          needed for font metric information.
-     *          
+     * 
      * @return the height in pixel the corresponding axis needs to paint itself.
      */
     public abstract int getHeight(Graphics2D g2d);
@@ -802,12 +802,14 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
         result += 4;
       }
       /*
-       * the width of the y-axis title (it is rotated by default) is skipped here as it is 
-       * centered vertically. There could be situations where it is very long and would 
-       * extend much and had to be taken into account. But then again the code here 
-       * had to look whether it is rotated and also how it is positioned....
+       * the width of the y-axis title (it is rotated by default) is skipped
+       * here as it is centered vertically. There could be situations where it
+       * is very long and would extend much and had to be taken into account.
+       * But then again the code here had to look whether it is rotated and also
+       * how it is positioned....
        */
-//      result += AAxis.this.getAxisTitle().getTitlePainter().getHeight(AAxis.this, g2d);
+      // result +=
+      // AAxis.this.getAxisTitle().getTitlePainter().getHeight(AAxis.this, g2d);
       return result;
     }
 
@@ -1038,7 +1040,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     AAxis.propertyReactors.put(AxisTitle.PROPERTY_TITLEFONT, repaintReactor);
     AAxis.propertyReactors.put(AxisTitle.PROPERTY_TITLE, repaintReactor);
     AAxis.propertyReactors.put(AxisTitle.PROPERTY_TITLEPAINTER, repaintReactor);
-    
+
     AAxis.propertyReactors.put(ITrace2D.PROPERTY_MAX_X, new APropertyChangeReactorSynced() {
 
       /**
@@ -1419,8 +1421,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
           System.out.println(Thread.currentThread().getName() + ", AAxis" + this.getDimensionString() + ".addTrace(), 2 locks");
         }
         if (this.m_traces.contains(trace)) {
-          throw new IllegalArgumentException("Trace " + trace.getName() + " is already contaied in this axis " + this.getAxisTitle()
-              + ". Review your code. ");
+          throw new IllegalArgumentException("Trace " + trace.getName() + " is already contaied in this axis " + this.getAxisTitle() + ". Review your code. ");
         }
         // do it here:
         result = this.m_traces.add(trace);
@@ -1443,15 +1444,15 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
             this.m_max = max;
           }
           if (Chart2D.DEBUG_THREADING) {
-            System.out.println(Thread.currentThread().getName() + ", AAxis" + this.getDimensionString()
-                + ".addTrace(), before installing chart to trace " + trace.getName());
+            System.out.println(Thread.currentThread().getName() + ", AAxis" + this.getDimensionString() + ".addTrace(), before installing chart to trace "
+                + trace.getName());
             ExceptionUtil.dumpThreadStack(System.out);
 
           }
           trace.setRenderer(this.m_accessor.getChart());
           if (Chart2D.DEBUG_THREADING) {
-            System.out.println(Thread.currentThread().getName() + ", AAxis" + this.getDimensionString()
-                + ".addTrace(), after installing chart to trace " + trace.getName());
+            System.out.println(Thread.currentThread().getName() + ", AAxis" + this.getDimensionString() + ".addTrace(), after installing chart to trace "
+                + trace.getName());
           }
           // unconditionally scale the trace as we don't know which
           // bounds it was related to before.
@@ -1460,13 +1461,11 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
 
       }
       if (Chart2D.DEBUG_THREADING) {
-        System.out.println(Thread.currentThread().getName() + ", AAxis" + this.getDimensionString()
-            + ".addTrace(), left 1 lock: 1 remaining");
+        System.out.println(Thread.currentThread().getName() + ", AAxis" + this.getDimensionString() + ".addTrace(), left 1 lock: 1 remaining");
       }
     }
     if (Chart2D.DEBUG_THREADING) {
-      System.out.println(Thread.currentThread().getName() + ", AAxis" + this.getDimensionString()
-          + ".addTrace(), left 1 lock:  0 remaining");
+      System.out.println(Thread.currentThread().getName() + ", AAxis" + this.getDimensionString() + ".addTrace(), left 1 lock:  0 remaining");
     }
     // A deadlock occurs if a listener triggers paint.
     // This was the case with ChartPanel.
@@ -2165,10 +2164,18 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
         if (this.isPaintGrid()) {
           // do not paint over the axis
           if (tmp != xAxisStart) {
+            Stroke gridStroke = chart.getGridStroke();
+            Stroke oldStroke = null;
+            if (gridStroke != null) {
+              oldStroke = g2d.getStroke();
+              g2d.setStroke(gridStroke);
+            }
             g2d.setColor(chart.getGridColor());
             g2d.drawLine(tmp, yAxisLine - 1, tmp, yAxisEnd);
             g2d.setColor(chart.getForeground());
-
+            if (gridStroke != null) {
+              g2d.setStroke(oldStroke);
+            }
           }
         }
       }
@@ -2218,10 +2225,18 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
         if (this.isPaintGrid()) {
           // do not paint over the axis:
           if (tmp != xAxisStart) {
+            Stroke gridStroke = chart.getGridStroke();
+            Stroke oldStroke = null;
+            if (gridStroke != null) {
+              oldStroke = g2d.getStroke();
+              g2d.setStroke(chart.getGridStroke());
+            }
             g2d.setColor(chart.getGridColor());
             g2d.drawLine(tmp, yAxisLine + 1, tmp, yAxisStart);
             g2d.setColor(chart.getForeground());
-
+            if (gridStroke != null) {
+              g2d.setStroke(oldStroke);
+            }
           }
         }
       }
@@ -2269,9 +2284,18 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
         }
         if (this.isPaintGrid()) {
           if (tmp != yAxisStart) {
+            Stroke gridStroke = chart.getGridStroke();
+            Stroke oldStroke = null;
+            if (gridStroke != null) {
+              oldStroke = g2d.getStroke();
+              g2d.setStroke(chart.getGridStroke());
+            }
             g2d.setColor(chart.getGridColor());
             g2d.drawLine(xAxisStart + 1, tmp, xAxisEnd, tmp);
             g2d.setColor(chart.getForeground());
+            if (gridStroke != null) {
+              g2d.setStroke(oldStroke);
+            }
           }
         }
       }
@@ -2321,16 +2345,24 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
         if (this.isPaintGrid()) {
           // do not paint over the axis:
           if (tmp != yAxisStart) {
+            Stroke gridStroke = chart.getGridStroke();
+            Stroke oldStroke = null;
+            if (gridStroke != null) {
+              oldStroke = g2d.getStroke();
+              g2d.setStroke(chart.getGridStroke());
+            }
             g2d.setColor(chart.getGridColor());
             g2d.drawLine(xAxisStart + 1, tmp, xAxisEnd, tmp);
             g2d.setColor(chart.getForeground());
+            if (gridStroke != null) {
+              g2d.setStroke(oldStroke);
+            }
           }
         }
       }
       // unit-labeling
       final String unitName = this.getFormatter().getUnit().getUnitName();
-      g2d.drawString(unitName, (int) chart.getSize().getWidth() - fontdim.charsWidth(unitName.toCharArray(), 0, unitName.length()) - 4,
-          yAxisEnd);
+      g2d.drawString(unitName, (int) chart.getSize().getWidth() - fontdim.charsWidth(unitName.toCharArray(), 0, unitName.length()) - 4, yAxisEnd);
 
     }
 
@@ -2517,7 +2549,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
 
     AxisTitle oldValue = this.m_axisTitle;
     this.unListenToAxisTitle(this.m_axisTitle);
-    
+
     this.m_axisTitle = axisTitle;
     this.listenToAxisTitle(this.m_axisTitle);
     this.m_propertyChangeSupport.firePropertyChange(IAxis.PROPERTY_AXIS_TITLE, oldValue, axisTitle);
@@ -2646,8 +2678,8 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     final boolean oldValue = this.m_paintGrid;
     this.m_paintGrid = grid;
     if (oldValue != grid) {
-      this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this, IAxis.PROPERTY_PAINTGRID, Boolean.valueOf(oldValue),
-          Boolean.valueOf(this.m_paintGrid)));
+      this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this, IAxis.PROPERTY_PAINTGRID, Boolean.valueOf(oldValue), Boolean
+          .valueOf(this.m_paintGrid)));
     }
   }
 
@@ -2662,8 +2694,8 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     boolean oldValue = this.m_paintScale;
     this.m_paintScale = show;
     if (oldValue != this.m_paintScale) {
-      this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this, IAxis.PROPERTY_PAINTSCALE, Boolean.valueOf(oldValue),
-          Boolean.valueOf(this.m_paintGrid)));
+      this.m_propertyChangeSupport.firePropertyChange(new PropertyChangeEvent(this, IAxis.PROPERTY_PAINTSCALE, Boolean.valueOf(oldValue), Boolean
+          .valueOf(this.m_paintGrid)));
     }
   }
 
@@ -2771,8 +2803,8 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
 
     // check for scaling changes:
     if (((max != 0) && (min != 0)) && ((max != AAxis.this.getMax()) || (min != AAxis.this.getMin()))) {
-      this.m_accessor.m_chart.propertyChange(new PropertyChangeEvent(rangePolicy, IRangePolicy.PROPERTY_RANGE, new Range(min, max),
-          this.m_rangePolicy.getRange()));
+      this.m_accessor.m_chart.propertyChange(new PropertyChangeEvent(rangePolicy, IRangePolicy.PROPERTY_RANGE, new Range(min, max), this.m_rangePolicy
+          .getRange()));
     }
 
     this.m_propertyChangeSupport.firePropertyChange(IAxis.PROPERTY_RANGEPOLICY, old, rangePolicy);
@@ -2898,8 +2930,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     trace.removePropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINTS, this);
     trace.removePropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_LOCATION, this);
     trace.removePropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_RENDERING, this);
-    
-    
+
   }
 
   /**

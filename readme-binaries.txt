@@ -72,6 +72,12 @@ jchart2d-3.3.0 - <month>, <day>, <year>
   Gerard Verhaag!  
 ! Property of type ITracePointProvider is now assigned at trace level (vs. for all traces of a chart) which enables you 
   to define them differently for each trace in a chart.
+! Added option to define strokes for the grid. This i.e. allows you to draw dashed grids via: 
+  chart.setGridStroke(new BasicStroke(3.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] {10.0f }, 0.0f));
+  and 
+  chart.getAxisY().setPaintGrid(true);
+  Contribution by Ramon Zambelli. 
+! Added scrollable panel for zoomed charts. Contribution by Ramon Zambelli. 
 o Changed policy of Chart2D.translateMousePosition(final MouseEvent mouseEvent). Before this the translation was done into the values 
   covered by the first x and y axes. By now the translation is related to the axes of the trace of the nearest point to the given 
   mouse event. 

@@ -275,6 +275,27 @@ import javax.swing.Timer;
  * <td>{@link IPointFinder}</td>
  * <td>if {@link Chart2D#setPointFinder(IPointFinder)} caused a change.</td>
  * </tr>
+ * <tr>
+ * <td>{@link #PROPERTY_GRID_STROKE}</td>
+ * <td>{@link Chart2D}</td>
+ * <td>null</td>
+ * <td>{@link Stroke}</td>
+ * <td>A grid stroke was set (no one used before)</td>
+ * </tr>
+ * <tr>
+ * <td>{@link #PROPERTY_GRID_STROKE}</td>
+ * <td>{@link Chart2D}</td>
+ * <td>{@link Stroke}</td>
+ * <td>null</td>
+ * <td>The grid stroke was set to null (turned off, performance)</td>
+ * </tr>
+ * <tr>
+ * <td>{@link #PROPERTY_GRID_STROKE}</td>
+ * <td>{@link Chart2D}</td>
+ * <td>{@link Stroke}</td>
+ * <td>{@link Stroke}</td>
+ * <td>A new grid stroke was set.</td>
+ * </tr>
  * </table>
  * <p>
  * 
@@ -922,6 +943,16 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   public static final String PROPERTY_GRID_COLOR = "Chart2D.PROPERTY_GRID_COLOR";
 
   /**
+   * The bean property <code>constant</code> identifying a change of the grid
+   * stroke.
+   * <p>
+   * Use this constant to register a {@link java.beans.PropertyChangeListener}
+   * with the <code>Chart2D</code>.
+   * <p>
+   */
+  public static final String PROPERTY_GRID_STROKE = "Chart2D.PROPERTY_GRID_STROKE";
+
+  /**
    * The bean property <code>constant</code> identifying a change of the paint
    * labels flag.
    * <p>
@@ -1019,6 +1050,9 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
 
   /** The grid color. */
   private Color m_gridcolor = Color.lightGray;
+
+  /** The grid stroke. */
+  private Stroke m_gridstroke = null;
 
   /**
    * Chart - wide setting for the ms to give a repaint operation time for
@@ -2014,6 +2048,16 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    */
   public final Color getGridColor() {
     return this.m_gridcolor;
+  }
+
+  /**
+   * Returns the stroke of the grid or <code>null</code> if none is used.
+   * <p>
+   * 
+   * @return the stroke of the grid <code>null</code> if none is used.
+   */
+  public final Stroke getGridStroke() {
+    return this.m_gridstroke;
   }
 
   /**
@@ -4042,6 +4086,24 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       }
       this.setRequestedRepaint(true);
     }
+  }
+
+  /**
+   * Set the grid stroke to use.
+   * <p>
+   * Set <code>null</code> to turn off the grid stroke feature (this is the
+   * default) for optimal performance.
+   * <p>
+   * 
+   * @param gridStroke
+   *          the grid stroke to use or null if the feature should be turned
+   *          off.
+   */
+  public final void setGridStroke(final Stroke gridStroke) {
+    Stroke old = this.m_gridstroke;
+    this.m_gridstroke = gridStroke;
+    this.firePropertyChange(Chart2D.PROPERTY_GRID_STROKE, old, this.m_gridstroke);
+    this.setRequestedRepaint(true);
   }
 
   /**
