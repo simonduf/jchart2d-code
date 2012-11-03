@@ -57,6 +57,7 @@ jchart2d-3.3.0 - <month>, <day>, <year>
   to be painted (not only their raw coordinates). This is a heavy change that will remove bugs related to clipped 
   renderings in case error bars / additional point painters / trace painters actually require more space than the 
   mere coordinate bounds. This also allows to implement the feature #3571940: Real time candle stick chart.   
+* Fixed bug: Duplicate labels are accepted.   
 ! Improved performance of ITracePoint.setLocation(double, double): This was O(n) where n was amount of points in a trace in any 
   case except boundary increase. Now it is only O(n) if an extremum was diminished via that method.   
 ! Introduced data accumulation API. This allows you to have traces with 10^6 points painted with increased speed while zooming in 
