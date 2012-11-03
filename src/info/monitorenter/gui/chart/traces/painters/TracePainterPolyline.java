@@ -92,6 +92,17 @@ public class TracePainterPolyline extends ATracePainter {
   }
 
   /**
+   * Internally invokes the draw operation (to allow subclassing with a
+   * different one).
+   * <p>
+   * This implementation uses {@link Graphics#drawPolyline(int[], int[], int)}.
+   * <p>
+   */
+  protected void doDrawOperation(final Graphics g2d, int[] x, int[] y, int length) {
+    g2d.drawPolyline(x, y, x.length);
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics)
    */
   @Override
@@ -115,17 +126,6 @@ public class TracePainterPolyline extends ATracePainter {
       y[count] = this.getPreviousY();
       this.doDrawOperation(g2d, x, y, x.length);
     }
-  }
-
-  /**
-   * Internally invokes the draw operation (to allow subclassing with a
-   * different one).
-   * <p>
-   * This implementation uses {@link Graphics#drawPolyline(int[], int[], int)}.
-   * <p>
-   */
-  protected void doDrawOperation(final Graphics g2d, int[] x, int[] y, int length) {
-    g2d.drawPolyline(x, y, x.length);
   }
 
   /**
@@ -170,6 +170,22 @@ public class TracePainterPolyline extends ATracePainter {
     result = prime * result + ((this.m_xPoints == null) ? 0 : this.m_xPoints.hashCode());
     result = prime * result + ((this.m_yPoints == null) ? 0 : this.m_yPoints.hashCode());
     return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededY()
+   */
+  @Override
+  public boolean isPixelTransformationNeededY() {
+    return false;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededX()
+   */
+  @Override
+  public boolean isPixelTransformationNeededX() {
+    return false;
   }
 
   /**

@@ -660,22 +660,29 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    *          or a modified one.
    * 
    * @param state
-   *          one of {<code>{@link ITracePoint2D#STATE_ADDED},
-   *          {@link ITracePoint2D#STATE_CHANGED},
-   *          {@link ITracePoint2D#STATE_REMOVED},
-   *          {@link ITracePoint2D#STATE_RENDERING_CHANGED}
-   *          </code> to inform about the
-   *          type of change.
+   *          one of {@link ITracePoint2D.STATE}.
    * 
-   * @param oldX
-   *          if state is {@link ITracePoint2D#STATE_CHANGED} this is the
-   *          previous x value, else ignored.
+   * @param oldValue
+   *          the old value, or an old x coordinate. May vary depending on
+   *          state: {@link ITracePoint2D.STATE#ADDED} : null <br/>
+   *          {@link ITracePoint2D.STATE#REMOVED}: Double, the old x value. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}: null. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}:
+   *          {@link IPointPainter}, the old point painter that was removed. <br/>
+   *          {@link ITracePoint2D.STATE#CHANGED}:
+   *          {@link Double}, the old x coordinate. <br/>
+   *          
    * 
-   * @param oldY
-   *          if state is {@link ITracePoint2D#STATE_CHANGED} this is the
-   *          previous y value, else ignored.
-   */
-  public void firePointChanged(final ITracePoint2D changed, final int state, final double oldX, final double oldY);
+   * @param newValue
+   *          the new value, or an old y coordinate. May vary depending on
+   *          state: {@link ITracePoint2D.STATE#ADDED} : null <br/>
+   *          {@link ITracePoint2D.STATE#REMOVED}: Double, the old y value. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}:
+   *          {@link IPointPainter}, the new point painter that was added. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}: null <br/>
+   *          {@link ITracePoint2D.STATE#CHANGED}:
+   *          {@link Double}, the old y coordinate. <br/>   */
+  public void firePointChanged(final ITracePoint2D changed, final ITracePoint2D.STATE state, final Object oldValue, final Object newValue);
 
   /**
    * Because the color is data common to a trace of a <code>Chart2D</code> it is

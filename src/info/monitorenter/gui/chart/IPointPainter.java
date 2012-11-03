@@ -162,4 +162,30 @@ public interface IPointPainter<T extends IPointPainter<T>> extends Serializable,
    *          provided in case pending paint operations have to be performed.
    */
   public void startPaintIteration(Graphics g2d);
+
+  /**
+   * Return true if rendering in x dimension requires a transformation from pixel to value
+   * domain.
+   * <p>
+   * If this is the case min-max - search of the trace is much slower (points *
+   * 2 * amount of painters).
+   * <p>
+   * 
+   * @return true if rendering in x dimension requires a transformation from pixel to value
+   *         domain.
+   */
+  public boolean isPixelTransformationNeededX();
+
+  /**
+   * Return true if rendering in y dimension requires a transformation from pixel to value
+   * domain.
+   * <p>
+   * If this is the case min-max - search of the trace is much slower (points *
+   * 2 * amount of painters).
+   * <p>
+   * 
+   * @return true if rendering in y dimension requires a transformation from pixel to value
+   *         domain.
+   */
+  public boolean isPixelTransformationNeededY();
 }

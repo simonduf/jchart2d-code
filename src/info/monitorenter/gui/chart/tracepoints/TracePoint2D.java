@@ -27,6 +27,8 @@ import java.awt.geom.Point2D;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import com.sun.org.apache.bcel.internal.generic.NEW;
+
 /**
  * A specialized version of <code>java.awt.Point2D.Double </code> who carries
  * two further values: <code> double scaledX</code> and
@@ -134,8 +136,7 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
         final boolean res = TracePoint2D.this.m_additionalPointPainters.add(additionalPointPainter);
         // for interpolated points listener may be null:
         if (res && TracePoint2D.this.m_listener != null) {
-          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this,
-              ITracePoint2D.STATE_RENDERING_CHANGED, 0, 0);
+          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE.ADDITIONAL_POINT_PAINTER_ADDED, null, additionalPointPainter);
         }
         return Boolean.valueOf(res);
       }
@@ -161,8 +162,7 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
     result.m_y = this.m_y;
     result.m_scaledX = this.m_scaledX;
     result.m_scaledY = this.m_scaledY;
-    result.m_additionalPointPainters = new LinkedHashSet<IPointPainter< ? >>(
-        this.m_additionalPointPainters);
+    result.m_additionalPointPainters = new LinkedHashSet<IPointPainter< ? >>(this.m_additionalPointPainters);
     return result;
   }
 
@@ -317,8 +317,7 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
         TracePoint2D.this.m_x = xValue;
         TracePoint2D.this.m_y = yValue;
         if (TracePoint2D.this.m_listener != null) {
-          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this,
-              ITracePoint2D.STATE_CHANGED, oldX, oldY);
+          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE.CHANGED, new java.lang.Double(oldX), new java.lang.Double(oldY));
         }
         return null;
       }
@@ -353,12 +352,8 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
       } else {
         // not connected to a chart by now:
         if (Chart2D.DEBUG_THREADING) {
-          System.err
-              .println("Only partially synchronized execution of code that should run synchronized ("
-                  + runSynchronized.getClass().getSimpleName()
-                  + ") for point "
-                  + this.toString()
-                  + " as trace (" + this.m_listener.getName() + ") is not connected to chart.");
+          System.err.println("Only partially synchronized execution of code that should run synchronized (" + runSynchronized.getClass().getSimpleName()
+              + ") for point " + this.toString() + " as trace (" + this.m_listener.getName() + ") is not connected to chart.");
         }
 
         synchronized (this.m_listener) {
@@ -369,9 +364,8 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
       // not connected to any trace now:
       result = runSynchronized.execute();
       if (Chart2D.DEBUG_THREADING) {
-        System.err.println("Unsynchronized execution of code that should run synchronized ("
-            + runSynchronized.getClass().getSimpleName() + ") for point " + this.toString()
-            + " as listener (trace) is not connected.");
+        System.err.println("Unsynchronized execution of code that should run synchronized (" + runSynchronized.getClass().getSimpleName() + ") for point "
+            + this.toString() + " as listener (trace) is not connected.");
       }
     }
     return result;
@@ -412,8 +406,7 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
         boolean res = TracePoint2D.this.m_additionalPointPainters.remove(pointPainter);
         if (res) {
           if (TracePoint2D.this != null) {
-            TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this,
-                ITracePoint2D.STATE_RENDERING_CHANGED, 0, 0);
+            TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE.ADDITIONAL_POINT_PAINTER_REMOVED, pointPainter, null);
           }
         }
         return Boolean.valueOf(res);
@@ -433,8 +426,8 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
         Set<IPointPainter< ? >> result = TracePoint2D.this.m_additionalPointPainters;
         TracePoint2D.this.m_additionalPointPainters = new LinkedHashSet<IPointPainter< ? >>();
         if (TracePoint2D.this != null && TracePoint2D.this.m_listener != null) {
-          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this,
-              ITracePoint2D.STATE_RENDERING_CHANGED, 0, 0);
+          for (IPointPainter< ? > pointPainter : result)
+            TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE.ADDITIONAL_POINT_PAINTER_REMOVED, pointPainter, null);
         }
         return result;
       }

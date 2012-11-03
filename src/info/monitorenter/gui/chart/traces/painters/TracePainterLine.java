@@ -21,17 +21,10 @@
  */
 package info.monitorenter.gui.chart.traces.painters;
 
-import info.monitorenter.gui.chart.IPointPainter;
-import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.pointpainters.PointPainterLine;
-
-import java.awt.Graphics;
 
 /**
  * A trace painter that renders a trace by lines.
- * <p>
- * 
- * FIXME: Look if this one could extend {@link TracePainterConfigurable}.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
@@ -39,111 +32,16 @@ import java.awt.Graphics;
  * @version $Revision: 1.22 $
  * 
  */
-public class TracePainterLine extends ATracePainter {
+public class TracePainterLine extends TracePainterConfigurable<PointPainterLine> {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -3310431930065989648L;
-
-  /** The implementation for rendering the point as a line. */
-  private final IPointPainter< ? > m_pointPainter;
 
   /**
    * Defcon.
    * <p>
    */
-  public TracePainterLine() {    // TODO Auto-generated method stub
-
-    this.m_pointPainter = new PointPainterLine();
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public double calculateMaxX(final ITracePoint2D point) {
-    return this.m_pointPainter.calculateMaxX(point);
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public double calculateMaxY(final ITracePoint2D point) {
-    return this.m_pointPainter.calculateMaxY(point);
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public double calculateMinX(final ITracePoint2D point) {
-    return this.m_pointPainter.calculateMinX(point);
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public double calculateMinY(final ITracePoint2D point) {
-    return this.m_pointPainter.calculateMinY(point);
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#endPaintIteration(java.awt.Graphics)
-   */
-  @Override
-  public void endPaintIteration(final Graphics g2d) {
-    this.m_pointPainter.endPaintIteration(g2d);
-  }
-
-  /**
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (!super.equals(obj)) {
-      return false;
-    }
-    if (this.getClass() != obj.getClass()) {
-      return false;
-    }
-    final TracePainterLine other = (TracePainterLine) obj;
-    if (this.m_pointPainter == null) {
-      if (other.m_pointPainter != null) {
-        return false;
-      }
-    } else if (!this.m_pointPainter.equals(other.m_pointPainter)) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((this.m_pointPainter == null) ? 0 : this.m_pointPainter.hashCode());
-    return result;
-  }
-
-  /**
-   * Paints a line from current to next point.
-   * <p>
-   * 
-   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int,
-   *      int, int, int, java.awt.Graphics,
-   *      info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final ITracePoint2D original) {
-    super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
-    this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
+  public TracePainterLine() {    
+    super(new PointPainterLine());
   }
 }

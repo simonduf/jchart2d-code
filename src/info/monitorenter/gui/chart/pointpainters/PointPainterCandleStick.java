@@ -27,11 +27,9 @@
 package info.monitorenter.gui.chart.pointpainters;
 
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.tracepoints.CandleStick;
-import info.monitorenter.gui.util.TracePoint2DUtil;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -50,6 +48,9 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
   /** Generated <code>serialVersionUID</code>. **/
   private static final long serialVersionUID = -6708238540093878572L;
 
+  /** The width of the candlestick. */
+  private double m_width;
+
   /**
    * Constructor taking the width.
    * <p>
@@ -62,16 +63,50 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
   }
 
   /**
-   * @see java.lang.Object#hashCode()
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    long temp;
-    temp = Double.doubleToLongBits(this.m_width);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
+  public double calculateMaxX(final ITracePoint2D point) {
+   return point.getX();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMaxY(final ITracePoint2D point) {
+    double result;
+    CandleStick candleStick = (CandleStick) point;
+    result = candleStick.getHigh();
     return result;
+  }
+
+  /**
+   * 
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMinX(final ITracePoint2D point) {
+    return point.getX();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMinY(final ITracePoint2D point) {
+    double result;
+    CandleStick candleStick = (CandleStick) point;
+    result = candleStick.getLow();
+    return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#endPaintIteration(java.awt.Graphics)
+   */
+  @Override
+  public void endPaintIteration(Graphics g2d) {
+    // nop
   }
 
   /**
@@ -95,9 +130,6 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
     return true;
   }
 
-  /** The width of the candlestick. */
-  private double m_width;
-
   /**
    * Returns the width.
    * <p>
@@ -109,11 +141,32 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#endPaintIteration(java.awt.Graphics)
+   * @see java.lang.Object#hashCode()
    */
   @Override
-  public void endPaintIteration(Graphics g2d) {
-    // nop
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    long temp;
+    temp = Double.doubleToLongBits(this.m_width);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededX()
+   */
+  @Override
+  public boolean isPixelTransformationNeededX() {
+    return false;
+  }
+  
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededX()
+   */
+  @Override
+  public boolean isPixelTransformationNeededY() {
+    return false;
   }
 
   /**
@@ -159,85 +212,45 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
         double highYPx = yChartStartPx - (int) Math.round(highYNormalized * rangeYPx);
         double lowYPx = yChartStartPx - (int) Math.round(lowYNormalized * rangeYPx);
         /*
-         * Finally paint: 
+         * Finally paint:
          */
+        Color backupColor;
         if (candleStick.getStart() > candleStick.getEnd()) {
           /*
            * 1. box marking space between start and stop y
            */
+          backupColor = this.installColor(g);
           g.drawRect((int) (x - this.getWidth() / 2), (int) startYPx, (int) this.getWidth(), (int) (endYPx - startYPx));
           /*
            * 2. upper wick
            */
-          g.drawLine((int)x, (int)startYPx, (int)x, (int)highYPx);
+          g.drawLine((int) x, (int) startYPx, (int) x, (int) highYPx);
           /*
            * 2. lower wick
            */
-          g.drawLine((int)x, (int)endYPx, (int)x, (int)lowYPx);
+          g.drawLine((int) x, (int) endYPx, (int) x, (int) lowYPx);
+          g.setColor(backupColor);
         } else {
           /*
            * 1. box marking space between start and stop y
            */
-          Color backgroundBackup = this.getColor();
-          g.setColor(this.getColorFill());
+          backupColor = this.installColorFill(g);
           g.fillRect((int) (x - this.getWidth() / 2), (int) endYPx, (int) this.getWidth(), (int) (startYPx - endYPx));
-          g.setColor(backgroundBackup);
+          this.installColor(g);
           g.drawRect((int) (x - this.getWidth() / 2), (int) endYPx, (int) this.getWidth(), (int) (startYPx - endYPx));
           /*
            * 2. upper wick
            */
-          g.drawLine((int)x, (int)endYPx, (int)x, (int)highYPx);
+          g.drawLine((int) x, (int) endYPx, (int) x, (int) highYPx);
           /*
            * 2. lower wick
            */
-          g.drawLine((int)x, (int)startYPx, (int)x, (int)lowYPx);
+          g.drawLine((int) x, (int) startYPx, (int) x, (int) lowYPx);
+          g.setColor(backupColor);
         }
-        
+
       }
     }
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public double calculateMaxX(final ITracePoint2D point) {
-    IAxis< ? > axisX = TracePoint2DUtil.getAxisXOfTracePoint(point);
-    double widthValue = axisX.translatePxToValue((int) this.m_width);
-    return point.getX() + (widthValue / 2);
-  }
-
-  /**
-   * 
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public double calculateMinX(final ITracePoint2D point) {
-    IAxis< ? > axisX = TracePoint2DUtil.getAxisXOfTracePoint(point);
-    double widthValue = axisX.translatePxToValue((int) this.m_width);
-    return point.getX() - (widthValue / 2);
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public double calculateMaxY(final ITracePoint2D point) {
-    double result;
-    CandleStick candleStick = (CandleStick) point;
-    result = candleStick.getHigh();
-    return result;
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public double calculateMinY(final ITracePoint2D point) {
-    double result;
-    CandleStick candleStick = (CandleStick) point;
-    result = candleStick.getLow();
-    return result;
   }
 
   /**

@@ -80,6 +80,22 @@ public class PointPainterLine extends APointPainter<PointPainterLine> {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededX()
+   */
+  @Override
+  public boolean isPixelTransformationNeededX() {
+    return false;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededY()
+   */
+  @Override
+  public boolean isPixelTransformationNeededY() {
+    return false;
+  }
+
+  /**
    * Paints a line from current to next point.
    * <p>
    * 

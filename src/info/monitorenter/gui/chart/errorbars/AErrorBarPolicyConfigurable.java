@@ -195,6 +195,165 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy<AEr
   }
 
   /**
+   * This implementation actually does shift the semantics of this method.
+   * Instead of just finding out if this painter will exceed the given
+   * coordinates desired bound first the error bar coordinate will be calculated
+   * and then the end point painters of this instance will subsequently be asked
+   * if they increase the desired bound.
+   * <p>
+   * This is necessary because an error bar painter does not paint the original
+   * given coordinate but first derives another internal coordinate for the
+   * error bar and then paints that one.
+   * <p>
+   * 
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(ITracePoint2D)
+   */
+  @Override
+  public double calculateMaxX(final ITracePoint2D point) {
+    /*
+     * 1. Find the absolute error bar bound based upon the given point.
+     */
+    double result = point.getX();
+    double errorBarMaxXCollect = 0;
+    if (this.isShowPositiveXErrors()) {
+      errorBarMaxXCollect = this.getXError(result);
+      final double absoluteMax = result + errorBarMaxXCollect;
+      if (absoluteMax > result) {
+        result = absoluteMax;
+      }
+
+      /*
+       * 2. Find out, if an internal painter would exceed this bound further.
+       */
+      for (IErrorBarPainter painter : this.getErrorBarPainters()) {
+        /*
+         * Assumption: the end point painter is the one that will exceed bound,
+         * ignore the others. However technically also segment painter or even
+         * start painter could exceed more (if coded weird / in a way that would
+         * also look strange).
+         */
+        IPointPainter< ? > endPointPainter = painter.getEndPointPainter();
+        errorBarMaxXCollect = endPointPainter.calculateMaxX(point);
+        if (errorBarMaxXCollect > result) {
+          result = errorBarMaxXCollect;
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMaxY(final ITracePoint2D point) {
+    /*
+     * 1. Find the absolute error bar bound based upon the given point.
+     */
+    double result = point.getY();
+    double errorBarMaxYCollect = 0;
+    if (this.isShowPositiveYErrors()) {
+      errorBarMaxYCollect = this.getXError(result);
+    }
+    final double absoluteMax = result + errorBarMaxYCollect;
+    if (absoluteMax > result) {
+      result = absoluteMax;
+
+      /*
+       * 2. Find out, if an internal painter would exceed this bound further.
+       */
+      for (IErrorBarPainter painter : this.getErrorBarPainters()) {
+        /*
+         * Assumption: the end point painter is the one that will exceed bound,
+         * ignore the others. However technically also segment painter or even
+         * start painter could exceed more (if coded weird / in a way that would
+         * also look strange).
+         */
+        IPointPainter< ? > endPointPainter = painter.getEndPointPainter();
+        errorBarMaxYCollect = endPointPainter.calculateMaxY(point);
+        if (errorBarMaxYCollect > result) {
+          result = errorBarMaxYCollect;
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMinX(final ITracePoint2D point) {
+    /*
+     * 1. Find the absolute error bar bound based upon the given point.
+     */
+    double result = point.getX();
+    double errorBarMinXCollect = 0;
+    if (this.isShowNegativeXErrors()) {
+      errorBarMinXCollect = this.getXError(result);
+      final double absoluteMin = result - errorBarMinXCollect;
+      if (absoluteMin < result) {
+        result = absoluteMin;
+      }
+
+      /*
+       * 2. Find out, if an internal painter would exceed this bound further.
+       */
+      for (IErrorBarPainter painter : this.getErrorBarPainters()) {
+        /*
+         * Assumption: the end point painter is the one that will exceed bound,
+         * ignore the others. However technically also segment painter or even
+         * start painter could exceed more (if coded weird / in a way that would
+         * also look strange).
+         */
+        IPointPainter< ? > endPointPainter = painter.getEndPointPainter();
+        errorBarMinXCollect = endPointPainter.calculateMinX(point);
+        if (errorBarMinXCollect < result) {
+          result = errorBarMinXCollect;
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMinY(final ITracePoint2D point) {
+    /*
+     * 1. Find the absolute error bar bound based upon the given point.
+     */
+    double result = point.getY();
+    double errorBarMinYCollect = 0;
+    if (this.isShowNegativeXErrors()) {
+      errorBarMinYCollect = this.getXError(result);
+      final double absoluteMin = result - errorBarMinYCollect;
+      if (absoluteMin < result) {
+        result = absoluteMin;
+      }
+
+      /*
+       * 2. Find out, if an internal painter would exceed this bound further.
+       */
+      for (IErrorBarPainter painter : this.getErrorBarPainters()) {
+        /*
+         * Assumption: the end point painter is the one that will exceed bound,
+         * ignore the others. However technically also segment painter or even
+         * start painter could exceed more (if coded weird / in a way that would
+         * also look strange).
+         */
+        IPointPainter< ? > endPointPainter = painter.getEndPointPainter();
+        errorBarMinYCollect = endPointPainter.calculateMinY(point);
+        if (errorBarMinYCollect < result) {
+          result = errorBarMinYCollect;
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
   public int compareTo(final AErrorBarPolicyConfigurable o) {
@@ -477,6 +636,70 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy<AEr
   protected abstract int internalGetPositiveYError(final int xPixel, final int yPixel, final ITracePoint2D original);
 
   /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededX()
+   */
+  @Override
+  public boolean isPixelTransformationNeededX() {
+    boolean result = false;
+    for (IErrorBarPainter painter : this.getErrorBarPainters()) {
+      /*
+       * Assumption: the end point painter is the one that will exceed bound,
+       * ignore the others. However technically also segment painter or even
+       * start painter could exceed more (if coded weird / in a way that would
+       * also look strange).
+       */
+      IPointPainter< ? > segmentPainter = painter.getEndPointPainter();
+      if(segmentPainter.isPixelTransformationNeededX()){
+        result = true;
+        break;
+      }
+      segmentPainter = painter.getStartPointPainter();
+      if(segmentPainter.isPixelTransformationNeededX()){
+        result = true;
+        break;
+      }
+      segmentPainter = painter.getConnectionPainter();
+      if(segmentPainter.isPixelTransformationNeededX()){
+        result = true;
+        break;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededY()
+   */
+  @Override
+  public boolean isPixelTransformationNeededY() {
+    boolean result = false;
+    for (IErrorBarPainter painter : this.getErrorBarPainters()) {
+      /*
+       * Assumption: the end point painter is the one that will exceed bound,
+       * ignore the others. However technically also segment painter or even
+       * start painter could exceed more (if coded weird / in a way that would
+       * also look strange).
+       */
+      IPointPainter< ? > segmentPainter = painter.getEndPointPainter();
+      if(segmentPainter.isPixelTransformationNeededY()){
+        result = true;
+        break;
+      }
+      segmentPainter = painter.getStartPointPainter();
+      if(segmentPainter.isPixelTransformationNeededY()){
+        result = true;
+        break;
+      }
+      segmentPainter = painter.getConnectionPainter();
+      if(segmentPainter.isPixelTransformationNeededY()){
+        result = true;
+        break;
+      }
+    }
+    return result;
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.IErrorBarPolicy#isShowNegativeXErrors()
    */
   public final boolean isShowNegativeXErrors() {
@@ -669,165 +892,6 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy<AEr
    */
   public void startPaintIteration(final Graphics g2d) {
     // nop
-  }
-
-  /**
-   * This implementation actually does shift the semantics of this method.
-   * Instead of just finding out if this painter will exceed the given
-   * coordinates desired bound first the error bar coordinate will be calculated
-   * and then the end point painters of this instance will subsequently be asked
-   * if they increase the desired bound.
-   * <p>
-   * This is necessary because an error bar painter does not paint the original
-   * given coordinate but first derives another internal coordinate for the
-   * error bar and then paints that one.
-   * <p>
-   * 
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(ITracePoint2D)
-   */
-  @Override
-  public double calculateMaxX(final ITracePoint2D point) {
-    /*
-     * 1. Find the absolute error bar bound based upon the given point.
-     */
-    double result = point.getX();
-    double errorBarMaxXCollect = 0;
-    if (this.isShowPositiveXErrors()) {
-      errorBarMaxXCollect = this.getXError(result);
-      final double absoluteMax = result + errorBarMaxXCollect;
-      if (absoluteMax > result) {
-        result = absoluteMax;
-      }
-
-      /*
-       * 2. Find out, if an internal painter would exceed this bound further.
-       */
-      for (IErrorBarPainter painter : this.getErrorBarPainters()) {
-        /*
-         * Assumption: the end point painter is the one that will exceed bound,
-         * ignore the others. However technically also segment painter or even
-         * start painter could exceed more (if coded weird / in a way that would
-         * also look strange).
-         */
-        IPointPainter< ? > endPointPainter = painter.getEndPointPainter();
-        errorBarMaxXCollect = endPointPainter.calculateMaxX(point);
-        if (errorBarMaxXCollect > result) {
-          result = errorBarMaxXCollect;
-        }
-      }
-    }
-    return result;
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public double calculateMinX(final ITracePoint2D point) {
-    /*
-     * 1. Find the absolute error bar bound based upon the given point.
-     */
-    double result = point.getX();
-    double errorBarMinXCollect = 0;
-    if (this.isShowNegativeXErrors()) {
-      errorBarMinXCollect = this.getXError(result);
-      final double absoluteMin = result - errorBarMinXCollect;
-      if (absoluteMin < result) {
-        result = absoluteMin;
-      }
-
-      /*
-       * 2. Find out, if an internal painter would exceed this bound further.
-       */
-      for (IErrorBarPainter painter : this.getErrorBarPainters()) {
-        /*
-         * Assumption: the end point painter is the one that will exceed bound,
-         * ignore the others. However technically also segment painter or even
-         * start painter could exceed more (if coded weird / in a way that would
-         * also look strange).
-         */
-        IPointPainter< ? > endPointPainter = painter.getEndPointPainter();
-        errorBarMinXCollect = endPointPainter.calculateMinX(point);
-        if (errorBarMinXCollect < result) {
-          result = errorBarMinXCollect;
-        }
-      }
-    }
-    return result;
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public double calculateMaxY(final ITracePoint2D point) {
-    /*
-     * 1. Find the absolute error bar bound based upon the given point.
-     */
-    double result = point.getY();
-    double errorBarMaxYCollect = 0;
-    if (this.isShowPositiveYErrors()) {
-      errorBarMaxYCollect = this.getXError(result);
-    }
-    final double absoluteMax = result + errorBarMaxYCollect;
-    if (absoluteMax > result) {
-      result = absoluteMax;
-
-      /*
-       * 2. Find out, if an internal painter would exceed this bound further.
-       */
-      for (IErrorBarPainter painter : this.getErrorBarPainters()) {
-        /*
-         * Assumption: the end point painter is the one that will exceed bound,
-         * ignore the others. However technically also segment painter or even
-         * start painter could exceed more (if coded weird / in a way that would
-         * also look strange).
-         */
-        IPointPainter< ? > endPointPainter = painter.getEndPointPainter();
-        errorBarMaxYCollect = endPointPainter.calculateMaxY(point);
-        if (errorBarMaxYCollect > result) {
-          result = errorBarMaxYCollect;
-        }
-      }
-    }
-    return result;
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public double calculateMinY(final ITracePoint2D point) {
-    /*
-     * 1. Find the absolute error bar bound based upon the given point.
-     */
-    double result = point.getY();
-    double errorBarMinYCollect = 0;
-    if (this.isShowNegativeXErrors()) {
-      errorBarMinYCollect = this.getXError(result);
-      final double absoluteMin = result - errorBarMinYCollect;
-      if (absoluteMin < result) {
-        result = absoluteMin;
-      }
-
-      /*
-       * 2. Find out, if an internal painter would exceed this bound further.
-       */
-      for (IErrorBarPainter painter : this.getErrorBarPainters()) {
-        /*
-         * Assumption: the end point painter is the one that will exceed bound,
-         * ignore the others. However technically also segment painter or even
-         * start painter could exceed more (if coded weird / in a way that would
-         * also look strange).
-         */
-        IPointPainter< ? > endPointPainter = painter.getEndPointPainter();
-        errorBarMinYCollect = endPointPainter.calculateMinY(point);
-        if (errorBarMinYCollect < result) {
-          result = errorBarMinYCollect;
-        }
-      }
-    }
-    return result;
   }
 
 }

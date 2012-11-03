@@ -83,23 +83,6 @@ public abstract class APointPainter<T extends IPointPainterConfigurableUI<T>> im
   }
 
   /**
-   * Caution: <code>{@link ClassCastException}</code> thrown if wrong type
-   * given.
-   * <p>
-   * 
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  // @SuppressWarnings("unchecked")
-  // @Override
-  // public final boolean equals(Object arg0) {
-  // boolean result = false;
-  // if (arg0.getClass() == this.getClass()) {
-  // result = this.compareTo((T) arg0) == 0;
-  // }
-  // return result;
-  // }
-
-  /**
    * 
    * @see java.lang.Object#equals(java.lang.Object)
    */

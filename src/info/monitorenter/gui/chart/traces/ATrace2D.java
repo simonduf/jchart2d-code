@@ -329,7 +329,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * Prefer calling {@link #addPoint(ITracePoint2D)}.
    * <p>
    * 
-   * @see #firePointChanged(ITracePoint2D, int, double, double)
+   * @see #firePointChanged(ITracePoint2D,
+   *      info.monitorenter.gui.chart.ITracePoint2D.STATE, Object, Object)
    * 
    * @param p
    *          the <code>TracePoint2D</code> to add.
@@ -356,6 +357,27 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
         if (Chart2D.DEBUG_THREADING) {
           System.out.println(Thread.currentThread().getName() + ", ATrace2D.addPoint, 2 locks");
         }
+        if (this.m_firsttime) {
+          /*
+           * MAX events / members are done already from the
+           * firePointAdded()->firePointChanged() method, this is only the
+           * special case that a new point also marks the minimum. Don't move
+           * this code block before the firePointAdded or the minimum of the
+           * chart will be higher than the maximum which causes an infinite loop
+           * in AxisAutoUnit!
+           */
+          this.m_minX = p.getX();
+          this.m_minY = p.getY();
+          this.m_maxX = p.getX();
+          this.m_maxY = p.getY();
+          final Double zero = new Double(0);
+          this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, zero, new Double(this.m_minX));
+          this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, zero, new Double(this.m_minY));
+          this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, zero, new Double(this.m_maxX));
+          this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, zero, new Double(this.m_maxY));
+
+          this.m_firsttime = false;
+        }
         accepted = this.addPointInternal(p);
         if (accepted) {
           p.setListener(wrapperOfMe);
@@ -370,26 +392,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
             }
           }
         }
-        if (this.m_firsttime) {
-          // MAX events / members are done already from the
-          // firePointAdded()->firePointChanged() method,
-          // this is only the special case that a new point also marks the
-          // minimum.
-          // Don't move this code block before the firePointAdded or
-          // the minimum of the chart will be higher than the maximum
-          // which causes an infinite loop in AxisAutoUnit!
-          this.m_minX = p.getX();
-          this.m_minY = p.getY();
-          this.m_maxX = p.getX();
-          this.m_maxY = p.getY();
-          final Double zero = new Double(0);
-          this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, zero, new Double(this.m_minX));
-          this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, zero, new Double(this.m_minY));
-
-          this.m_firsttime = false;
-        }
-
-      }
+       }
       if (Chart2D.DEBUG_THREADING) {
         System.out.println(Thread.currentThread().getName() + ", ATrace2D.addPoint, freed 1 lock,  1 lock remaining.");
       }
@@ -428,7 +431,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * returns <code>true</code> the outer logic of the calling method
    * <code>{@link #addPoint(ITracePoint2D)}</code> will perform bound checks for
    * the new point and fire property changes as described in method
-   * <code>{@link #firePointChanged(ITracePoint2D, int, double, double)}</code>.
+   * <code>{@link #firePointChanged(ITracePoint2D, info.monitorenter.gui.chart.ITracePoint2D.STATE, Object, Object)}</code>.
    * </p>
    * <p>
    * In special cases - when additional modifications to the internal set of
@@ -736,9 +739,17 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    *          the point that was added.
    */
   protected void firePointAdded(final ITracePoint2D added) {
-    this.firePointChanged(added, ITracePoint2D.STATE_ADDED, 0, 0);
+    this.firePointChanged(added, ITracePoint2D.STATE.ADDED, null, null);
     this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINTS, null, added);
   }
+
+  /**
+   * For tracking the amount of painters in the trace that require pixel
+   * translation. If it is not needed min-max - tracking can be done much
+   * quicker (point * 2 * amount of painters (which are tracepainters,
+   * pointpainters and errorbarpainters)).
+   */
+  private int m_paintersThatNeedsPixelTranslation = 0;
 
   /**
    * Method triggered by <code>{@link ITracePoint2D#setLocation(double, double)}
@@ -762,41 +773,95 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    *          the point that has been changed which may be a newly added point
    *          (from <code>{@link #addPoint(ITracePoint2D)}</code>, a removed one
    *          or a modified one.
+   * 
    * @param state
-   *          one of {<code>{@link ITracePoint2D#STATE_ADDED},
-   *          {@link ITracePoint2D#STATE_CHANGED},
-   *          {@link ITracePoint2D#STATE_REMOVED}</code> to inform about the
-   *          type of change.
+   *          one of {@link ITracePoint2D.STATE}.
    * 
-   * @param oldX
-   *          if state is {@link ITracePoint2D#STATE_CHANGED} this is the
-   *          previous x value, else ignored.
+   * @param oldValue
+   *          the old value, or an old x coordinate. May vary depending on
+   *          state: {@link ITracePoint2D.STATE#ADDED} : null <br/>
+   *          {@link ITracePoint2D.STATE#REMOVED}: Double, the old x value. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}: null. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}:
+   *          {@link IPointPainter}, the old point painter that was removed. <br/>
+   *          {@link ITracePoint2D.STATE#CHANGED}: {@link Double}, the old x
+   *          coordinate. <br/>
    * 
-   * @param oldY
-   *          if state is {@link ITracePoint2D#STATE_CHANGED} this is the
-   *          previous y value, else ignored.
+   * 
+   * @param newValue
+   *          the new value, or an old y coordinate. May vary depending on
+   *          state: {@link ITracePoint2D.STATE#ADDED} : null <br/>
+   *          {@link ITracePoint2D.STATE#REMOVED}: Double, the old y value. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}:
+   *          {@link IPointPainter}, the new point painter that was added. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}: null <br/>
+   *          {@link ITracePoint2D.STATE#CHANGED}: {@link Double}, the old y
+   *          coordinate. <br/>
    */
-  public void firePointChanged(final ITracePoint2D changed, final int state, final double oldX, final double oldY) {
+  public void firePointChanged(final ITracePoint2D changed, final ITracePoint2D.STATE state, final Object oldValue, final Object newValue) {
     this.ensureInitialized();
     synchronized (this.m_renderer) {
       synchronized (this) {
         /*
-         * First find out if the tracepainters, errorbarpainters or the
-         * additional point painters would require more space:
+         * Track pointpainters if they need pixel-transformation:
+         */
+        this.trackPainterPixelTransformationRequired(changed, state, oldValue, newValue);
+
+        double collectMaxX;
+        double collectMinX;
+        double collectMaxY;
+        double collectMinY;
+
+        if (this.isPixelTransformationRequired()) {
+          /*
+           * A complete bounds check is first needed before asking the painters
+           * for additional space needed.
+           */
+          if (ITracePoint2D.STATE.ADDED == state) {
+            if (changed.getX() > this.m_maxX) {
+              this.m_maxX = changed.getX();
+            } if (changed.getX() < this.m_minX) {
+              this.m_minX = changed.getX();
+            }
+            if (changed.getY() > this.m_maxY) {
+              this.m_maxY = changed.getY();
+            } else if (changed.getY() < this.m_minY) {
+              this.m_minY = changed.getY();
+            }
+          } else if (ITracePoint2D.STATE.REMOVED == state) {
+            if (changed.getX() >= this.m_maxX) {
+              this.maxXSearch();
+              this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(this.m_maxX), new Double(changed.getX()));
+            } else if (changed.getX() <= this.m_minX) {
+              this.minXSearch();
+              this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(this.m_minX), new Double(changed.getX()));
+            }
+            if (changed.getY() >= this.m_maxY) {
+              this.maxYSearch();
+              this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(this.m_maxY), new Double(changed.getX()));
+            } else if (changed.getY() <= this.m_minY) {
+              this.minYSearch();
+              this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(this.m_minY), new Double(changed.getY()));
+            }
+          }
+        } 
+        /*
+         * Now bounds are ready for pixel to value transformation:
          */
         double[] bounds = this.calculatePointBounds(changed);
-        double collectMaxX = bounds[POINTBOUNDS_MAX_X];
-        double collectMinX = bounds[POINTBOUNDS_MIN_X];
-        double collectMaxY = bounds[POINTBOUNDS_MAX_Y];
-        double collectMinY = bounds[POINTBOUNDS_MIN_Y];
+        collectMaxX = bounds[POINTBOUNDS_MAX_X];
+        collectMinX = bounds[POINTBOUNDS_MIN_X];
+        collectMaxY = bounds[POINTBOUNDS_MAX_Y];
+        collectMinY = bounds[POINTBOUNDS_MIN_Y];
+
 
         /*
          * For a changed point all cases (new extremum as for added case, other
          * point becomes extremum as the change point was one like in removed
-         * case) have to be tested. Additionally we have to fire a changd point
+         * case) have to be tested. Additionally we have to fire a change point
          * event.
          */
-        if (ITracePoint2D.STATE_ADDED == state) {
+        if (ITracePoint2D.STATE.ADDED == state) {
           // add
           if (collectMaxX > this.m_maxX) {
             this.m_maxX = collectMaxX;
@@ -814,7 +879,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
             this.m_minY = collectMinY;
             this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, null, new Double(this.m_minY));
           }
-        } else if (ITracePoint2D.STATE_REMOVED == state) {
+        } else if (ITracePoint2D.STATE.REMOVED == state) {
           // removal: care for extrema (<=, >=)
           if (collectMaxX >= this.m_maxX) {
             collectMaxX = this.m_maxX;
@@ -842,7 +907,9 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           if (this.getSize() == 0) {
             this.m_firsttime = true;
           }
-        } else if (state == ITracePoint2D.STATE_CHANGED) {
+        } else if (state == ITracePoint2D.STATE.CHANGED) {
+          double oldX = ((Double) oldValue).doubleValue();
+          double oldY = ((Double) newValue).doubleValue();
           // did we decrease bounds?
           if (collectMaxX < this.m_maxX) {
             // check if the changed point was maxX
@@ -897,10 +964,86 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
             this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldMinY), new Double(this.m_minY));
           }
           this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_LOCATION, null, changed);
-        } else if (state == ITracePoint2D.STATE_RENDERING_CHANGED) {
+        } else if (state == ITracePoint2D.STATE.ADDITIONAL_POINT_PAINTER_ADDED) {
+          this.trackPainterPixelTransformationRequired(changed, state, oldValue, newValue);
+          // FIXME: could a changed/added/removed painter cause bound changes???
+          this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_RENDERING, null, changed);
+        } else if (state == ITracePoint2D.STATE.ADDITIONAL_POINT_PAINTER_REMOVED) {
+          this.trackPainterPixelTransformationRequired(changed, state, oldValue, newValue);
           // FIXME: could a changed/added/removed painter cause bound changes???
           this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_RENDERING, null, changed);
         }
+      }
+    }
+  }
+
+  /**
+   * Returns true if a transformation from pixel-domain to value-domain is
+   * needed for min-max - search.
+   * <p>
+   * In this case min-max - search is much more expensive (points * 2 *
+   * painters).
+   * <p>
+   * 
+   * @return true if a transformation from pixel-domain to value-domain is
+   *         needed for min-max - search.
+   */
+  private boolean isPixelTransformationRequired() {
+    boolean result;
+    result = this.m_paintersThatNeedsPixelTranslation > 0;
+    return result;
+  }
+
+  /**
+   * Track the amount of painters that require pixel transformations.
+   * <p>
+   * If it is not needed min-max first is much faster.
+   * <p>
+   * 
+   * @param changed
+   *          the changed point.
+   * 
+   * @param state
+   *          see {@link ITracePoint2D.STATE}.
+   * 
+   * @param oldValue
+   *          the old value, or an old x coordinate. May vary depending on
+   *          state: {@link ITracePoint2D.STATE#ADDED} : null <br/>
+   *          {@link ITracePoint2D.STATE#REMOVED}: null. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}: null. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}:
+   *          {@link IPointPainter}, the old point painter that was removed. <br/>
+   * 
+   * @param newValue
+   *          the new value, or an old y coordinate. May vary depending on
+   *          state: {@link ITracePoint2D.STATE#ADDED} : null <br/>
+   *          {@link ITracePoint2D.STATE#REMOVED}: null <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}:
+   *          {@link IPointPainter}, the new point painter that was added. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}: null <br/>
+   * 
+   */
+  private void trackPainterPixelTransformationRequired(ITracePoint2D changed, final ITracePoint2D.STATE state, final Object oldValue, final Object newValue) {
+    if (ITracePoint2D.STATE.ADDED == state) {
+      for (IPointPainter< ? > pointPainter : changed.getAdditionalPointPainters()) {
+        if (pointPainter.isPixelTransformationNeededX() || pointPainter.isPixelTransformationNeededY()) {
+          this.m_paintersThatNeedsPixelTranslation++;
+        }
+      }
+    } else if (ITracePoint2D.STATE.REMOVED == state) {
+      IPointPainter< ? > removedPointPainter = (IPointPainter< ? >) oldValue;
+      if (removedPointPainter.isPixelTransformationNeededX() || removedPointPainter.isPixelTransformationNeededY()) {
+        this.m_paintersThatNeedsPixelTranslation--;
+      }
+    } else if (ITracePoint2D.STATE.ADDITIONAL_POINT_PAINTER_ADDED == state) {
+      IPointPainter< ? > addedPointPainter = (IPointPainter< ? >) newValue;
+      if (addedPointPainter.isPixelTransformationNeededX() || addedPointPainter.isPixelTransformationNeededY()) {
+        this.m_paintersThatNeedsPixelTranslation++;
+      }
+    } else if (ITracePoint2D.STATE.ADDITIONAL_POINT_PAINTER_REMOVED == state) {
+      IPointPainter< ? > removedPointPainter = (IPointPainter< ? >) oldValue;
+      if (removedPointPainter.isPixelTransformationNeededX() || removedPointPainter.isPixelTransformationNeededY()) {
+        this.m_paintersThatNeedsPixelTranslation--;
       }
     }
   }
@@ -1079,7 +1222,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    *          the point that was removed.
    */
   protected void firePointRemoved(final ITracePoint2D removed) {
-    this.firePointChanged(removed, ITracePoint2D.STATE_REMOVED, 0, 0);
+    this.firePointChanged(removed, ITracePoint2D.STATE.REMOVED, null, null);
     this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINTS, removed, null);
   }
 

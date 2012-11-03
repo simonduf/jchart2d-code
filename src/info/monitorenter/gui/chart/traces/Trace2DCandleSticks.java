@@ -194,11 +194,10 @@ public class Trace2DCandleSticks implements ITrace2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(info.monitorenter.gui.chart.ITracePoint2D,
-   *      int, double, double)
+   * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(info.monitorenter.gui.chart.ITracePoint2D, info.monitorenter.gui.chart.ITracePoint2D.STATE, java.lang.Object, java.lang.Object)
    */
-  public void firePointChanged(ITracePoint2D changed, int state, double oldX, double oldY) {
-    this.m_delegate.firePointChanged(changed, state, oldX, oldY);
+  public void firePointChanged(final ITracePoint2D changed, final ITracePoint2D.STATE state, final Object oldValue, final Object newValue) {
+    this.m_delegate.firePointChanged(changed, state, oldValue, newValue);
   }
 
   /**

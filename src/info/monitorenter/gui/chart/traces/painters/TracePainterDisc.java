@@ -24,14 +24,9 @@ package info.monitorenter.gui.chart.traces.painters;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 
-import java.awt.Graphics;
-
 /**
  * Renders traces by painting a disc (hollow circle) with choosable diameter for
  * each {@link ITracePoint2D} to show.
- * <p>
- * 
- * FIXME: Look if this one could extend {@link TracePainterConfigurable}.
  * <p>
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
@@ -39,20 +34,18 @@ import java.awt.Graphics;
  * @version $Revision: 1.20 $
  * 
  */
-public class TracePainterDisc extends ATracePainter {
+public class TracePainterDisc extends TracePainterConfigurable<PointPainterDisc> {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 8919406018882664083L;
 
-  /** The implementation for rendering the point as a disc. */
-  private final PointPainterDisc m_pointPainter;
 
   /**
    * Creates an instance with a default disc size of 4.
    * <p>
    */
   public TracePainterDisc() {
-    this.m_pointPainter = new PointPainterDisc(4);
+    super(new PointPainterDisc(4));
   }
 
   /**
@@ -62,79 +55,7 @@ public class TracePainterDisc extends ATracePainter {
    *          the disc size in pixel to use.
    */
   public TracePainterDisc(final int discSize) {
-    this.m_pointPainter = new PointPainterDisc(discSize);
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public double calculateMaxX(final ITracePoint2D point) {
-    return this.m_pointPainter.calculateMaxX(point);
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public double calculateMaxY(final ITracePoint2D point) {
-    return this.m_pointPainter.calculateMaxY(point);
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public double calculateMinX(final ITracePoint2D point) {
-    return this.m_pointPainter.calculateMinX(point);
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public double calculateMinY(final ITracePoint2D point) {
-    return this.m_pointPainter.calculateMinY(point);
-  }
-  
-  /**
-   * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics)
-   */
-  @Override
-  public void endPaintIteration(final Graphics g2d) {
-    if (g2d != null) {
-      int previousX = this.getPreviousX();
-      int previousY = this.getPreviousY();
-      if (previousX != Integer.MIN_VALUE || previousY != Integer.MIN_VALUE) {
-        this.m_pointPainter.paintPoint(previousX, previousY, 0, 0, g2d, this.getPreviousPoint());
-      }
-    }
-    this.m_pointPainter.endPaintIteration(g2d);
-  }
-
-  /**
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (!super.equals(obj)) {
-      return false;
-    }
-    if (this.getClass() != obj.getClass()) {
-      return false;
-    }
-    final TracePainterDisc other = (TracePainterDisc) obj;
-    if (this.m_pointPainter == null) {
-      if (other.m_pointPainter != null) {
-        return false;
-      }
-    } else if (!this.m_pointPainter.equals(other.m_pointPainter)) {
-      return false;
-    }
-    return true;
+    super(new PointPainterDisc(discSize));
   }
 
   /**
@@ -148,29 +69,6 @@ public class TracePainterDisc extends ATracePainter {
   }
 
   /**
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((this.m_pointPainter == null) ? 0 : this.m_pointPainter.hashCode());
-    return result;
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int,
-   *      int, int, int, java.awt.Graphics,
-   *      info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final ITracePoint2D original) {
-    super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
-    this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
-  }
-
-  /**
    * Sets the diameter of the discs to paint in pixel.
    * <p>
    * 
@@ -180,14 +78,4 @@ public class TracePainterDisc extends ATracePainter {
   public void setDiscSize(final int discSize) {
     this.m_pointPainter.setDiscSize(discSize);
   }
-
-  /**
-   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#startPaintIteration(java.awt.Graphics)
-   */
-  @Override
-  public void startPaintIteration(final Graphics g2d) {
-    super.startPaintIteration(g2d);
-    this.m_pointPainter.startPaintIteration(g2d);
-  }
-
 }

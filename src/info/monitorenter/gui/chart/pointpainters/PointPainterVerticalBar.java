@@ -86,9 +86,7 @@ public class PointPainterVerticalBar extends APointPainter<PointPainterVerticalB
    */
   @Override
   public double calculateMaxX(final ITracePoint2D point) {
-    IAxis< ? > xAxis = TracePoint2DUtil.getAxisXOfTracePoint(point);
-    double barWidthValue = xAxis.translatePxToValue(this.getBarWidth());
-    return point.getX() + Math.ceil(barWidthValue / 2);
+    return point.getX();
   }
 
   /**
@@ -104,9 +102,7 @@ public class PointPainterVerticalBar extends APointPainter<PointPainterVerticalB
    */
   @Override
   public double calculateMinX(final ITracePoint2D point) {
-    IAxis< ? > xAxis = TracePoint2DUtil.getAxisXOfTracePoint(point);
-    double barWidthValue = xAxis.translatePxToValue(this.getBarWidth());
-    return point.getX() - Math.ceil(barWidthValue / 2);
+    return point.getX();
   }
 
   /**
@@ -165,6 +161,22 @@ public class PointPainterVerticalBar extends APointPainter<PointPainterVerticalB
     result = prime * result + ((this.m_chart == null) ? 0 : this.m_chart.hashCode());
     result = prime * result + this.m_halfWidth;
     return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededX()
+   */
+  @Override
+  public boolean isPixelTransformationNeededX() {
+    return false;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededY()
+   */
+  @Override
+  public boolean isPixelTransformationNeededY() {
+    return false;
   }
 
   /**
