@@ -40,6 +40,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -69,6 +70,9 @@ public final class CandleSticksStaticChart extends JPanel {
    *          ignored.
    */
   public static void main(final String[] args) {
+    double value = 1.0E7;
+    long lValue = (long) value;
+    System.out.println(new Date(lValue));
     JFrame frame = new JFrame(CandleSticksStaticChart.class.getSimpleName());
     CandleSticksStaticChart stickChart = new CandleSticksStaticChart();
     frame.getContentPane().add(stickChart);
@@ -81,7 +85,7 @@ public final class CandleSticksStaticChart extends JPanel {
         System.exit(0);
       }
     });
-    frame.setSize(600, 300);
+    frame.setSize(1400, 300);
     frame.setVisible(true);
     try {
       Thread.sleep(2000);
@@ -92,7 +96,6 @@ public final class CandleSticksStaticChart extends JPanel {
     stickChart.fill();
   }
 
-  
   /**
    * Defcon.
    */
@@ -100,11 +103,12 @@ public final class CandleSticksStaticChart extends JPanel {
     this.setLayout(new BorderLayout());
     this.m_chart = new Chart2D();
     this.add(new ChartPanel(this.m_chart), BorderLayout.CENTER);
+    this.m_chart.getAxisX().setFormatter(new LabelFormatterDate(new SimpleDateFormat("yyyy-MM-dd")));
   }
 
   private Chart2D m_chart;
+
   void fill() {
-    this.m_chart.getAxisX().setFormatter(new LabelFormatterDate(new SimpleDateFormat("yyyy-MM-dd")));
 
     // Create an ITrace:
     ITrace2D trace = new Trace2DCandleSticks(new Trace2DSimple(), 6);
@@ -115,6 +119,10 @@ public final class CandleSticksStaticChart extends JPanel {
 
     // Add all points, as it is static:
     Calendar cal = Calendar.getInstance();
+    cal.set(Calendar.HOUR_OF_DAY, 0);
+    cal.set(Calendar.SECOND, 0);
+    cal.set(Calendar.MILLISECOND, 0);
+
     // DAX 19.10.2012
     cal.set(Calendar.DAY_OF_MONTH, 19);
     cal.set(Calendar.MONTH, 10);
@@ -158,9 +166,9 @@ public final class CandleSticksStaticChart extends JPanel {
     trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7283.26, 7322.08, 7339.33, 7272.06));
 
     this.m_chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
-    
+
     /*
-     * Ensuring visibility: 
+     * Ensuring visibility:
      */
     cal.set(Calendar.DAY_OF_MONTH, 2);
     double startTimeX = cal.getTimeInMillis();
@@ -169,7 +177,7 @@ public final class CandleSticksStaticChart extends JPanel {
     
     IRangePolicy rangePolicy = new RangePolicyFixedViewport(new Range(startTimeX, endTimeX));
     this.m_chart.getAxisX().setRangePolicy(rangePolicy);
-    
+
   }
 
 }

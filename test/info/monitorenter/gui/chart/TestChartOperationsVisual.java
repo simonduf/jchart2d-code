@@ -21,6 +21,7 @@ import info.monitorenter.util.Range;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -479,7 +480,7 @@ public class TestChartOperationsVisual extends ATestChartOperations {
       public void preCondition(Chart2D chart) throws Exception {
         super.preCondition(chart);
         AxisTitle yTitle = chart.getAxisX().getAxisTitle();
-        Font yFont = yTitle.getTitleFont();
+        Font yFont = chart.getFont();
         Font yNewFont = yFont.deriveFont(36f);
         yTitle.setTitleFont(yNewFont);
       }

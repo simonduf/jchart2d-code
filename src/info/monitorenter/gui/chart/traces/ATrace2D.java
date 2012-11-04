@@ -392,7 +392,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
             }
           }
         }
-       }
+      }
       if (Chart2D.DEBUG_THREADING) {
         System.out.println(Thread.currentThread().getName() + ", ATrace2D.addPoint, freed 1 lock,  1 lock remaining.");
       }
@@ -431,7 +431,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * returns <code>true</code> the outer logic of the calling method
    * <code>{@link #addPoint(ITracePoint2D)}</code> will perform bound checks for
    * the new point and fire property changes as described in method
-   * <code>{@link #firePointChanged(ITracePoint2D, info.monitorenter.gui.chart.ITracePoint2D.STATE, Object, Object)}</code>.
+   * <code>{@link #firePointChanged(ITracePoint2D, info.monitorenter.gui.chart.ITracePoint2D.STATE, Object, Object)}</code>
+   * .
    * </p>
    * <p>
    * In special cases - when additional modifications to the internal set of
@@ -820,7 +821,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           if (ITracePoint2D.STATE.ADDED == state) {
             if (changed.getX() > this.m_maxX) {
               this.m_maxX = changed.getX();
-            } if (changed.getX() < this.m_minX) {
+            }
+            if (changed.getX() < this.m_minX) {
               this.m_minX = changed.getX();
             }
             if (changed.getY() > this.m_maxY) {
@@ -844,7 +846,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
               this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(this.m_minY), new Double(changed.getY()));
             }
           }
-        } 
+        }
         /*
          * Now bounds are ready for pixel to value transformation:
          */
@@ -853,7 +855,6 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
         collectMinX = bounds[POINTBOUNDS_MIN_X];
         collectMaxY = bounds[POINTBOUNDS_MAX_Y];
         collectMinY = bounds[POINTBOUNDS_MIN_Y];
-
 
         /*
          * For a changed point all cases (new extremum as for added case, other
@@ -1031,9 +1032,11 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
         }
       }
     } else if (ITracePoint2D.STATE.REMOVED == state) {
-      IPointPainter< ? > removedPointPainter = (IPointPainter< ? >) oldValue;
-      if (removedPointPainter.isPixelTransformationNeededX() || removedPointPainter.isPixelTransformationNeededY()) {
-        this.m_paintersThatNeedsPixelTranslation--;
+
+      for (IPointPainter< ? > removedPointPainter : changed.getAdditionalPointPainters()) {
+        if (removedPointPainter.isPixelTransformationNeededX() || removedPointPainter.isPixelTransformationNeededY()) {
+          this.m_paintersThatNeedsPixelTranslation--;
+        }
       }
     } else if (ITracePoint2D.STATE.ADDITIONAL_POINT_PAINTER_ADDED == state) {
       IPointPainter< ? > addedPointPainter = (IPointPainter< ? >) newValue;

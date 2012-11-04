@@ -28,6 +28,7 @@ import info.monitorenter.util.Range;
 import info.monitorenter.util.SimpleDateFormatAnalyzer;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -44,10 +45,9 @@ import java.util.Date;
  * <b>Caution: <br>
  * This implementation is not completely conform with the constraint: <code>
  * instance.parse(instance.format(value)) == value
- * </code>
- * </b> This only works for subsequent call: one call to format contains the
- * next value to return from parse to be the same as the format. That value is
- * cached as date / time formatting produces truncation of the internal value
+ * </code> </b> This only works for subsequent call: one call to format contains
+ * the next value to return from parse to be the same as the format. That value
+ * is cached as date / time formatting produces truncation of the internal value
  * (e.g. if no year is displayed). <br>
  * Use: <br>
  * 
@@ -83,7 +83,7 @@ public class LabelFormatterDate extends ALabelFormatter implements IAxisLabelFor
   /**
    * The last value that was formatted - needed for the parse - format contract.
    */
-  private double m_lastFormatted = 0;
+  // private double m_lastFormatted = 0;
 
   /**
    * Default constructor that uses the local datetime (
@@ -112,17 +112,17 @@ public class LabelFormatterDate extends ALabelFormatter implements IAxisLabelFor
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
-  public boolean equals(final Object obj) {
+  public boolean equals(Object obj) {
     if (this == obj) {
       return true;
     }
     if (!super.equals(obj)) {
       return false;
     }
-    if (this.getClass() != obj.getClass()) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
-    final LabelFormatterDate other = (LabelFormatterDate) obj;
+    LabelFormatterDate other = (LabelFormatterDate) obj;
     if (this.m_cachedMaxAmountChars != other.m_cachedMaxAmountChars) {
       return false;
     }
@@ -133,10 +133,6 @@ public class LabelFormatterDate extends ALabelFormatter implements IAxisLabelFor
     } else if (!this.m_dateFormat.equals(other.m_dateFormat)) {
       return false;
     }
-    if (Double.doubleToLongBits(this.m_lastFormatted) != Double
-        .doubleToLongBits(other.m_lastFormatted)) {
-      return false;
-    }
     return true;
   }
 
@@ -144,7 +140,6 @@ public class LabelFormatterDate extends ALabelFormatter implements IAxisLabelFor
    * @see info.monitorenter.gui.chart.IAxisLabelFormatter#format(double)
    */
   public String format(final double value) {
-    this.m_lastFormatted = value;
     return this.m_dateFormat.format(new Date((long) value));
   }
 
@@ -259,9 +254,6 @@ public class LabelFormatterDate extends ALabelFormatter implements IAxisLabelFor
     int result = super.hashCode();
     result = prime * result + this.m_cachedMaxAmountChars;
     result = prime * result + ((this.m_dateFormat == null) ? 0 : this.m_dateFormat.hashCode());
-    long temp;
-    temp = Double.doubleToLongBits(this.m_lastFormatted);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
     return result;
   }
 
@@ -269,7 +261,14 @@ public class LabelFormatterDate extends ALabelFormatter implements IAxisLabelFor
    * @see info.monitorenter.gui.chart.IAxisLabelFormatter#parse(java.lang.String)
    */
   public Number parse(final String formatted) throws NumberFormatException {
-    return new Double(this.m_lastFormatted);
+    Number result = null;
+    try {
+      Date date = this.m_dateFormat.parse(formatted);
+      result = Long.valueOf(date.getTime());
+      return result;
+    } catch (ParseException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**

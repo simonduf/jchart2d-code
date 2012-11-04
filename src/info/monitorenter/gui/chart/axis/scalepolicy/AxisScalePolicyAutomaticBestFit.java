@@ -155,7 +155,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
         if (loopStop == 99) {
           if (AAxis.DEBUG) {
             System.out.println(axis.getAccessor().toString() + " axis: loop to high");
-          }
+          }//value  1.3518972E12    
         }
         label = this.roundToTicks(value, false, !firstMajorFound && axis.isStartMajorTick(), axis);
 
