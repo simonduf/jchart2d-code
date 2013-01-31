@@ -1,0 +1,54 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>net.sf.jchart2d</groupId>
+  <artifactId>maven</artifactId>
+  <packaging>jar</packaging>
+  <name>jChart2d</name>
+  <version>3.3.0</version>
+  <description>JChart2D is an easy to use component for displaying two- dimensional traces in a coordinate system written in Java.</description>
+  <url>http://jchart2d.sourceforge.net/</url>
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+  <licenses>
+    <license>
+      <name>GNU Library or Lesser General Public License version 2.0 (LGPLv2)</name>
+      <url>http://www.gnu.org/licenses/lgpl-2.1.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <connection>scm:git:git://jchart2d.git.sourceforge.net/gitroot/jchart2d/jchart2d</connection>
+    <url>http://jchart2d.git.sourceforge.net/</url>
+  </scm>
+  <developers>
+    <developer>
+      <id>...</id>
+      <name>Achim Westermann</name>
+      <email>Achim.Westermann@gmx.de</email>
+    </developer>
+  </developers>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>xmlgraphics-commons</artifactId>
+      <version>1.3.1</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <directory>${project.basedir}/build</directory>
+    <outputDirectory>${project.build.directory}/classes</outputDirectory>
+    <finalName>${project.artifactId}-${project.version}</finalName>    
+    <sourceDirectory>${project.basedir}/src</sourceDirectory>
+    <testSourceDirectory>${project.basedir}/test</testSourceDirectory>
+  </build>
+</project>
