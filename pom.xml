@@ -1,10 +1,10 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.sf.jchart2d</groupId>
-  <artifactId>maven</artifactId>
+  <artifactId>jchart2d</artifactId>
   <packaging>jar</packaging>
-  <name>jChart2d</name>
-  <version>3.3.0</version>
+  <name>jchart2d</name>
+  <version>3.3.2</version>
   <description>JChart2D is an easy to use component for displaying two- dimensional traces in a coordinate system written in Java.</description>
   <url>http://jchart2d.sourceforge.net/</url>
   <parent>
@@ -42,6 +42,11 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.jidesoft</groupId>
+      <artifactId>jide-oss</artifactId>
+      <version>2.4.8</version>
+    </dependency>            
   </dependencies>
 
   <build>
