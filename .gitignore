@@ -14,3 +14,5 @@
 /jchart2d-doc-3.3.0.zip
 /jchart2d-eclipse-project-3.3.0.zip
 build/
+.idea
+*.iml
