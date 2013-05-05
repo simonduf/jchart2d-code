@@ -101,11 +101,13 @@ public abstract class AAccumulationFunction implements IAccumulationFunction {
     this.setAccumulatedPointCurrent(null);
     if (result != null) {
       if (!MathUtil.isDouble(result.getX()) || !MathUtil.isDouble(result.getY())) {
-        throw new IllegalStateException("Result has a wrong value (programming and/or rounding error): " + result);
+        throw new IllegalStateException(
+            "Result has a wrong value (programming and/or rounding error): " + result);
       }
     } else {
       /*
-       * This happens when nothing was accumulated but an upper bound was crossed by the accumulation iterator (ordered x). 
+       * This happens when nothing was accumulated but an upper bound was
+       * crossed by the accumulation iterator (ordered x).
        */
     }
     return result;
@@ -129,18 +131,15 @@ public abstract class AAccumulationFunction implements IAccumulationFunction {
    *           if the point is not assigned to a trace which is assigned to a
    *           chart.
    */
-  protected final ITracePointProvider acquireTracePointProvider(final ITracePoint2D point) throws IllegalStateException {
+  protected final ITracePointProvider acquireTracePointProvider(final ITracePoint2D point)
+      throws IllegalStateException {
     ITrace2D trace = point.getListener();
     if (trace == null) {
-      throw new IllegalStateException("You cannot use accumulation functions for trace points that have not been assigned to a trace yet!");
+      throw new IllegalStateException(
+          "You cannot use accumulation functions for trace points that have not been assigned to a trace yet!");
     } else {
-      Chart2D chart = trace.getRenderer();
-      if (chart == null) {
-        throw new IllegalStateException("You cannot use accumulation functions for trace points of traces that have not been assigned to a chart yet!");
-      } else {
-        ITracePointProvider tracePointProvider = chart.getTracePointProvider();
-        return tracePointProvider;
-      }
+      ITracePointProvider tracePointProvider = trace.getTracePointProvider();
+      return tracePointProvider;
     }
 
   }

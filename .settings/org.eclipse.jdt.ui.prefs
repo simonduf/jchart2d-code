@@ -1,4 +1,3 @@
-#Mon Jan 30 13:41:11 CET 2012
 =\=\=\=\=\=\=
 <<<<<<<=HEAD
 >>>>>>>=refs/remotes/origin/Feature2582509
@@ -57,7 +56,7 @@ cleanup_profile=_jbuzzer-cleanup
 cleanup_settings_version=2
 eclipse.preferences.version=1
 formatter_profile=_jchart2d
-formatter_settings_version=11
+formatter_settings_version=12
 org.eclipse.jdt.ui.exception.name=e
 org.eclipse.jdt.ui.gettersetter.use.is=true
 org.eclipse.jdt.ui.ignorelowercasenames=true

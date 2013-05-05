@@ -42,6 +42,7 @@ import info.monitorenter.util.StringUtil;
 import info.monitorenter.util.math.MathUtil;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
@@ -548,8 +549,9 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     @Override
     protected final double getMaximumPixelForLabel(final Graphics2D g2d) {
 
-      final FontMetrics fontdim = g2d.getFontMetrics();
-      final int fontwidth = fontdim.charWidth('0');
+      FontMetrics fontdim;
+      fontdim = g2d.getFontMetrics();
+      final int fontwidth = fontdim.charWidth('W');
       /*
        * multiply with longest possible number. longest possible number is the
        * non-fraction part of the highest number plus the maximum amount of
@@ -584,7 +586,8 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
           valuerange = 10;
         }
         final double pxToValue = valuerange / pxrange;
-        result = pxToValue * this.getMaximumPixelForLabel(g2d);
+        final double maxPixelForLabel = this.getMaximumPixelForLabel(g2d);
+        result = pxToValue * maxPixelForLabel;
       }
       return result;
     }
@@ -648,7 +651,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
       if (AAxis.this.isPaintScale()) {
         final FontMetrics fontdim = g2d.getFontMetrics();
         // only the space required for the right side label:
-        final int fontwidth = fontdim.charWidth('0');
+        final int fontwidth = fontdim.charWidth('W');
         rightSideOverhang = (AAxis.this.getFormatter().getMaxAmountChars()) * fontwidth;
       }
       return rightSideOverhang;

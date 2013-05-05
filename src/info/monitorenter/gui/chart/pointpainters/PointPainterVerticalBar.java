@@ -23,7 +23,9 @@
 package info.monitorenter.gui.chart.pointpainters;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITracePoint2D;
+import info.monitorenter.gui.util.TracePoint2DUtil;
 
 import java.awt.Graphics;
 
@@ -80,6 +82,38 @@ public class PointPainterVerticalBar extends APointPainter<PointPainterVerticalB
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMaxX(final ITracePoint2D point) {
+    return point.getX();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMaxY(final ITracePoint2D point) {
+    return point.getY();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMinX(final ITracePoint2D point) {
+    return point.getX();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMinY(final ITracePoint2D point) {
+    return point.getY();
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.pointpainters.APointPainter#equals(java.lang.Object)
    */
   @Override
@@ -130,14 +164,27 @@ public class PointPainterVerticalBar extends APointPainter<PointPainterVerticalB
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededX()
+   */
+  @Override
+  public boolean isPixelTransformationNeededX() {
+    return false;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededY()
+   */
+  @Override
+  public boolean isPixelTransformationNeededY() {
+    return false;
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.IPointPainter#paintPoint(int, int, int,
    *      int, java.awt.Graphics, info.monitorenter.gui.chart.ITracePoint2D)
    */
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final ITracePoint2D original) {
-    g.fillRect(absoluteX - this.m_halfWidth, absoluteY, 2 * this.m_halfWidth, this.m_chart
-        .getYChartStart()
-        - absoluteY);
+  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX, final int nextY, final Graphics g, final ITracePoint2D original) {
+    g.fillRect(absoluteX - this.m_halfWidth, absoluteY, 2 * this.m_halfWidth, this.m_chart.getYChartStart() - absoluteY);
   }
 
   /**

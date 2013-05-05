@@ -213,6 +213,11 @@ public interface IErrorBarPolicy<T extends IErrorBarPolicy<T>> extends ITracePai
    * Returns the relative x error (value domain) that is added to / subtracted
    * from the values to display.
    * <p>
+   * This is always a relative positive value (addition of the original
+   * value)that will be subtracted or added depending on the dimension this
+   * error is shown in.
+   * <p>
+   * 
    * 
    * @param xValue
    *          the absolute x value (not pixel) to get the error for.
@@ -225,6 +230,10 @@ public interface IErrorBarPolicy<T extends IErrorBarPolicy<T>> extends ITracePai
   /**
    * Returns the relative y error (value domain) that is added to / subtracted
    * from the values to display.
+   * <p>
+   * This is always a relative positive value (addition of the original
+   * value)that will be subtracted or added depending on the dimension this
+   * error is shown in.
    * <p>
    * 
    * @param yValue

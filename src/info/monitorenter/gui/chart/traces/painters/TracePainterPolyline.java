@@ -60,6 +60,49 @@ public class TracePainterPolyline extends ATracePainter {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMaxX(final ITracePoint2D point) {
+    return point.getX();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMaxY(final ITracePoint2D point) {
+    return point.getY();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMinX(final ITracePoint2D point) {
+    return point.getX();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMinY(final ITracePoint2D point) {
+    return point.getY();
+  }
+
+  /**
+   * Internally invokes the draw operation (to allow subclassing with a
+   * different one).
+   * <p>
+   * This implementation uses {@link Graphics#drawPolyline(int[], int[], int)}.
+   * <p>
+   */
+  protected void doDrawOperation(final Graphics g2d, int[] x, int[] y, int length) {
+    g2d.drawPolyline(x, y, x.length);
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics)
    */
   @Override
@@ -81,8 +124,7 @@ public class TracePainterPolyline extends ATracePainter {
         count++;
       }
       y[count] = this.getPreviousY();
-
-      g2d.drawPolyline(x, y, x.length);
+      this.doDrawOperation(g2d, x, y, x.length);
     }
   }
 
@@ -131,13 +173,28 @@ public class TracePainterPolyline extends ATracePainter {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededY()
+   */
+  @Override
+  public boolean isPixelTransformationNeededY() {
+    return false;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededX()
+   */
+  @Override
+  public boolean isPixelTransformationNeededX() {
+    return false;
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int,
    *      int, int, int, java.awt.Graphics,
    *      info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final ITracePoint2D original) {
+  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX, final int nextY, final Graphics g, final ITracePoint2D original) {
     super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
     this.m_xPoints.add(new Integer(absoluteX));
     this.m_yPoints.add(new Integer(absoluteY));

@@ -46,8 +46,7 @@ public class TracePainterConfigurable<T extends IPointPainter<T>> extends ATrace
   private static final long serialVersionUID = 548540923475344855L;
 
   /** The implementation for rendering the point as a disc. */
-  private final IPointPainter<T> m_pointPainter;
-
+  protected final T m_pointPainter;
   /**
    * Creates an instance that works with the given point painter.
    * <p>
@@ -55,22 +54,65 @@ public class TracePainterConfigurable<T extends IPointPainter<T>> extends ATrace
    * @param pointPainter
    *          the point painter to use.
    */
-  public TracePainterConfigurable(final IPointPainter<T> pointPainter) {
+  public TracePainterConfigurable(final T pointPainter) {
     this.m_pointPainter = pointPainter;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public final double calculateMaxX(final ITracePoint2D point) {
+    return this.m_pointPainter.calculateMaxX(point);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public final double calculateMaxY(final ITracePoint2D point) {
+    return this.m_pointPainter.calculateMaxY(point);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public final double calculateMinX(final ITracePoint2D point) {
+    return this.m_pointPainter.calculateMinX(point);
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public final double calculateMinY(final ITracePoint2D point) {
+    return this.m_pointPainter.calculateMinY(point);
+  }
+
+  /**
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  public final int compareTo(T o) {
+    return this.m_pointPainter.compareTo(o);
   }
 
   /**
    * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics)
    */
   @Override
-  public void endPaintIteration(final Graphics g2d) {
+  public final void endPaintIteration(final Graphics g2d) {
     if (g2d != null) {
-      this.m_pointPainter.paintPoint(this.getPreviousX(), this.getPreviousY(), 0, 0, g2d, this
-          .getPreviousPoint());
+      int previousX = this.getPreviousX();
+      int previousY = this.getPreviousY();
+      if (previousX != Integer.MIN_VALUE || previousY != Integer.MIN_VALUE) {
+        this.m_pointPainter.paintPoint(previousX, previousY, 0, 0, g2d, this.getPreviousPoint());
+      }
     }
     this.m_pointPainter.endPaintIteration(g2d);
   }
 
+  
   /**
    * @see java.lang.Object#equals(java.lang.Object)
    */
@@ -85,7 +127,7 @@ public class TracePainterConfigurable<T extends IPointPainter<T>> extends ATrace
     if (this.getClass() != obj.getClass()) {
       return false;
     }
-    final TracePainterConfigurable<?> other = (TracePainterConfigurable<?>) obj;
+    final TracePainterConfigurable< ? > other = (TracePainterConfigurable< ? >) obj;
     if (this.m_pointPainter == null) {
       if (other.m_pointPainter != null) {
         return false;
@@ -108,13 +150,26 @@ public class TracePainterConfigurable<T extends IPointPainter<T>> extends ATrace
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededX()
+   */
+  public final boolean isPixelTransformationNeededX() {
+    return this.m_pointPainter.isPixelTransformationNeededX();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededY()
+   */
+  public final boolean isPixelTransformationNeededY() {
+    return this.m_pointPainter.isPixelTransformationNeededY();
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int,
    *      int, int, int, java.awt.Graphics,
    *      info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final ITracePoint2D original) {
+  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX, final int nextY, final Graphics g, final ITracePoint2D original) {
     super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
     this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
   }
@@ -123,7 +178,7 @@ public class TracePainterConfigurable<T extends IPointPainter<T>> extends ATrace
    * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#startPaintIteration(java.awt.Graphics)
    */
   @Override
-  public void startPaintIteration(final Graphics g2d) {
+  public final  void startPaintIteration(final Graphics g2d) {
     this.m_pointPainter.startPaintIteration(g2d);
   }
 

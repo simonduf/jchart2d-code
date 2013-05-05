@@ -43,14 +43,12 @@ import java.util.List;
  * {@link info.monitorenter.gui.chart.Chart2D}.
  * <p>
  * 
- * 
- * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  * @version $Revision: 1.21 $
  * 
  */
-public class TracePainterFill extends ATracePainter {
+public class TracePainterFill extends TracePainterPolyline {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = -7194158082574997539L;
@@ -88,6 +86,11 @@ public class TracePainterFill extends ATracePainter {
   }
 
   /**
+   * FIXME: Check design if it is possible to reuse the code of superclass
+   * {@link TracePainterPolyline#endPaintIteration(Graphics)} here to avoid code
+   * duplication.
+   * <p>
+   * 
    * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics)
    */
   @Override
@@ -119,9 +122,20 @@ public class TracePainterFill extends ATracePainter {
       y[count + 1] = this.m_chart.getYChartStart();
       // step back to startx,starty (root)
       y[count + 2] = this.m_chart.getYChartStart();
-
-      g2d.fillPolygon(x, y, x.length);
+      this.doDrawOperation(g2d, x, y, x.length);
     }
+  }
+
+  /**
+   * This implementation calls the draw operation  {@link Graphics#fillPolygon(int[], int[], int)}.
+   * <p>
+   * 
+   * @see info.monitorenter.gui.chart.traces.painters.TracePainterPolyline#doDrawOperation(java.awt.Graphics,
+   *      int[], int[], int)
+   */
+  @Override
+  protected void doDrawOperation(Graphics g2d, int[] x, int[] y, int length) {
+    g2d.fillPolygon(x, y, x.length);
   }
 
   /**

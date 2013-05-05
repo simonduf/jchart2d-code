@@ -312,14 +312,14 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
     }
 
   }
-
+  
   /**
    * The property key defining the <code>color</code> property. Use in
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
   public static final String PROPERTY_COLOR = "ITrace2D.PROPERTY_COLOR";
-
+  
   /**
    * The property key defining a change of <code>{@link IErrorBarPolicy}</code>
    * instances contained.
@@ -409,6 +409,20 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public static final String PROPERTY_PHYSICALUNITS = "ITrace2D.PROPERTY_PHYSICALUNITS";
 
   /**
+   * The property key defining the <code>stroke</code> property. Use in
+   * combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   */
+  public static final String PROPERTY_STROKE = "ITrace2D.PROPERTY_STROKE";
+
+  /**
+   * The property key defining a change in the set of <code>
+   * {@link IPointPainter}</code> instances. Use in combination with
+   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
+   */
+  public static final String PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS = "ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS";
+
+  /**
    * The property key defining any change of a location of a contained <code>
    * {@link ITracePoint2D} </code> .
    * <p>
@@ -423,18 +437,12 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public static final String PROPERTY_TRACEPOINT_CHANGED_LOCATION = "ITrace2D.PROPERTY_TRACEPOINT_CHANGED_LOCATION";
 
   /**
-   * The property key defining a change in the set of <code>
-   * {@link IPointPainter}</code> instances. Use in combination with
-   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
-   */
-  public static final String PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS = "ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS";
-
-  /**
-   * The property key defining the <code>stroke</code> property. Use in
+   * The property key defining a change in the rendering of  a contained 
+   * <code>{@link ITracePoint2D}</code> instance within this trace. Use in
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
-  public static final String PROPERTY_STROKE = "ITrace2D.PROPERTY_STROKE";
+  public static final String PROPERTY_TRACEPOINT_CHANGED_RENDERING = "ITrace2D.PROPERTY_TRACEPOINT_CHANGED_RENDERING";
 
   /**
    * The property key defining a change in the collection of <code>
@@ -444,13 +452,6 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    */
   public static final String PROPERTY_TRACEPOINTS = "ITrace2D.PROPERTY_TRACEPOINTS";
 
-  /**
-   * The property key defining a change in the rendering of  a contained 
-   * <code>{@link ITracePoint2D}</code> instance within this trace. Use in
-   * combination with
-   * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
-   */
-  public static final String PROPERTY_TRACEPOINT_CHANGED_RENDERING = "ITrace2D.PROPERTY_TRACEPOINT_CHANGED_RENDERING";
   /**
    * The property key defining the <code>visible</code> property. Use in
    * combination with
@@ -466,7 +467,6 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * <p>
    */
   public static final String PROPERTY_ZINDEX = "ITrace2D.PROPERTY_ZINDEX";
-
   /**
    * The minimum value for property zIndex: 0.
    * 
@@ -515,11 +515,6 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   /**
    * Adds a trace point to the internal data.
    * <p>
-   * <b>Warning</b>:<br/>
-   * Do not call this method before this trace has been added to a chart or you
-   * will not succeed as the chart is needed to get the proper <code>
-   *             {@link Chart2D#getTracePointProvider()}</code>.
-   * <p>
    * 
    * 
    * @see #addPoint(ITracePoint2D p)
@@ -553,6 +548,27 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * @return true if the operation was successful, false else.
    */
   public boolean addPoint(ITracePoint2D p);
+
+  /**
+   * Do not call this unless you know what it does. This is a hook for
+   * {@link ITrace2D} implementations that decorate other implementations and
+   * have to register themselves with the added point (instead of this instance
+   * directly).
+   * <p>
+   * Prefer calling {@link #addPoint(ITracePoint2D)}.
+   * <p>
+   * 
+   * @see #firePointChanged(ITracePoint2D, int, double, double)
+   * 
+   * @param p
+   *          the <code>TracePoint2D</code> to add.
+   * 
+   * @param wrapperOfMe
+   *          the trace instance that wraps this instance.
+   * 
+   * @return true if the operation was successful, false else.
+   */
+  public boolean addPoint(final ITracePoint2D p, final ITrace2D wrapperOfMe);
 
   /**
    * Adds the given point painter to the internal set of point highlighters.
@@ -606,6 +622,25 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public boolean containsTracePainter(final ITracePainter< ? > painter);
 
   /**
+   * Returns an <code>Iterator</code> over the internal <code>
+   * {@link ITrace2D}</code> instances in reverse order.
+   * <p>
+   * Implementations should be synchronized. This method is meant to allow
+   * modifications of the internal <code{@link ITracePoint2D}</code> instances,
+   * so the original points should be returned.
+   * <p>
+   * There is no guarantee that changes made to the contained tracepoints will
+   * be reflected in the display immediately. The order the iterator returns the
+   * <code>{@link ITracePoint2D}</code> instances decides how the
+   * <code>Chart2D</code> will paint the trace.
+   * <p>
+   * 
+   * @return an <code>Iterator</code> over the internal <code>
+   *         {@link ITracePoint2D}</code> instances in descending order.
+   */
+  public Iterator<ITracePoint2D> descendingIterator();
+
+  /**
    * Method to trigger by
    * <code>{@link ITracePoint2D#setLocation(double, double)}
    * </code>, <code>{@link #addPoint(ITracePoint2D)}</code> or <code>
@@ -625,22 +660,29 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    *          or a modified one.
    * 
    * @param state
-   *          one of {<code>{@link ITracePoint2D#STATE_ADDED},
-   *          {@link ITracePoint2D#STATE_CHANGED},
-   *          {@link ITracePoint2D#STATE_REMOVED},
-   *          {@link ITracePoint2D#STATE_RENDERING_CHANGED}
-   *          </code> to inform about the
-   *          type of change.
+   *          one of {@link ITracePoint2D.STATE}.
    * 
-   * @param oldX
-   *          if state is {@link ITracePoint2D#STATE_CHANGED} this is the
-   *          previous x value, else ignored.
+   * @param oldValue
+   *          the old value, or an old x coordinate. May vary depending on
+   *          state: {@link ITracePoint2D.STATE#ADDED} : null <br/>
+   *          {@link ITracePoint2D.STATE#REMOVED}: Double, the old x value. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}: null. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}:
+   *          {@link IPointPainter}, the old point painter that was removed. <br/>
+   *          {@link ITracePoint2D.STATE#CHANGED}:
+   *          {@link Double}, the old x coordinate. <br/>
+   *          
    * 
-   * @param oldY
-   *          if state is {@link ITracePoint2D#STATE_CHANGED} this is the
-   *          previous y value, else ignored.
-   */
-  public void firePointChanged(final ITracePoint2D changed, final int state, final double oldX, final double oldY);
+   * @param newValue
+   *          the new value, or an old y coordinate. May vary depending on
+   *          state: {@link ITracePoint2D.STATE#ADDED} : null <br/>
+   *          {@link ITracePoint2D.STATE#REMOVED}: Double, the old y value. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}:
+   *          {@link IPointPainter}, the new point painter that was added. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}: null <br/>
+   *          {@link ITracePoint2D.STATE#CHANGED}:
+   *          {@link Double}, the old y coordinate. <br/>   */
+  public void firePointChanged(final ITracePoint2D changed, final ITracePoint2D.STATE state, final Object oldValue, final Object newValue);
 
   /**
    * Because the color is data common to a trace of a <code>Chart2D</code> it is
@@ -925,6 +967,14 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public Set<ITracePainter< ? >> getTracePainters();
 
   /**
+   * Returns the trace point creator of this trace.
+   * <p>
+   * 
+   * @return the trace point creator of this trace.
+   */
+  public ITracePointProvider getTracePointProvider();
+
+  /**
    * The z-index defines the order in which this instance will be painted.
    * <p>
    * A higher value will bring it more "to the front".
@@ -971,25 +1021,6 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    *         {@link ITracePoint2D}</code> instances.
    */
   public Iterator<ITracePoint2D> iterator();
-
-  /**
-   * Returns an <code>Iterator</code> over the internal <code>
-   * {@link ITrace2D}</code> instances in reverse order.
-   * <p>
-   * Implementations should be synchronized. This method is meant to allow
-   * modifications of the internal <code{@link ITracePoint2D}</code> instances,
-   * so the original points should be returned.
-   * <p>
-   * There is no guarantee that changes made to the contained tracepoints will
-   * be reflected in the display immediately. The order the iterator returns the
-   * <code>{@link ITracePoint2D}</code> instances decides how the
-   * <code>Chart2D</code> will paint the trace.
-   * <p>
-   * 
-   * @return an <code>Iterator</code> over the internal <code>
-   *         {@link ITracePoint2D}</code> instances in descending order.
-   */
-  public Iterator<ITracePoint2D> descendingIterator();
 
   /**
    * Clears all internal point highlighters used.
@@ -1184,6 +1215,17 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    *         before.
    */
   public Set<ITracePainter< ? >> setTracePainter(ITracePainter< ? > painter);
+
+  /**
+   * Sets the trace point creator of this trace.
+   * <p>
+   * Null assignment attempts will raise an <code>{@link AssertionError}</code>.
+   * <p>
+   * 
+   * @param tracePointProvider
+   *          the trace point creator of this trace to set.
+   */
+  public void setTracePointProvider(final ITracePointProvider tracePointProvider);
 
   /**
    * Set the visibility. If argument is false, this instance will not be

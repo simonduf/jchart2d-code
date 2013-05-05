@@ -36,18 +36,18 @@ import java.awt.Graphics;
  * dimension is the exact x value.
  * <p>
  * 
+ * FIXME: Look if this one could extend {@link TracePainterConfigurable}.
+ * <p>
+ * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  * @version $Revision: 1.19 $
  * 
  */
-public class TracePainterVerticalBar extends ATracePainter {
+public class TracePainterVerticalBar extends TracePainterConfigurable<PointPainterVerticalBar> {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 6151930248938945671L;
-
-  /** The implementation for rendering the point as a vertical bar. */
-  private final PointPainterVerticalBar m_pointPainter;
 
   /**
    * Creates an instance with a default bar width size of 4.
@@ -70,17 +70,7 @@ public class TracePainterVerticalBar extends ATracePainter {
    *          needed for bound information.
    */
   public TracePainterVerticalBar(final int barWidth, final Chart2D chart) {
-    this.m_pointPainter = new PointPainterVerticalBar(barWidth, chart);
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.ITracePainter#endPaintIteration(java.awt.Graphics)
-   */
-  @Override
-  public void endPaintIteration(final Graphics g2d) {
-    if (g2d != null) {
-      this.m_pointPainter.paintPoint(this.getPreviousX(), this.getPreviousY(), 0, 0, g2d, this.getPreviousPoint());
-    }
+    super(new PointPainterVerticalBar(barWidth, chart));
   }
 
   /**
@@ -116,29 +106,6 @@ public class TracePainterVerticalBar extends ATracePainter {
    */
   public int getBarWidth() {
     return this.m_pointPainter.getBarWidth();
-  }
-
-  /**
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((this.m_pointPainter == null) ? 0 : this.m_pointPainter.hashCode());
-    return result;
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#paintPoint(int,
-   *      int, int, int, java.awt.Graphics,
-   *      info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  @Override
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX, final int nextY, final Graphics g,
-      final ITracePoint2D original) {
-    super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
-    this.m_pointPainter.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
   }
 
   /**

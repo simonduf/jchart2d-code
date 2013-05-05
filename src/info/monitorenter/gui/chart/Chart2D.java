@@ -40,6 +40,8 @@ import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
@@ -1131,9 +1133,6 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    */
   private int m_traceHighlighterCount = 0;
 
-  /** Used to create trace point instances. */
-  private ITracePointProvider m_tracePointProvider;
-
   /**
    * Boolean flag to turn on antialiasing.
    */
@@ -1168,14 +1167,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * <p>
    */
   public Chart2D() {
-
     // initialize the axis collections:
     this.m_axesXBottom = new LinkedList<IAxis< ? >>();
     this.m_axesXTop = new LinkedList<IAxis< ? >>();
     this.m_axesYLeft = new LinkedList<IAxis< ? >>();
     this.m_axesYRight = new LinkedList<IAxis< ? >>();
-
-    this.setTracePointProvider(new TracePointProviderDefault());
 
     AAxis< ? > axisX = new AxisLinear<IAxisScalePolicy>();
     this.setAxisXBottom(axisX, 0);
@@ -1230,6 +1226,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     this.m_repainter.setRepeats(true);
     this.m_repainter.setCoalesce(true);
     this.m_repainter.start();
+
+  
   }
 
   /**
@@ -2375,16 +2373,6 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   }
 
   /**
-   * Returns the trace point creator of this chart.
-   * <p>
-   * 
-   * @return the trace point creator of this chart.
-   */
-  public ITracePointProvider getTracePointProvider() {
-    return this.m_tracePointProvider;
-  }
-
-  /**
    * Returns the set of traces that are currently rendered by this instance.
    * <p>
    * The instances are collected from all underlying axes. The resulting <code> 
@@ -2951,6 +2939,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       oldpoint = null;
       newpoint = null;
       trace = traceIt.next();
+      ITracePointProvider tracePointProvider = trace.getTracePointProvider();
       if (trace.isVisible()) {
         synchronized (trace) {
           if (Chart2D.DEBUG_THREADING) {
@@ -3046,8 +3035,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
                * check if the interconnection of both invisible points cuts the
                * visible area:
                */
-              oldpoint = TracePoint2DUtil.interpolateVisible(oldpoint, newpoint, this.m_tracePointProvider);
-              newpoint = TracePoint2DUtil.interpolateVisible(newpoint, oldpoint, this.m_tracePointProvider);
+              oldpoint = TracePoint2DUtil.interpolateVisible(oldpoint, newpoint, tracePointProvider);
+              newpoint = TracePoint2DUtil.interpolateVisible(newpoint, oldpoint, tracePointProvider);
 
               tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
               tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
@@ -3066,7 +3055,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
             } else if (newpointVisible && !oldpointVisible) {
               // entering the visible bounds: interpolate from old point
               // to new point
-              oldpoint = TracePoint2DUtil.interpolateVisible(oldpoint, newpoint, this.m_tracePointProvider);
+              oldpoint = TracePoint2DUtil.interpolateVisible(oldpoint, newpoint, tracePointProvider);
               tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
               tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
               oldtmpx = this.m_xChartStart + (int) Math.round(oldpoint.getScaledX() * rangex);
@@ -3076,7 +3065,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
             } else if (!newpointVisible && oldpointVisible) {
               // leaving the visible bounds:
               tmppt = (ITracePoint2D) newpoint.clone();
-              newpoint = TracePoint2DUtil.interpolateVisible(newpoint, oldpoint, this.m_tracePointProvider);
+              newpoint = TracePoint2DUtil.interpolateVisible(newpoint, oldpoint, tracePointProvider);
               tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
               tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
               // don't use error bars for interpolated points!
@@ -3256,16 +3245,16 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     while (itTracePainters.hasNext()) {
       tracePainter = itTracePainters.next();
       tracePainter.paintPoint(xPxOld, yPxOld, xPxNew, yPxNew, g2d, original);
-      Set<IPointPainter< ? >> additionalHighlighters = original.getAdditionalPointPainters();
-      Iterator<IPointPainter< ? >> itPointHighlighters = additionalHighlighters.iterator();
-      IPointPainter< ? > highlighter;
-      while (itPointHighlighters.hasNext()) {
-        highlighter = itPointHighlighters.next();
-        highlighter.paintPoint(xPxNew, yPxNew, xPxNew, yPxNew, g2d, original);
-      }
       if (discontinue) {
         tracePainter.discontinue(g2d);
       }
+    }
+    Set<IPointPainter< ? >> additionalHighlighters = original.getAdditionalPointPainters();
+    Iterator<IPointPainter< ? >> itPointHighlighters = additionalHighlighters.iterator();
+    IPointPainter< ? > highlighter;
+    while (itPointHighlighters.hasNext()) {
+      highlighter = itPointHighlighters.next();
+      highlighter.paintPoint(xPxNew, yPxNew, xPxNew, yPxNew, g2d, original);
     }
     if (errorBarSupport) {
       this.paintErrorBars(trace, xPxOld, yPxOld, xPxNew, yPxNew, g2d, discontinue, original);
@@ -4271,20 +4260,6 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   }
 
   /**
-   * Sets the trace point creator of this chart.
-   * <p>
-   * Null assignment attempts will raise an <code>{@link AssertionError}</code>.
-   * <p>
-   * 
-   * @param tracePointProvider
-   *          the trace point creator of this chart to set.
-   */
-  public void setTracePointProvider(final ITracePointProvider tracePointProvider) {
-    assert (tracePointProvider != null);
-    this.m_tracePointProvider = tracePointProvider;
-  }
-
-  /**
    * Sets whether antialiasing is used.
    * <p>
    * 
@@ -4418,9 +4393,12 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * 
    * @param mouseEvent
    *          a mouse event that has been fired on this component.
+   * 
    * @return the translation of the mouse event coordinates of the given mouse
    *         event to the value within the chart or null if no calculations
-   *         could be performed as the chart was not painted before.
+   *         could be performed as the chart was not painted before / had no
+   *         data/traces.
+   * 
    * @throws IllegalArgumentException
    *           if the given mouse event does not belong to this component.
    */
@@ -4454,10 +4432,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     double valueX = translationXAxis.translateMousePosition(mouseEvent);
     double valueY = translationYAxis.translateMousePosition(mouseEvent);
     if (nearestTrace != null) {
-      result = this.m_tracePointProvider.createTracePoint(valueX, valueY, nearestTrace);
-    } else {
-      result = this.m_tracePointProvider.createTracePoint(valueX, valueY, null);
-      // TODO: warn?
+      result = nearestTrace.getTracePointProvider().createTracePoint(valueX, valueY, nearestTrace);
     }
 
     return result;

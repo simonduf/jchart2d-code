@@ -53,6 +53,11 @@ jchart2d-3.3.0 - <month>, <day>, <year>
 * Fixed bug #3529738: Weird line is drawn when having no scale and title.
 * Fixed unreported bug: Potential deadlock when removing trace because treelock was not acquired before lock of chart 
   (and paint() first acquires treelock then demands chart lock). 
+* Bound changes for added/removed/changed points are now computed taking into account the space the actually need 
+  to be painted (not only their raw coordinates). This is a heavy change that will remove bugs related to clipped 
+  renderings in case error bars / additional point painters / trace painters actually require more space than the 
+  mere coordinate bounds. This also allows to implement the feature #3571940: Real time candle stick chart.   
+* Fixed bug: Duplicate labels are accepted.   
 ! Improved performance of ITracePoint.setLocation(double, double): This was O(n) where n was amount of points in a trace in any 
   case except boundary increase. Now it is only O(n) if an extremum was diminished via that method.   
 ! Introduced data accumulation API. This allows you to have traces with 10^6 points painted with increased speed while zooming in 
@@ -65,6 +70,8 @@ jchart2d-3.3.0 - <month>, <day>, <year>
   Use this e.g. to cast the point into your subtype to extract further information about the highlighted point. 
 ! Added AxisTickPainterInwards, an axis tick mark painter that paints the ticks within the chart area. Contribution by 
   Gerard Verhaag!  
+! Property of type ITracePointProvider is now assigned at trace level (vs. for all traces of a chart) which enables you 
+  to define them differently for each trace in a chart.
 ! Added option to define strokes for the grid. This i.e. allows you to draw dashed grids via: 
   chart.setGridStroke(new BasicStroke(3.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] {10.0f }, 0.0f));
   and 
@@ -84,8 +91,8 @@ o ITrace2D.PROPERTY_POINT_CHANGED has been renamed to ITrace2D.PROPERTY_TRACEPOI
 o ITrace2D.PROPERTY_POINT_HIGHLIGHTERS_CHANGED has been renamed to ITrace2D.PROPERTY_TRACEPOINT_CHANGED_HIGHLIGHTERS.
 o Changed ITrace2D.firePointChanged(ITracePoint2D, int) to ITrace2D.firePointChanged(ITracePoint2D, int, double double) 
   to let it know if an extremum was changed which saves a lot of performance especially on large traces.  
-
-
+o Chart2D.setTracePointProvider(ITracePointProvider) has been removed. Use ITrace2D.setTracePointProvider(ITracePointProvider) instead. 
+o Chart2D.getTracePointProvider() has been removed. Use ITrace2D.getTracePointProvider() instead. 
 
 jchart2d-3.2.2 - September, 24th, 2011
   

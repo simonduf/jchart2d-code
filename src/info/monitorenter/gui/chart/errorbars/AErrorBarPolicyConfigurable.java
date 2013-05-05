@@ -25,6 +25,7 @@ package info.monitorenter.gui.chart.errorbars;
 
 import info.monitorenter.gui.chart.IErrorBarPainter;
 import info.monitorenter.gui.chart.IErrorBarPolicy;
+import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 
@@ -61,8 +62,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  * 
  * @version $Revision: 1.41 $
  */
-public abstract class AErrorBarPolicyConfigurable implements
-    IErrorBarPolicy<AErrorBarPolicyConfigurable>, PropertyChangeListener {
+public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy<AErrorBarPolicyConfigurable>, PropertyChangeListener {
 
   /** Generated <code>serialVersionUID</code>. **/
   private static final long serialVersionUID = -1163969612681194656L;
@@ -168,8 +168,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @see info.monitorenter.gui.chart.ITrace2D#addPropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
-  public final void addPropertyChangeListener(final String propertyName,
-      final PropertyChangeListener listener) {
+  public final void addPropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
     this.m_propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
   }
 
@@ -178,8 +177,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    *      int, info.monitorenter.gui.chart.errorbars.ErrorBarPixel,
    *      info.monitorenter.gui.chart.ITracePoint2D)
    */
-  public final void calculateErrorBar(final int xPixel, final int yPixel,
-      final ErrorBarPixel errorBar, final ITracePoint2D original) {
+  public final void calculateErrorBar(final int xPixel, final int yPixel, final ErrorBarPixel errorBar, final ITracePoint2D original) {
     errorBar.clear();
 
     if (this.m_showNegativeXErrors) {
@@ -194,6 +192,165 @@ public abstract class AErrorBarPolicyConfigurable implements
     if (this.m_showPositiveYErrors) {
       errorBar.setPositiveYErrorPixel(this.internalGetPositiveYError(xPixel, yPixel, original));
     }
+  }
+
+  /**
+   * This implementation actually does shift the semantics of this method.
+   * Instead of just finding out if this painter will exceed the given
+   * coordinates desired bound first the error bar coordinate will be calculated
+   * and then the end point painters of this instance will subsequently be asked
+   * if they increase the desired bound.
+   * <p>
+   * This is necessary because an error bar painter does not paint the original
+   * given coordinate but first derives another internal coordinate for the
+   * error bar and then paints that one.
+   * <p>
+   * 
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(ITracePoint2D)
+   */
+  @Override
+  public double calculateMaxX(final ITracePoint2D point) {
+    /*
+     * 1. Find the absolute error bar bound based upon the given point.
+     */
+    double result = point.getX();
+    double errorBarMaxXCollect = 0;
+    if (this.isShowPositiveXErrors()) {
+      errorBarMaxXCollect = this.getXError(result);
+      final double absoluteMax = result + errorBarMaxXCollect;
+      if (absoluteMax > result) {
+        result = absoluteMax;
+      }
+
+      /*
+       * 2. Find out, if an internal painter would exceed this bound further.
+       */
+      for (IErrorBarPainter painter : this.getErrorBarPainters()) {
+        /*
+         * Assumption: the end point painter is the one that will exceed bound,
+         * ignore the others. However technically also segment painter or even
+         * start painter could exceed more (if coded weird / in a way that would
+         * also look strange).
+         */
+        IPointPainter< ? > endPointPainter = painter.getEndPointPainter();
+        errorBarMaxXCollect = endPointPainter.calculateMaxX(point);
+        if (errorBarMaxXCollect > result) {
+          result = errorBarMaxXCollect;
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxY(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMaxY(final ITracePoint2D point) {
+    /*
+     * 1. Find the absolute error bar bound based upon the given point.
+     */
+    double result = point.getY();
+    double errorBarMaxYCollect = 0;
+    if (this.isShowPositiveYErrors()) {
+      errorBarMaxYCollect = this.getXError(result);
+    }
+    final double absoluteMax = result + errorBarMaxYCollect;
+    if (absoluteMax > result) {
+      result = absoluteMax;
+
+      /*
+       * 2. Find out, if an internal painter would exceed this bound further.
+       */
+      for (IErrorBarPainter painter : this.getErrorBarPainters()) {
+        /*
+         * Assumption: the end point painter is the one that will exceed bound,
+         * ignore the others. However technically also segment painter or even
+         * start painter could exceed more (if coded weird / in a way that would
+         * also look strange).
+         */
+        IPointPainter< ? > endPointPainter = painter.getEndPointPainter();
+        errorBarMaxYCollect = endPointPainter.calculateMaxY(point);
+        if (errorBarMaxYCollect > result) {
+          result = errorBarMaxYCollect;
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinX(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMinX(final ITracePoint2D point) {
+    /*
+     * 1. Find the absolute error bar bound based upon the given point.
+     */
+    double result = point.getX();
+    double errorBarMinXCollect = 0;
+    if (this.isShowNegativeXErrors()) {
+      errorBarMinXCollect = this.getXError(result);
+      final double absoluteMin = result - errorBarMinXCollect;
+      if (absoluteMin < result) {
+        result = absoluteMin;
+      }
+
+      /*
+       * 2. Find out, if an internal painter would exceed this bound further.
+       */
+      for (IErrorBarPainter painter : this.getErrorBarPainters()) {
+        /*
+         * Assumption: the end point painter is the one that will exceed bound,
+         * ignore the others. However technically also segment painter or even
+         * start painter could exceed more (if coded weird / in a way that would
+         * also look strange).
+         */
+        IPointPainter< ? > endPointPainter = painter.getEndPointPainter();
+        errorBarMinXCollect = endPointPainter.calculateMinX(point);
+        if (errorBarMinXCollect < result) {
+          result = errorBarMinXCollect;
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#calculateMinY(info.monitorenter.gui.chart.ITracePoint2D)
+   */
+  @Override
+  public double calculateMinY(final ITracePoint2D point) {
+    /*
+     * 1. Find the absolute error bar bound based upon the given point.
+     */
+    double result = point.getY();
+    double errorBarMinYCollect = 0;
+    if (this.isShowNegativeXErrors()) {
+      errorBarMinYCollect = this.getXError(result);
+      final double absoluteMin = result - errorBarMinYCollect;
+      if (absoluteMin < result) {
+        result = absoluteMin;
+      }
+
+      /*
+       * 2. Find out, if an internal painter would exceed this bound further.
+       */
+      for (IErrorBarPainter painter : this.getErrorBarPainters()) {
+        /*
+         * Assumption: the end point painter is the one that will exceed bound,
+         * ignore the others. However technically also segment painter or even
+         * start painter could exceed more (if coded weird / in a way that would
+         * also look strange).
+         */
+        IPointPainter< ? > endPointPainter = painter.getEndPointPainter();
+        errorBarMinYCollect = endPointPainter.calculateMinY(point);
+        if (errorBarMinYCollect < result) {
+          result = errorBarMinYCollect;
+        }
+      }
+    }
+    return result;
   }
 
   /**
@@ -216,11 +373,9 @@ public abstract class AErrorBarPolicyConfigurable implements
    */
   public void endPaintIteration(final Graphics g2d) {
     if (g2d != null) {
-      this.calculateErrorBar(this.getPreviousX(), this.getPreviousY(), this.m_reusedErrorBarPixel,
-          this.getPreviousTracePoint());
+      this.calculateErrorBar(this.getPreviousX(), this.getPreviousY(), this.m_reusedErrorBarPixel, this.getPreviousTracePoint());
       for (final IErrorBarPainter painter : this.m_errorBarPainters) {
-        painter.paintErrorBar(this.getPreviousX(), this.getPreviousY(), this
-            .getPreviousTracePoint(), g2d, this.m_reusedErrorBarPixel);
+        painter.paintErrorBar(this.getPreviousX(), this.getPreviousY(), this.getPreviousTracePoint(), g2d, this.m_reusedErrorBarPixel);
       }
     }
   }
@@ -292,8 +447,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @param newvalue
    *          the new value of the property.
    */
-  protected final void firePropertyChange(final String property, final Object oldvalue,
-      final Object newvalue) {
+  protected final void firePropertyChange(final String property, final Object oldvalue, final Object newvalue) {
     this.m_propertyChangeSupport.firePropertyChange(property, oldvalue, newvalue);
   }
 
@@ -392,8 +546,7 @@ public abstract class AErrorBarPolicyConfigurable implements
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result
-        + ((this.m_errorBarPainters == null) ? 0 : this.m_errorBarPainters.hashCode());
+    result = prime * result + ((this.m_errorBarPainters == null) ? 0 : this.m_errorBarPainters.hashCode());
     result = prime * result + (this.m_isEnded ? 1231 : 1237);
     result = prime * result + ((this.m_lastPoint == null) ? 0 : this.m_lastPoint.hashCode());
     result = prime * result + this.m_lastX;
@@ -423,8 +576,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    *         value (not relative to the the origin value).
    * 
    */
-  protected abstract int internalGetNegativeXError(final int xPixel, final int yPixel,
-      final ITracePoint2D original);
+  protected abstract int internalGetNegativeXError(final int xPixel, final int yPixel, final ITracePoint2D original);
 
   /**
    * Internally compute the negative y error for the given point as a pixel
@@ -443,8 +595,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @param original
    *          the original point, possibly useful for calculations.
    */
-  protected abstract int internalGetNegativeYError(final int xPixel, final int yPixel,
-      final ITracePoint2D original);
+  protected abstract int internalGetNegativeYError(final int xPixel, final int yPixel, final ITracePoint2D original);
 
   /**
    * Internally compute the positive x error in pixel for the given point as an
@@ -463,8 +614,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @return the positive x error in pixel for the given point as an absolute
    *         value (not relative to the the origin value).
    */
-  protected abstract int internalGetPositiveXError(final int xPixel, final int yPixel,
-      final ITracePoint2D original);
+  protected abstract int internalGetPositiveXError(final int xPixel, final int yPixel, final ITracePoint2D original);
 
   /**
    * Internally compute the positive y error in pixel for the given point as an
@@ -483,8 +633,71 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @return the positive y error in pixel for the given point as an absolute
    *         value (not relative to the the origin value).
    */
-  protected abstract int internalGetPositiveYError(final int xPixel, final int yPixel,
-      final ITracePoint2D original);
+  protected abstract int internalGetPositiveYError(final int xPixel, final int yPixel, final ITracePoint2D original);
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededX()
+   */
+  @Override
+  public boolean isPixelTransformationNeededX() {
+    boolean result = false;
+    for (IErrorBarPainter painter : this.getErrorBarPainters()) {
+      /*
+       * Assumption: the end point painter is the one that will exceed bound,
+       * ignore the others. However technically also segment painter or even
+       * start painter could exceed more (if coded weird / in a way that would
+       * also look strange).
+       */
+      IPointPainter< ? > segmentPainter = painter.getEndPointPainter();
+      if(segmentPainter.isPixelTransformationNeededX()){
+        result = true;
+        break;
+      }
+      segmentPainter = painter.getStartPointPainter();
+      if(segmentPainter.isPixelTransformationNeededX()){
+        result = true;
+        break;
+      }
+      segmentPainter = painter.getConnectionPainter();
+      if(segmentPainter.isPixelTransformationNeededX()){
+        result = true;
+        break;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededY()
+   */
+  @Override
+  public boolean isPixelTransformationNeededY() {
+    boolean result = false;
+    for (IErrorBarPainter painter : this.getErrorBarPainters()) {
+      /*
+       * Assumption: the end point painter is the one that will exceed bound,
+       * ignore the others. However technically also segment painter or even
+       * start painter could exceed more (if coded weird / in a way that would
+       * also look strange).
+       */
+      IPointPainter< ? > segmentPainter = painter.getEndPointPainter();
+      if(segmentPainter.isPixelTransformationNeededY()){
+        result = true;
+        break;
+      }
+      segmentPainter = painter.getStartPointPainter();
+      if(segmentPainter.isPixelTransformationNeededY()){
+        result = true;
+        break;
+      }
+      segmentPainter = painter.getConnectionPainter();
+      if(segmentPainter.isPixelTransformationNeededY()){
+        result = true;
+        break;
+      }
+    }
+    return result;
+  }
 
   /**
    * @see info.monitorenter.gui.chart.IErrorBarPolicy#isShowNegativeXErrors()
@@ -518,8 +731,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @see info.monitorenter.gui.chart.IPointPainter#paintPoint(int, int, int,
    *      int, java.awt.Graphics, info.monitorenter.gui.chart.ITracePoint2D)
    */
-  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX,
-      final int nextY, final Graphics g, final ITracePoint2D original) {
+  public void paintPoint(final int absoluteX, final int absoluteY, final int nextX, final int nextY, final Graphics g, final ITracePoint2D original) {
 
     this.calculateErrorBar(nextX, nextY, this.m_reusedErrorBarPixel, original);
     for (final IErrorBarPainter painter : this.m_errorBarPainters) {
@@ -534,17 +746,15 @@ public abstract class AErrorBarPolicyConfigurable implements
   /**
    * Just turns the property change event of subsequent configuration (like
    * <code>{@link IErrorBarPainter#PROPERTY_CONNECTION}</code> to <code>
-   * {@link IErrorBarPolicy#PROPERTY_CONFIGURATION}</code>
-   * and informs outer <code>{@link PropertyChangeListener}</code> added with
-   * <code>
+   * {@link IErrorBarPolicy#PROPERTY_CONFIGURATION}</code> and informs outer
+   * <code>{@link PropertyChangeListener}</code> added with <code>
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}</code>.
    * <p>
    * 
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
   public void propertyChange(final PropertyChangeEvent evt) {
-    this.firePropertyChange(IErrorBarPolicy.PROPERTY_CONFIGURATION, evt.getOldValue(), evt
-        .getNewValue());
+    this.firePropertyChange(IErrorBarPolicy.PROPERTY_CONFIGURATION, evt.getOldValue(), evt.getNewValue());
   }
 
   /**
@@ -577,8 +787,7 @@ public abstract class AErrorBarPolicyConfigurable implements
    * @see info.monitorenter.gui.chart.IErrorBarPolicy#removePropertyChangeListener(java.lang.String,
    *      java.beans.PropertyChangeListener)
    */
-  public void removePropertyChangeListener(final String property,
-      final PropertyChangeListener listener) {
+  public void removePropertyChangeListener(final String property, final PropertyChangeListener listener) {
     this.m_propertyChangeSupport.removePropertyChangeListener(property, listener);
   }
 

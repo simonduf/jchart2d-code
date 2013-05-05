@@ -120,7 +120,7 @@ public class Trace2DArithmeticMeanX extends ATrace2D {
       divisor = 1;
     }
     x /= divisor;
-    result = this.getRenderer().getTracePointProvider().createTracePoint(x, y, this);
+    result = this.getTracePointProvider().createTracePoint(x, y, this);
     return result;
 
   }

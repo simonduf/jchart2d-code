@@ -121,7 +121,7 @@ public class Trace2DArithmeticMeanY extends ATrace2D {
       divisor = 1;
     }
     y /= divisor;
-    result = this.getRenderer().getTracePointProvider().createTracePoint(x, y, this);
+    result = this.getTracePointProvider().createTracePoint(x, y, this);
     return result;
 
   }

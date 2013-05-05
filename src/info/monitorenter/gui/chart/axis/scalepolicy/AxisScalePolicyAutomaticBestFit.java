@@ -68,7 +68,8 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
   public List<LabeledValue> getScaleValues(final Graphics2D g2d, final IAxis< ? > axis) {
     final double labelspacepx = axis.getAccessor().getMinimumValueDistanceForLabels(g2d);
     final double formattingspace = axis.getFormatter().getMinimumValueShiftForChange();
-   // final double max = this.normalize(Math.max(labelspacepx, formattingspace));
+    // final double max = this.normalize(Math.max(labelspacepx,
+    // formattingspace));
     final double max = Math.max(labelspacepx, formattingspace);
     return this.getLabels(max, axis);
   }
@@ -154,12 +155,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
         if (loopStop == 99) {
           if (AAxis.DEBUG) {
             System.out.println(axis.getAccessor().toString() + " axis: loop to high");
-          }
-        }
-        if (oldLabelName.equals(labelName)) {
-          if (AAxis.DEBUG) {
-            System.out.println("constant Label " + labelName);
-          }
+          }//value  1.3518972E12    
         }
         label = this.roundToTicks(value, false, !firstMajorFound && axis.isStartMajorTick(), axis);
 
@@ -171,7 +167,13 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
         if (firstMajorFound || !axis.isStartMajorTick() || label.isMajorTick()) {
           firstMajorFound = true;
           if ((value <= max) && (value >= min)) {
-            collect.add(label);
+            if (oldLabelName.equals(labelName)) {
+              if (AAxis.DEBUG) {
+                System.out.println("constant Label " + labelName);
+              }
+            } else {
+              collect.add(label);
+            }
           } else if (value > max) {
             if (AAxis.DEBUG) {
               System.out.println("Dropping label (too high) : (" + label + ")[max: " + max + "]");
@@ -213,8 +215,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
    *          fare more away from the given value than the next major tick).
    * @return the value rounded to minor or major ticks.
    */
-  protected LabeledValue roundToTicks(final double value, final boolean floor,
-      final boolean findMajorTick, final IAxis< ? > axis) {
+  protected LabeledValue roundToTicks(final double value, final boolean floor, final boolean findMajorTick, final IAxis< ? > axis) {
     final LabeledValue ret = new LabeledValue();
 
     final double minorTick = axis.getMinorTickSpacing() * this.m_power;

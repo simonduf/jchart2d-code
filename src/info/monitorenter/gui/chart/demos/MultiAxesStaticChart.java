@@ -91,16 +91,16 @@ public final class MultiAxesStaticChart extends JPanel {
     this.setLayout(new BorderLayout());
     Chart2D chart = new Chart2D();
     chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
-    // This is not important: We do this just because we want to add points
-    // before
-    // configuring the axes and add the traces to the chart:
-    ITracePointProvider pointCreator = chart.getTracePointProvider();
+    /*
+     * This is not important: We do this just because we want to add points
+     * before configuring the axes and add the traces to the chart:
+     */
+    ITracePointProvider pointCreator;
 
     // Create apples trace:
     ITrace2D apples = new Trace2DSimple();
     apples.setColor(Color.RED);
     apples.setName("Apples");
-
 
     // Create pears trace:
     ITrace2D pears = new Trace2DSimple();
@@ -113,15 +113,15 @@ public final class MultiAxesStaticChart extends JPanel {
     carrots.setName("Carrots");
 
     // Use three y axes:
-    AAxis<?> yAxisApples = new AxisLinear<IAxisScalePolicy>();
+    AAxis< ? > yAxisApples = new AxisLinear<IAxisScalePolicy>();
     yAxisApples.getAxisTitle().setTitle("Y-Apples");
     yAxisApples.getAxisTitle().setTitleColor(Color.RED);
 
-    AAxis<?> yAxisPears = new AxisLinear<IAxisScalePolicy>();
+    AAxis< ? > yAxisPears = new AxisLinear<IAxisScalePolicy>();
     yAxisPears.getAxisTitle().setTitle("Y-Pears");
     yAxisPears.getAxisTitle().setTitleColor(Color.BLUE);
 
-    AAxis<?> yAxisCarrots = new AxisLinear<IAxisScalePolicy>();
+    AAxis< ? > yAxisCarrots = new AxisLinear<IAxisScalePolicy>();
     yAxisCarrots.getAxisTitle().setTitle("Y-Carrots");
     yAxisCarrots.getAxisTitle().setTitleColor(Color.MAGENTA);
 
@@ -131,15 +131,15 @@ public final class MultiAxesStaticChart extends JPanel {
     chart.addAxisYLeft(yAxisCarrots);
 
     // use three x axes:
-    AAxis<?> xAxisApples = new AxisLinear<IAxisScalePolicy>();
+    AAxis< ? > xAxisApples = new AxisLinear<IAxisScalePolicy>();
     xAxisApples.getAxisTitle().setTitle("X-Apples");
     xAxisApples.getAxisTitle().setTitleColor(Color.RED);
 
-    AAxis<?> xAxisPears = new AxisLinear<IAxisScalePolicy>();
+    AAxis< ? > xAxisPears = new AxisLinear<IAxisScalePolicy>();
     xAxisPears.getAxisTitle().setTitle("X-Pears");
     xAxisPears.getAxisTitle().setTitleColor(Color.BLUE);
 
-    AAxis<?> xAxisCarrots = new AxisLinear<IAxisScalePolicy>();
+    AAxis< ? > xAxisCarrots = new AxisLinear<IAxisScalePolicy>();
     xAxisCarrots.getAxisTitle().setTitle("X-Carrots");
     xAxisCarrots.getAxisTitle().setTitleColor(Color.MAGENTA);
 
@@ -153,14 +153,13 @@ public final class MultiAxesStaticChart extends JPanel {
     chart.addTrace(apples, xAxisApples, yAxisApples);
     chart.addTrace(pears, xAxisPears, yAxisPears);
     chart.addTrace(carrots, xAxisCarrots, yAxisCarrots);
-    
-    
-    // Only the trace is assigned to the chart points may be added! 
+
+    // Only the trace is assigned to the chart points may be added!
     // Add all points, as it is static:
     double time = System.currentTimeMillis();
     int i;
     for (i = 0; i < 120; i++) {
-      apples.addPoint(pointCreator.createTracePoint(time + i * 10000, (10.0 + Math.random()) * i, apples));
+      apples.addPoint(time + i * 10000, (10.0 + Math.random()) * i);
     }
     // add pears:
     ITracePoint2D copyPoint;
@@ -168,8 +167,7 @@ public final class MultiAxesStaticChart extends JPanel {
     i = 0;
     while (it.hasNext()) {
       copyPoint = it.next();
-      pears.addPoint(pointCreator.createTracePoint(i * 0.001, copyPoint.getY()
-          + (Math.random() * 1000), pears));
+      pears.addPoint(i * 0.001, copyPoint.getY() + (Math.random() * 1000));
       i++;
     }
     // add carrots:
@@ -177,12 +175,9 @@ public final class MultiAxesStaticChart extends JPanel {
     i = 0;
     while (it.hasNext()) {
       copyPoint = it.next();
-      carrots.addPoint(pointCreator.createTracePoint(i * 100, 100 - copyPoint.getY(), carrots));
+      carrots.addPoint(i * 100, 100 - copyPoint.getY());
       i++;
     }
-
-
-
 
     // Make it visible:
     this.add(new ChartPanel(chart), BorderLayout.CENTER);
