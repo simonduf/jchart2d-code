@@ -1292,7 +1292,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    */
   public final Set<IErrorBarPolicy< ? >> getErrorBarPolicies() {
     return this.m_errorBarPolicies;
-  }
+  } 
 
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#getHasErrorBars()
