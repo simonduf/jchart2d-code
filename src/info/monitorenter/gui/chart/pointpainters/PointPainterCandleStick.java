@@ -27,9 +27,11 @@
 package info.monitorenter.gui.chart.pointpainters;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.tracepoints.CandleStick;
+import info.monitorenter.gui.util.TracePoint2DUtil;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -49,16 +51,16 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
   private static final long serialVersionUID = -6708238540093878572L;
 
   /** The width of the candlestick. */
-  private double m_width;
+  private int m_width;
 
   /**
-   * Constructor taking the width.
+   * Constructor taking the width in pixels.
    * <p>
    * 
    * @param width
-   *          the width of the {@link CandleStick}.
+   *          the width of the {@link CandleStick} in pixels.
    **/
-  public PointPainterCandleStick(final double width) {
+  public PointPainterCandleStick(final int width) {
     this.m_width = width;
   }
 
@@ -67,7 +69,11 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
    */
   @Override
   public double calculateMaxX(final ITracePoint2D point) {
-   return point.getX();
+    IAxis< ? > axisX = TracePoint2DUtil.getAxisXOfTracePoint(point);
+    Chart2D chart = TracePoint2DUtil.getChartFromTracePoint(point);
+    double widthInValue = axisX.translatePxToValue(this.getWidth() + chart.getXChartStart()) - point.getX();
+    double result = point.getX() + widthInValue / 2;
+    return result;
   }
 
   /**
@@ -87,7 +93,11 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
    */
   @Override
   public double calculateMinX(final ITracePoint2D point) {
-    return point.getX();
+    IAxis< ? > axisX = TracePoint2DUtil.getAxisXOfTracePoint(point);
+    Chart2D chart = TracePoint2DUtil.getChartFromTracePoint(point);
+    double widthInValue = axisX.translatePxToValue(this.getWidth() + chart.getXChartStart()) - point.getX();
+    double result = point.getX() - widthInValue / 2;
+    return result;
   }
 
   /**
@@ -136,7 +146,7 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
    * 
    * @return the width.
    */
-  public double getWidth() {
+  public int getWidth() {
     return this.m_width;
   }
 
@@ -158,9 +168,9 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
    */
   @Override
   public boolean isPixelTransformationNeededX() {
-    return false;
+    return true;
   }
-  
+
   /**
    * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededX()
    */

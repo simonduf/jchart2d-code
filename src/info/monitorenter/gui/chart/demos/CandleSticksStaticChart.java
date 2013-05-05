@@ -175,8 +175,8 @@ public final class CandleSticksStaticChart extends JPanel {
     cal.set(Calendar.DAY_OF_MONTH, 20);
     double endTimeX = cal.getTimeInMillis();
     
-    IRangePolicy rangePolicy = new RangePolicyFixedViewport(new Range(startTimeX, endTimeX));
-    this.m_chart.getAxisX().setRangePolicy(rangePolicy);
+//    IRangePolicy rangePolicy = new RangePolicyFixedViewport(new Range(startTimeX, endTimeX));
+//    this.m_chart.getAxisX().setRangePolicy(rangePolicy);
 
   }
 

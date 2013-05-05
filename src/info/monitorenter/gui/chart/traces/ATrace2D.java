@@ -1112,35 +1112,37 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
     double tmpMinY, collectMinY = point.getY();
     Set<ITracePainter< ? >> tracePainters = this.getTracePainters();
     /*
-     * Incorporate half stroke width to all extrema:
+     * Incorporate half stroke width to all extrema. 
+     * 
+     * FIXME: This seems nonsense: We talk about absoute values here - not about pixels!
      */
-    double halfStrokeWidth = 0.0;
-    ITrace2D trace = point.getListener();
-    if (trace != null) {
-      Stroke stroke = trace.getStroke();
-      if (stroke instanceof BasicStroke) {
-        BasicStroke basicStroke = (BasicStroke) stroke;
-        halfStrokeWidth = basicStroke.getLineWidth() / 2.0;
-      }
-    }
-
+//    double halfStrokeWidth = 0.0;
+//    ITrace2D trace = point.getListener();
+//    if (trace != null) {
+//      Stroke stroke = trace.getStroke();
+//      if (stroke instanceof BasicStroke) {
+//        BasicStroke basicStroke = (BasicStroke) stroke;
+//        halfStrokeWidth = basicStroke.getLineWidth() / 2.0;
+//      }
+//    }
+//
     /*
      * 1. ITracePainters
      */
     for (ITracePainter< ? > painter : tracePainters) {
-      tmpMaxX = painter.calculateMaxX(point) + halfStrokeWidth;
+      tmpMaxX = painter.calculateMaxX(point);// + halfStrokeWidth;
       if (tmpMaxX > collectMaxX) {
         collectMaxX = tmpMaxX;
       }
-      tmpMinX = painter.calculateMinX(point) - halfStrokeWidth;
+      tmpMinX = painter.calculateMinX(point);// - halfStrokeWidth;
       if (tmpMinX < collectMinX) {
         collectMinX = tmpMinX;
       }
-      tmpMaxY = painter.calculateMaxY(point) + halfStrokeWidth;
+      tmpMaxY = painter.calculateMaxY(point);// + halfStrokeWidth;
       if (tmpMaxY > collectMaxY) {
         collectMaxY = tmpMaxY;
       }
-      tmpMinY = painter.calculateMinY(point) - halfStrokeWidth;
+      tmpMinY = painter.calculateMinY(point);// - halfStrokeWidth;
       if (tmpMinY < collectMinY) {
         collectMinY = tmpMinY;
       }
@@ -1150,19 +1152,19 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
      */
     Set<IPointPainter< ? >> pointPainters = point.getAdditionalPointPainters();
     for (IPointPainter< ? > painter : pointPainters) {
-      tmpMaxX = painter.calculateMaxX(point) + halfStrokeWidth;
+      tmpMaxX = painter.calculateMaxX(point);// + halfStrokeWidth;
       if (tmpMaxX > collectMaxX) {
         collectMaxX = tmpMaxX;
       }
-      tmpMinX = painter.calculateMinX(point) - halfStrokeWidth;
+      tmpMinX = painter.calculateMinX(point);// - halfStrokeWidth;
       if (tmpMinX < collectMinX) {
         collectMinX = tmpMinX;
       }
-      tmpMaxY = painter.calculateMaxY(point) + halfStrokeWidth;
+      tmpMaxY = painter.calculateMaxY(point);// + halfStrokeWidth;
       if (tmpMaxY > collectMaxY) {
         collectMaxY = tmpMaxY;
       }
-      tmpMinY = painter.calculateMinY(point) - halfStrokeWidth;
+      tmpMinY = painter.calculateMinY(point);// - halfStrokeWidth;
       if (tmpMinY < collectMinY) {
         collectMinY = tmpMinY;
       }
@@ -1174,25 +1176,25 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
 
     for (IErrorBarPolicy< ? > errorBarPolicy : errorBarPolicies) {
       if (errorBarPolicy.isShowPositiveXErrors()) {
-        tmpMaxX = errorBarPolicy.calculateMaxX(point) + halfStrokeWidth;
+        tmpMaxX = errorBarPolicy.calculateMaxX(point);// + halfStrokeWidth;
         if (tmpMaxX > collectMaxX) {
           collectMaxX = tmpMaxX;
         }
       }
       if (errorBarPolicy.isShowNegativeXErrors()) {
-        tmpMinX = errorBarPolicy.calculateMinX(point) - halfStrokeWidth;
+        tmpMinX = errorBarPolicy.calculateMinX(point);// - halfStrokeWidth;
         if (tmpMinX < collectMinX) {
           collectMinX = tmpMinX;
         }
       }
       if (errorBarPolicy.isShowPositiveYErrors()) {
-        tmpMaxY = errorBarPolicy.calculateMaxY(point) + halfStrokeWidth;
+        tmpMaxY = errorBarPolicy.calculateMaxY(point);// + halfStrokeWidth;
         if (tmpMaxY > collectMaxY) {
           collectMaxY = tmpMaxY;
         }
       }
       if (errorBarPolicy.isShowNegativeYErrors()) {
-        tmpMinY = errorBarPolicy.calculateMinY(point) - halfStrokeWidth;
+        tmpMinY = errorBarPolicy.calculateMinY(point);// - halfStrokeWidth;
         if (tmpMinY < collectMinY) {
           collectMinY = tmpMinY;
         }
@@ -1218,7 +1220,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * <p>
    * Additionally before this property change, property change events for bounds
    * are fired as described in method
-   * <code>{@link #firePointChanged(ITracePoint2D, int, double, double)}</code>.
+   * <code>{@link #firePointChanged(ITracePoint2D, info.monitorenter.gui.chart.ITracePoint2D.STATE, Object, Object)}</code>.
    * <p>
    * 
    * @param removed
@@ -1292,7 +1294,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    */
   public final Set<IErrorBarPolicy< ? >> getErrorBarPolicies() {
     return this.m_errorBarPolicies;
-  } 
+  }
 
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#getHasErrorBars()
