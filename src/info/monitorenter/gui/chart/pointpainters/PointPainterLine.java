@@ -80,6 +80,22 @@ public class PointPainterLine extends APointPainter<PointPainterLine> {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isAdditionalSpaceRequiredX()
+   */
+  @Override
+  public boolean isAdditionalSpaceRequiredX() {
+    return false;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isAdditionalSpaceRequiredY()
+   */
+  @Override
+  public boolean isAdditionalSpaceRequiredY() {
+    return false;
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededX()
    */
   @Override

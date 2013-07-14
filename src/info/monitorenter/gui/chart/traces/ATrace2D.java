@@ -36,6 +36,7 @@ import info.monitorenter.gui.chart.traces.accumulationfunctions.AccumulationFunc
 import info.monitorenter.gui.chart.traces.accumulationstrategies.AAccumulationStrategy;
 import info.monitorenter.gui.chart.traces.accumulationstrategies.AccumulationStrategyByPass;
 import info.monitorenter.gui.chart.traces.painters.TracePainterPolyline;
+import info.monitorenter.gui.util.TracePoint2DUtil;
 import info.monitorenter.util.SerializationUtility;
 import info.monitorenter.util.StringUtil;
 
@@ -78,6 +79,30 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * Instance counter for read-access in subclasses.
    */
   private static int instanceCount = 0;
+
+  /**
+   * Index for accessing the result of
+   * {@link #calculatePointBounds(ITracePoint2D)}.
+   */
+  private static int POINTBOUNDS_MAX_X = 1;
+
+  /**
+   * Index for accessing the result of
+   * {@link #calculatePointBounds(ITracePoint2D)}.
+   */
+  private static int POINTBOUNDS_MAX_Y = 3;
+
+  /**
+   * Index for accessing the result of
+   * {@link #calculatePointBounds(ITracePoint2D)}.
+   */
+  private static int POINTBOUNDS_MIN_X = 0;
+
+  /**
+   * Index for accessing the result of
+   * {@link #calculatePointBounds(ITracePoint2D)}.
+   */
+  private static int POINTBOUNDS_MIN_Y = 2;
 
   /** Generated <code>serialVersionUID</code>. * */
   private static final long serialVersionUID = -3955095612824507919L;
@@ -170,6 +195,22 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * The name property.
    */
   protected String m_name = "";
+
+  /**
+   * For tracking the amount of painters in the trace that require additional
+   * space. If it is not needed min-max - tracking can be done much quicker
+   * (point * 2 * amount of painters (which are tracepainters, pointpainters and
+   * errorbarpainters)).
+   */
+  private int m_paintersThatNeedsAdditionalSpace = 0;
+
+  /**
+   * For tracking the amount of painters in the trace that require pixel
+   * translation. If it is not needed min-max - tracking can be done much
+   * quicker (point * 2 * amount of painters (which are tracepainters,
+   * pointpainters and errorbarpainters)).
+   */
+  private int m_paintersThatNeedsPixelTranslation = 0;
 
   /**
    * The physical unit property for x dimension.
@@ -474,6 +515,228 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   }
 
   /**
+   * Internal search for all bounds which is very expensive!
+   * <p>
+   * The result is assigned to the the properties
+   * <ul>
+   * <li>maxX</li>
+   * <li>minX</li>
+   * <li>maxY</li>
+   * <li>minY</li>
+   * </ul>
+   * maxX.
+   * <p>
+   * Also property change events are fired for detected bound changes.
+   * <p>
+   */
+  protected void boundSearch() {
+    if (Chart2D.DEBUG_THREADING) {
+      System.out.println("trace.maxXSearch, 0 locks");
+    }
+
+    synchronized (this) {
+      if (Chart2D.DEBUG_THREADING) {
+        System.out.println("trace.maxXSearch, 1 locks");
+      }
+      // for firing events:
+      double oldMaxX = this.m_maxX;
+      double oldMinX = this.m_minX;
+      double oldMaxY = this.m_maxX;
+      double oldMinY = this.m_minY;
+
+      // go search
+      double maxXCollect = -Double.MAX_VALUE;
+      double maxYCollect = -Double.MAX_VALUE;
+      double minXCollect = Double.MAX_VALUE;
+      double minYCollect = Double.MAX_VALUE;
+      ITracePoint2D tmpoint = null;
+      final Iterator<ITracePoint2D> it = this.iterator();
+      double[] pointBounds;
+      while (it.hasNext()) {
+        tmpoint = it.next();
+        pointBounds = this.calculatePointBounds(tmpoint);
+        if (pointBounds[POINTBOUNDS_MAX_X] > maxXCollect) {
+          maxXCollect = pointBounds[POINTBOUNDS_MAX_X];
+        }
+        if (pointBounds[POINTBOUNDS_MAX_Y] > maxYCollect) {
+          maxXCollect = pointBounds[POINTBOUNDS_MAX_Y];
+        }
+        if (pointBounds[POINTBOUNDS_MIN_X] > minXCollect) {
+          minXCollect = pointBounds[POINTBOUNDS_MIN_X];
+        }
+        if (pointBounds[POINTBOUNDS_MIN_Y] > minYCollect) {
+          minXCollect = pointBounds[POINTBOUNDS_MIN_Y];
+        }
+      }
+      this.m_maxX = maxXCollect;
+      this.m_maxY = maxYCollect;
+      this.m_minX = minXCollect;
+      this.m_minY = minYCollect;
+
+      // fire events:
+      if (oldMaxX < this.m_maxX) {
+        this.firePropertyChange(PROPERTY_MAX_X, Double.valueOf(oldMaxX), Double.valueOf(this.m_maxX));
+      }
+      if (oldMaxY < this.m_maxY) {
+        this.firePropertyChange(PROPERTY_MAX_Y, Double.valueOf(oldMaxY), Double.valueOf(this.m_maxY));
+      }
+      if (oldMinX > this.m_minX) {
+        this.firePropertyChange(PROPERTY_MIN_X, Double.valueOf(oldMinX), Double.valueOf(this.m_minX));
+      }
+      if (oldMinY > this.m_minY) {
+        this.firePropertyChange(PROPERTY_MIN_Y, Double.valueOf(oldMinY), Double.valueOf(this.m_minY));
+      }
+    }
+  }
+
+  /**
+   * We need to know the x and y range of a trace in order to scale all points.
+   * However the point's position is not sufficient. Because:
+   * <ul>
+   * <li>{@link #getTracePainters()} may exceed bounds.</li>
+   * <li>{@link ITracePoint2D#getAdditionalPointPainters()} may exceed bounds.</li>
+   * <li>{@link #getErrorBarPolicies()} may exceed bounds.</li>
+   * </ul>
+   * <p>
+   * All this is taken into account here. This returns a <code>double[4]</code>
+   * which should be accessed by the constants:
+   * <ul>
+   * <li>{@link #POINTBOUNDS_MAX_X}</li>
+   * <li>{@link #POINTBOUNDS_MIN_X}</li>
+   * <li>{@link #POINTBOUNDS_MAX_Y}</li>
+   * <li>{@link #POINTBOUNDS_MIN_Y}</li>
+   * <ul>
+   * 
+   * @param point
+   *          the point to find the bounds of.
+   * 
+   * @return a <code>double[4]</code> which should be accessed by the constants:
+   *         <ul>
+   *         <li>{@link #POINTBOUNDS_MAX_X}</li> <li>{@link #POINTBOUNDS_MIN_X}
+   *         </li> <li>{@link #POINTBOUNDS_MAX_Y}</li> <li>
+   *         {@link #POINTBOUNDS_MIN_Y}</li>
+   *         <ul>
+   *         .
+   */
+  private double[] calculatePointBounds(final ITracePoint2D point) {
+    final double[] result = new double[4];
+    double tmpMaxX, collectMaxX = point.getX();
+    double tmpMinX, collectMinX = point.getX();
+    double tmpMaxY, collectMaxY = point.getY();
+    double tmpMinY, collectMinY = point.getY();
+    Chart2D chart = TracePoint2DUtil.getChartFromTracePoint(point);
+    if (this.isAdditionalSpaceRequired() && chart.isVisible() && chart.getWidth() > 0) {
+
+      Set<ITracePainter< ? >> tracePainters = this.getTracePainters();
+      /*
+       * Incorporate half stroke width to all extrema.
+       * 
+       * FIXME: This seems nonsense: We talk about absoute values here - not
+       * about pixels!
+       */
+      // double halfStrokeWidth = 0.0;
+      // ITrace2D trace = point.getListener();
+      // if (trace != null) {
+      // Stroke stroke = trace.getStroke();
+      // if (stroke instanceof BasicStroke) {
+      // BasicStroke basicStroke = (BasicStroke) stroke;
+      // halfStrokeWidth = basicStroke.getLineWidth() / 2.0;
+      // }
+      // }
+      //
+      /*
+       * 1. ITracePainters
+       */
+      for (ITracePainter< ? > painter : tracePainters) {
+        tmpMaxX = painter.calculateMaxX(point);// + halfStrokeWidth;
+        if (tmpMaxX > collectMaxX) {
+          collectMaxX = tmpMaxX;
+        }
+        tmpMinX = painter.calculateMinX(point);// - halfStrokeWidth;
+        if (tmpMinX < collectMinX) {
+          collectMinX = tmpMinX;
+        }
+        tmpMaxY = painter.calculateMaxY(point);// + halfStrokeWidth;
+        if (tmpMaxY > collectMaxY) {
+          collectMaxY = tmpMaxY;
+        }
+        tmpMinY = painter.calculateMinY(point);// - halfStrokeWidth;
+        if (tmpMinY < collectMinY) {
+          collectMinY = tmpMinY;
+        }
+      }
+      /*
+       * 2. additional point painter
+       */
+      Set<IPointPainter< ? >> pointPainters = point.getAdditionalPointPainters();
+      for (IPointPainter< ? > painter : pointPainters) {
+        tmpMaxX = painter.calculateMaxX(point);// + halfStrokeWidth;
+        if (tmpMaxX > collectMaxX) {
+          collectMaxX = tmpMaxX;
+        }
+        tmpMinX = painter.calculateMinX(point);// - halfStrokeWidth;
+        if (tmpMinX < collectMinX) {
+          collectMinX = tmpMinX;
+        }
+        tmpMaxY = painter.calculateMaxY(point);// + halfStrokeWidth;
+        if (tmpMaxY > collectMaxY) {
+          collectMaxY = tmpMaxY;
+        }
+        tmpMinY = painter.calculateMinY(point);// - halfStrokeWidth;
+        if (tmpMinY < collectMinY) {
+          collectMinY = tmpMinY;
+        }
+      }
+      /*
+       * 3. IErrorBarPolicies
+       */
+      Set<IErrorBarPolicy< ? >> errorBarPolicies = this.getErrorBarPolicies();
+
+      for (IErrorBarPolicy< ? > errorBarPolicy : errorBarPolicies) {
+        if (errorBarPolicy.isShowPositiveXErrors()) {
+          tmpMaxX = errorBarPolicy.calculateMaxX(point);// + halfStrokeWidth;
+          if (tmpMaxX > collectMaxX) {
+            collectMaxX = tmpMaxX;
+          }
+        }
+        if (errorBarPolicy.isShowNegativeXErrors()) {
+          tmpMinX = errorBarPolicy.calculateMinX(point);// - halfStrokeWidth;
+          if (tmpMinX < collectMinX) {
+            collectMinX = tmpMinX;
+          }
+        }
+        if (errorBarPolicy.isShowPositiveYErrors()) {
+          tmpMaxY = errorBarPolicy.calculateMaxY(point);// + halfStrokeWidth;
+          if (tmpMaxY > collectMaxY) {
+            collectMaxY = tmpMaxY;
+          }
+        }
+        if (errorBarPolicy.isShowNegativeYErrors()) {
+          tmpMinY = errorBarPolicy.calculateMinY(point);// - halfStrokeWidth;
+          if (tmpMinY < collectMinY) {
+            collectMinY = tmpMinY;
+          }
+        }
+      }
+    } else {
+      /*
+       * We do not have to look for additional range changes in case pixel
+       * transformation is not needed. We must not do it in case chart is not
+       * visible (wrong calculations in pixel transformation then).
+       */
+    }
+
+    /*
+     * Done: we have explored all possible increased bounds!
+     */
+    result[POINTBOUNDS_MAX_X] = collectMaxX;
+    result[POINTBOUNDS_MIN_X] = collectMinX;
+    result[POINTBOUNDS_MAX_Y] = collectMaxY;
+    result[POINTBOUNDS_MIN_Y] = collectMinY;
+    return result;
+  }
+
+  /**
    * @param o
    *          the trace to compare to.
    * @return see interface.
@@ -733,7 +996,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * <p>
    * Additionally before this property change, property change events for bounds
    * are fired as described in method
-   * <code>{@link #firePointChanged(ITracePoint2D, int, double, double)}</code>.
+   * <code>{@link #firePointChanged(ITracePoint2D, info.monitorenter.gui.chart.ITracePoint2D.STATE, Object, Object)}</code>.
    * <p>
    * 
    * @param added
@@ -743,14 +1006,6 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
     this.firePointChanged(added, ITracePoint2D.STATE.ADDED, null, null);
     this.firePropertyChange(ITrace2D.PROPERTY_TRACEPOINTS, null, added);
   }
-
-  /**
-   * For tracking the amount of painters in the trace that require pixel
-   * translation. If it is not needed min-max - tracking can be done much
-   * quicker (point * 2 * amount of painters (which are tracepainters,
-   * pointpainters and errorbarpainters)).
-   */
-  private int m_paintersThatNeedsPixelTranslation = 0;
 
   /**
    * Method triggered by <code>{@link ITracePoint2D#setLocation(double, double)}
@@ -804,49 +1059,58 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
     synchronized (this.m_renderer) {
       synchronized (this) {
         /*
-         * Track pointpainters if they need pixel-transformation:
+         * Track pointpainters if they need pixel-transformation or additional
+         * space:
          */
-        this.trackPainterPixelTransformationRequired(changed, state, oldValue, newValue);
+        this.trackPainters(changed, state, oldValue, newValue);
 
         double collectMaxX;
         double collectMinX;
         double collectMaxY;
         double collectMinY;
+        // boolean doFireMaxX = false;
+        // boolean doFireMinX = false;
+        // boolean doFireMaxY = false;
+        // boolean doFireMinY = false;
 
-        if (this.isPixelTransformationRequired()) {
-          /*
-           * A complete bounds check is first needed before asking the painters
-           * for additional space needed.
-           */
-          if (ITracePoint2D.STATE.ADDED == state) {
-            if (changed.getX() > this.m_maxX) {
-              this.m_maxX = changed.getX();
-            }
-            if (changed.getX() < this.m_minX) {
-              this.m_minX = changed.getX();
-            }
-            if (changed.getY() > this.m_maxY) {
-              this.m_maxY = changed.getY();
-            } else if (changed.getY() < this.m_minY) {
-              this.m_minY = changed.getY();
-            }
-          } else if (ITracePoint2D.STATE.REMOVED == state) {
-            if (changed.getX() >= this.m_maxX) {
-              this.maxXSearch();
-              this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(this.m_maxX), new Double(changed.getX()));
-            } else if (changed.getX() <= this.m_minX) {
-              this.minXSearch();
-              this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(this.m_minX), new Double(changed.getX()));
-            }
-            if (changed.getY() >= this.m_maxY) {
-              this.maxYSearch();
-              this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(this.m_maxY), new Double(changed.getX()));
-            } else if (changed.getY() <= this.m_minY) {
-              this.minYSearch();
-              this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(this.m_minY), new Double(changed.getY()));
-            }
-          }
-        }
+        // if (this.isPixelTransformationRequired()) {
+        // /*
+        // * A complete bounds check is first needed before asking the painters
+        // * for additional space needed.
+        // */
+        // if (ITracePoint2D.STATE.ADDED == state) {
+        // if (changed.getX() > this.m_maxX) {
+        // this.m_maxX = changed.getX();
+        // doFireMaxX = true;
+        // }
+        // if (changed.getX() < this.m_minX) {
+        // this.m_minX = changed.getX();
+        // doFireMinX = true;
+        // }
+        // if (changed.getY() > this.m_maxY) {
+        // this.m_maxY = changed.getY();
+        // doFireMaxY = true;
+        // } else if (changed.getY() < this.m_minY) {
+        // this.m_minY = changed.getY();
+        // doFireMinY = true;
+        // }
+        // } else if (ITracePoint2D.STATE.REMOVED == state) {
+        // if (changed.getX() >= this.m_maxX) {
+        // this.m_maxX = this.maxXSearch();
+        // doFireMaxX = true;
+        // } else if (changed.getX() <= this.m_minX) {
+        // this.m_minX = this.minXSearch();
+        // doFireMinX = true;
+        // }
+        // if (changed.getY() >= this.m_maxY) {
+        // this.m_maxY = this.maxYSearch();
+        // doFireMaxY = true;
+        // } else if (changed.getY() <= this.m_minY) {
+        // this.m_minY = this.minYSearch();
+        // doFireMinY = true;
+        // }
+        // }
+        // }
         /*
          * Now bounds are ready for pixel to value transformation:
          */
@@ -864,42 +1128,42 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
          */
         if (ITracePoint2D.STATE.ADDED == state) {
           // add
-          if (collectMaxX > this.m_maxX) {
+          if ((collectMaxX > this.m_maxX)) {
             this.m_maxX = collectMaxX;
             this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, null, new Double(this.m_maxX));
           }
-          if (collectMinX < this.m_minX) {
+          if ((collectMinX < this.m_minX)) {
             this.m_minX = collectMinX;
             this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, null, new Double(this.m_minX));
           }
-          if (collectMaxY > this.m_maxY) {
+          if ((collectMaxY > this.m_maxY)) {
             this.m_maxY = collectMaxY;
             this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, null, new Double(this.m_maxY));
           }
-          if (collectMinY < this.m_minY) {
+          if ((collectMinY < this.m_minY)) {
             this.m_minY = collectMinY;
             this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, null, new Double(this.m_minY));
           }
         } else if (ITracePoint2D.STATE.REMOVED == state) {
           // removal: care for extrema (<=, >=)
-          if (collectMaxX >= this.m_maxX) {
+          if ((collectMaxX >= this.m_maxX)) {
             collectMaxX = this.m_maxX;
-            this.maxXSearch();
+            this.m_maxX = this.maxXSearch();
             this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(collectMaxX), new Double(this.m_maxX));
           }
-          if (collectMinX <= this.m_minX) {
+          if ((collectMinX <= this.m_minX)) {
             collectMinX = this.m_minX;
-            this.minXSearch();
+            this.m_minX = this.minXSearch();
             this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(collectMinX), new Double(this.m_minX));
           }
-          if (collectMaxY >= this.m_maxY) {
+          if ((collectMaxY >= this.m_maxY)) {
             collectMaxY = this.m_maxY;
-            this.maxYSearch();
+            this.m_maxY = this.maxYSearch();
             this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(collectMaxY), new Double(this.m_maxY));
           }
-          if (collectMinY <= this.m_minY) {
+          if ((collectMinY <= this.m_minY)) {
             collectMinY = this.m_minY;
-            this.minYSearch();
+            this.m_minY = this.minYSearch();
             this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(collectMinY), new Double(this.m_minY));
           }
           /*
@@ -917,7 +1181,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
             if (oldX == this.m_maxX) {
               // the point was maximum: expensive re-search of new maximum
               final double oldMaxX = this.m_maxX;
-              this.maxXSearch();
+              this.m_maxX = this.maxXSearch();
               this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(oldMaxX), new Double(this.m_maxX));
             }
           } else if (collectMaxX > this.m_maxX) {
@@ -930,7 +1194,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
             if (oldX == this.m_minX) {
               // the point was minimum: expensive re-search of new minimum
               final double oldMinX = this.m_minX;
-              this.minXSearch();
+              this.m_minX = this.minXSearch();
               this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(oldMinX), new Double(this.m_minX));
             }
           } else if (collectMinX < this.m_minX) {
@@ -943,7 +1207,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
             if (oldY == this.m_maxY) {
               // the point was maximum: expensive re-search of new maximum
               final double oldMaxY = this.m_maxY;
-              this.maxYSearch();
+              this.m_maxY = this.maxYSearch();
               this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(oldMaxY), new Double(this.m_maxY));
             }
           } else if (collectMaxY > this.m_maxY) {
@@ -956,7 +1220,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
             if (oldY == this.m_maxY) {
               // the point was minimum: expensive re-search of new minimum
               final double oldMinY = this.m_minY;
-              this.minYSearch();
+              this.m_minY = this.minYSearch();
               this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(oldMinY), new Double(this.m_minY));
             }
           } else if (collectMinY < this.m_minY) {
@@ -976,238 +1240,6 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
         }
       }
     }
-  }
-
-  /**
-   * Returns true if a transformation from pixel-domain to value-domain is
-   * needed for min-max - search.
-   * <p>
-   * In this case min-max - search is much more expensive (points * 2 *
-   * painters).
-   * <p>
-   * 
-   * @return true if a transformation from pixel-domain to value-domain is
-   *         needed for min-max - search.
-   */
-  private boolean isPixelTransformationRequired() {
-    boolean result;
-    result = this.m_paintersThatNeedsPixelTranslation > 0;
-    return result;
-  }
-
-  /**
-   * Track the amount of painters that require pixel transformations.
-   * <p>
-   * If it is not needed min-max first is much faster.
-   * <p>
-   * 
-   * @param changed
-   *          the changed point.
-   * 
-   * @param state
-   *          see {@link ITracePoint2D.STATE}.
-   * 
-   * @param oldValue
-   *          the old value, or an old x coordinate. May vary depending on
-   *          state: {@link ITracePoint2D.STATE#ADDED} : null <br/>
-   *          {@link ITracePoint2D.STATE#REMOVED}: null. <br/>
-   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}: null. <br/>
-   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}:
-   *          {@link IPointPainter}, the old point painter that was removed. <br/>
-   * 
-   * @param newValue
-   *          the new value, or an old y coordinate. May vary depending on
-   *          state: {@link ITracePoint2D.STATE#ADDED} : null <br/>
-   *          {@link ITracePoint2D.STATE#REMOVED}: null <br/>
-   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}:
-   *          {@link IPointPainter}, the new point painter that was added. <br/>
-   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}: null <br/>
-   * 
-   */
-  private void trackPainterPixelTransformationRequired(ITracePoint2D changed, final ITracePoint2D.STATE state, final Object oldValue, final Object newValue) {
-    if (ITracePoint2D.STATE.ADDED == state) {
-      for (IPointPainter< ? > pointPainter : changed.getAdditionalPointPainters()) {
-        if (pointPainter.isPixelTransformationNeededX() || pointPainter.isPixelTransformationNeededY()) {
-          this.m_paintersThatNeedsPixelTranslation++;
-        }
-      }
-    } else if (ITracePoint2D.STATE.REMOVED == state) {
-
-      for (IPointPainter< ? > removedPointPainter : changed.getAdditionalPointPainters()) {
-        if (removedPointPainter.isPixelTransformationNeededX() || removedPointPainter.isPixelTransformationNeededY()) {
-          this.m_paintersThatNeedsPixelTranslation--;
-        }
-      }
-    } else if (ITracePoint2D.STATE.ADDITIONAL_POINT_PAINTER_ADDED == state) {
-      IPointPainter< ? > addedPointPainter = (IPointPainter< ? >) newValue;
-      if (addedPointPainter.isPixelTransformationNeededX() || addedPointPainter.isPixelTransformationNeededY()) {
-        this.m_paintersThatNeedsPixelTranslation++;
-      }
-    } else if (ITracePoint2D.STATE.ADDITIONAL_POINT_PAINTER_REMOVED == state) {
-      IPointPainter< ? > removedPointPainter = (IPointPainter< ? >) oldValue;
-      if (removedPointPainter.isPixelTransformationNeededX() || removedPointPainter.isPixelTransformationNeededY()) {
-        this.m_paintersThatNeedsPixelTranslation--;
-      }
-    }
-  }
-
-  /**
-   * Index for accessing the result of
-   * {@link #calculatePointBounds(ITracePoint2D)}.
-   */
-  private static int POINTBOUNDS_MIN_X = 0;
-
-  /**
-   * Index for accessing the result of
-   * {@link #calculatePointBounds(ITracePoint2D)}.
-   */
-  private static int POINTBOUNDS_MAX_X = 1;
-
-  /**
-   * Index for accessing the result of
-   * {@link #calculatePointBounds(ITracePoint2D)}.
-   */
-  private static int POINTBOUNDS_MIN_Y = 2;
-
-  /**
-   * Index for accessing the result of
-   * {@link #calculatePointBounds(ITracePoint2D)}.
-   */
-  private static int POINTBOUNDS_MAX_Y = 3;
-
-  /**
-   * We need to know the x and y range of a trace in order to scale all points.
-   * However the point's position is not sufficient. Because:
-   * <ul>
-   * <li>{@link #getTracePainters()} may exceed bounds.</li>
-   * <li>{@link ITracePoint2D#getAdditionalPointPainters()} may exceed bounds.</li>
-   * <li>{@link #getErrorBarPolicies()} may exceed bounds.</li>
-   * </ul>
-   * <p>
-   * All this is taken into account here. This returns a <code>double[4]</code>
-   * which should be accessed by the constants:
-   * <ul>
-   * <li>{@link #POINTBOUNDS_MAX_X}</li>
-   * <li>{@link #POINTBOUNDS_MIN_X}</li>
-   * <li>{@link #POINTBOUNDS_MAX_Y}</li>
-   * <li>{@link #POINTBOUNDS_MIN_Y}</li>
-   * <ul>
-   * 
-   * @param point
-   *          the point to find the bounds of.
-   * 
-   * @return a <code>double[4]</code> which should be accessed by the constants:
-   *         <ul>
-   *         <li>{@link #POINTBOUNDS_MAX_X}</li> <li>{@link #POINTBOUNDS_MIN_X}
-   *         </li> <li>{@link #POINTBOUNDS_MAX_Y}</li> <li>
-   *         {@link #POINTBOUNDS_MIN_Y}</li>
-   *         <ul>
-   *         .
-   */
-  private double[] calculatePointBounds(final ITracePoint2D point) {
-    final double[] result = new double[4];
-    double tmpMaxX, collectMaxX = point.getX();
-    double tmpMinX, collectMinX = point.getX();
-    double tmpMaxY, collectMaxY = point.getY();
-    double tmpMinY, collectMinY = point.getY();
-    Set<ITracePainter< ? >> tracePainters = this.getTracePainters();
-    /*
-     * Incorporate half stroke width to all extrema. 
-     * 
-     * FIXME: This seems nonsense: We talk about absoute values here - not about pixels!
-     */
-//    double halfStrokeWidth = 0.0;
-//    ITrace2D trace = point.getListener();
-//    if (trace != null) {
-//      Stroke stroke = trace.getStroke();
-//      if (stroke instanceof BasicStroke) {
-//        BasicStroke basicStroke = (BasicStroke) stroke;
-//        halfStrokeWidth = basicStroke.getLineWidth() / 2.0;
-//      }
-//    }
-//
-    /*
-     * 1. ITracePainters
-     */
-    for (ITracePainter< ? > painter : tracePainters) {
-      tmpMaxX = painter.calculateMaxX(point);// + halfStrokeWidth;
-      if (tmpMaxX > collectMaxX) {
-        collectMaxX = tmpMaxX;
-      }
-      tmpMinX = painter.calculateMinX(point);// - halfStrokeWidth;
-      if (tmpMinX < collectMinX) {
-        collectMinX = tmpMinX;
-      }
-      tmpMaxY = painter.calculateMaxY(point);// + halfStrokeWidth;
-      if (tmpMaxY > collectMaxY) {
-        collectMaxY = tmpMaxY;
-      }
-      tmpMinY = painter.calculateMinY(point);// - halfStrokeWidth;
-      if (tmpMinY < collectMinY) {
-        collectMinY = tmpMinY;
-      }
-    }
-    /*
-     * 2. additional point painter
-     */
-    Set<IPointPainter< ? >> pointPainters = point.getAdditionalPointPainters();
-    for (IPointPainter< ? > painter : pointPainters) {
-      tmpMaxX = painter.calculateMaxX(point);// + halfStrokeWidth;
-      if (tmpMaxX > collectMaxX) {
-        collectMaxX = tmpMaxX;
-      }
-      tmpMinX = painter.calculateMinX(point);// - halfStrokeWidth;
-      if (tmpMinX < collectMinX) {
-        collectMinX = tmpMinX;
-      }
-      tmpMaxY = painter.calculateMaxY(point);// + halfStrokeWidth;
-      if (tmpMaxY > collectMaxY) {
-        collectMaxY = tmpMaxY;
-      }
-      tmpMinY = painter.calculateMinY(point);// - halfStrokeWidth;
-      if (tmpMinY < collectMinY) {
-        collectMinY = tmpMinY;
-      }
-    }
-    /*
-     * 3. IErrorBarPolicies
-     */
-    Set<IErrorBarPolicy< ? >> errorBarPolicies = this.getErrorBarPolicies();
-
-    for (IErrorBarPolicy< ? > errorBarPolicy : errorBarPolicies) {
-      if (errorBarPolicy.isShowPositiveXErrors()) {
-        tmpMaxX = errorBarPolicy.calculateMaxX(point);// + halfStrokeWidth;
-        if (tmpMaxX > collectMaxX) {
-          collectMaxX = tmpMaxX;
-        }
-      }
-      if (errorBarPolicy.isShowNegativeXErrors()) {
-        tmpMinX = errorBarPolicy.calculateMinX(point);// - halfStrokeWidth;
-        if (tmpMinX < collectMinX) {
-          collectMinX = tmpMinX;
-        }
-      }
-      if (errorBarPolicy.isShowPositiveYErrors()) {
-        tmpMaxY = errorBarPolicy.calculateMaxY(point);// + halfStrokeWidth;
-        if (tmpMaxY > collectMaxY) {
-          collectMaxY = tmpMaxY;
-        }
-      }
-      if (errorBarPolicy.isShowNegativeYErrors()) {
-        tmpMinY = errorBarPolicy.calculateMinY(point);// - halfStrokeWidth;
-        if (tmpMinY < collectMinY) {
-          collectMinY = tmpMinY;
-        }
-      }
-    }
-    /*
-     * Done: we have explored all possible increased bounds!
-     */
-    result[POINTBOUNDS_MAX_X] = collectMaxX;
-    result[POINTBOUNDS_MIN_X] = collectMinX;
-    result[POINTBOUNDS_MAX_Y] = collectMaxY;
-    result[POINTBOUNDS_MIN_Y] = collectMinY;
-    return result;
   }
 
   /**
@@ -1622,6 +1654,25 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#isAdditionalSpaceRequired()
+   */
+  @Override
+  public boolean isAdditionalSpaceRequired() {
+    boolean result;
+    result = this.m_paintersThatNeedsAdditionalSpace > 0;
+    return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#isPixelTransformationRequired()
+   */
+  public boolean isPixelTransformationRequired() {
+    boolean result;
+    result = this.m_paintersThatNeedsPixelTranslation > 0;
+    return result;
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#isVisible()
    */
   public final boolean isVisible() {
@@ -1636,90 +1687,15 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   }
 
   /**
-   * Internal search for all bounds which is very expensive!
-   * <p>
-   * The result is assigned to the the properties
-   * <ul>
-   * <li>maxX</li>
-   * <li>minX</li>
-   * <li>maxY</li>
-   * <li>minY</li>
-   * </ul>
-   * maxX.
-   * <p>
-   * Also property change events are fired for detected bound changes.
-   * <p>
+   * @see info.monitorenter.gui.chart.ITrace2D#maxXSearch()
    */
-  protected void boundSearch() {
-    if (Chart2D.DEBUG_THREADING) {
-      System.out.println("trace.maxXSearch, 0 locks");
-    }
+  public double maxXSearch() {
 
-    synchronized (this) {
-      if (Chart2D.DEBUG_THREADING) {
-        System.out.println("trace.maxXSearch, 1 locks");
-      }
-      // for firing events:
-      double oldMaxX = this.m_maxX;
-      double oldMinX = this.m_minX;
-      double oldMaxY = this.m_maxX;
-      double oldMinY = this.m_minY;
-
-      // go search
-      double maxXCollect = -Double.MAX_VALUE;
-      double maxYCollect = -Double.MAX_VALUE;
-      double minXCollect = Double.MAX_VALUE;
-      double minYCollect = Double.MAX_VALUE;
-      ITracePoint2D tmpoint = null;
-      final Iterator<ITracePoint2D> it = this.iterator();
-      double[] pointBounds;
-      while (it.hasNext()) {
-        tmpoint = it.next();
-        pointBounds = this.calculatePointBounds(tmpoint);
-        if (pointBounds[POINTBOUNDS_MAX_X] > maxXCollect) {
-          maxXCollect = pointBounds[POINTBOUNDS_MAX_X];
-        }
-        if (pointBounds[POINTBOUNDS_MAX_Y] > maxYCollect) {
-          maxXCollect = pointBounds[POINTBOUNDS_MAX_Y];
-        }
-        if (pointBounds[POINTBOUNDS_MIN_X] > minXCollect) {
-          minXCollect = pointBounds[POINTBOUNDS_MIN_X];
-        }
-        if (pointBounds[POINTBOUNDS_MIN_Y] > minYCollect) {
-          minXCollect = pointBounds[POINTBOUNDS_MIN_Y];
-        }
-      }
-      this.m_maxX = maxXCollect;
-      this.m_maxY = maxYCollect;
-      this.m_minX = minXCollect;
-      this.m_minY = minYCollect;
-
-      // fire events:
-      if (oldMaxX < this.m_maxX) {
-        this.firePropertyChange(PROPERTY_MAX_X, Double.valueOf(oldMaxX), Double.valueOf(this.m_maxX));
-      }
-      if (oldMaxY < this.m_maxY) {
-        this.firePropertyChange(PROPERTY_MAX_Y, Double.valueOf(oldMaxY), Double.valueOf(this.m_maxY));
-      }
-      if (oldMinX > this.m_minX) {
-        this.firePropertyChange(PROPERTY_MIN_X, Double.valueOf(oldMinX), Double.valueOf(this.m_minX));
-      }
-      if (oldMinY > this.m_minY) {
-        this.firePropertyChange(PROPERTY_MIN_Y, Double.valueOf(oldMinY), Double.valueOf(this.m_minY));
-      }
-    }
-  }
-
-  /**
-   * Internal search for the maximum x value that is only invoked if no cached
-   * value is at hand or bounds have changed by adding new points.
-   * <p>
-   * The result is assigned to the property maxX.
-   * <p>
-   * 
-   * @see #getMaxX()
-   */
-  protected void maxXSearch() {
+    /*
+     * This is similar to {@link #boundSearch()} and it was considered to let
+     * that method use this method. But we accepted duplicated code as
+     * delegation would have costed full iteration 4 times (vs. 1 time).
+     */
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("trace.maxXSearch, 0 locks");
     }
@@ -1739,21 +1715,24 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           ret = pointBounds[POINTBOUNDS_MAX_X];
         }
       }
-      this.m_maxX = ret;
+      if(ret>this.m_maxX) {
+        this.m_maxX = ret;
+      }
+
+      return ret;
     }
   }
 
   /**
-   * Internal search for the maximum y value that is only invoked if no cached
-   * value is at hand or bounds have changed by adding new points.
-   * <p>
-   * The result is assigned to the property maxY.
-   * <p>
-   * 
-   * @see #getMaxY()
+   * @see info.monitorenter.gui.chart.ITrace2D#maxYSearch()
    */
-  protected void maxYSearch() {
+  public double maxYSearch() {
 
+    /*
+     * This is similar to {@link #boundSearch()} and it was considered to let
+     * that method use this method. But we accepted duplicated code as
+     * delegation would have costed full iteration 4 times (vs. 1 time).
+     */
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("trace.maxYSearch, 0 locks");
     }
@@ -1774,21 +1753,23 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           ret = pointBounds[POINTBOUNDS_MAX_Y];
         }
       }
-      this.m_maxY = ret;
+      if(ret>this.m_maxY) {
+        this.m_maxY = ret;
+      }
+      return ret;
     }
   }
 
   /**
-   * Internal search for the minimum x value that is only invoked if no cached
-   * value is at hand or bounds have changed by adding new points.
-   * <p>
-   * The result is assigned to the property minX.
-   * <p>
-   * 
-   * @see #getMinX()
+   * @see info.monitorenter.gui.chart.ITrace2D#minXSearch()
    */
-  protected void minXSearch() {
+  public double minXSearch() {
 
+    /*
+     * This is similar to {@link #boundSearch()} and it was considered to let
+     * that method use this method. But we accepted duplicated code as
+     * delegation would have costed full iteration 4 times (vs. 1 time).
+     */
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("trace.minXSearch, 0 locks");
     }
@@ -1809,21 +1790,23 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           ret = pointBounds[POINTBOUNDS_MIN_X];
         }
       }
-      this.m_minX = ret;
+      if(ret<this.m_maxX) {
+        this.m_minX = ret;
+      }
+
+      return ret;
     }
   }
 
   /**
-   * Internal search for the minimum y value that is only invoked if no cached
-   * value is at hand or bounds have changed by adding new points.
-   * <p>
-   * The result is assigned to the property minY.
-   * <p>
-   * 
-   * @see #getMinY()
+   * @see info.monitorenter.gui.chart.ITrace2D#minYSearch()
    */
-  protected void minYSearch() {
-
+  public double minYSearch() {
+    /*
+     * This is similar to {@link #boundSearch()} and it was considered to let
+     * that method use this method. But we accepted duplicated code as
+     * delegation would have costed full iteration 4 times (vs. 1 time).
+     */
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("trace.minYSearch, 0 locks");
     }
@@ -1844,7 +1827,11 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           ret = pointBounds[POINTBOUNDS_MIN_Y];
         }
       }
-      this.m_minY = ret;
+      if(ret<this.m_minY) {
+        this.m_minY = ret;
+      }
+
+      return ret;
     }
   }
 
@@ -2024,20 +2011,20 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           // System.out.println("Trace2DLtd.addPoint() removed point!");
           if (tmpx >= this.m_maxX) {
             tmpx = this.m_maxX;
-            this.maxXSearch();
+            this.m_maxX = this.maxXSearch();
             this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, new Double(tmpx), new Double(this.m_maxX));
           } else if (tmpx <= this.m_minX) {
             tmpx = this.m_minX;
-            this.minXSearch();
+            this.m_minX = this.minXSearch();
             this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, new Double(tmpx), new Double(this.m_minX));
           }
           if (tmpy >= this.m_maxY) {
             tmpy = this.m_maxY;
-            this.maxYSearch();
+            this.m_maxY = this.maxYSearch();
             this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, new Double(tmpy), new Double(this.m_maxY));
           } else if (tmpy <= this.m_minY) {
             tmpy = this.m_minY;
-            this.minYSearch();
+            this.m_minY = this.minYSearch();
             this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, new Double(tmpy), new Double(this.m_minY));
           }
 
@@ -2470,6 +2457,150 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   @Override
   public String toString() {
     return this.getName();
+  }
+
+  /**
+   * Track the amount of painters that require additional space.
+   * <p>
+   * If it is not needed min-max search is much faster.
+   * <p>
+   * 
+   * @param changed
+   *          the changed point.
+   * 
+   * @param state
+   *          see {@link ITracePoint2D.STATE}.
+   * 
+   * @param oldValue
+   *          the old value, or an old x coordinate. May vary depending on
+   *          state: {@link ITracePoint2D.STATE#ADDED} : null <br/>
+   *          {@link ITracePoint2D.STATE#REMOVED}: null. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}: null. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}:
+   *          {@link IPointPainter}, the old point painter that was removed. <br/>
+   * 
+   * @param newValue
+   *          the new value, or an old y coordinate. May vary depending on
+   *          state: {@link ITracePoint2D.STATE#ADDED} : null <br/>
+   *          {@link ITracePoint2D.STATE#REMOVED}: null <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}:
+   *          {@link IPointPainter}, the new point painter that was added. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}: null <br/>
+   * 
+   */
+  private void trackPainterAdditionalSpaceRequired(ITracePoint2D changed, final ITracePoint2D.STATE state, final Object oldValue, final Object newValue) {
+    if (ITracePoint2D.STATE.ADDED == state) {
+      for (IPointPainter< ? > pointPainter : changed.getAdditionalPointPainters()) {
+        if (pointPainter.isAdditionalSpaceRequiredX() || pointPainter.isAdditionalSpaceRequiredY()) {
+          this.m_paintersThatNeedsAdditionalSpace++;
+        }
+      }
+    } else if (ITracePoint2D.STATE.REMOVED == state) {
+
+      for (IPointPainter< ? > removedPointPainter : changed.getAdditionalPointPainters()) {
+        if (removedPointPainter.isAdditionalSpaceRequiredX() || removedPointPainter.isAdditionalSpaceRequiredY()) {
+          this.m_paintersThatNeedsAdditionalSpace--;
+        }
+      }
+    } else if (ITracePoint2D.STATE.ADDITIONAL_POINT_PAINTER_ADDED == state) {
+      IPointPainter< ? > addedPointPainter = (IPointPainter< ? >) newValue;
+      if (addedPointPainter.isAdditionalSpaceRequiredX() || addedPointPainter.isAdditionalSpaceRequiredY()) {
+        this.m_paintersThatNeedsAdditionalSpace++;
+      }
+    } else if (ITracePoint2D.STATE.ADDITIONAL_POINT_PAINTER_REMOVED == state) {
+      IPointPainter< ? > removedPointPainter = (IPointPainter< ? >) oldValue;
+      if (removedPointPainter.isAdditionalSpaceRequiredX() || removedPointPainter.isAdditionalSpaceRequiredY()) {
+        this.m_paintersThatNeedsAdditionalSpace--;
+      }
+    }
+  }
+
+  /**
+   * Track the amount of painters that require pixel transformations.
+   * <p>
+   * If it is not needed min-max search is much faster.
+   * <p>
+   * 
+   * @param changed
+   *          the changed point.
+   * 
+   * @param state
+   *          see {@link ITracePoint2D.STATE}.
+   * 
+   * @param oldValue
+   *          the old value, or an old x coordinate. May vary depending on
+   *          state: {@link ITracePoint2D.STATE#ADDED} : null <br/>
+   *          {@link ITracePoint2D.STATE#REMOVED}: null. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}: null. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}:
+   *          {@link IPointPainter}, the old point painter that was removed. <br/>
+   * 
+   * @param newValue
+   *          the new value, or an old y coordinate. May vary depending on
+   *          state: {@link ITracePoint2D.STATE#ADDED} : null <br/>
+   *          {@link ITracePoint2D.STATE#REMOVED}: null <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}:
+   *          {@link IPointPainter}, the new point painter that was added. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}: null <br/>
+   * 
+   */
+  private void trackPainterPixelTransformationRequired(ITracePoint2D changed, final ITracePoint2D.STATE state, final Object oldValue, final Object newValue) {
+    if (ITracePoint2D.STATE.ADDED == state) {
+      for (IPointPainter< ? > pointPainter : changed.getAdditionalPointPainters()) {
+        if (pointPainter.isPixelTransformationNeededX() || pointPainter.isPixelTransformationNeededY()) {
+          this.m_paintersThatNeedsPixelTranslation++;
+        }
+      }
+    } else if (ITracePoint2D.STATE.REMOVED == state) {
+
+      for (IPointPainter< ? > removedPointPainter : changed.getAdditionalPointPainters()) {
+        if (removedPointPainter.isPixelTransformationNeededX() || removedPointPainter.isPixelTransformationNeededY()) {
+          this.m_paintersThatNeedsPixelTranslation--;
+        }
+      }
+    } else if (ITracePoint2D.STATE.ADDITIONAL_POINT_PAINTER_ADDED == state) {
+      IPointPainter< ? > addedPointPainter = (IPointPainter< ? >) newValue;
+      if (addedPointPainter.isPixelTransformationNeededX() || addedPointPainter.isPixelTransformationNeededY()) {
+        this.m_paintersThatNeedsPixelTranslation++;
+      }
+    } else if (ITracePoint2D.STATE.ADDITIONAL_POINT_PAINTER_REMOVED == state) {
+      IPointPainter< ? > removedPointPainter = (IPointPainter< ? >) oldValue;
+      if (removedPointPainter.isPixelTransformationNeededX() || removedPointPainter.isPixelTransformationNeededY()) {
+        this.m_paintersThatNeedsPixelTranslation--;
+      }
+    }
+  }
+
+  /**
+   * Tracks additional space requirement and rendering state requirements of the
+   * given point.
+   * <p>
+   * 
+   * @param changed
+   *          the changed point.
+   * 
+   * @param state
+   *          see {@link ITracePoint2D.STATE}.
+   * 
+   * @param oldValue
+   *          the old value, or an old x coordinate. May vary depending on
+   *          state: {@link ITracePoint2D.STATE#ADDED} : null <br/>
+   *          {@link ITracePoint2D.STATE#REMOVED}: null. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}: null. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}:
+   *          {@link IPointPainter}, the old point painter that was removed. <br/>
+   * 
+   * @param newValue
+   *          the new value, or an old y coordinate. May vary depending on
+   *          state: {@link ITracePoint2D.STATE#ADDED} : null <br/>
+   *          {@link ITracePoint2D.STATE#REMOVED}: null <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}:
+   *          {@link IPointPainter}, the new point painter that was added. <br/>
+   *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}: null <br/>
+   */
+  private void trackPainters(final ITracePoint2D changed, final ITracePoint2D.STATE state, final Object oldValue, final Object newValue) {
+    this.trackPainterAdditionalSpaceRequired(changed, state, oldValue, newValue);
+    this.trackPainterPixelTransformationRequired(changed, state, oldValue, newValue);
   }
 
   /**

@@ -36,13 +36,13 @@ import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyAutomaticBest
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterAutoUnits;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterSimple;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyUnbounded;
+import info.monitorenter.gui.util.TracePoint2DUtil;
 import info.monitorenter.util.ExceptionUtil;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.StringUtil;
 import info.monitorenter.util.math.MathUtil;
 
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
@@ -192,6 +192,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      * 
      * @param trace
      *          the trace to read the maximum of.
+     * 
      * @return the max value of the given trace according to the dimension the
      *         outer axis belongs to.
      */
@@ -225,6 +226,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      * 
      * @param trace
      *          the trace to read the maximum of.
+     * 
      * @return the min value of the given trace according to the dimension the
      *         outer axis belongs to.
      */
@@ -351,15 +353,38 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     public abstract double translatePxToValue(final int pixel);
 
     /**
-     * Transforms the given chart data value into the corresponding awt pixel
-     * value for the chart.
+     * Transforms the given relative pixel value into the relative chart value
+     * regarding the point's position.
      * <p>
-     * The inverse transformation to {@link #translatePxToValue(int)}.
+     * This must only be used when the chart dimensions (
+     * {@link Chart2D#getXChartEnd()}, {@link Chart2D#getXChartStart()}, ...)
+     * are already computed and valid.
+     * <p>
+     * 
+     * @param pixel
+     *          a relative pixel value of the chart component as used by awt.
+     * 
+     * @param point
+     *          the point to relate to (origin of the relative distance).
+     * 
+     * @return the relative awt pixel value transformed to the chart value.
+     */
+    public abstract double translatePxToValueRelative(ITracePoint2D point, int pixel);
+
+    /**
+     * Transforms the given relative value into the relative chart pixel value
+     * regarding the point's position.
+     * <p>
+     * This must only be used when the chart dimensions (
+     * {@link Chart2D#getXChartEnd()}, {@link Chart2D#getXChartStart()}, ...)
+     * are already computed and valid.
      * <p>
      * 
      * @param value
-     *          a chart data value.
-     * @return the awt pixel value corresponding to the chart data value.
+     *          a relative pixel value of the chart component as used by awt.
+     * 
+     * 
+     * @return the relative awt pixel value transformed to the chart value.
      */
     public abstract int translateValueToPx(final double value);
   }
@@ -562,11 +587,17 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     }
 
     /**
-     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMaxValue(info.monitorenter.gui.chart.ITrace2D)
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#getMaxValue(ITrace2D)
      */
     @Override
     protected double getMaxValue(final ITrace2D trace) {
-      return trace.getMaxX();
+      double result;
+      if (trace.isPixelTransformationRequired()) {
+        result = trace.maxXSearch();
+      } else {
+        result = trace.getMaxX();
+      }
+      return result;
     }
 
     /**
@@ -597,7 +628,14 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      */
     @Override
     protected double getMinValue(final ITrace2D trace) {
-      return trace.getMinX();
+
+      double result;
+      if (trace.isPixelTransformationRequired()) {
+        result = trace.minXSearch();
+      } else {
+        result = trace.getMinX();
+      }
+      return result;
     }
 
     /**
@@ -663,20 +701,28 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      */
     @Override
     protected void scaleTrace(final ITrace2D trace, final Range range) {
-      Iterator<ITracePoint2D> itPoints;
-      final double scaler = range.getExtent();
-      if (trace.isVisible()) {
-        itPoints = trace.iterator();
-        ITracePoint2D point;
-        while (itPoints.hasNext()) {
-          point = itPoints.next();
-          final double absolute = point.getX();
-          double result = (absolute - range.getMin()) / scaler;
-          if (!MathUtil.isDouble(result)) {
-            result = 0;
+      Chart2D chart = TracePoint2DUtil.getChartFromTrace(trace);
+      if (chart.isVisible() && chart.getWidth() > 0) {
+        Iterator<ITracePoint2D> itPoints;
+        final double scaler = range.getExtent();
+        if (trace.isVisible()) {
+          itPoints = trace.iterator();
+          ITracePoint2D point;
+          while (itPoints.hasNext()) {
+            point = itPoints.next();
+            final double absolute = point.getX();
+            double result = (absolute - range.getMin()) / scaler;
+            if (!MathUtil.isDouble(result)) {
+              result = 0;
+            }
+            point.setScaledX(result);
           }
-          point.setScaledX(result);
         }
+      } else {
+        /*
+         * Don't care: We have a full rescale for VISIBLE in
+         * propertyChangeReactor.
+         */
       }
     }
 
@@ -715,6 +761,18 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
         final Range valueRangeX = AAxis.this.getRange();
         result = scaledX * valueRangeX.getExtent() + valueRangeX.getMin();
       }
+      return result;
+    }
+
+    /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translatePxToValueRelative(info.monitorenter.gui.chart.ITracePoint2D,
+     *      int)
+     */
+    @Override
+    public double translatePxToValueRelative(ITracePoint2D point, int pixel) {
+      double absolutePxOriginPx = this.translateValueToPx(point.getX());
+      double absoluteTargetPx = absolutePxOriginPx + pixel;
+      double result = this.translatePxToValue((int) absoluteTargetPx) - point.getX();
       return result;
     }
 
@@ -835,7 +893,13 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      */
     @Override
     protected double getMaxValue(final ITrace2D trace) {
-      return trace.getMaxY();
+      double result;
+      if (trace.isPixelTransformationRequired()) {
+        result = trace.maxYSearch();
+      } else {
+        result = trace.getMaxY();
+      }
+      return result;
     }
 
     /**
@@ -865,7 +929,13 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
      */
     @Override
     protected double getMinValue(final ITrace2D trace) {
-      return trace.getMinY();
+      double result;
+      if (trace.isPixelTransformationRequired()) {
+        result = trace.minYSearch();
+      } else {
+        result = trace.getMinY();
+      }
+      return result;
     }
 
     /**
@@ -985,6 +1055,18 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     }
 
     /**
+     * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translatePxToValueRelative(info.monitorenter.gui.chart.ITracePoint2D,
+     *      int)
+     */
+    @Override
+    public double translatePxToValueRelative(ITracePoint2D point, int pixel) {
+      double absolutePxOriginPx = this.translateValueToPx(point.getY());
+      double absoluteTargetPx = absolutePxOriginPx + pixel;
+      double result = this.translatePxToValue((int) absoluteTargetPx) - point.getY();
+      return result;
+    }
+
+    /**
      * @see info.monitorenter.gui.chart.axis.AAxis.AChart2DDataAccessor#translateValueToPx(double)
      */
     @Override
@@ -1020,216 +1102,10 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
    * this.
    * <p>
    */
-  private static SortedMap<String, AAxis.IPropertyChangeReactor> propertyReactors;
+  private SortedMap<String, AAxis.IPropertyChangeReactor> m_propertyReactors;
 
   /** Generated <code>serialVersionUID</code>. **/
   private static final long serialVersionUID = -3615740476406530580L;
-
-  static {
-    AAxis.propertyReactors = new TreeMap<String, AAxis.IPropertyChangeReactor>();
-    // Don't waste the heap for stateless code:
-    final IPropertyChangeReactor repaintReactor = new PropertyChangeRepainter();
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_STROKE, repaintReactor);
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_STROKE, repaintReactor);
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_PAINTERS, repaintReactor);
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_COLOR, repaintReactor);
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_NAME, repaintReactor);
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_ERRORBARPOLICY, repaintReactor);
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_ERRORBARPOLICY_CONFIGURATION, repaintReactor);
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_ZINDEX, repaintReactor);
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_RENDERING, repaintReactor);
-    AAxis.propertyReactors.put(IAxis.PROPERTY_LABELFORMATTER, repaintReactor);
-    AAxis.propertyReactors.put(IAxisLabelFormatter.PROPERTY_FORMATCHANGE, repaintReactor);
-    AAxis.propertyReactors.put(AxisTitle.PROPERTY_TITLEFONT, repaintReactor);
-    AAxis.propertyReactors.put(AxisTitle.PROPERTY_TITLE, repaintReactor);
-    AAxis.propertyReactors.put(AxisTitle.PROPERTY_TITLEPAINTER, repaintReactor);
-
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_MAX_X, new APropertyChangeReactorSynced() {
-
-      /**
-       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
-       *      info.monitorenter.gui.chart.axis.AAxis)
-       */
-      @Override
-      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent, final AAxis< ? > receiver) {
-        boolean result = false;
-        if (Chart2D.DEBUG_SCALING) {
-          System.out.println("pc-Xmax");
-        }
-        final AAxis< ? >.AChart2DDataAccessor accessor = receiver.getAccessor();
-        // only care if axis works in x dimension:
-        if (accessor.getDimension() == Chart2D.X) {
-          final double value = ((Double) changeEvent.getNewValue()).doubleValue();
-          if (value > receiver.m_max) {
-            final ITrace2D trace = (ITrace2D) changeEvent.getSource();
-            if (trace.isVisible()) {
-              receiver.m_max = value;
-              receiver.m_needsFullRescale = true;
-              result = true;
-            }
-          } else if (value < receiver.m_max) {
-            receiver.m_max = receiver.findMax();
-            receiver.m_needsFullRescale = true;
-            result = true;
-          }
-        }
-        return result;
-      }
-
-    });
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_MIN_X, new APropertyChangeReactorSynced() {
-
-      /**
-       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
-       *      info.monitorenter.gui.chart.axis.AAxis)
-       */
-      @Override
-      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent, final AAxis< ? > receiver) {
-        boolean result = false;
-        if (Chart2D.DEBUG_SCALING) {
-          System.out.println("pc-Xmin");
-        }
-        if (receiver.getAccessor().getDimension() == Chart2D.X) {
-          final double value = ((Double) changeEvent.getNewValue()).doubleValue();
-          if (value < receiver.m_min) {
-            final ITrace2D trace = (ITrace2D) changeEvent.getSource();
-            if (trace.isVisible()) {
-              receiver.m_min = value;
-              receiver.m_needsFullRescale = true;
-              result = true;
-            }
-          } else if (value > receiver.m_min) {
-            receiver.m_min = receiver.findMin();
-            receiver.m_needsFullRescale = true;
-            result = true;
-          }
-        }
-        return result;
-      }
-
-    });
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_MAX_Y, new APropertyChangeReactorSynced() {
-
-      /**
-       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
-       *      info.monitorenter.gui.chart.axis.AAxis)
-       */
-      @Override
-      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent, final AAxis< ? > receiver) {
-        boolean result = false;
-        if (Chart2D.DEBUG_SCALING) {
-          System.out.println("pc-Ymax");
-        }
-        // only care if axis works in y dimension:
-        if (receiver.getAccessor().getDimension() == Chart2D.Y) {
-          final double value = ((Double) changeEvent.getNewValue()).doubleValue();
-          if (value > receiver.m_max) {
-            final ITrace2D trace = (ITrace2D) changeEvent.getSource();
-            if (trace.isVisible()) {
-              receiver.m_max = value;
-              receiver.m_needsFullRescale = true;
-              result = true;
-            }
-          } else if (value < receiver.m_max) {
-            receiver.m_max = receiver.findMax();
-            receiver.m_needsFullRescale = true;
-            result = true;
-          }
-        }
-        return result;
-      }
-    });
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_MIN_Y, new APropertyChangeReactorSynced() {
-
-      /**
-       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
-       *      info.monitorenter.gui.chart.axis.AAxis)
-       */
-      @Override
-      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent, final AAxis< ? > receiver) {
-        boolean result = false;
-        if (Chart2D.DEBUG_SCALING) {
-          System.out.println("pc-Ymin");
-        }
-        if (receiver.getAccessor().getDimension() == Chart2D.Y) {
-
-          final double value = ((Double) changeEvent.getNewValue()).doubleValue();
-          if (value < receiver.m_min) {
-            final ITrace2D trace = (ITrace2D) changeEvent.getSource();
-            if (trace.isVisible()) {
-              receiver.m_min = value;
-              receiver.m_needsFullRescale = true;
-              result = true;
-            }
-          } else if (value > receiver.m_min) {
-            receiver.m_min = receiver.findMin();
-            receiver.m_needsFullRescale = true;
-            result = true;
-          }
-        }
-        return result;
-      }
-    });
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_TRACEPOINTS, new APropertyChangeReactorSynced() {
-
-      /**
-       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
-       *      info.monitorenter.gui.chart.axis.AAxis)
-       */
-      @Override
-      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent, final AAxis< ? > receiver) {
-        boolean result = false;
-        // now points added or removed -> rescale!
-        if (Chart2D.DEBUG_SCALING) {
-          System.out.println("pc-tp");
-        }
-        final ITracePoint2D oldPt = (ITracePoint2D) changeEvent.getOldValue();
-        final ITracePoint2D newPt = (ITracePoint2D) changeEvent.getNewValue();
-        // added or removed?
-        // we only care about added points (rescaling is our task)
-        if (oldPt == null) {
-          receiver.scalePoint(newPt);
-          result = true;
-        }
-        return result;
-      }
-    });
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_VISIBLE, new APropertyChangeReactorSynced() {
-
-      /**
-       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
-       *      info.monitorenter.gui.chart.axis.AAxis)
-       */
-      @Override
-      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent, final AAxis< ? > receiver) {
-        boolean result = false;
-        final ITrace2D trace = (ITrace2D) changeEvent.getSource();
-        Boolean traceVisible = (Boolean) changeEvent.getNewValue();
-        if (traceVisible.booleanValue()) {
-          receiver.m_max = receiver.findMax();
-          receiver.m_min = receiver.findMin();
-          receiver.scaleTrace(trace);
-          result = true;
-        }
-        return result;
-      }
-    });
-    AAxis.propertyReactors.put(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_LOCATION, new APropertyChangeReactorSynced() {
-
-      /**
-       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
-       *      info.monitorenter.gui.chart.axis.AAxis)
-       */
-      @Override
-      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent, final AAxis< ? > receiver) {
-        boolean result = false;
-        final ITracePoint2D changed = (ITracePoint2D) changeEvent.getNewValue();
-        receiver.scalePoint(changed);
-        result = true;
-        return result;
-      }
-    });
-  }
 
   /**
    * The accessor to the Chart2D.
@@ -1391,12 +1267,267 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     this.m_rangePolicy = new RangePolicyUnbounded(Range.RANGE_UNBOUNDED);
     this.setFormatter(formatter);
     this.setAxisScalePolicy(scalePolicy);
+    this.setupPropertyChangeReactors();
   }
 
   // public AAxis(LabelFormatterAutoUnits labelFormatterAutoUnits,
   // AxisScalePolicyAutomaticBestFit axisScalePolicyAutomaticBestFit) {
   // this(labelFormatterAutoUnits, axisScalePolicyAutomaticBestFit);
   // }
+
+  /**
+   * Installs the property change reactors. 
+   * <p>
+   * Code looks a bit overdesigned but was "invented" to replace a large 
+   * <pre>
+   * if(property.equals(constant1) {
+   *  ...
+   * } else if (property.equals(constant2) {
+   * ...
+   * }
+   * </pre>
+   * block and now looks up the property match in log(n) (Map). 
+   * <p>
+   */
+  private void setupPropertyChangeReactors() {
+    this.m_propertyReactors = new TreeMap<String, AAxis.IPropertyChangeReactor>();
+    // Don't waste the heap for stateless code:
+    final IPropertyChangeReactor repaintReactor = new PropertyChangeRepainter();
+    this.m_propertyReactors.put(ITrace2D.PROPERTY_STROKE, repaintReactor);
+    this.m_propertyReactors.put(ITrace2D.PROPERTY_STROKE, repaintReactor);
+    this.m_propertyReactors.put(ITrace2D.PROPERTY_PAINTERS, repaintReactor);
+    this.m_propertyReactors.put(ITrace2D.PROPERTY_COLOR, repaintReactor);
+    this.m_propertyReactors.put(ITrace2D.PROPERTY_NAME, repaintReactor);
+    this.m_propertyReactors.put(ITrace2D.PROPERTY_ERRORBARPOLICY, repaintReactor);
+    this.m_propertyReactors.put(ITrace2D.PROPERTY_ERRORBARPOLICY_CONFIGURATION, repaintReactor);
+    this.m_propertyReactors.put(ITrace2D.PROPERTY_ZINDEX, repaintReactor);
+    this.m_propertyReactors.put(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_RENDERING, repaintReactor);
+    this.m_propertyReactors.put(IAxis.PROPERTY_LABELFORMATTER, repaintReactor);
+    this.m_propertyReactors.put(IAxisLabelFormatter.PROPERTY_FORMATCHANGE, repaintReactor);
+    this.m_propertyReactors.put(AxisTitle.PROPERTY_TITLEFONT, repaintReactor);
+    this.m_propertyReactors.put(AxisTitle.PROPERTY_TITLE, repaintReactor);
+    this.m_propertyReactors.put(AxisTitle.PROPERTY_TITLEPAINTER, repaintReactor);
+
+    this.m_propertyReactors.put(ITrace2D.PROPERTY_MAX_X, new APropertyChangeReactorSynced() {
+
+      /**
+       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
+       *      info.monitorenter.gui.chart.axis.AAxis)
+       */
+      @Override
+      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent, final AAxis< ? > receiver) {
+        boolean result = false;
+        if (Chart2D.DEBUG_SCALING) {
+          System.out.println("pc-Xmax");
+        }
+        final AAxis< ? >.AChart2DDataAccessor accessor = receiver.getAccessor();
+        // only care if axis works in x dimension:
+        if (accessor.getDimension() == Chart2D.X) {
+          final double value = ((Double) changeEvent.getNewValue()).doubleValue();
+          if (value > receiver.m_max) {
+            final ITrace2D trace = (ITrace2D) changeEvent.getSource();
+            if (trace.isVisible()) {
+              receiver.m_max = value;
+              receiver.m_needsFullRescale = true;
+              result = true;
+            }
+          } else if (value < receiver.m_max) {
+            receiver.m_max = receiver.findMax();
+            receiver.m_needsFullRescale = true;
+            result = true;
+          }
+        }
+        return result;
+      }
+
+    });
+    this.m_propertyReactors.put(ITrace2D.PROPERTY_MIN_X, new APropertyChangeReactorSynced() {
+
+      /**
+       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
+       *      info.monitorenter.gui.chart.axis.AAxis)
+       */
+      @Override
+      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent, final AAxis< ? > receiver) {
+        boolean result = false;
+        if (Chart2D.DEBUG_SCALING) {
+          System.out.println("pc-Xmin");
+        }
+        if (receiver.getAccessor().getDimension() == Chart2D.X) {
+          final double value = ((Double) changeEvent.getNewValue()).doubleValue();
+          if (value < receiver.m_min) {
+            final ITrace2D trace = (ITrace2D) changeEvent.getSource();
+            if (trace.isVisible()) {
+              receiver.m_min = value;
+              receiver.m_needsFullRescale = true;
+              result = true;
+            }
+          } else if (value > receiver.m_min) {
+            receiver.m_min = receiver.findMin();
+            receiver.m_needsFullRescale = true;
+            result = true;
+          }
+        }
+        return result;
+      }
+
+    });
+    this.m_propertyReactors.put(ITrace2D.PROPERTY_MAX_Y, new APropertyChangeReactorSynced() {
+
+      /**
+       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
+       *      info.monitorenter.gui.chart.axis.AAxis)
+       */
+      @Override
+      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent, final AAxis< ? > receiver) {
+        boolean result = false;
+        if (Chart2D.DEBUG_SCALING) {
+          System.out.println("pc-Ymax");
+        }
+        // only care if axis works in y dimension:
+        if (receiver.getAccessor().getDimension() == Chart2D.Y) {
+          final double value = ((Double) changeEvent.getNewValue()).doubleValue();
+          if (value > receiver.m_max) {
+            final ITrace2D trace = (ITrace2D) changeEvent.getSource();
+            if (trace.isVisible()) {
+              receiver.m_max = value;
+              receiver.m_needsFullRescale = true;
+              result = true;
+            }
+          } else if (value < receiver.m_max) {
+            receiver.m_max = receiver.findMax();
+            receiver.m_needsFullRescale = true;
+            result = true;
+          }
+        }
+        return result;
+      }
+    });
+    this.m_propertyReactors.put(ITrace2D.PROPERTY_MIN_Y, new APropertyChangeReactorSynced() {
+
+      /**
+       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
+       *      info.monitorenter.gui.chart.axis.AAxis)
+       */
+      @Override
+      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent, final AAxis< ? > receiver) {
+        boolean result = false;
+        if (Chart2D.DEBUG_SCALING) {
+          System.out.println("pc-Ymin");
+        }
+        if (receiver.getAccessor().getDimension() == Chart2D.Y) {
+
+          final double value = ((Double) changeEvent.getNewValue()).doubleValue();
+          if (value < receiver.m_min) {
+            final ITrace2D trace = (ITrace2D) changeEvent.getSource();
+            if (trace.isVisible()) {
+              receiver.m_min = value;
+              receiver.m_needsFullRescale = true;
+              result = true;
+            }
+          } else if (value > receiver.m_min) {
+            receiver.m_min = receiver.findMin();
+            receiver.m_needsFullRescale = true;
+            result = true;
+          }
+        }
+        return result;
+      }
+    });
+    this.m_propertyReactors.put(ITrace2D.PROPERTY_TRACEPOINTS, new APropertyChangeReactorSynced() {
+
+      /**
+       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
+       *      info.monitorenter.gui.chart.axis.AAxis)
+       */
+      @Override
+      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent, final AAxis< ? > receiver) {
+        boolean result = false;
+        // now points added or removed -> rescale!
+        if (Chart2D.DEBUG_SCALING) {
+          System.out.println("pc-tp");
+        }
+        final ITracePoint2D oldPt = (ITracePoint2D) changeEvent.getOldValue();
+        final ITracePoint2D newPt = (ITracePoint2D) changeEvent.getNewValue();
+        /*
+         * Added or removed? we only care about added points (rescaling is our
+         * task).
+         */
+        if (oldPt == null) {
+          Chart2D chart = TracePoint2DUtil.getChartFromTracePoint(newPt);
+          if (chart.isVisible() && chart.getWidth() > 0) {
+            receiver.scalePoint(newPt);
+            result = true;
+          } else {
+            /*
+             * Don't care. We have a full rescale on Chart2D.setVisible()
+             * installed. Else we would produce wrong "interpolated" points in
+             * Chart2D.paint(..).
+             */
+          }
+
+        }
+        return result;
+      }
+    });
+
+    this.m_propertyReactors.put(ITrace2D.PROPERTY_VISIBLE, new APropertyChangeReactorSynced() {
+
+      /**
+       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
+       *      info.monitorenter.gui.chart.axis.AAxis)
+       */
+      @Override
+      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent, final AAxis< ? > receiver) {
+        boolean result = false;
+        final ITrace2D trace = (ITrace2D) changeEvent.getSource();
+        Boolean traceVisible = (Boolean) changeEvent.getNewValue();
+        if (traceVisible.booleanValue()) {
+          receiver.m_max = receiver.findMax();
+          receiver.m_min = receiver.findMin();
+          receiver.scaleTrace(trace);
+          result = true;
+        }
+        return result;
+      }
+    });
+    this.m_propertyReactors.put(Chart2D.PROPERTY_BEFORE_VISIBLE, new APropertyChangeReactorSynced() {
+
+      /**
+       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
+       *      info.monitorenter.gui.chart.axis.AAxis)
+       */
+      @Override
+      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent, final AAxis< ? > receiver) {
+        boolean result = false;
+        Boolean visible = (Boolean) changeEvent.getNewValue();
+        if (visible.booleanValue()) {
+          receiver.m_max = receiver.findMax();
+          receiver.m_min = receiver.findMin();
+          receiver.scale();
+          result = true;
+        }
+        return result;
+      }
+    });
+
+    this.m_propertyReactors.put(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_LOCATION, new APropertyChangeReactorSynced() {
+
+      /**
+       * @see info.monitorenter.gui.chart.axis.AAxis.APropertyChangeReactorSynced#propertyChangeSynced(java.beans.PropertyChangeEvent,
+       *      info.monitorenter.gui.chart.axis.AAxis)
+       */
+      @Override
+      protected boolean propertyChangeSynced(final PropertyChangeEvent changeEvent, final AAxis< ? > receiver) {
+        boolean result = false;
+        final ITracePoint2D changed = (ITracePoint2D) changeEvent.getNewValue();
+        receiver.scalePoint(changed);
+        result = true;
+        return result;
+      }
+    });
+    
+  }
 
   /**
    * @see info.monitorenter.gui.chart.IAxis#addPropertyChangeListener(java.lang.String,
@@ -1431,8 +1562,10 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
         if (result) {
           this.listen2Trace(trace);
 
-          // for static traces (all points added) we won't get events.
-          // so update here:
+          /*
+           * For static traces (all points added) we won't get events. So update
+           * here:
+           */
           final double max = this.getAccessor().getMaxValue(trace);
           if (max > this.m_max) {
             this.m_max = max;
@@ -2080,6 +2213,19 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
   }
 
   /**
+   * Adds this axis as a listener to all property change events of the given
+   * trace that are needed here.
+   * <p>
+   * 
+   * @param chart
+   *          the chart to listen to.
+   */
+  private void listen2Chart(final Chart2D chart) {
+    chart.addPropertyChangeListener(Chart2D.PROPERTY_VISIBLE, this);
+    chart.addPropertyChangeListener(Chart2D.PROPERTY_BEFORE_VISIBLE, this);
+  }
+
+  /**
    * Internal routine for an axis to listen to the new given axis title.
    * <p>
    * Factored out to have a better overview of event handling (vs. putting this
@@ -2416,7 +2562,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
       System.out.println("AAxis.propertyChange (" + Thread.currentThread().getName() + "), 0 locks");
     }
     final String property = evt.getPropertyName();
-    final IPropertyChangeReactor reactor = AAxis.propertyReactors.get(property);
+    final IPropertyChangeReactor reactor = this.m_propertyReactors.get(property);
     if (reactor != null) {
       reactor.propertyChange(evt, this);
     }
@@ -2499,7 +2645,8 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
   /**
    * @see info.monitorenter.gui.chart.IAxis#scale()
    */
-  public void scale() {
+  public synchronized void scale() {
+    
     final Iterator<ITrace2D> it = this.m_traces.iterator();
     ITrace2D trace;
     while (it.hasNext()) {
@@ -2577,7 +2724,14 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
    *          {@link Chart2D#CHART_POSITION_TOP}</code>.
    */
   public void setChart(final Chart2D chart, final int dimension, final int position) {
+    if (this.m_accessor != null) {
+      Chart2D oldChart = this.m_accessor.getChart();
+      if (oldChart != null) {
+        this.unlisten2Chart(oldChart);
+      }
+    }
     this.m_accessor = this.createAccessor(chart, dimension, position);
+    this.listen2Chart(chart);
     this.m_needsFullRescale = true;
   }
 
@@ -2897,6 +3051,16 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IAxis#translatePxToValueRelative(info.monitorenter.gui.chart.ITracePoint2D,
+   *      int)
+   */
+  @Override
+  public final double translatePxToValueRelative(ITracePoint2D point, int pixel) {
+    double result = this.m_accessor.translatePxToValueRelative(point, pixel);
+    return result;
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.IAxis#translateValueToPx(double)
    */
   public final int translateValueToPx(final double value) {
@@ -2934,6 +3098,21 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     trace.removePropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_LOCATION, this);
     trace.removePropertyChangeListener(ITrace2D.PROPERTY_TRACEPOINT_CHANGED_RENDERING, this);
 
+  }
+
+  /**
+   * Removes this axis as a listener for all property change events of the given
+   * chart that are needed here.
+   * <p>
+   * TODO: stick to <code>{@link AAxis#listen2Chart(Chart2D)}</code>.
+   * <p>
+   * 
+   * @param chart
+   *          the chart to not listen to any more.
+   */
+  private void unlisten2Chart(final Chart2D chart) {
+    chart.removePropertyChangeListener(Chart2D.PROPERTY_VISIBLE, this);
+    chart.removePropertyChangeListener(Chart2D.PROPERTY_BEFORE_VISIBLE, this);
   }
 
   /**

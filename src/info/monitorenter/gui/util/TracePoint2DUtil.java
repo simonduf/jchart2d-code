@@ -60,9 +60,26 @@ public class TracePoint2DUtil {
    */
   public static final Chart2D getChartFromTracePoint(final ITracePoint2D tracePoint) throws IllegalStateException {
     ITrace2D trace = TracePoint2DUtil.getTraceFromTracePoint(tracePoint);
+    Chart2D result = getChartFromTrace(trace);
+    return result;
+  }
+
+  /**
+   * Returns the chart this trace is attached to.
+   * <p>
+   * 
+   * @param trace
+   *          the trace to find the chart of.
+   * 
+   * @return the chart this trace is attached to.
+   * 
+   * @throws IllegalStateException
+   *           if the trace is not added to a {@link Chart2D}.
+   */
+  public static final Chart2D getChartFromTrace(final ITrace2D trace) throws IllegalStateException {
     Chart2D result = trace.getRenderer();
     if (result == null) {
-      throw new IllegalStateException("Trace of tracepoint is not added to a chart.");
+      throw new IllegalStateException("Trace is not added to a chart.");
     } else {
       return result;
     }
@@ -81,13 +98,13 @@ public class TracePoint2DUtil {
    *           if the tracepoint is not contained in an {@link ITrace2D} which
    *           is added to a {@link Chart2D}.
    */
-  public static final IAxis<?> getAxisYOfTracePoint(final ITracePoint2D tracePoint) throws IllegalStateException {
+  public static final IAxis< ? > getAxisYOfTracePoint(final ITracePoint2D tracePoint) throws IllegalStateException {
     ITrace2D trace = TracePoint2DUtil.getTraceFromTracePoint(tracePoint);
     Chart2D chart = trace.getRenderer();
     if (chart == null) {
       throw new IllegalStateException("Trace of tracepoint is not added to a chart.");
     } else {
-      IAxis<?> result = chart.getAxisY(trace);
+      IAxis< ? > result = chart.getAxisY(trace);
       if (result == null) {
         throw new IllegalStateException("Error in code. Chart does not know the axis of it's trace.");
       } else {
@@ -96,7 +113,7 @@ public class TracePoint2DUtil {
 
     }
   }
-  
+
   /**
    * Returns the x-axis this tracepoint is related to.
    * <p>
@@ -110,13 +127,13 @@ public class TracePoint2DUtil {
    *           if the tracepoint is not contained in an {@link ITrace2D} which
    *           is added to a {@link Chart2D}.
    */
-  public static final IAxis<?> getAxisXOfTracePoint(final ITracePoint2D tracePoint) throws IllegalStateException {
+  public static final IAxis< ? > getAxisXOfTracePoint(final ITracePoint2D tracePoint) throws IllegalStateException {
     ITrace2D trace = TracePoint2DUtil.getTraceFromTracePoint(tracePoint);
     Chart2D chart = trace.getRenderer();
     if (chart == null) {
       throw new IllegalStateException("Trace of tracepoint is not added to a chart.");
     } else {
-      IAxis<?> result = chart.getAxisX(trace);
+      IAxis< ? > result = chart.getAxisX(trace);
       if (result == null) {
         throw new IllegalStateException("Error in code. Chart does not know the axis of it's trace.");
       } else {

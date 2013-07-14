@@ -25,6 +25,7 @@ import info.monitorenter.util.IStopWatch;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.StopWatchSimple;
 import info.monitorenter.util.StringUtil;
+import info.monitorenter.util.UIUtil;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -294,6 +295,13 @@ import javax.swing.Timer;
  * <td>{@link Chart2D}</td>
  * <td>{@link Stroke}</td>
  * <td>{@link Stroke}</td>
+ * <td>A new grid stroke was set.</td>
+ * </tr>
+ * <tr>
+ * <td>{@link #PROPERTY_VISIBLE}</td>
+ * <td>{@link Chart2D}</td>
+ * <td>{@link Boolean}</td>
+ * <td>{@link Boolean}</td>
  * <td>A new grid stroke was set.</td>
  * </tr>
  * </table>
@@ -812,6 +820,25 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   public static final String PROPERTY_ADD_REMOVE_TRACE = IAxis.PROPERTY_ADD_REMOVE_TRACE;
 
   /**
+   * The bean property <code>constant</code> identifying a change of visiblity.
+   * <p>
+   * Use this constant to register a {@link java.beans.PropertyChangeListener}
+   * with the <code>Chart2D</code>.
+   * <p>
+   */
+  public static final String PROPERTY_VISIBLE = IAxis.PROPERTY_VISIBLE;
+  
+  
+  /**
+   * The bean property <code>constant</code> identifying a pending change to visiblity.
+   * <p>
+   * Use this constant to register a {@link java.beans.PropertyChangeListener}
+   * with the <code>Chart2D</code>.
+   * <p>
+   */
+  public static final String PROPERTY_BEFORE_VISIBLE = "Chart2D.PROPERTY_BEFORE_VISIBLE";
+
+  /**
    * The bean property <code>constant</code> identifying a change of the
    * antialiasing enabled state.
    * <p>
@@ -1198,8 +1225,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
 
     // set a custom cursor:
     this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-
-    this.m_repainter = new Timer(this.m_minPaintLatency, new ActionListener() {
+    
+       this.m_repainter = new Timer(this.m_minPaintLatency, new ActionListener() {
 
       /**
        * Repaints the Chart if dirty.
@@ -1226,10 +1253,13 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     this.m_repainter.setRepeats(true);
     this.m_repainter.setCoalesce(true);
     this.m_repainter.start();
-
-  
   }
 
+  /**
+   * When becoming visible for the first time a {@link Chart2D#PROPERTY_VISIBLE} 
+   * has to be fired. 
+   */
+  private boolean firstPaint = true;
   /**
    * Adds the given x axis to the list of internal bottom x axes.
    * <p>
@@ -2901,6 +2931,9 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     Iterator<ITrace2D> traceIt;
     // painting trace labels
     this.negociateXChart(g2d);
+    
+    
+    
     int labelHeight = this.paintTraceLabels(g);
     // finding start point of coordinate System.
     this.m_yChartStart = this.calculateYChartStart(g2d, labelHeight);
@@ -2908,6 +2941,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     int rangex = this.m_xChartEnd - this.m_xChartStart;
     int rangey = this.m_yChartStart - this.m_yChartEnd;
     this.paintCoordinateSystem(g2d);
+    if(this.firstPaint) {
+      this.firstPaint = false; 
+      this.firePropertyChange(PROPERTY_BEFORE_VISIBLE, Boolean.FALSE, Boolean.TRUE);
+    }
+    
     // paint Traces.
     int tmpx = 0;
     int oldtmpx;
@@ -3101,6 +3139,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       }
       if (Chart2D.DEBUG_THREADING) {
         System.out.println("paint(" + Thread.currentThread().getName() + "), left lock on trace " + trace.getName());
+      }
+      if(this.firstPaint) {
+        this.firstPaint = false; 
+        this.firePropertyChange(PROPERTY_VISIBLE, Boolean.FALSE, Boolean.TRUE);
       }
     }
     if (g2d != null) {

@@ -185,19 +185,11 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @param debug
-   *          The ITrace to debug.
-   */
-
-  /**
    * @see info.monitorenter.gui.chart.ITrace2D#descendingIterator()
    */
   public Iterator<ITracePoint2D> descendingIterator() {
     return this.m_delegate.descendingIterator();
   }
-
-  // /////////////////////////////////
-  // Proxy methods
 
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#firePointChanged(info.monitorenter.gui.chart.ITracePoint2D, info.monitorenter.gui.chart.ITracePoint2D.STATE, java.lang.Object, java.lang.Object)
@@ -235,11 +227,19 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
+   * @param debug
+   *          The ITrace to debug.
+   */
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#getMaxSize()
    */
   public int getMaxSize() {
     return this.m_delegate.getMaxSize();
   }
+
+  // /////////////////////////////////
+  // Proxy methods
 
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#getMaxX()
@@ -387,10 +387,24 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#isAdditionalSpaceRequired()
+   */
+  public boolean isAdditionalSpaceRequired() {
+    return this.m_delegate.isAdditionalSpaceRequired();
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#isEmpty()
    */
   public boolean isEmpty() {
     return this.m_delegate.isEmpty();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#isPixelTransformationRequired()
+   */
+  public boolean isPixelTransformationRequired() {
+    return this.m_delegate.isPixelTransformationRequired();
   }
 
   /**
@@ -405,6 +419,34 @@ public class Trace2DDebugger implements ITrace2D {
    */
   public Iterator<ITracePoint2D> iterator() {
     return this.m_delegate.iterator();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#maxXSearch()
+   */
+  public double maxXSearch() {
+    return this.m_delegate.maxXSearch();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#maxYSearch()
+   */
+  public double maxYSearch() {
+    return this.m_delegate.maxYSearch();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#minXSearch()
+   */
+  public double minXSearch() {
+    return this.m_delegate.minXSearch();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#minYSearch()
+   */
+  public double minYSearch() {
+    return this.m_delegate.minYSearch();
   }
 
   /**

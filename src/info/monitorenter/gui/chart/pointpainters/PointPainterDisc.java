@@ -148,6 +148,22 @@ public class PointPainterDisc extends APointPainter<PointPainterDisc> {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isAdditionalSpaceRequiredX()
+   */
+  @Override
+  public boolean isAdditionalSpaceRequiredX() {
+    return this.getDiscSize() > 1;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isAdditionalSpaceRequiredY()
+   */
+  @Override
+  public boolean isAdditionalSpaceRequiredY() {
+    return this.getDiscSize() > 1;
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededX()
    */
   @Override

@@ -150,6 +150,22 @@ public class TracePainterConfigurable<T extends IPointPainter<T>> extends ATrace
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isAdditionalSpaceRequiredX()
+   */
+  @Override
+  public boolean isAdditionalSpaceRequiredX() {
+    return this.m_pointPainter.isAdditionalSpaceRequiredX();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isAdditionalSpaceRequiredY()
+   */
+  @Override
+  public boolean isAdditionalSpaceRequiredY() {
+    return this.m_pointPainter.isAdditionalSpaceRequiredY();
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededX()
    */
   public final boolean isPixelTransformationNeededX() {

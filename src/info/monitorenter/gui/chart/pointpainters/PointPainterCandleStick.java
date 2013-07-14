@@ -70,9 +70,8 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
   @Override
   public double calculateMaxX(final ITracePoint2D point) {
     IAxis< ? > axisX = TracePoint2DUtil.getAxisXOfTracePoint(point);
-    Chart2D chart = TracePoint2DUtil.getChartFromTracePoint(point);
-    double widthInValue = axisX.translatePxToValue(this.getWidth() + chart.getXChartStart()) - point.getX();
-    double result = point.getX() + widthInValue / 2;
+    double widthInValue = axisX.translatePxToValueRelative(point, this.getWidth() / 2);
+    double result = point.getX() + widthInValue;
     return result;
   }
 
@@ -94,9 +93,8 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
   @Override
   public double calculateMinX(final ITracePoint2D point) {
     IAxis< ? > axisX = TracePoint2DUtil.getAxisXOfTracePoint(point);
-    Chart2D chart = TracePoint2DUtil.getChartFromTracePoint(point);
-    double widthInValue = axisX.translatePxToValue(this.getWidth() + chart.getXChartStart()) - point.getX();
-    double result = point.getX() - widthInValue / 2;
+    double widthInValue = axisX.translatePxToValueRelative(point, -this.getWidth() / 2);
+    double result = point.getX() + widthInValue;
     return result;
   }
 
@@ -161,6 +159,22 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
     temp = Double.doubleToLongBits(this.m_width);
     result = prime * result + (int) (temp ^ (temp >>> 32));
     return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isAdditionalSpaceRequiredX()
+   */
+  @Override
+  public boolean isAdditionalSpaceRequiredX() {
+    return this.getWidth() > 1;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isAdditionalSpaceRequiredY()
+   */
+  @Override
+  public boolean isAdditionalSpaceRequiredY() {
+    return true;
   }
 
   /**

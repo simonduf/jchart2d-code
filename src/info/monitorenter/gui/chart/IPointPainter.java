@@ -22,6 +22,8 @@
  */
 package info.monitorenter.gui.chart;
 
+import info.monitorenter.gui.chart.tracepoints.TracePoint2D;
+
 import java.awt.Graphics;
 import java.io.Serializable;
 
@@ -50,6 +52,70 @@ import java.io.Serializable;
  */
 public interface IPointPainter<T extends IPointPainter<T>> extends Serializable, Comparable<T> {
   /**
+   * Returns the maximum x bound this painter will need to paint the given
+   * point.
+   * <p>
+   * This is needed because a point's bounds may be exceeded when actually
+   * painting it.
+   * <p>
+   * 
+   * @param point
+   *          the point to draw.
+   * 
+   * @return the maximum x bound this painter will need to paint the given
+   *         point.
+   */
+  public double calculateMaxX(final ITracePoint2D point);
+
+  /**
+   * Returns the maximum y bound this painter will need to paint the given
+   * point.
+   * <p>
+   * This is needed because a point's bounds may be exceeded when actually
+   * painting it.
+   * <p>
+   * 
+   * @param point
+   *          the point to draw.
+   * 
+   * @return the maximum y bound this painter will need to paint the given
+   *         point.
+   */
+  public double calculateMaxY(final ITracePoint2D point);
+
+  /**
+   * Returns the minimum x bound this painter will need to paint the given
+   * point.
+   * <p>
+   * This is needed because a point's bounds may be exceeded when actually
+   * painting it.
+   * <p>
+   * 
+   * @param point
+   *          the point to draw.
+   * 
+   * @return the minimum x bound this painter will need to paint the given
+   *         point.
+   */
+  public double calculateMinX(final ITracePoint2D point);
+
+  /**
+   * Returns the minimum y bound this painter will need to paint the given
+   * point.
+   * <p>
+   * This is needed because a point's bounds may be exceeded when actually
+   * painting it.
+   * <p>
+   * 
+   * @param point
+   *          the point to draw.
+   * 
+   * @return the minimum y bound this painter will need to paint the given
+   *         point.
+   */
+  public double calculateMinY(final ITracePoint2D point);
+
+  /**
    * Invoked to inform implementations that a paint iteration ends for the
    * corresponding {@link info.monitorenter.gui.chart.ITrace2D}.
    * <p>
@@ -58,6 +124,52 @@ public interface IPointPainter<T extends IPointPainter<T>> extends Serializable,
    *          provided in case pending paint operations have to be performed.
    */
   public void endPaintIteration(Graphics g2d);
+
+  /**
+   * Return true if this point painter needs more space in x dimension than
+   * {@link TracePoint2D#getX()}.
+   * <p>
+   * 
+   * @return true if this point painter needs more space in x dimension than
+   *         {@link TracePoint2D#getX()}.
+   */
+  public boolean isAdditionalSpaceRequiredX();
+
+  /**
+   * Return true if this point painter needs more space in y dimension than
+   * {@link TracePoint2D#getY()}.
+   * <p>
+   * 
+   * @return true if this point painter needs more space in y dimension than
+   *         {@link TracePoint2D#getY()}.
+   */
+  public boolean isAdditionalSpaceRequiredY();
+
+  /**
+   * Return true if rendering in x dimension requires a transformation from
+   * pixel to value domain.
+   * <p>
+   * If this is the case min-max - search of the trace is much slower (points *
+   * 2 * amount of painters).
+   * <p>
+   * 
+   * @return true if rendering in x dimension requires a transformation from
+   *         pixel to value domain.
+   */
+  public boolean isPixelTransformationNeededX();
+
+  /**
+   * Return true if rendering in y dimension requires a transformation from
+   * pixel to value domain.
+   * <p>
+   * If this is the case min-max - search of the trace is much slower (points *
+   * 2 * amount of painters).
+   * <p>
+   * 
+   * @return true if rendering in y dimension requires a transformation from
+   *         pixel to value domain.
+   */
+  public boolean isPixelTransformationNeededY();
 
   /**
    * Paint the point given by absolute coordinates on the given graphic context.
@@ -90,70 +202,6 @@ public interface IPointPainter<T extends IPointPainter<T>> extends Serializable,
   public void paintPoint(final int absoluteX, final int absoluteY, final int nextX, final int nextY, final Graphics g, final ITracePoint2D original);
 
   /**
-   * Returns the maximum x bound this painter will need to paint the given
-   * point.
-   * <p>
-   * This is needed because a point's bounds may be exceeded when actually
-   * painting it.
-   * <p>
-   * 
-   * @param point
-   *          the point to draw.
-   * 
-   * @return the maximum x bound this painter will need to paint the given
-   *         point.
-   */
-  public double calculateMaxX(final ITracePoint2D point);
-
-  /**
-   * Returns the minimum x bound this painter will need to paint the given
-   * point.
-   * <p>
-   * This is needed because a point's bounds may be exceeded when actually
-   * painting it.
-   * <p>
-   * 
-   * @param point
-   *          the point to draw.
-   * 
-   * @return the minimum x bound this painter will need to paint the given
-   *         point.
-   */
-  public double calculateMinX(final ITracePoint2D point);
-
-  /**
-   * Returns the maximum y bound this painter will need to paint the given
-   * point.
-   * <p>
-   * This is needed because a point's bounds may be exceeded when actually
-   * painting it.
-   * <p>
-   * 
-   * @param point
-   *          the point to draw.
-   * 
-   * @return the maximum y bound this painter will need to paint the given
-   *         point.
-   */
-  public double calculateMaxY(final ITracePoint2D point);
-
-  /**
-   * Returns the minimum y bound this painter will need to paint the given
-   * point.
-   * <p>
-   * This is needed because a point's bounds may be exceeded when actually
-   * painting it.
-   * <p>
-   * 
-   * @param point
-   *          the point to draw.
-   * 
-   * @return the minimum y bound this painter will need to paint the given
-   *         point.
-   */
-  public double calculateMinY(final ITracePoint2D point);
-
-  /**
    * Invoked to inform implementations that a paint iteration starts for the
    * corresponding {@link info.monitorenter.gui.chart.ITrace2D}.
    * <p>
@@ -163,29 +211,4 @@ public interface IPointPainter<T extends IPointPainter<T>> extends Serializable,
    */
   public void startPaintIteration(Graphics g2d);
 
-  /**
-   * Return true if rendering in x dimension requires a transformation from pixel to value
-   * domain.
-   * <p>
-   * If this is the case min-max - search of the trace is much slower (points *
-   * 2 * amount of painters).
-   * <p>
-   * 
-   * @return true if rendering in x dimension requires a transformation from pixel to value
-   *         domain.
-   */
-  public boolean isPixelTransformationNeededX();
-
-  /**
-   * Return true if rendering in y dimension requires a transformation from pixel to value
-   * domain.
-   * <p>
-   * If this is the case min-max - search of the trace is much slower (points *
-   * 2 * amount of painters).
-   * <p>
-   * 
-   * @return true if rendering in y dimension requires a transformation from pixel to value
-   *         domain.
-   */
-  public boolean isPixelTransformationNeededY();
 }

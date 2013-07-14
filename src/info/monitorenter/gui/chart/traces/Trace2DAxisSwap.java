@@ -322,10 +322,24 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#isAdditionalSpaceRequired()
+   */
+  public boolean isAdditionalSpaceRequired() {
+    return this.m_delegate.isAdditionalSpaceRequired();
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#isEmpty()
    */
   public boolean isEmpty() {
     return this.m_delegate.isEmpty();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#isPixelTransformationRequired()
+   */
+  public boolean isPixelTransformationRequired() {
+    return this.m_delegate.isPixelTransformationRequired();
   }
 
   /**
@@ -340,6 +354,34 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
    */
   public Iterator<ITracePoint2D> iterator() {
     return this.m_delegate.iterator();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#maxXSearch()
+   */
+  public double maxXSearch() {
+    return this.m_delegate.maxXSearch();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#maxYSearch()
+   */
+  public double maxYSearch() {
+    return this.m_delegate.maxYSearch();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#minXSearch()
+   */
+  public double minXSearch() {
+    return this.m_delegate.minXSearch();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#minYSearch()
+   */
+  public double minYSearch() {
+    return this.m_delegate.minYSearch();
   }
 
   /**

@@ -164,6 +164,22 @@ public class PointPainterVerticalBar extends APointPainter<PointPainterVerticalB
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isAdditionalSpaceRequiredX()
+   */
+  @Override
+  public boolean isAdditionalSpaceRequiredX() {
+    return this.getBarWidth() > 1;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isAdditionalSpaceRequiredY()
+   */
+  @Override
+  public boolean isAdditionalSpaceRequiredY() {
+    return false;
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededX()
    */
   @Override

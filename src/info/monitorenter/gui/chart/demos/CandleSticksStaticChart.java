@@ -24,15 +24,12 @@
 package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.IRangePolicy;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterDate;
-import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.tracepoints.CandleStick;
 import info.monitorenter.gui.chart.traces.Trace2DCandleSticks;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.views.ChartPanel;
-import info.monitorenter.util.Range;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -86,14 +83,10 @@ public final class CandleSticksStaticChart extends JPanel {
       }
     });
     frame.setSize(1400, 300);
-    frame.setVisible(true);
-    try {
-      Thread.sleep(2000);
-    } catch (InterruptedException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
-    }
     stickChart.fill();
+    frame.setVisible(true);
+
+    
   }
 
   /**

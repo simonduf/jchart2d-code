@@ -312,14 +312,14 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
     }
 
   }
-  
+
   /**
    * The property key defining the <code>color</code> property. Use in
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
   public static final String PROPERTY_COLOR = "ITrace2D.PROPERTY_COLOR";
-  
+
   /**
    * The property key defining a change of <code>{@link IErrorBarPolicy}</code>
    * instances contained.
@@ -437,7 +437,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public static final String PROPERTY_TRACEPOINT_CHANGED_LOCATION = "ITrace2D.PROPERTY_TRACEPOINT_CHANGED_LOCATION";
 
   /**
-   * The property key defining a change in the rendering of  a contained 
+   * The property key defining a change in the rendering of a contained
    * <code>{@link ITracePoint2D}</code> instance within this trace. Use in
    * combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
@@ -446,8 +446,8 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
 
   /**
    * The property key defining a change in the collection of <code>
-   * {@link ITracePoint2D}</code> instances within this trace (add or remove). Use in
-   * combination with
+   * {@link ITracePoint2D}</code> instances within this trace (add or remove).
+   * Use in combination with
    * {@link #addPropertyChangeListener(String, PropertyChangeListener)}.
    */
   public static final String PROPERTY_TRACEPOINTS = "ITrace2D.PROPERTY_TRACEPOINTS";
@@ -467,6 +467,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * <p>
    */
   public static final String PROPERTY_ZINDEX = "ITrace2D.PROPERTY_ZINDEX";
+
   /**
    * The minimum value for property zIndex: 0.
    * 
@@ -669,9 +670,9 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}: null. <br/>
    *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}:
    *          {@link IPointPainter}, the old point painter that was removed. <br/>
-   *          {@link ITracePoint2D.STATE#CHANGED}:
-   *          {@link Double}, the old x coordinate. <br/>
-   *          
+   *          {@link ITracePoint2D.STATE#CHANGED}: {@link Double}, the old x
+   *          coordinate. <br/>
+   * 
    * 
    * @param newValue
    *          the new value, or an old y coordinate. May vary depending on
@@ -680,8 +681,9 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_ADDED}:
    *          {@link IPointPainter}, the new point painter that was added. <br/>
    *          {@link ITracePoint2D.STATE#ADDITIONAL_POINT_PAINTER_REMOVED}: null <br/>
-   *          {@link ITracePoint2D.STATE#CHANGED}:
-   *          {@link Double}, the old y coordinate. <br/>   */
+   *          {@link ITracePoint2D.STATE#CHANGED}: {@link Double}, the old y
+   *          coordinate. <br/>
+   */
   public void firePointChanged(final ITracePoint2D changed, final ITracePoint2D.STATE state, final Object oldValue, final Object newValue);
 
   /**
@@ -797,9 +799,8 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * 
    * @return the minimum value of the internal data for the x- dimension.
    */
-
-  double getMinX();
-
+   public double getMinX();
+  
   /**
    * Returns the minimum value to be displayed on the y- axis of the Chart2D.
    * <p>
@@ -996,6 +997,30 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public boolean isEmpty();
 
   /**
+   * Returns true if a transformation from pixel-domain to value-domain is
+   * needed for min-max - search.
+   * <p>
+   * In this case min-max - search is much more expensive (points * 2 *
+   * painters).
+   * <p>
+   * 
+   * @return true if a transformation from pixel-domain to value-domain is
+   *         needed for min-max - search.
+   */
+  public boolean isPixelTransformationRequired();
+
+  /**
+   * Returns true if additional space is required for rendering the points. 
+   * <p>
+   * In this case min-max - search is much more expensive (points * 2 *
+   * painters).
+   * <p>
+   * 
+   * @return true if additional space is required for rendering the points. 
+   */
+  public boolean isAdditionalSpaceRequired();
+
+  /**
    * Returns true if this instance should be rendered.
    * <p>
    * 
@@ -1021,6 +1046,50 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    *         {@link ITracePoint2D}</code> instances.
    */
   public Iterator<ITracePoint2D> iterator();
+
+  /**
+   * "Internal" expensive search for the maximum x value that is only invoked if
+   * no cached value is at hand or bounds have changed by adding new points.
+   * <p>
+   * 
+   * @see #getMaxX()
+   * 
+   * @return the found extremum.
+   */
+  public double maxXSearch();
+
+  /**
+   * "Internal" expensive search for the maximum y value that is only invoked if
+   * no cached value is at hand or bounds have changed by adding new points.
+   * <p>
+   * 
+   * @see #getMaxY()
+   * 
+   * @return the found extremum.
+   */
+  public double maxYSearch();
+
+  /**
+   * "Internal" expensive search for the minimum x value that is only invoked if
+   * no cached value is at hand or bounds have changed by adding new points.
+   * <p>
+   * 
+   * @see #getMinX()
+   * 
+   * @return the found extremum.
+   */
+  public double minXSearch();
+
+  /**
+   * "Internal" expensive search for the minimum y value that is only invoked if
+   * no cached value is at hand or bounds have changed by adding new points.
+   * <p>
+   * 
+   * @see #getMinY()
+   * 
+   * @return the found extremum.
+   */
+  public double minYSearch();
 
   /**
    * Clears all internal point highlighters used.

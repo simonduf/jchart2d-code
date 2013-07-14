@@ -65,18 +65,15 @@ public class Trace2DCandleSticks implements ITrace2D {
   private static final long serialVersionUID = -2358495593310332400L;
 
   /**
+   * Reused candle stick point painter.
+   */
+  private IPointPainter< ? > m_candleStickPainter;
+
+  /**
    * The trace implementation that is being decorated with the
    * candlestick-feature.
    */
   private final ITrace2D m_delegate;
-
-  /**
-   * @see info.monitorenter.gui.chart.ITrace2D#addPoint(info.monitorenter.gui.chart.ITracePoint2D,
-   *      info.monitorenter.gui.chart.ITrace2D)
-   */
-  public boolean addPoint(ITracePoint2D p, ITrace2D wrapperOfMe) {
-    return this.m_delegate.addPoint(p, wrapperOfMe);
-  }
 
   /**
    * Constructor taking the trace implementation to decorate with candle stick
@@ -99,21 +96,6 @@ public class Trace2DCandleSticks implements ITrace2D {
       this.m_delegate.removeTracePainter(tracePainter);
     }
     this.m_candleStickPainter = new PointPainterCandleStick(candleStickWidth);
-  }
-
-  /**
-   * @param evt
-   * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
-   */
-  public void propertyChange(PropertyChangeEvent evt) {
-    this.m_delegate.propertyChange(evt);
-  }
-
-  /**
-   * @see java.lang.Comparable#compareTo(java.lang.Object)
-   */
-  public int compareTo(ITrace2D o) {
-    return this.m_delegate.compareTo(o);
   }
 
   /**
@@ -142,11 +124,6 @@ public class Trace2DCandleSticks implements ITrace2D {
   }
 
   /**
-   * Reused candle stick point painter.
-   */
-  private IPointPainter< ? > m_candleStickPainter;
-
-  /**
    * @see info.monitorenter.gui.chart.ITrace2D#addPoint(info.monitorenter.gui.chart.ITracePoint2D)
    */
   public boolean addPoint(ITracePoint2D p) {
@@ -155,6 +132,14 @@ public class Trace2DCandleSticks implements ITrace2D {
     candleStick.addAdditionalPointPainter(this.m_candleStickPainter);
     boolean result = this.m_delegate.addPoint(p, this);
     return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#addPoint(info.monitorenter.gui.chart.ITracePoint2D,
+   *      info.monitorenter.gui.chart.ITrace2D)
+   */
+  public boolean addPoint(ITracePoint2D p, ITrace2D wrapperOfMe) {
+    return this.m_delegate.addPoint(p, wrapperOfMe);
   }
 
   /**
@@ -177,6 +162,13 @@ public class Trace2DCandleSticks implements ITrace2D {
    */
   public boolean addTracePainter(ITracePainter< ? > painter) {
     return this.m_delegate.addTracePainter(painter);
+  }
+
+  /**
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  public int compareTo(ITrace2D o) {
+    return this.m_delegate.compareTo(o);
   }
 
   /**
@@ -380,10 +372,24 @@ public class Trace2DCandleSticks implements ITrace2D {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#isAdditionalSpaceRequired()
+   */
+  public boolean isAdditionalSpaceRequired() {
+    return this.m_delegate.isAdditionalSpaceRequired();
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#isEmpty()
    */
   public boolean isEmpty() {
     return this.m_delegate.isEmpty();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#isPixelTransformationRequired()
+   */
+  public boolean isPixelTransformationRequired() {
+    return this.m_delegate.isPixelTransformationRequired();
   }
 
   /**
@@ -398,6 +404,42 @@ public class Trace2DCandleSticks implements ITrace2D {
    */
   public Iterator<ITracePoint2D> iterator() {
     return this.m_delegate.iterator();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#maxXSearch()
+   */
+  public double maxXSearch() {
+    return this.m_delegate.maxXSearch();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#maxYSearch()
+   */
+  public double maxYSearch() {
+    return this.m_delegate.maxYSearch();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#minXSearch()
+   */
+  public double minXSearch() {
+    return this.m_delegate.minXSearch();
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#minYSearch()
+   */
+  public double minYSearch() {
+    return this.m_delegate.minYSearch();
+  }
+
+  /**
+   * @param evt
+   * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
+   */
+  public void propertyChange(PropertyChangeEvent evt) {
+    this.m_delegate.propertyChange(evt);
   }
 
   /**

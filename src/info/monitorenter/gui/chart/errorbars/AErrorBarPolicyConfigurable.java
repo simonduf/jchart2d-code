@@ -540,6 +540,24 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy<AEr
   }
 
   /**
+   * @see info.monitorenter.gui.chart.IErrorBarPolicy#getXError(double)
+   */
+  @Override
+  public double getXError(double xValue) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IErrorBarPolicy#getYError(double)
+   */
+  @Override
+  public double getYError(double yValue) {
+    // TODO Auto-generated method stub
+    return 0;
+  }
+
+  /**
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -634,6 +652,72 @@ public abstract class AErrorBarPolicyConfigurable implements IErrorBarPolicy<AEr
    *         value (not relative to the the origin value).
    */
   protected abstract int internalGetPositiveYError(final int xPixel, final int yPixel, final ITracePoint2D original);
+  
+  
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isAdditionalSpaceRequiredX()
+   */
+  @Override
+  public boolean isAdditionalSpaceRequiredX() {
+    boolean result = false;
+    for (IErrorBarPainter painter : this.getErrorBarPainters()) {
+      /*
+       * Assumption: the end point painter is the one that will exceed bound,
+       * ignore the others. However technically also segment painter or even
+       * start painter could exceed more (if coded weird / in a way that would
+       * also look strange).
+       */
+      IPointPainter< ? > segmentPainter = painter.getEndPointPainter();
+      if(segmentPainter.isAdditionalSpaceRequiredX()){
+        result = true;
+        break;
+      }
+      segmentPainter = painter.getStartPointPainter();
+      if(segmentPainter.isAdditionalSpaceRequiredX()){
+        result = true;
+        break;
+      }
+      segmentPainter = painter.getConnectionPainter();
+      if(segmentPainter.isAdditionalSpaceRequiredX()){
+        result = true;
+        break;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isAdditionalSpaceRequiredY()
+   */
+  @Override
+  public boolean isAdditionalSpaceRequiredY() {
+    boolean result = false;
+    for (IErrorBarPainter painter : this.getErrorBarPainters()) {
+      /*
+       * Assumption: the end point painter is the one that will exceed bound,
+       * ignore the others. However technically also segment painter or even
+       * start painter could exceed more (if coded weird / in a way that would
+       * also look strange).
+       */
+      IPointPainter< ? > segmentPainter = painter.getEndPointPainter();
+      if(segmentPainter.isAdditionalSpaceRequiredY()){
+        result = true;
+        break;
+      }
+      segmentPainter = painter.getStartPointPainter();
+      if(segmentPainter.isAdditionalSpaceRequiredY()){
+        result = true;
+        break;
+      }
+      segmentPainter = painter.getConnectionPainter();
+      if(segmentPainter.isAdditionalSpaceRequiredY()){
+        result = true;
+        break;
+      }
+    }
+    return result;
+  }
 
   /**
    * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededX()

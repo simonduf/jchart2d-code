@@ -78,8 +78,8 @@ public class Trace2DSimple extends ATrace2D implements ITrace2D {
    */
   @Override
   protected boolean addPointInternal(final ITracePoint2D p) {
-    this.m_points.add(p);
-    return true;
+    boolean result = this.m_points.add(p);
+    return result;
   }
 
   /**

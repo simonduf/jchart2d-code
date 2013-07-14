@@ -173,10 +173,18 @@ public class TracePainterPolyline extends ATracePainter {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededY()
+   * @see info.monitorenter.gui.chart.IPointPainter#isAdditionalSpaceRequiredX()
    */
   @Override
-  public boolean isPixelTransformationNeededY() {
+  public boolean isAdditionalSpaceRequiredX() {
+    return false;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isAdditionalSpaceRequiredY()
+   */
+  @Override
+  public boolean isAdditionalSpaceRequiredY() {
     return false;
   }
 
@@ -185,6 +193,14 @@ public class TracePainterPolyline extends ATracePainter {
    */
   @Override
   public boolean isPixelTransformationNeededX() {
+    return false;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.IPointPainter#isPixelTransformationNeededY()
+   */
+  @Override
+  public boolean isPixelTransformationNeededY() {
     return false;
   }
 

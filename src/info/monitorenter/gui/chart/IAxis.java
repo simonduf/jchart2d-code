@@ -1303,6 +1303,25 @@ public interface IAxis<T extends IAxisScalePolicy> extends Serializable {
   public double translatePxToValue(final int pixel);
 
   /**
+   * Transforms the given relative pixel value into the relative chart value
+   * regarding the point's position.
+   * <p>
+   * This must only be used when the chart dimensions (
+   * {@link Chart2D#getXChartEnd()}, {@link Chart2D#getXChartStart()}, ...) are
+   * already computed and valid.
+   * <p>
+   * 
+   * @param pixel
+   *          a relative pixel value of the chart component as used by awt.
+   * 
+   * @param point
+   *          the point to relate to (origin of the relative distance).
+   * 
+   * @return the relative awt pixel value transformed to the chart value.
+   */
+  public double translatePxToValueRelative(final ITracePoint2D point, final int pixel);
+
+  /**
    * Transforms the given chart data value into the corresponding awt pixel
    * value for the chart.
    * <p>
