@@ -110,6 +110,9 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
       while (computeRange < 5) {
         computeRange *= 10;
         tmpPower++;
+        if(Double.isInfinite(computeRange)) {
+          computeRange = 0;
+        }
       }
 
       tmpPower = 1 / Math.pow(10, tmpPower);
