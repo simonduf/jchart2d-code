@@ -113,8 +113,8 @@ public final class MinimalDynamicChart {
       }
       
     };
-    // Every 20 milliseconds a new value is collected.
-    timer.schedule(task, 1000, 20);
+    // Every 200 milliseconds a new value is collected.
+    timer.schedule(task, 1000, 200);
   }
 
   /** Defcon. */
