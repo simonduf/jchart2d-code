@@ -27,7 +27,6 @@ import java.awt.geom.Point2D;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
 
 /**
  * A specialized version of <code>java.awt.Point2D.Double </code> who carries
