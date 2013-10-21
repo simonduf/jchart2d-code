@@ -45,6 +45,8 @@ import javax.swing.JScrollBar;
 
 public class ScrollablePanel extends JPanel {
 
+  private final int SCROLL_RANGE = 1000;
+
   private final Chart2D m_Chart;
 
   private JScrollBar m_scrollBarXaxis;
@@ -176,24 +178,32 @@ public class ScrollablePanel extends JPanel {
   }
 
   private void onScrollBarAdjustment(JScrollBar scrollBar, AAxis axis) {
-    double range = axis.getMax() - axis.getMin();
-    double value = (double) scrollBar.getValue() / 1000;
-    double min = value - (range / 2);
-    double max = value + (range / 2);
+    double axisMin = axis.getMinValue();
+    double axisMax = axis.getMaxValue();
+    double axisRange = axisMax - axisMin;
     IRangePolicy rangePolicy = axis.getRangePolicy();
-    rangePolicy.setRange(new Range(min, max));
+    double rangeMin = rangePolicy.getRange().getMin();
+    double rangeMax = rangePolicy.getRange().getMax();
+    double range = rangeMax - rangeMin;
+    double rangeCenter = axis.getMinValue() + (axisRange * scrollBar.getValue() / SCROLL_RANGE);
+    rangePolicy.setRange(new Range(rangeCenter - range / 2, rangeCenter + range / 2));
   }
 
-  private void onAxisPropertyChanged(JScrollBar scrollBar, AAxis axis, IRangePolicy rangePolicy,
-      AdjustmentListener adjustmentListener) {
+  private void onAxisPropertyChanged(JScrollBar scrollBar, AAxis axis, IRangePolicy rangePolicy, AdjustmentListener adjustmentListener) {
     System.out.println("onAxisPropertyChanged propertyChange:" + rangePolicy + "," + axis);
     if (rangePolicy instanceof RangePolicyFixedViewport) {
       System.out.println("RangePolicyFixedViewport");
       scrollBar.setVisible(true);
-      scrollBar.setMinimum((int) (axis.getMinValue() * 1000));
-      scrollBar.setMaximum((int) (axis.getMaxValue() * 1000));
-      double range = axis.getMax() - axis.getMin();
-      scrollBar.setValue((int) ((axis.getMin() + (range / 2)) * 1000));
+      scrollBar.setMinimum(0);
+      scrollBar.setMaximum(SCROLL_RANGE);
+      double axisMin = axis.getMinValue();
+      double axisMax = axis.getMaxValue();
+      double axisRange = axisMax - axisMin;
+      double rangeMin = rangePolicy.getRange().getMin();
+      double rangeMax = rangePolicy.getRange().getMax();
+      double rangeCenter = (rangeMin + rangeMax) / 2;
+      double scrollValue = scrollBar.getMinimum() + (SCROLL_RANGE * (rangeCenter - axisMin) / axisRange);
+      scrollBar.setValue((int) scrollValue);
       scrollBar.addAdjustmentListener(adjustmentListener);
     } else {
       System.out.println("RangePolicyMinimumViewport");
