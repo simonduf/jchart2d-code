@@ -121,51 +121,52 @@ public final class CandleSticksStaticChart extends JPanel {
     cal.set(Calendar.HOUR_OF_DAY, 0);
     cal.set(Calendar.SECOND, 0);
     cal.set(Calendar.MILLISECOND, 0);
-
-    // DAX 19.10.2012
     cal.set(Calendar.DAY_OF_MONTH, 19);
-    cal.set(Calendar.MONTH, 10);
+    cal.set(Calendar.MONTH, 9);
     cal.set(Calendar.YEAR, 2012);
-    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7413.69, 7380.64, 7430.12, 7363.50));
-    // 18.10.2012
-    cal.set(Calendar.DAY_OF_MONTH, 18);
-    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7401.41, 7437.23, 7447.81, 7389.01));
-    // 17.10.2012
-    cal.set(Calendar.DAY_OF_MONTH, 17);
-    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7381.08, 7394.55, 7399.99, 7367.59));
-    // 16.10.2012
-    cal.set(Calendar.DAY_OF_MONTH, 16);
-    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7309.08, 7376.27, 7387.78, 7293.90));
-    // 15.10.2012
-    cal.set(Calendar.DAY_OF_MONTH, 15);
-    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7237.40, 7261.25, 7302.23, 7237.40));
-    // 12.10.2012
-    cal.set(Calendar.DAY_OF_MONTH, 12);
-    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7260.57, 7232.49, 7291.24, 7232.42));
-    // 11.10.2012
-    cal.set(Calendar.DAY_OF_MONTH, 11);
-    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7192.75, 7281.7, 7305.46, 7182.31));
-    // 10.10.2012
-    cal.set(Calendar.DAY_OF_MONTH, 10);
-    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7219.46, 7205.23, 7245.17, 7201.09));
-    // 09.10.2012
-    cal.set(Calendar.DAY_OF_MONTH, 9);
-    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7306.33, 7234.53, 7308.13, 7221.50));
-    // 08.10.2012
-    cal.set(Calendar.DAY_OF_MONTH, 8);
-    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7340.39, 7291.21, 7341.28, 7286.24));
-    // 05.10.2012
-    cal.set(Calendar.DAY_OF_MONTH, 5);
-    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7327.7, 7397.87, 7409.78, 7312.79));
+
+    // 03.10.2012
+    cal.set(Calendar.DAY_OF_MONTH, 3);
+    System.err.println("Calendar: " + new Date(cal.getTimeInMillis()));
+    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7283.26, 7322.08, 7339.33, 7272.06));
     // 04.10.2012
     cal.set(Calendar.DAY_OF_MONTH, 4);
     trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7368.21, 7305.21, 7374.86, 7283.48));
-    // 03.10.2012
-    cal.set(Calendar.DAY_OF_MONTH, 3);
-    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7283.26, 7322.08, 7339.33, 7272.06));
+    // 05.10.2012
+    cal.set(Calendar.DAY_OF_MONTH, 5);
+    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7327.7, 7397.87, 7409.78, 7312.79));
+    // 08.10.2012
+    cal.set(Calendar.DAY_OF_MONTH, 8);
+    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7340.39, 7291.21, 7341.28, 7286.24));
+    // 09.10.2012
+    cal.set(Calendar.DAY_OF_MONTH, 9);
+    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7306.33, 7234.53, 7308.13, 7221.50));
+    // 10.10.2012
+    cal.set(Calendar.DAY_OF_MONTH, 10);
+    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7219.46, 7205.23, 7245.17, 7201.09));
+    // 11.10.2012
+    cal.set(Calendar.DAY_OF_MONTH, 11);
+    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7192.75, 7281.7, 7305.46, 7182.31));
+    // 12.10.2012
+    cal.set(Calendar.DAY_OF_MONTH, 12);
+    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7260.57, 7232.49, 7291.24, 7232.42));
+    // 15.10.2012
+    cal.set(Calendar.DAY_OF_MONTH, 15);
+    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7237.40, 7261.25, 7302.23, 7237.40));
+    // 16.10.2012
+    cal.set(Calendar.DAY_OF_MONTH, 16);
+    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7309.08, 7376.27, 7387.78, 7293.90));
+    // 17.10.2012
+    cal.set(Calendar.DAY_OF_MONTH, 17);
+    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7381.08, 7394.55, 7399.99, 7367.59));
+    // 18.10.2012
+    cal.set(Calendar.DAY_OF_MONTH, 18);
+    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7401.41, 7437.23, 7447.81, 7389.01));
+    // DAX 19.10.2012
+    cal.set(Calendar.DAY_OF_MONTH, 19);
+    trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7413.69, 7380.64, 7430.12, 7363.50));
 
-//    this.m_chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
-  
+    this.m_chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
 
   }
 
