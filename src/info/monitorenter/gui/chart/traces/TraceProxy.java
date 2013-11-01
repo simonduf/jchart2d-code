@@ -505,7 +505,7 @@ public class TraceProxy implements ITrace2D {
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#removePointHighlighter(info.monitorenter.gui.chart.IPointPainter)
    */
-  @Override
+  @Override 
   public boolean removePointHighlighter(final IPointPainter< ? > highlighter) {
     return this.m_delegate.removePointHighlighter(highlighter);
   }
