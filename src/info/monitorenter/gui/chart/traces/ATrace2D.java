@@ -352,7 +352,8 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * <code>{@link #firePointAdded(ITracePoint2D)}</code>.
    * <p>
    * 
-   * @see #firePointChanged(ITracePoint2D, int, double, double)
+   * @see #firePointChanged(ITracePoint2D,
+   *      info.monitorenter.gui.chart.ITracePoint2D.STATE, Object, Object)
    * @param p
    *          the <code>TracePoint2D</code> to add.
    * @return true if the operation was successful, false else.
@@ -398,30 +399,31 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
         if (Chart2D.DEBUG_THREADING) {
           System.out.println(Thread.currentThread().getName() + ", ATrace2D.addPoint, 2 locks");
         }
-        if (this.m_firsttime) {
-          /*
-           * MAX events / members are done already from the
-           * firePointAdded()->firePointChanged() method, this is only the
-           * special case that a new point also marks the minimum. Don't move
-           * this code block before the firePointAdded or the minimum of the
-           * chart will be higher than the maximum which causes an infinite loop
-           * in AxisAutoUnit!
-           */
-          this.m_minX = p.getX();
-          this.m_minY = p.getY();
-          this.m_maxX = p.getX();
-          this.m_maxY = p.getY();
-          final Double zero = new Double(0);
-          this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, zero, new Double(this.m_minX));
-          this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, zero, new Double(this.m_minY));
-          this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, zero, new Double(this.m_maxX));
-          this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, zero, new Double(this.m_maxY));
 
-          this.m_firsttime = false;
-        }
         accepted = this.addPointInternal(p);
         if (accepted) {
           p.setListener(wrapperOfMe);
+          if (this.m_firsttime) {
+            /*
+             * MAX events / members are done already from the
+             * firePointAdded()->firePointChanged() method, this is only the
+             * special case that a new point also marks the minimum. Don't move
+             * this code block before the firePointAdded or the minimum of the
+             * chart will be higher than the maximum which causes an infinite
+             * loop in AxisAutoUnit!
+             */
+            this.m_minX = p.getX();
+            this.m_minY = p.getY();
+            this.m_maxX = p.getX();
+            this.m_maxY = p.getY();
+            final Double zero = new Double(0);
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_X, zero, new Double(this.m_minX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MIN_Y, zero, new Double(this.m_minY));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_X, zero, new Double(this.m_maxX));
+            this.firePropertyChange(ITrace2D.PROPERTY_MAX_Y, zero, new Double(this.m_maxY));
+
+            this.m_firsttime = false;
+          }
           this.firePointAdded(p);
           // inform computing traces:
           if (this.m_computingTraces.size() > 0) {
@@ -503,12 +505,34 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   public boolean addTracePainter(final ITracePainter< ? > painter) {
     boolean result = false;
     this.ensureInitialized();
-    synchronized (this.m_renderer) {
+    if (this.m_renderer != null) {
+      synchronized (this.m_renderer) {
+        synchronized (this) {
+          result = this.m_tracePainters.add(painter);
+          if (painter.isAdditionalSpaceRequiredX() || painter.isAdditionalSpaceRequiredY()) {
+            this.m_paintersThatNeedsAdditionalSpace++;
+          }
+          if (painter.isPixelTransformationNeededX() || painter.isPixelTransformationNeededY()) {
+            this.m_paintersThatNeedsPixelTranslation++;
+          }
+          if (result) {
+            this.firePropertyChange(ITrace2D.PROPERTY_PAINTERS, null, painter);
+          }
+        }
+      }
+    } else {
       synchronized (this) {
         result = this.m_tracePainters.add(painter);
+        if (painter.isAdditionalSpaceRequiredX() || painter.isAdditionalSpaceRequiredY()) {
+          this.m_paintersThatNeedsAdditionalSpace++;
+        }
+        if (painter.isPixelTransformationNeededX() || painter.isPixelTransformationNeededY()) {
+          this.m_paintersThatNeedsPixelTranslation++;
+        }
         if (result) {
           this.firePropertyChange(ITrace2D.PROPERTY_PAINTERS, null, painter);
         }
+
       }
     }
     return result;
@@ -770,7 +794,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    *           if this trace is not assigned to a chart.
    * 
    */
-  protected final void ensureInitialized() {
+  protected void ensureInitialized() {
     if (this.m_renderer == Boolean.FALSE) {
       throw new IllegalStateException("Connect this trace (" + this.getName()
           + ") to a chart first before this operation (undebuggable deadlocks might occur else)");
@@ -782,10 +806,26 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITrace2D#initPaintIteration()
+   */
+  @Override
+  public void initPaintIteration() {
+    // nop
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#onAdded2ChartBeforeFirstPaint()
+   */
+  @Override
+  public void onAdded2ChartBeforeFirstPaint() {
+    // nop
+  }
+
+  /**
    * Internally expands all bounds according to potential error bars.
    * 
    * @deprecated put that into
-   *             {@link #firePointChanged(ITracePoint2D, int, double, double)}.
+   *             {@link #firePointChanged(ITracePoint2D, info.monitorenter.gui.chart.ITracePoint2D.STATE, Object, Object)}
    */
   @Deprecated
   // private void expandErrorBarBounds() {
@@ -1715,7 +1755,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           ret = pointBounds[POINTBOUNDS_MAX_X];
         }
       }
-      if(ret>this.m_maxX) {
+      if (ret > this.m_maxX) {
         this.m_maxX = ret;
       }
 
@@ -1753,7 +1793,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           ret = pointBounds[POINTBOUNDS_MAX_Y];
         }
       }
-      if(ret>this.m_maxY) {
+      if (ret > this.m_maxY) {
         this.m_maxY = ret;
       }
       return ret;
@@ -1790,7 +1830,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           ret = pointBounds[POINTBOUNDS_MIN_X];
         }
       }
-      if(ret<this.m_maxX) {
+      if (ret < this.m_maxX) {
         this.m_minX = ret;
       }
 
@@ -1827,7 +1867,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           ret = pointBounds[POINTBOUNDS_MIN_Y];
         }
       }
-      if(ret<this.m_minY) {
+      if (ret < this.m_minY) {
         this.m_minY = ret;
       }
 
