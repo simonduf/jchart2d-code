@@ -198,7 +198,7 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
    *      int, java.awt.Graphics, info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public void paintPoint(int absoluteX, int absoluteY, int nextX, int nextY, Graphics g, ITracePoint2D original) {
+  public void paintPoint(int oldX, int oldY, int absoluteX, int absoluteY, Graphics g, ITracePoint2D original) {
     /*
      * absoluteX corresponds to getX(), absoluteY to getStart(). All other
      * coords have to be transformed to px.
@@ -235,11 +235,13 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
         double endYPx = yChartStartPx - (int) Math.round(endYNormalized * rangeYPx);
         double highYPx = yChartStartPx - (int) Math.round(highYNormalized * rangeYPx);
         double lowYPx = yChartStartPx - (int) Math.round(lowYNormalized * rangeYPx);
+
         /*
          * Finally paint:
          */
         Color backupColor;
         if (candleStick.getStart() > candleStick.getEnd()) {
+
           /*
            * 1. box marking space between start and stop y
            */
@@ -255,6 +257,7 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
           g.drawLine((int) x, (int) endYPx, (int) x, (int) lowYPx);
           g.setColor(backupColor);
         } else {
+
           /*
            * 1. box marking space between start and stop y
            */
