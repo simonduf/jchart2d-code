@@ -25,7 +25,6 @@ import info.monitorenter.util.IStopWatch;
 import info.monitorenter.util.Range;
 import info.monitorenter.util.StopWatchSimple;
 import info.monitorenter.util.StringUtil;
-import info.monitorenter.util.UIUtil;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -41,8 +40,6 @@ import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
@@ -2977,6 +2974,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       oldpoint = null;
       newpoint = null;
       trace = traceIt.next();
+      trace.initPaintIteration();
       ITracePointProvider tracePointProvider = trace.getTracePointProvider();
       if (trace.isVisible()) {
         synchronized (trace) {
