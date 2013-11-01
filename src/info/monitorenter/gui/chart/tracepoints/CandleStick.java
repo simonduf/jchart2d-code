@@ -26,7 +26,6 @@
 
 package info.monitorenter.gui.chart.tracepoints;
 
-
 /**
  * Faked tracepoint that adds the properties to contain all data for a
  * candlestick.
@@ -74,6 +73,19 @@ public class CandleStick extends TracePoint2D {
    */
   public CandleStick(final double xValue, final double startY, final double endY, final double highY, final double lowY) {
     super(xValue, startY);
+    if (startY > highY) {
+      throw new IllegalArgumentException("start Y must not be higher than high Y.");
+    }
+    if (startY < lowY) {
+      throw new IllegalArgumentException("start Y must not be lower than low Y.");
+    }
+    if (endY > highY) {
+      throw new IllegalArgumentException("end Y must not be higher than high Y.");
+
+    }
+    if (endY < lowY) {
+      throw new IllegalArgumentException("endY must not be lower than low Y.");
+    }
     this.m_end = endY;
     this.m_high = highY;
     this.m_low = lowY;
