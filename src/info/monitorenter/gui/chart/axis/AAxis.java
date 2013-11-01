@@ -1276,9 +1276,10 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
   // }
 
   /**
-   * Installs the property change reactors. 
+   * Installs the property change reactors.
    * <p>
-   * Code looks a bit overdesigned but was "invented" to replace a large 
+   * Code looks a bit overdesigned but was "invented" to replace a large
+   * 
    * <pre>
    * if(property.equals(constant1) {
    *  ...
@@ -1286,7 +1287,8 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
    * ...
    * }
    * </pre>
-   * block and now looks up the property match in log(n) (Map). 
+   * 
+   * block and now looks up the property match in log(n) (Map).
    * <p>
    */
   private void setupPropertyChangeReactors() {
@@ -1526,7 +1528,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
         return result;
       }
     });
-    
+
   }
 
   /**
@@ -1576,8 +1578,10 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
           }
           // special case: first trace added:
           if (this.getTraces().size() == 1) {
-            this.m_min = min;
-            this.m_max = max;
+            if (!trace.isEmpty()) {
+              this.m_min = min;
+              this.m_max = max;
+            }
           }
           if (Chart2D.DEBUG_THREADING) {
             System.out.println(Thread.currentThread().getName() + ", AAxis" + this.getDimensionString() + ".addTrace(), before installing chart to trace "
@@ -1586,6 +1590,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
 
           }
           trace.setRenderer(this.m_accessor.getChart());
+          trace.onAdded2ChartBeforeFirstPaint();
           if (Chart2D.DEBUG_THREADING) {
             System.out.println(Thread.currentThread().getName() + ", AAxis" + this.getDimensionString() + ".addTrace(), after installing chart to trace "
                 + trace.getName());
@@ -2646,7 +2651,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
    * @see info.monitorenter.gui.chart.IAxis#scale()
    */
   public synchronized void scale() {
-    
+
     final Iterator<ITrace2D> it = this.m_traces.iterator();
     ITrace2D trace;
     while (it.hasNext()) {
