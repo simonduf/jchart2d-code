@@ -227,19 +227,11 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
-   * @param debug
-   *          The ITrace to debug.
-   */
-
-  /**
    * @see info.monitorenter.gui.chart.ITrace2D#getMaxSize()
    */
   public int getMaxSize() {
     return this.m_delegate.getMaxSize();
   }
-
-  // /////////////////////////////////
-  // Proxy methods
 
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#getMaxX()
@@ -249,11 +241,19 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
+   * @param debug
+   *          The ITrace to debug.
+   */
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#getMaxY()
    */
   public double getMaxY() {
     return this.m_delegate.getMaxY();
   }
+
+  // /////////////////////////////////
+  // Proxy methods
 
   /**
    * @see info.monitorenter.gui.chart.ITrace2D#getMinX()
@@ -387,6 +387,14 @@ public class Trace2DDebugger implements ITrace2D {
   }
 
   /**
+   * 
+   * @see info.monitorenter.gui.chart.ITrace2D#initPaintIteration()
+   */
+  public void initPaintIteration() {
+    m_delegate.initPaintIteration();
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#isAdditionalSpaceRequired()
    */
   public boolean isAdditionalSpaceRequired() {
@@ -447,6 +455,14 @@ public class Trace2DDebugger implements ITrace2D {
    */
   public double minYSearch() {
     return this.m_delegate.minYSearch();
+  }
+
+  /**
+   * 
+   * @see info.monitorenter.gui.chart.ITrace2D#onAdded2ChartBeforeFirstPaint()
+   */
+  public void onAdded2ChartBeforeFirstPaint() {
+    m_delegate.onAdded2ChartBeforeFirstPaint();
   }
 
   /**

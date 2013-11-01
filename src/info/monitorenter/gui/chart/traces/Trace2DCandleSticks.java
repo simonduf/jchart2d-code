@@ -27,13 +27,6 @@
 
 package info.monitorenter.gui.chart.traces;
 
-import java.awt.Color;
-import java.awt.Stroke;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.Iterator;
-import java.util.Set;
-
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IErrorBarPolicy;
 import info.monitorenter.gui.chart.IPointPainter;
@@ -43,6 +36,14 @@ import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.ITracePointProvider;
 import info.monitorenter.gui.chart.pointpainters.PointPainterCandleStick;
 import info.monitorenter.gui.chart.tracepoints.CandleStick;
+import info.monitorenter.gui.chart.traces.painters.TracePainterConfigurable;
+
+import java.awt.Color;
+import java.awt.Stroke;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * An ITrace2D decorator that adds the feature of drawing candlestick-traces.
@@ -67,13 +68,35 @@ public class Trace2DCandleSticks implements ITrace2D {
   /**
    * Reused candle stick point painter.
    */
-  private IPointPainter< ? > m_candleStickPainter;
+//  private IPointPainter< ? > m_candleStickPainter;
 
   /**
    * The trace implementation that is being decorated with the
    * candlestick-feature.
    */
   private final ITrace2D m_delegate;
+
+  /** The width of the candlestick. **/
+  private int m_candleStickWidth = 2;
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#initPaintIteration()
+   */
+  @Override
+  public void initPaintIteration() {
+    //  nop
+  }
+
+
+
+  /**
+   * @see info.monitorenter.gui.chart.ITrace2D#onAdded2ChartBeforeFirstPaint()
+   */
+  @Override
+  public void onAdded2ChartBeforeFirstPaint() {
+    this.m_delegate.addTracePainter(new TracePainterConfigurable<PointPainterCandleStick>(new PointPainterCandleStick(this.m_candleStickWidth)));
+  }
+
+
 
   /**
    * Constructor taking the trace implementation to decorate with candle stick
@@ -87,16 +110,20 @@ public class Trace2DCandleSticks implements ITrace2D {
    *          width of the candlesticks.
    */
   public Trace2DCandleSticks(final ITrace2D delegateThatIsEnrichedByCandlestickPainting, final int candleStickWidth) {
-    assert (delegateThatIsEnrichedByCandlestickPainting != null) : " Do not pass null";
+    if(delegateThatIsEnrichedByCandlestickPainting == null) {
+      throw new IllegalArgumentException("Given trace must not be null.");
+    }
     this.m_delegate = delegateThatIsEnrichedByCandlestickPainting;
+    this.m_candleStickWidth = candleStickWidth;
     /*
      * FIXME: Once method removeAllTracePainters() is available switch to that.
      */
     for (ITracePainter< ? > tracePainter : this.m_delegate.getTracePainters()) {
       this.m_delegate.removeTracePainter(tracePainter);
     }
-    this.m_candleStickPainter = new PointPainterCandleStick(candleStickWidth);
   }
+  
+  
 
   /**
    * @param trace
@@ -117,10 +144,9 @@ public class Trace2DCandleSticks implements ITrace2D {
    * @see info.monitorenter.gui.chart.ITrace2D#addPoint(double, double)
    */
   public boolean addPoint(double x, double y) {
-    throw new UnsupportedOperationException(
-        "Don't use this on a "
-            + this.getClass().getName()
-            + " instance as this implementation needs a special ITracePoint2D implementation. Use addPoint(ITracePoint2D) with the proper ITracePoint2DCandleStick implementation.");
+    throw new UnsupportedOperationException("Don't use this on a " + this.getClass().getName()
+        + " instance as this implementation needs a special ITracePoint2D implementation. Use addPoint(ITracePoint2D) with the proper "
+        + CandleStick.class.getName() + " implementation.");
   }
 
   /**
@@ -129,7 +155,7 @@ public class Trace2DCandleSticks implements ITrace2D {
   public boolean addPoint(ITracePoint2D p) {
     CandleStick candleStick = (CandleStick) p;
     candleStick.removeAllAdditionalPointPainters();
-    candleStick.addAdditionalPointPainter(this.m_candleStickPainter);
+//    candleStick.addAdditionalPointPainter(this.m_candleStickPainter);
     boolean result = this.m_delegate.addPoint(p, this);
     return result;
   }
@@ -279,7 +305,7 @@ public class Trace2DCandleSticks implements ITrace2D {
    *      double)
    */
   public DistancePoint getNearestPointEuclid(double x, double y) {
-    // FIXME: search for the nearest point to the centre of the candlestick
+    // FIXME: search for the nearest point to the center of the candlestick
     // tracepoints.
     return this.m_delegate.getNearestPointEuclid(x, y);
   }
@@ -289,7 +315,7 @@ public class Trace2DCandleSticks implements ITrace2D {
    *      double)
    */
   public DistancePoint getNearestPointManhattan(double x, double y) {
-    // FIXME: search for the nearest point to the centre of the candlestick
+    // FIXME: search for the nearest point to the center of the candlestick
     // tracepoints.
     return this.m_delegate.getNearestPointManhattan(x, y);
   }

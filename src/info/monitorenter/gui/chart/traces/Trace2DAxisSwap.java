@@ -322,6 +322,14 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
   }
 
   /**
+   * 
+   * @see info.monitorenter.gui.chart.ITrace2D#initPaintIteration()
+   */
+  public void initPaintIteration() {
+    this.m_delegate.initPaintIteration();
+  }
+
+  /**
    * @see info.monitorenter.gui.chart.ITrace2D#isAdditionalSpaceRequired()
    */
   public boolean isAdditionalSpaceRequired() {
@@ -382,6 +390,14 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
    */
   public double minYSearch() {
     return this.m_delegate.minYSearch();
+  }
+
+  /**
+   * 
+   * @see info.monitorenter.gui.chart.ITrace2D#onAdded2ChartBeforeFirstPaint()
+   */
+  public void onAdded2ChartBeforeFirstPaint() {
+    this.m_delegate.onAdded2ChartBeforeFirstPaint();
   }
 
   /**
