@@ -23,14 +23,33 @@
 package info.monitorenter.gui.chart.traces.painters;
 
 import info.monitorenter.gui.chart.IPointPainter;
+import info.monitorenter.gui.chart.IPointPainterConfigurableUI;
 import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.awt.Graphics;
 
 /**
  * An <code>{@link info.monitorenter.gui.chart.ITracePainter}</code>
- * implementation that works on a given <code>{@link IPointPainter}</code>.
+ * implementation that works on a given <code>{@link IPointPainter}</code>. It
+ * is configurable by using the point painter to paint the trace (wrapper /
+ * delegate).
  * <p>
+ * Configure painting by first calling: 
+ * <code>
+ * {@link TracePainterConfigurable#getPointPainter()}
+ * </code>
+ * 
+ * and then: 
+ * 
+ * <code>
+ * {@link IPointPainterConfigurableUI#setColor(java.awt.Color)},
+ * {@link IPointPainterConfigurableUI#setColorFill(java.awt.Color)} and
+ * {@link IPointPainterConfigurableUI#setStroke(java.awt.Stroke)}
+ * </code>
+ * .
+ * <p>
+ * 
+ * 
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
@@ -40,13 +59,14 @@ import java.awt.Graphics;
  *          needed for comparable<T>.
  * 
  */
-public class TracePainterConfigurable<T extends IPointPainter<T>> extends ATracePainter {
+public class TracePainterConfigurable<T extends IPointPainterConfigurableUI<T>> extends ATracePainter {
 
   /** Generated <code>serialVersionUID</code>. */
   private static final long serialVersionUID = 548540923475344855L;
 
   /** The implementation for rendering the point as a disc. */
   protected final T m_pointPainter;
+
   /**
    * Creates an instance that works with the given point painter.
    * <p>
@@ -112,7 +132,6 @@ public class TracePainterConfigurable<T extends IPointPainter<T>> extends ATrace
     this.m_pointPainter.endPaintIteration(g2d);
   }
 
-  
   /**
    * @see java.lang.Object#equals(java.lang.Object)
    */
@@ -136,6 +155,16 @@ public class TracePainterConfigurable<T extends IPointPainter<T>> extends ATrace
       return false;
     }
     return true;
+  }
+
+  /**
+   * Returns the pointPainter.
+   * <p>
+   * 
+   * @return the pointPainter
+   */
+  public T getPointPainter() {
+    return this.m_pointPainter;
   }
 
   /**
@@ -194,7 +223,7 @@ public class TracePainterConfigurable<T extends IPointPainter<T>> extends ATrace
    * @see info.monitorenter.gui.chart.traces.painters.ATracePainter#startPaintIteration(java.awt.Graphics)
    */
   @Override
-  public final  void startPaintIteration(final Graphics g2d) {
+  public final void startPaintIteration(final Graphics g2d) {
     this.m_pointPainter.startPaintIteration(g2d);
   }
 
