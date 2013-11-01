@@ -24,11 +24,13 @@
 package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IPointPainterConfigurableUI;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterDate;
 import info.monitorenter.gui.chart.tracepoints.CandleStick;
 import info.monitorenter.gui.chart.traces.Trace2DCandleSticks;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
+import info.monitorenter.gui.chart.traces.painters.TracePainterConfigurable;
 import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BorderLayout;
@@ -105,10 +107,14 @@ public final class CandleSticksStaticChart extends JPanel {
 
     // Create an ITrace:
     ITrace2D trace = new Trace2DCandleSticks(new Trace2DSimple(), 6);
-    trace.setColor(Color.RED);
-
     // Add the trace to the chart:
     this.m_chart.addTrace(trace);
+    TracePainterConfigurable<?> painter = (TracePainterConfigurable<?>)trace.getTracePainters().iterator().next();
+    IPointPainterConfigurableUI<?> pointPainter = painter.getPointPainter();
+    pointPainter.setColor(Color.RED);
+    pointPainter.setColorFill(Color.BLUE);
+    pointPainter.setTransparencyFill(100);
+    pointPainter.setTransparency(200);
 
     // Add all points, as it is static:
     Calendar cal = Calendar.getInstance();
@@ -158,18 +164,8 @@ public final class CandleSticksStaticChart extends JPanel {
     cal.set(Calendar.DAY_OF_MONTH, 3);
     trace.addPoint(new CandleStick(cal.getTimeInMillis(), 7283.26, 7322.08, 7339.33, 7272.06));
 
-    this.m_chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
-
-    /*
-     * Ensuring visibility:
-     */
-    cal.set(Calendar.DAY_OF_MONTH, 2);
-    double startTimeX = cal.getTimeInMillis();
-    cal.set(Calendar.DAY_OF_MONTH, 20);
-    double endTimeX = cal.getTimeInMillis();
-    
-//    IRangePolicy rangePolicy = new RangePolicyFixedViewport(new Range(startTimeX, endTimeX));
-//    this.m_chart.getAxisX().setRangePolicy(rangePolicy);
+//    this.m_chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
+  
 
   }
 
