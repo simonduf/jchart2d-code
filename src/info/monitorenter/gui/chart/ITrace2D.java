@@ -742,7 +742,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * @return a String describing the Axis being accessed.
    */
   public String getLabel();
-
+  
   /**
    * <p>
    * Returns the maximum amount of {@link ITracePoint2D} instances that may be
@@ -756,7 +756,6 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    *         added.
    */
   public int getMaxSize();
-
   /**
    * Returns the maximum value to be displayed on the x- axis of the
    * <code>Chart2D</code>. Implementations should be synchronized for
@@ -800,7 +799,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * @return the minimum value of the internal data for the x- dimension.
    */
    public double getMinX();
-  
+
   /**
    * Returns the minimum value to be displayed on the y- axis of the Chart2D.
    * <p>
@@ -827,7 +826,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * @see #setName(String s)
    */
   public String getName();
-
+  
   /**
    * Returns the nearest point to the given normalized value coordinates of this
    * trace in Euclid distance.
@@ -987,6 +986,22 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
   public Integer getZIndex();
 
   /**
+   * Hook called before each paint iteration. 
+   */
+  public void initPaintIteration();
+
+  /**
+   * Returns true if additional space is required for rendering the points. 
+   * <p>
+   * In this case min-max - search is much more expensive (points * 2 *
+   * painters).
+   * <p>
+   * 
+   * @return true if additional space is required for rendering the points. 
+   */
+  public boolean isAdditionalSpaceRequired();
+
+  /**
    * Returns false if internal <code>{@link ITracePoint2D}</code> instances are
    * contained or true if not.
    * <p>
@@ -1008,17 +1023,6 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    *         needed for min-max - search.
    */
   public boolean isPixelTransformationRequired();
-
-  /**
-   * Returns true if additional space is required for rendering the points. 
-   * <p>
-   * In this case min-max - search is much more expensive (points * 2 *
-   * painters).
-   * <p>
-   * 
-   * @return true if additional space is required for rendering the points. 
-   */
-  public boolean isAdditionalSpaceRequired();
 
   /**
    * Returns true if this instance should be rendered.
@@ -1090,6 +1094,11 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * @return the found extremum.
    */
   public double minYSearch();
+
+  /**
+   * Hook called when the trace has been added to a chart but before the first paint operation. 
+   */
+  public void onAdded2ChartBeforeFirstPaint();
 
   /**
    * Clears all internal point highlighters used.
