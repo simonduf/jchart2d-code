@@ -109,6 +109,7 @@ public final class CandleSticksStaticChart extends JPanel {
     ITrace2D trace = new Trace2DCandleSticks(new Trace2DSimple(), 6);
     // Add the trace to the chart:
     this.m_chart.addTrace(trace);
+    // Fiddling with colours: 
     TracePainterConfigurable<?> painter = (TracePainterConfigurable<?>)trace.getTracePainters().iterator().next();
     IPointPainterConfigurableUI<?> pointPainter = painter.getPointPainter();
     pointPainter.setColor(Color.RED);
