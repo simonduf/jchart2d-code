@@ -196,10 +196,9 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
             break;
           }
           case Chart2D.CHART_POSITION_TOP: {
-            int startX = chart.getXChartStart();
             int endX = chart.getXChartEnd();
             double xspace = bounds.getWidth();
-            int titleStartX = (int) ((endX - startX) / 2.0 - xspace / 2.0);
+            int titleStartX = (int) (endX / 2.0 - xspace / 2.0);
             g.drawString(title, titleStartX, axis.getPixelYTop() + (int) bounds.getHeight());
             break;
           }
