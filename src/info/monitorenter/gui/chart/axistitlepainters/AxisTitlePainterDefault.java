@@ -183,10 +183,9 @@ public class AxisTitlePainterDefault implements IAxisTitlePainter {
         switch (position) {
           case Chart2D.CHART_POSITION_BOTTOM: {
 
-            int startX = chart.getXChartStart();
             int endX = chart.getXChartEnd();
             double xspace = bounds.getWidth();
-            int titleStartX = (int) ((endX - startX) / 2.0 - xspace / 2.0);
+            int titleStartX = (int)  (endX / 2.0 - xspace / 2.0);
             g.drawString(title, titleStartX, axis.getPixelYBottom());
             if (Chart2D.DEBUG_LAYOUT) {
               Color backupColor = g.getColor();
