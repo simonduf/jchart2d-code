@@ -27,6 +27,7 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ZoomableChart;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
+import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.gui.chart.views.ScrollablePanel;
 
 import java.awt.BasicStroke;
@@ -45,7 +46,7 @@ import javax.swing.JFrame;
  * Demonstration of a zoom - enabled chart ({@link info.monitorenter.gui.chart.ZoomableChart}).
  * <p>
  * 
- * @author Alessio Sambarino (Contributor)
+ * @author Ramon Zambelli (Contributor)
  * @version $Revision: 1.17 $
  */
 public class ZoomScrollTest
@@ -155,7 +156,7 @@ public class ZoomScrollTest
     chart.enablePointHighlighting(true);
 
     // Add chart to the pane
-    c.add(new ScrollablePanel(chart));
+    c.add(new ScrollablePanel(new ChartPanel(chart)));
 
     // Create the zoomAll button
     JButton zoomAllButton = new JButton("Zoom All");
