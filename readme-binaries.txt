@@ -67,6 +67,7 @@ jchart2d-3.3.0 - <month>, <day>, <year>
 * Fixed issue with all TracePainterConfigurable implementations that do not override endPaintIteration(..) drawing a line 
   to the left upper corner. 
 * Fixed unnecessary (and potentially implementation dangerous / irritating) dual-paint operation of first point in traces. 
+* Fixed issue with empty scale in case LabelFormatterDate is used which does not format year month and day. 
 ! Improved performance of ITracePoint.setLocation(double, double): This was O(n) where n was amount of points in a trace in any 
   case except boundary increase. Now it is only O(n) if an extremum was diminished via that method.   
 ! Introduced data accumulation API. This allows you to have traces with 10^6 points painted with increased speed while zooming in 
@@ -103,7 +104,8 @@ o Changed ITrace2D.firePointChanged(ITracePoint2D, int) to ITrace2D.firePointCha
   to let it know if an extremum was changed which saves a lot of performance especially on large traces.  
 o Chart2D.setTracePointProvider(ITracePointProvider) has been removed. Use ITrace2D.setTracePointProvider(ITracePointProvider) instead. 
 o Chart2D.getTracePointProvider() has been removed. Use ITrace2D.getTracePointProvider() instead. 
-o Added o Support for init hook on trace level. 
+o Added support for init hook on trace level. 
+o Allow using ScrollablePanel with ChartPanel. 
 
 jchart2d-3.2.2 - September, 24th, 2011
   

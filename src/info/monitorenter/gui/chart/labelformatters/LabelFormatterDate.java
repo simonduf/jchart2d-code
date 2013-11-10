@@ -161,7 +161,8 @@ public class LabelFormatterDate extends ALabelFormatter implements IAxisLabelFor
     final Range range = this.getAxis().getRange();
     final double dRange = range.getExtent();
     if (this.m_cachedMaxAmountChars == Integer.MAX_VALUE) {
-      this.m_cachedMaxAmountChars = this.m_dateFormat.format(new Date((long) dRange)).length();
+      String dateString = this.m_dateFormat.format(new Date((long) dRange));
+      this.m_cachedMaxAmountChars = dateString.length();
     }
     return this.m_cachedMaxAmountChars;
   }

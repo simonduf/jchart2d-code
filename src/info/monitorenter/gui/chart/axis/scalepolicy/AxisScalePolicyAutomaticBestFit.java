@@ -27,6 +27,7 @@
 package info.monitorenter.gui.chart.axis.scalepolicy;
 
 import info.monitorenter.gui.chart.IAxis;
+import info.monitorenter.gui.chart.IAxisLabelFormatter;
 import info.monitorenter.gui.chart.IAxisScalePolicy;
 import info.monitorenter.gui.chart.LabeledValue;
 import info.monitorenter.gui.chart.axis.AAxis;
@@ -36,6 +37,8 @@ import info.monitorenter.util.math.MathUtil;
 import java.awt.Graphics2D;
 import java.util.LinkedList;
 import java.util.List;
+
+import sun.rmi.runtime.Log;
 
 /**
  * Very basic and fast scale policy implementation that ensures the following:
@@ -264,10 +267,26 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
     }
 
     // format label string.
-    ret.setLabel(axis.getFormatter().format(ret.getValue()));
-    // as formatting rounds too, reparse value so that it is exactly at the
-    // point the label string describes.
-    ret.setValue(axis.getFormatter().parse(ret.getLabel()).doubleValue());
+    IAxisLabelFormatter formatter = axis.getFormatter();
+    ret.setLabel(formatter.format(ret.getValue()));
+    
+    /*
+     *  As formatting rounds too, reparse value so that it is exactly at the point the label string describes.
+     *  
+     *  There are formatters that will loose value information by formatting. E.g. a date formatter which does not 
+     *  render the year. So we use a tolerance of 10 % between original value and formatted and reparsed value. 
+     */
+
+    double reparsed = formatter.parse(ret.getLabel()).doubleValue();
+    double relativeDifferende = Math.abs(ret.getValue() - reparsed)/ret.getValue();
+    if(relativeDifferende < 0.1) {
+      ret.setValue(reparsed);
+    } else {
+      if(AAxis.DEBUG) {
+        System.out.println("Axis formatter " + this.toString() + " looses information. Original value: " + ret.getValue() + ". Formatted value: "
+            + ret.getLabel() + ". Reparsed value (dropped): " + reparsed);
+      }
+    }
     return ret;
   }
 
