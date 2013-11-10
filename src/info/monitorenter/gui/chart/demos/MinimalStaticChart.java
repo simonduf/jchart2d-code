@@ -25,7 +25,10 @@ package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
+import info.monitorenter.gui.chart.rangepolicies.RangePolicyMargin;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
+import info.monitorenter.gui.chart.traces.painters.TracePainterDisc;
+import info.monitorenter.gui.chart.traces.painters.TracePainterLine;
 import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BorderLayout;
@@ -85,26 +88,30 @@ public final class MinimalStaticChart extends JPanel {
   private MinimalStaticChart() {
     this.setLayout(new BorderLayout());
     Chart2D chart = new Chart2D();
-
+    chart.getAxisX().setRangePolicy(new RangePolicyMargin(0.2, 0.2));
+    
     // Create an ITrace:
     // Note that dynamic charts need limited amount of values!!!
     // ITrace2D trace = new Trace2DLtd(200);
     ITrace2D trace = new Trace2DSimple();
-    trace.setColor(Color.RED);
-
     // Add the trace to the chart:
     chart.addTrace(trace);
+    trace.setTracePainter(new TracePainterLine());
+    trace.addTracePainter(new TracePainterDisc(6));
+    trace.setColor(Color.RED);
+
 
     // Add all points, as it is static:
     double time = System.currentTimeMillis();
     for (int i = 0; i < 120; i++) {
-      trace.addPoint(time + 1000 * 60 * i, i);
+      trace.addPoint(time + 1000 * 60 * i, i* (1+Math.random()));
     }
 
     chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
 
     chart.getAxisY().setPaintScale(false);
     chart.getAxisX().setPaintScale(false);
+    
     
     // Make it visible:
     this.add(new ChartPanel(chart), BorderLayout.CENTER);
