@@ -159,8 +159,6 @@ public class ScrollablePanel extends JPanel {
 
       @Override
       public void propertyChange(PropertyChangeEvent event) {
-        System.out.println("m_Chart propertyChange:" + event.getPropertyName() + ","
-            + event.getNewValue());
         if (event.equals(Chart2D.PROPERTY_AXIS_X)) {
           AAxis axis = (AAxis) event.getNewValue();
           if (axis != null) {
