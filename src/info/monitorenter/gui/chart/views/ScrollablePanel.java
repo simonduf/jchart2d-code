@@ -1,5 +1,5 @@
 /*
- *  ScrollablePanel.java of project jchart2d, <enterpurposehere>. 
+ *  ScrollablePanel.java of project jchart2d, a panel that offers scrollbars when chart is zoomed in.
  *  Copyright (C) 2002 - 2012, Achim Westermann, created on Oct 17, 2012
  *
  *  This library is free software; you can redistribute it and/or
@@ -17,22 +17,16 @@
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
- *
- *
- * File   : $Source: /cvsroot/jchart2d/jchart2d/codetemplates.xml,v $
- * Date   : $Date: 2009/02/24 16:45:41 $
- * Version: $Revision: 1.2 $
  */
-
 package info.monitorenter.gui.chart.views;
 
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.IRangePolicy;
-import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.util.Range;
 
+import java.awt.Adjustable;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.AdjustmentEvent;
@@ -40,10 +34,28 @@ import java.awt.event.AdjustmentListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 
+/**
+ * Panel that offers scrollbars when chart is zoomed in. Use like:
+ * 
+ * <code>
+ *  // Within a JComponent: 
+ *  Chart2d chart = new ZoomableChart();
+ *  ...
+ *  this.this.getContentPane().add(chart);
+ *  </code>
+ * <p>
+ * 
+ * @author Ramon Zambelli.
+ * 
+ */
 public class ScrollablePanel extends JPanel {
+
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = -2293615518310543613L;
 
   private final int SCROLL_RANGE = 1000;
 
@@ -61,146 +73,172 @@ public class ScrollablePanel extends JPanel {
 
   private AdjustmentListener m_adjustmentListenerYaxis;
 
-  private AAxis m_xAxis;
+  private IAxis< ? > m_xAxis;
 
-  private AAxis m_yAxis;
+  private IAxis< ? > m_yAxis;
 
-  public ScrollablePanel(Chart2D chart) {
+  /**
+   * Constructor taking a chart panel.
+   * <p>
+   * 
+   * @param chartPanel
+   *          adds controls to the chart.
+   */
+  public ScrollablePanel(final ChartPanel chartPanel) {
+    this(chartPanel.getChart(), chartPanel);
+  }
+
+  /**
+   * Constructor taking the chart.
+   * <p>
+   * 
+   * @param chart
+   *          the chart to allow scrolling when zoomed in.
+   */
+  public ScrollablePanel(final Chart2D chart) {
+    this(chart, null);
+  }
+
+  /**
+   * Constructor taking the chart and also an optional (nullable) wrapper the
+   * chart is already contained in.
+   * <p>
+   * 
+   * @param chart
+   *          the chart itself.
+   * 
+   * @param wrapper
+   *          optional (nullable) wrapper the chart is already contained in.
+   */
+  private ScrollablePanel(final Chart2D chart, final JComponent wrapper) {
     this.m_Chart = chart;
 
-    m_adjustmentListenerXaxis = new AdjustmentListener() {
+    this.m_adjustmentListenerXaxis = new AdjustmentListener() {
 
       @Override
-      public void adjustmentValueChanged(AdjustmentEvent arg0) {
-        onScrollBarAdjustment(m_scrollBarXaxis, m_xAxis);
+      public void adjustmentValueChanged(final AdjustmentEvent arg0) {
+        ScrollablePanel.this.onScrollBarAdjustment(ScrollablePanel.this.m_scrollBarXaxis, ScrollablePanel.this.m_xAxis);
       }
     };
-    m_adjustmentListenerYaxis = new AdjustmentListener() {
+    this.m_adjustmentListenerYaxis = new AdjustmentListener() {
 
       @Override
-      public void adjustmentValueChanged(AdjustmentEvent arg0) {
-        onScrollBarAdjustment(m_scrollBarYaxis, m_yAxis);
+      public void adjustmentValueChanged(final AdjustmentEvent arg0) {
+        ScrollablePanel.this.onScrollBarAdjustment(ScrollablePanel.this.m_scrollBarYaxis, ScrollablePanel.this.m_yAxis);
       }
     };
 
-    GridBagLayout gridBagLayout = new GridBagLayout();
+    final GridBagLayout gridBagLayout = new GridBagLayout();
     gridBagLayout.columnWidths = new int[] {0, 0, 0 };
     gridBagLayout.rowHeights = new int[] {0, 0, 0 };
     gridBagLayout.columnWeights = new double[] {1.0, 0.0, Double.MIN_VALUE };
     gridBagLayout.rowWeights = new double[] {0.0, 1.0, Double.MIN_VALUE };
-    setLayout(gridBagLayout);
+    this.setLayout(gridBagLayout);
 
-    m_scrollBarXaxis = new JScrollBar();
-    m_scrollBarXaxis.setVisible(false);
-    m_scrollBarXaxis.setOrientation(JScrollBar.HORIZONTAL);
-    GridBagConstraints gbc_scrollBarHorizontal = new GridBagConstraints();
+    this.m_scrollBarXaxis = new JScrollBar();
+    this.m_scrollBarXaxis.setVisible(false);
+    this.m_scrollBarXaxis.setOrientation(Adjustable.HORIZONTAL);
+    final GridBagConstraints gbc_scrollBarHorizontal = new GridBagConstraints();
     gbc_scrollBarHorizontal.fill = GridBagConstraints.BOTH;
     gbc_scrollBarHorizontal.gridx = 0;
     gbc_scrollBarHorizontal.gridy = 0;
-    add(m_scrollBarXaxis, gbc_scrollBarHorizontal);
+    this.add(this.m_scrollBarXaxis, gbc_scrollBarHorizontal);
 
-    m_scrollBarYaxis = new JScrollBar();
-    m_scrollBarYaxis.setVisible(false);
-    GridBagConstraints gbc_scrollBarVertical = new GridBagConstraints();
+    this.m_scrollBarYaxis = new JScrollBar();
+    this.m_scrollBarYaxis.setVisible(false);
+    final GridBagConstraints gbc_scrollBarVertical = new GridBagConstraints();
     gbc_scrollBarVertical.fill = GridBagConstraints.VERTICAL;
     gbc_scrollBarVertical.gridx = 1;
     gbc_scrollBarVertical.gridy = 1;
-    add(m_scrollBarYaxis, gbc_scrollBarVertical);
+    this.add(this.m_scrollBarYaxis, gbc_scrollBarVertical);
 
-    GridBagConstraints gbc_chart = new GridBagConstraints();
+    final GridBagConstraints gbc_chart = new GridBagConstraints();
     gbc_chart.fill = GridBagConstraints.BOTH;
     gbc_chart.gridx = 0;
     gbc_chart.gridy = 1;
-    add(chart, gbc_chart);
+    if (wrapper != null) {
+      this.add(wrapper, gbc_chart);
+    } else {
+      this.add(chart, gbc_chart);
+    }
 
-    m_changeListenerXaxis = new PropertyChangeListener() {
+    this.m_changeListenerXaxis = new PropertyChangeListener() {
 
       @Override
-      public void propertyChange(PropertyChangeEvent event) {
-        IRangePolicy rangePolicy = (IRangePolicy) event.getNewValue();
+      public void propertyChange(final PropertyChangeEvent event) {
+        final IRangePolicy rangePolicy = (IRangePolicy) event.getNewValue();
         if (rangePolicy == null) {
           return;
         }
-        m_xAxis = (AAxis) event.getSource();
-        if (m_xAxis == null) {
+        ScrollablePanel.this.m_xAxis = (IAxis< ? >) event.getSource();
+        if (ScrollablePanel.this.m_xAxis == null) {
           return;
         }
-        onAxisPropertyChanged(m_scrollBarXaxis, m_xAxis, rangePolicy, m_adjustmentListenerXaxis);
+        ScrollablePanel.this.onAxisPropertyChanged(ScrollablePanel.this.m_scrollBarXaxis, ScrollablePanel.this.m_xAxis, rangePolicy,
+            ScrollablePanel.this.m_adjustmentListenerXaxis);
       }
     };
 
-    m_changeListenerYaxis = new PropertyChangeListener() {
+    this.m_changeListenerYaxis = new PropertyChangeListener() {
 
       @Override
-      public void propertyChange(PropertyChangeEvent event) {
-        IRangePolicy rangePolicy = (IRangePolicy) event.getNewValue();
+      public void propertyChange(final PropertyChangeEvent event) {
+        final IRangePolicy rangePolicy = (IRangePolicy) event.getNewValue();
         if (rangePolicy == null) {
           return;
         }
-        m_yAxis = (AAxis) event.getSource();
-        if (m_xAxis == null) {
+        ScrollablePanel.this.m_yAxis = (IAxis< ? >) event.getSource();
+        if (ScrollablePanel.this.m_xAxis == null) {
           return;
         }
-        onAxisPropertyChanged(m_scrollBarYaxis, m_yAxis, rangePolicy, m_adjustmentListenerYaxis);
+        ScrollablePanel.this.onAxisPropertyChanged(ScrollablePanel.this.m_scrollBarYaxis, ScrollablePanel.this.m_yAxis, rangePolicy,
+            ScrollablePanel.this.m_adjustmentListenerYaxis);
       }
     };
 
-    if (m_Chart.getAxisX() != null) {
-      m_Chart.getAxisX().addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY,
-          m_changeListenerXaxis);
+    if (this.m_Chart.getAxisX() != null) {
+      this.m_Chart.getAxisX().addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, this.m_changeListenerXaxis);
     }
 
-    if (m_Chart.getAxisY() != null) {
-      m_Chart.getAxisY().addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY,
-          m_changeListenerYaxis);
+    if (this.m_Chart.getAxisY() != null) {
+      this.m_Chart.getAxisY().addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, this.m_changeListenerYaxis);
     }
 
-    m_Chart.addPropertyChangeListener(new PropertyChangeListener() {
+    this.m_Chart.addPropertyChangeListener(new PropertyChangeListener() {
 
       @Override
-      public void propertyChange(PropertyChangeEvent event) {
+      public void propertyChange(final PropertyChangeEvent event) {
         if (event.equals(Chart2D.PROPERTY_AXIS_X)) {
-          AAxis axis = (AAxis) event.getNewValue();
+          final IAxis< ? > axis = (IAxis< ? >) event.getNewValue();
           if (axis != null) {
-            axis.addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, m_changeListenerXaxis);
+            axis.addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, ScrollablePanel.this.m_changeListenerXaxis);
           }
         }
         if (event.equals(Chart2D.PROPERTY_AXIS_Y)) {
-          AAxis axis = (AAxis) event.getNewValue();
+          final IAxis< ? > axis = (IAxis< ? >) event.getNewValue();
           if (axis != null) {
-            axis.addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, m_changeListenerYaxis);
+            axis.addPropertyChangeListener(IAxis.PROPERTY_RANGEPOLICY, ScrollablePanel.this.m_changeListenerYaxis);
           }
         }
       }
     });
   }
 
-  private void onScrollBarAdjustment(JScrollBar scrollBar, AAxis axis) {
-    double axisMin = axis.getMinValue();
-    double axisMax = axis.getMaxValue();
-    double axisRange = axisMax - axisMin;
-    IRangePolicy rangePolicy = axis.getRangePolicy();
-    double rangeMin = rangePolicy.getRange().getMin();
-    double rangeMax = rangePolicy.getRange().getMax();
-    double range = rangeMax - rangeMin;
-    double rangeCenter = axis.getMinValue() + (axisRange * scrollBar.getValue() / SCROLL_RANGE);
-    rangePolicy.setRange(new Range(rangeCenter - range / 2, rangeCenter + range / 2));
-  }
-
-  private void onAxisPropertyChanged(JScrollBar scrollBar, AAxis axis, IRangePolicy rangePolicy, AdjustmentListener adjustmentListener) {
+  private void onAxisPropertyChanged(final JScrollBar scrollBar, final IAxis< ? > axis, final IRangePolicy rangePolicy,
+      final AdjustmentListener adjustmentListener) {
     System.out.println("onAxisPropertyChanged propertyChange:" + rangePolicy + "," + axis);
     if (rangePolicy instanceof RangePolicyFixedViewport) {
       System.out.println("RangePolicyFixedViewport");
       scrollBar.setVisible(true);
       scrollBar.setMinimum(0);
-      scrollBar.setMaximum(SCROLL_RANGE);
-      double axisMin = axis.getMinValue();
-      double axisMax = axis.getMaxValue();
-      double axisRange = axisMax - axisMin;
-      double rangeMin = rangePolicy.getRange().getMin();
-      double rangeMax = rangePolicy.getRange().getMax();
-      double rangeCenter = (rangeMin + rangeMax) / 2;
-      double scrollValue = scrollBar.getMinimum() + (SCROLL_RANGE * (rangeCenter - axisMin) / axisRange);
+      scrollBar.setMaximum(this.SCROLL_RANGE);
+      final double axisMin = axis.getMinValue();
+      final double axisMax = axis.getMaxValue();
+      final double axisRange = axisMax - axisMin;
+      final double rangeMin = rangePolicy.getRange().getMin();
+      final double rangeMax = rangePolicy.getRange().getMax();
+      final double rangeCenter = (rangeMin + rangeMax) / 2;
+      final double scrollValue = scrollBar.getMinimum() + ((this.SCROLL_RANGE * (rangeCenter - axisMin)) / axisRange);
       scrollBar.setValue((int) scrollValue);
       scrollBar.addAdjustmentListener(adjustmentListener);
     } else {
@@ -208,5 +246,17 @@ public class ScrollablePanel extends JPanel {
       scrollBar.removeAdjustmentListener(adjustmentListener);
       scrollBar.setVisible(false);
     }
+  }
+
+  private void onScrollBarAdjustment(final JScrollBar scrollBar, final IAxis< ? > axis) {
+    final double axisMin = axis.getMinValue();
+    final double axisMax = axis.getMaxValue();
+    final double axisRange = axisMax - axisMin;
+    final IRangePolicy rangePolicy = axis.getRangePolicy();
+    final double rangeMin = rangePolicy.getRange().getMin();
+    final double rangeMax = rangePolicy.getRange().getMax();
+    final double range = rangeMax - rangeMin;
+    final double rangeCenter = axis.getMinValue() + ((axisRange * scrollBar.getValue()) / this.SCROLL_RANGE);
+    rangePolicy.setRange(new Range(rangeCenter - (range / 2), rangeCenter + (range / 2)));
   }
 }
