@@ -190,22 +190,6 @@ public class PointPainterDisc extends APointPainter<PointPainterDisc> {
     // filling is desired as fill color has been set (if not null):
     if (test != null) {
       backupColor = test;
-      // get the width of the stroke:
-      // int strokeWidth = 1;
-      // int halfstrokeWidth = 1;
-      // Stroke stroke = this.getStroke();
-      // if (stroke != null) {
-      // if (stroke instanceof BasicStroke) {
-      // BasicStroke basicStroke = (BasicStroke) stroke;
-      // strokeWidth = (int) Math.ceil(basicStroke.getLineWidth());
-      // halfstrokeWidth = (int) Math.ceil(basicStroke.getLineWidth() / 2);
-      // // System.out.println("Strokewidth: " + strokeWidth);
-      // }
-      // }
-      // g.fillOval(absoluteX - this.m_halfDiscSize + halfstrokeWidth, absoluteY
-      // - this.m_halfDiscSize
-      // + halfstrokeWidth, this.m_discSize - strokeWidth, this.m_discSize -
-      // strokeWidth);
       g.fillOval(absoluteX - this.m_halfDiscSize, absoluteY - this.m_halfDiscSize, this.m_discSize, this.m_discSize);
     }
     test = this.installColor(g);
