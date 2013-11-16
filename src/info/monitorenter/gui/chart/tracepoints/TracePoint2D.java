@@ -109,6 +109,14 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.ITracePoint2D#getHighlightSweetSpotCoordinates()
+   */
+  @Override
+  public double[] getHighlightSweetSpotCoordinates() {
+    return new double[]{this.getX(), this.getY()};
+  }
+
+  /**
    * Construct a TracePoint2D whose coords are initalized to (x,y).
    * <p>
    * 
@@ -230,7 +238,7 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
   /**
    * @see info.monitorenter.gui.chart.ITracePoint2D#getListener()
    */
-  public ITrace2D getListener() {
+  public final ITrace2D getListener() {
     return this.m_listener;
   }
 
@@ -244,12 +252,6 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
     return result;
   }
 
-  /**
-   * @see info.monitorenter.gui.chart.ITracePoint2D#getManhattanDistance(info.monitorenter.gui.chart.ITracePoint2D)
-   */
-  public double getManhattanDistance(final ITracePoint2D point) {
-    return this.getManhattanDistance(point.getX(), point.getY());
-  }
 
   /**
    * @see info.monitorenter.gui.chart.ITracePoint2D#getScaledX()
@@ -299,7 +301,7 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
   /**
    * @see info.monitorenter.gui.chart.ITracePoint2D#setListener(info.monitorenter.gui.chart.ITrace2D)
    */
-  public void setListener(final ITrace2D listener) {
+  public final void setListener(final ITrace2D listener) {
     this.m_listener = listener;
   }
 

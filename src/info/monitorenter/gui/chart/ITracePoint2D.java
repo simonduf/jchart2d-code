@@ -21,6 +21,8 @@
  */
 package info.monitorenter.gui.chart;
 
+import info.monitorenter.gui.chart.tracepoints.CandleStick;
+
 import java.util.Set;
 
 /**
@@ -36,7 +38,7 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
     /**
      * The state flag used to inform the <code>{@link ITrace2D}</code> listener
      * via
-     * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int, double, double)}</code>
+     * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, STATE, Object, Object)}</code>
      * in case a point was added.
      * <p>
      */
@@ -44,7 +46,25 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
     /**
      * The state flag used to inform the <code>{@link ITrace2D}</code> listener
      * via
-     * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int, double, double)}</code>
+     * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, STATE, Object, Object)}</code>
+     * in case {@link ITracePoint2D#addAdditionalPointPainter(IPointPainter)}
+     * was invoked.
+     * <p>
+     */
+    ADDITIONAL_POINT_PAINTER_ADDED,
+    /**
+     * The state flag used to inform the <code>{@link ITrace2D}</code> listener
+     * via
+     * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, STATE, Object, Object)}</code>
+     * in case {@link ITracePoint2D#removeAdditionalPointPainter(IPointPainter)}
+     * was invoked.
+     * <p>
+     */
+    ADDITIONAL_POINT_PAINTER_REMOVED,
+    /**
+     * The state flag used to inform the <code>{@link ITrace2D}</code> listener
+     * via
+     * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, STATE, Object, Object)}</code>
      * in case a point was changed.
      * <p>
      * Will be used by <code>{@link #setLocation(double, double)}</code> and
@@ -55,70 +75,13 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
     /**
      * The state flag used to inform the <code>{@link ITrace2D}</code> listener
      * via
-     * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int, double, double)}</code>
+     * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, STATE, Object, Object)}</code>
      * in case a point was removed.
      * <p>
      */
 
-    REMOVED,
-    /**
-     * The state flag used to inform the <code>{@link ITrace2D}</code> listener
-     * via
-     * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int, double, double)}</code>
-     * in case {@link ITracePoint2D#removeAdditionalPointPainter(IPointPainter)} was invoked.
-     * <p>
-     */
-    ADDITIONAL_POINT_PAINTER_REMOVED,
-    /**
-     * The state flag used to inform the <code>{@link ITrace2D}</code> listener
-     * via
-     * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int, double, double)}</code>
-     * in case {@link ITracePoint2D#addAdditionalPointPainter(IPointPainter)} was invoked.
-     * <p>
-     */
-    ADDITIONAL_POINT_PAINTER_ADDED
+    REMOVED
   }
-  /**
-   * The state flag used to inform the <code>{@link ITrace2D}</code> listener
-   * via
-   * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int, double, double)}</code>
-   * in case a point was added.
-   * <p>
-   */
-//  public static final int STATE_ADDED = 1;
-
-  /**
-   * The state flag used to inform the <code>{@link ITrace2D}</code> listener
-   * via
-   * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int, double, double)}</code>
-   * in case a point was changed.
-   * <p>
-   * Will be used by <code>{@link #setLocation(double, double)}</code> and
-   * <code>{@link java.awt.geom.Point2D#setLocation(java.awt.geom.Point2D)}</code>.
-   * <p>
-   */
-//  public static final int STATE_CHANGED = 4;
-
-  /**
-   * The state flag used to inform the <code>{@link ITrace2D}</code> listener
-   * via
-   * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int, double, double)}</code>
-   * in case a point was removed.
-   * <p>
-   */
-//  public static final int STATE_REMOVED = 2;
-
-  /**
-   * The state flag used to inform the <code>{@link ITrace2D}</code> listener
-   * via
-   * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int, double, double)}</code>
-   * in case a point has changed it's way to render it (e.g.
-   * {@link ITracePoint2D#addAdditionalPointPainter(IPointPainter)}).
-   * <p>
-   */
-
-//  public static final int STATE_RENDERING_CHANGED = 16;
-  
 
   /**
    * Adds a point painter that additionally (to the pointer painters of the
@@ -192,6 +155,22 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
   public abstract double getEuclidDistance(final double xNormalized, final double yNormalized);
 
   /**
+   * Returns the coordinates of this point that should be highlighted. For
+   * normal trace points this is always <code>
+   * new double[]{this.getX(), this.getY()};
+   * </code>
+   * <p>
+   * But other trace point implementations (like {@link CandleStick}) render
+   * larger spaces than their center coordinate. Those may return the area of
+   * interest that should be highlighted.
+   * <p>
+   * 
+   * @return the coordinates of this point that should be highlighted.
+   * 
+   */
+  public abstract double[] getHighlightSweetSpotCoordinates();
+
+  /**
    * Returns the listener trace connected to this trace point.
    * <p>
    * 
@@ -216,16 +195,6 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
    *         normalized coordinates.
    */
   public abstract double getManhattanDistance(final double xNormalized, final double yNormalized);
-
-  /**
-   * Returns the Manhattan distance of this point to the given one.
-   * <p>
-   * 
-   * @param point
-   *          the point to measure the Manhattan distance to.
-   * @return the Manhattan distance of this point to the given one.
-   */
-  public abstract double getManhattanDistance(final ITracePoint2D point);
 
   /**
    * @return the scaledX.
@@ -269,13 +238,13 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
 
   /**
    * Returns true if {@link #getScaledX()} AND {@link #getScaledY()} is in the
-   * range [0.0..1.0] and {@link #isDiscontinuation()} returns false. 
+   * range [0.0..1.0] and {@link #isDiscontinuation()} returns false.
    * <p>
    * This call only makes sense after the point has been added to a trace.
    * <p>
    * 
    * @return true if {@link #getScaledX()} AND {@link #getScaledY()} is in the
-   *         range [0.0..1.0] and {@link #isDiscontinuation()} returns false. 
+   *         range [0.0..1.0] and {@link #isDiscontinuation()} returns false.
    */
   public boolean isVisble();
 
@@ -308,7 +277,7 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
    * Allows <code>ITrace2D</code> instances to register (or de-register)
    * themselves with this point to receive (or stop receiving) change
    * information via
-   * {@link ITrace2D#firePointChanged(ITracePoint2D, int, double, double)}
+   * {@link ITrace2D#firePointChanged(ITracePoint2D, STATE, Object, Object)}
    * events.
    * <p>
    * 
@@ -323,7 +292,7 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
    * <code>java.awt.geom.Point2D.Double</code> to fire a property change event
    * to listeners of the corresponding <code>{@link ITrace2D}</code> instances
    * via their method
-   * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, int, double, double)}</code>
+   * <code>{@link ITrace2D#firePointChanged(ITracePoint2D, STATE, Object, Object)}</code>
    * (with int argument set to <code>{@link STATE#CHANGED}</code>).
    * <p>
    * 

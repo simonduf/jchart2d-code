@@ -89,7 +89,7 @@ public final class AdvancedStaticChart {
     chart.addTrace(trace);
 
     // Feature: trace painters: You are also able to specify multiple ones!
-    trace.setTracePainter(new TracePainterVerticalBar(4, chart));
+    trace.setTracePainter(new TracePainterVerticalBar(8, chart));
 
     // Feature: trace color.
     trace.setColor(Color.ORANGE);
