@@ -824,10 +824,10 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * <p>
    */
   public static final String PROPERTY_VISIBLE = IAxis.PROPERTY_VISIBLE;
-  
-  
+
   /**
-   * The bean property <code>constant</code> identifying a pending change to visiblity.
+   * The bean property <code>constant</code> identifying a pending change to
+   * visiblity.
    * <p>
    * Use this constant to register a {@link java.beans.PropertyChangeListener}
    * with the <code>Chart2D</code>.
@@ -1222,8 +1222,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
 
     // set a custom cursor:
     this.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-    
-       this.m_repainter = new Timer(this.m_minPaintLatency, new ActionListener() {
+
+    this.m_repainter = new Timer(this.m_minPaintLatency, new ActionListener() {
 
       /**
        * Repaints the Chart if dirty.
@@ -1253,10 +1253,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   }
 
   /**
-   * When becoming visible for the first time a {@link Chart2D#PROPERTY_VISIBLE} 
-   * has to be fired. 
+   * When becoming visible for the first time a {@link Chart2D#PROPERTY_VISIBLE}
+   * has to be fired.
    */
   private boolean firstPaint = true;
+
   /**
    * Adds the given x axis to the list of internal bottom x axes.
    * <p>
@@ -2928,9 +2929,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     Iterator<ITrace2D> traceIt;
     // painting trace labels
     this.negociateXChart(g2d);
-    
-    
-    
+
     int labelHeight = this.paintTraceLabels(g);
     // finding start point of coordinate System.
     this.m_yChartStart = this.calculateYChartStart(g2d, labelHeight);
@@ -2938,11 +2937,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     int rangex = this.m_xChartEnd - this.m_xChartStart;
     int rangey = this.m_yChartStart - this.m_yChartEnd;
     this.paintCoordinateSystem(g2d);
-    if(this.firstPaint) {
-      this.firstPaint = false; 
+    if (this.firstPaint) {
+      this.firstPaint = false;
       this.firePropertyChange(PROPERTY_BEFORE_VISIBLE, Boolean.FALSE, Boolean.TRUE);
     }
-    
+
     // paint Traces.
     int tmpx = 0;
     int oldtmpx;
@@ -3082,7 +3081,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
               if (this.hasChartIntersection(oldpoint, newpoint)) {
                 // don't use error bars for interpolated points that do not
                 // intersect the chart's viewport!
-                this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, trace, g, newpoint, false);
+                this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, trace, g, newpoint, false, rangex, rangey);
               }
               // restore for next loop start:
               newpoint = tmppt;
@@ -3097,11 +3096,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
               oldtmpx = this.m_xChartStart + (int) Math.round(oldpoint.getScaledX() * rangex);
               oldtmpy = this.m_yChartStart - (int) Math.round(oldpoint.getScaledY() * rangey);
               /**
-               * Oldpoint was null before call to interpolate: First iteration. 
+               * Oldpoint was null before call to interpolate: First iteration.
                */
-              if(oldpoint != newpoint) {
+              if (oldpoint != newpoint) {
                 // don't use error bars for interpolated points!
-                this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, trace, g, newpoint, false);
+                this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, trace, g, newpoint, false, rangex, rangey);
               }
             } else if (!newpointVisible && oldpointVisible) {
               // leaving the visible bounds:
@@ -3110,14 +3109,14 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
               tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
               tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
               // don't use error bars for interpolated points!
-              this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, trace, g, newpoint, false);
+              this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, true, trace, g, newpoint, false, rangex, rangey);
               // restore for next loop start:
               newpoint = tmppt;
             } else {
               // staying in the visible bounds: just paint
               tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
               tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
-              this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, false, trace, g, newpoint, hasErrorBars);
+              this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, false, trace, g, newpoint, hasErrorBars, rangex, rangey);
             }
           }
           if (DEBUG_DATA_ACCUMULATION) {
@@ -3143,8 +3142,8 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       if (Chart2D.DEBUG_THREADING) {
         System.out.println("paint(" + Thread.currentThread().getName() + "), left lock on trace " + trace.getName());
       }
-      if(this.firstPaint) {
-        this.firstPaint = false; 
+      if (this.firstPaint) {
+        this.firstPaint = false;
         this.firePropertyChange(PROPERTY_VISIBLE, Boolean.FALSE, Boolean.TRUE);
       }
     }
@@ -3255,35 +3254,51 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    *          the x coordinate of the previous point to render in px
    *          (potentially an interpolation of it if the old point was not
    *          visible and the new point is).
+   * 
    * @param yPxOld
    *          the y coordinate of the previous point to render in px
    *          (potentially an interpolation of it if the old point was not
    *          visible and the new point is).
+   * 
    * @param xPxNew
    *          the x coordinate of the point to render in px (potentially an
    *          interpolation of it if the old point was visible and the new point
    *          is not).
+   * 
    * @param yPxNew
    *          the y coordinate of the point to render in px (potentially an
    *          interpolation of it if the old point was visible and the new point
    *          is not).
+   * 
    * @param trace
    *          needed for obtaining trace painters and error bar painters.
+   * 
    * @param g2d
    *          the graphics context to use.
+   * 
    * @param discontinue
    *          if a discontinuation has been taken place and all potential cached
    *          points by an <code>{@link ITracePainter}</code> (done for polyline
    *          performance boost) have to be drawn immediately before starting a
    *          new point caching.
+   * 
    * @param original
    *          intended for information only, should nor be needed to paint the
    *          point neither be changed in any way!
+   * 
    * @param errorBarSupport
    *          optimization that allows to skip error bar code.
+   * 
+   * @param rangeX
+   *          needed in case the highlighters highlight not the exact coordinate
+   *          of the point.
+   *          
+   * @param rangey
+   *          needed in case the highlighters highlight not the exact coordinate
+   *          of the point.
    */
   private final void paintPoint(final int xPxOld, final int yPxOld, final int xPxNew, final int yPxNew, final boolean discontinue, final ITrace2D trace,
-      final Graphics g2d, final ITracePoint2D original, final boolean errorBarSupport) {
+      final Graphics g2d, final ITracePoint2D original, final boolean errorBarSupport, final double rangeX, final double rangeY) {
     Iterator<ITracePainter< ? >> itTracePainters;
     ITracePainter< ? > tracePainter;
     itTracePainters = trace.getTracePainters().iterator();
@@ -3297,9 +3312,19 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
     Set<IPointPainter< ? >> additionalHighlighters = original.getAdditionalPointPainters();
     Iterator<IPointPainter< ? >> itPointHighlighters = additionalHighlighters.iterator();
     IPointPainter< ? > highlighter;
+    double[] highlightSweetSpot = original.getNormalizedHighlightSweetSpotCoordinates();
     while (itPointHighlighters.hasNext()) {
       highlighter = itPointHighlighters.next();
-      highlighter.paintPoint(xPxNew, yPxNew, xPxNew, yPxNew, g2d, original);
+      if(highlightSweetSpot == null) {
+        highlighter.paintPoint(xPxNew, yPxNew, xPxNew, yPxNew, g2d, original);
+      } else{
+        if(!discontinue) {
+          
+          int highlightX = this.m_xChartStart + (int) Math.round(highlightSweetSpot[0]  * rangeX);
+          int highlightY = this.m_yChartStart - (int) Math.round(highlightSweetSpot[1] * rangeY);
+          highlighter.paintPoint(highlightX, highlightY, highlightX, highlightY, g2d, original);
+        }
+      }
     }
     if (errorBarSupport) {
       this.paintErrorBars(trace, xPxOld, yPxOld, xPxNew, yPxNew, g2d, discontinue, original);

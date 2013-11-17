@@ -109,11 +109,11 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePoint2D#getHighlightSweetSpotCoordinates()
+   * @see info.monitorenter.gui.chart.ITracePoint2D#getNormalizedHighlightSweetSpotCoordinates()
    */
   @Override
-  public double[] getHighlightSweetSpotCoordinates() {
-    return new double[]{this.getX(), this.getY()};
+  public double[] getNormalizedHighlightSweetSpotCoordinates() {
+    return null;
   }
 
   /**

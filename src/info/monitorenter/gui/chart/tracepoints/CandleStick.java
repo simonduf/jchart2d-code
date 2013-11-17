@@ -69,27 +69,27 @@ public class CandleStick extends TracePoint2D {
   private NEAREST_SPOT m_cachedNearestSpot = NEAREST_SPOT.START;
   
   /**
-   * @see info.monitorenter.gui.chart.tracepoints.TracePoint2D#getHighlightSweetSpotCoordinates()
+   * @see info.monitorenter.gui.chart.tracepoints.TracePoint2D#getNormalizedHighlightSweetSpotCoordinates()
    */
   @Override
-  public double[] getHighlightSweetSpotCoordinates() {
+  public double[] getNormalizedHighlightSweetSpotCoordinates() {
     double[] result = new double[2];
-    result[0] = this.getX();
+    result[0] = this.getScaledX();
     switch (this.m_cachedNearestSpot) {
       case START :{
-        result[1] = this.getStart();
+        result[1] = this.scaleY(this.getStart());
         break;
       }
       case END :{
-        result[1] = this.getEnd();
+        result[1] = this.scaleY(this.getEnd());
         break;
       }
       case HIGH :{
-        result[1] = this.getHigh();
+        result[1] = this.scaleY(this.getHigh());
         break;
       }
       case LOW :{
-        result[1] = this.getLow();
+        result[1] = this.scaleY(this.getLow());
         break;
       }
     }
