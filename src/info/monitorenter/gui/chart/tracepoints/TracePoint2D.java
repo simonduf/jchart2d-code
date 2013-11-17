@@ -17,16 +17,17 @@
 package info.monitorenter.gui.chart.tracepoints;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IAxis;
 import info.monitorenter.gui.chart.ICodeBlock;
 import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.TracePointProviderDefault;
+import info.monitorenter.gui.util.TracePoint2DUtil;
 
 import java.awt.geom.Point2D;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
 
 /**
  * A specialized version of <code>java.awt.Point2D.Double </code> who carries
@@ -109,14 +110,6 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePoint2D#getNormalizedHighlightSweetSpotCoordinates()
-   */
-  @Override
-  public double[] getNormalizedHighlightSweetSpotCoordinates() {
-    return null;
-  }
-
-  /**
    * Construct a TracePoint2D whose coords are initalized to (x,y).
    * <p>
    * 
@@ -152,14 +145,6 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePoint2D#isDiscontinuation()
-   */
-  public boolean isDiscontinuation() {
-
-    return java.lang.Double.isNaN(this.getX()) || java.lang.Double.isNaN(this.getY());
-  }
-
-  /**
    * @see info.monitorenter.gui.chart.ITracePoint2D#clone()
    */
   @Override
@@ -187,6 +172,53 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
         result = 0;
       } else {
         result = 1;
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Internal helper that invokes the given internal runnable if this trace
+   * point is already connected to a trace. This is needed to avoid that changes
+   * on a trace point that are made within a paint iteration while the point
+   * already has been painted (but the iteration is still ongoing and the
+   * modification of the point -> request of a repaint to the chart is
+   * accumulated) are not reflected in the UI (are not drawn).
+   * <p>
+   * Synchronization is following the idiom also used in the painting
+   * <code>{@link Chart2D}</code>.
+   * 
+   * @param runSynchronized
+   *          code to execute synchronized.
+   */
+  private <T> T doSynchronized(final ICodeBlock<T> runSynchronized) {
+    T result;
+    if (this.m_listener != null) {
+      Chart2D chart = this.m_listener.getRenderer();
+      if (chart != null) {
+        // already connected to the chart: keep full locking order
+        synchronized (chart) {
+          synchronized (this.m_listener) {
+            result = runSynchronized.execute();
+          }
+        }
+      } else {
+        // not connected to a chart by now:
+        if (Chart2D.DEBUG_THREADING) {
+          System.err.println("Only partially synchronized execution of code that should run synchronized (" + runSynchronized.getClass().getSimpleName()
+              + ") for point " + this.toString() + " as trace (" + this.m_listener.getName() + ") is not connected to chart.");
+        }
+
+        synchronized (this.m_listener) {
+          result = runSynchronized.execute();
+        }
+      }
+    } else {
+      // not connected to any trace now:
+      result = runSynchronized.execute();
+      if (Chart2D.DEBUG_THREADING) {
+        System.err.println("Unsynchronized execution of code that should run synchronized (" + runSynchronized.getClass().getSimpleName() + ") for point "
+            + this.toString() + " as listener (trace) is not connected.");
       }
     }
     return result;
@@ -252,6 +284,13 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
     return result;
   }
 
+  /**
+   * @see info.monitorenter.gui.chart.ITracePoint2D#getNormalizedHighlightSweetSpotCoordinates()
+   */
+  @Override
+  public double[] getNormalizedHighlightSweetSpotCoordinates() {
+    return null;
+  }
 
   /**
    * @see info.monitorenter.gui.chart.ITracePoint2D#getScaledX()
@@ -265,6 +304,22 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
    */
   public final double getScaledY() {
     return this.m_scaledY;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITracePoint2D#getTooltipText()
+   */
+  @Override
+  public String getTooltipText() {
+    String result = null;
+    StringBuffer buffer = new StringBuffer("X: ");
+    IAxis< ? > xAxis = TracePoint2DUtil.getAxisXOfTracePoint(this);
+    IAxis< ? > yAxis = TracePoint2DUtil.getAxisYOfTracePoint(this);
+    buffer.append(xAxis.getFormatter().format(this.getX())).append(" ");
+    buffer.append("Y: ");
+    buffer.append(yAxis.getFormatter().format(this.getY()));
+    result = buffer.toString();
+    return result;
   }
 
   /**
@@ -299,99 +354,31 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePoint2D#setListener(info.monitorenter.gui.chart.ITrace2D)
+   * @see info.monitorenter.gui.chart.ITracePoint2D#isDiscontinuation()
    */
-  public final void setListener(final ITrace2D listener) {
-    this.m_listener = listener;
+  public boolean isDiscontinuation() {
+
+    return java.lang.Double.isNaN(this.getX()) || java.lang.Double.isNaN(this.getY());
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePoint2D#setLocation(double, double)
+   * @see info.monitorenter.gui.chart.ITracePoint2D#isVisble()
    */
   @Override
-  public void setLocation(final double xValue, final double yValue) {
-    this.doSynchronized(new ICodeBlock<Object>() {
-      @SuppressWarnings("synthetic-access")
-      public Object execute() {
-        double oldX = TracePoint2D.this.m_x;
-        double oldY = TracePoint2D.this.m_y;
-        TracePoint2D.this.m_x = xValue;
-        TracePoint2D.this.m_y = yValue;
-        if (TracePoint2D.this.m_listener != null) {
-          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE.CHANGED, new java.lang.Double(oldX), new java.lang.Double(oldY));
-        }
-        return null;
-      }
-    });
-  }
-
-  /**
-   * Internal helper that invokes the given internal runnable if this trace
-   * point is already connected to a trace. This is needed to avoid that changes
-   * on a trace point that are made within a paint iteration while the point
-   * already has been painted (but the iteration is still ongoing and the
-   * modification of the point -> request of a repaint to the chart is
-   * accumulated) are not reflected in the UI (are not drawn).
-   * <p>
-   * Synchronization is following the idiom also used in the painting
-   * <code>{@link Chart2D}</code>.
-   * 
-   * @param runSynchronized
-   *          code to execute synchronized.
-   */
-  private <T> T doSynchronized(final ICodeBlock<T> runSynchronized) {
-    T result;
-    if (this.m_listener != null) {
-      Chart2D chart = this.m_listener.getRenderer();
-      if (chart != null) {
-        // already connected to the chart: keep full locking order
-        synchronized (chart) {
-          synchronized (this.m_listener) {
-            result = runSynchronized.execute();
-          }
-        }
-      } else {
-        // not connected to a chart by now:
-        if (Chart2D.DEBUG_THREADING) {
-          System.err.println("Only partially synchronized execution of code that should run synchronized (" + runSynchronized.getClass().getSimpleName()
-              + ") for point " + this.toString() + " as trace (" + this.m_listener.getName() + ") is not connected to chart.");
-        }
-
-        synchronized (this.m_listener) {
-          result = runSynchronized.execute();
-        }
-      }
-    } else {
-      // not connected to any trace now:
-      result = runSynchronized.execute();
-      if (Chart2D.DEBUG_THREADING) {
-        System.err.println("Unsynchronized execution of code that should run synchronized (" + runSynchronized.getClass().getSimpleName() + ") for point "
-            + this.toString() + " as listener (trace) is not connected.");
+  public boolean isVisble() {
+    boolean result = !this.isDiscontinuation();
+    if (result) {
+      if (this.m_scaledX < 0.0) {
+        result = false;
+      } else if (this.m_scaledX > 1.0) {
+        result = false;
+      } else if (this.m_scaledY < 0.0) {
+        result = false;
+      } else if (this.m_scaledY > 1.0) {
+        result = false;
       }
     }
     return result;
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.ITracePoint2D#setScaledX(double)
-   */
-  public final void setScaledX(final double scaledX) {
-    this.m_scaledX = scaledX;
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.ITracePoint2D#setScaledY(double)
-   */
-  public final void setScaledY(final double scaledY) {
-    this.m_scaledY = scaledY;
-  }
-
-  /**
-   * @see info.monitorenter.gui.chart.ITracePoint2D#toString()
-   */
-  @Override
-  public String toString() {
-    return "TracePoint2D[" + this.m_x + ", " + this.m_y + "]";
   }
 
   /**
@@ -438,23 +425,52 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
   }
 
   /**
-   * @see info.monitorenter.gui.chart.ITracePoint2D#isVisble()
+   * @see info.monitorenter.gui.chart.ITracePoint2D#setListener(info.monitorenter.gui.chart.ITrace2D)
+   */
+  public final void setListener(final ITrace2D listener) {
+    this.m_listener = listener;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITracePoint2D#setLocation(double, double)
    */
   @Override
-  public boolean isVisble() {
-    boolean result = !this.isDiscontinuation();
-    if (result) {
-      if (this.m_scaledX < 0.0) {
-        result = false;
-      } else if (this.m_scaledX > 1.0) {
-        result = false;
-      } else if (this.m_scaledY < 0.0) {
-        result = false;
-      } else if (this.m_scaledY > 1.0) {
-        result = false;
+  public void setLocation(final double xValue, final double yValue) {
+    this.doSynchronized(new ICodeBlock<Object>() {
+      @SuppressWarnings("synthetic-access")
+      public Object execute() {
+        double oldX = TracePoint2D.this.m_x;
+        double oldY = TracePoint2D.this.m_y;
+        TracePoint2D.this.m_x = xValue;
+        TracePoint2D.this.m_y = yValue;
+        if (TracePoint2D.this.m_listener != null) {
+          TracePoint2D.this.m_listener.firePointChanged(TracePoint2D.this, ITracePoint2D.STATE.CHANGED, new java.lang.Double(oldX), new java.lang.Double(oldY));
+        }
+        return null;
       }
-    }
-    return result;
+    });
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITracePoint2D#setScaledX(double)
+   */
+  public final void setScaledX(final double scaledX) {
+    this.m_scaledX = scaledX;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITracePoint2D#setScaledY(double)
+   */
+  public final void setScaledY(final double scaledY) {
+    this.m_scaledY = scaledY;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.ITracePoint2D#toString()
+   */
+  @Override
+  public String toString() {
+    return "TracePoint2D[" + this.m_x + ", " + this.m_y + "]";
   }
 
 }

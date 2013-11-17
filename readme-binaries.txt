@@ -1,12 +1,9 @@
 /*
- * File   : $Source: /cvsroot/jchart2d/jchart2d/history.txt,v $
- * Date   : $Date: 2011/02/13 06:42:53 $
- * Version: $Revision: 1.216 $
  *
  * This file is part of jchart2d -
  * the Open Source real time charting library.
  *
- * Copyright (c) 2002 - 2011 Achim Westermann
+ * Copyright (c) 2002 - 2013 Achim Westermann
  */
 
 Quick intro
@@ -21,8 +18,8 @@ You may also want to look at other demos. The may be launched by typing
 E.g.: "java -cp jchart2d-3.2.1.jar  info.monitorenter.gui.chart.demos.MinimalDynamicChart".
 For full support (eps output, range chooser) also incorporate the 3rd party libraries to the 
 classplath: 
-linux: "java -cp jchart2d-3.2.1.jar:xmlgraphics-commons-1.3.1.jar:bislider.jar info.monitorenter.gui.chart.demos.AdvancedDynamicChart" 
-Windows: "java -cp jchart2d-3.2.1.jar;xmlgraphics-commons-1.3.1.jar;bislider.jar info.monitorenter.gui.chart.demos.AdvancedDynamicChart" 
+linux: "java -cp jchart2d-3.2.1.jar:xmlgraphics-commons-1.3.1.jar: info.monitorenter.gui.chart.demos.AdvancedDynamicChart" 
+Windows: "java -cp jchart2d-3.2.1.jar;xmlgraphics-commons-1.3.1.jar; info.monitorenter.gui.chart.demos.AdvancedDynamicChart" 
 
 
 History of changes for the jchart2d project.
@@ -90,7 +87,8 @@ jchart2d-3.3.0 - <month>, <day>, <year>
 ! Added scrollable panel for zoomed charts. Contribution by Ramon Zambelli. 
 ! Added IntelliJ project files git ignore. Contribution by Ian Phillips. 
 ! Added RangePolicyMargin. Contribution by Ramon Zambelli. 
-! improved point highlighting for candle sticks. 
+! Improved point highlighting for candle sticks. 
+! Improved tool tip texts for candle sticks. 
 o Changed policy of Chart2D.translateMousePosition(final MouseEvent mouseEvent). Before this the translation was done into the values 
   covered by the first x and y axes. By now the translation is related to the axes of the trace of the nearest point to the given 
   mouse event. 

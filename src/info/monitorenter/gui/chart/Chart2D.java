@@ -20,6 +20,7 @@ import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.axistickpainters.AxisTickPainterDefault;
 import info.monitorenter.gui.chart.events.Chart2DActionPrintSingleton;
+import info.monitorenter.gui.chart.tracepoints.CandleStick;
 import info.monitorenter.gui.util.TracePoint2DUtil;
 import info.monitorenter.util.IStopWatch;
 import info.monitorenter.util.Range;
@@ -620,7 +621,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    */
   public static enum ToolTipType implements IToolTipType {
     /**
-     * Chart data value tool tips are shown.
+     * Chart data value tool tips are shown at the exact mouse position.
      * <p>
      * Note that this implementation only works correctly for one left y axis
      * and one bottom x axis as it does not search for the nearest trace.
@@ -704,24 +705,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         String result = null;
         ITracePoint2D point = chart.getPointFinder().getNearestPoint(me, chart);
         if (point != null) {
-          /*
-           * We need the axes of the point for correct formatting
-           * (expensive...).
-           */
-          ITrace2D trace = point.getListener();
-          IAxis< ? > xAxis = chart.getAxisX(trace);
-          IAxis< ? > yAxis = chart.getAxisY(trace);
-
+          result = point.getTooltipText();
           chart.setRequestedRepaint(true);
-          StringBuffer buffer = new StringBuffer("X: ");
-          buffer.append(xAxis.getFormatter().format(point.getX())).append(" ");
-          buffer.append("Y: ");
-          buffer.append(yAxis.getFormatter().format(point.getY()));
-          result = buffer.toString();
         }
         return result;
       }
-
     };
 
     /**

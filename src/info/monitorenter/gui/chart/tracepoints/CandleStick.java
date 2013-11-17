@@ -68,33 +68,17 @@ public class CandleStick extends TracePoint2D {
    */
   private NEAREST_SPOT m_cachedNearestSpot = NEAREST_SPOT.START;
   
-  /**
-   * @see info.monitorenter.gui.chart.tracepoints.TracePoint2D#getNormalizedHighlightSweetSpotCoordinates()
-   */
-  @Override
-  public double[] getNormalizedHighlightSweetSpotCoordinates() {
-    double[] result = new double[2];
-    result[0] = this.getScaledX();
-    switch (this.m_cachedNearestSpot) {
-      case START :{
-        result[1] = this.scaleY(this.getStart());
-        break;
-      }
-      case END :{
-        result[1] = this.scaleY(this.getEnd());
-        break;
-      }
-      case HIGH :{
-        result[1] = this.scaleY(this.getHigh());
-        break;
-      }
-      case LOW :{
-        result[1] = this.scaleY(this.getLow());
-        break;
-      }
-    }
-    return result;
-  }
+  /** Generated <code>serialVersionUID</code>. **/
+  private static final long serialVersionUID = -135311007801611830L;
+
+  /** The high y value. **/
+  private double m_high;
+
+  /** The low y value. **/
+  private double m_low;
+
+  /** The end y value. **/
+  private double m_end;
 
   /**
    * Constructor with every argument needed.
@@ -139,32 +123,6 @@ public class CandleStick extends TracePoint2D {
     this.m_low = lowY;
   }
 
-  /** Generated <code>serialVersionUID</code>. **/
-  private static final long serialVersionUID = -135311007801611830L;
-
-  /** The high y value. **/
-  private double m_high;
-
-  /**
-   * Returns the high y value.
-   * <p>
-   * 
-   * @return the high y value.
-   */
-  public double getHigh() {
-    return this.m_high;
-  }
-
-  /**
-   * Returns the low y value.
-   * <p>
-   * 
-   * @return the low y value.
-   */
-  public double getLow() {
-    return this.m_low;
-  }
-
   /**
    * Returns the end y value.
    * <p>
@@ -204,37 +162,7 @@ public class CandleStick extends TracePoint2D {
     }
     return result;
   }
-
-  /**
-   * @see info.monitorenter.gui.chart.tracepoints.TracePoint2D#getManhattanDistance(double,
-   *      double)
-   */
-  @Override
-  public double getManhattanDistance(double xNormalized, double yNormalized) {
-    double result = java.lang.Double.MAX_VALUE;
-    double improve = this.getManhattanDistance(xNormalized, yNormalized, this.getScaledX(), this.scaleY(this.getLow()));
-    if(improve < result) {
-      result = improve;
-      this.m_cachedNearestSpot = NEAREST_SPOT.LOW;
-    }
-    improve = this.getManhattanDistance(xNormalized, yNormalized, this.getScaledX(), this.scaleY(this.getStart()));
-    if(improve < result) {
-      result = improve;
-      this.m_cachedNearestSpot = NEAREST_SPOT.START;
-    }
-    improve = this.getManhattanDistance(xNormalized, yNormalized, this.getScaledX(), this.scaleY(this.getEnd()));
-    if(improve < result) {
-      result = improve;
-      this.m_cachedNearestSpot = NEAREST_SPOT.END;
-    }
-    improve = this.getManhattanDistance(xNormalized, yNormalized, this.getScaledX(), this.scaleY(this.getHigh()));
-    if(improve < result) {
-      result = improve;
-      this.m_cachedNearestSpot = NEAREST_SPOT.HIGH;
-    }
-    return result;
-  }
-
+  
   /**
    * Internal helper that returns the eculid distance between the given
    * "outside" coordinates (mouse move) and the "inside" coordinates. "Inside"
@@ -273,6 +201,56 @@ public class CandleStick extends TracePoint2D {
   }
 
   /**
+   * Returns the high y value.
+   * <p>
+   * 
+   * @return the high y value.
+   */
+  public double getHigh() {
+    return this.m_high;
+  }
+
+  /**
+   * Returns the low y value.
+   * <p>
+   * 
+   * @return the low y value.
+   */
+  public double getLow() {
+    return this.m_low;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.tracepoints.TracePoint2D#getManhattanDistance(double,
+   *      double)
+   */
+  @Override
+  public double getManhattanDistance(double xNormalized, double yNormalized) {
+    double result = java.lang.Double.MAX_VALUE;
+    double improve = this.getManhattanDistance(xNormalized, yNormalized, this.getScaledX(), this.scaleY(this.getLow()));
+    if(improve < result) {
+      result = improve;
+      this.m_cachedNearestSpot = NEAREST_SPOT.LOW;
+    }
+    improve = this.getManhattanDistance(xNormalized, yNormalized, this.getScaledX(), this.scaleY(this.getStart()));
+    if(improve < result) {
+      result = improve;
+      this.m_cachedNearestSpot = NEAREST_SPOT.START;
+    }
+    improve = this.getManhattanDistance(xNormalized, yNormalized, this.getScaledX(), this.scaleY(this.getEnd()));
+    if(improve < result) {
+      result = improve;
+      this.m_cachedNearestSpot = NEAREST_SPOT.END;
+    }
+    improve = this.getManhattanDistance(xNormalized, yNormalized, this.getScaledX(), this.scaleY(this.getHigh()));
+    if(improve < result) {
+      result = improve;
+      this.m_cachedNearestSpot = NEAREST_SPOT.HIGH;
+    }
+    return result;
+  }
+
+  /**
    * Internal helper that returns the manhattan distance between the given
    * "outside" coordinates (mouse move) and the "inside" coordinates. "Inside"
    * coordinates means: The tracepoint may have several areas of interest like
@@ -307,6 +285,34 @@ public class CandleStick extends TracePoint2D {
     return result;
   }
   /**
+   * @see info.monitorenter.gui.chart.tracepoints.TracePoint2D#getNormalizedHighlightSweetSpotCoordinates()
+   */
+  @Override
+  public double[] getNormalizedHighlightSweetSpotCoordinates() {
+    double[] result = new double[2];
+    result[0] = this.getScaledX();
+    switch (this.m_cachedNearestSpot) {
+      case START :{
+        result[1] = this.scaleY(this.getStart());
+        break;
+      }
+      case END :{
+        result[1] = this.scaleY(this.getEnd());
+        break;
+      }
+      case HIGH :{
+        result[1] = this.scaleY(this.getHigh());
+        break;
+      }
+      case LOW :{
+        result[1] = this.scaleY(this.getLow());
+        break;
+      }
+    }
+    return result;
+  }
+
+  /**
    * Returns the start y value.
    * <p>
    * 
@@ -319,11 +325,40 @@ public class CandleStick extends TracePoint2D {
     return this.getY();
   }
 
-  /** The low y value. **/
-  private double m_low;
-
-  /** The end y value. **/
-  private double m_end;
+  /**
+   * @see info.monitorenter.gui.chart.ITracePoint2D#getTooltipText()
+   */
+  @Override
+  public String getTooltipText() {
+    String result = null;
+    StringBuffer buffer = new StringBuffer();
+    IAxis< ? > yAxis = TracePoint2DUtil.getAxisYOfTracePoint(this);
+    switch(this.m_cachedNearestSpot) {
+      case END: {
+        buffer.append("End: ");
+        buffer.append(yAxis.getFormatter().format(this.getEnd()));
+        break;
+        
+      }
+      case HIGH: {
+        buffer.append("High: ");
+        buffer.append(yAxis.getFormatter().format(this.getHigh()));
+        break;
+      }
+      case LOW: {
+        buffer.append("Low: ");
+        buffer.append(yAxis.getFormatter().format(this.getLow()));
+        break;
+      }
+      case START: {
+        buffer.append("Start: ");
+        buffer.append(yAxis.getFormatter().format(this.getStart()));
+        break;
+      }
+    }
+    result = buffer.toString();
+    return result;
+  }
 
   
   /**

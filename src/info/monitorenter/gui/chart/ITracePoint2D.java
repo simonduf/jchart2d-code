@@ -155,23 +155,6 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
   public abstract double getEuclidDistance(final double xNormalized, final double yNormalized);
 
   /**
-   * Returns the normalized coordinates of this point that should be highlighted or null if
-   * <code>
-   * new double[]{this.getX(), this.getY()};
-   * </code> is the position to highlight.
-   * <p>
-   * Trace point implementations (like {@link CandleStick}) render larger spaces
-   * than their center coordinate. Those may return the area of interest that
-   * should be highlighted.
-   * <p>
-   * 
-   * @return the normalized coordinates of this point that should be highlighted or null if
-   *         not different from {@link #getX()} and {@link #getY()}.
-   * 
-   */
-  public abstract double[] getNormalizedHighlightSweetSpotCoordinates();
-
-  /**
    * Returns the listener trace connected to this trace point.
    * <p>
    * 
@@ -198,6 +181,23 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
   public abstract double getManhattanDistance(final double xNormalized, final double yNormalized);
 
   /**
+   * Returns the normalized coordinates of this point that should be highlighted
+   * or null if <code>
+   * new double[]{this.getX(), this.getY()};
+   * </code> is the position to highlight.
+   * <p>
+   * Trace point implementations (like {@link CandleStick}) render larger spaces
+   * than their center coordinate. Those may return the area of interest that
+   * should be highlighted.
+   * <p>
+   * 
+   * @return the normalized coordinates of this point that should be highlighted
+   *         or null if not different from {@link #getX()} and {@link #getY()}.
+   * 
+   */
+  public abstract double[] getNormalizedHighlightSweetSpotCoordinates();
+
+  /**
    * @return the scaledX.
    */
   public abstract double getScaledX();
@@ -206,6 +206,15 @@ public interface ITracePoint2D extends Comparable<ITracePoint2D>, java.io.Serial
    * @return the scaledY.
    */
   public abstract double getScaledY();
+
+  /**
+   * Returns the tool tip text that should be displayed in case this trace point
+   * is selected to show a tool tip.
+   * 
+   * @return the tool tip text that should be displayed in case this trace point
+   *         is selected to show a tool tip.
+   */
+  public abstract String getTooltipText();
 
   /**
    * Returns the x value.
