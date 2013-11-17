@@ -198,7 +198,7 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
    *      int, java.awt.Graphics, info.monitorenter.gui.chart.ITracePoint2D)
    */
   @Override
-  public void paintPoint(int oldX, int oldY, int absoluteX, int absoluteY, Graphics g, ITracePoint2D original) {
+  public void paintPoint(int absoluteX, int absoluteY, int nextX, int nextY, Graphics g, ITracePoint2D original) {
     /*
      * absoluteX corresponds to getX(), absoluteY to getStart(). All other
      * coords have to be transformed to px.
