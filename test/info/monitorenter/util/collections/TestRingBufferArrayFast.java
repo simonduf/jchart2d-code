@@ -142,6 +142,30 @@ public class TestRingBufferArrayFast
 
     ringBuffer.clear();
     Assert.assertEquals(0, ringBuffer.size());
+    value = 10;
+    System.out.println("Adding 11 elements to a buffer of size 10");
+    for (int i = 0; i < 10; i++) {
+      ringBuffer.add(Integer.valueOf(i));
+    }
+    Integer thrownOut = ringBuffer.add(Integer.valueOf(10));
+    Assert.assertNotNull("11 th add should have returned the thrown out value 0. ", thrownOut);
+    Assert.assertEquals(Integer.valueOf(0), thrownOut);
+    
+    Assert.assertEquals(10, ringBuffer.size());
+    it = ringBuffer.iteratorF2L();
+    int count = 0;
+    while (it.hasNext()) {
+      removed = it.next();
+      Assert.assertNotNull("Element no. " + value + " is null.", removed);
+      // tests the order of the iterator:
+      Assert.assertEquals(removed.intValue(), value);
+      value--;
+      count++;
+    }
+    Assert.assertEquals("iterator did not run the proper amount of times. ", 10, count);
+    
+    ringBuffer.clear();
+    Assert.assertEquals(0, ringBuffer.size());
     value = 11;
     System.out.println("Adding 12 elements to a buffer of size 10");
     for (int i = 0; i < 12; i++) {
@@ -191,7 +215,10 @@ public class TestRingBufferArrayFast
     }
     Assert.assertEquals(2, ringBuffer.size());
     int value = 0;
-    for (Integer removed : ringBuffer) {
+    Iterator<Integer> it = ringBuffer.iteratorL2F();
+    Integer removed;
+    while (it.hasNext()) {
+      removed = it.next();
       Assert.assertNotNull("Element no. " + value + " is null.", removed);
       // tests the order of the iterator:
       Assert.assertEquals(removed.intValue(), value);
@@ -206,7 +233,9 @@ public class TestRingBufferArrayFast
       ringBuffer.add(Integer.valueOf(i));
     }
     Assert.assertEquals(1, ringBuffer.size());
-    for (Integer removed : ringBuffer) {
+    it = ringBuffer.iteratorL2F();
+    while(it.hasNext()) {
+      removed = it.next();
       Assert.assertNotNull("Element no. " + value + " is null.", removed);
       // tests the order of the iterator:
       Assert.assertEquals(removed.intValue(), value);
@@ -221,12 +250,39 @@ public class TestRingBufferArrayFast
       ringBuffer.add(Integer.valueOf(i));
     }
     Assert.assertEquals(10, ringBuffer.size());
-    for (Integer removed : ringBuffer) {
+    it = ringBuffer.iteratorL2F();
+    while (it.hasNext()) {
+      removed = it.next();
       Assert.assertNotNull("Element no. " + value + " is null.", removed);
       // tests the order of the iterator:
       Assert.assertEquals(removed.intValue(), value);
       value++;
     }
+    
+
+    ringBuffer.clear();
+    Assert.assertEquals(0, ringBuffer.size());
+    value = 10;
+    System.out.println("Adding 11 elements to a buffer of size 10");
+    for (int i = 0; i < 10; i++) {
+      ringBuffer.add(Integer.valueOf(i));
+    }
+    Integer thrownOut = ringBuffer.add(Integer.valueOf(10));
+    Assert.assertNotNull("11 th add should have returned the thrown out value 0. ", thrownOut);
+    Assert.assertEquals(Integer.valueOf(0), thrownOut);
+    
+    Assert.assertEquals(10, ringBuffer.size());
+    it = ringBuffer.iteratorF2L();
+    int count = 0;
+    while (it.hasNext()) {
+      removed = it.next();
+      Assert.assertNotNull("Element no. " + value + " is null.", removed);
+      // tests the order of the iterator:
+      Assert.assertEquals(removed.intValue(), value);
+      value--;
+      count++;
+    }
+    Assert.assertEquals("iterator did not run the proper amount of times. ", 10, count);
 
     ringBuffer.clear();
     Assert.assertEquals(0, ringBuffer.size());
@@ -236,7 +292,9 @@ public class TestRingBufferArrayFast
       ringBuffer.add(Integer.valueOf(i));
     }
     Assert.assertEquals(10, ringBuffer.size());
-    for (Integer removed : ringBuffer) {
+    it = ringBuffer.iteratorL2F();
+    while(it.hasNext()) {
+      removed = it.next();
       Assert.assertNotNull("Element no. " + value + " is null.", removed);
       // tests the order of the iterator:
       Assert.assertEquals(value, removed.intValue());
@@ -244,7 +302,7 @@ public class TestRingBufferArrayFast
     }
 
     System.out.println("Testing for side effects of hasNext()...");
-    Iterator<Integer> it = ringBuffer.iteratorL2F();
+    it = ringBuffer.iteratorL2F();
     for (int i = 0; i < 100; i++) {
       Assert.assertTrue(it.hasNext());
     }

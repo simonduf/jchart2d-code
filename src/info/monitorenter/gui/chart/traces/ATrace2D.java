@@ -400,9 +400,9 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           System.out.println(Thread.currentThread().getName() + ", ATrace2D.addPoint, 2 locks");
         }
 
+        p.setListener(wrapperOfMe);
         accepted = this.addPointInternal(p);
         if (accepted) {
-          p.setListener(wrapperOfMe);
           if (this.m_firsttime) {
             /*
              * MAX events / members are done already from the
@@ -1755,10 +1755,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           ret = pointBounds[POINTBOUNDS_MAX_X];
         }
       }
-      if (ret > this.m_maxX) {
-        this.m_maxX = ret;
-      }
-
+      this.m_maxX = ret;
       return ret;
     }
   }
@@ -1793,9 +1790,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           ret = pointBounds[POINTBOUNDS_MAX_Y];
         }
       }
-      if (ret > this.m_maxY) {
-        this.m_maxY = ret;
-      }
+      this.m_maxY = ret;
       return ret;
     }
   }
@@ -1830,9 +1825,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           ret = pointBounds[POINTBOUNDS_MIN_X];
         }
       }
-      if (ret < this.m_maxX) {
-        this.m_minX = ret;
-      }
+      this.m_minX = ret;
 
       return ret;
     }
@@ -1867,9 +1860,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
           ret = pointBounds[POINTBOUNDS_MIN_Y];
         }
       }
-      if (ret < this.m_minY) {
-        this.m_minY = ret;
-      }
+      this.m_minY = ret;
 
       return ret;
     }

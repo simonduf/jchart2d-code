@@ -59,7 +59,7 @@ import info.monitorenter.gui.chart.ITracePoint2D;
  * @deprecated this is a proprietary example on how to use Threads: Bigger
  *             applications will use Threadpools, Reactor- or Observer- patterns
  *             to save setting up new Threads for ever single piece of the
- *             application, so this will be voided soon.
+ *             application, so this is only intended for demos.
  * 
  */
 @Deprecated

@@ -92,7 +92,7 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
    * @see info.monitorenter.gui.chart.ITrace2D#addPoint(double, double)
    */
   public boolean addPoint(final double x, final double y) {
-    return this.m_delegate.addPoint(x,y);
+    return this.m_delegate.addPoint(y,x);
   }
 
   /**
@@ -108,7 +108,9 @@ public class Trace2DAxisSwap implements ITrace2D, Comparable<ITrace2D> {
    * @see info.monitorenter.gui.chart.ITrace2D#addPoint(info.monitorenter.gui.chart.ITracePoint2D, info.monitorenter.gui.chart.ITrace2D)
    */
   public boolean addPoint(ITracePoint2D p, ITrace2D wrapperOfMe) {
-    return this.m_delegate.addPoint(p, wrapperOfMe);
+    final ITracePoint2D swap = (ITracePoint2D) p.clone();
+    swap.setLocation(p.getY(), p.getX());
+    return this.m_delegate.addPoint(swap, wrapperOfMe);
   }
 
   public boolean addPointHighlighter(final IPointPainter< ? > highlighter) {
