@@ -26,8 +26,6 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 
 import java.awt.Graphics;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * A trace painter that fills the area between trace to render and the x axis
@@ -58,12 +56,6 @@ public class TracePainterFill extends TracePainterPolyline {
    * polygon to fill.
    */
   private final Chart2D m_chart;
-
-  /** The list of x coordinates collected in one paint iteration. */
-  private List<Integer> m_xPoints;
-
-  /** The list of y coordinates collected in one paint iteration. */
-  private List<Integer> m_yPoints;
 
   /**
    * Constructor with the corresponding chart.
@@ -204,13 +196,6 @@ public class TracePainterFill extends TracePainterPolyline {
     super.paintPoint(absoluteX, absoluteY, nextX, nextY, g, original);
   }
 
-  /**
-   * @see info.monitorenter.gui.chart.ITracePainter#startPaintIteration(java.awt.Graphics)
-   */
-  @Override
-  public void startPaintIteration(final Graphics g2d) {
-    this.m_xPoints = new LinkedList<Integer>();
-    this.m_yPoints = new LinkedList<Integer>();
-  }
+
 
 }

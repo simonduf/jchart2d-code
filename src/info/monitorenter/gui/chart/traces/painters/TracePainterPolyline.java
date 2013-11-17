@@ -46,10 +46,10 @@ public class TracePainterPolyline extends ATracePainter {
   private static final long serialVersionUID = 142122979535173974L;
 
   /** The list of x coordinates collected in one paint iteration. */
-  private List<Integer> m_xPoints;
+  protected List<Integer> m_xPoints;
 
   /** The list of y coordinates collected in one paint iteration. */
-  private List<Integer> m_yPoints;
+  protected List<Integer> m_yPoints;
 
   /**
    * Default Constructor.
@@ -221,7 +221,7 @@ public class TracePainterPolyline extends ATracePainter {
    * @see info.monitorenter.gui.chart.ITracePainter#startPaintIteration(java.awt.Graphics)
    */
   @Override
-  public void startPaintIteration(final Graphics g2d) {
+  public final void startPaintIteration(final Graphics g2d) {
     super.startPaintIteration(g2d);
     if (this.m_xPoints == null) {
       this.m_xPoints = new LinkedList<Integer>();
