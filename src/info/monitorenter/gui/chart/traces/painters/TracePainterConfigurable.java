@@ -122,6 +122,13 @@ public class TracePainterConfigurable<T extends IPointPainterConfigurableUI<T>> 
    */
   @Override
   public final void endPaintIteration(final Graphics g2d) {
+    if (g2d != null) {
+      int previousX = this.getPreviousX();
+      int previousY = this.getPreviousY();
+      if (previousX != Integer.MIN_VALUE || previousY != Integer.MIN_VALUE) {
+        this.m_pointPainter.paintPoint(previousX, previousY, 0, 0, g2d, this.getPreviousPoint());
+      }
+    }
     this.m_pointPainter.endPaintIteration(g2d);
   }
 
