@@ -27,6 +27,7 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.IPointPainterConfigurableUI;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterDate;
+import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.tracepoints.CandleStick;
 import info.monitorenter.gui.chart.traces.Trace2DCandleSticks;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
@@ -99,6 +100,7 @@ public final class CandleSticksStaticChart extends JPanel {
     this.m_chart = new Chart2D();
     this.add(new ChartPanel(this.m_chart), BorderLayout.CENTER);
     this.m_chart.getAxisX().setFormatter(new LabelFormatterDate(new SimpleDateFormat("yyyy-MM-dd")));
+    
   }
 
   private Chart2D m_chart;
@@ -109,6 +111,13 @@ public final class CandleSticksStaticChart extends JPanel {
     ITrace2D trace = new Trace2DCandleSticks(new Trace2DSimple(), 6);
     // Add the trace to the chart:
     this.m_chart.addTrace(trace);
+    
+    // Point highlighting: 
+    IPointPainterConfigurableUI<?> pointHighlighter = new PointPainterDisc(10);
+    pointHighlighter.setColor(Color.red);
+    trace.setPointHighlighter(pointHighlighter);
+    this.m_chart.enablePointHighlighting(true);
+
     // Fiddling with colours: 
     TracePainterConfigurable<?> painter = (TracePainterConfigurable<?>)trace.getTracePainters().iterator().next();
     IPointPainterConfigurableUI<?> pointPainter = painter.getPointPainter();

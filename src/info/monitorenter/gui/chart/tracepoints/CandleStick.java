@@ -26,6 +26,9 @@
 
 package info.monitorenter.gui.chart.tracepoints;
 
+import info.monitorenter.gui.chart.IAxis;
+import info.monitorenter.gui.util.TracePoint2DUtil;
+
 /**
  * Faked tracepoint that adds the properties to contain all data for a
  * candlestick.
@@ -47,6 +50,51 @@ package info.monitorenter.gui.chart.tracepoints;
  * 
  */
 public class CandleStick extends TracePoint2D {
+
+  /**
+   * To remember cached nearest spot detection. 
+   * <p>
+   */
+  private enum NEAREST_SPOT {
+      START,
+      LOW,
+      END,
+      HIGH
+  };
+  
+  /**
+   * To remember cached nearest spot detection. 
+   * <p>
+   */
+  private NEAREST_SPOT m_cachedNearestSpot = NEAREST_SPOT.START;
+  
+  /**
+   * @see info.monitorenter.gui.chart.tracepoints.TracePoint2D#getHighlightSweetSpotCoordinates()
+   */
+  @Override
+  public double[] getHighlightSweetSpotCoordinates() {
+    double[] result = new double[2];
+    result[0] = this.getX();
+    switch (this.m_cachedNearestSpot) {
+      case START :{
+        result[1] = this.getStart();
+        break;
+      }
+      case END :{
+        result[1] = this.getEnd();
+        break;
+      }
+      case HIGH :{
+        result[1] = this.getHigh();
+        break;
+      }
+      case LOW :{
+        result[1] = this.getLow();
+        break;
+      }
+    }
+    return result;
+  }
 
   /**
    * Constructor with every argument needed.
@@ -128,6 +176,137 @@ public class CandleStick extends TracePoint2D {
   }
 
   /**
+   * @see info.monitorenter.gui.chart.tracepoints.TracePoint2D#getEuclidDistance(double,
+   *      double)
+   */
+  @Override
+  public double getEuclidDistance(final double xNormalized,final double yNormalized) {
+    double result = java.lang.Double.MAX_VALUE;
+    double improve = this.getEuclidDistance(xNormalized, yNormalized, this.getScaledX(), this.scaleY(this.getLow()));
+    if(improve < result) {
+      result = improve;
+      this.m_cachedNearestSpot = NEAREST_SPOT.LOW;
+    }
+    improve = this.getEuclidDistance(xNormalized, yNormalized, this.getScaledX(), this.scaleY(this.getStart()));
+    if(improve < result) {
+      result = improve;
+      this.m_cachedNearestSpot = NEAREST_SPOT.START;
+    }
+    improve = this.getEuclidDistance(xNormalized, yNormalized, this.getScaledX(), this.scaleY(this.getEnd()));
+    if(improve < result) {
+      result = improve;
+      this.m_cachedNearestSpot = NEAREST_SPOT.END;
+    }
+    improve = this.getEuclidDistance(xNormalized, yNormalized, this.getScaledX(), this.scaleY(this.getHigh()));
+    if(improve < result) {
+      result = improve;
+      this.m_cachedNearestSpot = NEAREST_SPOT.HIGH;
+    }
+    return result;
+  }
+
+  /**
+   * @see info.monitorenter.gui.chart.tracepoints.TracePoint2D#getManhattanDistance(double,
+   *      double)
+   */
+  @Override
+  public double getManhattanDistance(double xNormalized, double yNormalized) {
+    double result = java.lang.Double.MAX_VALUE;
+    double improve = this.getManhattanDistance(xNormalized, yNormalized, this.getScaledX(), this.scaleY(this.getLow()));
+    if(improve < result) {
+      result = improve;
+      this.m_cachedNearestSpot = NEAREST_SPOT.LOW;
+    }
+    improve = this.getManhattanDistance(xNormalized, yNormalized, this.getScaledX(), this.scaleY(this.getStart()));
+    if(improve < result) {
+      result = improve;
+      this.m_cachedNearestSpot = NEAREST_SPOT.START;
+    }
+    improve = this.getManhattanDistance(xNormalized, yNormalized, this.getScaledX(), this.scaleY(this.getEnd()));
+    if(improve < result) {
+      result = improve;
+      this.m_cachedNearestSpot = NEAREST_SPOT.END;
+    }
+    improve = this.getManhattanDistance(xNormalized, yNormalized, this.getScaledX(), this.scaleY(this.getHigh()));
+    if(improve < result) {
+      result = improve;
+      this.m_cachedNearestSpot = NEAREST_SPOT.HIGH;
+    }
+    return result;
+  }
+
+  /**
+   * Internal helper that returns the eculid distance between the given
+   * "outside" coordinates (mouse move) and the "inside" coordinates. "Inside"
+   * coordinates means: The tracepoint may have several areas of interest like
+   * this candle stick. So finding the shortest distance to it may be the
+   * question which area of interest is closest: The start value, the end value,
+   * the high value or the low value.
+   * <p>
+   * 
+   * @param xNormalized
+   *          the normalized x coordinate between 0 and 1.0 to measure the
+   *          Euclid distance to.
+   * 
+   * @param yNormalized
+   *          the normalized y coordinate between 0 and 1.0 to measure the
+   *          Euclid distance to.
+   * 
+   * @param myScaledX
+   *          the normalized x "inside" coordinate between 0 and 1.0 to measure
+   *          the Euclid distance to.
+   * 
+   * @param myScaledY
+   *          the normalized y "inside" coordinate between 0 and 1.0 to measure
+   *          the Euclid distance to.
+   * 
+   * @return the eculid distance between the given "outside" coordinates (mouse
+   *         move) and the "inside" coordinates.
+   * 
+   */
+  protected final double getEuclidDistance(final double xNormalized, final double yNormalized, final double myScaledX, final double myScaledY) {
+    double result;
+    final double xdist = Math.abs(myScaledX - xNormalized);
+    final double ydist = Math.abs(myScaledY - yNormalized);
+    result = Math.sqrt(Math.pow(xdist, 2) + Math.pow(ydist, 2));
+    return result;
+  }
+
+  /**
+   * Internal helper that returns the manhattan distance between the given
+   * "outside" coordinates (mouse move) and the "inside" coordinates. "Inside"
+   * coordinates means: The tracepoint may have several areas of interest like
+   * this candle stick. So finding the shortest distance to it may be the
+   * question which area of interest is closest: The start value, the end value,
+   * the high value or the low value.
+   * <p>
+   * 
+   * @param xNormalized
+   *          the normalized x coordinate between 0 and 1.0 to measure the
+   *          manhattan distance to.
+   * 
+   * @param yNormalized
+   *          the normalized y coordinate between 0 and 1.0 to measure the
+   *          manhattan distance to.
+   * 
+   * @param myScaledX
+   *          the normalized x "inside" coordinate between 0 and 1.0 to measure
+   *          the manhattan distance to.
+   * 
+   * @param myScaledY
+   *          the normalized y "inside" coordinate between 0 and 1.0 to measure
+   *          the manhattan distance to.
+   * 
+   * @return the manhattan distance between the given "outside" coordinates (mouse
+   *         move) and the "inside" coordinates.
+   * 
+   */
+  public double getManhattanDistance(final double xNormalized, final double yNormalized, final double myScaledX, final double myScaledY) {
+    double result;
+    result = Math.abs(myScaledX - xNormalized) + Math.abs(myScaledY - yNormalized);
+    return result;
+  }
+  /**
    * Returns the start y value.
    * <p>
    * 
@@ -146,4 +325,38 @@ public class CandleStick extends TracePoint2D {
   /** The end y value. **/
   private double m_end;
 
+  
+  /**
+   * Helper to scale the additional values in this trace.  
+   * <p>
+   * FIXME: Think about caching or move this to the axis code along with setters? Should be profiled. 
+   * <p> 
+   * 
+   * @param value the internal value to scale. 
+   * 
+   * @return the scaled value. 
+   *
+   */
+  protected double scaleX(final double value) {
+    IAxis<?> xAxis = TracePoint2DUtil.getAxisXOfTracePoint(this);
+    double result = xAxis.getScaledValue(value);
+    return result;
+  }
+  /**
+   * Helper to scale the additional values in this trace.  
+   * <p>
+   * FIXME: Think about caching or move this to the axis code along with setters? Should be profiled. 
+   * <p> 
+   * 
+   * @param value the internal value to scale. 
+   * 
+   * @return the scaled value. 
+   *
+   */
+  protected double scaleY(final double value) {
+    IAxis<?> xAxis = TracePoint2DUtil.getAxisYOfTracePoint(this);
+    double result = xAxis.getScaledValue(value);
+    return result;
+  }
+  
 }
