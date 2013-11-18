@@ -126,7 +126,7 @@ public class TracePainterConfigurable<T extends IPointPainterConfigurableUI<T>> 
       int previousX = this.getPreviousX();
       int previousY = this.getPreviousY();
       if (previousX != Integer.MIN_VALUE || previousY != Integer.MIN_VALUE) {
-        this.m_pointPainter.paintPoint(previousX, previousY, 0, 0, g2d, this.getPreviousPoint());
+        this.m_pointPainter.paintPoint(previousX, previousY, previousX, previousY, g2d, this.getPreviousPoint());
       }
     }
     this.m_pointPainter.endPaintIteration(g2d);
