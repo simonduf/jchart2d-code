@@ -1,6 +1,6 @@
 /*
  * IRingBuffer, an interface for implementations of a RingBuffer.
- * Copyright (c) 2004 - 2011 Achim Westermann, Achim.Westermann@gmx.de.
+ * Copyright (c) 2004 - 2013 Achim Westermann, Achim.Westermann@gmx.de.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

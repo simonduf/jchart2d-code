@@ -2,7 +2,7 @@
  *  OneStringChooserPanel.java of project jchart2d, a panel that allows 
  *  to input a <code>String</code> via 
  *  a normal javax.swing.JTextField instance. 
- *  Copyright (c) 2007 - 2011 Achim Westermann, created on 09:50:20.
+ *  Copyright (c) 2007 - 2013 Achim Westermann, created on 09:50:20.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

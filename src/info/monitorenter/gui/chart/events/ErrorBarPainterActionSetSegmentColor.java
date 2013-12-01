@@ -1,7 +1,7 @@
 /*
  *  AErrorBarPainterActionSetSegmentColor, action that 
  *  sets a custom color to a segment of the error bar painter.
- *  Copyright (C) 2004 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2004 - 2013 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

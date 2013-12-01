@@ -2,7 +2,7 @@
  *  Trace2DArithmeticMeanY.java of project jchart2d, a trace 
  *  that accumulates the latest n y values added to a single point with the arithmetic 
  *  mean y value and the latest x value. 
- *  Copyright 2005 - 2011 (C) Achim Westermann.
+ *  Copyright 2005 - 2013 (C) Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

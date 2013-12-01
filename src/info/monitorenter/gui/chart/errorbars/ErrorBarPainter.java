@@ -1,6 +1,6 @@
 /*
  * ErrorBarPainter.java of project jchart2d, base class for an error bar painter that allows configuration of the way the segment, start
- * point and end point of an error bar is painted by the use of info.monitorenter.gui.chart.IPointPainter. Copyright (c) 2007 - 2011 Achim
+ * point and end point of an error bar is painted by the use of info.monitorenter.gui.chart.IPointPainter. Copyright (c) 2007 - 2013 Achim
  * Westermann, created on 03.09.2006 19:55:53.
  * 
  * This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as

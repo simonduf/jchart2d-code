@@ -1,7 +1,7 @@
 /*
  * AnnotationPanel.java, a moveable panel containing annotations. Copyright (C) Achim Westermann.
  * 
- *  Copyright (C) 2002 - 2011, Achim Westermann, created on 13.02.2009
+ *  Copyright (C) 2002 - 2013, Achim Westermann, created on 13.02.2009
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

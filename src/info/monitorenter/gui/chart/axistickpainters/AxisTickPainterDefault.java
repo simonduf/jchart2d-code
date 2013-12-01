@@ -2,7 +2,7 @@
  * AxisTickPainterDefault.java,  default IAxisTickPainter 
  * implementation for a tick painter that uses all given arguments 
  * (no proprietary behavior)
- * Copyright (C) 2007 - 2011 Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (C) 2007 - 2013 Achim Westermann, Achim.Westermann@gmx.de
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

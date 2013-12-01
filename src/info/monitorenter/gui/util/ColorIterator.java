@@ -1,7 +1,7 @@
 /*
  *  ColorIterator.java, something that walks over the Hue-Saturation-Brightness 
  *  color space. 
- *  Copyright (C) 2004 - 2011 Achim Westermann.
+ *  Copyright (C) 2004 - 2013 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

@@ -1,6 +1,6 @@
 /*
  *  AAxis.java (bold as love), base class for an axis  of the Chart2D.
- *  Copyright (C) 2007 -2011 Achim Westermann, created on 20:33:13.
+ *  Copyright (C) 2007 - 2013 Achim Westermann, created on 20:33:13.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

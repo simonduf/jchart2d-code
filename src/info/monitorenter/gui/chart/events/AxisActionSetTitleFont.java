@@ -1,7 +1,7 @@
 /*
  *  AxisActionSetTitle.java of project jchart2d, an action  implementation 
  *  to set the title font of an IAxis.
- *  Copyright (c) 2007 - 2011 Achim Westermann. 
+ *  Copyright (c) 2007 - 2013 Achim Westermann. 
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

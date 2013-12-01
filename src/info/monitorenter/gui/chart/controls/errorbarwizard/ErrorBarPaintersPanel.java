@@ -3,7 +3,7 @@
  *  that displays all ErrorBarPainterConfigurable instances of an IErrorBarPolicy 
  *  and offers their edit and remove buttons as well as 
  *  an add button for a new IErrorBarPainter. 
- *  Copyright (c) 2007 - 2011 Achim Westermann, created on 09:50:20.
+ *  Copyright (c) 2007 - 2013 Achim Westermann, created on 09:50:20.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

@@ -1,6 +1,6 @@
 /*
  *  CandleStick.java of project jchart2d, <enterpurposehere>. 
- *  Copyright (C) 2002 - 2012, Achim Westermann, created on Oct 9, 2012
+ *  Copyright (C) 2002 - 2013, Achim Westermann, created on Oct 9, 2012
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

@@ -1,6 +1,6 @@
 /*
  *  Log10AxisChart.java, A demo chart that uses a logarithmic axis for Y.
- *  Copyright (C) 2007 - 2011 Achim Westermann, created on 10.12.2004, 13:48:55
+ *  Copyright (C) 2007 - 2013 Achim Westermann, created on 10.12.2004, 13:48:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

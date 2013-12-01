@@ -1,7 +1,7 @@
 /*
  *  MultipleCharts.java of project jchart2d, a demonstration 
  *  of the minimal code to display multiple charts in a window. 
- *  Copyright (C) 2007 - 2011 Achim Westermann, created on 01.08.2006, 19:31:55
+ *  Copyright (C) 2007 - 2013 Achim Westermann, created on 01.08.2006, 19:31:55
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

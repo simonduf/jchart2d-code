@@ -2,7 +2,7 @@
  *  APointPainter.java of project jchart2d, adapter class 
  *  that implements the optional methods of the interface 
  *  IPointPainter with "no operations". 
- *  Copyright (c) 2006 - 2011 Achim Westermann, created on 03.09.2006 20:27:06.
+ *  Copyright (c) 2006 - 2013 Achim Westermann, created on 03.09.2006 20:27:06.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

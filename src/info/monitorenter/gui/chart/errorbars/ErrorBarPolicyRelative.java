@@ -2,7 +2,7 @@
  *  ErrorBarPolicyRelative.java of project jchart2d, configurable 
  *  info.monitorenter.gui.chart.IErrorBarPolicy that adds a 
  *  relative error to the points to render.
- *  Copyright (c) 2007 - 2011 Achim Westermann, created on 10.08.2006 19:37:54.
+ *  Copyright (c) 2007 - 2013 Achim Westermann, created on 10.08.2006 19:37:54.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

@@ -1,7 +1,7 @@
 /*
  *  MultiAxisZoomTest.java of project jchart2d, demonstration of a zoom-enabled 
  *  chart with multiple axes. 
- *  Copyright 2007 - 2011 (C) Achim Westermann, created on 23:59:21.
+ *  Copyright 2007 - 2013 (C) Achim Westermann, created on 23:59:21.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

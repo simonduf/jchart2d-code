@@ -1,7 +1,7 @@
 /*
  *  IPointPainterConfigurableUI.java of project jchart2d, adds configuration of 
  *  UI like strokes and color to IPointPainter. 
- *  Copyright (C) 2002 - 2011, Achim Westermann, created on Jun 11, 2011
+ *  Copyright (C) 2002 - 2013, Achim Westermann, created on Jun 11, 2011
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

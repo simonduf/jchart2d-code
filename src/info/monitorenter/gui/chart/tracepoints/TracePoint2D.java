@@ -1,5 +1,5 @@
 /*
- * TracePoint2D, a tuned Point2D.Double for use with ITrace2D- implementations. Copyright (c) 2004 - 2011 Achim Westermann,
+ * TracePoint2D, a tuned Point2D.Double for use with ITrace2D- implementations. Copyright (c) 2004 - 2013 Achim Westermann,
  * Achim.Westermann@gmx.de
  * 
  * This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as

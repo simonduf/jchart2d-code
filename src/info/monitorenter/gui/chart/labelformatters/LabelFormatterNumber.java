@@ -1,7 +1,7 @@
 /*
  *  LabelFormatterNumber.java of jchart2d, a label formatter that 
  *  formats the labels with a number format. 
- *  Copyright (C) 2005 - 2011 Achim Westermann, created on 20.04.2005, 22:34:16
+ *  Copyright (C) 2005 - 2013 Achim Westermann, created on 20.04.2005, 22:34:16
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

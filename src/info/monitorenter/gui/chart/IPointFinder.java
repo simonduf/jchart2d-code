@@ -1,7 +1,7 @@
 /*
  *  IPointFinder.java of project jchart2d, interface for finding a tracepoint of 
  *  a chart corresponding to a mouse event. 
- *  Copyright (C) 2002 - 2011, Achim Westermann, created on Jun 12, 2011
+ *  Copyright (C) 2002 - 2013, Achim Westermann, created on Jun 12, 2011
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

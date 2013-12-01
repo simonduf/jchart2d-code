@@ -1,7 +1,7 @@
 /*
  *  Trace2DSorted, a TreeSet- based implementation of a ITrace2D that performs
  *  insertion- sort of TracePoint2D - instances by their x- value.
- *  Copyright (c) 2004 - 2011 Achim Westermann, Achim.Westermann@gmx.de
+ *  Copyright (c) 2004 - 2013 Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

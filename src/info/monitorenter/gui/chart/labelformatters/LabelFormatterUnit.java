@@ -2,7 +2,7 @@
  * LabelFormatterUnit.java, a label formatter that adds 
  * a constructor given unit with the unit SI prefix to a decorated 
  * label formatter. 
- * Copyright (c) 2005 - 2011  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2005 - 2013  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

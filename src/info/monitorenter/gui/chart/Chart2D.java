@@ -1,6 +1,6 @@
 /*
  * Chart2D, a component for displaying ITrace2D instances. 
- * Copyright (C) 2004 - 2011 Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (C) 2004 - 2013 Achim Westermann, Achim.Westermann@gmx.de
  * 
  * This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.

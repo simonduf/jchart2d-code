@@ -1,6 +1,6 @@
 /*
  *  AxisLogE.java of project jchart2d, Axis implementation with log display.
- *  Copyright (c) 2007 - 2011 Achim Westermann, created on 20:33:13.
+ *  Copyright (c) 2007 - 2013 Achim Westermann, created on 20:33:13.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

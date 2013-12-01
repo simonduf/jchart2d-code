@@ -2,7 +2,7 @@
  *
  *  RandomDataCollectorTimeStamped.java  of project jchart2d, collects time stamped 
  *  random data for demo purposes. 
- *  Copyright (C) 2005 - 2011 Achim Westermann, created on 20.03.2005, 16:59:10
+ *  Copyright (C) 2005 - 2013 Achim Westermann, created on 20.03.2005, 16:59:10
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

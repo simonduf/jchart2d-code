@@ -1,6 +1,6 @@
 /*
  *  ChartPanel.java, a decoration of a Chart2D that adds popup menues for traces and the chart.
- *  Copyright (C) 2005 - 2011 Achim Westermann.
+ *  Copyright (C) 2005 - 2013 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

@@ -1,7 +1,7 @@
 /*
  *  ModalDialog.java, class for dialogs with ok and cancel buttons and 
  *  support for modality within jchart2d.
- *  Copyright (c) 2007 - 2011 Achim Westermann, created on 09:31:15.
+ *  Copyright (c) 2007 - 2013 Achim Westermann, created on 09:31:15.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

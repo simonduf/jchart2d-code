@@ -2,7 +2,7 @@
  *  AErrorBarPolicyConfigurable.java of project jchart2d, a basic 
  *  error bar policy implementation that allows configuration of 
  *  the dimension and direction error bars will be visible in. 
- *  Copyright (c) 2007 - 2011 Achim Westermann, created on 08.08.2006 08:05:54.
+ *  Copyright (c) 2007 - 2013 Achim Westermann, created on 08.08.2006 08:05:54.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

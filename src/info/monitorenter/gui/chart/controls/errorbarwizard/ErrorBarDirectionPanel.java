@@ -1,7 +1,7 @@
 /*
  *  ErrorBarDirectionPanel.java of project jchart2d, a panel 
  *  for selection of the directions of error bars. 
- *  Copyright (c) 2007 - 2011 Achim Westermann, created on 09:50:20.
+ *  Copyright (c) 2007 - 2013 Achim Westermann, created on 09:50:20.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

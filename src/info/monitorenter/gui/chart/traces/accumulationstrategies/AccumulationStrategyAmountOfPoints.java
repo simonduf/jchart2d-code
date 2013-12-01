@@ -1,7 +1,7 @@
 /*
  *  AccumulationStrategyAmountOfPoints.java of project jchart2d, accumulation strategy 
  *  that will add n consecutive points not caring about an order of the data. 
- *  Copyright (C) 2002 - 2011, Achim Westermann, created on Dec 11, 2011
+ *  Copyright (C) 2002 - 2013, Achim Westermann, created on Dec 11, 2011
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

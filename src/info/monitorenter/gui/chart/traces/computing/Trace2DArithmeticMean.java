@@ -2,7 +2,7 @@
  *  Trace2DArithmeticMean.java of project jchart2d, a trace 
  *  that accumulates the latest n points added to a single point with the arithmetic 
  *  mean value. 
- *  Copyright 2004 - 2011 (C) Achim Westermann.
+ *  Copyright 2004 - 2013 (C) Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

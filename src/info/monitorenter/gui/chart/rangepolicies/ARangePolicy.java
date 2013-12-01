@@ -2,7 +2,7 @@
  * AbstractRangePolicy.java of project jchart2d,  A default superclass for chart viewport 
  * implementations that adds support for setting and getting ranges.
  * 
- * Copyright (c) 2007 - 2011  Achim Westermann, Achim.Westermann@gmx.de
+ * Copyright (c) 2007 - 2013  Achim Westermann, Achim.Westermann@gmx.de
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

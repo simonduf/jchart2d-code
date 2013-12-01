@@ -1,6 +1,6 @@
 /*
  *  Trace2DActionAddRemoveHighlighter, action to set a Highlighter on an ITrace2D.
- *  Copyright (C) 2007 - 2011 Achim Westermann.
+ *  Copyright (C) 2007 - 2013 Achim Westermann.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

@@ -1,6 +1,6 @@
 /*
  *  TracePoint2DUtil.java of project jchart2d, <enterpurposehere>. 
- *  Copyright (C) 2002 - 2011, Achim Westermann, created on Nov 13, 2011
+ *  Copyright (C) 2002 - 2013, Achim Westermann, created on Nov 13, 2011
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

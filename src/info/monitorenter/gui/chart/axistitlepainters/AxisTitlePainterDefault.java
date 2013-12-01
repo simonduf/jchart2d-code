@@ -2,7 +2,7 @@
  *  AxisTitlePainterDafault.java of project jchart2d, an IAxisTitlePainter 
  *  that will render titles in a default way while adapting to x or y 
  *  axis use. 
- *  Copyright 2007 - 2011 (C) Achim Westermann, created on 04.08.2007 19:40:52.
+ *  Copyright 2007 - 2013 (C) Achim Westermann, created on 04.08.2007 19:40:52.
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

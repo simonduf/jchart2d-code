@@ -1,3 +1,25 @@
+/*
+ *  AAccumulationIterator.java of project jchart2d, an Iterator that decorates 
+ *  a given iterator by the feature of accumulation of points.
+ *  Copyright 2011 - 2013 (C) Achim Westermann.
+ *
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA*
+ *  If you modify or optimize the code in a useful way please let me know.
+ *  Achim.Westermann@gmx.de
+ *
+ */
 package info.monitorenter.gui.chart.traces.iterators;
 
 import info.monitorenter.gui.chart.IAccumulationFunction;
@@ -62,8 +84,9 @@ public abstract class AAccumulationIterator implements Iterator<ITracePoint2D> {
   private final IAccumulationStrategy.IAccumulationControl m_accumulationControl;
 
   /**
-   * Returns the termination criteria for each accumulation.<p>
-   *
+   * Returns the termination criteria for each accumulation.
+   * <p>
+   * 
    * @return the termination criteria for each accumulation.
    */
   protected IAccumulationStrategy.IAccumulationControl getAccumulationControl() {
@@ -104,8 +127,7 @@ public abstract class AAccumulationIterator implements Iterator<ITracePoint2D> {
    *          has to be been called before.
    * 
    */
-  public AAccumulationIterator(final ITrace2D originalTrace,
-      final IAccumulationFunction accumulationFunction,
+  public AAccumulationIterator(final ITrace2D originalTrace, final IAccumulationFunction accumulationFunction,
       final IAccumulationStrategy.IAccumulationControl accumulationControl) {
     this.m_originalTrace = originalTrace;
     this.m_accumulationFunction = accumulationFunction;
