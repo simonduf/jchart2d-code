@@ -646,7 +646,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
         String result = null;
         ITracePoint2D tracePoint = chart.translateMousePosition(me);
         if (tracePoint != null) {
-          StringBuffer buffer = new StringBuffer("X: ");
+          StringBuilder buffer = new StringBuilder("X: ");
           buffer.append(chart.getAxisX().getFormatter().format(tracePoint.getX())).append(" ");
           buffer.append("Y: ");
           buffer.append(chart.getAxisY().getFormatter().format(tracePoint.getY()));
@@ -674,7 +674,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
        */
       @Override
       public String getToolTipText(final Chart2D chart, final MouseEvent me) {
-        return "pixel, not implemented yet";
+        StringBuilder result = new StringBuilder("X: ");
+        result.append(me.getX());
+        result.append(", Y: ");
+        result.append(me.getY());
+        return result.toString();
       }
 
     },
@@ -1651,8 +1655,9 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    */
   private int calculateYChartStart(final Graphics2D g2d, final int labelHeight) {
     int result;
+    int axisLineWidth = 1;
     result = (int) this.getSize().getHeight();
-    result = result - labelHeight;
+    result = result - labelHeight-axisLineWidth;
     IAxis< ? > currentAxis;
     Iterator<IAxis< ? >> it = this.m_axesXBottom.iterator();
     while (it.hasNext()) {

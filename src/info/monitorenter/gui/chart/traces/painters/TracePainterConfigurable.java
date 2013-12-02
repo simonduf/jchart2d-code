@@ -1,27 +1,27 @@
 /*
- *  TracePainterConfigurable.java, an ITracePainter implementation 
- *  that works on a given IPointPainter.
- *  Copyright (c) 2004 - 2013 Achim Westermann, Achim.Westermann@gmx.de
- *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
+ * TracePainterConfigurable.java, an ITracePainter implementation that works on
+ * a given IPointPainter. Copyright (c) 2004 - 2013 Achim Westermann,
+ * Achim.Westermann@gmx.de
  * 
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
  * 
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
- *  If you modify or optimize the code in a useful way please let me know.
- *  Achim.Westermann@gmx.de
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ * 
+ * If you modify or optimize the code in a useful way please let me know.
+ * Achim.Westermann@gmx.de
  */
 package info.monitorenter.gui.chart.traces.painters;
- 
+
 import info.monitorenter.gui.chart.IPointPainter;
 import info.monitorenter.gui.chart.IPointPainterConfigurableUI;
 import info.monitorenter.gui.chart.ITracePoint2D;
@@ -34,19 +34,17 @@ import java.awt.Graphics;
  * is configurable by using the point painter to paint the trace (wrapper /
  * delegate).
  * <p>
- * Configure painting by first calling: 
- * <code>
+ * Configure painting by first calling: <code>
  * {@link TracePainterConfigurable#getPointPainter()}
  * </code>
  * 
- * and then: 
+ * and then:
  * 
  * <code>
  * {@link IPointPainterConfigurableUI#setColor(java.awt.Color)},
  * {@link IPointPainterConfigurableUI#setColorFill(java.awt.Color)} and
  * {@link IPointPainterConfigurableUI#setStroke(java.awt.Stroke)}
- * </code>
- * .
+ * </code> .
  * <p>
  * 
  * 
@@ -112,6 +110,10 @@ public class TracePainterConfigurable<T extends IPointPainterConfigurableUI<T>> 
 
   /**
    * @see java.lang.Comparable#compareTo(java.lang.Object)
+   * 
+   * @param o
+   *          the instance to compare oneself to.
+   * @return see super.
    */
   public final int compareTo(T o) {
     return this.m_pointPainter.compareTo(o);

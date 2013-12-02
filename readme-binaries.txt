@@ -67,7 +67,10 @@ jchart2d-3.3.0 - <month>, <day>, <year>
 * Fixed issue with empty scale in case LabelFormatterDate is used which does not format year month and day. 
 * Fixed broken TracePainterFill (NullpointerException). 
 * Fixed issue with dynamic charts with limited amount of values that ascend into y dimension: Lower bound would remain constant 
-  thus "shrinking" the trace and leaving an increasing empty gap.  
+  thus "shrinking" the trace and leaving an increasing empty gap.
+* Fixed unreported issue whith missing x axis line when
+    chart.getAxisX().setPaintScale(false);
+    chart.getAxisX().getAxisTitle().setTitle(null);
 ! Improved performance of ITracePoint.setLocation(double, double): This was O(n) where n was amount of points in a trace in any 
   case except boundary increase. Now it is only O(n) if an extremum was diminished via that method.   
 ! Introduced data accumulation API. This allows you to have traces with 10^6 points painted with increased speed while zooming in 
