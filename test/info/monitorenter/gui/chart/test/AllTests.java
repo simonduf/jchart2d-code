@@ -42,7 +42,6 @@ import org.junit.runners.Suite;
     info.monitorenter.gui.chart.demos.AllTests.class,
     info.monitorenter.gui.chart.errorbars.AllTests.class,
     info.monitorenter.gui.chart.labelformatters.AllTests.class,
-    info.monitorenter.gui.chart.layouts.AllTests.class,
     info.monitorenter.gui.chart.traces.AllTests.class,
     info.monitorenter.util.collections.AllTests.class })
 public final class AllTests {

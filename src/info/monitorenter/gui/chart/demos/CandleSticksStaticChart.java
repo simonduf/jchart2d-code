@@ -32,7 +32,6 @@ import info.monitorenter.gui.chart.tracepoints.CandleStick;
 import info.monitorenter.gui.chart.traces.Trace2DCandleSticks;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.traces.painters.TracePainterConfigurable;
-import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -95,7 +94,7 @@ public final class CandleSticksStaticChart extends JPanel {
   private CandleSticksStaticChart() {
     this.setLayout(new BorderLayout());
     this.m_chart = new Chart2D();
-    this.add(new ChartPanel(this.m_chart), BorderLayout.CENTER);
+    this.add(this.m_chart, BorderLayout.CENTER);
     this.m_chart.getAxisX().setFormatter(new LabelFormatterDate(new SimpleDateFormat("yyyy-MM-dd")));
 
   }

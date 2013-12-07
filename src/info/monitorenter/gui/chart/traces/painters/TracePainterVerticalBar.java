@@ -26,8 +26,6 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.pointpainters.PointPainterVerticalBar;
 
-import java.awt.Graphics;
-
 /**
  * Renders traces by painting a bar with selectable width for each
  * {@link ITracePoint2D} to show.

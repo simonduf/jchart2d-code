@@ -49,7 +49,7 @@
      <p>
       Now go to &lt;dir&gt; via the "cd" command and type. 
       <blockquote>
-       java -jar jchart2d-3.2.2.jar 
+       java -jar jchart2d-3.3.jar 
       </blockquote>
       The showcase example chart starts. 
      </p>
@@ -63,7 +63,7 @@
      <p>
       Another example with multithreaded traces may be viewed by typing: 
       <blockquote>
-       java -cp jchart2d-3.2.2.jar info.monitorenter.gui.chart.demos.MultiTracing
+       java -cp jchart2d-3.3.0.jar info.monitorenter.gui.chart.demos.MultiTracing
       </blockquote>
       You may resize the window and see how the scaling takes advantage of more space. 
       The command looks different to the first. This is because the first command tells 
@@ -71,19 +71,11 @@
       the name of the entry point (main class) is written. The 2<sup>nd</sup> command 
       tells plain-forward which class to start. 
      </p>
+     <h3>Dependencies (3rd party jars)</h3>
      <p>
-     If you want to use all features of JChart2D enabled (e.g. eps export) you have to include all libraries (*.jar files) from the 
-     binary distribution zip file in the class path of the java process. <br/>
-     For Windows type:  
-     <blockquote>
-       java -cp jchart2d-3.2.2.jar;xmlgraphics-commons-1.3.1.jar;jide-oss-2.9.7.jar info.monitorenter.gui.chart.demos.MultiTracing
-     </blockquote> 
-     For Linux type: 
-     <blockquote>
-       java -cp jchart2d-3.2.2.jar:xmlgraphics-commons-1.3.1.jar:jide-oss-2.9.7.jar info.monitorenter.gui.chart.demos.MultiTracing
-     </blockquote> 
+        Since jchart2d-3.3.0 there are no more dependencies to 3rd party libraries. 
+        The code that caused these has been migrated to the subproject jchart2d-uimenu. 
      </p>
-     
      <h3>Design</h3>
      <p>
       The framework is quite small, simple but clever. The 
@@ -100,14 +92,14 @@
       dimensional coordinate system. The chart ensures, that every point of 
       every trace it owns is displayed. It does this by finding the minimum maximum 
       bounds of both dimensions x and y and scales every point into it's 
-      display size. <br>
+      display size. <br/>
       A trace itself may only be contained in one chart [caused by synchronization requirements]. 
       It has it's own color, name and 
       policy of ordering the points that are added to it.  
       It even has a trace painter that allows different graphical representation 
       of the data points. By default a trace painter that interconnects the 
       data points with lines is used but dots, circles and filled polygon 
-      is currently supported. <br>
+      is currently supported. <br/>
       The interaction needed for rendering is a chain: The application code that 
       uses the API just adds a point to a trace. The trace then notifies it's chart 
       that it has changed. The chart then keeps this change in mind and will rescale and 

@@ -28,7 +28,7 @@ import info.monitorenter.gui.chart.test.ATestStackedJChart2D;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-
+ 
 /**
  * Junit test for <code>{@link info.monitorenter.gui.chart.Chart2D}</code>
  * implementations.

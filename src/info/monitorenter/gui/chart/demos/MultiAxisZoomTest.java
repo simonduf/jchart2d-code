@@ -30,7 +30,6 @@ import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
-import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -156,7 +155,7 @@ public class MultiAxisZoomTest
     chart.enablePointHighlighting(true);
 
     // Add chart to the pane
-    c.add(new ChartPanel(chart));
+    c.add(chart);
 
     // Create the zoomAll button
     JButton zoomAllButton = new JButton("Zoom All");

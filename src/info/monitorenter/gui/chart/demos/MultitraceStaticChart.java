@@ -28,7 +28,6 @@ import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
-import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -123,7 +122,7 @@ public final class MultitraceStaticChart
     }
 
     // Make it visible:
-    this.add(new ChartPanel(chart), BorderLayout.CENTER);
+    this.add(chart, BorderLayout.CENTER);
 
   }
 

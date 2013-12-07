@@ -38,8 +38,6 @@ import java.awt.Graphics2D;
 import java.util.LinkedList;
 import java.util.List;
 
-import sun.rmi.runtime.Log;
-
 /**
  * Very basic and fast scale policy implementation that ensures the following:
  * <ul>

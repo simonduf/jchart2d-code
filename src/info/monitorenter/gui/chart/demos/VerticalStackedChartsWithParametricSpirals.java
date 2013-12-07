@@ -5,7 +5,6 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ZoomableChart;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.traces.painters.TracePainterDisc;
-import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -44,8 +43,8 @@ public class VerticalStackedChartsWithParametricSpirals {
       charts[i].setUseAntialiasing(true);
     }
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-    panel.add(new ChartPanel(charts[0]));
-    panel.add(new ChartPanel(charts[1]));
+    panel.add(charts[0]);
+    panel.add(charts[1]);
 
     ITrace2D trace, trace2;
     trace = new Trace2DSimple();

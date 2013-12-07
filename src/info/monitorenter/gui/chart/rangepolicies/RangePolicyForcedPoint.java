@@ -43,7 +43,7 @@ public final class RangePolicyForcedPoint extends RangePolicyMinimumViewport {
    * <p>
    */
   public RangePolicyForcedPoint() {
-    super(new Range(0, 0));
+    this(0.0d);
   }
 
   /**

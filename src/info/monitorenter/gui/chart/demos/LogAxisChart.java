@@ -30,7 +30,6 @@ import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyTransformatio
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.traces.painters.TracePainterDisc;
-import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
@@ -89,7 +88,7 @@ public final class LogAxisChart {
     // Create a frame.
     JFrame frame = new JFrame(LogAxisChart.class.getName());
     // add the chart to the frame:
-    frame.getContentPane().add(new ChartPanel(chart));
+    frame.getContentPane().add(chart);
     frame.setSize(400, 300);
     // Enable the termination button [cross on the upper right edge]:
     frame.addWindowListener(new WindowAdapter() {

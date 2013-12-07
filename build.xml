@@ -155,13 +155,10 @@
 			<outjar name="${basedir}/${project.name}-${project.version}-shrinked.jar" />
 			<!-- Filter -->
 			<!-- keep all interfaces -->
-			<keep name="*" type="interface" />
-			<!-- keep all demos -->
-
-			<keep access="public" name="info.monitorenter.gui.chart.demos.*">
-				<method access="public static" name="main" />
-				<constructor />
+			<keep name="*" type="interface" >
+				<method name="*"/>
 			</keep>
+			<!-- keep the main package along with all methods -->
 			<keep access="public" name="info.monitorenter.gui.chart.*">
 				<method access="public" name="*" />
 				<constructor />
@@ -169,9 +166,23 @@
 			<!-- keep all error bar stuff -->
 			<keep access="public" name="info.monitorenter.gui.chart.errorbars.**">
 				<constructor />
+				<method name="*"/>
+			</keep>
+			<!-- keep all events  -->
+			<keep access="public" name="info.monitorenter.gui.chart.events.**">
+				<constructor />
+				<method name="*"/>
+			</keep>
+			<!-- keep all io  -->
+			<keep access="public" name="info.monitorenter.gui.chart.io.**">
+				<constructor />
+				<method name="*"/>
 			</keep>
 			<!-- keep all label formatters -->
 			<keep access="public" name="info.monitorenter.gui.chart.labelformatters.**">
+			</keep>
+			<!-- keep all axis scale policies -->
+			<keep access="public" name="info.monitorenter.gui.chart.axis.scalepolicy.**">
 			</keep>
 			<!-- keep all axis title painters -->
 			<keep access="public" name="info.monitorenter.gui.chart.axistitlepainters.**">
@@ -179,30 +190,50 @@
 			<!-- keep all axis tick painters -->
 			<keep access="public" name="info.monitorenter.gui.chart.axistickpainters.**">
 			</keep>
-			<!-- keep all point painters -->
+			<!-- keep all point painters and their constructors.  -->
 			<keep access="public" name="info.monitorenter.gui.chart.pointpainters.**">
+				<constructor access="public"/>
 			</keep>
-			<!-- keep all range policies -->
+			<!-- keep all range policies and their constructors. -->
 			<keep access="public" name="info.monitorenter.gui.chart.rangepolicies.**">
+				<constructor access="public"/>
 			</keep>
-			<!-- keep all constructors for traces -->
+			<!-- keep all  traces and their constructors and methods -->
 			<keep name="info.monitorenter.gui.chart.traces.*">
-				<constructor />
+				<constructor access="public"/>
+				<constructor name="*"/>
 			</keep>
-			<!-- keep all computing traces -->
+			<!-- keep all computing traces and their constructors-->
 			<keep access="public" name="info.monitorenter.gui.chart.traces.computing.*">
+				<constructor access="public"/>
 			</keep>
-			<!-- keep all trace painters -->
+			<!-- keep all trace painters, especially constructors -->
 			<keep access="public" name="info.monitorenter.gui.chart.traces.painters.*">
+				<constructor name="*"/>
 			</keep>
-			<!-- keep all IAxis implementations -->
+			<!-- keep all  dialogs, especially constructors -->
+			<keep access="public" name="info.monitorenter.gui.chart.dialogs.*">
+				<constructor name="*"/>
+				<method access="public" name="*"/>
+			</keep>
+			
+			<!-- keep all IAxis implementations and their methods -->
 			<keep name="info.monitorenter.gui.chart.axis.*">
+				<method access="public" name="*"/>
 			</keep>
-			<!-- keep all utility classes -->
+			<!-- keep all utility classes and their methods -->
 			<keep name="info.monitorenter.util.*">
+				<method access="public" name="*"/>
 			</keep>
+			<!-- keep all math utility classes and their methods -->
+			<keep name="info.monitorenter.util.math.*">
+				<method access="public" name="*"/>
+			</keep>
+			<!-- keep all gui utility classes and their methods -->
 			<keep name="info.monitorenter.gui.util.*">
+				<method access="public" name="*"/>
 			</keep>
+			
 			<!-- keep all getters, setters and constants of classes that are preserved -->
 			<keepclassmembers>
 				<method name="get*" />

@@ -35,7 +35,6 @@ import info.monitorenter.gui.chart.labelformatters.LabelFormatterNumber;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyMinimumViewport;
 import info.monitorenter.gui.chart.traces.Trace2DAxisSwap;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
-import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.util.Range;
 
 import java.awt.BasicStroke;
@@ -117,7 +116,7 @@ public final class AdvancedDynamicChart {
     // Create a frame.
     JFrame frame = new JFrame("AdvancedDynamicChart");
     // add the chart to the frame:
-    frame.getContentPane().add(new ChartPanel(chart));
+    frame.getContentPane().add(chart);
     frame.setSize(400, 300);
     // Enable the termination button [cross on the upper right edge]:
     frame.addWindowListener(new WindowAdapter() {

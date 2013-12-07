@@ -1,35 +1,32 @@
 /*
- *  Showcase.java, the main demo application of project jchart2d.
- *  Copyright (C) 2007 - 2013 Achim Westermann, created on 10.12.2004, 13:48:55
- *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
+ * Showcase.java, the main demo application of project jchart2d. Copyright (C)
+ * 2007 - 2013 Achim Westermann, created on 10.12.2004, 13:48:55
  * 
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
  * 
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
- *  If you modify or optimize the code in a useful way please let me know.
- *  Achim.Westermann@gmx.de
- *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ * 
+ * If you modify or optimize the code in a useful way please let me know.
+ * Achim.Westermann@gmx.de
  */
 package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
-import info.monitorenter.gui.chart.controls.LayoutFactory;
 import info.monitorenter.gui.chart.events.Chart2DActionSaveImageSingleton;
 import info.monitorenter.gui.chart.io.ADataCollector;
 import info.monitorenter.gui.chart.io.RandomDataCollectorOffset;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyMinimumViewport;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
-import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.util.Range;
 
 import java.awt.Color;
@@ -66,8 +63,7 @@ import javax.swing.event.ChangeListener;
  * @version $Revision: 1.15 $
  * 
  */
-public final class Showcase
-    extends JApplet { 
+public final class Showcase extends JApplet {
 
   /**
    * Panel with controls for the chart.
@@ -78,8 +74,7 @@ public final class Showcase
    * 
    * @version $Revision: 1.15 $
    */
-  final class ControlPanel
-      extends JPanel {
+  final class ControlPanel extends JPanel {
     /**
      * Generated for <code>serialVersionUID</code>.
      */
@@ -160,8 +155,8 @@ public final class Showcase
       this.m_amountPointsSlider.setMinorTickSpacing(20);
       this.m_amountPointsSlider.setSnapToTicks(true);
       this.m_amountPointsSlider.setPaintLabels(true);
-      this.m_amountPointsSlider.setBorder(BorderFactory.createTitledBorder(BorderFactory
-          .createEtchedBorder(), "Amount of points.", TitledBorder.LEFT, TitledBorder.BELOW_TOP));
+      this.m_amountPointsSlider.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Amount of points.", TitledBorder.LEFT,
+          TitledBorder.BELOW_TOP));
       this.m_amountPointsSlider.setPaintTicks(true);
       this.m_amountPointsSlider.addChangeListener(new ChangeListener() {
         public void stateChanged(final ChangeEvent e) {
@@ -209,8 +204,7 @@ public final class Showcase
        * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
        * @version $Revision: 1.15 $
        */
-      final class ColorItem
-          extends Color {
+      final class ColorItem extends Color {
         /**
          * Generated <code>serialVersionUID</code>.
          */
@@ -280,8 +274,7 @@ public final class Showcase
       this.m_latencyTimeSlider.setMinorTickSpacing(10);
       this.m_latencyTimeSlider.setSnapToTicks(true);
       this.m_latencyTimeSlider.setPaintLabels(true);
-      this.m_latencyTimeSlider.setBorder(BorderFactory.createTitledBorder(BorderFactory
-          .createEtchedBorder(), "Latency for adding points.", TitledBorder.LEFT,
+      this.m_latencyTimeSlider.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Latency for adding points.", TitledBorder.LEFT,
           TitledBorder.BELOW_TOP));
       this.m_latencyTimeSlider.setPaintTicks(true);
 
@@ -303,8 +296,7 @@ public final class Showcase
      */
     private void createSnapShotButton() {
       // the button for snapshot:
-      this.m_snapshot = new JButton(Chart2DActionSaveImageSingleton.getInstance(
-          Showcase.this.m_chart, "Save image"));
+      this.m_snapshot = new JButton(Chart2DActionSaveImageSingleton.getInstance(Showcase.this.m_chart, "Save image"));
       this.m_snapshot.setBackground(Color.WHITE);
     }
 
@@ -441,13 +433,9 @@ public final class Showcase
     chart.addTrace(this.getTrace());
     Container content = this.getContentPane();
     content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-    LayoutFactory factory = LayoutFactory.getInstance();
-    ChartPanel chartpanel = new ChartPanel(chart);
 
-    this.setJMenuBar(factory.createChartMenuBar(chartpanel, false));
-
-    content.add(chartpanel);
-    content.addPropertyChangeListener(chartpanel);
+    content.add(chart);
+    content.addPropertyChangeListener(chart);
     this.setCollector(new RandomDataCollectorOffset(this.getTrace(), 50));
     content.add(new ControlPanel());
   }

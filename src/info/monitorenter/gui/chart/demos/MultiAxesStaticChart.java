@@ -31,7 +31,6 @@ import info.monitorenter.gui.chart.ITracePointProvider;
 import info.monitorenter.gui.chart.axis.AAxis;
 import info.monitorenter.gui.chart.axis.AxisLinear;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
-import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -180,7 +179,7 @@ public final class MultiAxesStaticChart extends JPanel {
     }
 
     // Make it visible:
-    this.add(new ChartPanel(chart), BorderLayout.CENTER);
+    this.add(chart, BorderLayout.CENTER);
 
   }
 

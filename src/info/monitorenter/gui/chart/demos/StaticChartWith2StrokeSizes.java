@@ -31,7 +31,6 @@ import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyManualTicks;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterNumber;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
-import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.util.Range;
 
 import java.awt.BasicStroke;
@@ -143,7 +142,7 @@ public final class StaticChartWith2StrokeSizes extends JPanel {
     chart.getAxisX().setPaintScale(false);
 
     // Make it visible:
-    this.add(new ChartPanel(chart), BorderLayout.CENTER);
+    this.add(chart, BorderLayout.CENTER);
 
   }
 

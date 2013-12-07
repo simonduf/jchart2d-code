@@ -34,7 +34,6 @@ import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.traces.painters.TracePainterVerticalBar;
-import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.util.Range;
 
 import java.awt.BasicStroke;
@@ -144,7 +143,7 @@ public final class AdvancedStaticChart {
     // Create a frame.
     JFrame frame = new JFrame("AdvancedStaticChart");
     // add the chart to the frame:
-    frame.getContentPane().add(new ChartPanel(chart));
+    frame.getContentPane().add(chart);
     frame.setSize(600, 600);
     // Enable the termination button [cross on the upper right edge]:
     frame.addWindowListener(new WindowAdapter() {

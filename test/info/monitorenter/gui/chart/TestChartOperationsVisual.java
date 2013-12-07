@@ -31,6 +31,7 @@ import java.util.SortedSet;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+
 /**
  * Visual test of operations upon the chart with basic ui for human judgement of
  * success or failure.

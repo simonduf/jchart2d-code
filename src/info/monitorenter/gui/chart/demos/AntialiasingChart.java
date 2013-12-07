@@ -28,7 +28,6 @@ import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyMinimumViewport;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.gui.chart.traces.painters.TracePainterPolyline;
-import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.reflection.ObjRecorder2Trace2DAdapter;
 import info.monitorenter.util.Range;
 
@@ -198,6 +197,6 @@ public class AntialiasingChart extends JFrame {
     });
     Container contentPane = this.getContentPane();
     contentPane.setLayout(new BorderLayout());
-    contentPane.add(new ChartPanel(this.m_chart), BorderLayout.CENTER);
+    contentPane.add(this.m_chart, BorderLayout.CENTER);
   }
 }

@@ -27,7 +27,6 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.io.AStaticDataCollector;
 import info.monitorenter.gui.chart.io.PropertyFileStaticDataCollector;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
-import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.util.StringUtil;
 
 import java.awt.BorderLayout;
@@ -138,7 +137,7 @@ public class StaticCollectorChart extends JPanel {
 		datacollector.collectData();
 
 		// Make it visible:
-		this.add(new ChartPanel(this.m_chart), BorderLayout.CENTER);
+		this.add(this.m_chart, BorderLayout.CENTER);
 
 	}
 

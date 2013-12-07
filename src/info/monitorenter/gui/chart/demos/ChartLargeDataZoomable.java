@@ -28,7 +28,6 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ZoomableChart;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
-import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.Color;
 import java.awt.event.WindowAdapter;
@@ -79,7 +78,7 @@ public final class ChartLargeDataZoomable {
     // Create a frame.
     JFrame frame = new JFrame("MinimalStaticChartLargeData");
     // add the chart to the frame:
-    frame.getContentPane().add(new ChartPanel(chart));
+    frame.getContentPane().add(chart);
     frame.setSize(800, 600);
     // Enable the termination button [cross on the upper right edge]:
     frame.addWindowListener(new WindowAdapter() {

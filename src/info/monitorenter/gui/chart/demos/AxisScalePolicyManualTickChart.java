@@ -31,7 +31,6 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyManualTicks;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
-import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.util.Range;
 
 import java.awt.BorderLayout;
@@ -133,7 +132,7 @@ public final class AxisScalePolicyManualTickChart extends JPanel {
     chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
 
     // Make it visible:
-    this.add(new ChartPanel(chart), BorderLayout.CENTER);
+    this.add(chart, BorderLayout.CENTER);
 
   }
   

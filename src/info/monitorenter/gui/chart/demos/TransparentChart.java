@@ -27,7 +27,6 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.ITracePainter;
 import info.monitorenter.gui.chart.traces.Trace2DLtd;
 import info.monitorenter.gui.chart.traces.painters.TracePainterPolyline;
-import info.monitorenter.gui.chart.views.ChartPanel;
 import info.monitorenter.reflection.ObjRecorder2Trace2DAdapter;
 
 import java.awt.BasicStroke;
@@ -205,6 +204,6 @@ public class TransparentChart extends JFrame {
     });
     Container contentPane = this.getContentPane();
     contentPane.setLayout(new BorderLayout());
-    contentPane.add(new ChartPanel(this.m_chart), BorderLayout.CENTER);
+    contentPane.add(this.m_chart, BorderLayout.CENTER);
   }
 }

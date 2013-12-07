@@ -12,15 +12,14 @@ Use this library for integration of charts into your Java application.
 To just view a chart open a shell (under windows cmd, penguins
 will know), cd to the directory you downloaded this file to 
 and type 
-"java - jar jchart2d-3.2.1.jar". 
+"java - jar jchart2d-3.3.0.jar". 
 You may also want to look at other demos. The may be launched by typing 
 "java -cp <jarfilelist> <fullyqualifiedclassname>". 
-E.g.: "java -cp jchart2d-3.2.1.jar  info.monitorenter.gui.chart.demos.MinimalDynamicChart".
-For full support (eps output, range chooser) also incorporate the 3rd party libraries to the 
-classplath: 
-linux: "java -cp jchart2d-3.2.1.jar:xmlgraphics-commons-1.3.1.jar: info.monitorenter.gui.chart.demos.AdvancedDynamicChart" 
-Windows: "java -cp jchart2d-3.2.1.jar;xmlgraphics-commons-1.3.1.jar; info.monitorenter.gui.chart.demos.AdvancedDynamicChart" 
+E.g.: "java -cp jchart2d-3.3.0.jar  info.monitorenter.gui.chart.demos.MinimalDynamicChart".
 
+No further jar files are required. Have a look at the subproject jchart2d-uimenu for 
+support of graphical interfaces. The code was formerly distributed with jchart2d but caused 
+dependencies to 3rd party libraries.  
 
 History of changes for the jchart2d project.
 
@@ -96,6 +95,7 @@ jchart2d-3.3.0 - <month>, <day>, <year>
 ! Improved point highlighting for candle sticks. 
 ! Improved tool tip texts for candle sticks. 
 ! Incorporated text antialiasing (Feature #61). 
+! Feature request #67: Split demo code into separate jar file. Or: remove any dependency from 3rd party libraries (with different license). 
 o Changed policy of Chart2D.translateMousePosition(final MouseEvent mouseEvent). Before this the translation was done into the values 
   covered by the first x and y axes. By now the translation is related to the axes of the trace of the nearest point to the given 
   mouse event. 

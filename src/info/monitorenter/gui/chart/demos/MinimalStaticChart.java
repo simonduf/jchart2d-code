@@ -29,7 +29,6 @@ import info.monitorenter.gui.chart.rangepolicies.RangePolicyMargin;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
 import info.monitorenter.gui.chart.traces.painters.TracePainterDisc;
 import info.monitorenter.gui.chart.traces.painters.TracePainterLine;
-import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -117,7 +116,7 @@ public final class MinimalStaticChart extends JPanel {
     
 //    chart.setToolTipType(Chart2D.ToolTipType.PIXEL);
     // Make it visible:
-    this.add(new ChartPanel(chart), BorderLayout.CENTER);
+    this.add(chart, BorderLayout.CENTER);
 
   }
 

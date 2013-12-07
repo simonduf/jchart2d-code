@@ -31,7 +31,6 @@ import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyTransformatio
 import info.monitorenter.gui.chart.errorbars.ErrorBarPainter;
 import info.monitorenter.gui.chart.errorbars.ErrorBarPolicyAbsoluteSummation;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
-import info.monitorenter.gui.chart.views.ChartPanel;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -139,7 +138,7 @@ public class ZoomChartWithErrorBarsAndLogAxis extends JFrame {
     }
 
     // Add chart to the pane
-    c.add(new ChartPanel(chart));
+    c.add(chart);
 
     // Create the zoomAll button
     JButton zoomAllButton = new JButton("Zoom All");
