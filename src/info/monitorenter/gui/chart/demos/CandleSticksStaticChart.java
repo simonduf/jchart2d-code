@@ -1,7 +1,6 @@
 /*
- * MinimalStaticChart.java of project jchart2d, a demonstration of the minimal
- * code to set up a chart with static data. Copyright (C) 2007 - 2013 Achim
- * Westermann, created on 10.12.2004, 13:48:55
+ * CandleSticksStaticChart.java of project jchart2d, a demonstration of using
+ * candlesticks Copyright (C) 2013 Achim Westermann.
  * 
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -27,6 +26,7 @@ import info.monitorenter.gui.chart.IPointPainterCandleStick;
 import info.monitorenter.gui.chart.IPointPainterConfigurableUI;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterDate;
+import info.monitorenter.gui.chart.pointpainters.PointPainterCandleStick;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.tracepoints.CandleStick;
 import info.monitorenter.gui.chart.traces.Trace2DCandleSticks;
@@ -46,10 +46,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
- * Title: MinimalStaticChart
- * <p>
- * 
- * Description: A minimal example for rendering a static chart.
+ * A demonstration of using {@link Trace2DCandleSticks} and 
+ * {@link PointPainterCandleStick}
  * <p>
  * 
  * @author Achim Westermann
