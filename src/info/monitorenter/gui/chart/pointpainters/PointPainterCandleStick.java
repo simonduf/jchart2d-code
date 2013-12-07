@@ -17,11 +17,6 @@
  *
  *  If you modify or optimize the code in a useful way please let me know.
  *  Achim.Westermann@gmx.de
- *
- *
- * File   : $Source: /cvsroot/jchart2d/jchart2d/codetemplates.xml,v $
- * Date   : $Date: 2009/02/24 16:45:41 $
- * Version: $Revision: 1.2 $
  */
 
 package info.monitorenter.gui.chart.pointpainters;
@@ -33,11 +28,14 @@ import info.monitorenter.gui.chart.ITracePoint2D;
 import info.monitorenter.gui.chart.tracepoints.CandleStick;
 import info.monitorenter.gui.util.TracePoint2DUtil;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
 
 /**
- * A special point painter that will only be useable to render instances of
+ * A special point painter that will only be useful to render instances of
  * {@link CandleStick}.
  * <p>
  * 
@@ -45,13 +43,10 @@ import java.awt.Graphics;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  */
-public class PointPainterCandleStick extends APointPainter<PointPainterCandleStick> {
+public class PointPainterCandleStick extends APointPainterCandleStick<PointPainterCandleStick>  {
 
   /** Generated <code>serialVersionUID</code>. **/
   private static final long serialVersionUID = -6708238540093878572L;
-
-  /** The width of the candlestick. */
-  private int m_width;
 
   /**
    * Constructor taking the width in pixels.
@@ -61,8 +56,9 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
    *          the width of the {@link CandleStick} in pixels.
    **/
   public PointPainterCandleStick(final int width) {
-    this.m_width = width;
+    this.setWidth(width);
   }
+
 
   /**
    * @see info.monitorenter.gui.chart.IPointPainter#calculateMaxX(info.monitorenter.gui.chart.ITracePoint2D)
@@ -117,49 +113,9 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
     // nop
   }
 
-  /**
-   * @see java.lang.Object#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    PointPainterCandleStick other = (PointPainterCandleStick) obj;
-    if (Double.doubleToLongBits(this.m_width) != Double.doubleToLongBits(other.m_width)) {
-      return false;
-    }
-    return true;
-  }
 
-  /**
-   * Returns the width.
-   * <p>
-   * 
-   * @return the width.
-   */
-  public int getWidth() {
-    return this.m_width;
-  }
 
-  /**
-   * @see java.lang.Object#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    long temp;
-    temp = Double.doubleToLongBits(this.m_width);
-    result = prime * result + (int) (temp ^ (temp >>> 32));
-    return result;
-  }
+
 
   /**
    * @see info.monitorenter.gui.chart.IPointPainter#isAdditionalSpaceRequiredX()
@@ -251,11 +207,16 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
            * 2. upper wick
            */
           g.drawLine((int) x, (int) startYPx, (int) x, (int) highYPx);
+          if(this.isDrawUpperWickDash()) {
+            g.drawLine((int) x - this.getWidth() / 2, (int) highYPx, (int) x+this.getWidth() /2, (int) highYPx);
+          }
           /*
            * 2. lower wick
            */
           g.drawLine((int) x, (int) endYPx, (int) x, (int) lowYPx);
-          g.setColor(backupColor);
+          if(this.isDrawUpperWickDash()) {
+            g.drawLine((int) x - this.getWidth() / 2, (int) lowYPx, (int) x+this.getWidth() /2, (int) lowYPx);
+          }
         } else {
 
           /*
@@ -269,12 +230,18 @@ public class PointPainterCandleStick extends APointPainter<PointPainterCandleSti
            * 2. upper wick
            */
           g.drawLine((int) x, (int) endYPx, (int) x, (int) highYPx);
+          if(this.isDrawUpperWickDash()) {
+            g.drawLine((int) x - this.getWidth() / 2, (int) highYPx, (int) x+this.getWidth() /2, (int) highYPx);
+          }
           /*
            * 2. lower wick
            */
           g.drawLine((int) x, (int) startYPx, (int) x, (int) lowYPx);
-          g.setColor(backupColor);
+          if(this.isDrawLowerWickDash()) {
+            g.drawLine((int) x - this.getWidth() / 2, (int) lowYPx, (int) x+this.getWidth() /2, (int) lowYPx);
+          }
         }
+        g.setColor(backupColor);
 
       }
     }

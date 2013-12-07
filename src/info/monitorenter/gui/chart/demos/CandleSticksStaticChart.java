@@ -1,29 +1,29 @@
 /*
- *  MinimalStaticChart.java of project jchart2d, a demonstration 
- *  of the minimal code to set up a chart with static data. 
- *  Copyright (C) 2007 - 2013 Achim Westermann, created on 10.12.2004, 13:48:55
- *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
+ * MinimalStaticChart.java of project jchart2d, a demonstration of the minimal
+ * code to set up a chart with static data. Copyright (C) 2007 - 2013 Achim
+ * Westermann, created on 10.12.2004, 13:48:55
  * 
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
  * 
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
- *  If you modify or optimize the code in a useful way please let me know.
- *  Achim.Westermann@gmx.de
- *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ * 
+ * If you modify or optimize the code in a useful way please let me know.
+ * Achim.Westermann@gmx.de
  */
 package info.monitorenter.gui.chart.demos;
 
 import info.monitorenter.gui.chart.Chart2D;
+import info.monitorenter.gui.chart.IPointPainterCandleStick;
 import info.monitorenter.gui.chart.IPointPainterConfigurableUI;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.labelformatters.LabelFormatterDate;
@@ -89,7 +89,6 @@ public final class CandleSticksStaticChart extends JPanel {
     stickChart.fill();
     frame.setVisible(true);
 
-    
   }
 
   /**
@@ -100,7 +99,7 @@ public final class CandleSticksStaticChart extends JPanel {
     this.m_chart = new Chart2D();
     this.add(new ChartPanel(this.m_chart), BorderLayout.CENTER);
     this.m_chart.getAxisX().setFormatter(new LabelFormatterDate(new SimpleDateFormat("yyyy-MM-dd")));
-    
+
   }
 
   private Chart2D m_chart;
@@ -111,20 +110,24 @@ public final class CandleSticksStaticChart extends JPanel {
     ITrace2D trace = new Trace2DCandleSticks(new Trace2DSimple(), 6);
     // Add the trace to the chart:
     this.m_chart.addTrace(trace);
-    
-    // Point highlighting: 
-    IPointPainterConfigurableUI<?> pointHighlighter = new PointPainterDisc(10);
+
+    // Point highlighting:
+    IPointPainterConfigurableUI< ? > pointHighlighter = new PointPainterDisc(10);
     pointHighlighter.setColor(Color.red);
     trace.setPointHighlighter(pointHighlighter);
     this.m_chart.enablePointHighlighting(true);
 
-    // Fiddling with colours: 
-    TracePainterConfigurable<?> painter = (TracePainterConfigurable<?>)trace.getTracePainters().iterator().next();
-    IPointPainterConfigurableUI<?> pointPainter = painter.getPointPainter();
+    // Fiddling with colours:
+    TracePainterConfigurable< ? > painter = (TracePainterConfigurable< ? >) trace.getTracePainters().iterator().next();
+    IPointPainterConfigurableUI< ? > pointPainter = painter.getPointPainter();
     pointPainter.setColor(Color.RED);
     pointPainter.setColorFill(Color.BLUE);
     pointPainter.setTransparencyFill(100);
     pointPainter.setTransparency(200);
+    // Special for candlestick painter:
+    IPointPainterCandleStick< ? > downCast = (IPointPainterCandleStick< ? >) pointPainter;
+    downCast.setDrawLowerWickDash(true);
+    downCast.setDrawUpperWickDash(true);
 
     // Add all points, as it is static:
     Calendar cal = Calendar.getInstance();
