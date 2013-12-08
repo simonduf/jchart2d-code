@@ -3482,7 +3482,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       } else if (property.equals(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY_ACCUMULATION_FUNCTION_CHANGED)) {
         // repaint
       } else {
-        throw new IllegalStateException("Received a property change event \"" + property + "\" the code is not expecting (programming error).");
+        throw new IllegalStateException("Received a property change event \"" + property + "\" the code is not expecting (programming error). Event: "+evt);
       }
       this.setRequestedRepaint(true);
     }
