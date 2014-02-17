@@ -96,6 +96,8 @@ jchart2d-3.3.0 - <month>, <day>, <year>
 ! Improved tool tip texts for candle sticks. 
 ! Incorporated text antialiasing (Feature #61). 
 ! Feature request #67: Split demo code into separate jar file. Or: remove any dependency from 3rd party libraries (with different license). 
+! Changed TooltipType.VALUE_SNAP_TO_TRACEPOINTS to show "<xAxisTitle>: <xAxisValueFormatted>; <yAxisTitle>: <yAxisValueFormatted>" 
+  vs. "X: <xAxisValueFormatted>; Y: <yAxisValueFormatted>".
 o Changed policy of Chart2D.translateMousePosition(final MouseEvent mouseEvent). Before this the translation was done into the values 
   covered by the first x and y axes. By now the translation is related to the axes of the trace of the nearest point to the given 
   mouse event. 
