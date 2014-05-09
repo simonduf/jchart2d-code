@@ -71,7 +71,6 @@ public final class AdvancedStaticChart {
   public static void main(final String[] args) throws ParseException {
     // Create a chart:
     Chart2D chart = new Chart2D();
-    chart.setGridStroke(new BasicStroke(3.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] {10.0f }, 0.0f));
 
     // Obtain the basic default axes:
     IAxis< ? > axisX = chart.getAxisX();
@@ -81,6 +80,17 @@ public final class AdvancedStaticChart {
     chart.setGridColor(Color.LIGHT_GRAY);
     axisX.setPaintGrid(true);
     axisY.setPaintGrid(true);
+    axisX.setStartMajorTick(true);
+    axisX.setMajorTickSpacing(10);
+    axisX.setMinorTickSpacing(1);
+    
+    axisY.setStartMajorTick(true);
+    // 5 minutes
+    axisY.setMajorTickSpacing(1000*60*5);
+    // 1 minute
+    axisY.setMinorTickSpacing(1000*60);
+    chart.setMinorGridStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] {10.0f }, 0.0f));
+    chart.setMajorGridStroke(new BasicStroke(3.0f));
 
     // Create an ITrace:
     ITrace2D trace = new Trace2DSimple();
@@ -111,10 +121,10 @@ public final class AdvancedStaticChart {
     axisTitle.setTitleFont(titleFont);
 
     // Feature: range policy for axis.
-    axisX.setRangePolicy(new RangePolicyFixedViewport(new Range(0, 220)));
+    axisX.setRangePolicy(new RangePolicyFixedViewport(new Range(0, 200)));
 
     // Feature: turn on tool tips (recommended for use in static mode only):
-    chart.setToolTipType(Chart2D.ToolTipType.VALUE_SNAP_TO_TRACEPOINTS);
+    chart.setToolTipType(Chart2D.ToolTipType.DATAVALUES);
 
     // Feature: turn on highlighting: Two steps enable it on the chart and set a
     // highlighter for the trace:
@@ -127,7 +137,7 @@ public final class AdvancedStaticChart {
     double high = System.currentTimeMillis();
     for (double i = 0; i < 20; i++) {
       trace.addPoint(i * 10, high);
-      high += 1000 * 50;
+      high += 1000 * 60;
 
     }
 
@@ -144,7 +154,7 @@ public final class AdvancedStaticChart {
     JFrame frame = new JFrame("AdvancedStaticChart");
     // add the chart to the frame:
     frame.getContentPane().add(chart);
-    frame.setSize(600, 600);
+    frame.setSize(1600,600);
     // Enable the termination button [cross on the upper right edge]:
     frame.addWindowListener(new WindowAdapter() {
       /**
