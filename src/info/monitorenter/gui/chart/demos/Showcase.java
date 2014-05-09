@@ -435,7 +435,6 @@ public final class Showcase extends JApplet {
     content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 
     content.add(chart);
-    content.addPropertyChangeListener(chart);
     this.setCollector(new RandomDataCollectorOffset(this.getTrace(), 50));
     content.add(new ControlPanel());
   }
