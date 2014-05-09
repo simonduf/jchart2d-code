@@ -315,8 +315,8 @@ public class TracePoint2D extends Point2D.Double implements ITracePoint2D {
     IAxis< ? > xAxis = TracePoint2DUtil.getAxisXOfTracePoint(this);
     IAxis< ? > yAxis = TracePoint2DUtil.getAxisYOfTracePoint(this);
     StringBuffer buffer = new StringBuffer(xAxis.getAxisTitle().getTitle()).append(": ");
-    buffer.append(xAxis.getFormatter().format(this.getX())).append(" ");
-    buffer.append(", ").append(yAxis.getAxisTitle().getTitle()).append(": ");
+    buffer.append(xAxis.getFormatter().format(this.getX())).append("\n");
+    buffer.append(yAxis.getAxisTitle().getTitle()).append(": ");
     buffer.append(yAxis.getFormatter().format(this.getY()));
     result = buffer.toString();
     return result;
