@@ -1,25 +1,24 @@
 /*
- *  LabelFormatterNumber.java of jchart2d, a label formatter that 
- *  formats the labels with a number format. 
- *  Copyright (C) 2005 - 2013 Achim Westermann, created on 20.04.2005, 22:34:16
- *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
+ * LabelFormatterNumber.java of jchart2d, a label formatter that formats the
+ * labels with a number format. Copyright (C) 2005 - 2013 Achim Westermann,
+ * created on 20.04.2005, 22:34:16
  * 
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
  * 
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
- *  If you modify or optimize the code in a useful way please let me know.
- *  Achim.Westermann@gmx.de
- *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ * 
+ * If you modify or optimize the code in a useful way please let me know.
+ * Achim.Westermann@gmx.de
  */
 package info.monitorenter.gui.chart.labelformatters;
 
@@ -104,8 +103,7 @@ public class LabelFormatterNumber extends ALabelFormatter implements IAxisLabelF
       return false;
     }
     final LabelFormatterNumber other = (LabelFormatterNumber) obj;
-    if (Double.doubleToLongBits(this.m_cachedMinValueShift) != Double
-        .doubleToLongBits(other.m_cachedMinValueShift)) {
+    if (Double.doubleToLongBits(this.m_cachedMinValueShift) != Double.doubleToLongBits(other.m_cachedMinValueShift)) {
       return false;
     }
     if (this.m_numberFormat == null) {
@@ -136,86 +134,94 @@ public class LabelFormatterNumber extends ALabelFormatter implements IAxisLabelF
 
     // Test start:
     int result;
-//    final int maxMaxLength = this.format(this.getAxis().getMax()).length();
-//    final int minMaxLength = this.format(this.getAxis().getMin()).length();
-//    result = Math.max(maxMaxLength, minMaxLength);
-//    // add max fraction digits:
-//    result += this.m_numberFormat.getMaximumFractionDigits();
-//    return result;
-//
-//    // Test end:
+    // final int maxMaxLength = this.format(this.getAxis().getMax()).length();
+    // final int minMaxLength = this.format(this.getAxis().getMin()).length();
+    // result = Math.max(maxMaxLength, minMaxLength);
+    // // add max fraction digits:
+    // result += this.m_numberFormat.getMaximumFractionDigits();
+    // return result;
+    //
+    // // Test end:
 
     // find the fractions by using range information:
-     int fractionDigits = 0;
-     Range range = this.getAxis().getRange();
-     double dRange = range.getExtent();
-     if (dRange < 1) {
-     if (dRange == 0) {
-     fractionDigits = 1;
-     } else {
-     if (dRange == 0) {
-     fractionDigits = 1;
-     } else {
-     // find the power
-     while (dRange < 1) {
-     dRange *= 10;
-     fractionDigits++;
-     }
-     }
-     }
-     } else {
-     if (dRange < 10) {
-     fractionDigits = 2;
-     } else if (dRange < 100) {
-     fractionDigits = 1;
-     } else {
-     fractionDigits = 0;
-     }
-     }
-    
-     // find integer digits by using longest value:
-     int integerDigits = 0;
-     double max = range.getMax();
-     double min = Math.abs(range.getMin());
-     if (max == 0 && min == 0) {
-     integerDigits = 1;
-     } else if (max < min) {
-     while (min > 1) {
-     min /= 10;
-     integerDigits++;
-     }
-     } else {
-     while (max > 1) {
-     max /= 10;
-     integerDigits++;
-     }
-     }
-    
-     // check if the internal numberformat would cut values and cause endering.
-     // errors:
-     if (integerDigits > this.m_numberFormat.getMaximumIntegerDigits()) {
-     this.m_numberFormat.setMaximumIntegerDigits(integerDigits);
-     }
-     if (fractionDigits > this.m_numberFormat.getMaximumFractionDigits()) {
-     this.m_numberFormat.setMaximumFractionDigits(fractionDigits);
-     }
-    
-     // check if the internal numberformat will format bigger numbers than the
-     // computed ones thus causing labels overwriting the y axis or each other
-     // for the x axis:
-    
-     int minFractionDigits = this.m_numberFormat.getMinimumFractionDigits();
-     int minIntegerDigits = this.m_numberFormat.getMinimumIntegerDigits();
-     if (minFractionDigits > fractionDigits) {
-     fractionDigits = minFractionDigits;
-     }
-     if (minIntegerDigits > integerDigits) {
-     integerDigits = minFractionDigits;
-     }
-    
-     // <sign> integerDigits <dot> fractionDigits:
-     result = 1 + integerDigits + 1 + fractionDigits;
-     return result;
+    int fractionDigits = 0;
+    Range range = this.getAxis().getRange();
+    double dRange = range.getExtent();
+    if (dRange < 1) {
+      if (dRange == 0) {
+        fractionDigits = 1;
+      } else {
+        if (dRange == 0) {
+          fractionDigits = 1;
+        } else {
+          // find the power
+          while (dRange < 1) {
+            dRange *= 10;
+            fractionDigits++;
+          }
+        }
+      }
+    } else {
+      if (dRange < 10) {
+        fractionDigits = 2;
+      } else if (dRange < 100) {
+        fractionDigits = 1;
+      } else {
+        fractionDigits = 0;
+      }
+    }
+
+    // find integer digits by using longest value:
+    int integerDigits = 0;
+    double max = range.getMax();
+    double min = Math.abs(range.getMin());
+    if (max == 0 && min == 0) {
+      integerDigits = 1;
+    } else if (max < min) {
+      while (min > 1) {
+        min /= 10;
+        integerDigits++;
+      }
+    } else {
+      while (max > 1) {
+        max /= 10;
+        integerDigits++;
+      }
+    }
+
+    // check if the internal numberformat would cut values and cause endering.
+    // errors:
+    if (integerDigits > this.m_numberFormat.getMaximumIntegerDigits()) {
+      this.m_numberFormat.setMaximumIntegerDigits(integerDigits);
+    }
+    if (fractionDigits > this.m_numberFormat.getMaximumFractionDigits()) {
+      this.m_numberFormat.setMaximumFractionDigits(fractionDigits);
+    }
+
+    // check if the internal numberformat will format bigger numbers than the
+    // computed ones thus causing labels overwriting the y axis or each other
+    // for the x axis:
+
+    int minFractionDigits = this.m_numberFormat.getMinimumFractionDigits();
+    int minIntegerDigits = this.m_numberFormat.getMinimumIntegerDigits();
+    if (minFractionDigits > fractionDigits) {
+      fractionDigits = minFractionDigits;
+    }
+    if (minIntegerDigits > integerDigits) {
+      integerDigits = minFractionDigits;
+    }
+
+    result = integerDigits + fractionDigits;
+    if (min < 0) {
+      // <sign>
+      result += 1;
+    }
+    if (this.m_numberFormat.isGroupingUsed()) {
+      // decimal separators
+      result += range.getMax() / 1000;
+    }
+
+    return result;
   }
 
   /**
@@ -296,7 +302,6 @@ public class LabelFormatterNumber extends ALabelFormatter implements IAxisLabelF
   public final void setNumberFormat(final NumberFormat numberFormat) {
     final NumberFormat old = this.m_numberFormat;
     this.m_numberFormat = numberFormat;
-    this.m_propertyChangeSupport.firePropertyChange(IAxisLabelFormatter.PROPERTY_FORMATCHANGE, old,
-        this.m_numberFormat);
+    this.m_propertyChangeSupport.firePropertyChange(IAxisLabelFormatter.PROPERTY_FORMATCHANGE, old, this.m_numberFormat);
   }
 }
