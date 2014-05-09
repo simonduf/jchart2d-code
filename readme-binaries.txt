@@ -115,6 +115,7 @@ o Chart2D.setTracePointProvider(ITracePointProvider) has been removed. Use ITrac
 o Chart2D.getTracePointProvider() has been removed. Use ITrace2D.getTracePointProvider() instead. 
 o Added support for init hook on trace level. 
 o Allow using ScrollablePanel with ChartPanel. 
+o Improved spacing of labels controlled by LabelFormatterNumber (more labels possible). 
 
 jchart2d-3.2.2 - September, 24th, 2011
   
