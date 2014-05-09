@@ -576,14 +576,14 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
 
       FontMetrics fontdim;
       fontdim = g2d.getFontMetrics();
-      final int fontwidth = fontdim.charWidth('W');
+      final int fontwidth = fontdim.charWidth('0');
       /*
        * multiply with longest possible number. longest possible number is the
        * non-fraction part of the highest number plus the maximum amount of
        * fraction digits plus one for the fraction separator dot.
        */
       final int len = AAxis.this.getFormatter().getMaxAmountChars();
-      return fontwidth * (len + 2);
+      return fontwidth * (len);
     }
 
     /**
@@ -607,8 +607,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     public final double getMinimumValueDistanceForLabels(final Graphics2D g2d) {
 
       double result;
-      final Dimension d = this.m_chart.getSize();
-      final int pxrange = (int) d.getWidth() - 60;
+      final int pxrange = this.getChart().getXAxisWidth();
       if (pxrange <= 0) {
         result = 1;
       } else {
@@ -909,8 +908,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
     public final double getMinimumValueDistanceForLabels(final Graphics2D g2d) {
 
       double result;
-      final Dimension d = this.m_chart.getSize();
-      final int pxrange = (int) d.getHeight() - 40;
+      final int pxrange = this.getChart().getYAxisHeight();
       if (pxrange <= 0) {
         result = 1;
       } else {
@@ -2318,7 +2316,12 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
         if (this.isPaintGrid()) {
           // do not paint over the axis
           if (tmp != xAxisStart) {
-            Stroke gridStroke = chart.getGridStroke();
+            Stroke gridStroke;
+            if(label.isMajorTick()) {
+              gridStroke = chart.getMajorGridStroke();
+            } else {
+              gridStroke = chart.getMinorGridStroke();
+            }
             Stroke oldStroke = null;
             if (gridStroke != null) {
               oldStroke = g2d.getStroke();
@@ -2379,11 +2382,16 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
         if (this.isPaintGrid()) {
           // do not paint over the axis:
           if (tmp != xAxisStart) {
-            Stroke gridStroke = chart.getGridStroke();
+            Stroke gridStroke;
+            if(label.isMajorTick()) {
+              gridStroke = chart.getMajorGridStroke();
+            } else {
+              gridStroke = chart.getMinorGridStroke();
+            }
             Stroke oldStroke = null;
             if (gridStroke != null) {
               oldStroke = g2d.getStroke();
-              g2d.setStroke(chart.getGridStroke());
+              g2d.setStroke(gridStroke);
             }
             g2d.setColor(chart.getGridColor());
             g2d.drawLine(tmp, yAxisLine + 1, tmp, yAxisStart);
@@ -2438,11 +2446,16 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
         }
         if (this.isPaintGrid()) {
           if (tmp != yAxisStart) {
-            Stroke gridStroke = chart.getGridStroke();
+            Stroke gridStroke;
+            if(label.isMajorTick()) {
+              gridStroke = chart.getMajorGridStroke();
+            } else {
+              gridStroke = chart.getMinorGridStroke();
+            }
             Stroke oldStroke = null;
             if (gridStroke != null) {
               oldStroke = g2d.getStroke();
-              g2d.setStroke(chart.getGridStroke());
+              g2d.setStroke(gridStroke);
             }
             g2d.setColor(chart.getGridColor());
             g2d.drawLine(xAxisStart + 1, tmp, xAxisEnd, tmp);
@@ -2499,11 +2512,16 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
         if (this.isPaintGrid()) {
           // do not paint over the axis:
           if (tmp != yAxisStart) {
-            Stroke gridStroke = chart.getGridStroke();
+            Stroke gridStroke;
+            if(label.isMajorTick()) {
+              gridStroke = chart.getMajorGridStroke();
+            } else {
+              gridStroke = chart.getMajorGridStroke();
+            }
             Stroke oldStroke = null;
             if (gridStroke != null) {
               oldStroke = g2d.getStroke();
-              g2d.setStroke(chart.getGridStroke());
+              g2d.setStroke(gridStroke);
             }
             g2d.setColor(chart.getGridColor());
             g2d.drawLine(xAxisStart + 1, tmp, xAxisEnd, tmp);

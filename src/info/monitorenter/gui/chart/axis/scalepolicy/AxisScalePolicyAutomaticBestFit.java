@@ -1,27 +1,25 @@
 /*
- *  AxisScalePolicyAutomaticBestFit.java of project jchart2d, <enterpurposehere>. 
- *  Copyright (C) 2002 - 2013, Achim Westermann, created on Apr 22, 2011
- *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
+ * AxisScalePolicyAutomaticBestFit.java of project jchart2d, <enterpurposehere>.
+ * Copyright (C) 2002 - 2013, Achim Westermann, created on Apr 22, 2011
  * 
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
- *  If you modify or optimize the code in a useful way please let me know.
- *  Achim.Westermann@gmx.de
- *
- *
- * File   : $Source: /cvsroot/jchart2d/jchart2d/codetemplates.xml,v $
- * Date   : $Date: 2009/02/24 16:45:41 $
- * Version: $Revision: 1.2 $
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version. This library is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+ * General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ * 
+ * If you modify or optimize the code in a useful way please let me know.
+ * Achim.Westermann@gmx.de
+ * 
+ * 
+ * File : $Source: /cvsroot/jchart2d/jchart2d/codetemplates.xml,v $ Date :
+ * $Date: 2009/02/24 16:45:41 $ Version: $Revision: 1.2 $
  */
 
 package info.monitorenter.gui.chart.axis.scalepolicy;
@@ -64,7 +62,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
   /**
    * Internally used for rounding to ticks, calculated once per paint iteration.
    */
-  protected double m_power;
+  // protected double m_power;
 
   public List<LabeledValue> getScaleValues(final Graphics2D g2d, final IAxis< ? > axis) {
     final double labelspacepx = axis.getAccessor().getMinimumValueDistanceForLabels(g2d);
@@ -75,25 +73,14 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
     return this.getLabels(max, axis);
   }
 
-  private double normalize(final double value) {
-    double norm = Math.pow(10, Math.ceil(Math.log10(value)));
-    if ((norm / 8.0) >= value) {
-      norm /= 8.0;
-    } else if ((norm / 4.0) >= value) {
-      norm /= 4.0;
-    } else if ((norm / 2.0) >= value) {
-      norm /= 2.0;
-    }
-    return norm;
-  }
-
   /**
    * @see info.monitorenter.gui.chart.IAxisScalePolicy#initPaintIteration(info.monitorenter.gui.chart.IAxis)
    */
   public void initPaintIteration(IAxis< ? > axis) {
-    // get the powers of ten of the range, a minor Tick of 1.0 has to be
-    // able to be 100 times in a range of 100 (match 1,2,3,... instead of
-    // 10,20,30,....
+    /*
+     * Get the powers of ten of the range, a minor Tick of 1.0 has to be able to
+     * be 100 times in a range of 100 (match 1,2,3,... instead of 10,20,30,.. .
+     */
     final double range = axis.getMax() - axis.getMin();
     double computeRange = range;
     if ((range == 0) || !MathUtil.isDouble(range)) {
@@ -111,14 +98,14 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
       while (computeRange < 5) {
         computeRange *= 10;
         tmpPower++;
-        if(Double.isInfinite(computeRange)) {
+        if (Double.isInfinite(computeRange)) {
           computeRange = 0;
         }
       }
 
       tmpPower = 1 / Math.pow(10, tmpPower);
     }
-    this.m_power = tmpPower;
+    // this.m_power = tmpPower;
 
   }
 
@@ -145,7 +132,15 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
       String oldLabelName = "";
       LabeledValue label;
       final double range = max - min;
-      final double tickResolution = this.roundToTicks(resolution, false, false, axis).getValue();
+      /*
+       * Try to stick to ticks and be able to hit major ticks: Major tick
+       * spacing should be a multiple of increment.
+       */
+      double minorTick = axis.getMinorTickSpacing();
+      double majorTick = axis.getMajorTickSpacing();
+      double increment = this.glueToMinorTicks(minorTick, majorTick, resolution);
+
+      final double tickResolution = this.roundToTicks(resolution, false, axis.isStartMajorTick(), axis).getValue();
       double value = Math.ceil(min / tickResolution) * tickResolution;
       // This was value before the patch that prevents the labels from jumping:
       // It's benefit was that the first label was not this
@@ -159,7 +154,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
         if (loopStop == 99) {
           if (AAxis.DEBUG) {
             System.out.println(axis.getAccessor().toString() + " axis: loop to high");
-          }//value  1.3518972E12    
+          }// value 1.3518972E12
         }
         label = this.roundToTicks(value, false, !firstMajorFound && axis.isStartMajorTick(), axis);
 
@@ -188,7 +183,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
             }
           }
         }
-        value += resolution;
+        value += increment;
       }
       final int stop = collect.size();
 
@@ -198,6 +193,35 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
       }
     }
     return collect;
+  }
+
+  private double glueToMinorTicks(final double minorTick, final double majorTick, final double resolution) {
+    double result = 0;
+    double ratio = minorTick / resolution;
+    if (ratio >= 1) {
+      int capacity = (int) Math.floor(ratio);
+      result = minorTick / capacity;
+    } else {
+      /*
+       * Skip major ticks until they are at least greater than resolution. Only
+       * pick possible values that are divisors of majorTick (or multiples in
+       * case value grew bigger than major tick).
+       */
+      double shiftedResolution = minorTick;
+      while ((shiftedResolution < resolution) || ((majorTick % shiftedResolution != 0) && (shiftedResolution % majorTick != 0))) {
+        shiftedResolution += minorTick;
+      }
+      /*
+       * Then find the resolution where it will hit at least some majort ticks
+       * (we skipped some above).
+       */
+      if (shiftedResolution < majorTick) {
+        result = shiftedResolution;
+      } else {
+        result = this.glueToMinorTicks(shiftedResolution, majorTick, resolution);
+      }
+    }
+    return result;
   }
 
   /**
@@ -212,18 +236,22 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
    * 
    * @param value
    *          the value to round.
+   * 
    * @param floor
    *          if true, rounding goes to floor else to ceiling.
+   * 
    * @param findMajorTick
    *          if true the returned value will be a major tick (which might be
    *          fare more away from the given value than the next major tick).
+   * 
    * @return the value rounded to minor or major ticks.
    */
   protected LabeledValue roundToTicks(final double value, final boolean floor, final boolean findMajorTick, final IAxis< ? > axis) {
     final LabeledValue ret = new LabeledValue();
 
-    final double minorTick = axis.getMinorTickSpacing() * this.m_power;
-    final double majorTick = axis.getMajorTickSpacing() * this.m_power;
+    double power = axis.getFormatter().getUnit().getFactor();
+    final double minorTick = axis.getMinorTickSpacing() * power;
+    final double majorTick = axis.getMajorTickSpacing() * power;
 
     double majorRound;
 
@@ -267,25 +295,39 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
     // format label string.
     IAxisLabelFormatter formatter = axis.getFormatter();
     ret.setLabel(formatter.format(ret.getValue()));
-    
+
     /*
-     *  As formatting rounds too, reparse value so that it is exactly at the point the label string describes.
-     *  
-     *  There are formatters that will loose value information by formatting. E.g. a date formatter which does not 
-     *  render the year. So we use a tolerance of 10 % between original value and formatted and reparsed value. 
+     * As formatting rounds too, reparse value so that it is exactly at the
+     * point the label string describes.
+     * 
+     * There are formatters that will loose value information by formatting.
+     * E.g. a date formatter which does not render the year. So we use a
+     * tolerance of 10 % between original value and formatted and reparsed
+     * value.
      */
 
     double reparsed = formatter.parse(ret.getLabel()).doubleValue();
-    double relativeDifferende = Math.abs(ret.getValue() - reparsed)/ret.getValue();
-    if(relativeDifferende < 0.1) {
+    double relativeDifferende = Math.abs(ret.getValue() - reparsed) / ret.getValue();
+    if (relativeDifferende < 0.1) {
       ret.setValue(reparsed);
     } else {
-      if(AAxis.DEBUG) {
+      if (AAxis.DEBUG) {
         System.out.println("Axis formatter " + this.toString() + " looses information. Original value: " + ret.getValue() + ". Formatted value: "
             + ret.getLabel() + ". Reparsed value (dropped): " + reparsed);
       }
     }
     return ret;
+  }
+
+  public static void main(String[] args) {
+    AxisScalePolicyAutomaticBestFit test = new AxisScalePolicyAutomaticBestFit();
+
+    double a = test.glueToMinorTicks(1, 10, 3);
+    a = 10 % 100;
+    a = test.glueToMinorTicks(1, 10, 2.1);
+    a = test.glueToMinorTicks(1, 10, 99);
+    a = test.glueToMinorTicks(1, 3, 88);
+    a = test.glueToMinorTicks(1, 10, 9.046997389033942);
   }
 
 }

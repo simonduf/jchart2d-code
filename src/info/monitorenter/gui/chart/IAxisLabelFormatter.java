@@ -24,6 +24,7 @@
 package info.monitorenter.gui.chart;
 
 import info.monitorenter.util.units.AUnit;
+import info.monitorenter.util.units.UnitUnchanged;
 
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
@@ -130,14 +131,6 @@ public interface IAxisLabelFormatter extends Serializable {
   double getNextEvenValue(double value, boolean ceiling);
 
   /**
-   * Returns the unit that is currently used by this formatter.
-   * <p>
-   * 
-   * @return the unit that is currently used by this formatter.
-   */
-  public AUnit getUnit();
-
-  /**
    * Callback method invoked by the corresponding
    * {@link info.monitorenter.gui.chart.axis.AAxis} upon start of a paint
    * iteration of the {@link Chart2D}.
@@ -196,5 +189,18 @@ public interface IAxisLabelFormatter extends Serializable {
    *          the axis to gain information about.
    */
   public void setAxis(IAxis<?> axis);
+  
+  /**
+   * Return the unit this labels should be formatted with. 
+   * This allows to have shorter labels. This could be the case if the values of the 
+   * corresponding axis are numbers that may be expressed with a unit prefix. <p>
+   * Example: The number 10000 could be expressed as 10 K (for Kilo). 
+   * <p>
+   * Return {@link UnitUnchanged} if you do not want a re-formatting (e.g.: Your axis displays dates/timestamps which cannot be shortened). 
+   * <p>
+   * 
+   * @return the unit this labels should be formatted with.
+   */
+  public AUnit getUnit();
 
 }

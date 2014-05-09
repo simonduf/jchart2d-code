@@ -274,25 +274,25 @@ import javax.swing.Timer;
  * <td>if {@link Chart2D#setPointFinder(IPointFinder)} caused a change.</td>
  * </tr>
  * <tr>
- * <td>{@link #PROPERTY_GRID_STROKE}</td>
+ * <td>{@link #PROPERTY_MAJOR_GRID_STROKE}</td>
  * <td>{@link Chart2D}</td>
  * <td>null</td>
  * <td>{@link Stroke}</td>
- * <td>A grid stroke was set (no one used before)</td>
+ * <td>A major grid stroke was set (no one used before)</td>
  * </tr>
  * <tr>
- * <td>{@link #PROPERTY_GRID_STROKE}</td>
+ * <td>{@link #PROPERTY_MAJOR_GRID_STROKE}</td>
  * <td>{@link Chart2D}</td>
  * <td>{@link Stroke}</td>
  * <td>null</td>
- * <td>The grid stroke was set to null (turned off, performance)</td>
+ * <td>The major grid stroke was set to null (turned off, performance)</td>
  * </tr>
  * <tr>
- * <td>{@link #PROPERTY_GRID_STROKE}</td>
+ * <td>{@link #PROPERTY_MAJOR_GRID_STROKE}</td>
  * <td>{@link Chart2D}</td>
  * <td>{@link Stroke}</td>
  * <td>{@link Stroke}</td>
- * <td>A new grid stroke was set.</td>
+ * <td>A new major grid stroke was set.</td>
  * </tr>
  * <tr>
  * <td>{@link #PROPERTY_VISIBLE}</td>
@@ -958,14 +958,24 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   public static final String PROPERTY_GRID_COLOR = "Chart2D.PROPERTY_GRID_COLOR";
 
   /**
-   * The bean property <code>constant</code> identifying a change of the grid
+   * The bean property <code>constant</code> identifying a change of the minor grid
    * stroke.
    * <p>
    * Use this constant to register a {@link java.beans.PropertyChangeListener}
    * with the <code>Chart2D</code>.
    * <p>
    */
-  public static final String PROPERTY_GRID_STROKE = "Chart2D.PROPERTY_GRID_STROKE";
+  public static final String PROPERTY_MINOR_GRID_STROKE = "Chart2D.PROPERTY_MINOR_GRID_STROKE";
+
+  /**
+   * The bean property <code>constant</code> identifying a change of the major grid
+   * stroke.
+   * <p>
+   * Use this constant to register a {@link java.beans.PropertyChangeListener}
+   * with the <code>Chart2D</code>.
+   * <p>
+   */
+  public static final String PROPERTY_MAJOR_GRID_STROKE = "Chart2D.PROPERTY_MAJOR_GRID_STROKE";
 
   /**
    * The bean property <code>constant</code> identifying a change of the paint
@@ -1066,8 +1076,11 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   /** The grid color. */
   private Color m_gridcolor = Color.lightGray;
 
-  /** The grid stroke. */
-  private Stroke m_gridstroke = null;
+  /** The major grid stroke. */
+  private Stroke m_majorGridstroke = null;
+
+  /** The minor grid stroke. */
+  private Stroke m_minorGridstroke = null;
 
   /**
    * Chart - wide setting for the ms to give a repaint operation time for
@@ -2071,13 +2084,23 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   }
 
   /**
-   * Returns the stroke of the grid or <code>null</code> if none is used.
+   * Returns the major stroke of the grid or <code>null</code> if none is used.
    * <p>
    * 
-   * @return the stroke of the grid <code>null</code> if none is used.
+   * @return the major stroke of the grid <code>null</code> if none is used.
    */
-  public final Stroke getGridStroke() {
-    return this.m_gridstroke;
+  public final Stroke getMajorGridStroke() {
+    return this.m_majorGridstroke;
+  }
+
+  /**
+   * Returns the minor stroke of the grid or <code>null</code> if none is used.
+   * <p>
+   * 
+   * @return the minor stroke of the grid <code>null</code> if none is used.
+   */
+  public final Stroke getMinorGridStroke() {
+    return this.m_minorGridstroke;
   }
 
   /**
@@ -2954,6 +2977,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       renderHints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
       renderHints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
       renderHints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+      renderHints.put(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_NORMALIZE);
       g2d.setRenderingHints(renderHints);
     }
 
@@ -3418,6 +3442,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    *          the property change event that was fired.
    * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
    */
+  @Override
   public void propertyChange(final PropertyChangeEvent evt) {
     if (Chart2D.DEBUG_THREADING) {
       System.out.println("chart.propertyChange (" + Thread.currentThread().getName() + "), 0 locks");
@@ -3482,7 +3507,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
       } else if (property.equals(ITrace2DDataAccumulating.PROPERTY_ACCUMULATION_STRATEGY_ACCUMULATION_FUNCTION_CHANGED)) {
         // repaint
       } else {
-        throw new IllegalStateException("Received a property change event \"" + property + "\" the code is not expecting (programming error). Event: "+evt);
+        System.out.println("Received an unexpected property change event \"" + property + "\" the code is not expecting (programming error). Event: "+evt);
       }
       this.setRequestedRepaint(true);
     }
@@ -4152,20 +4177,38 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
   }
 
   /**
-   * Set the grid stroke to use.
+   * Set the major grid stroke to use.
    * <p>
-   * Set <code>null</code> to turn off the grid stroke feature (this is the
+   * Set <code>null</code> to turn off the major grid stroke feature (this is the
    * default) for optimal performance.
    * <p>
    * 
    * @param gridStroke
-   *          the grid stroke to use or null if the feature should be turned
+   *          the major grid stroke to use or null if the feature should be turned
    *          off.
    */
-  public final void setGridStroke(final Stroke gridStroke) {
-    Stroke old = this.m_gridstroke;
-    this.m_gridstroke = gridStroke;
-    this.firePropertyChange(Chart2D.PROPERTY_GRID_STROKE, old, this.m_gridstroke);
+  public final void setMajorGridStroke(final Stroke gridStroke) {
+    Stroke old = this.m_majorGridstroke;
+    this.m_majorGridstroke = gridStroke;
+    this.firePropertyChange(Chart2D.PROPERTY_MAJOR_GRID_STROKE, old, this.m_majorGridstroke);
+    this.setRequestedRepaint(true);
+  }
+
+  /**
+   * Set the minor grid stroke to use.
+   * <p>
+   * Set <code>null</code> to turn off the minor grid stroke feature (this is the
+   * default) for optimal performance.
+   * <p>
+   * 
+   * @param gridStroke
+   *          the minor grid stroke to use or null if the feature should be turned
+   *          off.
+   */
+  public final void setMinorGridStroke(final Stroke gridStroke) {
+    Stroke old = this.m_minorGridstroke;
+    this.m_minorGridstroke = gridStroke;
+    this.firePropertyChange(Chart2D.PROPERTY_MINOR_GRID_STROKE, old, this.m_minorGridstroke);
     this.setRequestedRepaint(true);
   }
 
