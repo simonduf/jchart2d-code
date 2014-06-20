@@ -35,7 +35,7 @@ import info.monitorenter.gui.chart.ITracePoint2D;
  * <li>All traceoints added whose x- values are not already contained are added
  * to the end.</li>
  * <li>If a tracepoint is inserted whose x - value already exists in the List,
- * the old tracepoint with that value will be replaced by the new tracepoint.
+ * the old tracepoint with that value will be grabbed and it's location (effective: y value) will be set to the new location.
  * </li>
  * </ul>
  * <p>
@@ -74,21 +74,30 @@ public class Trace2DReplacing extends Trace2DSimple {
   @Override
   public boolean addPointInternal(final ITracePoint2D p) {
     boolean result = true;
-    int index = -1;
-    ITracePoint2D old;
-    index = this.m_points.indexOf(p);
-    if (index != -1) {
+    ITracePoint2D old = this.findPointWithXValue(p);
+    if (old != null) {
       // already contained.
-      old = this.m_points.get(index);
       // fires property changes with bound checks
       old.setLocation(old.getX(), p.getY());
-      // we don't need further bound checks and property change events from
-      // calling
-      // addPoint method.
+      /*
+       *  we don't need further bound checks and property change events from calling addPoint method.
+       */
       result = false;
     } else {
       this.m_points.add(p);
       result = true;
+    }
+    return result;
+  }
+
+  private ITracePoint2D findPointWithXValue(ITracePoint2D p) {
+    ITracePoint2D result = null;
+    double x = p.getX();
+    for(ITracePoint2D search:this.m_points) {
+      if(search.getX() == x) {
+        result = search;
+        break;
+      }
     }
     return result;
   }

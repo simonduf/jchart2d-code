@@ -24,14 +24,14 @@
  * Version: $Revision: 1.2 $
  */
 
-package info.monitorenter.gui.chart.traces;
+package info.monitorenter.gui.chart.tracepoints;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({TestTrace2D.class, TestTrace2DLtd.class, TestTrace2DReplacing.class, TestTrace2DSimple.class })
+@SuiteClasses({TestTracePoint2D.class })
 public class AllTests {
 
 }

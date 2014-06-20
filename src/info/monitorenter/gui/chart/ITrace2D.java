@@ -559,7 +559,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * Prefer calling {@link #addPoint(ITracePoint2D)}.
    * <p>
    * 
-   * @see #firePointChanged(ITracePoint2D, int, double, double)
+   * @see #firePointChanged(ITracePoint2D, info.monitorenter.gui.chart.ITracePoint2D.STATE, Object, Object)
    * 
    * @param p
    *          the <code>TracePoint2D</code> to add.
