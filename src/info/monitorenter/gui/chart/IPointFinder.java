@@ -28,6 +28,7 @@
 package info.monitorenter.gui.chart;
 
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 
 /**
  * Interface for finding a <code>{@link ITracePoint2D}</code> of a
@@ -40,7 +41,7 @@ import java.awt.event.MouseEvent;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  */
-public interface IPointFinder {
+public interface IPointFinder extends Serializable {
   /**
    * Returns the nearest <code>{@link ITracePoint2D}</code> to the given mouse
    * event's screen coordinates.

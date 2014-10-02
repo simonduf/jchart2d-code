@@ -26,6 +26,8 @@
 
 package info.monitorenter.gui.chart;
 
+import java.io.Serializable;
+
 /**
  * Interface for listeners that get informed by {@link Chart2D} about
  * highlighted points.
@@ -37,7 +39,7 @@ package info.monitorenter.gui.chart;
  * @author Frans Bouwmans (contribution)
  * 
  */
-public interface IPointHighlightListener {
+public interface IPointHighlightListener extends Serializable {
 
   /**
    * This function is called upon highlight of a trace point.

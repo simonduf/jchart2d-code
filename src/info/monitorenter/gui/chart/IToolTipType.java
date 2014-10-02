@@ -27,6 +27,7 @@
 package info.monitorenter.gui.chart;
 
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 
 /**
  * Defines the tool tips to display on a <code>{@link Chart2D}</code>.<p>
@@ -36,7 +37,7 @@ import java.awt.event.MouseEvent;
  *
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  **/
-public interface IToolTipType {
+public interface IToolTipType extends Serializable {
 
   /**
    * Returns a description of this tool tip type (for UI display).<p> 

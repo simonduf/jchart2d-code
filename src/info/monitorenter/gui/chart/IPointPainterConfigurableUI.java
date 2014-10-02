@@ -30,6 +30,7 @@ package info.monitorenter.gui.chart;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Stroke;
+import java.io.Serializable;
 
 /**
  * Adds configuration of UI like strokes and color to IPointPainter.
@@ -41,7 +42,7 @@ import java.awt.Stroke;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  */
-public interface IPointPainterConfigurableUI<T extends IPointPainter<T>> extends IPointPainter<T> {
+public interface IPointPainterConfigurableUI<T extends IPointPainter<T>> extends IPointPainter<T>, Serializable {
 
   /**
    * Returns the color to paint with or

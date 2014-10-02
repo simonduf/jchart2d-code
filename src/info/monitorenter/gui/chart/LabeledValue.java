@@ -22,6 +22,8 @@
  */
 package info.monitorenter.gui.chart;
 
+import java.io.Serializable;
+
 /**
  * A double value along with it's label.
  * <p>
@@ -33,7 +35,7 @@ package info.monitorenter.gui.chart;
  * 
  * @version $Revision: 1.7 $
  */
-public class LabeledValue {
+public class LabeledValue implements Serializable {
 
   /** The flag showing if this label is a major tick. */
   protected boolean m_isMajorTick = false;

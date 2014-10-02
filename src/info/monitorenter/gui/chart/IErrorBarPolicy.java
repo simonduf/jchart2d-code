@@ -25,6 +25,7 @@ package info.monitorenter.gui.chart;
 import info.monitorenter.gui.chart.errorbars.ErrorBarPixel;
 
 import java.beans.PropertyChangeListener;
+import java.io.Serializable;
 import java.util.Set;
 
 import javax.swing.JComponent;
@@ -98,7 +99,7 @@ import javax.swing.JComponent;
  * @param <T>
  *          needed for generic comparable<T>.
  */
-public interface IErrorBarPolicy<T extends IErrorBarPolicy<T>> extends ITracePainter<T> {
+public interface IErrorBarPolicy<T extends IErrorBarPolicy<T>> extends ITracePainter<T>, Serializable {
   /**
    * The property key defining a general change of an instance.
    * <p>

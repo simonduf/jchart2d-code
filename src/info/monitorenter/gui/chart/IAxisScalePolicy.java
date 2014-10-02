@@ -27,9 +27,10 @@
 package info.monitorenter.gui.chart;
 
 import java.awt.Graphics2D;
+import java.io.Serializable;
 import java.util.List;
 
-public interface IAxisScalePolicy {
+public interface IAxisScalePolicy extends Serializable {
 
   /**
    * Returns the array of labeled values that will be used by the

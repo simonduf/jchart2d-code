@@ -32,6 +32,7 @@ import info.monitorenter.gui.chart.traces.iterators.AAccumulationIterator;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Serializable;
 import java.util.Iterator;
 
 /**
@@ -96,7 +97,7 @@ import java.util.Iterator;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  */
-public interface IAccumulationStrategy {
+public interface IAccumulationStrategy extends Serializable {
 
   /**
    * Just accumulates n consecutive points.

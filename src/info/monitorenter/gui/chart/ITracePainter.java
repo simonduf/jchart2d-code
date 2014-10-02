@@ -22,6 +22,7 @@
 package info.monitorenter.gui.chart;
 
 import java.awt.Graphics;
+import java.io.Serializable;
 
 /**
  * An interface that works at trace level and defines how it's points are rendered.
@@ -44,7 +45,7 @@ import java.awt.Graphics;
  * @param <T> demonstration of unknown comparable and inheritance idiom or bad generics design for this case. 
  * 
  */
-public interface ITracePainter<T extends ITracePainter<T>> extends IPointPainter<T> {
+public interface ITracePainter<T extends ITracePainter<T>> extends IPointPainter<T>, Serializable {
 
   /**
    * Invoked to inform the painter that a discontinue in the trace to # paint has occured.

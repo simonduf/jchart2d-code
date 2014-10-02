@@ -138,7 +138,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
        */
       double minorTick = axis.getMinorTickSpacing();
       double majorTick = axis.getMajorTickSpacing();
-      double increment = this.glueToMinorTicks(minorTick, majorTick, resolution);
+      double increment = this.glueToTicks(minorTick, majorTick, resolution);
 
       final double tickResolution = this.roundToTicks(resolution, false, axis.isStartMajorTick(), axis).getValue();
       double value = Math.ceil(min / tickResolution) * tickResolution;
@@ -195,7 +195,53 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
     return collect;
   }
 
-  private double glueToMinorTicks(final double minorTick, final double majorTick, final double resolution) {
+  /**
+   * Computes the needed increase of value per label.
+   * 
+   * Under the precondition:
+   * 
+   * <ul>
+   * <li><code>majorTick is a multiple of minorTick</code></li>
+   * </ul>
+   * 
+   * the following contract will be fulfilled:
+   * 
+   * <ul>
+   * <li><code>result >= resolution</code></li>
+   * <li>result is a multiple (including times 1) of minorTick</li>
+   * <li>result may be a multiple (excluding times 1) of minorTick in case
+   * majorTick will still be a multiple of result. This means: Every possible
+   * majorTick will be hit. Note that if <code>resolution > majorTick</code> not
+   * every majorTick must be hit. But then every nth majorTick that makes
+   * <code>n*majorTick > resolution</code></li>
+   * </ul>
+   * <p>
+   * In human language:
+   * <ul>
+   * <li>No increment will be returned that is smaller than the given
+   * resolution.</li>
+   * <li>It is tried to return the smallest multiple of minorTick that is bigger
+   * resolution and still guarantees that no majorTick will be skipped.</li>
+   * </ul>
+   * <p>
+   * 
+   * 
+   * 
+   * @param minorTick
+   *          the minorTicks of this scale policy.
+   *          
+   * @param majorTick
+   *          the majorTicks of this scale policy.
+   *          
+   * @param resolution
+   *          the minimum increment that is required for the scale (results from
+   *          display space calculations).
+   * 
+   * @return The minimal increment per scale label that will try to hit each
+   *         majorTick and to be as small as possible to also hit minorTicks
+   *         (without skipping majorTicks).
+   */
+  private double glueToTicks(final double minorTick, final double majorTick, final double resolution) {
     double result = 0;
     double ratio = minorTick / resolution;
     if (ratio >= 1) {
@@ -218,7 +264,7 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
       if (shiftedResolution < majorTick) {
         result = shiftedResolution;
       } else {
-        result = this.glueToMinorTicks(shiftedResolution, majorTick, resolution);
+        result = this.glueToTicks(shiftedResolution, majorTick, resolution);
       }
     }
     return result;
@@ -322,12 +368,12 @@ public class AxisScalePolicyAutomaticBestFit implements IAxisScalePolicy {
   public static void main(String[] args) {
     AxisScalePolicyAutomaticBestFit test = new AxisScalePolicyAutomaticBestFit();
 
-    double a = test.glueToMinorTicks(1, 10, 3);
+    double a = test.glueToTicks(1, 10, 3);
     a = 10 % 100;
-    a = test.glueToMinorTicks(1, 10, 2.1);
-    a = test.glueToMinorTicks(1, 10, 99);
-    a = test.glueToMinorTicks(1, 3, 88);
-    a = test.glueToMinorTicks(1, 10, 9.046997389033942);
+    a = test.glueToTicks(1, 10, 2.1);
+    a = test.glueToTicks(1, 10, 99);
+    a = test.glueToTicks(1, 3, 88);
+    a = test.glueToTicks(1, 10, 9.046997389033942);
   }
 
 }

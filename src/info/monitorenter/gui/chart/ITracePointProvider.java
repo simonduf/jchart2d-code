@@ -21,6 +21,9 @@
  *  Achim.Westermann@gmx.de
  */
 package info.monitorenter.gui.chart;
+
+import java.io.Serializable;
+
 /**
  * Interface for creation of new instances of <code>{@link ITracePoint2D}</code> which will be used wherever a chart 
  * component tree has to create them. 
@@ -29,7 +32,7 @@ package info.monitorenter.gui.chart;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * @version $Revision: 1.3 $
  */
-public interface ITracePointProvider {
+public interface ITracePointProvider extends Serializable {
 
   /**
    * Callback for creating trace points.

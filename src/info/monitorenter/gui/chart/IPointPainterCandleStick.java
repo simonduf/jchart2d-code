@@ -25,6 +25,8 @@
 
 package info.monitorenter.gui.chart;
 
+import java.io.Serializable;
+
 import info.monitorenter.gui.chart.tracepoints.CandleStick;
 
 /**
@@ -38,7 +40,7 @@ import info.monitorenter.gui.chart.tracepoints.CandleStick;
  * 
  */
 
-public interface IPointPainterCandleStick<T extends IPointPainterConfigurableUI<T>> extends IPointPainterConfigurableUI<T> {
+public interface IPointPainterCandleStick<T extends IPointPainterConfigurableUI<T>> extends IPointPainterConfigurableUI<T>, Serializable {
 
   /**
    * Returns the width of the {@link CandleStick}.

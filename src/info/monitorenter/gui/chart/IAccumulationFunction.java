@@ -1,5 +1,7 @@
 package info.monitorenter.gui.chart;
 
+import java.io.Serializable;
+
 /*
  *  IAccumulationFunction.java of project jchart2d, interface for tracepoint 
  *  accumulation functions. 
@@ -71,7 +73,7 @@ package info.monitorenter.gui.chart;
  * 
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  **/
-public interface IAccumulationFunction {
+public interface IAccumulationFunction extends Serializable {
 
   /**
    * Adds a point to accumulated.

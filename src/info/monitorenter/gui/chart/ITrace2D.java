@@ -264,7 +264,7 @@ public interface ITrace2D extends PropertyChangeListener, Comparable<ITrace2D>, 
    * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
    * @version $Revision: 1.41 $
    */
-  public final class DistancePoint {
+  public final class DistancePoint implements Serializable {
     /** Constant for unfound distance. */
     public static final DistancePoint EMPTY = new DistancePoint();
 

@@ -461,7 +461,7 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
    * @version $Revision: 1.61 $
    * @since 3.0.0
    */
-  private static interface IPropertyChangeReactor {
+  private static interface IPropertyChangeReactor extends Serializable {
     /**
      * Handle the property change of the given receiver.
      * <p>
@@ -492,6 +492,9 @@ public abstract class AAxis<T extends IAxisScalePolicy> implements IAxis<T>, Pro
    * @since 3.0.0
    */
   private static final class PropertyChangeRepainter implements AAxis.IPropertyChangeReactor {
+
+    /** Generated <code>serialVersionUID</code>. **/
+    private static final long serialVersionUID = -7898371303579810421L;
 
     /**
      * Defcon, internal use only.

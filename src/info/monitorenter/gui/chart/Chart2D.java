@@ -49,6 +49,7 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Serializable;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -373,7 +374,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
    * Tracks mouse motion events and highlights the nearest point in the trace.
    * <p>
    */
-  final class PointHighlighter extends MouseMotionAdapter implements MouseMotionListener, PropertyChangeListener {
+  final class PointHighlighter extends MouseMotionAdapter implements MouseMotionListener, PropertyChangeListener, Serializable {
 
     /** Needed to de-highlight previously highlighted points. */
     private Map<ITrace2D, ITracePoint2D> m_previousHighlighted;

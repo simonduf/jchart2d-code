@@ -21,6 +21,8 @@
  */
 package info.monitorenter.gui.chart;
 
+import java.io.Serializable;
+
 /**
  * Helper to allow running certain code in a certain scope (e.g.: synchronization scope, pre- or postrequisites to meet,...).
  * <p>
@@ -31,7 +33,7 @@ package info.monitorenter.gui.chart;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  */
-public interface ICodeBlock<T> {
+public interface ICodeBlock<T> extends Serializable {
   /**
    * Executes the code this instance stands for and gives back the result.
    * <p>
