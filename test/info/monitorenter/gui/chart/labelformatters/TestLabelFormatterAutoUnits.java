@@ -29,6 +29,7 @@ import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.test.ATestChartOperations;
 
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -233,6 +234,7 @@ public class TestLabelFormatterAutoUnits extends ATestChartOperations {
         return null;
       }
 
+      
       /**
        * @see info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation#fillTrace(info.monitorenter.gui.chart.ITrace2D)
        */
@@ -252,7 +254,7 @@ public class TestLabelFormatterAutoUnits extends ATestChartOperations {
       @Override
       public void preCondition(final Chart2D chart) throws Exception {
         chart.getAxisY().setStartMajorTick(false);
-        IAxisLabelFormatter formatter = new LabelFormatterSimple();
+        IAxisLabelFormatter formatter = new LabelFormatterNumber(new DecimalFormat("#.#####"));
        
         IAxis<?> yAxis = chart.getAxisY();
         yAxis.setFormatter(formatter);

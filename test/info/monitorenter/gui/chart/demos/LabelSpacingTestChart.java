@@ -52,41 +52,7 @@ import junit.framework.TestSuite;
  * 
  * @version $Revision: 1.2 $
  */
-public final class LabelSpacingTestChart
-    extends TestCase {
-
-  /**
-   * Generated <code>serialVersionUID</code>.
-   */
-  private static final long serialVersionUID = 3689069560279873588L;
-
-  /**
-   * Test suite for this test class.
-   * <p>
-   * 
-   * @return the test suite
-   */
-  public static Test suite() {
-
-    TestSuite suite = new TestSuite();
-    suite.setName(LabelSpacingTestChart.class.getName());
-
-    suite.addTest(new LabelSpacingTestChart("testLabelSpacing"));
-
-    return suite;
-  }
-
-  /**
-   * Creates a test case with the given name.
-   * <p>
-   * 
-   * @param testName
-   *          the name of the test case.
-   * 
-   */
-  public LabelSpacingTestChart(final String testName) {
-    super(testName);
-  }
+public final class LabelSpacingTestChart {
 
   /**
    * Creates a a chart with three traces and different labels and displays it.
@@ -94,8 +60,9 @@ public final class LabelSpacingTestChart
    * 
    * @throws InterruptedException
    */
+  @org.junit.Test
   public void testLabelSpacing() throws InterruptedException {
-    JFrame frame = new JFrame(this.getName());
+    JFrame frame = new JFrame(this.getClass().getSimpleName());
     Chart2D chart = new Chart2D();
     ITrace2D trace1 = new Trace2DLtd();
     trace1.setName("lottolotto");

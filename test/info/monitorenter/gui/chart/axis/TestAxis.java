@@ -222,9 +222,9 @@ public class TestAxis extends ATestJChart2D {
     BufferedImage image=new BufferedImage(400,400,BufferedImage.TYPE_INT_ARGB);
     Graphics2D graphics=(Graphics2D)image.getGraphics();
     int axisYWidth = this.m_axisY.getWidth(graphics);
-    assertEquals("Y axis without paintScale is too small.",50, axisYWidth);
+    assertEquals("Y axis without paintScale is too small.",34, axisYWidth);
     int axisXHeight = this.m_axisX.getHeight(graphics);
-    assertEquals("X axis without paintScale is too small.",33, axisXHeight);
+    assertEquals("X axis without paintScale is too small.",13, axisXHeight);
   }
 
 }

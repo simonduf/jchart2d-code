@@ -36,45 +36,14 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann</a>
  * @version $Revision: 1.10 $
  */
-public class TestRingBufferArrayFast
-    extends TestCase {
+public class TestRingBufferArrayFast{
 
-  /**
-   * Test suite for this test class.
-   * <p>
-   * 
-   * @return the test suite
-   */
-  public static Test suite() {
-
-    TestSuite suite = new TestSuite();
-    suite.setName(TestRingBufferArrayFast.class.getName());
-
-    suite.addTest(new TestRingBufferArrayFast("testAdd"));
-    suite.addTest(new TestRingBufferArrayFast("testIteratorF2L"));
-    suite.addTest(new TestRingBufferArrayFast("testIteratorL2F"));
-    suite.addTest(new TestRingBufferArrayFast("testSetBufferSize"));
-    suite.addTest(new TestRingBufferArrayFast("testSize"));
-    suite.addTest(new TestRingBufferArrayFast("testHashCode"));
-
-    return suite;
-  }
-
-  /**
-   * Creates a test case with the given name.
-   * <p>
-   * 
-   * @param testName
-   *            the name of the test case.
-   */
-  public TestRingBufferArrayFast(final String testName) {
-    super(testName);
-  }
 
   /**
    * Test method for {@link info.monitorenter.util.collections.RingBufferArrayFast#add(Object)}.
    * <p>
    */
+  @org.junit.Test
   public void testAdd() {
     RingBufferArrayFast<Integer> ringBuffer = new RingBufferArrayFast<Integer>(1);
     System.out.println("Adding 1 element to a buffer of size 1.");
@@ -87,6 +56,7 @@ public class TestRingBufferArrayFast
    * Test method for {@link info.monitorenter.util.collections.RingBufferArrayFast#iteratorF2L()}.
    * <p>
    */
+  @org.junit.Test
   public void testIteratorF2L() {
     IRingBuffer<Integer> ringBuffer = new RingBufferArrayFast<Integer>(10);
     System.out.println("Adding 2 elements to a buffer of size 10");
@@ -207,6 +177,7 @@ public class TestRingBufferArrayFast
    * Test method for {@link info.monitorenter.util.collections.RingBufferArrayFast#iteratorL2F()}.
    * <p>
    */
+  @org.junit.Test
   public void testIteratorL2F() {
     IRingBuffer<Integer> ringBuffer = new RingBufferArrayFast<Integer>(10);
     System.out.println("Adding 2 elements to a buffer of size 10");
@@ -320,6 +291,7 @@ public class TestRingBufferArrayFast
    * {@link info.monitorenter.util.collections.RingBufferArrayFast#setBufferSize(int)}.
    * <p>
    */
+  @org.junit.Test
   public void testSetBufferSize() {
     IRingBuffer<Integer> buffer = new RingBufferArrayFast<Integer>(3);
     Assert.assertEquals(3, buffer.getBufferSize());
@@ -347,6 +319,7 @@ public class TestRingBufferArrayFast
    * {@link info.monitorenter.util.collections.RingBufferArrayFast#hashCode()}.
    * <p>
    */
+  @org.junit.Test
   public void testHashCode() {
     final IRingBuffer<Integer> buffer1 = new RingBufferArrayFast<Integer>(4);
     for (int i = 0; i < 2; i++) {
@@ -361,6 +334,7 @@ public class TestRingBufferArrayFast
    * Test method for {@link info.monitorenter.util.collections.RingBufferArrayFast#size()}.
    * <p>
    */
+  @org.junit.Test
   public void testSize() {
 
     RingBufferArrayFast<Integer> ringBuffer = new RingBufferArrayFast<Integer>(100);

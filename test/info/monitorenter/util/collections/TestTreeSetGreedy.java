@@ -28,6 +28,8 @@ import info.monitorenter.gui.chart.ITrace2D;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.junit.After;
+
 import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -40,8 +42,7 @@ import junit.framework.TestSuite;
  * @author <a href="mailto:Achim.Westermann@gmx.de">Achim Westermann </a>
  * 
  */
-public class TestTreeSetGreedy
-    extends TestCase {
+public class TestTreeSetGreedy {
 
   /**
    * Helper class for adding as element to the tested
@@ -93,62 +94,24 @@ public class TestTreeSetGreedy
     }
   }
 
-  /**
-   * Test suite for this test class.
-   * <p>
-   * 
-   * @return the test suite
-   */
-  public static Test suite() {
-
-    TestSuite suite = new TestSuite();
-    suite.setName(TestTreeSetGreedy.class.getName());
-
-    suite.addTest(new TestTreeSetGreedy("testAdd"));
-    suite.addTest(new TestTreeSetGreedy("testAdd10RemoveCenter"));
-    suite.addTest(new TestTreeSetGreedy("testAddEqual10"));
-    suite.addTest(new TestTreeSetGreedy("testAddEqual2"));
-    suite.addTest(new TestTreeSetGreedy("testAddEqual3"));
-    suite.addTest(new TestTreeSetGreedy("testAddEqual5"));
-    suite.addTest(new TestTreeSetGreedy("testAddIdentical2"));
-    suite.addTest(new TestTreeSetGreedy("testAddRemoveEqual10"));
-    suite.addTest(new TestTreeSetGreedy("testAddRemoveEqual2"));
-    suite.addTest(new TestTreeSetGreedy("testAddRemoveEqual3"));
-    suite.addTest(new TestTreeSetGreedy("testAddRemoveEqual5"));
-    suite.addTest(new TestTreeSetGreedy("testMultiThreadingAddRemove"));
-
-    return suite;
-  }
-
   /** The instance to test. */
   protected TreeSetGreedy<IComparableProperty> m_test;
 
   /**
-   * Creates an instance with the given name.
-   * <p>
-   * 
-   * @param testName
-   *          the name of the test case.
-   */
-  public TestTreeSetGreedy(final String testName) {
-    super(testName);
-  }
-
-  /**
    * @see junit.framework.TestCase#setUp()
    */
-  @Override
+  @org.junit.Before
   protected void setUp() throws Exception {
-    super.setUp();
+    this.setUp();
     this.m_test = new TreeSetGreedy<IComparableProperty>();
   }
 
   /**
    * @see junit.framework.TestCase#tearDown()
    */
-  @Override
+  @After
   protected void tearDown() throws Exception {
-    super.tearDown();
+    this.tearDown();
     this.m_test = null;
   }
 
@@ -157,6 +120,7 @@ public class TestTreeSetGreedy
    * <p>
    * 
    */
+  @org.junit.Test
   public void testAdd() {
     Assert.assertNotNull(this.m_test);
 
@@ -171,6 +135,7 @@ public class TestTreeSetGreedy
    * <p>
    * 
    */
+  @org.junit.Test
   public void testAdd10RemoveCenter() {
     Assert.assertNotNull(this.m_test);
     IComparableProperty e1 = new Element();
@@ -211,6 +176,7 @@ public class TestTreeSetGreedy
    * <p>
    * 
    */
+  @org.junit.Test
   public void testAddEqual10() {
     Assert.assertNotNull(this.m_test);
     IComparableProperty e1 = new Element();
@@ -246,6 +212,7 @@ public class TestTreeSetGreedy
    * <p>
    * 
    */
+  @org.junit.Test
   public void testAddEqual2() {
     Assert.assertNotNull(this.m_test);
     IComparableProperty e1 = new Element();
@@ -259,9 +226,10 @@ public class TestTreeSetGreedy
   }
 
   /**
-   * Add 1,1,1 and test, wether all numbers are different.
+   * Add 1,1,1 and test, whether all numbers are different.
    * <p>
    */
+  @org.junit.Test
   public void testAddEqual3() {
     Assert.assertNotNull(this.m_test);
     IComparableProperty e1 = new Element();
@@ -278,10 +246,11 @@ public class TestTreeSetGreedy
   }
 
   /**
-   * Add 1,1,1,1,1 and test, wether all numbers are different.
+   * Add 1,1,1,1,1 and test, whether all numbers are different.
    * <p>
    * 
    */
+  @org.junit.Test
   public void testAddEqual5() {
     Assert.assertNotNull(this.m_test);
     IComparableProperty e1 = new Element();
@@ -306,6 +275,7 @@ public class TestTreeSetGreedy
    * <p>
    * 
    */
+  @org.junit.Test
   public void testAddIdentical2() {
     Assert.assertNotNull(this.m_test);
     IComparableProperty e1 = new Element();
@@ -323,6 +293,7 @@ public class TestTreeSetGreedy
    * <p>
    * 
    */
+  @org.junit.Test
   public void testAddRemoveEqual10() {
     Assert.assertNotNull(this.m_test);
     IComparableProperty e1 = new Element();
@@ -372,6 +343,7 @@ public class TestTreeSetGreedy
    * <p>
    * 
    */
+  @org.junit.Test
   public void testAddRemoveEqual2() {
     Assert.assertNotNull(this.m_test);
     IComparableProperty e1 = new Element();
@@ -396,6 +368,7 @@ public class TestTreeSetGreedy
    * <p>
    * 
    */
+  @org.junit.Test
   public void testAddRemoveEqual3() {
     Assert.assertNotNull(this.m_test);
     IComparableProperty e1 = new Element();
@@ -423,6 +396,7 @@ public class TestTreeSetGreedy
    * <p>
    * 
    */
+  @org.junit.Test
   public void testAddRemoveEqual5() {
     Assert.assertNotNull(this.m_test);
     IComparableProperty e1 = new Element();
@@ -462,6 +436,7 @@ public class TestTreeSetGreedy
    * 
    * 
    */
+  @org.junit.Test
   public void testMultiThreadingAddRemove() {
 
     /**
@@ -595,6 +570,5 @@ public class TestTreeSetGreedy
       }
     }
     System.out.println("testMultiThreadingAddRemove() finished.");
-
   }
 }

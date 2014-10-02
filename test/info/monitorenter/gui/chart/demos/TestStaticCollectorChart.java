@@ -1,26 +1,24 @@
 /*
- *  TestStaticCollectorChart.java  of project jchart2d - 
- *  Junit test case that works on property file based 
- *  data files. 
- *  Copyright (C) Achim Westermann, created on 23.04.2005, 08:21:12
- *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Lesser General Public
- *  License as published by the Free Software Foundation; either
- *  version 2.1 of the License, or (at your option) any later version.
+ * TestStaticCollectorChart.java of project jchart2d - Junit test case that
+ * works on property file based data files. Copyright (C) Achim Westermann,
+ * created on 23.04.2005, 08:21:12
  * 
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Lesser General Public License for more details.
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
  * 
- *  You should have received a copy of the GNU Lesser General Public
- *  License along with this library; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- *
- *  If you modify or optimize the code in a useful way please let me know.
- *  Achim.Westermann@gmx.de
- *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ * 
+ * If you modify or optimize the code in a useful way please let me know.
+ * Achim.Westermann@gmx.de
  */
 package info.monitorenter.gui.chart.demos;
 
@@ -39,10 +37,6 @@ import java.io.InputStream;
 
 import javax.swing.JFrame;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 /**
  * Visual Junit test that uses a
  * <code>{@link PropertyFileStaticDataCollector}</code> with data files in the
@@ -52,52 +46,7 @@ import junit.framework.TestSuite;
  * 
  * @author Achim Westermann
  */
-public class TestStaticCollectorChart extends TestCase {
-
-  /**
-   * Main debug entry.
-   * <p>
-   * 
-   * @param args
-   *          ignored.
-   * @throws IOException
-   *           if sth. goes wrong reading data.
-   */
-  public static void main(final String[] args) throws IOException {
-    TestStaticCollectorChart test = new TestStaticCollectorChart(TestStaticCollectorChart.class
-        .getName());
-    test.testStaticCollectorChart2();
-  }
-
-  /**
-   * Test suite for this test class.
-   * <p>
-   * 
-   * @return the test suite.
-   */
-  public static Test suite() {
-
-    TestSuite suite = new TestSuite();
-    suite.setName(TestStaticCollectorChart.class.getName());
-
-    suite.addTest(new TestStaticCollectorChart("testStaticCollectorChart1"));
-    suite.addTest(new TestStaticCollectorChart("testStaticCollectorChart2"));
-    suite.addTest(new TestStaticCollectorChart("testStaticCollectorChart3"));
-    suite.addTest(new TestStaticCollectorChart("testStaticCollectorChart7"));
-
-    return suite;
-  }
-
-  /**
-   * Creates a test case with the given name.
-   * <p>
-   * 
-   * @param testName
-   *          the name of the test case.
-   */
-  public TestStaticCollectorChart(final String testName) {
-    super(testName);
-  }
+public class TestStaticCollectorChart {
 
   /**
    * Internal helper that shows the chart in a frame.
@@ -136,8 +85,9 @@ public class TestStaticCollectorChart extends TestCase {
    * <p>
    * 
    * @throws IOException
-   *           if sth. goes wrong.
+   *           if something goes wrong.
    */
+  @org.junit.Test
   public final void testStaticCollectorChart1() throws IOException {
     InputStream stream = this.getClass().getResourceAsStream("test1.properties");
     ITrace2D trace = new Trace2DSimple();
@@ -152,8 +102,9 @@ public class TestStaticCollectorChart extends TestCase {
    * <p>
    * 
    * @throws IOException
-   *           if sth. goes wrong.
+   *           if something goes wrong.
    */
+  @org.junit.Test
   public final void testStaticCollectorChart2() throws IOException {
     InputStream stream = this.getClass().getResourceAsStream("test2.properties");
     ITrace2D trace = new Trace2DSimple();
@@ -171,8 +122,9 @@ public class TestStaticCollectorChart extends TestCase {
    * <p>
    * 
    * @throws IOException
-   *           if sth. goes wrong.
+   *           if something goes wrong.
    */
+  @org.junit.Test
   public final void testStaticCollectorChart3() throws IOException {
     InputStream stream = this.getClass().getResourceAsStream("test3.properties");
     ITrace2D trace = new Trace2DSimple();
@@ -188,8 +140,9 @@ public class TestStaticCollectorChart extends TestCase {
    * <p>
    * 
    * @throws IOException
-   *           if sth. goes wrong.
+   *           if something goes wrong.
    */
+  @org.junit.Test
   public final void testStaticCollectorChart7() throws IOException {
     InputStream stream = this.getClass().getResourceAsStream("test7.properties");
     ITrace2D trace = new Trace2DSimple();

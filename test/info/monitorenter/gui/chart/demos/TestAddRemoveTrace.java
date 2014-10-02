@@ -45,41 +45,7 @@ import junit.framework.TestSuite;
  * 
  * @version $Revision: 1.3 $
  */
-public final class TestAddRemoveTrace
-    extends TestCase {
-
-  /**
-   * Generated <code>serialVersionUID</code>.
-   */
-  private static final long serialVersionUID = 3689069560279873588L;
-
-  /**
-   * Test suite for this test class.
-   * <p>
-   * 
-   * @return the test suite
-   */
-  public static Test suite() {
-
-    TestSuite suite = new TestSuite();
-    suite.setName(TestAddRemoveTrace.class.getName());
-
-    suite.addTest(new TestAddRemoveTrace("testAddRemoveTrace"));
-
-    return suite;
-  }
-
-  /**
-   * Creates a test case with the given name.
-   * <p>
-   * 
-   * @param testName
-   *          the name of the test case.
-   * 
-   */
-  public TestAddRemoveTrace(final String testName) {
-    super(testName);
-  }
+public final class TestAddRemoveTrace {
 
   /**
    * Creates an empty chart adds a trace, removes it again and displays it.
@@ -88,6 +54,7 @@ public final class TestAddRemoveTrace
    * @throws InterruptedException
    *           if sleeping is interrupted.
    */
+  @org.junit.Test
   public void testAddRemoveTrace() throws InterruptedException {
     JFrame frame = new JFrame(this.getClass().getName());
     Dimension size = new Dimension(400,400);

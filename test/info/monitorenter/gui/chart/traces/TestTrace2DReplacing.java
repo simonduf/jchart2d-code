@@ -28,7 +28,6 @@ import static org.junit.Assert.fail;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.ITrace2D;
 import info.monitorenter.gui.chart.test.ATestChartOperations;
-import info.monitorenter.gui.chart.test.ATestChartOperations.AChartOperation;
 
 import org.junit.Test;
 
@@ -39,7 +38,7 @@ public class TestTrace2DReplacing extends ATestChartOperations {
   }
 
   @Test
-  public void testAddPointITracePoint2D() {
+  public void testReplaceAllPoints() {
     ATestChartOperations.AChartOperation operation = new AChartOperation(
         "Inserting points with same x values but different y values to Trace2DReplacing: Trace should be inverted.") {
 

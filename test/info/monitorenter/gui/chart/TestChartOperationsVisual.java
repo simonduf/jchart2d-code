@@ -21,16 +21,11 @@ import info.monitorenter.util.Range;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Toolkit;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.SortedSet;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 
 /**
  * Visual test of operations upon the chart with basic ui for human judgement of
@@ -43,43 +38,6 @@ import junit.framework.TestSuite;
  * @version $Revision: 1.34 $
  */
 public class TestChartOperationsVisual extends ATestChartOperations {
-
-//  /**
-//   * Test suite for this test class.
-//   * <p>
-//   * 
-//   * @return the test suite
-//   */
-//  public static Test suite() {
-//
-//    TestSuite suite = new TestSuite();
-//    suite.setName(TestChartOperationsVisual.class.getName());
-//
-//    suite.addTest(new TestChartOperationsVisual("testRemoveAllPoints"));
-//    suite.addTest(new TestChartOperationsVisual("testRemoveAllTraces"));
-//    suite.addTest(new TestChartOperationsVisual("testAddPoint"));
-//    suite.addTest(new TestChartOperationsVisual("testSetStroke"));
-//    suite.addTest(new TestChartOperationsVisual("testSetTraceName"));
-//    suite.addTest(new TestChartOperationsVisual("testSetTraceNameEmptyTrace"));
-//    suite.addTest(new TestChartOperationsVisual("testSetRangePolicyX"));
-//    suite.addTest(new TestChartOperationsVisual("testAxisLabelFormatterNumberFormatSetNumberFormat"));
-//    suite.addTest(new TestChartOperationsVisual("testAxisSetLabelFormatter"));
-//    suite.addTest(new TestChartOperationsVisual("testTraceSetErrorBarPolicy"));
-//    suite.addTest(new TestChartOperationsVisual("testIErrorBarPainterSetStartPointPainter"));
-//    suite.addTest(new TestChartOperationsVisual("testZoom"));
-//    suite.addTest(new TestChartOperationsVisual("testDeadLockAddPointThread"));
-//    suite.addTest(new TestChartOperationsVisual("testTracePointSetLocation"));
-//    suite.addTest(new TestChartOperationsVisual("testSetNullTraceTitle"));
-//    suite.addTest(new TestChartOperationsVisual("testSetEmptyTraceTitle"));
-//    suite.addTest(new TestChartOperationsVisual("testSetTraceTitleOnEmptyTitleTrace"));
-//    suite.addTest(new TestChartOperationsVisual("testAddRemoveTrace"));
-//    suite.addTest(new TestChartOperationsVisual("testSetZIndex"));
-//    suite.addTest(new TestChartOperationsVisual("testRemoveTraceForBug2891801"));
-//    suite.addTest(new TestChartOperationsVisual("testAddDiscontinuation"));
-//    suite.addTest(new TestChartOperationsVisual("testDisablePaintScaleAndTitle"));
-//    
-//    return suite;
-//  }
 
   /**
    * Constructor with the test name.
