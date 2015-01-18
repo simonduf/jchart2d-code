@@ -71,6 +71,7 @@ jchart2d-3.3.0 - <month>, <day>, <year>
     chart.getAxisX().setPaintScale(false);
     chart.getAxisX().getAxisTitle().setTitle(null);
 * Fixed bug: Trace2DReplacing did not work as described in contract (javadoc). 
+* Allow Log axes to use values > 0.
 ! Improved performance of ITracePoint.setLocation(double, double): This was O(n) where n was amount of points in a trace in any 
   case except boundary increase. Now it is only O(n) if an extremum was diminished via that method.   
 ! Introduced data accumulation API. This allows you to have traces with 10^6 points painted with increased speed while zooming in 
