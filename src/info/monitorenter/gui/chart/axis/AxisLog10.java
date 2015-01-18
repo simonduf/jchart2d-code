@@ -118,7 +118,7 @@ public class AxisLog10<T extends AxisScalePolicyTransformation> extends AAxisTra
      * negative, lim -> 0 becomes Double.NEGATIVE_INFINITY, which causes the
      * "while(true)" 100 % load effect. So everything is disallowed below 1.0.
      */
-    if (toTransform < 1) {
+    if (toTransform <= 0) {
       // allow to transform the input for empty traces or all traces with empty
       // points:
       if (this.m_accessor == null) {
@@ -135,15 +135,14 @@ public class AxisLog10<T extends AxisScalePolicyTransformation> extends AAxisTra
           if (trace.iterator().hasNext()) {
             // Illegal value for transformation defined by a point added:
             throw new IllegalArgumentException(this.getClass().getName()
-                + " must not be used with values < 1!");
+                + " must not be used with values <= 0!");
           }
         }
         // No illegal point: everything was empty
         toTransform = 1.0;
       }
     }
-    // TODO: change this to Math.log10 as soon as java 1.5 is used:
-    double result = Math.log(toTransform) / Math.log(10);
+    double result = Math.log10(toTransform);
     if (Double.isInfinite(result)) {
       result = Double.MAX_VALUE;
     }
@@ -157,5 +156,4 @@ public class AxisLog10<T extends AxisScalePolicyTransformation> extends AAxisTra
   public double untransform(final double in) {
     return Math.pow(10, in);
   }
-
 }

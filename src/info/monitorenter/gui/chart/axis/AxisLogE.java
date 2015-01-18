@@ -115,9 +115,10 @@ public class AxisLogE<T extends AxisScalePolicyTransformation> extends AAxisTran
     /*
      * Starting from 1 downwards the transformation of this value becomes
      * negative, lim -> 0 becomes Double.NEGATIVE_INFINITY, which causes the
-     * "while(true)" 100 % load effect. So everything is disallowed below 1.0.
+     * "while(true)" 100 % load effect. So value has to be > 0. 
+     * Double.MIN_VALUE is the smallest allowed number. 
      */
-    if (toTransform < 1) {
+    if (toTransform <= 0) {
       // allow to transform the input for empty traces or all traces with empty
       // points:
       Iterator<ITrace2D> itTraces = this.m_accessor.getChart().getTraces().iterator();
@@ -130,7 +131,7 @@ public class AxisLogE<T extends AxisScalePolicyTransformation> extends AAxisTran
           if (trace.iterator().hasNext()) {
             // Illegal value for transformation defined by a point added:
             throw new IllegalArgumentException(this.getClass().getName()
-                + " must not be used with values < 1 :(" + toTransform + ")!");
+                + " must not be used with values <= 0 :(" + toTransform + ")!");
           }
         }
         // No illegal point: everything was empty
@@ -152,5 +153,4 @@ public class AxisLogE<T extends AxisScalePolicyTransformation> extends AAxisTran
   public double untransform(final double in) {
     return Math.pow(Math.E, in);
   }
-
 }
