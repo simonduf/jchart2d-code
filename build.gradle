@@ -1,0 +1,128 @@
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath 'com.layer:gradle-git-repo-plugin:2.0.2'
+  }
+}
+plugins {
+  id 'java'
+  id 'eclipse'
+
+  //Plugins for code coverage
+  id "org.sonarqube" version "1.0"
+  id 'jacoco'
+  
+  //Plugin for having multiple tests
+  //https://github.com/unbroken-dome/gradle-testsets-plugin
+  //id 'org.unbroken-dome.test-sets' version '1.1.0'
+  
+  //Plugin to get git information
+  //https://github.com/ajoberstar/gradle-git/wiki/release%20plugins%201.x
+  id "org.ajoberstar.release-opinion" version "1.4.0-rc.1"
+  id "org.ajoberstar.grgit" version "1.4.0-rc.1"
+  id "org.ajoberstar.github-pages" version "1.4.0-rc.1"
+  
+  
+  id "com.jfrog.bintray" version "1.4"
+  id "maven-publish"
+  id 'maven'
+}
+
+repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+
+//Release task configuration
+	// Usage of the release task : ./gradlew release -Prelease.scope=major -Prelease.stage=final
+	// milestone rc final
+import org.ajoberstar.grgit.*
+release {
+	// need to specify the repository to interact with
+	grgit = Grgit.open(project.file('.'))
+}
+//TODO: add depends on other tasks in the release task
+tasks.release.dependsOn 'build' //, 'publishToMyRepo'
+
+//Task to verify the version string (result of the previous task configuration)
+task printVersion {
+    doLast { println project.version }
+}
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+//version = '1.0.1' //Defined by release-opinion
+group = 'simond'
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.13'
+}
+
+dependencies {
+	compile 'net.sf.jchart2d:jchart2d:3.3.2'
+	compile 'org.apache.xmlgraphics:fop:2.1'
+	
+    testCompile 'junit:junit:4.7'
+}
+
+// custom tasks for creating source/javadoc jars
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+//task javadocJar(type: Jar, dependsOn: javadoc) {
+//    classifier = 'javadoc'
+//    from javadoc.destinationDir
+//}
+
+// add javadoc/source jar tasks as artifacts
+artifacts {
+    archives sourcesJar//, javadocJar
+}
+
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+
+    configurations = ['archives']
+    pkg {
+        repo = "maven"
+        name = "jchart2d-code"
+        websiteUrl = "https://github.com/simonduf/jchart2d-code"
+        vcsUrl = "https://github.com/simonduf/jchart2d-code"
+        licenses = ["LGPL-2.1"]
+        userOrg = 'simond'
+        publish = true
+        
+        version {
+                name = project.version
+                desc = 'jchart2d gradle port experiment'
+                released  = new Date().format("EEE MMM dd HH:mm:ss zzz yyyy")
+                vcsTag = "v"+project.version
+                //attributes = []
+        }
+    }
+}
+
+//task tagRelease << {
+//  repo.tag.add {
+//    name = version
+//    message = "Release of ${version}"
+//}
+

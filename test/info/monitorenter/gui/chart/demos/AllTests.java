@@ -45,9 +45,9 @@ public final class AllTests {
   public static Test suite() {
     TestSuite suite = new TestSuite("Test for info.monitorenter.gui.chart.demo");
     // $JUnit-BEGIN$
-    suite.addTest(TestStaticCollectorChart.suite());
-    suite.addTest(TestAddRemoveTrace.suite());
-    suite.addTest(LabelSpacingTestChart.suite());
+//    suite.addTest(TestStaticCollectorChart.suite());
+//    suite.addTest(TestAddRemoveTrace.suite());
+//    suite.addTest(LabelSpacingTestChart.suite());
     // $JUnit-END$
     return suite;
   }
