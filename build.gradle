@@ -70,7 +70,6 @@ task wrapper(type: Wrapper) {
 }
 
 dependencies {
-	compile 'net.sf.jchart2d:jchart2d:3.3.2'
 	compile 'org.apache.xmlgraphics:fop:2.1'
 	
     testCompile 'junit:junit:4.7'
