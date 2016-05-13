@@ -72,8 +72,8 @@ public class AxisScalePolicyTransformation implements IAxisScalePolicy {
 
     double range = max - min;
 
-    double exp = 0.;
-    double val =  axisTransformation.untransform(0);
+    double exp = -10.;
+    double val =  axisTransformation.untransform(exp);
 
     while (val <= axis.getMax()) {
       if (val >= axis.getMin()) {
