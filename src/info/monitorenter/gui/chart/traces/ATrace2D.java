@@ -84,25 +84,25 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    * Index for accessing the result of
    * {@link #calculatePointBounds(ITracePoint2D)}.
    */
-  private static int POINTBOUNDS_MAX_X = 1;
+  protected static final int POINTBOUNDS_MAX_X = 1;
 
   /**
    * Index for accessing the result of
    * {@link #calculatePointBounds(ITracePoint2D)}.
    */
-  private static int POINTBOUNDS_MAX_Y = 3;
+  protected static final int POINTBOUNDS_MAX_Y = 3;
 
   /**
    * Index for accessing the result of
    * {@link #calculatePointBounds(ITracePoint2D)}.
    */
-  private static int POINTBOUNDS_MIN_X = 0;
+  protected static final int POINTBOUNDS_MIN_X = 0;
 
   /**
    * Index for accessing the result of
    * {@link #calculatePointBounds(ITracePoint2D)}.
    */
-  private static int POINTBOUNDS_MIN_Y = 2;
+  protected static final int POINTBOUNDS_MIN_Y = 2;
 
   /** Generated <code>serialVersionUID</code>. * */
   private static final long serialVersionUID = -3955095612824507919L;
@@ -642,7 +642,7 @@ public abstract class ATrace2D implements ITrace2D, ITrace2DDataAccumulating, Co
    *         <ul>
    *         .
    */
-  private double[] calculatePointBounds(final ITracePoint2D point) {
+  protected double[] calculatePointBounds(final ITracePoint2D point) {
     final double[] result = new double[4];
     double tmpMaxX, collectMaxX = point.getX();
     double tmpMinX, collectMinX = point.getX();
