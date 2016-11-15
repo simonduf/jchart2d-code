@@ -3134,7 +3134,7 @@ public class Chart2D extends JPanel implements PropertyChangeListener, Iterable<
               // staying in the visible bounds: just paint
               tmpx = this.m_xChartStart + (int) Math.round(newpoint.getScaledX() * rangex);
               tmpy = this.m_yChartStart - (int) Math.round(newpoint.getScaledY() * rangey);
-              this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, false, trace, g, oldpoint, hasErrorBars, rangex, rangey);
+              this.paintPoint(oldtmpx, oldtmpy, tmpx, tmpy, false, trace, g, newpoint, hasErrorBars, rangex, rangey);
             }
           }
           if (DEBUG_DATA_ACCUMULATION) {
